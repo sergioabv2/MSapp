@@ -415,9 +415,8 @@
   $scope.userDataLoaded = false;
 
   var requestData = {
-    action: "getData",
-    email: localStorage.getItem('MStoken'),
-    encryption: "si"
+    action: "getProfileData",
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -427,7 +426,7 @@
     followRedirects: true, 
   };
 
-  $http.post('https://script.google.com/macros/s/AKfycbwRz1ijX8Tlpk7Ydc3jTSWZD0661ZEcwEIW_CrTNxDG0I6bYt1_3CZ7g4lLYTGBf28p/exec', requestData, config)
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
       $scope.userData = response.data;
       $scope.userDataLoaded = true;
