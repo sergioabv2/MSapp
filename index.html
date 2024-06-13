@@ -1,7 +1,9 @@
 <head>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
-
+<link rel="icon" href="https://lh3.googleusercontent.com/d/1L1kLwLAt2KksPG2tN4tT1bRle4RqveWo" type="image/x-icon">
+    <title>Mozart Studio</title>
+  
 <link href="https://code.ionicframework.com/1.3.3/css/ionic.min.css" rel="stylesheet">
   <script src="https://code.ionicframework.com/1.3.3/js/ionic.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.11.3/paper-full.min.js">
@@ -310,10 +312,10 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 }
 
 .menuSelectedColor {    
-	border-left: solid 7px #311B92 !important;
+  border-left: solid 7px #311B92 !important;
     background-color: #E8E9EE !important;
-	color: #311B92 !important;
-	font-weight:bold;
+  color: #311B92 !important;
+  font-weight:bold;
 }
 
 
@@ -371,6 +373,13 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     background-size: 80px;
 }
 
+.card-4{
+   background-image: url(https://i.ibb.co/gFPnF2Y/Captura-de-Pantalla-2024-04-27-a-la-s-23-35-42.png);
+      background-repeat: no-repeat;
+    background-position: right;
+    background-size: 80px;
+}
+
 @media(max-width: 990px){
   .card{
     margin: 20px;
@@ -386,7 +395,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
             height:  88vh;
         }
 
-        /* Estilo para hacer el iframe responsivo */
+
         .iframe-container iframe {
           position: absolute;
           top: 0;
@@ -463,7 +472,8 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   <section class="mainSection" style="display: none;">
     
       
- <div ng-app="studentsApp">
+ <div ng-app="ionicApp">
+  <div ng-controller="AppCtrl">
 
 <ion-nav-bar class="nav-title-slide-ios bar-stable">
     <ion-nav-back-button icon="caret-back" style="color: black">regresar
@@ -475,6 +485,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     
   <script id="menu.html" type="text/ng-template">
     <ion-side-menus >
+    
 
       <ion-side-menu side="right" expose-aside-when="large">
         <ion-header-bar class="bar-stable">
@@ -482,16 +493,16 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
         </ion-header-bar>
         <ion-content>
           <ul class="list">
-            <a href="#/menu/tab/record" class="item" ng-class="(activeMenuClr=='record')?'menuSelectedColor':''" ng-click="activeMenuClr = 'record'" menu-toggle="right" ><i class="ri-home-2-fill"></i>&nbsp&nbspInicio</a>
-            <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="right"><i class="ri-presentation-fill"></i>&nbsp&nbspLecciones</a>
-               <a href="#/menu/tutorship/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'"  menu-toggle="right"><i class="ri-account-pin-box-fill"></i>&nbsp&nbspTutor</a>
-            <a href="#/menu/resources" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" class="item" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
-            
-             <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-information-2-fill"></i>&nbsp&nbspAcerca de</a>
+            <a href="#/menu/tab/profile" class="item" ng-class="(activeMenuClr=='profile')?'menuSelectedColor':''" ng-click="activeMenuClr = 'profile'" menu-toggle="right" ><i class="ri-home-2-fill"></i>&nbsp&nbspInicio</a>
+               <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="right"><i class="ri-presentation-fill"></i>&nbsp&nbspLecciones</a>
+                  <a href="#/menu/resources" class="item" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
+             
+             <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-book-marked-fill"></i>&nbsp&nbspLineamientos</a>
           </ul>
         </ion-content>
     <ion-footer-bar>
-  <button class="button pull-right" ng-click="logout()"><i class="icon ri-logout-box-r-line"></i>Salir</button>
+ 
+  <button class="button pull-right"><i class="icon ri-logout-box-r-line"></i>Salir</button>
 </ion-footer-bar>
       </ion-side-menu>
 
@@ -504,7 +515,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     
   <script id="tabs.html" type="text/ng-template">
     <ion-nav-bar class="bar-stable" >
-               
+            
         <ion-nav-buttons side="right">
           <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
         </ion-nav-buttons>      
@@ -515,12 +526,17 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
       <ion-tab title="Comunidad" icon="ion-ios-people" href="#/menu/tab/comunity">
         <ion-nav-view name="comunity-tab"></ion-nav-view>
       </ion-tab>
-      <ion-tab  icon="ion-mic-a" href="#/menu/tab/record" >
-        <ion-nav-view name="record-tab"></ion-nav-view>
-      </ion-tab>
-      <ion-tab title="Perfil" icon="ion-ios-contact" href="#/menu/tab/profile">
+     <ion-tab title="Perfil" icon="ion-ios-contact-outline" href="#/menu/tab/profile">
         <ion-nav-view name="profile-tab"></ion-nav-view>
       </ion-tab>
+     
+       <ion-tab title="Agenda" icon="ion-android-calendar" href="#/menu/tab/record" >
+        <ion-nav-view name="record-tab"></ion-nav-view>
+      </ion-tab>
+     
+    
+   
+     
     </ion-tabs>
 
   </script>
@@ -529,17 +545,19 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     <ion-view title="Comunidad">
       <ion-content >
        
-       <div class="iframe-container"><iframe src="https://app.mozart.studio/comunity" frameborder="0" allowfullscreen></iframe></div>
+        <div class="iframe-container"><iframe src="https://git.tallerdepiano.app/twitter" frameborder="0" allowfullscreen ></iframe></div> 
     
       </ion-content>
     </ion-view>
   </script>
 
   <script id="record.html" type="text/ng-template">
-    <ion-view title="Entrega de actividad">
+    <ion-view title="Agenda">
       <ion-content>
        
-    
+   
+
+       <div class="iframe-container"><iframe src="https://git.tallerdepiano.app/calendar" frameborder="0" allowfullscreen></iframe></div>
     
       </ion-content>
     </ion-view>
@@ -549,16 +567,15 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     <ion-view title="Perfil">
       <ion-content >
        
-   <div class="iframe-container"><iframe src="https://app.mozart.studio/profile" frameborder="0" allowfullscreen></iframe></div>     
+         <div class="iframe-container"><iframe src="https://git.tallerdepiano.app/profile_student" frameborder="0" allowfullscreen></iframe></div>
     
       </ion-content>
     </ion-view>
   </script>
 
  
-
-
-  <script id="lessons.html" type="text/ng-template">
+    
+     <script id="lessons.html" type="text/ng-template">
     <ion-view title="Actividades">
 
       <ion-nav-bar class="bar-calm">
@@ -591,12 +608,8 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </ion-view>
   </script>   
     
-   
-
-
     
-    
-    <script id="nivelprincipiante.html" type="text/ng-template">
+     <script id="nivelprincipiante.html" type="text/ng-template">
      <ion-view>
       <ion-content >
 
@@ -636,53 +649,12 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </ion-view>
   </script>
 
-
-<script id="tutorship.html" type="text/ng-template">
-   <ion-nav-bar class="bar-stable" >
-               
-        <ion-nav-buttons side="right">
-          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
-        </ion-nav-buttons>      
-    </ion-nav-bar>
-        
-
-    <ion-tabs class="tabs-icon-top tabs-stable"  >
-      <ion-tab title="Calendario" icon="ion-android-calendar" href="#/menu/tutorship/calendar">
-        <ion-nav-view name="calendar-tab"></ion-nav-view>
-      </ion-tab>
-      <ion-tab title="Chat" icon="ion-chatboxes" href="#/menu/tutorship/chat" >
-        <ion-nav-view name="chat-tab"></ion-nav-view>
-      </ion-tab>
-    </ion-tabs>
-  </script>
     
     
-    <script id="chat.html" type="text/ng-template">
-    <ion-view title="Chat">
-      <ion-content >
-       
-      
-    
-      </ion-content>
-    </ion-view>
-  </script>
-    
-    
-    <script id="calendar.html" type="text/ng-template">
-    <ion-view title="Calendario">
-      <ion-content >
-       
-       
-    
-      </ion-content>
-    </ion-view>
-  </script>
 
 
-
-
-    <script id="resources.html" type="text/ng-template">
-    <ion-view title="Apps musicales">
+   <script id="resources.html" type="text/ng-template">
+    <ion-view title="Recursos didácticos">
 
       <ion-nav-bar class="bar-stable">
         <ion-nav-buttons side="right">
@@ -695,7 +667,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
        
     <div class="list">
           <div class="item item-divider">
-            Apps de apoyo
+            Herramientas
           </div>  
 
      
@@ -705,10 +677,10 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
      <p> metronome beats </p>
           </a>
           
-          <a class="item item-avatar" href="#/menu/repertoire">
+          <a class="item item-avatar" href="#/menu/documents">
             <img src="https://play-lh.googleusercontent.com/MCS3HJVIDgTZp6oCMmTwYfItUXncCNCXtVDDRV1rT8QdWr7Lqp_kfcRl-ls4l20pmKDl=s96-rw">
-           <h2> Repertorio </h2>
-     <p> Tus piezas terminadas</p>
+           <h2> Documentos </h2>
+     <p> Tus actividades finalizadas</p>
           </a>
      
       <div class="item item-divider">
@@ -762,17 +734,103 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </ion-view>
   </script>
 
-   <script id="repertoire.html" type="text/ng-template">   
+   <script id="documents.html" type="text/ng-template">   
        <ion-view>
       <ion-content >
 
           <ion-back-button></ion-back-button>
 
-        <h2>Repertorio</h2>
+ <div class="list">
+         <a class="item" href="#/menu/manuals">
+            Manuales
+          </a>
+          <a class="item" href="#/menu/pieces">
+           Piezas
+          </a>
+
+          <div class="item item-divider">
+           Avanzado
+          </div>  
+
+          <a class="item" href="#/menu/repertoire">
+           Repertorio
+          </a>
+          <a class="item" href="#/menu/sightreading">
+           Lecura a primer vista
+          </a>
+          <a class="item" href="#/menu/scales">
+           Escalas y arpegios
+          </a>            
+</div>
        
       </ion-content>
     </ion-view>
   </script>
+    
+     <script id="manuals.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+              <div class="iframe-container"><iframe src="https://git.tallerdepiano.app//lessons" frameborder="0" allowfullscreen></iframe></div>
+       
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+    <script id="pieces.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+              <div class="iframe-container"><iframe src="https://git.tallerdepiano.app//lessons" frameborder="0" allowfullscreen></iframe></div>
+       
+      </ion-content>
+    </ion-view>
+  </script>
+    
+    
+     <script id="repertoire.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+              <div class="iframe-container"><iframe src="https://git.tallerdepiano.app//lessons" frameborder="0" allowfullscreen></iframe></div>
+       
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+    <script id="sightreading.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+              <div class="iframe-container"><iframe src="https://git.tallerdepiano.app//lessons" frameborder="0" allowfullscreen></iframe></div>
+       
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+  <script id="scales.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+              <div class="iframe-container"><iframe src="https://git.tallerdepiano.app//lessons" frameborder="0" allowfullscreen></iframe></div>
+       
+      </ion-content>
+    </ion-view>
+  </script>
+    
 
  <script id="notereader.html" type="text/ng-template">   
        <ion-view>
@@ -830,7 +888,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 
 <script id="about.html" type="text/ng-template">
  
-   <ion-view title="Acerca de">
+   <ion-view title="Lineamientos">
 
       <ion-nav-bar class="bar-stable">
         <ion-nav-buttons side="right">
@@ -838,21 +896,80 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
         </ion-nav-buttons>      
     </ion-nav-bar>
 
-
      <ion-content>
-       
-<h2> About us </h2>
+    <div class="list">
+          <a class="item" href="#/menu/regulation">
+            Reglamento
+          </a>
 
-     
+
+          <a class="item" href="#/menu/aboutus">
+           Acerca de
+          </a>
+</div>
       </ion-content>
-      
-     
     </ion-view>
   </script>   
 
 
 
+  <script id="regulation.html" type="text/ng-template">   
+    <ion-view>
+        <ion-content>
+            <ion-back-button></ion-back-button>
+
+            <ion-list>
+                <div ng-repeat="group in groups">
+                    <ion-item class="item-stable item-icon-right" ng-click="toggleGroup(group)" ng-class="{active: isGroupShown(group)}">
+                        <i class="icon" ng-class="isGroupShown(group) ? 'ion-chevron-up' : 'ion-chevron-down'" style="font-size:20px;"></i>
+                        &nbsp;
+                       {{group.heading}}
+                    </ion-item>
+                    <div class="item-accordion" ng-show="isGroupShown(group)">
+                        <div class="list">
+                            <div ng-repeat="bodyitem in group.body">
+                                <a class="item" ng-click="toggleDetail(bodyitem)">
+                  {{ bodyitem.no }}  {{bodyitem.name}}
+                                </a>
+                                <div ng-show="isDetailShown(bodyitem)">
+                                <div class="list card card-4" style="height: 100%;">
+        <div class="item item-body">
+     <p> {{ bodyitem.text }}</p>
+         </div> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ion-list>
+        </ion-content>
+    </ion-view>
+</script>
+
+    
    
+    
+  
+    
+
+
+
+
+   <script id="aboutus.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+        <h2>Acerca de</h2>
+     
+
+       
+      </ion-content>
+    </ion-view>
+  </script>
+
+
 
 
 
@@ -881,6 +998,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </div>
   </script>  
   </div>
+</div>
 
   </section>
 
@@ -893,7 +1011,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 
 
 <script>
-  var app = angular.module('studentsApp', ['ionic']);
+  var app = angular.module('ionicApp', ['ionic']);
 app
 .config(function ($stateProvider, $urlRouterProvider) {
 
@@ -947,13 +1065,22 @@ app
         }
       }
     }) 
-
-
+/*
+  .state('menu.detail', {
+      url: "/detail/:id",
+      views: {
+        'menuContent': {
+          templateUrl: "detail.html",
+      controller: 'NewsDetailController'
+        }
+      }
+    })*/
     .state('menu.resources', {
       url: "/resources",
       views: {
         'menuContent': {
-          templateUrl: "resources.html"
+          templateUrl: "resources.html",
+          controller: "listViewCtrl"
         }
       }
     })
@@ -965,6 +1092,30 @@ app
         }
       }
     })
+   .state('menu.documents', {
+      url: "/documents",
+      views: {
+        'menuContent': {
+          templateUrl: "documents.html"
+        }
+      }
+    })
+   .state('menu.manuals', {
+      url: "/manuals",
+      views: {
+        'menuContent': {
+          templateUrl: "manuals.html"
+        }
+      }
+    })
+  .state('menu.pieces', {
+      url: "/pieces",
+      views: {
+        'menuContent': {
+          templateUrl: "pieces.html"
+        }
+      }
+    })
    .state('menu.repertoire', {
       url: "/repertoire",
       views: {
@@ -973,6 +1124,23 @@ app
         }
       }
     })
+     .state('menu.sightreading', {
+      url: "/sightreading",
+      views: {
+        'menuContent': {
+          templateUrl: "sightreading.html"
+        }
+      }
+    })
+     .state('menu.scales', {
+      url: "/scales",
+      views: {
+        'menuContent': {
+          templateUrl: "scales.html"
+        }
+      }
+    })
+  
     .state('menu.notereader', {
       url: "/notereader",
       views: {
@@ -1029,31 +1197,7 @@ app
         }
       }
     })
-    .state('menu.tutorship', {
-      url: "/tutorship",
-      views: {
-        'menuContent': {
-          templateUrl: "tutorship.html"
-        }
-      }
-    })
-   .state('menu.tutorship.chat', {
-      url: "/chat",
-      views: {
-        'chat-tab': {
-          templateUrl: "chat.html"
-        }
-      }
-    })
-    .state('menu.tutorship.calendar', {
-      url: "/calendar",
-      views: {
-        'calendar-tab': {
-          templateUrl: "calendar.html"
-        }
-      }
-    })
- 
+
     .state('menu.about', {
       url: "/about",
       views: {
@@ -1061,9 +1205,29 @@ app
           templateUrl: "about.html"
         }
       }
-    });
+    })
+  .state('menu.regulation', {
+      url: "/regulation",
+      views: {
+        'menuContent': {
+          templateUrl: "regulation.html",
+          controller: "AccordianCtrl"
+        }
+      }
+    })
 
-  $urlRouterProvider.otherwise("menu/tab/record");
+  .state('menu.aboutus', {
+      url: "/aboutus",
+      views: {
+        'menuContent': {
+          templateUrl: "aboutus.html"
+        }
+      }
+    })
+    ;
+
+  $urlRouterProvider.otherwise("menu/tab/profile");
+   
 
 })
 
@@ -1114,8 +1278,8 @@ app
       
       $scope.news = [
  { id: 1, name: 'Nivel Principiante', material: "Material de trabajo preparatorio" },
-   { id: 2, name: 'Nivel Intermedio', material: "material de nivel 1" },
-   { id: 3, name: 'Nivel Avanzado', material: "material de nivel 2" }
+   { id: 2, name: 'Nivel Intermedio', material: "Material de nivel 1" },
+   { id: 3, name: 'Nivel Avanzado', material: "Material de nivel 2" }
         ];
       
       $scope.onSelectNews = function(n) {
@@ -1124,6 +1288,75 @@ app
       }
       
     });
+
+.controller('listViewCtrl', function($scope, $ionicPopup){
+    $scope.items = ["HTML5", "AngularJS", "IONIC"];
+    $scope.avataritems = [
+      { text: "HTML5", src: "http://www.w3.org/html/logo/img/mark-word-icon.png" },
+      { text: "AngularJS", src: "http://www.ocpsoft.org/wp-content/uploads/2013/01/angularjs.png" },
+      { text: "IONIC", src: "https://ionicframework.com/img/ionic-logo-blog.png" }
+    ];
+})
+  .controller('AccordianCtrl', function($scope){
+    $scope.groups = [{
+        "heading": "Matrícula",
+        "body": [
+            {"no":1, "name":"Asignación de horario", "text":"El alumno elegirá un horario de clase dentro de los disponibles en la academia, es posible elegirlo para comenzar a la media (por ejemplo de 2:30 a 3:30) siempre y cuando se acuerde con la administración. "},
+            {"no":2, "name":"Cambio de horario", "text":"Para tramitar un cambio de horario o plan de pago, se deberá realizar al término de la mensualidad vigente. "}
+        ]
+    },{
+        "heading": "Asistencias",
+        "body": [
+           {"no":1, "name":"raj", "text":"25"},
+            {"no":2, "name":"kumar", "text":"24"},
+            {"no":3, "name":"kumar", "text":"24"}
+        ]
+    }, {
+        "heading": "Inasistencias",
+        "body": [
+            {"sno":10, "name":"John", "age":"25", "sex":"M", "status":"Pass"},
+            {"sno":20, "name":"Ravi", "age":"24", "sex":"M", "status":"fail"},
+            {"sno":30, "name":"Priya", "age":"26", "sex":"F", "status":"Fail"}
+        ]
+    }, {
+        "heading": "Retardos",
+        "body": [
+            {"sno":10, "name":"John", "age":"25", "sex":"M", "status":"Pass"},
+            {"sno":20, "name":"Ravi", "age":"24", "sex":"M", "status":"fail"},
+            {"sno":30, "name":"Priya", "age":"26", "sex":"F", "status":"Fail"}
+        ]
+    }
+                    
+                    ]; 
+
+    /*
+    * if given group is the selected group, deselect it
+    * else, select the given group
+    */
+    $scope.toggleGroup = function(group) {
+        if ($scope.isGroupShown(group)) {
+            $scope.shownGroup = null;
+        } else {
+            $scope.shownGroup = group;
+        }
+    };
+
+    $scope.isGroupShown = function(group) {
+        return $scope.shownGroup === group;
+    };
+
+    $scope.isDetailShown = function(bodyitem) {
+        return $scope.shownDetail === bodyitem;
+    };
+
+    $scope.toggleDetail = function(bodyitem) {
+        if ($scope.isDetailShown(bodyitem)) {
+            $scope.shownDetail = null;
+        } else {
+            $scope.shownDetail = bodyitem;
+        }
+    };
+});
 
   /*  app.factory('SharedState', ["$http", function($http) {
   var service = {};
