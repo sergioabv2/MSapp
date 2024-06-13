@@ -1011,6 +1011,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 
 
 <script>
+
   var app = angular.module('ionicApp', ['ionic']);
 app
 .config(function ($stateProvider, $urlRouterProvider) {
@@ -1231,7 +1232,10 @@ app
 
 })
 
-          
+ .controller('AppCtrl', function() {
+  ionic.Platform.ready(function() {
+  });
+ })          
 
 .controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', function($http, $scope, $ionicSideMenuDelegate, $ionicModal) {
   $scope.toggleRight = function() {
@@ -1287,7 +1291,7 @@ app
         $location.url('/menu/detail/' + n.name);
       }
       
-    });
+    })
 
 .controller('listViewCtrl', function($scope, $ionicPopup){
     $scope.items = ["HTML5", "AngularJS", "IONIC"];
@@ -1357,77 +1361,6 @@ app
         }
     };
 });
-
-  /*  app.factory('SharedState', ["$http", function($http) {
-  var service = {};
-
-  service.getData = function() {
-    var requestData = {
-      action: "getData",
-      email: localStorage.getItem('MStoken'),
-      encryption: "si"
-    };
-
-    var config = {
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      followRedirects: true
-    };
-
-    return $http.post('https://script.google.com/macros/s/AKfycbwRz1ijX8Tlpk7Ydc3jTSWZD0661ZEcwEIW_CrTNxDG0I6bYt1_3CZ7g4lLYTGBf28p/exec', requestData, config)
-      .then(function(response) {
-        return response.data;
-      });
-  };
-
-  return service;
-}]);
-
-app.controller('Controller1', ["$scope", "SharedState", function($scope, SharedState) {
-  SharedState.getData()
-    .then(function(userData) {
-      $scope.userData = userData;
-    })
-    .catch(function(error) {
-      console.error('Error fetching data:', error);
-    });
-}]);
-
-app.controller('Controller2', ["$scope", "SharedState", function($scope, SharedState) {
-  SharedState.getData()
-    .then(function(userData) {
-      $scope.userData2 = userData;
-    })
-    .catch(function(error) {
-      console.error('Error fetching data:', error);
-    });
-}]);
-
-
-  .controller('Controller1', ['$http', '$scope', function($http, $scope) {
-  $scope.userData = [];
-
-  var requestData = {
-    action: "getData",
-    email: localStorage.getItem('MStoken'),
-    encryption: "si"
-  };
-
-  var config = {
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    followRedirects: true, 
-  };
-
-  $http.post('https://script.google.com/macros/s/AKfycbwRz1ijX8Tlpk7Ydc3jTSWZD0661ZEcwEIW_CrTNxDG0I6bYt1_3CZ7g4lLYTGBf28p/exec', requestData, config)
-    .then(function(response) {
-      $scope.userData = response.data;
-    })
-}]);*/
-
-
 
     </script>
 
