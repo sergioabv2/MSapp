@@ -1,6 +1,7 @@
 <head>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 </head>
@@ -14,6 +15,12 @@
 }
 
 .text-orange {color: #ff8300}
+  .text-golden {
+         color: orange;
+  text-shadow: 0 0 10px orange;
+        }
+  .text-blue {color: #20a2f1}
+  .text-green {color: green}
 
 /*-- Dashboard panel --*/
 .dashboard-panel {margin: 10px 0 20px; }
@@ -30,6 +37,13 @@
 /*-- Datos del usuario --*/
 .profile-user-data {padding: 10px 0;}
 .profile-user-data > * {float: left;}
+ .profile-user-data   .circle {
+    border-radius: 100% !important;
+    overflow: hidden;
+    width: 95px;
+    height: 95px;
+   margin-right: 10px;
+}
 .profile-user-data img { margin-right: 10px; max-width: 100px;}
 .profile-user-data .main-data {padding: 10px 0 20px; margin-bottom: 15px; width: calc(100% - 115px);}
 .profile-user-data .main-data h4 {margin: 0; font-size: 20px; font-weight: }
@@ -124,6 +138,13 @@
 .store-list-panel .panel-body .list-unstyled li .prize-actions .btn:focus {background: #ff9e16; color: #FFF;}
 
 
+.progress{
+  height: 8px; width: 90%; 
+  background-color: #484B53; 
+  margin-top: 5px;
+  margin-bottom: -25px;
+}
+
 .progress .progress-bar {
   background-color: #FF8095;
   box-shadow: 0px 0px 30px #FF2AA6;
@@ -132,7 +153,7 @@
 
 .documents {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
   grid-auto-rows: 214px;
   grid-gap: 12px;
   height: auto;
@@ -149,7 +170,7 @@
 .document__img {
   width: 105px;
   height: 136px;
-  background-image: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1609106/doc-1.png");
+
   background-size: cover;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
@@ -286,13 +307,140 @@
     stroke: #ffa700;
   }
 }
+  
+  
+  
+
+
+.p-image {
+  top: 95px;
+  left: 20px;
+  position: absolute;
+  color: #666666;
+  transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+}
+
+  
+  
+   #drive{
+    height: 400px;
+    width: 100%;
+  }
+  
+  .modal-container {
+    position: fixed;
+    display: table;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    z-index: 1;
+  }
+
+  .modal-container.four {
+    z-index: 0;
+    transform: scale(1);
+  }
+
+  .modal-container.four .modal-background .modal {
+    animation: blowUpModal 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four + body {
+    z-index: 1;
+    animation: blowUpContent 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four.out .modal-background .modal {
+    animation: blowUpModalTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four.out + body {
+    animation: blowUpContentTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+
+  .modal-container .modal-background {
+    display: table-cell;
+    background: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    vertical-align: middle;
+  }
+  .modal-container .modal-background .modal {
+    padding: 50px;
+    display: inline-block;
+    border-radius: 3px;
+    font-weight: 300;
+    position: relative;
+  }
+
+  @keyframes blowUpContent {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    99.9% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes blowUpContentTwo {
+    0% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes blowUpModal {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes blowUpModalTwo {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
+  
+  
+  
+@media screen and (min-width:576px){
+   #drive{
+    height: 480px;
+    width: 380px;
+    margin-top: 30px;
+  }
+   
+}
+
+
+@media screen and (max-width:575px) {
+     #drive{
+    height: 420px;
+    width: 120%;
+    margin-left: -25px;
+       
+  }
+}
+
 </style>
 
 
 
 
-<div class="dashboard-container" ng-app="studentsApp" ng-controller="Controller1" >
-
+<div ng-app="studentsApp" ng-controller="Controller1" >
+<div class="dashboard-container">
   <div class="showbox" ng-if="!userDataLoaded">
       <div class="loader">
         <svg class="circular" viewbox="25 25 50 50">
@@ -304,32 +452,55 @@
     <div class="row" ng-if="userDataLoaded">
       <div class="col-sm-5">
         <div class="profile-user-data clearfix">
-          <img class="img-circle" src="https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg" >
+          <div class="circle">
+              <img class="profile-pic" src={{picture}}>
+          </div>
+          <div class="p-image" >
+            <i class="fa fa-camera upload-button"></i>
+            <input class="file-upload" type="file" style="display: none;" accept="image/*"/>
+          </div>
           <div class="main-data" >
-            <h4>{{userData.name}}</h4>
-            <div style="margin-top: 5px">     Nivel 2 - <span>Bloque 2</span> </div>
+            <h4 style="font-size: 19px;">{{userData.name}}</h4>
+            
+            <div class="pull-left achievement-count" ng-if="userData.plan === 'PREMIUM'" style="color: #77777a; font-size: 12px;"> PLAN PREMIUM
+            <i class="ri-vip-crown-fill text-golden"></i>  </div>
+        <div class="pull-left achievement-count" ng-if="userData.plan === 'PRO'" style="color: #77777a; font-size: 12px;"> PLAN PRO
+            <i class="ri-verified-badge-fill text-blue"></i>  </div>
+       <div class="pull-left achievement-count" ng-if="userData.plan === 'ESTUDIANTE'" style="color: #77777a; font-size: 12px;"> PLAN ESTUDIANTE
+            <i class="ri-graduation-cap-fill"></i>  </div>
+       
+          <br>
+          <div style="margin-top: 1px">    {{userData.level}}  </div>
+             <div style="font-size: 11px">Bloque: <span>{{userData.blq}}</span> - Lección: <span>{{userData.lsn}} </span> </div>
 
-        <div class="progress" style="height: 8px; width: 90%; background-color: #484B53; margin-top: 15px;">
-          <div class="progress-bar" style="background-color: #FF8095; box-shadow: 0px 0px 30px #FF2AA6;" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.leveltop + '%'}" ng-init="startAnimation()"></div>
+        <div class="progress">
+          <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
         </div>
 
           </div> 
         </div>
         
-        <div class="user-stats clearfix">
+        <div class="user-stats clearfix" ng-if="userData.status == 'ACTIVO'">
+   
           <div class="pull-left achievement-count"><i class="fa fa-calendar text-orange"></i><span class="acive">1</span>/<span>4</span> asistencias</div> <br><br>
           <ul class="pull-left currency-count list-unstyled">
-             <li>Próximo pago: <span>Domingo 21 de abril</span></li>
+             <li>Próximo pago: <span>{{userData.nextpay}}</span></li>
             <li>Reposiciones: <span>1/2 </span></li>   
-      <br>     <li> Horario de clase: 
+           <li> Horario de clase: 
               <ul >
-                 <li>Miércoles de 4:00 a 5:00 PM</li>   
-                <li>Jueves de 4:00 a 5:00 PM</li>   
+                 <li ng-repeat="classTime in userData.classtime">  <span style="font-size: 16px;">{{classTime}}  <span></li> 
               </ul>
             </li>
           </ul>
         </div>
        
+          
+           <div class="user-stats " ng-if="userData.status == 'INACTIVO'" style="text-align: center;"> 
+          <div class="pull-left achievement-count"><span class="acive" >INACTIVO</span></div> <br><br><br>
+<button class="btn btn-primary "> Reinscribirse</button>
+        </div>
+          
+          
         <div class="dashboard-panel registry-log-panel">
           <div class="panel-header">
             <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
@@ -338,81 +509,54 @@
           <div class="panel-body log-list-container">
           
              <ul class="list-unstyled log-list">
-              <li>
-                <span>Nam euismod dignissim odio</span>
-                <small>2018/01/21</small>
-              </li>
-              <li>
-                <span>Sed aliquam placerat posuere. Sed sed lacinia erat.</span>
-                <small>2018/01/21</small>
-              </li>
-              <li>
-                <span>Phasellus vestibulum varius quam a ultrices.</span>
-                <small>2018/01/21</small>
-              </li>
-              <li>
-                <span>Vivamus luctus felis ex, et aliquam orci malesuada rhoncus.</span>
-                <small>2018/01/21</small>
-              </li>
-              <li>
-                <span>Sed aliquam placerat posuere. Sed sed lacinia erat.</span>
-                <small>2018/01/21</small>
-              </li>
-              <li>
-                <span>Nam euismod dignissim odio</span>
-                <small>2018/01/21</small>
-              </li>
+             <li ng-repeat="entry in userData.history">
+                        <span>{{entry.achieve}}</span>
+                        <small>{{entry.date}}</small>
+                    </li>
             </ul>
             
           </div>
         </div>
       </div>
-      <div class="col-sm-7">
+      <div class="col-sm-7" ng-if="userData.status == 'ACTIVO'">
         <div class="dashboard-panel achievement-list-panel">
           <div class="panel-header">
           <h4><i class="fa fa-fw fa-book"></i> Manuales</h4>
           </div>
-          <div class="panel-body">
+       <div class="panel-body">
             <div class="documents">
-            <div class="document">
-              <div class="document__img"></div>
-              <div class="document__title">tesla-patents</div>
-              <div class="document__date">07/16/2018</div>
+                <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)">
+                    <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
+                    <div class="document__title">{{manual.title}}</div>
+                </div>
             </div>
-            <div class="document">
-              <div class="document__img"></div>
-              <div class="document__title">yearly-budget</div>
-              <div class="document__date">09/04/2018</div>
-            </div>
-            <div class="document">
-              <div class="document__img"></div>
-              <div class="document__title">top-movies</div>
-              <div class="document__date">10/10/2018</div>
-            </div>
-            <div class="document" style="display: none;">
-              <div class="document__img"></div>
-              <div class="document__title">trip-itinerary</div>
-              <div class="document__date">11/01/2018</div>
-              </div>     
-          </div>
-            
-            
-          
-          </div>
+        </div>
         </div>
       </div>
     </div>
  </div> 
 
-
-
+<div ng-repeat="manual in manuals">
+    <div id="modalPDF-{{$index}}" class="modal-container">
+        <div class="modal-background" ng-click="hideModal($index)">
+            <div class="modal">
+                <iframe id="drive" ng-src="{{trustAsResourceUrl(manual.url)}}" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+  
+</div>
 <script>
+  
+
 
 
   angular.module('studentsApp', [])
-  .controller('Controller1', ['$http', '$scope', function($http, $scope) {
-  $scope.userData = [];
+  .controller('Controller1', ['$http', '$scope', '$sce', function($http, $scope, $sce) {
+   $scope.userData = [];
   $scope.userDataLoaded = false;
+  
 
   var requestData = {
     action: "getProfileData",
@@ -426,16 +570,118 @@
     followRedirects: true, 
   };
 
+  
+
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
       $scope.userData = response.data;
       $scope.userDataLoaded = true;
       $scope.startAnimation = function() {
         $('.progress-bar').animate({
-          width: $scope.userData.leveltop + '%'
+          width: $scope.userData.progress + '%'
         }, 500); 
       };
+    $scope.picture = $scope.userData.photo
     })
+
+    $scope.trustAsResourceUrl = function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+
+    $scope.showModal = function(index) {
+        document.getElementById('modalPDF-' + index).classList.add('four');
+    };
+
+    $scope.hideModal = function(index) {
+        const modal = document.getElementById('modalPDF-' + index);
+        modal.classList.add('out');
+        setTimeout(() => {
+            modal.classList.remove('four', 'out');
+        }, 400);
+    };
+
+    
+$scope.manuals = [ 
+  {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy',  
+  'url': 'https://drive.google.com/file/d/1zs8OzO57s1b0MTavriKWjMohnLjr39-d/preview'},
+{'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+  'url': 'https://drive.google.com/file/d/1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB/preview'}, 
+  {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+  'url': 'https://drive.google.com/file/d/10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB/preview'},
+  {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+  'url': 'https://drive.google.com/file/d/1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ/preview'}, 
+  {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+  'url': 'https://drive.google.com/file/d/1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu/preview'},
+  {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+  'url': 'https://drive.google.com/file/d/1nxK06XODrHt2J6lScQz4JjthmPoc16Ec/preview'}, 
+  {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+  'url': 'https://drive.google.com/file/d/1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa/preview'}
+
+
+  ]
+    
+    
+    
+    var readURL = function(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          $scope.$apply(function() {
+            $scope.picture = e.target.result;
+            //$scope.uploadImage(e.target.result); // Enviar la imagen cargada al servidor
+          });
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+    
+     angular.element(document).ready(function() {
+    angular.element(".file-upload").on('change', function() {
+      readURL(this);
+    });
+    
+    angular.element(".upload-button").on('click', function() {
+      angular.element(".file-upload").click();
+    });
+  });
+
+  /*$scope.userData = [];
+  $scope.userDataLoaded = false;
+  
+
+  var requestData = {
+    action: "getProfileData",
+    token: localStorage.getItem('MStoken')
+  };
+
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    followRedirects: true, 
+  };
+
+  
+
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+      $scope.userData = response.data;
+      $scope.userDataLoaded = true;
+      $scope.startAnimation = function() {
+        $('.progress-bar').animate({
+          width: $scope.userData.progress + '%'
+        }, 500); 
+      };
+    }) */
+    
+    
+    
+    /* $scope.userDataLoaded = true;
+    $scope.userData = {'photo':'https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg', 'totalClasses':'8.0', 'status':'ACTIVO', 'color':'#1894cc',  'lvl':'2', 'leveltop':'10', 'lsn':'1', 'id':'22.0', 'name':'Sergio Valenzo',  'level':'Nivel 2', 'blq':'1', 'nextpay':'sábado 8 de junio', 'plan':'PRO', 'classCounter':'2.0', 'misses':'2', 'classtime':["Miércoles de 22:00 a 23:00 Hrs",],  'block':'Bloque 1', 'progress': '90', 'history': [{'achieve': 'Termina Bloque 2', 'date': '19/04/2024'}, {'achieve': 'Termina Bloque 1', 'date': '10/03/2024'}, {'achieve': 'Primer clase', 'date': '10/02/2024'}]}*/
+    
+    
 }]);
   
 </script>
