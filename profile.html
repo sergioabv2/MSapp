@@ -506,10 +506,9 @@
             <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
           
           </div>
-          <div class="panel-body log-list-container">
-          
+          <div class="panel-body log-list-container"> 
              <ul class="list-unstyled log-list">
-             <li ng-repeat="entry in userData.history">
+             <li ng-repeat="entry in history">
                         <span>{{entry.achieve}}</span>
                         <small>{{entry.date}}</small>
                     </li>
@@ -582,6 +581,20 @@
         }, 500); 
       };
     $scope.picture = $scope.userData.photo
+    $scope.history = JSON.parse($scope.userData.history)
+
+    
+     angular.element(document).ready(function() {
+    angular.element(".file-upload").on('change', function() {
+      readURL(this);
+    });
+    
+    angular.element(".upload-button").on('click', function() {
+      angular.element(".file-upload").click();
+    });
+      });
+    
+    
     })
 
     $scope.trustAsResourceUrl = function(url) {
@@ -629,7 +642,7 @@ $scope.manuals = [
         reader.onload = function(e) {
           $scope.$apply(function() {
             $scope.picture = e.target.result;
-            //$scope.uploadImage(e.target.result); // Enviar la imagen cargada al servidor
+            $scope.uploadImage(e.target.result); // Enviar la imagen cargada al servidor
           });
         };
 
@@ -637,23 +650,12 @@ $scope.manuals = [
       }
     };
     
-     angular.element(document).ready(function() {
-    angular.element(".file-upload").on('change', function() {
-      readURL(this);
-    });
     
-    angular.element(".upload-button").on('click', function() {
-      angular.element(".file-upload").click();
-    });
-  });
-
-  /*$scope.userData = [];
-  $scope.userDataLoaded = false;
-  
-
-  var requestData = {
-    action: "getProfileData",
-    token: localStorage.getItem('MStoken')
+     $scope.uploadImage = function(data){
+       var requestData = {
+    action: "postImage",
+    token: localStorage.getItem('MStoken'),
+    blob: data
   };
 
   var config = {
@@ -662,20 +664,15 @@ $scope.manuals = [
     },
     followRedirects: true, 
   };
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+       .then(function(response) {
+ });
+     }
+       
+     
 
-  
 
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-    .then(function(response) {
-      $scope.userData = response.data;
-      $scope.userDataLoaded = true;
-      $scope.startAnimation = function() {
-        $('.progress-bar').animate({
-          width: $scope.userData.progress + '%'
-        }, 500); 
-      };
-    }) */
-    
+
     
     
     /* $scope.userDataLoaded = true;
