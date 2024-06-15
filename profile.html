@@ -525,7 +525,7 @@
           </div>
        <div class="panel-body">
             <div class="documents">
-                <div class="document" ng-repeat="manual in manuals" >
+                <div class="document" ng-repeat="manual in manuals" ng-click="openURL($index)">
                     <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
                     <div class="document__title">{{manual.title}}</div>
                 </div>
@@ -594,17 +594,7 @@
         return $sce.trustAsResourceUrl(url);
     };
 
-    $scope.showModal = function(index) {
-        document.getElementById('modalPDF-' + index).classList.add('four');
-    };
 
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalPDF-' + index);
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
 
     
 $scope.manuals = [ 
@@ -623,9 +613,12 @@ $scope.manuals = [
   {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
   'url': 'https://drive.google.com/file/d/1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa/preview'}
 
-
   ]
-    
+
+     $scope.openURL = function(index) {
+        var url = $scope.manuals[index].url;
+        window.open(url, '_blank');
+    };
     
     
     var readURL = function(input) {
