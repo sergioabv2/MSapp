@@ -25,6 +25,7 @@
 .fc {
 	direction: ltr;
 	text-align: left;
+  filter: blur(2px);
 }
 
 
@@ -1148,7 +1149,85 @@ be a descendant of the grid when it is being dragged.
 
 
 
+.formLoader {
+  overflow: hidden;
+  height: 80%;
+  position: absolute;
+  width: 90%;
+  min-height: 150px;
+  
+}
 
+.formLoader ul {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: 9999;
+  margin: 0;
+}
+
+@keyframes preload {
+  0% {
+    background: #ed7c00;
+    opacity: 1
+  }
+  50% {
+    background: #fff;
+    opacity: 0.5
+  }
+  100% {
+    background: #ed7c00;
+    opacity: 1
+  }
+}
+
+.formLoader .formLoading {
+  display: block;
+  height: 14px;
+  margin: 0 auto;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  transform: translateX(-50%);
+  position: absolute;
+  width: 100%;
+  padding: 0;
+}
+
+.formLoader .formLoading li {
+  background: #fff;
+  opacity: 0.5;
+  display: block;
+  float: left;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #ed7c00;
+  line-height: 12px;
+  padding: 0;
+  position: relative;
+  margin: 0 0 0 4px;
+  animation: preload 1s infinite;
+  top: -50%;
+  border-radius: 50%;
+}
+
+.formLoader .formLoading li:first-child {
+  margin-left: 0
+}
+
+.formLoader .formLoading li:nth-child(2) {
+  animation-delay: .15s
+}
+
+.formLoader .formLoading li:nth-child(3) {
+  animation-delay: .3s
+}
+
+.formLoader.formLoader-complete {
+  opacity: 0;
+  visibility: hidden;
+  transition-duration: 1s
+}
 </style>
 
 
@@ -1156,6 +1235,14 @@ be a descendant of the grid when it is being dragged.
 <div ng-app="myApp">
     <div ng-controller="Ctrl">
         <p></p>
+      
+ <div class="formLoader">
+    <ul class="formLoading">
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+</div>
         <div class="container">
             <!--             <div class="row">s
                 <h3 uib-tooltip-html="htmlTooltip" tooltip-placement="bottom">{{teste}}</h3>
@@ -1204,8 +1291,8 @@ be a descendant of the grid when it is being dragged.
   <select id="dayList" class="form-control" ng-model="selectedDay" ng-change="updateHourList()" ng-options="day for day in days" >
   </select>
      <label for="hourList" ng-if="selectedDay && selectedService != 'service3'">Hora</label>
-  <select id="hourList" class="form-control" ng-model="selectedHour" ng-if="selectedDay && selectedService != 'service3'">
-    <option ng-repeat="hour in hours">{{hour}}</option>
+  <select id="hourList" class="form-control" ng-model="selectedHour"  ng-change="logHour(selectedHour)" ng-if="selectedDay && selectedService != 'service3'" ng-options="hour for hour in hours">
+
   </select>
              </p>          
                   
@@ -1216,7 +1303,7 @@ be a descendant of the grid when it is being dragged.
                 </div>
                 <div class="modal-footer">
                   <button class="btn btn-default" type="button" ng-click="cancel()">Cancel</button>
-                    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+                    <button class="btn btn-primary" type="button" ng-click="ok(selectedService, selectedDay, selectedHour)">Solicitar</button>
                 </div>
             </script>
           
@@ -1232,9 +1319,10 @@ be a descendant of the grid when it is being dragged.
             </div>
         </div>
         <p></p>
-       <div class="col-md-12">
+       <div class="col-md-12">  
            <button style="margin-top: 20px; float: right;" ng-click="bookpiano()"> Agendar</button>
-                        </div>
+       
+                       </div>
     </div>
 </div>
 
@@ -1244,19 +1332,11 @@ be a descendant of the grid when it is being dragged.
 app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCalendarConfig) {
     $scope.teste = "calendar";
 
-    $scope.userData =
-      {
-        name: 'Sergio Aberlado Bello Valenzo',
-        miss: 2,
-        delay: 1,
-        month: 3,
-        day: 4,
-        hour: 18
-      };
+ 
   
    var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1/tcoAO5ISGLmlKykxie0NseNIaHvfJJWd5krGfgCVAS6XviCz8N7Eh"
   };
 
   var config = {
@@ -1267,8 +1347,8 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   };
  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
-    $scope.user = response.data;
-    $scope.events = JSON.parse($scope.user.agenda)
+    $scope.userData = response.data;
+    $scope.events = JSON.parse($scope.userData.agenda)
   
 
     $scope.eventSources = [$scope.events];
@@ -1277,10 +1357,11 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
      uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', $scope.events);
      uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
     }
-    
+   $(".formLoader").css("display", "none");
+    $(".fc").css("filter", "none");
   })
 
-    
+   
 
   
  $scope.bookpiano = function() {
@@ -1298,7 +1379,7 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
     });
   };
 
-    /* Render Tooltip 
+    /* Render Tooltip
     $scope.eventRender = function(event, element, view) {
         element.attr({
 
@@ -1403,11 +1484,24 @@ app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, items) {
 
 app.controller('bookCtrl', function($scope, $uibModalInstance, items, userData) {
   // Agrega aquí la lógica necesaria para el controlador del modal
-   $scope.miss = userData.miss;
-  $scope.delay = userData.delay;
+   $scope.miss = userData.repositions;
+  $scope.delay = userData.skips;
   // Por ejemplo, puedes definir una función para cerrar el modal
-  $scope.ok = function() {
+  
+  
+  $scope.ok = function(service, day, hour) {
+     if (service != 'service3') {
+      if(hour){
         $uibModalInstance.close();
+        alert(day)
+      }
+    }else{
+      if(day){
+          $uibModalInstance.close();
+          alert(day)
+      }
+
+    }
     };
 
     $scope.cancel = function() {
@@ -1481,7 +1575,7 @@ app.controller('bookCtrl', function($scope, $uibModalInstance, items, userData) 
         if(now.getDay() == 3){
           var filteredHours = hoursForWeekday.slice();
           $scope.hours = filteredHours.splice(substractHour(3));
-        }else if(now.getDay() == 4)
+        }else if(now.getDay() == 4) 
           var filteredHours = hoursForWeekday.slice();
           $scope.hours = filteredHours.splice(substractHour(3));
       }
@@ -1503,6 +1597,10 @@ app.controller('bookCtrl', function($scope, $uibModalInstance, items, userData) 
    }
    
   };
+  
+  $scope.logHour = function(hour) {
+    $scope.selectedHour = hour
+    };
   
   
   function substractHour(tolerance){
