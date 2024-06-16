@@ -483,10 +483,10 @@
         
         <div class="user-stats clearfix" ng-if="userData.status == 'ACTIVO'">
    
-          <div class="pull-left achievement-count"><i class="fa fa-calendar text-orange"></i><span class="acive">1</span>/<span>4</span> asistencias</div> <br><br>
+          <div class="pull-left achievement-count"><i class="fa fa-calendar text-orange"></i><span class="acive">{{userData.classCounter}}</span>/<span>{{userData.totalClasses}}</span> asistencias</div> <br><br>
           <ul class="pull-left currency-count list-unstyled">
              <li>Próximo pago: <span>{{userData.nextpay}}</span></li>
-            <li>Reposiciones: <span>1/2 </span></li>   
+            <li>Reposiciones: <span>{{2-userData.repositions}}/2 </span></li>   
            <li> Horario de clase: 
               <ul >
                  <li ng-repeat="classTime in userData.classtime">  <span style="font-size: 16px;">{{classTime}}  <span></li> 
@@ -525,7 +525,7 @@
           </div>
        <div class="panel-body">
             <div class="documents">
-                <div class="document" ng-repeat="manual in manuals" ng-click="openURL($index)">
+                <div class="document" ng-repeat="manual in manuals[userData.lvl] | filter:manualFilter" ng-click="openURL($index)">
                     <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
                     <div class="document__title">{{manual.title}}</div>
                 </div>
@@ -594,26 +594,39 @@
         return $sce.trustAsResourceUrl(url);
     };
 
+    $scope.manualFilter = function(manual, index) {
+      return index <= $scope.userData.blq - 1;
+    };
 
 
-    
 $scope.manuals = [ 
-  {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy',  
+  [
+    {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+    'url': 'https://drive.google.com/file/d/1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'},
+    {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+    'url': 'https://drive.google.com/file/d/1nxK06XODrHt2J6lScQz4JjthmPoc16Ec'}, 
+    {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
+    'url': 'https://drive.google.com/file/d/1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu'}   
+  ],
+  [
+    {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+    'url': 'https://drive.google.com/file/d/1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ'},
+    {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+    'url': 'https://drive.google.com/file/d/10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB'},
+    {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
+    'url': 'https://drive.google.com/file/d/1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB'}     
+  ],
+  [
+     {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy',  
   'url': 'https://drive.google.com/file/d/1zs8OzO57s1b0MTavriKWjMohnLjr39-d'},
-{'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
-  'url': 'https://drive.google.com/file/d/1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB'}, 
-  {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
-  'url': 'https://drive.google.com/file/d/10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB'},
-  {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM',  
-  'url': 'https://drive.google.com/file/d/1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ'}, 
-  {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
-  'url': 'https://drive.google.com/file/d/1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu'},
-  {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
-  'url': 'https://drive.google.com/file/d/1nxK06XODrHt2J6lScQz4JjthmPoc16Ec'}, 
-  {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-',  
-  'url': 'https://drive.google.com/file/d/1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'}
-
+     {'title': 'Bloque 2 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy',  
+  'url': 'https://drive.google.com/file/d/1zs8OzO57s1b0MTavriKWjMohnLjr39-d'}  
   ]
+  
+];
+
+
+
 
      $scope.openURL = function(index) {
         var url = $scope.manuals[index].url;
