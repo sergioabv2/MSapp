@@ -1237,12 +1237,18 @@ app
   });
  })       
 
-   app.run(function($rootScope, $location, $state) {
+app.run(function($rootScope, $location, $state) {
+  var firstLoad = true;
+
   $rootScope.$on('$locationChangeStart', function(event, next, current) {
-   
-      event.preventDefault();
-      $state.go('menu.tabs.profile');
-    
+    if (firstLoad) {
+      firstLoad = false;
+      var path = $location.path();
+      if (path === "" || path === "/") {
+        event.preventDefault();
+        $state.go('menu.tabs.profile');
+      }
+    }
   });
 });
 
