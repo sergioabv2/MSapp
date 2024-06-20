@@ -557,7 +557,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
        
    
 
-       <div class="iframe-container"><iframe src="https://app.mozart.studio/agenda" frameborder="0" allowfullscreen></iframe></div>
+       <div class="iframe-container"><iframe id="agendaFrame" src="https://app.mozart.studio/agenda" frameborder="0" allowfullscreen></iframe></div>
     
       </ion-content>
     </ion-view>
@@ -1396,6 +1396,11 @@ $(window).on('load', function() {
       $('.preloader').css({'display':'none'})  
       $('.loginSection').css({'display':'none'})  
       $('.mainSection').fadeIn('slow')
+      var url = window.location.href;
+        if(url == "https://app.mozart.studio/#/menu/tab/record"){
+          var iframe = document.getElementById('agendaFrame');
+        iframe.src = 'https://app.mozart.studio/agenda';
+        }
       //loadData(api, storedToken, "si");    
     } else {
       localStorage.removeItem('MStoken');
