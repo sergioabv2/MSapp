@@ -525,7 +525,7 @@
           </div>
        <div class="panel-body">
             <div class="documents">
-                <div class="document" ng-repeat="manual in manuals[userData.lvl] | filter:manualFilter" ng-click="openURL($index)">
+                <div class="document" ng-repeat="manual in manuals[userData.lvl] | filter:manualFilter" ng-click="openURL(userData.lvl, $index)">
                     <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
                     <div class="document__title">{{manual.title}}</div>
                 </div>
@@ -628,8 +628,8 @@ $scope.manuals = [
 
 
 
-     $scope.openURL = function(index) {
-        var url = $scope.manuals[$scope.userData.lvl][index].url;
+     $scope.openURL = function(lvl, index) {
+        var url = $scope.manuals[lvl][index].url;
         window.open(url, '_blank');
     };
     
