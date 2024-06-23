@@ -659,29 +659,38 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   </script>    
     
   <script id="tabs.html" type="text/ng-template">
-    <ion-nav-bar class="bar-stable" >
-            
-        <ion-nav-buttons side="right">
-          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
-        </ion-nav-buttons>      
-    </ion-nav-bar>
+   
         
 
        <ion-tabs class="tabs-icon-top tabs-stable"  >
       <ion-tab title="Tutor" icon="ion-chatboxes" href="#/menu/tab/chat">
-        <ion-nav-view name="chat-tab"></ion-nav-view>
+        <ion-nav-view name="chat-tab">
+       <ion-nav-bar class="bar-stable" >    
+        <ion-nav-buttons side="right">
+          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
+        </ion-nav-buttons>      
+    </ion-nav-bar>
+  </ion-nav-view>
       </ion-tab>
      <ion-tab title="Perfil" icon="ion-ios-contact-outline" href="#/menu/tab/profile">
-        <ion-nav-view name="profile-tab"></ion-nav-view>
+        <ion-nav-view name="profile-tab">
+       <ion-nav-bar class="bar-stable" >    
+        <ion-nav-buttons side="right">
+          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
+        </ion-nav-buttons>      
+    </ion-nav-bar>
+  </ion-nav-view>
       </ion-tab>
      
        <ion-tab title="Agenda" icon="ion-android-calendar" href="#/menu/tab/agenda" >
-        <ion-nav-view name="agenda-tab"></ion-nav-view>
+        <ion-nav-view name="agenda-tab">
+       <ion-nav-bar class="bar-stable" >    
+        <ion-nav-buttons side="right">
+          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
+        </ion-nav-buttons>      
+    </ion-nav-bar>
+  </ion-nav-view>
       </ion-tab>
-     
-    
-   
-     
     </ion-tabs>
 
   </script>
@@ -1168,7 +1177,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 
   var app = angular.module('ionicApp', ['ionic']);
 app
-.config(function ($stateProvider, $urlRouterProvider) {
+.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
    $stateProvider
     .state('menu', {
@@ -1361,8 +1370,7 @@ app
     ;
 
   $urlRouterProvider.otherwise("menu/tab/profile");
-   
-
+  $ionicConfigProvider.tabs.position('bottom'); 
 })
 
  .controller('AppCtrl', function() {
