@@ -1303,7 +1303,7 @@ be a descendant of the grid when it is being dragged.
                 </div>
                 <div class="modal-footer">
                   <button class="btn btn-default" type="button" ng-click="cancel()">Cancel</button>
-                    <button class="btn btn-primary" type="button" ng-click="ok(selectedService, selectedDay, selectedHour)">Solicitar</button>
+                    <button class="btn btn-primary" type="button" ng-click="submitForm()">Solicitar</button>
                 </div>
             </script>
           
@@ -1482,27 +1482,10 @@ app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, items) {
 
 
 
-app.controller('bookCtrl', function($scope, $uibModalInstance, items, userData) {
-  // Agrega aquí la lógica necesaria para el controlador del modal
+app.controller('bookCtrl', function($scope, $http, $uibModalInstance, items, userData, uiCalendarConfig) {
    $scope.miss = userData.repositions;
   $scope.delay = userData.skips;
-  // Por ejemplo, puedes definir una función para cerrar el modal
-  
-  
-  $scope.ok = function(service, day, hour) {
-     if (service != 'service3') {
-      if(hour){
-        $uibModalInstance.close();
-        alert(day)
-      }
-    }else{
-      if(day){
-          $uibModalInstance.close();
-          alert(day)
-      }
 
-    }
-    };
 
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
@@ -1629,26 +1612,7 @@ app.controller('bookCtrl', function($scope, $uibModalInstance, items, userData) 
     return dat2.charAt(0).toUpperCase() + dat2.slice(1);
   }
   
-  function getDateFormat(dayAndDate, time) {
-    var parts = dayAndDate.split(" ");
-    var day = parts[0];
-    var date = parseInt(parts[1]);
-    var month = parts[3];
 
-    var hour = parseInt(time.split(":")[0]);
-    var minute = parseInt(time.split(":")[1]);
-    var monthIndex = getMonthIndex(month);
-
-    // Crear el objeto de fecha
-    var dateObject = new Date();
-    dateObject.setFullYear(new Date().getFullYear());
-    dateObject.setMonth(monthIndex);
-    dateObject.setDate(date);
-    dateObject.setHours(hour);
-    dateObject.setMinutes(minute);
-
-    return dateObject;
-};
 
 function getMonthIndex(month) {
     var months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -1662,6 +1626,156 @@ function getMonthIndex(month) {
       return 12
     }
   }
+
+
+
+
+    function dateToISO(dateString, timeString) {
+        var months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        var dateParts = dateString.split(' ');
+        var timeParts = timeString.split(' ');
+
+        var day = parseInt(dateParts[1]);
+        var month = months.indexOf(dateParts[3]);
+        var hour = parseInt(timeParts[0].split(':')[0]);
+
+        var date = new Date(2024, month, day, hour);
+        var offset = date.getTimezoneOffset();
+        date.setMinutes(date.getMinutes() - offset);
+        return date.toISOString();
+    }
+  
+  
+   $scope.submitForm = function() {
+    if ($scope.selectedDay && $scope.selectedHour) {
+     $scope.addEvent($scope.selectedService, $scope.selectedDay, $scope.selectedHour)
+      $uibModalInstance.close();
+      $scope.sendData($scope.selectedService)
+    }else if ($scope.selectedService == "service3" && $scope.selectedDay){
+      $scope.addExtension($scope.selectedDay)
+     $uibModalInstance.close();
+      $scope.sendData($scope.selectedService)
+    } else {
+      alert('Por favor, complete todos los campos requeridos.');
+    }
+  };
+     
+  
+  $scope.addEvent = function(service, dateString, timeString) {
+    if(service == "service1"){
+        var newEvent = {
+            title: "Práctica",
+            start: dateToISO(dateString, timeString),
+            color: "#33BEFF"
+        }    
+    }
+    else if(service == "service2"){
+        var newEvent = {
+            title: "Reposición",
+            start: dateToISO(dateString, timeString),
+            color: "orange",
+          attendance: ""
+        };        
+      userData.repositions = userData.repositions - 1
+    }
+
+    items.push(newEvent);
+        if (uiCalendarConfig.calendars['myCalendar1']) {
+            uiCalendarConfig.calendars['myCalendar1'].fullCalendar('removeEvents'); uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', items);     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
+        }
+    };
+  
+  
+   
+   $scope.addExtension = function(dateString) {
+    var n = parseInt(dateString.split(" ")[1])
+    var m = ""
+
+    for(i=0; i<items.length; i++){
+        m = parseInt(items[i].title.split(" ")[1])
+        if(m == n){ 
+          items[i].title = "Ausencia sin cobro",
+          items[i].color = "silver"
+        }else if(n<=m){
+          items[i].title = "Clase "+(m-1).toString()
+        }else if(items[i].title.split(" ")[1] == "pago"){
+          items[i].title = "Clase 8"
+          items[i].color = ""
+        }
+        if(items[i].title == "Clase 7" && n != 8){
+          var dat = new Date(items[i].start)
+          dat.setDate(dat.getDate() + 7)
+          items.push({
+            "title": "Próxima mensualidad",
+            "start": dat.toISOString(),
+            "color": "green"
+          })
+        }else if(items[i].title == "Clase 6" && n == 8){
+          var dat = new Date(items[i].start)
+          dat.setDate(dat.getDate() + 14)
+          items.push({
+            "title": "Próxima mensualidad",
+            "start": dat.toISOString(),
+            "color": "green"
+          })
+        }
+    }
+     if(items.length == 5){
+      items[4].title = "Clase 4"
+      var dat = new Date(items[4].start)
+          dat.setDate(dat.getDate() + 7)
+          items.push({
+            "title": "Próximo pago",
+            "start": dat.toISOString(),
+            "color": "green"
+          })
+    } 
+
+    userData.skips = userData.skips - 1
+        if (uiCalendarConfig.calendars['myCalendar1']) {
+            uiCalendarConfig.calendars['myCalendar1'].fullCalendar('removeEvents'); 
+            uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', items);     
+            uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
+        }
+    };
+  
+  
+  
+   
+$scope.sendData = function(service){
+
+  if(service=='service3'){
+  var title = $scope.selectedDay
+  var requestData = {
+    action: "logDate",
+    token: localStorage.getItem('MStoken'),
+     event: service,
+     title: title.split(" -")[0]
+  }; 
+  
+  }else{
+  var requestData = {
+    action: "logDate",
+    token: localStorage.getItem('MStoken'),
+     event: service,
+     date: $scope.selectedDay, 
+     time: $scope.selectedHour
+  };
+  }
+ 
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    followRedirects: true, 
+  }; 
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+  })
+  }
+
+
+	
 });
 
 </script>
