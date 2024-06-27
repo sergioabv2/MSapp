@@ -24,7 +24,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90vh;
+  height: 100vh;
   font-family: Helvetica, sans-serif;
    overflow: hidden;
 }
@@ -1591,6 +1591,11 @@ ul{
   
   
 
+
+
+
+
+
 </style>
 
 
@@ -1631,7 +1636,7 @@ ul{
           </div>
           
       <div class="iframe-container" ng-if="message.type == 'video'">
-   <iframe  ng-src="{{message.url}}" frameborder="0" ></iframe>
+   <iframe  ng-src="{{trustAsResourceUrl(message.url)}}" frameborder="0" ></iframe>
           </div>
           
         </div>
@@ -1643,7 +1648,7 @@ ul{
   </main>
 
   <form class="msger-inputarea">
-     <input type="text" class="msger-input" ng-model="newMessage" placeholder="Ingresa tu mensaje...">
+     <input type="text" class="msger-input" ng-model="newMessage" placeholder="Ingresa tu mensaje..." ng-keypress="checkEnter($event)">
      <div class="msger-record-btn button" id="four" ><i class="ri-mic-fill"></i></div>
    <div ng-click="sendMsg(newMessage)" class="msger-send-btn">Enviar</div>
   </form>
@@ -1764,18 +1769,21 @@ ul{
   
 </section>
 
+
+
+
 <script>
   var alertsApp = angular.module('App', []);
 
 alertsApp
   
-  .controller('msgCtrl', ['$http', '$scope', '$sce', function($http, $scope, $sce) {
+  .controller('msgCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
   $scope.userDataLoaded = false;
   
   function getData(){
 var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX19MFZbYwMRH2k1Qq0bqhMLxFFAWrPGhtBN5WG5U3Oy0kUeyGXK+55Y1"
+    token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D"
   };
 
   var config = {
@@ -1783,9 +1791,9 @@ var requestData = {
       "Content-Type": "text/plain;charset=utf-8"
     },
     followRedirects: true, 
-  };
+  }; 
 
- $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
     $scope.userData = response.data;
     $scope.messages = JSON.parse($scope.userData.messages)
@@ -1798,8 +1806,8 @@ var requestData = {
   getData();
 
   
-  
- /* $scope.messages = [{"sender":"client","name":"Sergio A.","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:05:01.757Z"},{"sender":"client","name":"Sergio A.","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:05:10.908Z"},{"sender":"client","name":"Sergio Abelardo","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:10:36.761Z"}];*/
+   
+ /* $scope.messages = [{"sender":"client","name":"Sergio  A.","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:05:01.757Z"},{"sender":"client","name":"Sergio A.","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:05:10.908Z"},{"sender":"client","name":"Sergio Abelardo","type":"audio","url":"https://drive.google.com/file/d/15pb1f15dRfRA3rGRZKrzpiyzKEMjiyUp/preview","content":"","timestamp":"2024-06-19T01:10:36.761Z"}];*/
   
   $scope.trustAsResourceUrl = function(url) {
         return $sce.trustAsResourceUrl(url);
@@ -1811,7 +1819,7 @@ var requestData = {
      
     var requestData = {
     action: "postAudio",
-    token: "U2FsdGVkX19MFZbYwMRH2k1Qq0bqhMLxFFAWrPGhtBN5WG5U3Oy0kUeyGXK+55Y1",
+    token: localStorage.getItem('MStoken'),
     blob: base64Audio
   };
 
@@ -1820,30 +1828,56 @@ var requestData = {
       "Content-Type": "text/plain;charset=utf-8"
     },
     followRedirects: true, 
-  };
-   $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
+  }; 
+   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
      getData();
       //$scope.userData = response.data;
     })
-   };
-   
+   }; 
+    
+    
+    $scope.checkEnter = function(event) {
+        if (event.which === 13) { // 13 is the key code for Enter
+            $scope.sendMsg($scope.newMessage);
+        }
+    };
   
-  $scope.sendMsg = function(message) {  
+  $scope.sendMsg = function(message) {    
     var name = $scope.userData.name.split(" ")
      var chat =  {
     "sender": "client",
     "name": name[0]+" "+name[1],
     "type": "text",
-    "content": message,
-    "timestamp": getDate()
+    "content": message, 
+    "timestamp": getNow()
   }
     $scope.messages.push(chat)
-     $scope.newMessage = "";
+      $scope.newMessage = ""; 
+     var plan = $scope.userData.plan
+if(plan.split(" ")[0] == "Premium" || plan.split(" ")[0] == "Hibrido"){
+    $scope.sendMsgtoserver(message)
+}else{
+  var autoresponse =  {
+    "sender": "admin",
+    "name": "Mozart Studio", 
+    "type": "text",
+    "content": "Esta función esta solo disponible para el plan Híbrido y el plan PREMIUM. Actualiza tu plan para recibir este beneficio",
+    "timestamp": ""
+  }
     
-    /*var requestData = {
+   $timeout(function() {
+        $scope.messages.push(autoresponse);
+    }, 1000);
+}
+    
+};
+    
+    
+    $scope.sendMsgtoserver = function(message){
+ var requestData = {
         action: "newMsgChat",
-        token: "U2FsdGVkX19MFZbYwMRH2k1Qq0bqhMLxFFAWrPGhtBN5WG5U3Oy0kUeyGXK+55Y1",
+        token: localStorage.getItem('MStoken'),
         msg: message
     };
 
@@ -1853,18 +1887,21 @@ var requestData = {
         }
     };
 
-    $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
+    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
-        getData(); 
-    });*/
-};
+    });
+}
+   
+  function getNow() {
+  var date = new Date();
   
-  function getDate() {
-  var date = new Date()
+  const d = "0" + date.getDate();
+  const m = "0" + (date.getMonth() + 1);
+  const y = date.getFullYear().toString().slice(-2);
   const h = "0" + date.getHours();
-  const m = "0" + date.getMinutes();
+  const min = "0" + date.getMinutes();
 
-  return `${h.slice(-2)}:${m.slice(-2)}`;
+  return `${d.slice(-2)}/${m.slice(-2)}/${y} ${h.slice(-2)}:${min.slice(-2)}`;
 }
   
 
@@ -3010,5 +3047,3 @@ function mp3EncoderWorker () {
 }
 
 </script>
-
-
