@@ -639,7 +639,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
           <ul class="list">
             <a href="#/menu/tab/profile" class="item" ng-class="(activeMenuClr=='profile')?'menuSelectedColor':''" ng-click="activeMenuClr = 'profile'" menu-toggle="right" ><i class="ri-home-2-fill"></i>&nbsp&nbspInicio</a>
                <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="right"><i class="ri-presentation-fill"></i>&nbsp&nbspLecciones</a>
-                       <a href="#/menu/comunity" class="item" ng-class="(activeMenuClr=='comunity')?'menuSelectedColor':''" ng-click="activeMenuClr = 'comunity'"  menu-toggle="right"><i class="ri-award-fill"></i>&nbsp&nbspReel de logros</a>
+                       <a href="#/menu/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'"  menu-toggle="right"><i class="ri-question-answer-fill"></i>&nbsp&nbspTutor</a>
                            <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="right"><i class="ri-git-repository-fill"></i>&nbsp&nbspBiblioteca</a>
                  <a href="#/menu/resources" class="item" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
              <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-file-paper-2-fill"></i>&nbsp&nbspLineamientos</a>
@@ -667,8 +667,8 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </ion-nav-bar>   
 
        <ion-tabs class="tabs-icon-top tabs-stable"  >
-      <ion-tab title="Tutor" icon="ion-chatboxes" href="#/menu/tab/chat">
-        <ion-nav-view name="chat-tab"></ion-nav-view>
+      <ion-tab title="Reel de logros" icon="ion-ribbon-b" href="#/menu/tab/reel">
+        <ion-nav-view name="reel-tab"></ion-nav-view>
       </ion-tab>
      <ion-tab title="Perfil" icon="ion-ios-contact-outline" href="#/menu/tab/profile">
         <ion-nav-view name="profile-tab"></ion-nav-view>
@@ -681,11 +681,11 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   </script>
 
 
-       <script id="chat.html" type="text/ng-template">
-    <ion-view title="Asesoría">
+       <script id="reel.html" type="text/ng-template">
+    <ion-view title="Reel de logros">
       <ion-content >
        
-        <div class="iframe-container"><iframe src="https://app.mozart.studio/chat" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozart.studio/comunity" frameborder="0" allowfullscreen ></iframe></div> 
     
       </ion-content>
     </ion-view>
@@ -790,7 +790,20 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   </script>
 
     
+        <script id="chat.html" type="text/ng-template">
+    <ion-view title="Asesoría">
+
+     <ion-nav-bar class="bar-stable">
+        <ion-nav-buttons side="right">
+          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
+        </ion-nav-buttons>      
+    </ion-nav-bar>
     
+      <ion-content>
+        <div class="iframe-container"><iframe src="https://app.mozart.studio/chat" frameborder="0" allowfullscreen ></iframe></div> 
+      </ion-content>
+    </ion-view>
+  </script>
 
 
    <script id="resources.html" type="text/ng-template">
@@ -1103,23 +1116,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   </script>
 
 
- <script id="comunity.html" type="text/ng-template">
-    <ion-view title="Comunidad">
 
-      <ion-nav-bar class="bar-positive">
-        <ion-nav-buttons side="right">
-          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
-        </ion-nav-buttons>      
-    </ion-nav-bar>
-
-     <ion-content>
-       
-  <div class="iframe-container"><iframe src="https://app.mozart.studio/comunity" frameborder="0" allowfullscreen ></iframe></div> 
-
-      </ion-content>
-
-    </ion-view>
-  </script>  
 
 
 <script id="about.html" type="text/ng-template">
@@ -1182,13 +1179,6 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
     </ion-view>
 </script>
 
-    
-   
-    
-  
-    
-
-
 
 
    <script id="aboutus.html" type="text/ng-template">   
@@ -1198,9 +1188,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
           <ion-back-button></ion-back-button>
 
         <h2>Acerca de</h2>
-     
-
-       
+ 
       </ion-content>
     </ion-view>
   </script>
@@ -1267,11 +1255,11 @@ app
         }
       }
     })
-    .state('menu.tabs.chat', {
-      url: "/chat",
+   .state('menu.tabs.reel', {
+      url: "/reel",
       views: {
-        'chat-tab': {
-          templateUrl: "chat.html"
+        'reel-tab': {
+          templateUrl: "reel.html"
         }
       }
     })
@@ -1326,7 +1314,14 @@ app
         }
       }
     })
-
+ .state('menu.chat', {
+      url: "/chat",
+      views: {
+        'menuContent': {
+          templateUrl: "chat.html"
+        }
+      }
+    })
     .state('menu.resources', {
       url: "/resources",
       views: {
@@ -1407,17 +1402,6 @@ app
       }
     })
   
-   
-  
- .state('menu.comunity', {
-      url: "/comunity",
-      views: {
-        'menuContent': {
-          templateUrl: "comunity.html"
-        }
-      }
-    })
-
     .state('menu.about', {
       url: "/about",
       views: {
