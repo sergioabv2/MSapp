@@ -1,34 +1,23 @@
- 
+
+
+<head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css"></link>
-
 <!---
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
 --->
-
-
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css"></link>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.js"></script>
-
-  
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js'></script>
-
-
 <script async defer src="//www.instagram.com/embed.js"></script>
-
+</head>
 
 
 <style>
-  /*** base color: #f27275 ***/
+	/*** base color: #f27275 ***/
 body {
   font-size: 0.9rem;
   background: silver;
@@ -732,24 +721,14 @@ font-family: 'Raleway';
 }
 
 
-
-
-
-
-
-
 </style>
 
+ 
 
-
-<body style="background: #ddd" ng-app="postApp" ng-controller="postController">
+<body style="background: #ddd" ng-app="postApp" ng-controller="postController" >
 <div class="page-wrapper chiller-theme">
-      
        
-   
-       
-   
-        <!-- sidebar-wrapper  -->
+
         <main class="page-content">
             <div class="container-fluid">
                 <div class="row">
@@ -762,10 +741,11 @@ font-family: 'Raleway';
                        
      
                       
-    <div ng-repeat="post in filteredData = (data | filter:postFilter)" >      
+    <div ng-repeat="post in filteredData.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
                         <div class="post " >
                           <div class="post_header">
                             <a href="#" ng-click="handleUserProfile(post.user)">{{post.user}}</a>
+                            <div style="float:right;"> {{post.date}} </div>
                           </div>
                           <div class="post_thumbnail">
   <div style="height: 150px; background: #343434; display: flex; justify-content: center; align-items: center;" ng-if="post.type == 'audio'">
@@ -773,27 +753,27 @@ font-family: 'Raleway';
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 125" height="160" style="filter: invert(1);">
         <path d="M85.83,53.22h-5L77.37,42.86a1.9,1.9,0,0,0-3.66.21L69.46,63.32,64.87,32.67a1.9,1.9,0,0,0-3.76.06L57.26,66.94l-5-43.9a1.9,1.9,0,0,0-3.78,0l-5,43.9L39.69,32.73a1.9,1.9,0,0,0-3.77-.06l-4.48,30L27.12,38.93a1.9,1.9,0,0,0-3.71-.14L19.89,52.33H14.13a1.5,1.5,0,1,0,0,3h6.61a1.91,1.91,0,0,0,1.84-1.43l2.48-9.54L29.68,69.7a1.9,1.9,0,0,0,3.75-.06l4.22-28.22,4,35.54a1.9,1.9,0,0,0,3.78,0L50.4,33l5,43.94a1.9,1.9,0,0,0,3.77,0l4-35.54L67.4,69.83a1.9,1.9,0,0,0,3.73.1l4.68-22.27,2.52,7.53a1.48,1.48,0,0,0,1.42,1h6.08A1.5,1.5,0,0,0,85.83,53.22Z"/>
                                 </svg></div>
-
+ 
 </div>                           
-                               <iframe width="100%" height="{{post.height}}" ng-src="{{post.url}}" frameborder="0" ></iframe>
+                               <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ></iframe>
 
                          
   <div id='app2' class='container' ng-if="post.type == 'diploma'" >
-  <card data-image='https://i.ibb.co/ZWqkznM/image.png' >
+  <card data-image='{{post.url}}' >
     <h1 slot='header'>click</h1>
     <p slot='content'>Reconocimiento por haber concluido el nivel preparatorio</p>
   </card> 
-</div>
+</div> 
                         <!---    <img src="https://loremflickr.com/620/640/istanbul?random=1" /> --->
                           </div>
                           <div class="post_footer" ng-if="post.type != 'instagram'">
-                            
+                             
                          <div class="row">
   <div class="col">
     <p>{{post.likes.length}} likes</p>
   </div>
   <div class="col">
-
+ 
                <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group mr-2" role="group" aria-label="First group">
     <button type="button" class="btn btn-outline-danger btn-sm"  ng-class="{ 'active': dangerButtonActive[$index] }" ng-click="newLike($index, post)">
@@ -812,28 +792,37 @@ font-family: 'Raleway';
         <div class="comments collapse multi-collapse" id="collapse{{post.id}}">
             <p ng-repeat="comment in post.comments">{{comment.user}}: {{comment.comment}}</p>   
         </div>    
-    </div>
+    </div> 
    </div>
-          
-                      
+            
+                       
                     
                       </div>
-                      
-                      
-                      
-                     
-       
-                                     
-                      
-                      
-
-
-
-
 
                     </div>
                 </div>
                 <hr class="hr-pagi">  
+              
+              
+               <div class="row">
+                    <div class="form-group col-md-12">           
+         <nav aria-label="Page navigation pagination">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                  <a class="page-link" href="#" ng-click="prevPage()">Previous</a>
+                </li>
+                <li class="page-item" ng-repeat="page in getPages()" ng-class="{active: currentPage === page}">
+                  <a class="page-link" href="#" ng-click="setPage(page)">{{page}}</a>
+                </li>
+                <li class="page-item" ng-class="{disabled: currentPage === totalPages}">
+                  <a class="page-link" href="#" ng-click="nextPage()">Next</a>
+                </li>
+              </ul>
+            </nav>
+                    </div>
+                </div>
+              
+              
          
             </div>
         </main>
@@ -864,15 +853,15 @@ font-family: 'Raleway';
         <div class="card2" ng-class="{ 'is-active': currentSection === '#experience' }" data-state="#about">
             <div class="card-header" >
 
-                <img class="card-avatar" src="https://i.ibb.co/vYKGxKk/IMG-0438.jpg" alt="avatar" />
-                <h1 class="card-fullname" style="margin-bottom: 15px;">{{user.name}}</h1>
+                <img class="card-avatar" ng-src="{{user.photo}}" alt="avatar" />
+                <h1 class="card-fullname" style="margin-bottom: 15px;">{{user.nameshort}}</h1>
 
                 <h2 class="card-jobtitle"  >
 
                     <span class="site-name">{{user.level}}</span>
                 </h2>
               
-   
+    
 
            <div class="bar-column " ng-if="currentSection === '#about'">
                         <div class="bar u">
@@ -937,11 +926,11 @@ font-family: 'Raleway';
         </div>
     </div>
 </div>
-  
-</body>
+
+
 
 <script type="module">
-  
+	
 import confetti from "https://esm.run/canvas-confetti@1";
 
    /*   
@@ -952,69 +941,150 @@ window.anim = function() {
             });
         };*/
 
-
+ 
 var app = angular.module('postApp', [])
- app.controller('postController', ['$scope', '$interval', '$sce', '$timeout', function($scope, $interval, $sce, $timeout) {
-   $scope.user = "@mozart"
-   $scope.data = [
-     {
-       user: "@mozart",
-       id: "d-1",
-       type: "diploma",
-       likes: ["12"],
-       height: 0,
-       comments: [{
-         user: "@kevin",
-         comment: "wow!"
-       } ]
-       
-    },
-     {
-       user: "@mozart",
-       id: "v-1",
-       type: "youtube",
-       height: 220,
-       url: $sce.trustAsResourceUrl("https://www.youtube.com/embed/f0TeYaXzSjk"),
-       likes: [],
-       comments: [{
-         user: "@kevin",
-         comment: "cool!"
-       },{
-         user: "@yako",
-         comment: "si!"
-       } ]
-     
-    },
-     {
-       user: "@mozart",
-       id: "a-1",
-       type: "audio",
-       height: 60,
-       url: $sce.trustAsResourceUrl("https://drive.google.com/file/d/1584Ewlyz4xPr-VU6qbcLbRJOXMaJpJXv/preview"),
-       likes: [],
-       comments: [{
-         user: "@kevin",
-         comment: "wow!"
-       } ]
-    },
-     {
-       user: "@mozart3",
-       type: "instagram",
-       height: 350,
-       url: $sce.trustAsResourceUrl("https://instagram.com/p/CyWOlFkpFfh/embed/")
-    },
-     {
-       user: "@mozart3",
-       type: "soundcloud",
-       height: 180,
-       likes: [],
-       url: $sce.trustAsResourceUrl("https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/18942763&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=false&amp;show_reposts=false&amp;visual=false")
-    }    
-   ];
+ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$timeout', function($scope, $http, $interval, $sce, $timeout) {
+    $scope.trustAsResourceUrl = function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+   
+     $scope.data = [];
+  $scope.filteredData = [];
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 6;
+  $scope.totalPages = 1;
+
+
+    $http({
+      method: 'GET',
+      url: 'https://script.google.com/macros/s/AKfycbxN34IjjTFdUaPKeyLFI5-VCzDcBznvBB96B1IbWLAlSbqjISYOTK08Z07XrC2xDuwV/exec',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }).then(function(response) {
+      $scope.data = response.data.posts; 
+       $scope.profileData = response.data.profiles
+      $scope.filterPosts('all');
+      $scope.updatePagination();
+    });
+   
+    
+   
+    $scope.user = "@anonimo"
+
+ var requestData = {
+        action: "getUserName",
+        token: "U2FsdGVkX19FDH1PRGhq4QhqBpHJ+YJUDdiHtUdlThTQ+RV5lSZX3UvmVjpZfkIT"
+        //localStorage.getItem('MStoken')
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+
+$http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+      $scope.user = response.data
+    });
+
+   
+   
+     $scope.sendLike = function(postid){
+ var requestData = {
+        action: "newLike",
+        token: "U2FsdGVkX19FDH1PRGhq4QhqBpHJ+YJUDdiHtUdlThTQ+RV5lSZX3UvmVjpZfkIT",
+        //localStorage.getItem('MStoken'),
+        postid: postid
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+    });
+}
+
+
+
+    $scope.sendComment = function(postid, comment){
+ var requestData = {
+        action: "newComment",
+        token: "U2FsdGVkX19FDH1PRGhq4QhqBpHJ+YJUDdiHtUdlThTQ+RV5lSZX3UvmVjpZfkIT",
+        //localStorage.getItem('MStoken'),
+        comment: comment,
+        postid: postid
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+    });
+}
+   
+   
+
+  $scope.updatePagination = function() {
+    $scope.totalPages = Math.ceil($scope.filteredData.length / $scope.itemsPerPage);
+    $scope.currentPage = 1;
+  };
+
+  $scope.getPages = function() {
+    var pages = [];
+    for (var i = 1; i <= $scope.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  $scope.setPage = function(page) {
+    if (page >= 1 && page <= $scope.totalPages) {
+      $scope.currentPage = page;
+    }
+  };
+
+  $scope.prevPage = function() {
+    if ($scope.currentPage > 1) {
+      $scope.currentPage--;
+    }
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.totalPages) {
+      $scope.currentPage++;
+    }
+  };
+
+  $scope.filterPosts = function(type) {
+    $scope.filter = type;
+    if (type === 'all') {
+      $scope.filteredData = $scope.data;
+    } else {
+      $scope.filteredData = $scope.data.filter(function(post) {
+        return post.type === type;
+      });
+    }
+     $timeout(function() {
+            $('.post').hide().fadeIn(400);
+        }, 100);
+    $scope.updatePagination();
+  };
+
+
    
 $scope.openModal = function(post) {
     $scope.selectedPost = post;
-    var userInput = prompt("Por favor, ingrese el comando:");
+    var userInput = prompt("Agregar comentario:");
 
     if (userInput !== null) {
         var newComment = { user: $scope.user, comment: userInput };
@@ -1024,6 +1094,7 @@ $scope.openModal = function(post) {
         if (selectedDataItem) {
             // Agrega el nuevo comentario al arreglo de comentarios
             selectedDataItem.comments.push(newComment);
+          $scope.sendComment(post.id, userInput)
         }
     }
 };
@@ -1037,10 +1108,10 @@ $scope.newLike = function(index, post) {
         confetti({
             particleCount: 150,
             spread: 60
-        });
+        }); 
         $scope.dangerButtonActive[index] = true;
-    }
-
+      $scope.sendLike(post.id)
+    } 
     $scope.selectedPost = post;
     var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
 
@@ -1053,22 +1124,7 @@ $scope.newLike = function(index, post) {
     }
 };
    
-   $scope.filterPosts = function(filter) {
-                $scope.filter = filter;
-                $scope.postFilter = function(post) {
-                    if (filter === 'all') {
-                        return true;
-                    } else {
-                       return post.user === $scope.user && post.type === filter;
-                    }
-                };
-   $timeout(function() {
-            $('.post').hide().fadeIn(400);
-        }, 100);
-     
-            };
-   
-            $scope.filterPosts('all');
+ 
 
    $scope.currentSection = '#about';
    $scope.handleButtonClick = function(section) {
@@ -1078,18 +1134,12 @@ $scope.newLike = function(index, post) {
       $scope.currentMain = username;
       $('#profileModal').modal('show');
     };
-   $scope.profileData = [{
-        name: "Sergio V.",
-        level: "NIVEL 1",
-        username: "@mozart"
-    },
-      {
-        name: "Mozart Studio",
-        level: "NIVEL INFINITO",
-        username: "@mozart3"
-    }
-                         ];
+   
+   
+   
 
+
+   
 }]);
 
 
@@ -1175,3 +1225,5 @@ const app2 = new Vue({
 
 
 </script>
+  
+</body>
