@@ -724,22 +724,7 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
 
      <ion-content>
        
-    <div class="list">
-        
-             <a class="card card-3" href="#/menu/nivelprincipiante" style="text-decoration: none; ">
-          <h3>Nivel Principiante</h3>
-          </a>
-        
-    
-    <a class="card card-1" href="#/menu/nivelintermedio" style="text-decoration: none; ">
-            <h3>Nivel Intermedio</h3>
-          </a>
-    
-     <a class="card card-2" href="#/menu/nivelavanzado" style="text-decoration: none; ">
-            <h3>Nivel Avanzado</h3>
-          </a>
-
-    </div> 
+   <div class="iframe-container"><iframe src="https://app.mozart.studio/lessons" frameborder="0" allowfullscreen></iframe></div>
 
       </ion-content>
 
@@ -747,45 +732,6 @@ button:focus.off.login, button:active.off.login, button:hover.off.login {
   </script>   
     
     
-     <script id="nivelprincipiante.html" type="text/ng-template">
-     <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-            <div class="iframe-container"><iframe src="https://dashboard.mozart.studio/lessons1" frameborder="0" allowfullscreen></iframe></div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-    
-    
-    
-     <script id="nivelintermedio.html" type="text/ng-template">
-     <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-            En construcción
-       
-      </ion-content>
-    </ion-view>
-  </script>
-    
-    
-    
-     <script id="nivelavanzado.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-             En construcción
-       
-      </ion-content>
-    </ion-view>
-  </script>
 
     
         <script id="chat.html" type="text/ng-template">
@@ -1277,41 +1223,14 @@ app
         }
       }
     })
-
-
     .state('menu.lessons', {
       url: "/lessons",
       views: {
         'menuContent': {
-          templateUrl: "lessons.html",
-          controller: 'NewsListController'
+          templateUrl: "lessons.html"
         }
       }
     }) 
-   .state('menu.nivelprincipiante', {
-      url: "/nivelprincipiante",
-      views: {
-        'menuContent': {
-          templateUrl: "nivelprincipiante.html"
-        }
-      }
-    })
-  .state('menu.nivelintermedio', {
-      url: "/nivelintermedio",
-      views: {
-        'menuContent': {
-          templateUrl: "nivelintermedio.html"
-        }
-      }
-    })
-  .state('menu.nivelavanzado', {
-      url: "/nivelavanzado",
-      views: {
-        'menuContent': {
-          templateUrl: "nivelavanzado.html"
-        }
-      }
-    })
  .state('menu.chat', {
       url: "/chat",
       views: {
@@ -1478,20 +1397,6 @@ app
  }])
 
 
-.controller('NewsListController', function ($scope, $location) {
-      
-      $scope.news = [
- { id: 1, name: 'Nivel Principiante', material: "Material de trabajo preparatorio" },
-   { id: 2, name: 'Nivel Intermedio', material: "Material de nivel 1" },
-   { id: 3, name: 'Nivel Avanzado', material: "Material de nivel 2" }
-        ];
-      
-      $scope.onSelectNews = function(n) {
-        //$state.go('menu.detail', { NewsId: n.id });
-        $location.url('/menu/detail/' + n.name);
-      }
-      
-    })
 
    .controller('booksCtrl1', ['$http', '$scope', '$sce', function($http, $scope, $sce){
     $scope.trustAsResourceUrl = function(url) {
@@ -1514,13 +1419,17 @@ app
     };
 
     
- $scope.manuals = [ 
+/* $scope.manuals = [ 
       {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d'},
       {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB'},
       {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB'},
       {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ'},
       {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu'},
       {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec'},
+      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'}
+    ];*/
+
+       $scope.manuals = [ 
       {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'}
     ];
     
