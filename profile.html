@@ -444,12 +444,83 @@
   }
 }
 
+
+
+
+
+   
+      .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .add-to-btn {
+      background-color: #E02D44;
+      color: white;
+      border: none;
+      outline: none;
+      font-weight: bold;
+      width: 100%;
+      height: 50px;
+    }
+ 
+#myModal {
+  display: none; 
+}
+
+@media only screen and (max-width: 650px) {
+  #myModal {
+    display: block; 
+    z-index: 1000;
+  }
+}
 </style>
 
 
 
 
 <div ng-app="studentsApp" ng-controller="Controller1" >
+
+    <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add to Home Screen</h2>
+      <button class="add-to-btn">Add to home screen</button>
+    </div>
+  </div>
+
+   
 <div class="dashboard-container">
   <div class="showbox" ng-if="!userDataLoaded">
       <div class="loader">
@@ -684,7 +755,53 @@ $scope.manuals = [
     
     /* $scope.userDataLoaded = true;
     $scope.userData = {'photo':'https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg', 'totalClasses':'8.0', 'status':'ACTIVO', 'color':'#1894cc',  'lvl':'2', 'leveltop':'10', 'lsn':'1', 'id':'22.0', 'name':'Sergio Valenzo',  'level':'Nivel 2', 'blq':'1', 'nextpay':'sábado 8 de junio', 'plan':'PRO', 'classCounter':'2.0', 'misses':'2', 'classtime':["Miércoles de 22:00 a 23:00 Hrs",],  'block':'Bloque 1', 'progress': '90', 'history': [{'achieve': 'Termina Bloque 2', 'date': '19/04/2024'}, {'achieve': 'Termina Bloque 1', 'date': '10/03/2024'}, {'achieve': 'Primer clase', 'date': '10/02/2024'}]}*/
-    
+
+
+
+     
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+
+  let deferredPrompt;
+  var modal = document.getElementById("myModal");
+  var btn = document.querySelector('.add-to-btn');
+  var span = document.querySelector(".close");
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    modal.style.display = "block";
+
+    btn.addEventListener('click', () => {
+      modal.style.display = "none";
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        deferredPrompt = null;
+      });
+    });
+  });
+
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
     
 }]);
   
