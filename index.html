@@ -568,7 +568,7 @@ h1 {
            data-theme="filled_blue"
             data-text="signin_with"
             data-size="large"
-            data-logo_alignment="left" >
+            data-logo_alignment="left" onclick="showLoader()">
         </div>
 
  
@@ -720,10 +720,10 @@ function showMailLogin() {
     var photo = responsePayload.picture
     var email = responsePayload.email
 
- alert(email)
+ //alert(email)
 
 
-    /*
+    
     var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
 
   var validationData = {
@@ -750,7 +750,7 @@ function showMailLogin() {
       } else {
         alert('Error, intenta otro método de inicio de sesión');
       }
-    })*/
+    })
 }
 
 
@@ -764,8 +764,7 @@ function decodeJwtResponse(data) {
 function showLoader() {
   $('.preloader').css({'display': 'block'});  
   $('.buttons-container').css({'display': 'none'});  
-  
-  // Después de 10 segundos, invierte la visibilidad
+
   setTimeout(function() {
     $('.preloader').css({'display': 'none'});  
     $('.buttons-container').css({'display': 'block'});  
