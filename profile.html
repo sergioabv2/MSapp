@@ -5,7 +5,6 @@
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-   <link rel="manifest" href="/manifest.json">
 </head>
 
 
@@ -496,26 +495,9 @@
       height: 50px;
     }
  
-#myModal {
-  display: none; 
-}
 
-@media only screen and (max-width: 650px) {
-  #myModal {
-    display: block; 
-    z-index: 1000;
-  }
-}
 </style>
 
-
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Agrega a pantalla de inicio</h2>
-      <button class="add-to-btn">Instalar</button>
-    </div>
-  </div>
 
 <div ng-app="studentsApp" ng-controller="Controller1" >
 
@@ -761,49 +743,6 @@ $scope.manuals = [
 }]);
 
 
-      
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      }, function(err) {
-        console.log('ServiceWorker registration failed: ', err);
-      });
-    });
-  }
-
-  let deferredPrompt;
-  var modal = document.getElementById("myModal");
-  var btn = document.querySelector('.add-to-btn');
-  var span = document.querySelector(".close");
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    modal.style.display = "block";
-
-    btn.addEventListener('click', () => {
-      modal.style.display = "none";
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
-        } else {
-          console.log('User dismissed the A2HS prompt');
-        }
-        deferredPrompt = null;
-      });
-    });
-  });
-
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
+    
   
 </script>
