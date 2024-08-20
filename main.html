@@ -1075,15 +1075,12 @@ app
         if (response.data.status === "success") {
           localStorage.removeItem('MStoken');
           $('.preloader').css({ 'display': 'none' });
-          $('.loginSection').fadeIn('slow');
-          $('.mainSection').css({ 'display': 'none' });
-          loadForm();
+          window.location.href = 'https://app.mozart.studio/';
         }
       })
       .catch(function(error) {
-        console.error('Error during logout:', error);
-        // Ocultar preloader en caso de error
         $('.preloader').css({ 'display': 'none' });
+        window.location.href = 'https://app.mozart.studio/';
       });
   };
 
