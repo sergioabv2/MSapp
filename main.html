@@ -1157,54 +1157,6 @@ app
       });
   };
 
-    
-
-     if ('serviceWorker' in navigator) {
-    $window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      }, function(err) {
-        console.log('ServiceWorker registration failed: ', err);
-      });
-    });
-  }
-
-  let deferredPrompt;
-  $scope.isModalVisible = false;
-
-  $window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    $timeout(function() {
-      $scope.isModalVisible = true;
-    });
-
-    $scope.addToHomeScreen = function() {
-      $scope.isModalVisible = false;
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(choiceResult) {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
-        } else {
-          console.log('User dismissed the A2HS prompt');
-        }
-        deferredPrompt = null;
-      });
-    };
-  });
-
-  $scope.closeModal = function() {
-    $scope.isModalVisible = false;
-  };
-
-  // Para cerrar el modal si se hace clic fuera del modal
-  $scope.checkCloseModal = function(event) {
-    if (event.target.id === "myModal") {
-      $scope.isModalVisible = false;
-    }
-  };
-
  }])
 
        .controller('profileCtrl', function($scope) {
