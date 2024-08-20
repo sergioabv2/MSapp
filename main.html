@@ -985,7 +985,8 @@ app
       url: "/profile",
       views: {
         'profile-tab': {
-          templateUrl: "profile.html"
+          templateUrl: "profile.html",
+          controller: "profileCtrl"
         }
       }
     })
@@ -1206,6 +1207,53 @@ app
 
  }])
 
+       .controller('profileCtrl', function($scope) {
+            $scope.isModalVisible = false;
+    let deferredPrompt;
+
+    // Registrar el Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    }
+
+    // Manejar el evento 'beforeinstallprompt'
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        $scope.isModalVisible = true;
+        $scope.$apply(); // Forzar la actualización del scope
+    });
+
+    // Función para agregar a la pantalla de inicio
+    $scope.addToHomeScreen = function() {
+        $scope.isModalVisible = false;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+            } else {
+                console.log('User dismissed the A2HS prompt');
+            }
+            deferredPrompt = null;
+        });
+    };
+
+    // Cerrar modal
+    $scope.closeModal = function() {
+        $scope.isModalVisible = false;
+    };
+
+    // Cerrar modal si se hace clic fuera de él
+    $scope.checkCloseModal = function(event) {
+        if (event.target.id === 'myModal') {
+            $scope.closeModal();
+        }
+    };
+       })
 
 
    .controller('booksCtrl1', ['$http', '$scope', '$sce', function($http, $scope, $sce){
