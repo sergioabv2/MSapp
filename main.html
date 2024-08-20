@@ -466,11 +466,10 @@ body {
  
         <div class="iframe-container"><iframe id="profileFrame" src="https://app.mozart.studio/profile" frameborder="0" allowfullscreen></iframe></div> 
 
-         <div id="myModal" class="modal">
+          <div id="myModal" class="modal" ng-show="isModalVisible" ng-click="checkCloseModal($event)">
     <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Agrega a pantalla de inicio</h2>
-      <button class="add-to-btn">Instalar</button>
+      <span class="close" ng-click="closeModal()">&times;</span>
+      <button class="add-to-btn" ng-click="addToHomeScreen()">Add to home screen</button>
     </div>
   </div>
         
@@ -1157,6 +1156,53 @@ app
       });
   };
 
+    
+
+     if ('serviceWorker' in navigator) {
+    $window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+
+  let deferredPrompt;
+  $scope.isModalVisible = false;
+
+  $window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    $timeout(function() {
+      $scope.isModalVisible = true;
+    });
+
+    $scope.addToHomeScreen = function() {
+      $scope.isModalVisible = false;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(choiceResult) {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        deferredPrompt = null;
+      });
+    };
+  });
+
+  $scope.closeModal = function() {
+    $scope.isModalVisible = false;
+  };
+
+  // Para cerrar el modal si se hace clic fuera del modal
+  $scope.checkCloseModal = function(event) {
+    if (event.target.id === "myModal") {
+      $scope.isModalVisible = false;
+    }
+  };
 
  }])
 
@@ -1371,7 +1417,7 @@ $(window).on('load', function() {
 
 
 
-       
+ /*      
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -1415,5 +1461,5 @@ if ('serviceWorker' in navigator) {
       modal.style.display = "none";
     }
   }
-  
+  */
 </script>
