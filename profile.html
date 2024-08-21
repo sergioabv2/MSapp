@@ -5,6 +5,7 @@
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
 </head>
 
 
@@ -1229,7 +1230,7 @@ iframe#youtube {
           <div class="circle">
               <img class="profile-pic" src={{picture}}>
           </div>
-          <div class="p-image" >
+          <div class="p-image" style="cursor: pointer;">
             <i class="fa fa-camera upload-button"></i>
             <input class="file-upload" type="file" style="display: none;" accept="image/*"/>
           </div>
@@ -1262,12 +1263,12 @@ iframe#youtube {
         </div>
           
           
-        <div class="dashboard-panel registry-log-panel">
+        <div class="dashboard-panel registry-log-panel" >
           <div class="panel-header">
-            <h4><i class="fa fa-fw fa-clock-o"></i> Actividades en curso...</h4>
+            <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
           
           </div>
-          <div class="panel-body log-list-container" style="max-height: 175px;"> 
+          <div class="panel-body log-list-container" style="max-height: 180px;"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today}">
                 <button style="float:right; margin-right: -15px; margin-top: 7px;" ng-click="showModal(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'">Entregar </button>
@@ -1449,11 +1450,11 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)"> <i class="ri-
    $scope.userData = [];
   $scope.userDataLoaded = false;
      $scope.today = new Date()
-  
+   
 
-  var requestData = {
+  var requestData = { 
     action: "getProfileData",
-    token: "U2FsdGVkX18ULyziIuuWAfHRHmp4Ti/rMrOdDTDspKrXYc64BaycSOYvQkiaOUGl"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1462,8 +1463,8 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)"> <i class="ri-
     },
     followRedirects: true, 
   };
-
-    
+ 
+      
    
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) { 
@@ -1562,7 +1563,7 @@ $scope.manualFilter = function(manual, index) {
      $scope.openURL = function(lvl, index) {
         var url = $scope.manuals[lvl][index].url;
         window.open(url, '_blank');
-    };
+    }; 
 
 $scope.manuals = [ 
   [
@@ -1629,8 +1630,56 @@ $scope.manuals = [
        .then(function(response) {
  });
      }
+    
+    
+    
+    
+     $scope.uploadAudio = function() { 
+     var base64Audio = document.getElementById("AudioData").value
+       
+     
+     if(base64Audio == ""){
+        alert("No existe grabación a enviar")
+     }else{
+       $scope.selectedEntry.status = "En revisión"
+
+
+    var requestData = {
+    action: "postAudio",
+    token: localStorage.getItem('MStoken'),
+      lesson: $scope.selectedEntry.name,
+      index: $scope.selectedEntry.index,
+    blob: base64Audio
+  };
  
-}]);
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    followRedirects: true, 
+  }; 
+   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+    })  
+       
+        $('#record-audio').empty(); 
+        document.getElementById("AudioData").value = "";
+        $('#delete-audio').hide();
+       alert("Actividad enviada a revisión")
+       $scope.hideModal()
+       
+     }
+   }; 
+
+
+     $scope.openURL = function(lvl, index) {
+        var url = $scope.manuals[lvl][index].url;
+        window.open(url, '_blank');
+    };
+    
+    
+   
+}]); 
 
   
 </script>
@@ -1779,7 +1828,7 @@ footer{
       $('#stop-recording').disabled = true;
    
       //document.getElementById("clicks").innerHTML = "Recording Stopped";
-
+ 
       var f = document.getElementById('clicks');
       setInterval(function () {
           f.style.display = (f.style.display == 'none' ? '' : 'none');
@@ -2060,7 +2109,7 @@ stop.addEventListener('click', function(){
   this.style.display = "none";
   start.style.display = "block";
 });
-
+ 
 close.addEventListener('click', function(){
   window.clearInterval(timer);
   noteFlag = 0;
