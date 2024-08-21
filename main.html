@@ -22,6 +22,8 @@
       background-color: #444444;
       color: #fff;
     }
+
+
 	 
 .loadInfo{
   z-index: 4;
@@ -479,42 +481,43 @@ body {
        <script id="status.html" type="text/ng-template">
     <ion-view title="Status">
       <ion-content >
-       
-        <div class="list">
-				<a class="item item-avatar" href="javascript:;" >
+       <div class="list">
+				<a class="item item-avatar" href="" >
           
-				  <img data-ng-src="https://lh3.googleusercontent.com/d/1L1kLwLAt2KksPG2tN4tT1bRle4RqveWo">
-             <span class="item-note">ACTIVO</span>
-				  <h2>Sergio Valenzo</h2>       
-				  <p>sergioabv2@gmail.com.</p>         
+				  <img data-ng-src="{{userData.photo}}">
+             <span class="item-note">{{userData.status}}</span>
+				  <h2>{{userData.name}}</h2>       
+				  <p>{{userData.mail}}</p>         
 				</a>
 				
 				<div class="item item-divider itemDividerforitem">Status académico</div>
        
 				<a class="item">
 					Próximo pago
-			<p>Lunes 25 de Agosto</p>   
+			<p>{{userData.nextpay}}</p>   
 				</a>
-         <a class="item">
+         <a class="item"> 
 					Horario de clase
-           <span class="item-note">PLAN PRO</span>
-			<p>Jueves de 11:00 a 12:00 Hrs</p>   
-         	<p>Domingo de 11:00 a 12:00 Hrs</p>   
+           <span class="item-note"  style=" margin-top: 3px;">{{userData.plan}}</span>
+			<p>{{userData.classtime[0]}}</p>   
+         	<p>{{userData.classtime[1]}}</p>   
 				</a>
          <div class="item item-divider itemDividerforitem">Asistencias</div>
          
 				 <div class="item item-icon-left item-button-right">
            <i class="icon ri-calendar-check-fill"></i> Asistencias
-					<button class="button button-balanced">
-						3
+					<button class="button button-balanced" style=" margin-top: 10px;">
+						{{userData.classCounter}}
 					</button>
+          <p style="font-size: 10px;">El contador indica cuantas clases te quedan</p> 
 				</div>
          
          <div class="item item-icon-left item-button-right">
            <i class="icon ri-calendar-schedule-fill"></i> Reposiciones
-					<button class="button button-calm">
-						1
+					<button class="button button-calm"  style=" margin-top: 10px;">
+					{{userData.repositions}}
 					</button>
+         <p style="font-size: 10px;">El contador indica cuantas reposiciones te quedan</p>  
 				</div>
          
          <div class="item item-icon-left item-button-right">
@@ -522,24 +525,25 @@ body {
 					<button class="button button-stable" style="transform: scale(.8); margin-right: -20px; margin-top: 10px;">
 						solicitar         
 					</button>
-         <p style="font-size: 10px;">Puedes solicitar 2 extensions por semestre</p>  
+         <p style="font-size: 10px;">Puedes solicitar 2 por semestre</p>  
 				</div>
          
          <div class="item item-icon-left item-button-right">
            <i class="icon ri-calendar-close-fill"></i> Baja temporal
-					<button class="button button-stable" style="transform: scale(.8); margin-right: -20px; margin-top: 10px;">
+					<button class="button button-assertive" style="transform: scale(.8); margin-right: -20px; margin-top: 10px;" ng-click="modal.show()">
 						solicitar         
 					</button>
-         <p style="font-size: 10px;">Puedes solicitar 2 bajas temporales por año</p>  
+         <p style="font-size: 10px;">Puedes solicitar 2 por año</p>  
 				</div>
          
           <div class="item item-divider itemDividerforitem">Social feed</div>
          <a class="item" ng-click="showPopup()">
 					Nombre de usuario
-			<p>@SchertzValenzo</p>   
+			<p>{{userData.username}}</p>   
 				</a>
+          
+         
          </div>
-           
       </ion-content>
     </ion-view>
   </script>
@@ -989,26 +993,29 @@ body {
 
 
   <script id="modal.html" type="text/ng-template">
-    <div class="modal">
-      <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">Modal</h1>
-        <button class="button button-clear button-primary" ng-click="modal.hide()">Cancel</button>
-      </ion-header-bar>
-      
-      <ion-content class="padding">
-        <div class="list">
-          <label class="item item-input">
-            <span class="input-label">To</span>
-            <input type="text">
-          </label>
-          <label class="item item-input">
-            <span class="input-label">Message</span>
-            <textarea rows="4"></textarea>
-          </label>
-        </div>
-        <button class="button icon icon-right ion-arrow-right-c button-balanced button-block">Send</button>
-      </ion-content>
-    </div>
+    <ion-modal-view>
+        <ion-header-bar class="bar bar-header bar-positive">
+          <h1 class="title">New Contact</h1>
+          <button class="button button-clear button-primary" ng-click="modal.hide()">Cancel</button>
+        </ion-header-bar>
+        <ion-content class="padding">
+          <div class="list">
+            <label class="item item-input">
+              <span class="input-label">First Name</span>
+              <input ng-model="newUser.firstName" type="text">
+            </label>
+            <label class="item item-input">
+              <span class="input-label">Last Name</span>
+              <input ng-model="newUser.lastName" type="text">
+            </label>
+            <label class="item item-input">
+              <span class="input-label">Email</span>
+              <input ng-model="newUser.email" type="text">
+            </label>
+            <button class="button button-full button-positive" ng-click="createContact(newUser)">Create</button>
+          </div>
+        </ion-content>
+      </ion-modal-view>
   </script>  
   </div>
 </div>
@@ -1048,7 +1055,8 @@ app
       url: "/status",
       views: {
         'status-tab': {
-          templateUrl: "status.html"
+          templateUrl: "status.html",
+          controller: 'StatusCtrl'
         }
       }
     })
@@ -1293,7 +1301,30 @@ app
     };
        })
 
+  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', function($http, $scope, $ionicModal){
+        $scope.userData = [];
+  
 
+  var requestData = {
+    action: "getProfileData",
+    token: localStorage.getItem('MStoken')
+  };
+
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    followRedirects: true, 
+  };
+
+  
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+      $scope.userData = response.data;
+    })
+      
+      
+    }])
    .controller('booksCtrl1', ['$http', '$scope', '$sce', function($http, $scope, $sce){
     $scope.trustAsResourceUrl = function(url) {
         return $sce.trustAsResourceUrl(url);
