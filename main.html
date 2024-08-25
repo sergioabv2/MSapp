@@ -1259,14 +1259,16 @@ app
     }
 
     // Manejar el evento 'beforeinstallprompt'
-if (isAndroid) {
+
     window.addEventListener('beforeinstallprompt', (e) => {
+if (isAndroid) {
         e.preventDefault();
         deferredPrompt = e;
         $scope.isModalVisible = true;
         $scope.$apply(); // Forzar la actualización del scope
-    });
 }
+    });
+
 
     // Función para agregar a la pantalla de inicio
     $scope.addToHomeScreen = function() {
