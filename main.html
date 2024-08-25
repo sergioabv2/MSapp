@@ -360,16 +360,7 @@ body {
       height: 50px;
     }
  
-#myModal {
-  display: none; 
-}
 
-@media only screen and (max-width: 650px) {
-  #myModal {
-    display: block; 
-    z-index: 1000;
-  }
-}
 
 </style>
 
@@ -469,7 +460,7 @@ body {
           <div id="myModal" class="modal" ng-show="isModalVisible" ng-click="checkCloseModal($event)">
     <div class="modal-content">
       <span class="close" ng-click="closeModal()">&times;</span>
-      <button class="add-to-btn" ng-click="addToHomeScreen()">Add to home screen</button>
+      <button class="add-to-btn" ng-click="addToHomeScreen()">Agregar a pantalla de inicio</button>
     </div>
   </div>
         
@@ -1256,6 +1247,7 @@ app
        .controller('profileCtrl', function($scope) {
             $scope.isModalVisible = false;
     let deferredPrompt;
+	const isAndroid = /Android/i.test(navigator.userAgent);
 
     // Registrar el Service Worker
     if ('serviceWorker' in navigator) {
@@ -1267,12 +1259,14 @@ app
     }
 
     // Manejar el evento 'beforeinstallprompt'
+if (isAndroid) {
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         $scope.isModalVisible = true;
         $scope.$apply(); // Forzar la actualización del scope
     });
+}
 
     // Función para agregar a la pantalla de inicio
     $scope.addToHomeScreen = function() {
