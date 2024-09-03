@@ -678,7 +678,7 @@ body {
 
     
    <script id="library.html" type="text/ng-template">
-    <ion-view title="Biblioteca de partituras">
+    <ion-view title="Biblioteca">
 
       <ion-nav-bar class="bar-stable">
         <ion-nav-buttons side="right">
@@ -694,17 +694,17 @@ body {
       <div class="item item-divider itemDividerforitem">Partituras</div>
        <a class="item item-icon-left item-button-right" href="#/menu/manuals">
            <i class="icon ri-book-2-fill"></i> Manuales
-          <p style="font-size: 10px;">Recopilación de tus lecciones</p> 
+          <p style="font-size: 10px;">Recopilación de los manuales que has completado</p> 
         </a>
      
      <a class="item item-icon-left item-button-right" href="#/menu/repertoire">
            <i class="icon ri-folder-music-fill"></i> Repertorio
-         <p style="font-size: 10px;">Tus piezas finalizadas</p>  
+         <p style="font-size: 10px;">Recopilación de las piezas que has completado</p>  
         </a>
 
         <a class="item item-icon-left item-button-right" href="#/menu/books">
-           <i class="icon ri-book-fill"></i> Métodos
-         <p style="font-size: 10px;">Libros complementarios</p>  
+           <i class="icon ri-book-fill"></i> Entrenamiento
+         <p style="font-size: 10px;">Libros complementarios de técnica en el piano</p>  
         </a>
      
      
@@ -738,7 +738,7 @@ body {
           <ion-back-button></ion-back-button>
 
 <div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; padding: 15px;">
+  <div class="alert alert-info" style="text-align: center; width: 250px; ">
 	   <div class="ionic-spinner"> </div>
    Cargando...
   </div>
@@ -796,16 +796,56 @@ body {
       <ion-content >
 
           <ion-back-button></ion-back-button>
+	     
+       <div class="list">
+  
+	      <a class="item item-icon-right" href="">
+      Básico   <i class="icon ri-walk-fill"></i>
+          <p style="font-size: 10px;">Piezas de Grado Preparatorio</p> 
+        </a>
+	    
+        <a class="item item-icon-right" href="">
+      Principiante   <i class="icon ri-run-fill"></i>
+          <p style="font-size: 10px;">Piezas de Grado 1 y 2</p> 
+        </a>
+       <a class="item item-icon-right" href="">
+      Intermedio <i class="icon ri-riding-fill"></i>
+          <p style="font-size: 10px;">Piezas de Grado 3, 4 y 5</p> 
+        </a>
+       <a class="item item-icon-right" href="">
+    Avanzado   <i class="icon ri-flight-takeoff-fill"></i>
+          <p style="font-size: 10px;">Piezas de Grado 6, 7 y 8</p> 
+        </a>
+    </div>  
+       
+      </ion-content>
+    </ion-view>
+  </script>
 
-           <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)">
+
+
+	     <script id="basic.html" type="text/ng-template">   
+       <ion-view>
+      <ion-content >
+
+          <ion-back-button></ion-back-button>
+
+<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+  <div class="alert alert-info" style="text-align: center; width: 250px; ">
+	   <div class="ionic-spinner"> </div>
+   Cargando...
+  </div>
+</div>
+ 
+        <div class="documents">
+      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
         <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
           <div class="document__title">{{manual.title}}</div>
          </div>
      </div>
   
 
-    <div id="modalPDF2" class="modal-container">
+    <div class="modalPDF2" class="modal-container">
         <div class="modal-background" ng-click="hideModal()">
             <div class="modalDoc">
         
@@ -847,44 +887,23 @@ body {
 
           <ion-back-button></ion-back-button>
 
-           <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
+ <div class="list">
   
-
-    <div id="modalPDF3" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
+	      <a class="item item-icon-left" href="">
+      Solfeo   <i class="icon ri-voiceprint-line"></i>
+          <p style="font-size: 10px;">Entrenamiento para identificar notas</p> 
         </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
+	    
+        <a class="item item-icon-left" href="">
+      Escalas y Arpegios  <i class="icon ri-arrow-up-down-fill"></i>
+          <p style="font-size: 10px;">Ejercicios técnicos para mejorar la destreza.</p> 
+        </a>
+       <a class="item item-icon-left" href="">
+      Lectura a primer vista   <i class="icon ri-book-open-line"></i>
+          <p style="font-size: 10px;"> Habilidad para interpretar música al instante.</p> 
+        </a>
+    </div>  
+
        
       </ion-content>
     </ion-view>
@@ -897,44 +916,13 @@ body {
 
           <ion-back-button></ion-back-button>
 
-           <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
+   <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+  <div class="alert alert-danger" style="text-align: center; width: 250px; padding: 15px;">
+    Sin elementos para mostrar aún
+  </div>
+</div>
   
 
-    <div id="modalPDF3" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
        
       </ion-content>
     </ion-view>
@@ -948,7 +936,7 @@ body {
 
 <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
   <div class="alert alert-danger" style="text-align: center; width: 250px; padding: 15px;">
-    No tienes elementos para mostrar
+    Sin elementos para mostrar aún
   </div>
 </div>
 	 
@@ -1316,8 +1304,16 @@ app
       url: "/repertoire",
       views: {
         'menuContent': {
-          templateUrl: "repertoire.html",
-          controller: "booksCtrl2"
+          templateUrl: "repertoire.html"
+        }
+      }
+    })
+  .state('menu.repertoire.basic', {
+      url: "/basic",
+      views: {
+        'menuContent': {
+          templateUrl: "basic.html",
+	  controller: "repCtrl1"	
         }
       }
     })
@@ -1534,7 +1530,7 @@ if (isAndroid) {
 
  
 }])
-    .controller('booksCtrl2', ['$http', '$scope', '$sce', function($http, $scope, $sce){
+    .controller('repCtrl1', ['$http', '$scope', '$sce', function($http, $scope, $sce){
     $scope.trustAsResourceUrl = function(url) {
         return $sce.trustAsResourceUrl(url);
     };
