@@ -699,7 +699,7 @@ body {
         </a>
       <a class="item item-icon-left item-button-right" href="#/menu/statistics">
            <i class="icon ri-pie-chart-box-fill"></i> Estadísticas
-          <p style="font-size: 10px;">Métricas de tu desempe{o</p> 
+          <p style="font-size: 10px;">Métricas de tu desempeño</p> 
         </a>
    </div>
         
@@ -722,7 +722,7 @@ body {
           <ion-back-button></ion-back-button>
 
         <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)">
+      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
         <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
           <div class="document__title">{{manual.title}}</div>
          </div>
@@ -1102,6 +1102,15 @@ body {
 
   var app = angular.module('ionicApp', ['ionic']);
 app
+.service('loadingService', function() {
+  var hasLoaded = false;
+  this.getHasLoaded = function() {
+    return hasLoaded;
+  };
+  this.setHasLoaded = function(value) {
+    hasLoaded = value;
+  };
+})
 .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
    $stateProvider
@@ -1124,7 +1133,34 @@ app
       views: {
         'status-tab': {
           templateUrl: "status.html",
-          controller: 'StatusCtrl'
+          controller: 'StatusCtrl',
+	  resolve: {
+            userData: function($http, $ionicLoading, loadingService) {
+	     if (!loadingService.getHasLoaded()) {
+	        $ionicLoading.show({
+	          template: 'Cargando...'
+	        });
+	      }
+              var requestData = {
+                action: "getProfileData",
+                token: localStorage.getItem('MStoken')
+              };
+
+              var config = {
+                headers: {
+                  "Content-Type": "text/plain;charset=utf-8"
+                },
+                followRedirects: true
+              };
+ 
+              return $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+                .then(function(response) {
+                loadingService.setHasLoaded(true);
+                $ionicLoading.hide();
+                  return response.data;
+                });
+            }
+          }	
         }
       }
     })
@@ -1390,28 +1426,18 @@ if (isAndroid) {
     };
        })
 
-  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', function($http, $scope, $ionicModal){
-        $scope.userData = [];
+  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', 'userData', function($http, $scope, $ionicModal, userData){
+         $scope.userData = userData;
   
-
-  var requestData = {
-    action: "getProfileData",
-    token: localStorage.getItem('MStoken')
-  };
-
-  var config = {
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    followRedirects: true, 
-  };
-
-  
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-    .then(function(response) {
-      $scope.userData = response.data;
-    })
-      
+	   $ionicModal.fromTemplateUrl('modal.html', {
+  scope: $scope,
+  animation: 'slide-in-up'  
+}).then(function(modal) {
+  $scope.modal = modal;
+});
+      $scope.goToPayment = function() {
+  window.location.href = '#/menu/payment';
+};
       
     }])
    .controller('booksCtrl1', ['$http', '$scope', '$sce', function($http, $scope, $sce){
@@ -1434,22 +1460,19 @@ if (isAndroid) {
         }, 400);
     };
 
-    
-/* $scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d'},
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB'},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB'},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ'},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu'},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec'},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'}
-    ];*/
-
-       $scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa'}
+    $scope.lvl = 1;
+     $scope.blq = 2;
+ $scope.manuals = [ 
+      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
+      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
+      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
+      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
+      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
+      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
+      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
     ];
-    
-    
+
+ 
 }])
     .controller('booksCtrl2', ['$http', '$scope', '$sce', function($http, $scope, $sce){
     $scope.trustAsResourceUrl = function(url) {
