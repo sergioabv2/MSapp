@@ -721,6 +721,12 @@ body {
 
           <ion-back-button></ion-back-button>
 
+<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+  <div class="alert alert-info" style="text-align: center; width: 250px; padding: 15px;">
+   Cargando...
+  </div>
+</div>
+ 
         <div class="documents">
       <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
         <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
@@ -1492,9 +1498,11 @@ if (isAndroid) {
         }, 400);
     };
 
+   $scope.isLoading = true;
   SharedState.getNum().then(function(data) {
     $scope.lvl = data.lvl;
-    $scope.blq = data.blq;	  
+    $scope.blq = data.blq;
+     $scope.isLoading = false;
   })
 
  $scope.manuals = [ 
