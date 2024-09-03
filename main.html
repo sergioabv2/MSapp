@@ -1111,6 +1111,38 @@ app
     hasLoaded = value;
   };
 })
+.factory('SharedState', function($http, $q) {
+  var requestData = {
+    action: "getBasicData",
+    token: localStorage.getItem('MStoken')
+  };
+
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    }
+  };
+
+  var getNum = function() {
+    var deferred = $q.defer();
+
+    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+      .then(function(response) {
+        deferred.resolve({
+          lvl: response.data.lvl,
+          blq: response.data.blq
+        });
+      }, function(error) {
+        deferred.reject(error);
+      });
+
+    return deferred.promise;
+  };
+
+  return {
+    getNum: getNum
+  };
+})
 .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
    $stateProvider
@@ -1252,34 +1284,7 @@ app
       views: {
         'menuContent': {
           templateUrl: "manuals.html",
-          controller: "booksCtrl1",
-	  resolve: {
-            userData: function($http, $ionicLoading, loadingService) {
-	     if (!loadingService.getHasLoaded()) {
-	        $ionicLoading.show({
-	          template: 'Cargando...'
-	        });
-	      }
-              var requestData = {
-                action: "getBasicData",
-                token: localStorage.getItem('MStoken')
-              };
-
-              var config = {
-                headers: {
-                  "Content-Type": "text/plain;charset=utf-8"
-                },
-                followRedirects: true
-              };
- 
-              return $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-                .then(function(response) {
-                loadingService.setHasLoaded(true);
-                $ionicLoading.hide();
-                  return response.data;
-                });
-            }
-          }
+          controller: "booksCtrl1"
         }
       }
     })
@@ -1467,7 +1472,7 @@ if (isAndroid) {
 };
       
     }])
-   .controller('booksCtrl1', ['$http', '$scope', '$sce', 'userData', function($http, $scope, $sce, userData){
+   .controller('booksCtrl1', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
     $scope.trustAsResourceUrl = function(url) {
         return $sce.trustAsResourceUrl(url);
     };
@@ -1487,8 +1492,11 @@ if (isAndroid) {
         }, 400);
     };
 
-    $scope.lvl = userData.lvl;
-     $scope.blq = userData.blq;
+  SharedState.getNum().then(function(data) {
+    $scope.lvl = data.lvl;
+    $scope.blq = data.blq;	  
+  })
+
  $scope.manuals = [ 
       {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
       {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
