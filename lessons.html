@@ -108,7 +108,7 @@
 .collapsible {
     
     
-    transition: max-height 0.3s ease-out; /* Define la transición de altura máxima */
+    transition: max-height 0.3s ease-out; 
 }
 
 .text-inside{
@@ -403,8 +403,8 @@ iframe#quiz {
   <!-- End Header -->
   <!-- Tabs Nav Start -->
   <div class="row">
-   <div class="col s12" style="overflow-x: auto; max-width: 100%;">
-  <ul class="tabs" style="display: flex; white-space: nowrap; width: max-content;">
+   <div class="col s12" style="overflow-x: auto;">
+  <ul class="tabs" style="display: flex; white-space: nowrap;">
         <li class="tab col s9 levelp"><a href="#test1"><span>Preparatorio</span></a></li>
         <li class="tab col s9 level1" ><a href="#test2"><span>&nbsp&nbsp&nbsp&nbsp Grado 1 &nbsp&nbsp&nbsp&nbsp</span></a></li>
         <li class="tab col s9 level2" ><a href="#test3"><span>&nbsp&nbsp&nbsp&nbsp Grado 2 &nbsp&nbsp&nbsp&nbsp</span></a></li>
@@ -427,22 +427,27 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton"> 
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
-      </a> 
+        <div>{{lesson.name}} 
+   <span class="secondary-content" ng-if="loading"><i class="material-icons">lock</i></span>
+          <span class="secondary-content" ng-if="lvl < 1">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
+      </a>  
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 0 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 0 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 0 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 0 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -479,22 +484,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+         <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 2">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 1 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 1 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 1 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 1 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -520,22 +528,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+        <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 3">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+       <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 2 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 2 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 2 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 2 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -560,22 +571,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+        <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 4">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+     <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 3 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 3 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 3 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 3 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -598,22 +612,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+       <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 5">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 4 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 4 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 4 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 4 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -635,22 +652,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+      <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 6">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 5 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 5 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 5 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 5 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -673,22 +693,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+       <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 7">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+       <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 6 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 6 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 6 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 6 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -711,22 +734,25 @@ iframe#quiz {
     </li>
     <li class="collection-item" ng-repeat="lesson in data.lessons">
       <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">
-        <div>{{lesson.name}}<span class="secondary-content"><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id == num+lesson.material.length-1">schedule</i><i class="material-icons" ng-if="lesson.material[lesson.material.length - 1].id > num+lesson.material.length-1">lock</i></span></div>
+       <div>{{lesson.name}}<span class="secondary-content" ng-if="lvl < 8">
+          <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
+          <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
+          </span></div>
       </a>
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton">
      <div class="linehorizontal" ></div>
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lesson.material[0].id <= num">
+       <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="lvl > 7 || lesson.id <= lsn">
           <div class="collapsible-header">
-      <i class="material-icons" ng-if="material.id < num">{{material.icon}}</i>
-<i class="material-icons" ng-if="material.id >= num">pending_actions</i>
-            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="material.id < num">check</i></span></div>
+   <i class="material-icons" ng-if="lvl > 7 || lesson.id < lsn">{{material.icon}}</i>
+<i class="material-icons" ng-if="lvl == 7 && lesson.id >= lsn">pending_actions</i>
+            {{material.title}}<span class="secondary-content"><i class="material-icons" ng-if="lvl > 7 || lesson.id < lsn">check</i></span></div>
           <div class="collapsible-body">
             
   <div class="row">
     <div class="col s12">
-      <ul class="tabs">
-          <li ng-repeat="activity in material.activity" class="tab col">
+      <ul class="tabs" style="display: flex; white-space: nowrap;">
+          <li ng-repeat="activity in material.activity" class="tab col s9">
     <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
 <span class="text-inside js-trigger-video-modal"  onclick="toggle_video_modal(this)" data-youtube-id="{{activity.url}}" ng-if="activity.media == 'video'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
   </li>
@@ -824,9 +850,8 @@ iframe#quiz {
 
 </body>
 
-
-
 <script>
+	
   $(document).ready(function() {
   $('ul.tabs').tabs();
 });
@@ -853,7 +878,10 @@ app.factory('SharedState', function($http, $q) {
 
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
-        deferred.resolve(response.data.id);
+         deferred.resolve({
+          lvl: response.data.lvl,
+          lsn: response.data.lsn
+        });
       }, function(error) {
         deferred.reject(error);
       });
@@ -865,21 +893,26 @@ app.factory('SharedState', function($http, $q) {
     getNum: getNum
   };
 });
-
+ 
 
   app
 .controller('levelP', ["$scope", "SharedState", function($scope, SharedState) {
-    SharedState.getNum().then(function(num) {
-    $scope.num = num;
+  $scope.loading = true;
+    SharedState.getNum().then(function(data) {
+    $scope.lsn = data.lsn;
+      $scope.lvl = data.lvl;
+      $scope.loading = false;
   })
+  
     $scope.allData = [
      {
           block: "Bloque 1",
           lessons: [
             {
               name: 'Lección 1: Introducción',
+              id: 1,
               material:[{
-                id: 1,
+                
                 title: 'Ritmo y métrica',
                 icon: 'library_books',
                 activity:[{
@@ -938,9 +971,10 @@ app.factory('SharedState', function($http, $q) {
           },
           {
               name: 'Lección 2: Grand Staff',
+            id: 2,
               material:[
               {
-                id: 4,
+                
                 title: 'El Pentagrama y el Grand Staff',
                 icon: 'library_books',
                 activity:[{
@@ -983,6 +1017,7 @@ app.factory('SharedState', function($http, $q) {
 
           {
               name: 'Lección 3: Intervalos',
+            id: 3,
               material:[{
                 id: 6,
                 title: 'Intervalos de 2da y 3era',
@@ -1029,6 +1064,7 @@ app.factory('SharedState', function($http, $q) {
 
           {
               name: 'Lección 4: Intervalos (2da parte)',
+            id: 4,
               material:[{
                 id: 8,
                 title: 'Intervalos de 4ta y 5ta',
@@ -1083,6 +1119,7 @@ app.factory('SharedState', function($http, $q) {
           lessons: [
             {
               name: 'Lección 5: Frases',
+              id: 5,
               material:[{
                 id: 10,
                 title: 'Construcción de frases',
@@ -1129,6 +1166,7 @@ app.factory('SharedState', function($http, $q) {
           },
           {
               name: 'Lección 6: Acordes',
+            id: 6,
               material:[{
                 id: 12,
                 title: 'Construcción de acordes',
@@ -3722,5 +3760,6 @@ function showModal(element) {
         $("#drive").attr('src', '');
         
       }
+
 
 </script>
