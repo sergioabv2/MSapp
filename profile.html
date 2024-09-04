@@ -1,19 +1,20 @@
 <head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.1/js/bootstrap.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.1/js/bootstrap.js"></script>
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-  <script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css">
+   <script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css">
 <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js"></script>
 </head>
 
 
 <style>
-  
-  body {
+   body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
   
@@ -164,6 +165,11 @@
  content: "\f021";
   animation: load 1.5s steps(900, end) infinite;
 }
+  
+
+  
+
+
   
    .status-delayed:before {
   content: "\f071"; /* Example icon for completed status */
@@ -422,7 +428,12 @@
   transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
 }
 
-
+  
+  
+   .drive{
+    height: 400px;
+    width: 100%;
+  }
   
   .modal-container {
     position: fixed;
@@ -511,11 +522,166 @@
   }
   
   
+ 
+  
+ .badges{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
+  grid-gap: 12px;
+  height: auto;
+}
   
 
+.badge2 {
+  margin-top: 10px;
+   margin-bottom: 10px;
+  margin-right: 10%;
+   margin-left: 20%;
+  width: 69px;
+  height: 69px;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+  
+  .badge2::after {
+     content: attr(data-badge-name);
+     font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      position: absolute;
+      top: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 13px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .badge2:hover::after {
+      opacity: 1;
+    }
 
 
- .menu-bar {
+    .badge2:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.1);
+    }
+  
+  
+  
+
+.badge-orange {
+  background: orange;
+  box-shadow: 0 0 0 4px orange;
+}
+
+.badge-green {
+  background: #2EBC74;
+  box-shadow: 0 0 0 4px #2EBC74;
+}
+
+.badge-turquoise {
+  background: #2FBAAC;
+  box-shadow: 0 0 0 4px #2FBAAC;
+}
+
+
+.badge-olive {
+  background: #b4cc2f;
+  box-shadow: 0 0 0 4px #b4cc2f;
+}
+
+.badge-red {
+  background: #cc492f;
+  box-shadow: 0 0 0 4px #cc492f;
+}
+
+.badge-blue {
+  background: #2f84cc;
+  box-shadow: 0 0 0 4px #2f84cc;
+}
+
+.badge-magenta {
+  background: #cc2f54;
+  box-shadow: 0 0 0 4px #cc2f54;
+}
+  
+  .badge-black {
+  background: black;
+  box-shadow: 0 0 0 4px black;
+}
+  
+  .badge-inactive {
+  background: rgba(211, 211, 211, 0.5); /* Color gris tenue con transparencia */
+  box-shadow: 0 0 0 4px rgba(211, 211, 211, 0.5);
+}
+  
+ 
+
+.dashicons:before {
+  position: relative;
+  top: 13px;
+  left: 1px;
+  font-size: 40px;
+  color: white;
+}
+
+.dashicons-networking:before {
+  top: 11px;
+  left: 0;
+}
+  
+
+  .circular-progress {
+
+  width: 69px;
+  height: 69px;
+  border-radius: 50%;
+  box-sizing: border-box;
+
+   transform: scale(1.34) translate(-2.2%, -45.4%);
+}
+.circular-progress svg {
+  transform: rotate(270deg);
+}
+.circular-progress circle {
+  stroke-width: 5;
+  fill: none;
+  stroke-linecap: round;
+}
+.circular-progress circle:nth-of-type(1) {
+ stroke: #dee2e6;
+}
+.circular-progress circle:nth-of-type(2) {
+ 
+  stroke-dasharray: 251.4285714286;
+}
+.circular-progress .pct {
+  font-size: 8px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-30%, 380%);
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+  
+   .badge2:hover .circular-progress circle:nth-of-type(2){
+    stroke: #dee2e6;
+}
+
+
+  
+  
+  
+
+  .menu-bar {
             display: flex;
             justify-content: space-around;
             background-color: black;
@@ -543,14 +709,14 @@
             text-decoration: none;
     transform: scaleX(1.03) scaleY(1.06) translateZ(0);
 }
- 
+
 .menu-bar li:active {
+   color: white;
    text-decoration: none;
     transform: scale(0.96) translateZ(0);
 }
 
-
-  .menu-bar2 {
+    .menu-bar2 {
             display: flex;
             justify-content: space-around;
             background-color: black;
@@ -650,7 +816,8 @@
      margin: 10px 0;
 }
 
-   #recorder2 {
+ 
+#recorder2 {
   position: relative;
   width: 3rem;
   height: 3rem;
@@ -670,7 +837,7 @@
   position: absolute;
   transition: inherit;
 }
-   
+
  @keyframes shadow-expansion {
     0% {
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
@@ -702,30 +869,21 @@
      color: #0062cc;
 }
 
- #clicks {
-     border-radius: 50%;
-     background-color: red;
-     width: 20px;
-     height: 15px;
-     position: absolute;
-     display: none;
-}
+
 #record-audio {
   position: relative;
     margin: 45px auto 0;
 }
-#delete-audio {
-   position: absolute;
-  display: none;
-  right: 10px;
-   margin-top:50px; 
-}
+
+
+
  .save {
      position: relative;
      left: 0px;
      top: -20px;
      z-index: 100;
 }
+
 
 
 
@@ -842,9 +1000,7 @@
 
 
 
-
-
-.metronome { 
+ .metronome { 
    position: absolute;
    display: block;
   width: calc(100% - .5em);
@@ -863,6 +1019,7 @@
   z-index: 10;
   outline-color: white;
 }
+
 #stop{
   display:none;
 }
@@ -1212,6 +1369,13 @@ iframe#youtube {
 
 
 
+
+
+
+
+
+
+
   .rotate-content {
     font: 400 14px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;
     position: fixed;
@@ -1258,7 +1422,9 @@ iframe#youtube {
   }
 
 
-   #full-screen-btn{
+
+
+#full-screen-btn{
     position: absolute;
             justify-content: space-around;
             background-color: black;
@@ -1272,146 +1438,6 @@ iframe#youtube {
   }
 
 
-.uploader {
-  text-align: center;
-  display: block;
-  clear: both;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 600px;
-}
-.uploader label {
-  float: left;
-  clear: both;
-  width: 100%;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  background: #fff;
-  border-radius: 7px;
-  border: 3px solid #eee;
-  transition: all 0.2s ease;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-.uploader label:hover {
-  border-color: #454cad;
-}
-.uploader label.hover {
-  border: 3px solid #454cad;
-  box-shadow: inset 0 0 0 6px #eee;
-}
-.uploader label.hover #start i.fa {
-  transform: scale(0.8);
-  opacity: 0.3;
-}
-.uploader #start {
-  float: left;
-  clear: both;
-  width: 100%;
-}
-.uploader #start.hidden {
-  display: none;
-}
-.uploader #start i.fa {
-  font-size: 50px;
-  margin-bottom: 1rem;
-  transition: all 0.2s ease-in-out;
-}
-.uploader #response {
-  float: left;
-  clear: both;
-  width: 100%;
-}
-.uploader #response.hidden {
-  display: none;
-}
-.uploader #response #messages {
-  margin-bottom: 0.5rem;
-}
-.uploader #file-image {
-  display: inline;
-  margin: 0 auto 0.5rem auto;
-  width: auto;
-  height: auto;
-  max-width: 180px;
-}
-.uploader #file-image.hidden {
-  display: none;
-}
-.uploader #notimage {
-  display: block;
-  float: left;
-  clear: both;
-  width: 100%;
-}
-.uploader #notimage.hidden {
-  display: none;
-}
-.uploader progress,
-.uploader .progress {
-  display: inline;
-  clear: both;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 180px;
-  height: 8px;
-  border: 0;
-  border-radius: 4px;
-  background-color: #eee;
-  overflow: hidden;
-}
-.uploader .progress[value]::-webkit-progress-bar {
-  border-radius: 4px;
-  background-color: #eee;
-}
-.uploader .progress[value]::-webkit-progress-value {
-  background: linear-gradient(to right, #393f90 0%, #454cad 50%);
-  border-radius: 4px;
-}
-.uploader .progress[value]::-moz-progress-bar {
-  background: linear-gradient(to right, #393f90 0%, #454cad 50%);
-  border-radius: 4px;
-}
-.uploader input[type=file] {
-  display: none;
-}
-.uploader div {
-  margin: 0 0 0.5rem 0;
-  color: #5f6982;
-}
-.uploader .btn {
-  display: inline-block;
-  margin: 0.5rem 0.5rem 1rem 0.5rem;
-  clear: both;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  text-transform: initial;
-  border: none;
-  border-radius: 0.2rem;
-  outline: none;
-  padding: 0 1rem;
-  height: 36px;
-  line-height: 36px;
-  color: #fff;
-  transition: all 0.2s ease-in-out;
-  box-sizing: border-box;
-  background: #454cad;
-  border-color: #454cad;
-  cursor: pointer;
-}
-
- .nav-pills .nav-link.active {
-    background-color: black;
-    color: white;
-}
-
-
-
- 
 @media screen and (min-width:576px){
    .drive{
     height: 480px;
@@ -1546,22 +1572,24 @@ iframe#youtube {
   }
 }
   
-
 </style>
 
 
-<div ng-app="studentsApp" ng-controller="Controller1" >
 
+
+<div ng-app="studentsApp" ng-controller="Controller1" >
+  
 <div class="dashboard-container">
-  <div class="showbox" ng-if="!userDataLoaded">
+ <!-- <div class="showbox" ng-if="!userDataLoaded">
       <div class="loader">
         <svg class="circular" viewbox="25 25 50 50">
           <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
         </svg>
       </div>
-    </div>
+    </div>  -->
 
-    <div class="row" ng-if="userDataLoaded">
+
+    <div class="row" >
       <div class="col-sm-5">
         <div class="profile-user-data clearfix">
           <div class="circle">
@@ -1573,13 +1601,15 @@ iframe#youtube {
           </div>
           <div class="main-data" >
             <h4 style="font-size: 19px;">{{userData.name}}</h4>
+            
             <div class="pull-left achievement-count" ng-if="userData.plan === 'Premium - $1300'" style="color: #77777a; font-size: 12px;"> PLAN PREMIUM
             <i class="ri-vip-crown-fill text-golden"></i>  </div>
         <div class="pull-left achievement-count" ng-if="userData.plan === 'Pro - $700'" style="color: #77777a; font-size: 12px;"> PLAN PRO
             <i class="ri-verified-badge-fill text-blue"></i>  </div>
        <div class="pull-left achievement-count" ng-if="userData.plan === 'Estudiante - $350'" style="color: #77777a; font-size: 12px;"> PLAN ESTUDIANTE
             <i class="ri-graduation-cap-fill"></i>  </div> 
-        
+     
+       
           <br>
           <div style="margin-top: 1px">    {{userLevel}}  </div>
              <div style="font-size: 11px">Bloque: <span>{{userData.blq}}</span> - Lección: <span>{{userData.lsn}} </span> </div>
@@ -1588,36 +1618,35 @@ iframe#youtube {
           <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
         </div>
 
-          </div> 
+          </div>  
         </div>
         
-      
+  
        
           
-           <div class="user-stats " ng-if="userData.status == 'INACTIVO'" style="text-align: center;"> 
+         <div class="user-stats " ng-if="userData.status == 'INACTIVO'" style="text-align: center;"> 
             <div  class="alert alert-danger">
           Cuenta inactiva
         </div> <br><br><br>
 <button class="btn btn-dark " ng-click="openPaymentInfoModal()"> Reinscribirse</button>
         </div>
-          
- 
         
-        <div class="dashboard-panel registry-log-panel"  ng-if="userData.status != 'INACTIVO'">
+          
+        <div class="dashboard-panel registry-log-panel">
           <div class="panel-header">
             <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
           
           </div>
-          <div class="panel-body log-list-container" style="max-height: 180px;"> 
+          <div class="panel-body log-list-container" style="max-height: 185px;"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
-                <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px; "  data-pdf-url="{{entry.pdf}}" onclick="showModal(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Estudiar </button>
+                <button style="float:right; margin-right: -15px; margin-top: 7px;" data-pdf-url="{{entry.pdf}}" onclick="showModal(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'">Abrir </button>
                <div style="float:right; margin-right: -9px; margin-top: 8px;" ng-if="entry.status == 'En revisión'"> Entregada </div>
                 <div style="float:right; margin-right: -15px;" ng-if="entry.status == 'Evaluada' && entry.quote"><i class="ri-award-fill" style="font-size: 25px; color: orange;"></i>  </div>
                <div ng-if="entry.status == 'Límite de entrega: '" data-youtube-id="{{entry.video}}" 
-class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: red; cursor: pointer; padding: 0 40px""> <i class="ri-youtube-fill yticon" style="float:right;  font-size: 26px;"></i></div>
+class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: red; cursor: pointer; padding: 0 40px"> <i class="ri-youtube-fill yticon" style="float:right;  font-size: 26px; "></i></div>
                 <div ng-if="entry.status === 'A corrección'" data-youtube-id="{{entry.video}}" 
-class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color: gray; cursor: pointer; padding: 0 40px""> <i class="ri-chat-quote-line yticon" style="float:right;  font-size: 26px;"></i></div>
+class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color: gray; cursor: pointer; padding: 0 40px"> <i class="ri-chat-quote-line yticon" style="float:right; font-size: 26px; "></i></div>
                         <span style="font-size: 13px;">{{entry.name}}</span>
                <small style="font-size: 11px; margin-top: 2px;">{{entry.status}} <span ng-if="entry.status == 'Límite de entrega: '"> {{dateToString(entry.limitdate)}}</span></small>
            
@@ -1625,17 +1654,16 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
                     </li>
             </ul>
            
-          </div> 
+          </div>
         </div>
-         
       </div>
-      <div class="col-sm-7" >
-        <div class="dashboard-panel achievement-list-panel" ng-if="userData.status != 'INACTIVO'">
+      <div class="col-sm-7" ng-if="userData.status == 'ACTIVO'">
+        <div class="dashboard-panel achievement-list-panel">
           <div class="panel-header">
           <h4><i class="fa fa-fw fa-book"></i> Manuales</h4>
           </div>
-       <div class="panel-body" >
-          <div class="documents">
+       <div class="panel-body">
+            <div class="documents">
                 <div class="document" ng-repeat="manual in manuals[userData.lvl] | filter:manualFilter" ng-click="openURL(userData.lvl, $index)">
                     <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
                     <div class="document__title">{{manual.title}}</div>
@@ -1643,6 +1671,11 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
             </div>
         </div>
         </div>
+        
+        
+      
+        
+        
       </div>
     </div>
  </div> 
@@ -1652,163 +1685,8 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
   
   
   
-  <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true" >
-    <div class="modal-dialog " role="document" >
-       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        <div class="modal-content" style="margin: 0;">
-  <div class="row">
-    <aside class="col-lg-8 mx-auto text-center">
-      <article class="card" >
-        <div class="card-body p-5">
-          
-           <h4>Completa tu pago</h4> <br>
-
-
-          <ul class="nav bg-light nav-pills rounded flex-column mb-3" role="tablist" >
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" href="#nav-tab-card">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" style=" width: 22px; margin-bottom: 5px; "> Paypal</a>
-            </li>
-             <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" href="#nav-tab-google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/archive/c/c1/20210618182605%21Google_%22G%22_logo.svg" style=" width: 20px; margin-bottom: 5px; "> Google Pay</a>
-            </li>
-             <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" href="#nav-tab-bank">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Oxxo_Logo.svg" style=" width: 25px; margin-bottom: 5px;"> OXXO</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" href="#nav-tab-bbva">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/BBVA_2019.svg" style=" width: 30px; margin-bottom: 5px; "> Transferencia</a>
-            </li>
-           
-          </ul>
-
-          <div class="tab-content" >
-            <div class="tab-pane fade" id="nav-tab-card" style="background-color: transparent;">
-              <!--<p class="alert alert-success">Some text success or error</p>-->
-              <p>Paypal is easiest way to pay online</p>
-              <p>
-           <!-- <form action="https://www.paypal.me/pianounam" method="post" target="_top"> https://www.paypal.com/cgi-bin/webscr
-      <input type="hidden" name="cmd" value="_s-xclick">
-      <input type="hidden" name="hosted_button_id" value="KR9QLWUCGB98U">
-      <input type="image" src="https://lh3.googleusercontent.com/d/1TRC42weedxBQ4r9XMtulM0VS4B11KfKj" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    </form> -->
-              
-                <a href="https://www.paypal.me/pianounam" target="_blank">
-                  <img src="https://lh3.googleusercontent.com/d/1TRC42weedxBQ4r9XMtulM0VS4B11KfKj" border="0" alt="PayPal - The safer, easier way to pay online!">
-                </a>
-              </p>
-              <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div> <!-- tab-pane.// -->
-            
-            
-            
-            
-             <div class="tab-pane fade" id="nav-tab-google" style="background-color: transparent;">
-              <!--<p class="alert alert-success">Some text success or error</p>-->
-              <p>Paypal is easiest way to pay online</p>
-              <p>
-  
-               <div id="google-pay-button" style="background-color: red; display: contents;"><input type="image" src="https://raw.githubusercontent.com/google-pay/google-pay-button/1d25aa6162ad2330d3c9441ba7e6e2fb406f64c0/docs/images/google-pay-button.svg" ></div>
-              </p>
-              <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div> 
-            
-            
-            
-
-            <div class="tab-pane fade" id="nav-tab-bbva" style="background-color: transparent;">
-
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">BANCO</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">BBVA - Bancomer</p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Número de Tarjeta</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">5256 7821 7891 5792</p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">CLABE</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">0022 6090 3516 5075 21</p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Fecha</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">Domingo 28 de Julio del 2024</p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Monto</h2>
-                                            <p class="amount" style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left"></p>
-
-
-<br><br>              
-                <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left"><strong>Nota: </strong>Para que podamos validar y registrar el pago, debes enviar el comprobante mediante una captura de pantalla o una foto del baucher o ticket a nuestro contacto de WhatsApp.</p> <br>
-              
-              <form id="file-upload-form" class="uploader">
-  <input id="file-upload" type="file" name="fileUpload" accept="image/*" />
-
-  <label for="file-upload" id="file-drag">
-    <img id="file-image" src="#" alt="Preview" class="hidden">
-    <div id="start2">
-      <i class="fa fa-download" aria-hidden="true"></i>
-      <div>Select a file or drag here</div>
-      <div id="notimage" class="hidden">Please select an image</div>
-      <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
-    </div>
-    <div id="response" class="hidden">
-      <div id="messages"></div>
-    </div>
-  </label>
-</form>
-              
-  <a class="whatsapp-button" href="https://wa.me/5215564926947?text=Pago" target="_blank">
-  <svg fill="#fff" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <path d="M.057,22,1.6,16.351a10.9,10.9,0,1,1,4.233,4.133L.057,22ZM6.1,18.51A9.04,9.04,0,1,0,3.59,16.066L2.674,19.41l3.43-.9ZM16.542,13.5c-.068-.114-.249-.182-.522-.318s-1.612-.8-1.862-.886-.431-.137-.613.137-.7.886-.863,1.068-.318.2-.59.068A7.435,7.435,0,0,1,9.9,12.217,8.2,8.2,0,0,1,8.386,10.33c-.159-.272-.017-.42.119-.556s.272-.318.409-.478a1.787,1.787,0,0,0,.275-.454.5.5,0,0,0-.023-.478c-.069-.136-.613-1.477-.84-2.022s-.446-.459-.613-.468l-.523-.009a1,1,0,0,0-.726.341A3.057,3.057,0,0,0,5.511,8.48,5.3,5.3,0,0,0,6.623,11.3a12.145,12.145,0,0,0,4.653,4.113,15.762,15.762,0,0,0,1.553.574,3.744,3.744,0,0,0,1.716.108,2.806,2.806,0,0,0,1.839-1.3,2.269,2.269,0,0,0,.159-1.3Z"/>
-  </svg>
-  <p>
-    <strong>WhatsApp</strong>
-    <span>Enviar comprobante</span>
-  </p>
-</a>            
-              
-            </div>
-
-            <div class="tab-pane fade" id="nav-tab-bank" style="background-color: transparent;">
-        <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">BANCO</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">Spin OXXO</p>
-          
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Numero de Cuenta</h2>
-                                            <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left">0022 6090 3516 5075 21</p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Monto</h2>
-                                            <p class="amount" style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left"></p>
-               <h2 class="info-header" style="Margin:0;Margin-bottom:10px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-variant:all-small-caps;font-weight:600;line-height:1.230769231;margin:0;margin-bottom:0;padding:0;padding-bottom:0;padding-top:10px;text-align:left;word-wrap:normal">Presenta el QR al cajero del OXXO</h2>
-              <br> 
- <img src="https://lh3.googleusercontent.com/d/1_avjpaS-l-uLh9y2PqnwlSahTZS5F9-S" border="0" height="200px">
-
-<br><br>              
-                <p style="Margin:0;Margin-bottom:15px;color:#231f20;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:400;line-height:1.375;margin:0;margin-bottom:15px;padding:0;text-align:left"><strong>Nota: </strong>Para que podamos validar y registrar el pago, debes enviar el comprobante mediante una foto del baucher o ticket a nuestro contacto de WhatsApp.</p> <br>
-              
-  <a class="whatsapp-button" href="https://wa.me/5215564926947?text=Pago" target="_blank">
-  <svg fill="#fff" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <path d="M.057,22,1.6,16.351a10.9,10.9,0,1,1,4.233,4.133L.057,22ZM6.1,18.51A9.04,9.04,0,1,0,3.59,16.066L2.674,19.41l3.43-.9ZM16.542,13.5c-.068-.114-.249-.182-.522-.318s-1.612-.8-1.862-.886-.431-.137-.613.137-.7.886-.863,1.068-.318.2-.59.068A7.435,7.435,0,0,1,9.9,12.217,8.2,8.2,0,0,1,8.386,10.33c-.159-.272-.017-.42.119-.556s.272-.318.409-.478a1.787,1.787,0,0,0,.275-.454.5.5,0,0,0-.023-.478c-.069-.136-.613-1.477-.84-2.022s-.446-.459-.613-.468l-.523-.009a1,1,0,0,0-.726.341A3.057,3.057,0,0,0,5.511,8.48,5.3,5.3,0,0,0,6.623,11.3a12.145,12.145,0,0,0,4.653,4.113,15.762,15.762,0,0,0,1.553.574,3.744,3.744,0,0,0,1.716.108,2.806,2.806,0,0,0,1.839-1.3,2.269,2.269,0,0,0,.159-1.3Z"/>
-  </svg>
-  <p>
-    <strong>WhatsApp</strong>
-    <span>Enviar comprobante</span>
-  </p>
-</a>  
-            </div> <!-- tab-pane.// -->
-          </div> <!-- tab-content .// -->
-
-        </div> <!-- card-body.// -->
-      </article> <!-- card.// -->
-
-    </aside> <!-- col.// -->
-  </div> <!-- row.// -->
- </div>
-    </div>
-</div>
-  
-  
-  
-  
    <div id="modal-container2" class="modal-container">
- <div id="rotate-screen" style="overflow: hidden; display: none;">
+      <div id="rotate-screen" style="overflow: hidden; display: none;">
     <div class="rotate-content">
       <div class="rotate-box">
         <div class="rotate-device-img"></div>
@@ -1817,15 +1695,15 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
       </div>
   </div>
 </div>
-      
-  <div class="modal-background" > 
-    <div class="modal-msg">
-      <br>    
-        <div class="mic-container" id="recorder">
+     
+  <div class="modal-background"  >   
+    <div class="modal-msg" > 
+   
+        <div class="mic-container" id="recorder" >
       <div class="audio-record" id="recorder2">
-        <input type="checkbox" id="audio_record-icon" name="audio_record-icon">
+        <input type="checkbox" id="audio_record-icon" name="audio_record-icon ">
         <label for="audio_record-icon" class="player-icon audio_record-icon">
-           <img id="record" src="https://assets.codepen.io/3537853/record.svg" />
+   <img id="record" src="https://assets.codepen.io/3537853/record.svg" />
         </label> 
         <span> grabando... </span>
       </div>
@@ -1836,13 +1714,15 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
         
         </div>
       </div>
-
+ 
 <div id="record-audio"></div>
- <button id="delete-audio">Eliminar</button>
+<!-- <button id="delete-audio">Eliminar</button> -->
   <input type="hidden" id="AudioData">
 <span id="clicks"></span>
-          
-           <div class="metronome"  >  
+         
+</div>
+      
+       <div class="metronome">  
     <div hidden>
     <button class="main-btn blue flex-centered" id="tap" hidden>Tap</button> 
               <button class="min-btn" id="beatMinus">-</button>
@@ -1870,27 +1750,36 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
       <button class="main-btn" id="stop">
                <i class="ri-pause-fill" style="font-size: 44px; color: white;"></i>
              </button>
+      
+      
       <div class="input-section" style="opacity: 1">
     <input type="range" min="0" max="200" value="60" class="tempoSlider" step="1" oninput="temp(this.value)" id="tempo">
     <div class="thin-fill"></div>
     <div class="thick-fill"></div>
   </div>   
-  </div>          
-
-      <a href="#" class="menu-bar" id="full-screen-btn" style="visibility: hidden;"> Fullscreen </a>     
-
-      <iframe class="drive" id="drivemodal" src="" frameborder="0">
+  </div> 
+   <a href="#" class="menu-bar" id="full-screen-btn" style="visibility: hidden;"> Fullscreen </a>   
+  
+        <iframe class="drive" id="drivemodal" src="" frameborder="0">
         </iframe>
+    
+         
    
-       <ul class="menu-bar" id="menu-bar1">
+       
+      <ul class="menu-bar" id="menu-bar1">
             <li><a href="#" id="back-menu-bar" onclick="hideModal()">Salir</a></li> 
            <li><a href="#" id="toggle-recorder">Grabar</a></li> 
         </ul> 
        <ul class="menu-bar2" id="menu-bar2" style="visibility: hidden;">
             <li><a href="#" id="delete-audio">Eliminar</a></li>
            <li><a href="#" ng-click="uploadAudio()">Enviar</a></li> 
+       <!--     <li><a href="#" ng-click="uploadAudio($index)">Entregar</a></li>-->
         </ul>
- 
+     <!--  <div class="multimedia" style="font-size: 35px;">
+ <div data-youtube-id="bwiHhgPjkR8" 
+class="js-trigger-video-modal" onclick="toggle_video_modal(this)"> <i class="ri-youtube-fill" style="float: left; margin-left: 7%;"></i></div>
+         <div ><i class="ri-mic-2-fill"></i></div>
+   <div class="pdfreveal" id="two"><i class="ri-file-pdf-2-fill" style="float: right; margin-right: 7%;"></i></div>-->
              </div>
       <br>
     <!--<button ng-click="uploadAudio()" style="float: right;">Subir</button>-->
@@ -1898,10 +1787,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
     </div>
   </div>
   
-
-
-
-
+  
   
    <div class="video-modal">
     <div id="video-modal-content" class="video-modal-content">
@@ -1941,28 +1827,34 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
     </div>
     <div class="overlay"></div>
 </div>
+  
+  
+  
+  
 </div> 
   
-
-
-  
 </div>
+  
+  
+  
+  
+  
+  
 <script>
   
 
 
 
   angular.module('studentsApp', [])
-  .controller('Controller1', ['$http', '$scope', '$sce', function($http, $scope, $sce) {
+  .controller('Controller1', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
    $scope.userData = [];
   $scope.userDataLoaded = false;
-     $scope.today = new Date()
-   
+  $scope.today = new Date()
+    $scope.lsn = 5
 
   var requestData = { 
     action: "getProfileData",
     token: localStorage.getItem('MStoken')
-    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1979,7 +1871,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
       $scope.userData = response.data;
       $scope.userDataLoaded = true;
      $scope.userLevel = $scope.getLevel($scope.userData.lvl)
-    $scope.history = $scope.userData.lessons
+ $scope.history = $scope.userData.lessons
       $scope.startAnimation = function() {
         $('.progress-bar').animate({
           width: $scope.userData.progress + '%'
@@ -1997,17 +1889,11 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
     });
       });
 
-         $scope.lessons = JSON.parse($scope.userData.lessons)
+         
     
     })
-
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-
     
-    
-    $scope.getLevel = function(lvl){
+     $scope.getLevel = function(lvl){
   if(lvl == 0){
      return "Nivel Preparatorio"
   }else{
@@ -2016,12 +1902,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
 }
     
     
-    
-    
-    
-    
-    
-     $scope.dateToString = function(fechaOriginal){
+    $scope.dateToString = function(fechaOriginal){
   const partesFecha = fechaOriginal.split('/');
   const fecha = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
   const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
@@ -2038,44 +1919,16 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
   var date = new Date(parts[2], parts[1] - 1, parts[0]);
   date.setDate(date.getDate() + 1);
   return date
-}; 
-    
-     $scope.openPaymentInfoModal = function() {
-   $('#profileModal').modal('show');
-}
+};
 
    $scope.filterByLevel = function(entry) {
-    return entry.index <= $scope.userData.lsn + 1;
+    return entry.index <= $scope.lsn;
 };
-    
-    $scope.selectedManualUrl = '';
-     $scope.selectedEntry = null;
-    
-    $scope.showModal = function(entry) {
-       $scope.selectedManualUrl = entry.pdf;
-       $scope.selectedEntry = entry;
-        document.getElementById('modal-container2').classList.add('four');
-    };
 
-    $scope.hideModal = function() {
-        const modal = document.getElementById('modal-container2');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-      var metronome = document.getElementById('recorder');
-      metronome.style.display = 'none';
-    };
-    
-    
-$scope.manualFilter = function(manual, index) {
+    $scope.manualFilter = function(manual, index) {
       return index <= $scope.userData.blq - 1;
     };
-    
-     $scope.openURL = function(lvl, index) {
-        var url = $scope.manuals[lvl][index].url;
-        window.open(url, '_blank');
-    }; 
+
 
 $scope.manuals = [ 
   [
@@ -2103,52 +1956,12 @@ $scope.manuals = [
   
 ];
 
-
-
-$scope.selectedEntry = null;
-    $scope.selectEntry = function(entry) {
-       $scope.selectedEntry = entry;
-    };
     
     
+   
     
-    var readURL = function(input) {
-      if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-          $scope.$apply(function() {
-            $scope.picture = e.target.result;
-            $scope.uploadImage(e.target.result); // Enviar la imagen cargada al servidor
-          });
-        };
-
-        reader.readAsDataURL(input.files[0]);
-      }
-    };
+    
      
-    
-     $scope.uploadImage = function(data){
-       var requestData = {
-    action: "postImage",
-    token: localStorage.getItem('MStoken'),
-    blob: data
-  };
-
-  var config = {
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    followRedirects: true, 
-  };
- $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-       .then(function(response) {
- });
-     }
-    
-    
-    
-    
     $scope.uploadAudio = function() { 
      var base64Audio = document.getElementById("AudioData").value
        $scope.selectedEntry.status = "En revisión"
@@ -2172,6 +1985,15 @@ $scope.selectedEntry = null;
     .then(function(response) {
     })  
 
+      /*  $('#record-audio').empty(); 
+        document.getElementById("AudioData").value = "";
+      //document.getElementById('recorder').style.display = 'none';
+      var menuBar1 = document.getElementById('menu-bar1');
+        var menuBar2 = document.getElementById('menu-bar2');
+        menuBar2.style.visibility = 'hidden';
+        menuBar1.style.visibility = 'visible';
+        document.getElementById('back-menu-bar').style.visibility = 'visible';
+       alert("Actividad enviada a revisión")*/
       
       document.getElementById('menu-bar1').style.visibility = 'visible';
        document.getElementById('menu-bar2').style.visibility = 'hidden';
@@ -2197,12 +2019,75 @@ $scope.selectedEntry = null;
     };
     
     
-   
-}]); 
+    var readURL = function(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
 
+        reader.onload = function(e) {
+          $scope.$apply(function() {
+            $scope.picture = e.target.result;
+            $scope.uploadImage(e.target.result); // Enviar la imagen cargada al servidor
+          });
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      } 
+    };
+    
+     $scope.selectedManualUrl = '';
+     
+    
+     $scope.trustAsResourceUrl = function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+    
+    
+    $scope.selectedEntry = null;
+    $scope.selectEntry = function(entry) {
+       $scope.selectedEntry = entry;
+    };
+    
+/*     $scope.showModal = function(entry) {
+       $scope.selectedManualUrl = entry.pdf;
+       $scope.selectedEntry = entry;
+        document.getElementById('modal-container2').classList.add('four');
+    };
+
+    $scope.hideModal = function() {
+        const modal = document.getElementById('modal-container2');
+        modal.classList.add('out');
+        setTimeout(() => {
+            modal.classList.remove('four', 'out');
+        }, 400);
+      var metronome = document.getElementById('recorder');
+      metronome.style.display = 'none';
+    };  */
+    
+    
+     $scope.uploadImage = function(data){
+       var requestData = {
+    action: "postImage",
+    token: localStorage.getItem('TPtoken'),
+    blob: data
+  };
+
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    followRedirects: true, 
+  };
+ $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
+       .then(function(response) {
+ });
+     }
+    
+    
+
+}]);
+  
   
 </script>
-
 
 
 <script>
@@ -2226,10 +2111,14 @@ if (/Android/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent)
       document.getElementById('rotate-screen').style.display = 'none'
     }
   }
+
+  
+
 };
 
 
-   document.getElementById('full-screen-btn').addEventListener('click', function() {
+
+document.getElementById('full-screen-btn').addEventListener('click', function() {
     // Verifica si el navegador soporta la API de pantalla completa
     if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
@@ -2241,7 +2130,8 @@ if (/Android/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent)
         document.documentElement.msRequestFullscreen();
     }
 });
-   
+
+
 
  document.getElementById('toggle-recorder').addEventListener('click', function() {
           var metronome = document.getElementById('recorder');
@@ -2294,7 +2184,9 @@ function toggle_video_modal(element) {
       });
 
 
-   
+
+
+
   function showModal(element) {
        var url = element.getAttribute('data-pdf-url');
           $("#drivemodal").attr('src', url);   
@@ -2311,8 +2203,11 @@ function toggle_video_modal(element) {
       var metronome = document.getElementById('recorder');
       metronome.style.display = 'none';
     }
- 
 
+
+
+
+ 
 
 function toggle_video_modal2(element) {
     var htmlContent = element.getAttribute('data-youtube-id');
@@ -2388,10 +2283,9 @@ footer{
     document.body.classList.add("show-video-modal", "noscroll");
 }
 
-  
-  
-  
-  
+
+
+
 
 
  function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
@@ -2425,7 +2319,7 @@ footer{
       $('#stop-recording').disabled = true;
    
       //document.getElementById("clicks").innerHTML = "Recording Stopped";
- 
+
       var f = document.getElementById('clicks');
       setInterval(function () {
           f.style.display = (f.style.display == 'none' ? '' : 'none');
@@ -2443,6 +2337,8 @@ footer{
   };
 
   var mediaRecorder;
+
+
 
   function onMediaSuccess(stream) {
     mediaRecorder = new MediaStreamRecorder(stream);
@@ -2475,11 +2371,12 @@ footer{
     };
  
     var timeInterval = 360 * 1000;
-
     mediaRecorder.start(timeInterval);
-
     $('#stop-recording').disabled = false;
   }
+
+
+
 
   function onMediaError(e) {
     console.error('media error', e);
@@ -2514,100 +2411,7 @@ $(document).on('click','input[name="audio_record-icon"]',function(){
         stopRecording();
     }
 });
-  
-  
-  
-    
-  function ekUpload(){
-  function Init() {
 
-    console.log("Upload Initialised");
-
-    var fileSelect    = document.getElementById('file-upload'),
-        fileDrag      = document.getElementById('file-drag'),
-        submitButton  = document.getElementById('submit-button');
-
-    fileSelect.addEventListener('change', fileSelectHandler, false);
-
-    // Is XHR2 available?
-    var xhr = new XMLHttpRequest();
-    if (xhr.upload) {
-      // File Drop
-      fileDrag.addEventListener('dragover', fileDragHover, false);
-      fileDrag.addEventListener('dragleave', fileDragHover, false);
-      fileDrag.addEventListener('drop', fileSelectHandler, false);
-    }
-  }
-
-  function fileDragHover(e) {
-    var fileDrag = document.getElementById('file-drag');
-
-    e.stopPropagation();
-    e.preventDefault();
-
-    fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload');
-  }
-
-  function fileSelectHandler(e) {
-    // Fetch FileList object
-    var files = e.target.files || e.dataTransfer.files;
-
-    // Cancel event and hover styling
-    fileDragHover(e);
-
-    // Process all File objects
-    for (var i = 0, f; f = files[i]; i++) {
-      parseFile(f);
-      uploadFile(f);
-    }
-  }
-
-  // Output
-  function output(msg) {
-    // Response
-    var m = document.getElementById('messages');
-    m.innerHTML = msg;
-  }
-
-  function parseFile(file) {
-
-    console.log(file.name);
-    output(
-      '<strong>' + encodeURI(file.name) + '</strong>'
-    );
-    
-    // var fileType = file.type;
-    // console.log(fileType);
-    var imageName = file.name;
-
-    var isGood = (/\.(?=gif|jpg|png|jpeg)/gi).test(imageName);
-    if (isGood) {
-      document.getElementById('start2').classList.add("hidden");
-      document.getElementById('response').classList.remove("hidden");
-      document.getElementById('notimage').classList.add("hidden");
-      // Thumbnail Preview
-      document.getElementById('file-image').classList.remove("hidden");
-      document.getElementById('file-image').src = URL.createObjectURL(file);
-    }
-    else {
-      document.getElementById('file-image').classList.add("hidden");
-      document.getElementById('notimage').classList.remove("hidden");
-      document.getElementById('start2').classList.remove("hidden");
-      document.getElementById('response').classList.add("hidden");
-      document.getElementById("file-upload-form").reset();
-    }
-  }
-
-
-  // Check for the various File API support.
-  if (window.File && window.FileList && window.FileReader) {
-    Init();
-  } else {
-    document.getElementById('file-drag').style.display = 'none';
-  }
-}
-ekUpload();
- 
 
 const slider = document.querySelector(".tempoSlider");
 const sliderMax = slider.getAttribute("max");
@@ -2804,7 +2608,7 @@ stop.addEventListener('click', function(){
   this.style.display = "none";
   start.style.display = "block";
 });
- 
+
 close.addEventListener('click', function(){
   window.clearInterval(timer);
   noteFlag = 0;
@@ -2921,14 +2725,6 @@ bothDisplay.addEventListener('click', function(){
     dotTarget.style.display = 'flex';
     digitalDisplayContainer.style.display = 'flex';
 });
-
-
-
-
-
-
-
-
 
 
 </script>
