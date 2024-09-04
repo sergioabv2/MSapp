@@ -1503,6 +1503,22 @@ iframe#youtube {
       #record-audio{
     margin-left: -535px;
   }
+     #lsnContainer{
+       height: 285px !important;
+       max-height: 285px !important;
+     }
+     
+     .profile-user-data{
+       margin-top: 20px;
+     }
+     
+     .p-image{
+       margin-top: 20px;
+     }
+     
+     .achievement-list-panel{
+       margin-top: 50px;
+     }
    
 }
   
@@ -1590,7 +1606,7 @@ iframe#youtube {
 
 
     <div class="row" >
-      <div class="col-sm-5">
+      <div class="col-sm-8">
         <div class="profile-user-data clearfix">
           <div class="circle">
               <img class="profile-pic" src={{picture}}>
@@ -1637,7 +1653,7 @@ iframe#youtube {
             <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
           
           </div>
-          <div class="panel-body log-list-container" style="max-height: 185px;"> 
+          <div class="panel-body log-list-container" id="lsnContainer" style="max-height: 185px;"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
                 <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="showModal(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
@@ -1657,10 +1673,10 @@ class="js-trigger-video-modal" onclick="toggle_video_modal2(this)" style="color:
           </div>
         </div>
       </div>
-      <div class="col-sm-7" ng-if="userData.status == 'ACTIVO'">
+      <div class="col-sm-4" ng-if="userData.status == 'ACTIVO'">
         <div class="dashboard-panel achievement-list-panel">
           <div class="panel-header">
-          <h4><i class="fa fa-fw fa-book"></i> Manuales</h4>
+          <h4><i class="fa fa-fw fa-book"></i> Manual en curso</h4>
           </div>
        <div class="panel-body">
             <div class="documents">
