@@ -1870,8 +1870,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)"> <i class="ri-
 
   var requestData = { 
     action: "getProfileData",
-    token: "U2FsdGVkX18ULyziIuuWAfHRHmp4Ti/rMrOdDTDspKrXYc64BaycSOYvQkiaOUGl"
-    //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2084,7 +2083,7 @@ $scope.manuals = [
      $scope.uploadImage = function(data){
        var requestData = {
     action: "postImage",
-    token: localStorage.getItem('TPtoken'),
+    token: localStorage.getItem('MStoken'),
     blob: data
   };
 
@@ -2094,7 +2093,7 @@ $scope.manuals = [
     },
     followRedirects: true, 
   };
- $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
        .then(function(response) {
  });
      }
