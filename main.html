@@ -1609,8 +1609,7 @@ app
       url: "/profile",
       views: {
         'menuContent': {
-          templateUrl: "profile.html",
-          controller: "profileCtrl"
+          templateUrl: "profile.html"
         }
       }
     })
@@ -1854,6 +1853,59 @@ app
   window.location.href = '#/menu/status';
 };
 
+	$scope.isModalVisible = false;
+let deferredPrompt;
+const isAndroid = /Android/i.test(navigator.userAgent);
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// Registrar el Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(function (registration) {
+    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+  }, function (err) {
+    console.log('ServiceWorker registration failed: ', err);
+  });
+}
+
+// Manejar el evento 'beforeinstallprompt'
+window.addEventListener('beforeinstallprompt', (e) => {
+  if (isAndroid) {
+    e.preventDefault();
+    deferredPrompt = e;
+  }
+});
+
+// Función para agregar a la pantalla de inicio
+$scope.installApp = function () {
+  if (isAndroid && deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt');
+      } else {
+        console.log('User dismissed the A2HS prompt');
+      }
+      deferredPrompt = null;
+    });
+  } else if (isIOS) {
+    // Mostrar modal con la animación GIF para iOS
+    $scope.isModalVisible = true;
+  }
+};
+
+// Cerrar modal
+$scope.closeModal = function () {
+  $scope.isModalVisible = false;
+};
+
+// Cerrar modal si se hace clic fuera de él
+$scope.checkCloseModal = function (event) {
+  if (event.target.id === 'iosModal') {
+    $scope.closeModal();
+  }
+};
+
+
   $scope.logout = function() {
     $('.preloader').fadeIn('slow');
 
@@ -1884,60 +1936,6 @@ app
   };
 
  }])
-
-       .controller('profileCtrl', function($scope) {
-            $scope.isModalVisible = false;
-    let deferredPrompt;
-	const isAndroid = /Android/i.test(navigator.userAgent);
-
-    // Registrar el Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(function(registration) {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, function(err) {
-            console.log('ServiceWorker registration failed: ', err);
-        });
-    }
-
-    // Manejar el evento 'beforeinstallprompt'
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-if (isAndroid) {
-        e.preventDefault();
-        deferredPrompt = e;
-        $scope.isModalVisible = true;
-        $scope.$apply(); // Forzar la actualización del scope
-}
-    });
-
-
-    // Función para agregar a la pantalla de inicio
-    $scope.addToHomeScreen = function() {
-        $scope.isModalVisible = false;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-        });
-    };
-
-    // Cerrar modal
-    $scope.closeModal = function() {
-        $scope.isModalVisible = false;
-    };
-
-    // Cerrar modal si se hace clic fuera de él
-    $scope.checkCloseModal = function(event) {
-        if (event.target.id === 'myModal') {
-            $scope.closeModal();
-        }
-    };
-  
-       })
 
   .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', '$ionicLoading', 'SharedState', function($http, $scope, $ionicModal, $ionicLoading, SharedState){
     $ionicLoading.show({
