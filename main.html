@@ -661,12 +661,14 @@ body {
       <i class="ion-android-download" ></i> Instalar App
     </div>
 
-<div id="iosModal" class="modal" ng-show="isModalVisible" ng-click="checkCloseModal($event)">
-  <div class="modal-content">
-    <img src="https://lh3.googleusercontent.com/d/1Hv9WGtVuOhTwTcolJyMO7IIlZjjydQsU" alt="Agregar a inicio" style="max-width: 100%;" />
+ <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/1Hv9WGtVuOhTwTcolJyMO7IIlZjjydQsU" alt="Agregar a inicio" style="max-width: 100%;" />
     <p style="text-align: center; font-weight: bold;">Para agregar la aplicación a tu pantalla de inicio, presiona el icono de compartir y selecciona "Añadir a pantalla de inicio".</p>
+    </div>
   </div>
-</div>     
+	     
   </div>
         
     </ion-nav-bar>
@@ -1905,12 +1907,6 @@ $scope.closeModal = function () {
   $scope.isModalVisible = false;
 };
 
-// Cerrar modal si se hace clic fuera de él
-$scope.checkCloseModal = function (event) {
-  if (event.target.id === 'iosModal') {
-    $scope.closeModal();
-  }
-};
 
 
   $scope.logout = function() {
