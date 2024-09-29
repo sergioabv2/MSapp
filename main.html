@@ -1946,16 +1946,13 @@ $scope.closeModal = function () {
 
  }])
 
-  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', '$ionicLoading', 'SharedState', function($http, $scope, $ionicModal, $ionicLoading, SharedState){
+  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', '$ionicLoading', function($http, $scope, $ionicModal, $ionicLoading){
     $ionicLoading.show({
             template: 'Cargando...'
           });
     
-  SharedState.getNum().then(function(data) {
-       $scope.userData = data.data;
-       $ionicLoading.hide();
-  })
-   /*  var requestData = {
+
+     var requestData = {
                 action: "getProfileData",
                 token: localStorage.getItem('MStoken')
               };
@@ -1973,7 +1970,7 @@ $scope.closeModal = function () {
                   $scope.userData = response.data;
                 });
   
-	   $ionicModal.fromTemplateUrl('modal.html', {
+	/*   $ionicModal.fromTemplateUrl('modal.html', {
   scope: $scope,
   animation: 'slide-in-up'  
 }).then(function(modal) {
