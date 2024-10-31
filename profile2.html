@@ -1648,7 +1648,7 @@ iframe#youtube {
         </div>
         
           
-        <div class="dashboard-panel registry-log-panel">
+        <div class="dashboard-panel registry-log-panel" ng-if="userData.status == 'ACTIVO'">
           <div class="panel-header">
             <h4><i class="fa fa-fw fa-clock-o"></i> Registro de actividad</h4>
           
@@ -1869,7 +1869,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)"> <i class="ri-
 
   var requestData = { 
     action: "getProfileData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1983,7 +1983,7 @@ $scope.manuals = [
        $scope.selectedEntry.status = "En revisión"
 
 
-   /* var requestData = {
+    var requestData = {
     action: "postAudio",
     token: localStorage.getItem('MStoken'),
       lesson: $scope.selectedEntry.name,
@@ -1999,7 +1999,7 @@ $scope.manuals = [
   }; 
    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
-    })  */
+    })  
 
       /*  $('#record-audio').empty(); 
         document.getElementById("AudioData").value = "";
