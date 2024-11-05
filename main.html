@@ -464,6 +464,16 @@ body {
 
    
 
+.tabs-container {
+    display: none;
+}
+
+/* Mostrar la barra de tabs solo en pantallas de hasta 768px */
+@media (max-width: 850px) {
+    .tabs-container {
+        display: block;
+    }
+}
 </style>
 
 <body>
@@ -877,8 +887,7 @@ body {
       </ion-nav-buttons>
     </ion-nav-bar>
 
-    <!-- Mueve ion-tabs aquí dentro del ion-view para que aparezca en la parte superior -->
-    <ion-tabs class="tabs-icon-top tabs-stable">
+    <ion-tabs class="tabs-container tabs-icon-top tabs-stable">
       <ion-tab title="Teoría" icon="ion-ios-people" href="#/menu/tab/theory">
         <ion-nav-view name="theory-tab"></ion-nav-view>
       </ion-tab>
@@ -1806,9 +1815,7 @@ app
       url: "/tab",
       views: {
         'menuContent' :{
-          templateUrl: "tabs.html",
-          controller: 'tabsCtrl'
-        }
+          templateUrl: "tabs.html"
       }
     })
       .state("menu.tabs.theory", {
@@ -2183,27 +2190,6 @@ $scope.closeModal = function () {
 };
       
     }])
-
-
-    .controller('tabsCtrl', ['$scope', '$window', function($scope, $window) {
-    
-    // Función para determinar si la pantalla es de tamaño móvil
-    $scope.isMobile = function() {
-        return $window.innerWidth < 768;
-    };
-
-    // Escuchar cambios de tamaño en la ventana para actualizar la visibilidad de la barra de tabs
-    angular.element($window).on('resize', function() {
-        $scope.$apply(); // Aplicar el cambio en $scope si la ventana cambia de tamaño
-    });
-
-
-    // Limpiar el evento al destruir el controlador
-    $scope.$on('$destroy', function() {
-        angular.element($window).off('resize');
-    });
-    
-}])
 
     
    .controller('manualsCtrl', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
