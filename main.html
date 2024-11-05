@@ -502,7 +502,7 @@ body {
               
                            <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="right"><i class="ri-git-repository-fill" ></i>&nbsp&nbspBiblioteca</a>
                               
-       <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
+       <a href="#/menu/tab/theory" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
   <!--   <a href="#/menu/resources" class="item" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
     <a href="#/menu/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'"  menu-toggle="right"><i class="ri-question-answer-fill"></i>&nbsp&nbspTutor</a>     
              <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-file-paper-2-fill"></i>&nbsp&nbspLineamientos</a> -->
@@ -862,6 +862,48 @@ body {
       </ion-content>
     </ion-view>
   </script>
+
+
+
+        
+     <script id="tabs.html" type="text/ng-template">
+     <ion-nav-bar class="bar-light" >     
+       <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goToMain()">
+      <i class="ri-arrow-left-s-line"></i> regresar
+    </button>
+  </ion-nav-buttons>  
+    </ion-nav-bar>
+
+
+  <ion-tabs class="tabs-icon-top tabs-stable" >
+      <ion-tab title="Teoría" icon="ion-ios-people" href="#/menu/tab/theory">
+        <ion-nav-view name="comunity-tab"></ion-nav-view>
+      </ion-tab>
+      <ion-tab title="Práctica" icon="ion-ios-contact-outline" href="#/menu/tab/practice">
+        <ion-nav-view name="profile-tab"></ion-nav-view>
+      </ion-tab>
+    </ion-tabs>
+</script>
+
+
+
+
+ <script id="theory.html" type="text/ng-template"> 
+  <ion-view > 
+    <ion-content class="padding"> 
+        <div class="iframe-container"><iframe src="https://www.mozartacademy.mx/" frameborder="0" allowfullscreen ></iframe></div> 
+    </ion-content> 
+  </ion-view> 
+</script>
+
+ <script id="practice.html" type="text/ng-template"> 
+  <ion-view > 
+    <ion-content class="padding"> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/profile" frameborder="0" allowfullscreen ></iframe></div> 
+    </ion-content> 
+  </ion-view> 
+</script>
 
     
         <script id="chat.html" type="text/ng-template">
@@ -1757,6 +1799,30 @@ app
         }
       }
     }) 
+       .state('menu.tabs', {
+      url: "/tab",
+      views: {
+        'menuContent' :{
+          templateUrl: "tabs.html"
+        }
+      }
+    })
+      .state("menu.tabs.theory", {
+        url: "/theory",
+        views: {
+          "theory-tab": {
+            templateUrl: "theory.html"
+          }
+        }
+      })
+       .state("menu.tabs.practice", {
+        url: "/practice",
+        views: {
+          "practice-tab": {
+            templateUrl: "practice.html"
+          }
+        }
+      })
       .state('menu.courses', {
       url: "/courses",
       views: {
