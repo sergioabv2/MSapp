@@ -502,7 +502,7 @@ body {
               
                            <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="right"><i class="ri-git-repository-fill" ></i>&nbsp&nbspBiblioteca</a>
                               
-       <a href="#/menu/tab/theory" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
+       <a href="#/menu/tab/practice" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
   <!--   <a href="#/menu/resources" class="item" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
     <a href="#/menu/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'"  menu-toggle="right"><i class="ri-question-answer-fill"></i>&nbsp&nbspTutor</a>     
              <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-file-paper-2-fill"></i>&nbsp&nbspLineamientos</a> -->
@@ -1806,7 +1806,8 @@ app
       url: "/tab",
       views: {
         'menuContent' :{
-          templateUrl: "tabs.html"
+          templateUrl: "tabs.html",
+          controller: 'tabsCtrl'
         }
       }
     })
@@ -2065,6 +2066,9 @@ app
      $scope.goToStatus = function() {
   window.location.href = '#/menu/status';
 };
+    $scope.goToMain = function() {
+   window.location.href = '#/main';
+};
 
   $scope.isModalVisible = false;
 let deferredPrompt;
@@ -2179,6 +2183,29 @@ $scope.closeModal = function () {
 };
       
     }])
+
+
+    .controller('tabsCtrl', ['$scope', '$window', function($scope, $window) {
+    
+    // Función para determinar si la pantalla es de tamaño móvil
+    $scope.isMobile = function() {
+        return $window.innerWidth < 768;
+    };
+
+    // Escuchar cambios de tamaño en la ventana para actualizar la visibilidad de la barra de tabs
+    angular.element($window).on('resize', function() {
+        $scope.$apply(); // Aplicar el cambio en $scope si la ventana cambia de tamaño
+    });
+
+
+    // Limpiar el evento al destruir el controlador
+    $scope.$on('$destroy', function() {
+        angular.element($window).off('resize');
+    });
+    
+}])
+
+    
    .controller('manualsCtrl', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
     $scope.trustAsResourceUrl = function(url) {
         return $sce.trustAsResourceUrl(url);
