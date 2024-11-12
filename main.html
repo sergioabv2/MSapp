@@ -575,7 +575,13 @@ body {
        <script id="status.html" type="text/ng-template">
     <ion-view>
       
-        <ion-back-button></ion-back-button>
+        <ion-nav-bar class="bar-light" >     
+       <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goToMain()">
+      <i class="ri-arrow-left-s-line"></i> regresar
+    </button>
+  </ion-nav-buttons>  
+    </ion-nav-bar>
           
       <ion-content >
        <div class="list">
@@ -653,7 +659,7 @@ body {
       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="left">
 
-       <button class="button button-clear" ng-click="toggleDropdown($event)" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
       Mozart Appcademy
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
@@ -719,7 +725,7 @@ body {
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="left">
 
-       <button class="button button-clear" ng-click="toggleDropdown($event)" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
      Mozart Appcademy
  <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
@@ -839,7 +845,7 @@ body {
       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="left">
 
-       <button class="button button-clear" ng-click="toggleDropdown($event)" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
       Mozart Appcademy
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
@@ -1100,7 +1106,7 @@ app
   });
  })       
 
-.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', 'SharedState', '$document', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, SharedState, $document) {
+.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', 'SharedState', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, SharedState) {
   $scope.toggleRight = function() {
     $('.item').removeClass('anim');
     setTimeout(function() {
@@ -1117,23 +1123,11 @@ app
   }) 
 
     $scope.isDropdownVisible = false;
-    $scope.toggleDropdown = function(event) {
-      event.stopPropagation();
+    $scope.toggleDropdown = function() {
       $scope.isDropdownVisible = !$scope.isDropdownVisible;
     };
   
-   $document.on('click', function(event) {
-    const dropdown = document.querySelector('.dropdownContent');
-    if ($scope.isDropdownVisible && !dropdown.contains(event.target)) {
-      $scope.$apply(function() {
-        $scope.isDropdownVisible = false;
-      });
-    }
-  });
 
-     $scope.$on('$destroy', function() {
-    $document.off('click');
-  });
    $scope.goToProfile = function() {
   window.location.href = '#/menu/profile';
 };  
@@ -1225,14 +1219,9 @@ $scope.closeModal = function () {
 
  }])
 
-  .controller('StatusCtrl', ['$http', '$scope', '$ionicModal', '$ionicLoading', 'SharedState', function($http, $scope, $ionicModal, $ionicLoading, SharedState){
-     $ionicLoading.show({
-            template: 'Cargando...'
-          });
-    
+  .controller('StatusCtrl', ['$scope', 'SharedState', function($scope, SharedState){    
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
-       $ionicLoading.hide();
   })
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
