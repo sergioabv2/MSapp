@@ -2,7 +2,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" href="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" type="image/x-icon">
-    <title>Mozart Academy</title>
+    <title>Mozart Appcademy</title>
   
 <link href="https://code.ionicframework.com/1.3.3/css/ionic.min.css" rel="stylesheet">
   <script src="https://code.ionicframework.com/1.3.3/js/ionic.bundle.min.js"></script>
@@ -510,18 +510,10 @@ body {
         </ion-header-bar>
         <ion-content>
           <ul class="list">
-          <!--     <a href="#/menu/status" class="item"  menu-toggle="right" ><i class="ri-user-fill"></i>&nbsp&nbspPerfil</a>  -->
-      <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="right"><i class="" >🎹</i>&nbsp&nbspTaller de Piano</a> 
-   <a href="#/menu/profile" class="item" ng-class="(activeMenuClr=='profile')?'menuSelectedColor':''" ng-click="activeMenuClr = 'profile'" menu-toggle="right"><i class="ri-list-check-3" ></i>&nbsp&nbspProgreso</a> 
-            <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="right"><i class="ri-presentation-fill" ></i>&nbsp&nbspCursos</a> 
-           <!--    <a href="#/menu/profile" class="item" ng-class="(activeMenuClr=='profile')?'menuSelectedColor':''" ng-click="activeMenuClr = 'profile'" menu-toggle="right"><i class="ri-line-chart-fill" ></i>&nbsp&nbspProgreso</a> -->
-              
+           <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="right"><i class="ri-presentation-fill" ></i>&nbsp&nbspInicio</a> 
                            <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="right"><i class="ri-git-repository-fill" ></i>&nbsp&nbspBiblioteca</a>
                               
        <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
-  <!--   <a href="#/menu/resources" class="item" ng-class="(activeMenuClr=='resources')?'menuSelectedColor':''" ng-click="activeMenuClr = 'resources'" menu-toggle="right"><i class="ri-dashboard-fill"></i>&nbsp&nbspRecursos</a>
-    <a href="#/menu/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'"  menu-toggle="right"><i class="ri-question-answer-fill"></i>&nbsp&nbspTutor</a>     
-             <a href="#/menu/about" class="item" ng-class="(activeMenuClr=='about')?'menuSelectedColor':''" ng-click="activeMenuClr = 'about'" menu-toggle="right"><i class="ri-file-paper-2-fill"></i>&nbsp&nbspLineamientos</a> -->
           </ul>
         </ion-content>
     <ion-footer-bar>
@@ -693,72 +685,6 @@ body {
     </ion-view>
   </script>
     
-     <script id="lessons.html" type="text/ng-template">
-    <ion-view >
-
-      <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="left">
-  <!--  <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
-      <img src="https://lh3.googleusercontent.com/d/1EP2I0BOMo_8mXsR9qqAv08PxjztZFaQ8" width="35" height="35" style="border-radius: 50%;" />
-       Mozart Academy
-    </button> -->
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
-      <img src="https://lh3.googleusercontent.com/d/1EP2I0BOMo_8mXsR9qqAv08PxjztZFaQ8" width="35" height="35" style="border-radius: 50%;" />
-      Mozart Academy
-  <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
-        <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
-    </div>
-    </button>
-  </ion-nav-buttons>
-       
-        <ion-nav-buttons side="right">
-          <button class="button button-clear" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
-        </ion-nav-buttons>   
-       
-        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
-     <div id="bannerRow">
-      <div class="profileImageContainer">
-        <img src="{{userData.photo}}"  />
-      </div>
-      <p class="profileName">{{userData.name}}</p>
-      <p class="profileEmail">{{userData.mail}}</p>
-    </div>
-    <div class="dropdown-item" ng-click="goToStatus()">
-      <i class="ion-ios-contact-outline"></i> Perfil
-    </div>
-    <div class="dropdown-item" ng-click="goToAgenda()">
-      <i class="ion-android-calendar"></i> Agenda
-    </div>
-    <div class="dropdown-item" ng-click="installApp()">
-      <i class="ion-android-download" ></i> Instalar App
-    </div>
-
- <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>
-       
-  </div>
-        
-    </ion-nav-bar>
-
-     <ion-content>
-       
-   <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/lessons" frameborder="0" allowfullscreen></iframe></div>
-
-      </ion-content>
-
-    </ion-view>
-  </script>   
 
 
 
@@ -772,8 +698,8 @@ body {
        Mozart Academy
     </button> -->
        <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
-      <img src="https://lh3.googleusercontent.com/d/1EP2I0BOMo_8mXsR9qqAv08PxjztZFaQ8" width="35" height="35" style="border-radius: 50%;" />
-      Mozart Academy
+      <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
+      Mozart Appcademy
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
@@ -841,7 +767,7 @@ body {
        Mozart Academy
     </button> -->
        <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
-      <img src="https://lh3.googleusercontent.com/d/1EP2I0BOMo_8mXsR9qqAv08PxjztZFaQ8" width="35" height="35" style="border-radius: 50%;" />
+      <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
      Mozart Academy
  <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
@@ -873,7 +799,7 @@ body {
         
       <ion-content >
        
-        <div class="iframe-container"><iframe src="https://www.mozartacademy.mx/newLanding" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/comunity" frameborder="0" allowfullscreen ></iframe></div> 
     
       </ion-content>
     </ion-view>
@@ -903,7 +829,7 @@ body {
     </ion-tabs>
 
     <ion-content class="padding tabframe-container"> 
-        <div class="iframe-container"><iframe src="https://www.mozartacademy.mx/profile" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/profile" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
 
   </ion-view>
@@ -915,7 +841,7 @@ body {
  <script id="theory.html" type="text/ng-template"> 
   <ion-view > 
     <ion-content class="padding"> 
-        <div class="iframe-container"><iframe src="https://www.mozartacademy.mx/lessons" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/lessons" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
   </ion-view> 
 </script>
@@ -923,7 +849,7 @@ body {
  <script id="practice.html" type="text/ng-template"> 
   <ion-view > 
     <ion-content class="padding"> 
-        <div class="iframe-container"><iframe src="https://www.mozartacademy.mx/profile" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/profile" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
   </ion-view> 
 </script>
@@ -951,6 +877,8 @@ body {
       </ion-content>
     </ion-view>
   </script>
+
+
     
    <script id="library.html" type="text/ng-template">
     <ion-view >
@@ -1031,671 +959,11 @@ body {
   </script>   
 
 
-  
 
-    
-   <script id="manuals.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
 
-          <ion-back-button></ion-back-button>
 
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
 
-    <div id="modalPDF" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
 
-
-  
-    
-    
-     <script id="repertoire.html" type="text/ng-template">   
-       <ion-view title="Repertorio">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-       
-       <div class="list">
-  
-        <a class="item item-icon-right" href="#/menu/repertoire/basic">
-      Básico   <i class="icon ri-walk-fill"></i>
-          <p style="font-size: 10px;">Piezas de Grado Preparatorio</p> 
-        </a>
-      
-        <a class="item item-icon-right" href="#/menu/repertoire/beginner">
-      Principiante   <i class="icon ri-run-fill"></i>
-          <p style="font-size: 10px;">Piezas de Grado 1 y 2</p> 
-        </a>
-       <a class="item item-icon-right" href="#/menu/repertoire/intermediate">
-      Intermedio <i class="icon ri-riding-fill"></i>
-          <p style="font-size: 10px;">Piezas de Grado 3, 4 y 5</p> 
-        </a>
-       <a class="item item-icon-right" href="#/menu/repertoire/advanced">
-    Avanzado   <i class="icon ri-flight-takeoff-fill"></i>
-          <p style="font-size: 10px;">Piezas de Grado 6, 7 y 8</p> 
-        </a>
-    </div>  
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-
-       <script id="basic.html" type="text/ng-template">   
-       <ion-view title="Repertorio básico">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalBasic" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-    
-       <script id="beginner.html" type="text/ng-template">   
-       <ion-view title="Repertorio principiante">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalBeginner" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-
-
-    
-       <script id="intermediate.html" type="text/ng-template">   
-       <ion-view title="Repertorio intermedio">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalIntermediate" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-
-    
-       <script id="advanced.html" type="text/ng-template">   
-       <ion-view title="Repertorio avanzado">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalAdvanced" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-    <script id="books.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
- <div class="list">
-   <div class="item item-divider itemDividerforitem">Métodos</div>
-        <a class="item item-icon-left" href="#/menu/books/solfiege">
-      Solfeo   <i class="icon ri-voiceprint-line"></i>
-          <p style="font-size: 10px;">Entrenamiento para identificar notas</p> 
-        </a>
-      
-        <a class="item item-icon-left" href="#/menu/books/scales">
-      Escalas y Arpegios  <i class="icon ri-arrow-up-down-fill"></i>
-          <p style="font-size: 10px;">Ejercicios técnicos para mejorar la destreza.</p> 
-        </a>
-       <a class="item item-icon-left" href="#/menu/books/sightread">
-      Lectura a primer vista   <i class="icon ri-book-open-line"></i>
-          <p style="font-size: 10px;"> Habilidad para interpretar música al instante.</p> 
-        </a>
-
-       <div class="item item-divider itemDividerforitem">Apps musicales</div>
-   <a class="item item-avatar" href="#/menu/metronome">
-        <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/42/1e/07/421e07cc-b33b-e384-1995-06183618693a/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp">
-           <h2> Metrónomo</h2>
-     <p> metronome beats </p>
-          </a>
-     <a class="item item-avatar" href="#/menu/notereader">
-            <img src="https://play-lh.googleusercontent.com/NzG7u3_0xrBfYdx-_ddIZn9x8VFv5oBtOuMsgpWIZJ8vqB8pWUIUeIMcl-9saY8-N0o=w480-h960-rw">
-           <h2> Lectura de notas </h2>
-     <p> Entrenamiento melódico</p>
-          </a>
-      <a class="item item-avatar" href="#/menu/circlefifths">
-            <img src="https://lh3.googleusercontent.com/d/16w1B_HGaZPCaG5uhMjTA824i_uTFcnTF=s100-p">
-           <h2> Círculo de quintas </h2>
-     <p> Entrenamiento armónico</p>
-          </a>
-      
-    </div>  
-
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-
-         <script id="solfiege.html" type="text/ng-template">   
-       <ion-view title="Solfeo">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalSofiege" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-         <script id="scales.html" type="text/ng-template">   
-       <ion-view title="Escalas y Arpegios">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalScales" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-         <script id="sightread.html" type="text/ng-template">   
-       <ion-view title="Lectura a primer vista">
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-<div ng-if="isLoading" style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-info" style="text-align: center; width: 250px; ">
-     <div class="ionic-spinner"> </div>
-   Cargando...
-  </div>
-</div>
- 
-        <div class="documents">
-      <div class="document" ng-repeat="manual in manuals" ng-click="showModal($index)" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
-        <div class="document__img" ng-style="{'background-image': 'url(' + manual.background + ')'}"></div>
-          <div class="document__title">{{manual.title}}</div>
-         </div>
-     </div>
-  
-
-    <div id="modalSightread" class="modal-container">
-        <div class="modal-background" ng-click="hideModal()">
-            <div class="modalDoc">
-        
-                      <a 
-         href="" 
-         class="close-modal" 
-        >
-         <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg>
-        </a>
-       
-                <iframe class="drive" ng-src="{{trustAsResourceUrl(selectedManualUrl)}}" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-      <script id="diplomas.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-   <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-danger" style="text-align: center; width: 250px; padding: 15px;">
-    Sin elementos para mostrar aún
-  </div>
-</div>
- 
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-    
- <script id="statistics.html" type="text/ng-template">
-<ion-view>
-     <ion-content>
-         <ion-back-button></ion-back-button>
-
-<div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-  <div class="alert alert-danger" style="text-align: center; width: 250px; padding: 15px;">
-    Sin elementos para mostrar aún
-  </div>
-</div>
-   
-      </ion-content>
-    </ion-view>
-  </script>  
-
-
- <script id="metronome.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-       <div class="iframe-container"><iframe src="https://embed.metronome.app/" frameborder="0" allowfullscreen></iframe></div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-    
-
- <script id="notereader.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-    <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/notereader" frameborder="0" allowfullscreen></iframe></div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-     <script id="circlefifths.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-   <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/circleoffifths" frameborder="0" allowfullscreen></iframe></div>
-       
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-
-
-
-<script id="about.html" type="text/ng-template">
- 
-   <ion-view title="Lineamientos">
-
-      <ion-nav-bar class="bar-stable">
-        <ion-nav-buttons side="right">
-          <button class="button button-icon button-clear ion-navicon" ng-click="toggleRight()"></button>
-        </ion-nav-buttons>      
-    </ion-nav-bar>
-
-     <ion-content>
-    <div class="list">
-          <a class="item" href="#/menu/regulation">
-            Reglamento
-          </a>
-
-
-          <a class="item" href="#/menu/aboutus">
-           Acerca de
-          </a>
-</div>
-      </ion-content>
-    </ion-view>
-  </script>   
-
-
-
-
-
-
-   <script id="aboutus.html" type="text/ng-template">   
-       <ion-view>
-      <ion-content >
-
-          <ion-back-button></ion-back-button>
-
-        <h2>Acerca de</h2>
- 
-      </ion-content>
-    </ion-view>
-  </script>
 
 
 
@@ -1870,31 +1138,7 @@ app
         }
       }
     })
-   .state('menu.metronome', {
-      url: "/metronome",
-      views: {
-        'menuContent': {
-          templateUrl: "metronome.html"
-        }
-      }
-    })
-   .state('menu.notereader', {
-      url: "/notereader",
-      views: {
-        'menuContent': {
-          templateUrl: "notereader.html"
-        }
-      }
-    })
-
-  .state('menu.circlefifths', {
-      url: "/circlefifths",
-      views: {
-        'menuContent': {
-          templateUrl: "circlefifths.html"
-        }
-      }
-    })
+ 
    .state('menu.library', {
       url: "/library",
       views: {
@@ -1904,62 +1148,7 @@ app
       }
     })
  
-   .state('menu.manuals', {
-      url: "/manuals",
-      views: {
-        'menuContent': {
-          templateUrl: "manuals.html",
-          controller: "manualsCtrl"
-        }
-      }
-    })
-
-   .state('menu.repertoire', {
-      url: "/repertoire",
-      views: {
-        'menuContent': {
-          templateUrl: "repertoire.html"
-        }
-      }
-    })
-  .state('menu.repertoire.basic', {
-      url: "/basic",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "basic.html",
-    controller: "repCtrl1"  
-        }
-      }
-    })
-      .state('menu.repertoire.beginner', {
-      url: "/beginner",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "beginner.html",
-    controller: "repCtrl2"  
-        }
-      }
-    })
-      .state('menu.repertoire.intermediate', {
-      url: "/intermediate",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "intermediate.html",
-    controller: "repCtrl3"  
-        }
-      }
-    })
-      .state('menu.repertoire.advanced', {
-      url: "/advanced",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "advanced.html",
-    controller: "repCtrl4"  
-        }
-      }
-    })
-  
-
+   
      .state('menu.books', {
       url: "/books",
       views: {
@@ -1968,49 +1157,8 @@ app
         }
       }
     })
-.state('menu.books.solfiege', {
-      url: "/solfiege",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "solfiege.html",
-    controller: "booksCtrl1"  
-        }
-      }
-    })
-            .state('menu.books.scales', {
-      url: "/scales",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "scales.html",
-    controller: "booksCtrl2"  
-        }
-      }
-    })
-            .state('menu.books.sightread', {
-      url: "/sightread",
-      views: {
-        'menuContent@menu': {
-          templateUrl: "sightread.html",
-    controller: "booksCtrl3"  
-        }
-      }
-    })
-     .state('menu.diplomas', {
-      url: "/diplomas",
-      views: {
-        'menuContent': {
-          templateUrl: "diplomas.html"
-        }
-      }
-    })
- .state('menu.statistics', {
-      url: "/statistics",
-      views: {
-        'menuContent': {
-          templateUrl: "statistics.html"
-        }
-      }
-    })
+
+
    .state('menu.reel', {
       url: "/reel",
       views: {
@@ -2019,35 +1167,10 @@ app
         }
       }
     })
-    .state('menu.about', {
-      url: "/about",
-      views: {
-        'menuContent': {
-          templateUrl: "about.html"
-        }
-      }
-    })
-  .state('menu.regulation', {
-      url: "/regulation",
-      views: {
-        'menuContent': {
-          templateUrl: "regulation.html",
-          controller: "AccordianCtrl"
-        }
-      }
-    })
 
-  .state('menu.aboutus', {
-      url: "/aboutus",
-      views: {
-        'menuContent': {
-          templateUrl: "aboutus.html"
-        }
-      }
-    })
     ; 
 
-  $urlRouterProvider.otherwise("menu/lessons");
+  $urlRouterProvider.otherwise("menu/courses");
   $ionicConfigProvider.tabs.position('bottom'); 
 })
 
@@ -2203,314 +1326,6 @@ $scope.closeModal = function () {
       
     }])
 
-    
-   .controller('manualsCtrl', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalPDF').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalPDF');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-   $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-
- $scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-
- 
-}])
-   .controller('repCtrl1', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalBasic').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalBasic');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-   .controller('repCtrl2', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalBeginner').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalBeginner');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-     .controller('repCtrl3', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalIntermediate').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalIntermediate');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-  
-     .controller('repCtrl4', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalAdvanced').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalAdvanced');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-
-     .controller('booksCtrl1', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalSolfiege').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalSolfiege');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-     .controller('booksCtrl2', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalScales').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalScales');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
-     .controller('booksCtrl3', ['$http', '$scope', '$sce', 'SharedState', function($http, $scope, $sce, SharedState){
-    $scope.trustAsResourceUrl = function(url) {
-        return $sce.trustAsResourceUrl(url);
-    };
-    
-     $scope.selectedManualUrl = '';
-
-    $scope.showModal = function(index) {
-      $scope.selectedManualUrl = 'https://drive.google.com/file/d/' + $scope.manuals[index].id + '/preview';
-        document.getElementById('modalSightread').classList.add('four');
-    };
-
-    $scope.hideModal = function(index) {
-        const modal = document.getElementById('modalSightread');
-        modal.classList.add('out');
-        setTimeout(() => {
-            modal.classList.remove('four', 'out');
-        }, 400);
-    };
-
-     $scope.isLoading = true;
-  SharedState.getNum().then(function(data) {
-    $scope.lvl = data.lvl;
-    $scope.blq = data.blq;
-     $scope.isLoading = false;
-  })
-      
-$scope.manuals = [ 
-      {'title': 'Bloque 1 - Nivel 2','background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'id': '1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1},            
-      {'title': 'Bloque 3 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel 1','background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'id': '1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1},
-      {'title': 'Bloque 3 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3},
-      {'title': 'Bloque 2 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2},
-      {'title': 'Bloque 1 - Nivel P','background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'id': '1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1 }
-    ];
-    
-}])
 
     </script>
 
