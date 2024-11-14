@@ -579,7 +579,9 @@ body {
   </script>
 
 
-   <script id="status.html" type="text/ng-template">
+
+
+         <script id="status.html" type="text/ng-template">
     <ion-view>
       
            <ion-nav-bar class="bar-light" >     
@@ -608,45 +610,83 @@ body {
         
         <div class="item item-divider itemDividerforitem">Mi plan</div>
 
-          <a class="item item-icon-left">
-            <span class="item-note"  style=" margin-top: 10px;" >{{userData.status}}</span>
+     
+         
+           <a class="item item-icon-left" ng-click="userData.status != 'ACTIVO' && window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment'">
+            <span class="item-note"  style=" margin-right: -60px; margin-top: 5px; color: green" ng-if="userData.status == 'ACTIVO'">ACTIVO</span>
+           <span class="item-note"  style=" color: red" ng-if="userData.status != 'ACTIVO'">Pago pendiente</span>
          <i class="icon ri-currency-fill" ></i>
        Plan de pago
-         <p style="color: orange; text-shadow: 0 0 10px orange;"><i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i> Premium </p>  
+         <p style="color: orange; text-shadow: 0 0 10px orange;" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'"><i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i> Premium </p>   
+        <p style="color: #20a2f1; text-shadow: 0 0 1px #20a2f1;" ng-if="userPlan == 'Pro' && userData.status == 'ACTIVO'"><i class="ri-verified-badge-fill" style="color: #20a2f1; text-shadow: none;" ></i> PRO </p>   
+         <p ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'">><i class="ri-graduation-cap-fill'" ></i> Estudiante </p>  
+          <p style="color: brown;" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'"> Standard </p>  
         </a>
-         
+
+             <div class="item item-icon-left">
+      <i class="icon ri-presentation-fill" ></i> Formato
+         <p ng-if="userData.status == 'ACTIVO'">{{userData.format}} </p>  
+        </div>
          
            <div class="item item-icon-left">
+           
       <i class="icon ri-calendar-schedule-fill" ></i> Próximo pago
-         <p>{{userData.nextpay}} </p>  
+         <p ng-style="{'color': userData.status !== 'ACTIVO' ? 'red' : 'inherit'}">{{userData.nextpay}} </p>  
         </div>
 
          
-
+        <div class="item item-divider itemDividerforitem">Contacto</div>
+         
+           <div class="item item-icon-left item-button-right">
+           <i class="icon ri-video-chat-fill" style="color: blue;"></i> Datos de sesión de ZOOM
+          <button class="button button-positive"  style="transform: scale(.9); margin-right: -5px; margin-top: 20px;" onclick="window.top.location.href='https://us02web.zoom.us/j/2963134430?pwd=Vzk3aTFCSTdDSFBoK1c1SVh4eEwwZz09';">
+       Ingresar
+          </button>
+         <p> ID: 296 313 4430
+         <br> Password: bartok
+         </p>  
+        </div>
+         
+         
+          <div class="item item-icon-left item-button-right">
+           <i class="icon ri-whatsapp-fill" style="color: green;"></i> Prof. Daniel
+          <button class="button button-balanced"  style="transform: scale(.9); margin-right: -5px; margin-top: 10px;" onclick="window.top.location.href='https://wa.me/525627362997';">
+        Contactar
+          </button>
+         <p > 56 2736 2997</p>  
+        </div>
+         
+         
          <div class="item item-divider itemDividerforitem">Asistencias</div>
              <div class="item item-icon-left">
       <i class="icon ri-calendar-event-fill" ></i> Horario de clase
         <p>{{userData.classtime[0]}} <br> {{userData.classtime[1]}}</p>    
         </div>
+         
+     
+         
          <div class="item item-icon-left item-button-right">
            <i class="icon ri-calendar-close-fill"></i> Reposición de clase
           <button class="button button-dark"  style="transform: scale(.9); margin-right: -5px; margin-top: 10px;">
           solicitar
           </button>
-         <p style="font-size: 10px;">El contador indica cuantas reposiciones te quedan</p>  
+         <p style="font-size: 10px;">Agenda con anticipación tus reposiciones</p>  
         </div>
+         
+     
+         
          <div class="item item-icon-left item-button-right">
            <i class="icon ri-close-circle-fill" style="color: red;"></i> Baja temporal
           <button class="button button-assertive" style="transform: scale(.9); margin-right: -5px; margin-top: 10px;" >
             solicitar         
           </button>
-         <p style="font-size: 10px;">Puedes solicitar 2 por año</p>  
-        </div>         
+         <p style="font-size: 10px;">Expón el motivo de tu baja</p>  
+        </div>
+
          </div>
       </ion-content>
     </ion-view>
   </script>
-    
 
 
 
