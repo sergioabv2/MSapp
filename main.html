@@ -10,6 +10,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.3.3/angular-locale_es-mx.js"></script>
  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
  <link rel="manifest" href="/manifest.json">
@@ -487,6 +488,68 @@ body {
       display: none;
     }
 }
+
+
+     
+   
+.slide-hint-left {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: slideLeft 1.5s infinite;
+  font-size: 18px;
+  color: #666;
+}
+
+@keyframes slideLeft {
+  0%, 100% {
+    opacity: 0;
+    transform: translateX(0) translateY(-50%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-10px) translateY(-50%);
+  }
+}
+
+
+.custom-select {
+  width: 100%; /* Ajusta para ocupar todo el ancho */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px; /* Espacio entre select y botones */
+}
+   
+   .custom-select2 {
+  width: 100%; /* Ajusta para ocupar todo el ancho */
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+     margin-right: 5px;
+}
+   .item-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.item-input span {
+  margin-right: 10px;
+}
+
+.item-input input,
+.item-input select {
+  flex-grow: 1;
+  max-width: 200px; /* Puedes ajustar el tamaño máximo */
+  text-align: center;
+}
+   
+
 </style>
 
 <body>
@@ -582,7 +645,6 @@ body {
 
    <script id="status.html" type="text/ng-template">
     <ion-view>
-      
            <ion-nav-bar class="bar-light" >     
        <ion-nav-buttons side="left">
     <button class="button button-clear" ng-click="goToMain()">
@@ -590,33 +652,20 @@ body {
     </button>
   </ion-nav-buttons>  
     </ion-nav-bar>
-          
       <ion-content >
        <div class="list">
-
-         
         <ion-list>
       <ion-item class="item-avatar">
-    
-        <img data-ng-src="{{userData.photo}}"> 
-          
+        <img data-ng-src="{{userData.photo}}">    
            <h2>{{userData.name}}</h2>       
-          <p>{{userData.mail}}</p> 
-        
+          <p>{{userData.mail}}</p>    
           <ion-option-button class="button-calm" >Editar</ion-option-button>
           </ion-item>
-         
- 
-         
      </ion-list>    
-        
           <ion-list>
-
-
       <ion-item class="item-divider itemDividerforitem" >
     Mi plan
         </ion-item>
-         
       <ion-item class="item-icon-left">
             <span class="item-note"  style="  margin-top: 5px; color: green" ng-if="userData.status == 'ACTIVO'">ACTIVO</span>
            <span class="item-note"  style=" color: red" ng-if="userData.status != 'ACTIVO'">Pago pendiente</span>
@@ -627,29 +676,18 @@ body {
          <p ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'">><i class="ri-graduation-cap-fill'" ></i> Estudiante </p>  
           <p style="color: brown;" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'"> Standard </p> 
           </ion-item>
-    
-          
-
-            <ion-item class="item-icon-left" ng-if="userData.status == 'ACTIVO'">
+          <ion-item class="item-icon-left" ng-if="userData.status == 'ACTIVO'">
 <i class="icon ri-presentation-fill" ></i> Formato
-         <p>{{userData.format}} </p>  
+         <p>{{userData.format}} </p>   
                 </ion-item>
-
-
                  <ion-item class="item-icon-left item-icon-right" >
 <i class="icon ri-calendar-schedule-fill" ></i> Próximo pago
          <p ng-style="{'color': userData.status !== 'ACTIVO' ? 'red' : 'green'}">{{userData.nextpay}} </p>  
           <i class="icon ri-arrow-left-double-fill slide-hint-left" style="margin-top: 35px;" ng-if="userData.status != 'ACTIVO'"></i>
-            <ion-option-button class="button-balanced" ng-if="userData.status != 'ACTIVO'">Pagar</ion-option-button>
+            <ion-option-button class="button-balanced" ng-if="userData.status != 'ACTIVO'" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment';">Pagar</ion-option-button>
                 </ion-item>
-      
-
-
-    </ion-list>   
- 
-
- 
-         
+           
+    </ion-list>    
           <ion-list ng-if="userData.status == 'ACTIVO' && userData.format == 'En línea por ZOOM'">
              <ion-item class="item-divider itemDividerforitem">
     Contacto
@@ -662,7 +700,6 @@ body {
           </button>
     <p> ID: 296 313 4430<br> Password: bartok</p> 
           </ion-item>
-    
           <ion-item class="item-icon-left item-button-right">
     <i class="icon ri-whatsapp-fill" style="color: green;"></i> Prof. Daniel
           <button class="button button-balanced"  style="transform: scale(.9); margin-right: -5px; margin-top: 10px;" onclick="window.top.location.href='https://wa.me/525627362997';">
@@ -671,38 +708,29 @@ body {
          <p > 56 2736 2997</p>  
           </ion-item>
    </ion-list>
-         
-         
-         
           <ion-list >
              <ion-item class="item-divider itemDividerforitem" >
     Asistencias
         </ion-item>
             <ion-item class="item-icon-left" ng-if="userData.status == 'ACTIVO'">
       <i class="icon ri-calendar-event-fill" ></i> Horario de clase
-        <p>{{userData.classtime[0]}} <br> {{userData.classtime[1]}}</p>    
+        <p>{{userData.classtime[0]}} <br> {{userData.classtime[1]}}</p>   
         </ion-item>
-         
       <ion-item class="item-icon-left item-button-right" ng-if="userData.status == 'ACTIVO'">
         <i class="icon ri-calendar-close-fill" ></i> Reposición de clase
-         <button class="button button-dark" style="transform: scale(.8); margin-right: -5px; margin-top: 10px;" >
+         <button class="button button-dark" style="transform: scale(.8); margin-right: -5px; margin-top: 10px;" ng-click="showAlert()">
             solicitar           
           </button>
          <p style="font-size: 10px;">Agenda con anticipación tus reposiciones</p>    
-      
           </ion-item>
-
       <ion-item class="item-icon-left item-button-right">
         <i class="icon ri-close-circle-fill" style="color: red;"></i> Baja temporal
-          <button class="button button-assertive" style="transform: scale(.8); margin-right: -5px; margin-top: 10px;" >
+          <button class="button button-assertive" style="transform: scale(.8); margin-right: -5px; margin-top: 10px;" ng-click="showAlert2()"> 
             solicitar         
           </button>
-         <p style="font-size: 10px;">Expón el motivo de tu baja </p>   
-        
+         <p style="font-size: 10px;">Expón el motivo de tu baja </p> 
           </ion-item>
      </ion-list>   
- 
-
          </div>
       </ion-content>
     </ion-view>
@@ -1275,15 +1303,221 @@ $scope.closeModal = function () {
 
  }])
 
-  .controller('StatusCtrl', ['$scope', 'SharedState', function($scope, SharedState){    
+   .controller('StatusCtrl', ['$scope', 'SharedState', '$ionicPopup', function($scope, SharedState, $ionicPopup){
+
+    
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
+    $scope.agenda = JSON.parse(data.data.agenda);
+    $scope.userPlan = data.data.plan.split(" ")[0]
+    $scope.userPrice = data.data.plan.split(" ")[2]
   })
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
 };
+       $scope.returnDateFormat = function(date){
+    const dat = new Date(date);
+  const options = { weekday: 'long', month: 'long', day: 'numeric' };
+    var dat2 = dat.toLocaleDateString("es-mx",options).replace(",","");
+    return dat2.charAt(0).toUpperCase() + dat2.slice(1);
+  }
+     $scope.attendanceFilter = function(item) {
+  return item.attendance == ''; 
+};
+
+
+  $scope.selectedOption = null; 
+$scope.showAlert = function() {
+  var myPopup = $ionicPopup.show({
+    template: `
+     <div ng-if="!showSummary">
+     <label >Fecha de falta</label>
+      <select ng-model="popupData.selectedOption" class="custom-select">
+        <option ng-repeat="data in agenda | filter: attendanceFilter" value="{{data}}"> 
+          {{returnDateFormat(data.start)}}
+        </option>
+      </select>
+       <label ng-if="popupData.selectedOption">¿Cómo vas a reponer?</label>
+     <select ng-model="popupData.selectedOption2" class="custom-select" ng-if="popupData.selectedOption">
+      <option value="opc2" > 
+          Tomaré la reposición en otro horario de clase
+        </option>
+     <option value="opc1" > 
+       Tomaré 2 horas seguidas la siguiente semana en mi horario de clase
+        </option>
+      </select>
+      
+   <div ng-if="popupData.selectedOption2 === 'opc2'">
+        <label class="item item-input">
+          Fecha
+          <input type="date" ng-model="popupData.selectedDate" ng-change="updateAvailableTimes()">
+        </label>
+
+        <label class="item item-input" ng-if="popupData.availableTimes.length > 0">
+          Hora
+          <span>{{ selectedTime }}</span>
+        <select ng-model="popupData.selectedTime" class="custom-select2">
+        <option ng-repeat="time in popupData.availableTimes" value="{{time}}">
+          {{time}}
+        </option>
+      </select>
+        </label>
+      </div>
+       </div>  
+       
+      <div ng-if="showSummary">
+        <p><strong>Fecha de reposición:</strong><br> {{popupData.selectedDate | date: 'fullDate'}}</p>
+        <p><strong>Hora de inicio:</strong><br> {{popupData.selectedTime}}</p>
+      </div>
+     
+    `,
+    title: 'Agenda la reposición de tu clase',
+    scope: $scope,
+    buttons: [
+     { 
+        text: 'Cancelar',
+        onTap: function() {
+          $scope.popupData.selectedOption = null; 
+          $scope.popupData.selectedOption2 = null; 
+           $scope.popupData.selectedDate = null; 
+           $scope.popupData.selectedTime = null; 
+          $scope.showSummary = false;
+        }
+      },
+      {
+        text: '<b>Continuar</b> ',
+        type: 'button-positive',
+        onTap: function(e) {
+           if (!$scope.showSummary) {
+            if (!$scope.popupData.selectedDate || !$scope.popupData.selectedTime) {
+              e.preventDefault()
+              if ($scope.popupData.selectedOption2 === 'opc1') {
+                $scope.showSummary = true;
+                var dat = JSON.parse($scope.popupData.selectedOption)
+                var nextClass = new Date(dat.start)
+                nextClass.setDate(nextClass.getDate() + 7);
+                nextClass.setHours(nextClass.getHours() + 6);
+                $scope.popupData.selectedDate = nextClass
+                $scope.popupData.selectedTime = nextClass.getHours()+':00 Hrs'
+              } else if ($scope.popupData.selectedOption2 === 'opc2' && !$scope.popupData.selectedTime) {
+                alert("Ingresa una fecha válida")
+              }  
+            } else { 
+              $scope.showSummary = true;
+              e.preventDefault(); 
+            }
+          } else {
+            return $scope.popupData;
+          }
+        }
+      }
+    ]
+  }); 
+
+  myPopup.then(function(res) {
+    if (res) {
+      $scope.popupData.selectedOption = null; 
+          $scope.popupData.selectedOption2 = null; 
+           $scope.popupData.selectedDate = null; 
+           $scope.popupData.selectedTime = null; 
+          $scope.showSummary = false;
+      alert("Reposición agendada")
+     // alert($scope.userData.name);
+    }
+  });
+}; 
+ 
+
+    
+    $scope.showAlert2 = function() {
+  var myPopup = $ionicPopup.show({
+    template: `
+     <div>
+     <label >Expón el motivo de tu baja</label>
+<textarea name="longText" rows="4" cols="50" placeholder="Escriba su texto..." ng-model="popupData2.returnText"></textarea> <br>
+<label>Fecha aproximada de tu regreso a clases</label>
+        <label class="item-input">
+          Fecha
+          <input type="date" ng-model="popupData2.returnDate">
+        </label>
+    `,
+    title: 'Solicitud de baja temporal',
+    scope: $scope,
+    buttons: [
+     { 
+        text: 'Cancelar',
+        onTap: function() {
+          $scope.popupData2.returnText = null; 
+           $scope.popupData2.returnDate = null; 
+        }
+      },
+      {
+        text: '<b>Solicitar</b> ',
+        type: 'button-positive',
+        onTap: function(e) {
+          if (!$scope.popupData2.returnText || !$scope.popupData2.returnDate) {
+            alert("Ingresa todos los datos")
+              e.preventDefault()
+          } else {
+            return $scope.popupData2;
+          }
+        }
+      }
+    ]
+  }); 
+
+  myPopup.then(function(res) {
+    if (res) {
+      alert("Solicitud enviada")
+    }
+  });
+}; 
+ 
+    
+$scope.popupData = {
+  selectedDate: null,
+  availableTimes: [],
+  selectedTime: null
+};
+
+    
+$scope.popupData2 = {
+  returnDate: null,
+  returnText: null
+};
+
+$scope.updateAvailableTimes = function() {
+  const selectedDate = new Date($scope.popupData.selectedDate);
+  const today = new Date();
+  const twoWeeksFromToday = new Date();
+  twoWeeksFromToday.setDate(today.getDate() + 14);
+
+  // Reset available times if out of range
+  if (selectedDate < today || selectedDate > twoWeeksFromToday) {
+    $scope.popupData.availableTimes = [];
+    return;
+  }
+
+  const day = selectedDate.getDay();
+  let times = [];
+
+  if (day === 3 || day === 4 || day === 5) { // Wednesday, Thursday, Friday
+    times = ["11:00 Hrs", "12:00 Hrs", "13:00 Hrs", "14:00 Hrs", "15:00 Hrs", "16:00 Hrs"];
+  } else if (day === 6) { // Saturday
+    times = ["10:00 Hrs", "11:00 Hrs", "12:00 Hrs", "13:00 Hrs", "14:00 Hrs"];
+  } else if (day === 0) { // Sunday
+    times = ["9:00 Hrs", "10:00 Hrs", "11:00 Hrs", "12:00 Hrs", "13:00 Hrs"];
+  } else { // Monday, Tuesday or invalid
+    times = [];
+  }
+
+  $scope.popupData.availableTimes = times;
+};
+
+
       
     }])
+
 
 
     </script>
