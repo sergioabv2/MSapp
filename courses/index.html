@@ -1229,6 +1229,7 @@ body::-webkit-scrollbar-thumb {
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) { 
       $scope.userData = response.data;
+     $scope.totalProgress = parseFloat(($scope.userData.progress / 4).toFixed(1));
       $scope.nameShort = $scope.userData.name.split(" ")[0]
       $scope.userDataLoaded = true;
     })
