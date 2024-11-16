@@ -407,7 +407,7 @@ body {
 .dropdownContent {
   position: absolute;
   top: 50px;
-  left: 10px;
+  right: 10px;
   background: #fff;
   min-width: 250px;
   box-shadow: 0px 0px 15px 8px rgba(50, 50, 50, 0.2);
@@ -489,7 +489,45 @@ body {
     }
 }
 
+@media (min-width: 850px) {
+  .menubtn{
+    display: none;
+  }
+}
 
+.profile-user-data > * {float: left;}
+ .profile-user-data   .circle {
+    border-radius: 100% !important;
+    overflow: hidden; 
+    width: 95px;
+    height: 95px;
+   margin-top: 10px;
+   margin-right: 10px;
+}
+.profile-user-data img { margin-right: 10px; max-width: 100px;}
+.profile-user-data .main-data {padding: 10px 0 50px; margin-bottom: 15px; width: calc(100% - 115px); }
+.main-data h4{
+  font-size: 19px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+.main-data .planTag{
+  color: #77777a; 
+  font-size: 12px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+.main-data .userLvl{
+  margin-top: 1px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+.profile-user-data .main-data h4 {margin: 0; font-size: 20px; font-weight: }
+.profile-user-data .main-data span {font-size: 12px;}
+
+
+.progress{
+
+  margin-top: 5px;
+  margin-bottom: -25px;
+}
      
    
 .slide-hint-left {
@@ -550,6 +588,9 @@ body {
 }
    
 
+
+
+     
 </style>
 
 <body>
@@ -572,18 +613,42 @@ body {
     
  <script id="menu.html" type="text/ng-template">
     <ion-side-menus >
-      <ion-side-menu side="left" width='210'  expose-aside-when="large">
+      <ion-side-menu side="right" width='300'  expose-aside-when="large">
          
     
         <ion-header-bar class="bar-stable">
-          <h1 class="title">Menu</h1> 
+          <h1 class="title">Mozart Appcademy</h1> 
         </ion-header-bar>
         <ion-content>
+
+      <div class="profile-user-data clearfix">
+          <div class="circle">
+              <img class="profile-pic" src="{{userData.photo}}">
+          </div>
+          <div class="main-data" style="margin-top: 12px;">
+            <h4 >{{userData.name}}</h4>
+        <div class="pull-left planTag" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN PREMIUM
+            <i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
+    <div class="pull-left planTag" ng-if="userPlan == 'Pro' && userData.status == 'ACTIVO'" style="color: #20a2f1; text-shadow: 0 0 1px #20a2f1;"> PLAN PRO
+            <i class="ri-verified-badge-fill" style="color: #20a2f1; text-shadow: none;"></i>  </div>
+      <div class="pull-left planTag" ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN ESTUDIANTE
+            <i class="ri-graduation-cap-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
+    <div class="pull-left planTag" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'" style="color: brown;"> PLAN STANDARD </div>
+            <br>
+        <div class="userLvl" ng-if="userData.lvl == 0"> Nivel Preparatorio </div>
+          <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userData.lvl}} </div>
+        <div class="progress">
+          <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
+        </div>
+          </div>  
+        </div>
+     
           <ul class="list">
-           <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="right"><i class="ri-presentation-fill" ></i>&nbsp&nbspInicio</a> 
-                           <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="right"><i class="ri-git-repository-fill" ></i>&nbsp&nbspBiblioteca</a>
+           <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="left"><i class="ri-presentation-fill" ></i>&nbsp&nbspInicio</a> 
+<a href="#/menu/agenda" class="item" ng-class="(activeMenuClr=='agenda')?'menuSelectedColor':''" ng-click="activeMenuClr = 'agenda'" menu-toggle="left"><i class="ri-calendar-event-fill"></i>&nbsp&nbspAgenda</a> 
+                           <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-git-repository-fill" ></i>&nbsp&nbspBiblioteca</a>
                               
-       <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="right"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
+       <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-gallery-fill" ></i>&nbsp&nbspGalería</a>   
           </ul>
         </ion-content>
     <ion-footer-bar>
@@ -606,12 +671,55 @@ body {
   <script id="agenda.html" type="text/ng-template">
     <ion-view >
       
-   <ion-nav-bar class="bar-light" >     
-       <ion-nav-buttons side="left">
-    <button class="button button-clear" ng-click="goToMain()">
-      <i class="ri-arrow-left-s-line"></i> regresar
+     <ion-nav-bar class="bar-light" >      
+        <ion-nav-buttons side="right">
+
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
+      <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
+  <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+        <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
+    </div>
     </button>
-  </ion-nav-buttons>  
+  </ion-nav-buttons>
+       
+        <ion-nav-buttons side="left">
+          <button class="button button-clear" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
+        </ion-nav-buttons>   
+       
+        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
+     <div id="bannerRow">
+      <div class="profileImageContainer">
+        <img src="{{userData.photo}}"  />
+      </div>
+      <p class="profileName">{{userData.name}}</p>
+      <p class="profileEmail">{{userData.mail}}</p>
+    </div>
+    <div class="dropdown-item" ng-click="goToStatus()">
+      <i class="ion-ios-contact-outline"></i> Perfil
+    </div>
+    <div class="dropdown-item" ng-click="goToAgenda()">
+      <i class="ion-android-calendar"></i> Agenda
+    </div>
+    <div class="dropdown-item" ng-click="installApp()">
+      <i class="ion-android-download" ></i> Instalar App
+    </div>
+
+ <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
+    <p style="text-align: center; font-weight: bold;">
+      <br> Agrega a inicio:   </p> 
+        <p style="text-align: center;" >
+       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
+       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
+       3. Agregar
+       </p>
+    </div>
+  </div>
+       
+  </div>
+        
     </ion-nav-bar>
     
       <ion-content>
@@ -741,18 +849,17 @@ body {
     <ion-view >
 
       <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="left">
+        <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
-      Mozart Appcademy
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
     </button>
   </ion-nav-buttons>
        
-        <ion-nav-buttons side="right">
+        <ion-nav-buttons side="left">
           <button class="button button-clear" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
         </ion-nav-buttons>   
        
@@ -806,19 +913,18 @@ body {
       <script id="reel.html" type="text/ng-template">
     <ion-view >
     
-        <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="left">
+           <ion-nav-bar class="bar-light" >      
+        <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
-     Mozart Appcademy
- <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+  <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
     </button>
   </ion-nav-buttons>
        
-        <ion-nav-buttons side="right">
+        <ion-nav-buttons side="left">
           <button class="button button-clear" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
         </ion-nav-buttons>   
        
@@ -830,12 +936,30 @@ body {
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-   <div class="dropdown-item" ng-click="goToStatus()">
+    <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
     <div class="dropdown-item" ng-click="goToAgenda()">
       <i class="ion-android-calendar"></i> Agenda
     </div>
+    <div class="dropdown-item" ng-click="installApp()">
+      <i class="ion-android-download" ></i> Instalar App
+    </div>
+
+ <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
+    <p style="text-align: center; font-weight: bold;">
+      <br> Agrega a inicio:   </p> 
+        <p style="text-align: center;" >
+       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
+       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
+       3. Agregar
+       </p>
+    </div>
+  </div>
+       
   </div>
         
     </ion-nav-bar>
@@ -927,18 +1051,17 @@ body {
     <ion-view >
 
       <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="left">
+        <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif">
+       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
       <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" width="35" height="35" style="border-radius: 50%;" />
-      Mozart Appcademy
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
     </button>
   </ion-nav-buttons>
        
-        <ion-nav-buttons side="right">
+        <ion-nav-buttons side="left">
           <button class="button button-clear" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
         </ion-nav-buttons>   
        
@@ -950,12 +1073,30 @@ body {
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-     <div class="dropdown-item" ng-click="goToStatus()">
+    <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
     <div class="dropdown-item" ng-click="goToAgenda()">
       <i class="ion-android-calendar"></i> Agenda
     </div>
+    <div class="dropdown-item" ng-click="installApp()">
+      <i class="ion-android-download" ></i> Instalar App
+    </div>
+
+ <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
+    <p style="text-align: center; font-weight: bold;">
+      <br> Agrega a inicio:   </p> 
+        <p style="text-align: center;" >
+       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
+       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
+       3. Agregar
+       </p>
+    </div>
+  </div>
+       
   </div>
         
     </ion-nav-bar>
@@ -1199,11 +1340,12 @@ app
         });
     }, 10);
     
-    $ionicSideMenuDelegate.toggleRight();
+    $ionicSideMenuDelegate.toggleLeft();
 };
   
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
+       $scope.userPlan = data.data.plan.split(" ")[0]
   }) 
 
     $scope.isDropdownVisible = false;
@@ -1215,8 +1357,8 @@ app
    $scope.goToProfile = function() {
   window.location.href = '#/menu/profile';
 };  
-     $scope.goToAgenda = function() {
-  window.location.href = '#/menu/agenda';
+     $scope.goToChat = function() {
+  window.location.href = '#/menu/chat';
 };  
      $scope.goToStatus = function() {
   window.location.href = '#/menu/status';
