@@ -117,7 +117,7 @@ body {
  
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 75% 25%;
+  grid-template-columns: 95% 5%;
 }
 
 .card {
@@ -606,16 +606,11 @@ body::-webkit-scrollbar-thumb {
     display: none;
   }
 
-  .content {
-
-    grid-template-columns: 70% 30%;
-  }
+2
 }
 
 @media (max-width: 1120px) {
-  .content {
-    grid-template-columns: 65% 35%;
-  }   
+
 
   .event-number i {
     font-size: 2.2rem;
@@ -633,9 +628,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 @media (max-width: 980px) {
-  .content {
-    grid-template-columns: 60% 40%;
-  } 
+ 
 
   .header-mobile,
   .header-desktop {
@@ -652,9 +645,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 @media (max-width: 840px) {
-  .content {
-    grid-template-columns: 55% 45%;
-  }
+ 
 
   .event-number i {
     font-size: 2rem;
@@ -983,6 +974,23 @@ body::-webkit-scrollbar-thumb {
 
 
 
+
+
+  .iframe-container {
+            position: relative;
+    display: none;
+            overflow: hidden;
+            max-width: 100%;
+            height: 1500px;
+    
+        }
+
+        /* Estilo para hacer el iframe responsivo */
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
 </style>
 
 <body >
@@ -1015,8 +1023,16 @@ body::-webkit-scrollbar-thumb {
         <div class="upcoming-events">
           <h1>Asignaturas</h1>
 
+
+           <div class="iframe-container" id="lsnIframe"><iframe src="https://www.mozartacademy.mx/lessons" frameborder="0" allowfullscreen></iframe></div>
+
+
            
           <div class="event-container">
+
+
+
+
 
             <div class="card event-card">
               <div class="event-header">
@@ -1035,7 +1051,7 @@ body::-webkit-scrollbar-thumb {
      <!--        <p style="background-color: green" ng-if="userData.status == 'ACTIVO'">Activo</p> 
    <p style="background-color: orange" ng-if="userData.status != 'ACTIVO'">Pendiente</p> -->               
                 <div class="btn-group">
-                  <button onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/tab/practice';" >&nbsp&nbspAbrir&nbsp&nbsp</button>
+                  <button onclick="window.top.location.href='https://cubiculociencias.github.io/tallerdepiano/main#/menu/tab/practice';" >&nbsp&nbspAbrir&nbsp&nbsp</button>
            <!--       <div class="share">
                     <button class="share-btn">
                       <i class="fa-solid fa-share"></i>
@@ -1187,87 +1203,15 @@ body::-webkit-scrollbar-thumb {
                 <i class="bx bx-star"></i>
               </div>
               <p>
-                Tendremos un breve periodo de vacaciones a partir del 24 de Diciembre al 1 de Enero.
+                Tendremos un breve periodo de svacaciones a partir del 24 de Diciembre al 1 de Enero.
               </p>
             </div>
 
           </div>
         </div>
-      </div>
-
-      <div class="right-content">
-  
-        
-        
-        
-
-<div class="profile-user-data clearfix">
-          <div class="circle">
-              <img class="profile-pic" src={{picture}}>
-          </div>
-   
-          <div class="main-data" style="margin-top: 12px;">
-            <h4 >{{userData.name}}</h4>
-             
-         
-        <div class="pull-left planTag" ng-if="userData.classtime !== ''" > PLAN ZOOM
-           <i class="ri-video-chat-fill" style="color: #0B5CFF"></i>  </div>
-       <div class="pull-left planTag" ng-if="userData.classtime === ''" > PLAN ASÍNCRONO
-            <i class="ri-mac-line"></i>  </div> 
-     
-       
-          <br>
-          <div class="userLvl">    {{userLevel}}  </div>
-             
-
-        <div class="progress">
-          <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
-        </div>
-
-          </div>  
-        </div>
-
-        
-      
-
-        
-
-             <div class="analytics">
-          <h1>Analytics</h1>
-          <div class="analytics-container">
-           <div class="total-events">
-              <div class="event-number card">
-                <h2>Manuales</h2>
-                <p>2</p>
-                <i class="bx bx-check-circle"></i>
-              </div>
-              <div class="event-number card">
-                <h2>Piezas</h2>
-                <p>3</p>
-                <i class="bx bx-timer"></i>
-              </div>
-            </div> 
-        
-          </div>
-        </div>
+s
 
 
-        
-        <div class="contacts">
-          <h1>Logros</h1>
-          <div class="contacts-container">
-            <div class="contact-status" ng-repeat="user in feed | limitTo:-6">
-              <div class="contact-activity">
-                <img src="{{user.img}}" />
-                <p>{{user.name}}{{getEvent(user.task)}} <br>
-                  <span style="color: {{lvlColor(user.lvl)}}"><i class='fa fa-trophy' ng-if="getEvent(user.task) == ' ha subido de nivel'"></i> {{user.task}} </span></p>
-              </div>
-              <small>hace 1 hora</small>
-            </div>
-          </div>
-        </div>
-        
-        
         
   </body>
 
@@ -1285,7 +1229,7 @@ body::-webkit-scrollbar-thumb {
    function getData(){
   var requestData = { 
     action: "getProfileData",
-    token: localStorage.getItem('MStoken')
+    token: localStorage.getItem('TPtoken')
   };
 
   var config = {
@@ -1297,7 +1241,7 @@ body::-webkit-scrollbar-thumb {
  
       
    
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+  $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
     .then(function(response) { 
       $scope.userData = response.data;
       $scope.userDataLoaded = true;
