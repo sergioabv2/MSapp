@@ -1210,7 +1210,7 @@ body::-webkit-scrollbar-thumb {
   
   angular.module('studentsApp', [])
   .controller('Controller1', ['$http', '$scope', function($http, $scope) {
-
+ $scope.userDataLoaded = false;
 
   var requestData = { 
     action: "getProfileData",
@@ -1230,6 +1230,7 @@ body::-webkit-scrollbar-thumb {
     .then(function(response) { 
       $scope.userData = response.data;
       $scope.nameShort = $scope.userData.name.split(" ")[0]
+      $scope.userDataLoaded = true;
     })
 
     
