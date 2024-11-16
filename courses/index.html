@@ -192,8 +192,8 @@ body {
 .event-header img {
   position: relative;
   inset: 0;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   margin-left: 15px; 
   margin-top: 15px;
   border-radius: 10px;
@@ -238,25 +238,21 @@ body {
 }
 
 .event-content h2 {
-margin-top: -30px;
+margin-top: -40px;
+  margin-left: 5px;
+  font-size: 15px !important;
   line-height: 1.3;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 
-  @supports (-webkit-line-clamp: 2) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: initial;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
+
 }
 
 .event-content p {
-  font-size: clamp(0.8rem, 4vw, 0.9rem) !important;
-  margin-top: -10px;
+  font-size: 13px !important;
+  color: #83838e;
+
   opacity: 0.8;
 }
 
@@ -1021,17 +1017,9 @@ body::-webkit-scrollbar-thumb {
         </div>
 
         <div class="upcoming-events">
-          <h1>Asignaturas</h1>
-
-
-           <div class="iframe-container" id="lsnIframe"><iframe src="https://www.mozartacademy.mx/lessons" frameborder="0" allowfullscreen></iframe></div>
-
 
            
           <div class="event-container">
-
-
-
 
 
             <div class="card event-card">
@@ -1044,7 +1032,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Taller de Piano</h2>
-                <p>Aprende los fundamentos teóricos y técnicos de una correcta ejecución.</p>
+                <p>Aprende los fundamentos teóricos y técnicos de una correcta ejecución.</p><br>
               </div>
               <div class="event-footer">
  <p style="background-color: green">Activo</p>                
@@ -1081,7 +1069,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Solfeo</h2>
-                <p >Identifica notación musical y entrena tu oido.</p>
+                <p >Identifica notación musical y entrena tu oido.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1095,7 +1083,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Armonía</h2>
-                <p >Comprende el lenguaje musical tonal en su totalidad.</p>
+                <p >Comprende el lenguaje musical tonal en su totalidad.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1110,7 +1098,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Lectura a primer vista</h2>
-                <p >Desarrolla la lectura fluida de partituras.</p>
+                <p >Desarrolla la lectura fluida de partituras.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1127,7 +1115,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Biografías</h2>
-                <p >Conoce la vida y las obras de los músicos más influyentes de la historia.</p>
+                <p >Conoce la vida y las obras de los músicos más influyentes de la historia.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1142,7 +1130,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Historia de la Música</h2>
-                <p >Explora la evolución de la música a través de los siglos.</p>
+                <p >Explora la evolución de la música a través de los siglos.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1157,7 +1145,7 @@ body::-webkit-scrollbar-thumb {
               </div>
               <div class="event-content">
                 <h2>Técnica de Piano Avanzada</h2>
-                <p >Desarrolla destreza motriz avanzada en el piano.</p>
+                <p >Desarrolla destreza motriz avanzada en el piano.</p><br>
               </div>
                <div class="event-footer">
              <p style="background-color: silver">Próximamente</p> 
@@ -1209,7 +1197,7 @@ body::-webkit-scrollbar-thumb {
 
           </div>
         </div>
-s
+
 
 
         
@@ -1221,15 +1209,12 @@ s
 <script>
   
   angular.module('studentsApp', [])
-  .controller('Controller1', ['$http', '$scope', '$sce', '$timeout', '$interval', function($http, $scope, $sce, $timeout, $interval) {
-   $scope.userData = [];
-  $scope.userDataLoaded = false;
-  $scope.today = new Date()
+  .controller('Controller1', ['$http', '$scope', function($http, $scope) {
 
-   function getData(){
+
   var requestData = { 
     action: "getProfileData",
-    token: localStorage.getItem('TPtoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1244,179 +1229,13 @@ s
   $http.post('https://script.google.com/macros/s/AKfycbzuRdRbf_Yy-JUEUm4E2qzvWLm6hquJNhqEGEKecOPLowyjBJU8SS_wQ57W2--XobEA/exec', requestData, config)
     .then(function(response) { 
       $scope.userData = response.data;
-      $scope.userDataLoaded = true;
-     $scope.userLevel = $scope.getLevel($scope.userData.lvl)
-    $scope.feed = $scope.userData.feed
-   /*   $scope.lsn = $scope.userData.lsn*/
-    $scope.totalProgress = parseFloat(($scope.userData.progress / 4).toFixed(1));
-    $scope.nameShort = $scope.userData.name.split(" ")[0]
- /*$scope.history = $scope.userData.lessons
-      $scope.startAnimation = function() {
-        $('.progress-bar').animate({
-          width: $scope.userData.progress + '%'
-        }, 500); 
-      };*/
-    $scope.picture = $scope.userData.photo
     })
-     
-     
- 
-     
 
-$scope.lvlColor = function(lvl){
-  if(lvl == 0){
-    return "#F44336"
-  }else if(lvl == 1){
-    return "#9024dc"
-  }else if(lvl == 2){
-    return "#1894cc"
-  }else if(lvl == 3){
-    return "#489454"
-  }else if(lvl == 4){
-    return "#f0ac14"
-  }else if(lvl == 5){
-    return "#485cb4"
-  }else if(lvl == 6){
-    return "#08949c"
-  }
-}     
-     
-$scope.getEvent = function(task){
-  if(task.split(" ")[0] == "Nivel"){
-    return " ha subido de nivel"
-  }else{
-    return " ha entregado"
-  }
-}
-     
-    
-     $scope.getLevel = function(lvl){
-  if(lvl == 0){
-     return "Nivel Preparatorio"
-  }else{
-    return "Nivel "+lvl.toString()
-  }
-}
-    }
-    
-   getData()
-    
-     $scope.filterByLevel = function(entry) {
-    return entry.index <= $scope.lsn;
-};
-    
-    $scope.dateToString = function(fechaOriginal){
-  const partesFecha = fechaOriginal.split('/');
-  const fecha = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
-  const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-  const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];  
-  const diaSemana = diasSemana[fecha.getDay()];
-  const dia = fecha.getDate();
-  const mes = meses[fecha.getMonth()];
-
-  return `${diaSemana} ${dia} de ${mes}`;
-}
-    
-    $scope.stringToDate = function(dateStr) {
-  const parts = dateStr.split('/');
-  var date = new Date(parts[2], parts[1] - 1, parts[0]);
-  date.setDate(date.getDate() + 1);
-  return date
-};
-
-      $interval(getData, 120000);
     
 
 }]);
   
 
-
-
- 
-
-const navItems = document.querySelectorAll(".nav-item");
-
-navItems.forEach((navItem, i) => {
-  navItem.addEventListener("click", () => {
-    navItems.forEach((item, j) => {
-      item.className = "nav-item";
-    });
-    navItem.className = "nav-item active";
-  });
-});
-
-//! Light/Dark Mode
-
-const moonIcon = document.querySelector(".moon");
-const sunIcon = document.querySelector(".sun");
-const nightImage = document.querySelector(".night-img");
-const morningImage = document.querySelector(".morning-img");
-const toggle = document.querySelector(".toggle");
-
-function switchTheme() {
-  document.body.classList.toggle("darkmode");
-  if (document.body.classList.contains("darkmode")) {
-    sunIcon.classList.remove("hidden");
-    moonIcon.classList.add("hidden");
-    morningImage.classList.add("hidden");
-    nightImage.classList.remove("hidden");
-  } else {
-    sunIcon.classList.add("hidden");
-    moonIcon.classList.remove("hidden");
-    morningImage.classList.remove("hidden");
-    nightImage.classList.add("hidden");
-  }
-}
-
-//! Share Button Popup
-
-const sharebtns = document.querySelectorAll(".share-btn");
-
-sharebtns.forEach((btn) => {
-  btn.addEventListener("click", (event) => {
-    const popup = btn.closest(".event-footer").querySelector(".popup");
-
-    btn.classList.toggle("active");
-    popup.classList.toggle("active");
-
-    event.stopPropagation();
-  });
-});
-
-document.addEventListener("click", (event) => {
-  const popups = document.querySelectorAll(".popup");
-
-  popups.forEach((popup) => {
-    if (popup.classList.contains("active") && !popup.contains(event.target)) {
-      popup.classList.remove("active");
-
-      const shareBtn = popup
-        .closest(".event-footer")
-        .querySelector(".share-btn");
-      shareBtn.classList.remove("active");
-    }
-  });
-});
-
-//! Like Buttons
-
-const likeBtns = document.querySelectorAll(".like-btn");
-
-likeBtns.forEach((likeBtn) => {
-  likeBtn.addEventListener("click", () => {
-    if (likeBtn.classList.contains("bxs-heart")) {
-      likeBtn.classList.remove("bxs-heart");
-      likeBtn.classList.add("bx-heart");
-      likeBtn.classList.remove("bounce-in");
-    } else {
-      likeBtn.classList.add("bxs-heart");
-      likeBtn.classList.remove("bx-heart");
-      likeBtn.classList.add("bounce-in");
-    }
-  });
-});
-
-//! Chart JS
 
 
   
