@@ -20,7 +20,6 @@
 	/*** base color: #f27275 ***/
 body {
   font-size: 0.9rem;
-  background: silver;
 }
 
 a {color: #f27275;}a:hover, a:focus {color:#666;}
@@ -67,6 +66,7 @@ a {color: #f27275;}a:hover, a:focus {color:#666;}
   background: #fff;
   border-radius: 4px;
   margin-bottom: 10px;
+    box-shadow:  0 4px 8px 0px rgba(0,0,0,0.2);
 }
 
 
@@ -833,17 +833,41 @@ font-family: 'Raleway';
     }
 }
 
+  
+  
+  .content {
+  display: grid;
+  grid-template-columns: auto 270px; /* Deja que el lado izquierdo sea flexible */
+  height: 100vh;
+}
+
+.left-content {
+  overflow-y: auto; /* Permite scroll si el contenido es más grande */
+  background-color: #f5f5f5; /* Fondo opcional */
+}
+
+.right-content {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed; 
+  right: 0;
+  width: 270px; 
+}
 
 </style>
 
  
 
-<body style="background: #ddd" ng-app="postApp" ng-controller="postController" >
+<body  ng-app="postApp" ng-controller="postController" >
   
   
   
-<div class="page-wrapper chiller-theme">
-        <main class="page-content"> 
+<div class="page-wrapper chiller-theme content">
+        <main class="page-content left-content"> 
             <div class="container-fluid">
                 <div class="row">
                   <ul class="filtermenu">
@@ -944,6 +968,15 @@ font-family: 'Raleway';
             </div>
         </main>
         <!-- page-content" -->
+  
+  
+  <div class="right-content">
+Yes
+    </div>
+  
+  
+  
+  
     </div>
     <!-- page-wrapper -->
   
