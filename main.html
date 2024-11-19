@@ -970,6 +970,20 @@ ion-side-menu .list .item:hover {
       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
+              <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+<i class="ri-question-answer-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+        <div style="font-size: 13px; color: white;"> 2</div>
+    </div>
+</button>
+          
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+  <i class="ri-notification-3-line" ></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+        <div style="font-size: 13px; color: white;"> 9</div>
+    </div>
+</button>
+
        <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
       <img src="{{userData.photo}}" width="35" height="35" style="border-radius: 50%;" />
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
@@ -980,7 +994,9 @@ ion-side-menu .list .item:hover {
        
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()">menu<i class="button button-icon ion-navicon"></i></button>
-        </ion-nav-buttons>   
+        </ion-nav-buttons>  
+
+            
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
@@ -1016,7 +1032,25 @@ ion-side-menu .list .item:hover {
        </p>
     </div>
   </div>
-       
+  </div>
+
+            <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+    <div class="dropdown-item" >
+      <i class="ri-feedback-line"></i>Tienes 2 nuevos mensajes
+    </div>
+  </div>
+
+
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
+    <div class="dropdown-item" >
+      <i class="ri-alert-line"></i> Entrega atrasada
+    </div>
+    <div class="dropdown-item" >
+      <i class="ri-flag-line"></i> Nuevas actividades asignadas
+    </div>
+    <div class="dropdown-item" >
+      <i class="ion-android-chat"></i> Nueva corrección de actividad
+    </div>
   </div>
         
     </ion-nav-bar>
@@ -1507,9 +1541,25 @@ app
        $scope.userPlan = data.data.plan.split(" ")[0]
   }) 
 
-    $scope.isDropdownVisible = false;
+     $scope.isDropdownVisible = false;
     $scope.toggleDropdown = function() {
       $scope.isDropdownVisible = !$scope.isDropdownVisible;
+      $scope.dropdownChatVisible = false;
+      $scope.dropdownNotifVisible = false;
+    };
+  
+    $scope.dropdownChatVisible = false;
+    $scope.dropdownChat = function() {
+      $scope.dropdownChatVisible = !$scope.dropdownChatVisible;
+      $scope.isDropdownVisible = false;
+      $scope.dropdownNotifVisible = false;
+    };
+
+    $scope.dropdownNotifVisible = false;
+    $scope.dropdownNotif = function() {
+      $scope.dropdownNotifVisible = !$scope.dropdownNotifVisible;
+      $scope.isDropdownVisible = false;
+      $scope.dropdownChatVisible = false;
     };
   
 
