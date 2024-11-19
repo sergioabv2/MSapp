@@ -1,1 +1,300 @@
 
+
+
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css"></link>
+<!---
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
+--->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css"></link>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js'></script>
+
+</head>
+
+
+
+
+<body  ng-app="postApp" ng-controller="postController" >
+  
+  
+          <h1 style=" margin: 20px 0;">Ranking</h1>
+             <div class="page-leaderboard">
+ <section class="ranking">
+                <div class="contain">
+                    <div class="ranking-table">
+                        <div class="ranking-table-header-row">
+                            <div class="ranking-table-header-data h6"></div>
+                            <div class="ranking-table-header-data h6">Alumno</div>
+                            <div class="ranking-table-header-data h6">Puntaje</div>
+                        </div>
+                        <div class="ranking-table-row-leader-1">
+                            <div class="ranking-table-data-leader-1">
+                                <div class="medal-gold"></div>
+                            </div>
+                            <div class="ranking-table-data">
+                              {{userData.ranking[0].name}} 
+                <br>  <span style="font-size: 12px; color: {{userData.ranking[0].color}}">  {{userData.ranking[0].lvl}}</span>
+                          </div>
+                            <div class="ranking-table-data">
+                                <div class="complete" style="color: orange !important; text-shadow: 0 0 10px orange; font-weight: 700; font-size: 20px !important;">{{userData.ranking[0].score}}</div>
+                            </div>
+                        </div>
+                        <div class="ranking-table-row-leader-2">
+                            <div class="ranking-table-data-leader-2">
+                                <div class="medal-silver"></div>
+                            </div> 
+                            <div class="ranking-table-data">
+                                {{userData.ranking[1].name}}
+        <br>  <span style="font-size: 12px; color: {{userData.ranking[1].color}}">  {{userData.ranking[1].lvl}}</span>
+                        </div>
+                            <div class="ranking-table-data">
+                                <div class="complete" style="color: #2980b9  !important; text-shadow: 0 0 10px #85c1e9 ; font-weight: 500; font-size: 18px !important;">{{userData.ranking[1].score}}</div>
+                            </div> 
+                        </div>
+                        <div class="ranking-table-row-leader-3">
+                            <div class="ranking-table-data-leader-3">
+                                <div class="medal-bronze"></div>
+                            </div>
+                            <div class="ranking-table-data">
+                               {{userData.ranking[2].name}}
+                               <br>  <span style="font-size: 12px; color: {{userData.ranking[2].color}}">  {{userData.ranking[2].lvl}}</span>
+</div>
+                            <div class="ranking-table-data">
+                                <div class="complete" style="color: #85929e   !important; text-shadow: 0 0 5px #85929e; font-size: 16.5px !important;">{{userData.ranking[2].score}}</div>
+                            </div>
+                        </div>
+
+
+                         <div class="ranking-table-body">
+        <div class="ranking-table-row" ng-repeat="user in userData.ranking.slice(3)">
+            <div class="ranking-table-data">{{ $index + 4 }}</div> <!-- Muestra posición -->
+            <div class="ranking-table-data">{{ user.name }}<br>  <span style="font-size: 12px; color: {{user.color}}">  {{user.lvl}}</span></div>
+            <div class="ranking-table-data"><div class="complete">{{ user.score }}</div></div>
+        </div>
+    </div>
+                        </div>
+                    </div>
+
+            </section>  
+    
+                <div class="contain contain--small"></div>
+    
+     </div>
+
+
+
+            <div class="chart" id="doughnut-chart">
+              <h2>Distribution of Attended Events</h2>
+              <canvas id="doughnut"></canvas>
+              <ul></ul>
+            </div>
+
+  
+  
+</body>
+
+
+
+<script>
+  
+ 
+var app = angular.module('postApp', [])
+ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$timeout', function($scope, $http, $interval, $sce, $timeout) {
+    $scope.trustAsResourceUrl = function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+   $scope.userDataLoaded = true
+     $scope.data = [];
+  $scope.filteredData = [];
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 6;
+  $scope.totalPages = 1;
+
+
+    $http({
+      method: 'GET',
+      url: 'https://script.google.com/macros/s/AKfycbxN34IjjTFdUaPKeyLFI5-VCzDcBznvBB96B1IbWLAlSbqjISYOTK08Z07XrC2xDuwV/exec',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }).then(function(response) {
+      $scope.data = response.data.posts; 
+       $scope.profileData = response.data.profiles
+      $scope.filterPosts('all');
+      $scope.updatePagination();
+      $scope.userDataLoaded = false
+    });
+   
+    
+   
+    $scope.user = "@anonimo"
+
+ var requestData = {
+        action: "getUserName",
+        token: localStorage.getItem('MStoken')
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+
+$http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+      $scope.user = response.data
+    });
+
+   
+   
+}]);
+
+
+
+
+
+
+
+Vue.config.devtools = true;
+
+Vue.component('card', {
+  template: `
+    <div class='card-wrap'
+      @mouseenter='handleMouseEnter'
+      @mouseleave='handleMouseLeave'
+      ref='card'>
+      <div class='card'
+        :style='cardStyle'>
+        <div class='card-bg' :style='[cardBgTransform, cardBgImage]'></div>
+        <div class='card-info'>
+          <slot name='header'></slot>
+          <slot name='content'></slot>
+        </div>
+      </div>
+    </div>`,
+  mounted() {
+    this.width = this.$refs.card.offsetWidth;
+    this.height = this.$refs.card.offsetHeight;
+
+    // Add devicemotion event listener
+    window.addEventListener('devicemotion', this.handleDeviceMotion);
+  },
+  destroyed() {
+    // Remove devicemotion event listener when component is destroyed
+    window.removeEventListener('devicemotion', this.handleDeviceMotion);
+  },
+  props: ['dataImage'],
+  data: () => ({
+    width: 0,
+    height: 0,
+    gravity: { x: 0, y: 0, z: 0 }
+  }),
+  computed: {
+    cardStyle() {
+      const rX = this.gravity.x * 20;
+      const rY = this.gravity.y * -20;
+      return {
+        transform: `rotateY(${rX}deg) rotateX(${rY}deg)`
+      };
+    },
+    cardBgTransform() {
+      const tX = this.gravity.x * -30;
+      const tY = this.gravity.y * -30;
+      return {
+        transform: `translateX(${tX}px) translateY(${tY}px)`
+      };
+    },
+    cardBgImage() {
+      return {
+        backgroundImage: `url(${this.dataImage})`
+      };
+    }
+  },
+  methods: {
+    handleMouseEnter() {
+      clearTimeout(this.mouseLeaveDelay);
+    },
+    handleMouseLeave() {
+      this.mouseLeaveDelay = setTimeout(() => {
+        this.gravity.x = 0;
+        this.gravity.y = 0;
+      }, 100);
+    }
+  }
+});
+
+const app2 = new Vue({
+  el: '#app2'
+});
+
+
+
+
+
+
+const chartData = {
+  labels: ["Workshop", "Theater", "Concert", "Sport"],
+  data: [40, 15, 25, 20],
+};
+
+const chart = document.getElementById("doughnut");
+const eventList = document.querySelector(".chart ul");
+
+new Chart(chart, {
+  type: "doughnut",
+  data: {
+    labels: ["Workshop", "Theater", "Concert", "Sport"],
+    datasets: [
+      {
+        label: "# of Events",
+        data: [8, 3, 5, 4],
+        backgroundColor: ["#582bac", "#b31a4d", "#e48e2c", "#4a920f"],
+        offset: 10,
+        hoverOffset: 8,
+        hoverBorderColor: "#9a999b",
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: "#8b8a96",
+          font: {
+            size: 12,
+            weight: 600,
+          },
+        },
+      },
+    },
+    layout: {
+      padding: {
+        bottom: 10,
+      },
+    },
+  },
+});
+
+function population() {
+  chartData.labels.forEach((label, i) => {
+    let eachEvent = document.createElement("li");
+    eachEvent.innerHTML = `${label}: <span class="percentage">${chartData.data[i]}%</span> `;
+    eventList.appendChild(eachEvent);
+  });
+}
+
+population();
+
+
+</script>
