@@ -1403,21 +1403,18 @@ font-family: 'Raleway';
             <div class="card-header" >
 
                 <img class="card-avatar" ng-src="{{user.photo}}" alt="avatar" />
-                <h1 class="card-fullname" style="margin-bottom: 15px;">{{user.nameshort}}</h1>
+                <h1 class="card-fullname" style="margin-bottom: 15px;">{{user.nameshort}}
+		<div class="progress" > 
+          <div class="progress-bar" style=" background-color: {{user.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: user.progress + '%'}" ng-init="startAnimation()"></div>
+        </div>
+		</h1>
 
                 <h2 class="card-jobtitle"  >
 
-                    <span class="site-name">{{user.level}}</span>
+                    <span class="site-name">Nivel {{user.lvl}}</span>
                 </h2>
               
     
-
-           <div class="bar-column " ng-if="currentSection === '#about'">
-                        <div class="bar u">
-                            <div class="fill fill-u">
-                            </div>
-                        </div>
-           </div> 
             </div>
           
             <div class="card-main">
@@ -1441,17 +1438,9 @@ font-family: 'Raleway';
                         <div class="card-subtitle">ÚLTIMA ACTIVIDAD</div>
                         <div class="card-timeline" style=" overflow-y: auto; max-height: 208px;">
 
-                            <div class="card-item" >
-                                <div class="card-item-title">Sube de nivel</div>
-                                <div class="card-item-desc">Termina el bloque 1 del nivel preparatorio</div>
-                            </div>
-                            <div class="card-item" >
-                                <div class="card-item-title">Illustrator at <span>Google</span></div>
-                                <div class="card-item-desc">Onboarding illustrations for App.</div>
-                            </div>
-                            <div class="card-item" >
-                                <div class="card-item-title">Full-Stack Developer at <span>CodePen</span></div>
-                                <div class="card-item-desc">Responsible for the encomposing brand expreience.</div>
+                           <div class="card-item" ng-repeat="lsn in user.history | filter:filterByLevel(user.lsn)">
+                                <div class="card-item-title">{{lsn.name}}</div>
+                                <div class="card-item-desc">{{lsn.status}}</div>
                             </div>
                           
                         </div>
@@ -1684,6 +1673,11 @@ $scope.newLike = function(index, post) {
    
    
    
+     $scope.filterByLevel = function(lsn) {
+    return function(entry) {
+    return entry.index <= lsn;
+  };
+};
 
 
    
