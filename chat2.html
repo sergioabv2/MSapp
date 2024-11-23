@@ -2,6 +2,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 
+   <script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js"></script>
+
+
+
 
 <style>
  :root {
@@ -41,10 +47,10 @@ body {
   /*margin: 25px 10px;*/
   /*height: 100%;*/
   height: 100vh;
-  border: var(--border);
+
   border-radius: 5px;
-  background: var(--msger-bg);
-  box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+  background: #efeae2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 1.2);
 }
 
 .msger-header {
@@ -52,8 +58,10 @@ body {
   justify-content: space-between;
   padding: 10px;
   border-bottom: var(--border);
-  background: #eee; 
-  color: #666;
+ /* background: #eee;
+  color: #666;*/
+  background: #383c44;
+  color: #ececec;
 }
 
 .msger-chat {
@@ -85,7 +93,7 @@ body {
   max-width: 270px;
   padding: 15px;
   border-radius: 15px;
-  background: var(--left-msg-bg);
+  background: white;
 }
 
 .msg-info {
@@ -110,8 +118,8 @@ body {
   flex-direction: row-reverse;
 }
 .right-msg .msg-bubble {
-  background: var(--right-msg-bg);
-  color: #fff;
+  background: #e0fcd4;
+  color: #111b21;
   border-bottom-right-radius: 0;
 }
 .right-msg .msg-img {
@@ -122,7 +130,8 @@ body {
   display: flex;
   padding: 10px;
   border-top: var(--border);
-  background: #eee;
+  background: #383c44;
+ /* background: #eee;*/
 }
 .msger-inputarea * {
   padding: 10px;
@@ -132,13 +141,13 @@ body {
 }
 .msger-input {
   flex: 1;
-  background: #ddd;
+  background: white;
   width: 100%;
 }
 .msger-send-btn {
   margin-left: 10px;
-  background: rgb(0, 196, 65);
-  color: #fff;
+  background: #24d366;
+  color: #1c1e21;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.23s;
@@ -149,7 +158,7 @@ body {
 
 .msger-record-btn {
   margin-left: 10px;
-  background: rgb(221, 221, 221);
+  background: white;
   color: black;
   font-weight: bold;
   cursor: pointer;
@@ -171,22 +180,6 @@ body {
   height: 100%; /* La imagen ocupará todo el alto del contenedor */
   object-fit: fill; /* La imagen se deforma para ajustarse al contenedor */
 }
-
-
- .iframe-container {
-          margin-top: 15px;
-            position: relative;
-            overflow: hidden;
-            max-width: 100%;
-            height: 180px;
-        }
-
-        /* Estilo para hacer el iframe responsivo */
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
 
 
 
@@ -332,7 +325,20 @@ body {
 
 
 
+ .iframe-container {
+          margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            height: 180px;
+        }
 
+        /* Estilo para hacer el iframe responsivo */
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
 
 
 
@@ -375,6 +381,159 @@ body {
   font-size: 12px;
   color: #3a3b3c;
 }
+
+
+
+
+
+
+
+
+
+.mic-container{
+  display: none;
+  position: absolute;
+ background: transparent;
+
+}
+
+.audio-record {
+     display: flex;
+     align-items: center;
+  flex: 1 !important;
+}
+
+
+.audio-record span {
+  position: absolute;
+  color: white;
+  font-weight: 300;
+  font-size: 14px;
+  margin-left: 25px;
+}
+ .audio-record input[type=checkbox] {
+     position: absolute;
+     visibility: hidden;
+}
+.audio-record input[type=checkbox]:checked ~ label i {
+     color: #fff;
+     background: black;
+     border-radius: 100%;
+     animation: shadow-expansion 1.5s infinite;
+}
+
+
+
+
+ 
+#recorder2 {
+  position: relative;
+  margin-top: -10px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%; 
+  background: red;
+  border: 1px solid #f9f9fa33;
+  box-shadow: 0 1px 4px 0 rgba(12, 12, 13, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
+  animation: shadow-expansion 1.5s infinite;
+}
+#recorder2 #record {
+  width: 20px;
+  height: 20px;
+  top: -2px;
+  left: -2px;
+  position: absolute;
+  transition: inherit;
+}
+
+
+
+ @keyframes shadow-expansion {
+    0% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+  40% {
+    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+  }
+  80% {
+    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+#record-audio{
+  margin-top: -60px;
+  margin-left: -40px;
+}
+#delete-audio2{
+  z-index: 999 !important;
+}
+
+
+
+
+.mejs__container {
+   background: transparent !important; 
+    box-shadow: none !important; 
+    border: none !important; 
+}
+
+.mejs__controls{
+  background: transparent !important;
+}
+
+.mejs__time-handle {
+    display: none !important; /* Oculta el control del progreso */
+}
+
+
+
+
+
+
+.mejs__time-total {
+/*    background-color: gray !important; */
+  margin-top: 10px !important;
+  width: 270px !important;
+}
+
+@media (max-width: 500px){
+  .mejs__time-total {
+  width: 220px !important;
+ }
+}
+
+@media (max-width: 440px){
+  .mejs__time-total {
+  width: 160px !important;
+ }
+}
+
+
+@media (max-width: 380px){
+  .mejs__time-total {
+  width: 100px !important;
+ }
+}
+
+.mejs__time-current {
+ /*   background-color: black !important; */
+   margin-top: -10px !important;
+}
+
+.mejs__time-hovered{
+   margin-top: -10px !important;
+}
+
+.mejs__time-loaded{
+   margin-top: -10px !important;
+}
+
+
+
 
 </style>
  
@@ -423,23 +582,50 @@ body {
       </div>
     </div>
     
-
-    
   </main>
+  
+  
+    
+
 
   <form class="msger-inputarea">
+    
+      <div class="mic-container" id="recorder" >
+      <div class="audio-record" id="recorder2">
+        <input type="checkbox" id="audio_record-icon" name="audio_record-icon ">
+        <label  class="player-icon audio_record-icon">
+   <img id="record" src="https://assets.codepen.io/3537853/record.svg" />
+        </label>  
+        <span> grabando... </span>
+     
+      </div> 
+ 
+
+        
+<div id="record-audio" ></div>
+
+  <input type="hidden" id="AudioData">
+<span id="clicks"></span>
+          
+        
+</div>
+  
+    
      <input type="text" class="msger-input" id="msg-input" ng-model="newMessage" placeholder="Ingresa tu mensaje..." ng-keypress="checkEnter($event)"  ng-show="showMessageInput !== false">
     <div class="uploaded-file-name" style="flex: 1" ng-if="showMessageInput === false">
   {{ uploadedFileName }}
 </div>
-   <div class="msger-record-btn" ng-click="toggleMediaMenu()"> 
+   <div class="msger-record-btn" id="mediaBtn" ng-click="toggleMediaMenu()"> 
   <i class="ri-attachment-2"></i>
 </div>
+     <div class="msger-record-btn" id="stopBtn" style="display: none;"> Detener</div> 
+     <div class="msger-record-btn" id="delete-audio2" style="display: none;">Borrar</div> 
+    <div class="msger-record-btn" id="delete-image" style="display: none">Borrar</div> 
    <div ng-click="sendMsg(newMessage)" class="msger-send-btn" >Enviar</div>
   </form>
   
-  
-  <div class="media-menu" ng-show="showMediaMenu">
+   
+  <div class="media-menu" id="mediaMenu" ng-show="showMediaMenu">
   <div class="media-grid">
     <div class="media-item upload-image" >
       <i class="ri-image-fill"></i>
@@ -451,11 +637,12 @@ body {
       <i class="ri-volume-up-fill"></i>
       <span>Audio</span>
     </div> 
-    <div class="media-item" >
-      <i class="ri-file-fill"></i>
-      <span>Archivo</span>
+    <div class="media-item upload-camera" >
+      <i class="ri-camera-2-fill"></i>
+      <span>Foto&nbsp&nbsp&nbsp&nbsp</span>
     </div>
-    <div class="media-item" >
+    <input type="file" class="cameraInput" accept="image/*" capture="environment"  style="display: none;">
+    <div class="media-item" id="recordBtn">
       <i class="ri-mic-fill"></i>
       <span>Grabar</span>
     </div>
@@ -463,6 +650,7 @@ body {
 </div>
   
 </section>
+
 
 
 
@@ -475,7 +663,7 @@ alertsApp.controller('msgCtrl', ['$http', '$scope', '$sce', '$timeout', function
   function getData(){
 var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1+/bx4IRUs+4OVF2BXGHKcse6X5vQSs/AdPqn4wm882qjpkDxXz36kp"
+    token: localStorage.getItem('MStoken')
   };
  
   var config = {
@@ -492,13 +680,21 @@ var requestData = {
     $scope.userDataLoaded = true;
    
    angular.element(document).ready(function() {
-    angular.element(".imageData").on('change', function() {
-      readURL(this);
-    });
-    
     angular.element(".upload-image").on('click', function() {
       angular.element(".imageData").click();
     })
+     
+      angular.element(".upload-camera").on('click', function() {
+      angular.element(".cameraInput").click();
+    })
+     
+     angular.element(".imageData").on('change', function() {
+      readURL(this);
+    });
+     
+     angular.element(".cameraInput").on('change', function() {
+      readURL(this);
+    });
   })
    
 
@@ -518,7 +714,7 @@ var requestData = {
         reader.onload = function(e) {
           $scope.$apply(function() {
             $scope.picture = e.target.result;
-             $scope.uploadedFileName = '..' + file.name.slice(-14); // Captura el nombre del archivo
+             $scope.uploadedFileName = '..' + file.name.slice(-14); 
         $scope.showMessageInput = false; 
             $scope.showMediaMenu = false
             document.getElementById("imageData").value = e.target.result
@@ -551,8 +747,7 @@ var requestData = {
      
     var requestData = {
     action: "postAudio",
-    token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
-      //token: localStorage.getItem('MStoken'),
+    token: localStorage.getItem('MStoken'),
     blob: base64Audio
   };
 
@@ -576,7 +771,7 @@ var requestData = {
         }
     };
   
-  $scope.sendMsg = function(message) {    
+  $scope.sendMsg = function(message) {
     var name = $scope.userData.name.split(" ")
      var chat =  {
     "sender": "client",
@@ -596,9 +791,9 @@ var requestData = {
     $scope.messages.push(chat)
       $scope.newMessage = ""; 
      var plan = $scope.userData.plan
-if(plan.split(" ")[0] == "Premium" || plan.split(" ")[0] == "Hibrido"){
+/*if(plan.split(" ")[0] == "Premium" || plan.split(" ")[0] == "Hibrido"){*/
     $scope.sendMsgtoserver(message)
-}else{
+/*}else{*/
   var autoresponse =  {
     "sender": "admin",
     "name": "Mozart Studio", 
@@ -610,7 +805,7 @@ if(plan.split(" ")[0] == "Premium" || plan.split(" ")[0] == "Hibrido"){
    $timeout(function() {
         $scope.messages.push(autoresponse);
     }, 1000);
-}
+/*}*/
      
 };
     
@@ -618,8 +813,7 @@ if(plan.split(" ")[0] == "Premium" || plan.split(" ")[0] == "Hibrido"){
     $scope.sendMsgtoserver = function(message){
  var requestData = {
         action: "newMsgChat",
-        token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
-        //token: localStorage.getItem('MStoken'),
+        token: localStorage.getItem('MStoken'),
         msg: message
     };
 
@@ -653,48 +847,8 @@ $scope.toggleMediaMenu = function () {
   $scope.showMediaMenu = !$scope.showMediaMenu;
 };
 
-$scope.selectMedia = function (type) {
-  if (type === 'image') {
-    
-  } else if (type === 'video') {
-    document.getElementById('.imageInput').click();
-  } else if (type === 'audio') {
-    // Lógica para subir audio
-  } else if (type === 'file') {
-    // Lógica para subir otros archivos
-  }
-  $scope.showMediaMenu = false; // Cierra el menú después de seleccionar
-};
+
   
-  
-  
-  
-  
-$scope.handleImageUpload = function (event) {
-  const file = event.target.files[0];
-
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      const base64Image = e.target.result;
-
-      // Crear o actualizar el div oculto con el base64
-      let hiddenDiv = document.getElementById("hiddenBase64");
-      if (!hiddenDiv) {
-        hiddenDiv = document.createElement("div");
-        hiddenDiv.id = "hiddenBase64";
-        hiddenDiv.style.display = "none";
-        document.body.appendChild(hiddenDiv);
-      }
-
-      hiddenDiv.textContent = base64Image; // Usar textContent
-    };
-
-    reader.readAsDataURL(file);
-  }
-};
-
 
 
 
@@ -706,21 +860,157 @@ $scope.handleImageUpload = function (event) {
 
 
 
- document.addEventListener('DOMContentLoaded', function(e){ 
-      var i18n = {};
-      messageArea('.message');
-    })
 
-$(function() {
-  $('#colorselector').change(function(){
-    $('.colors').hide();
-    $('#' + $(this).val()).show();
+
+ document.getElementById('recordBtn').addEventListener('click', function() {
+          var recorder = document.getElementById('recorder');
+
+               document.getElementById('recorder2').style.visibility = 'visible';
+    document.getElementById('stopBtn').style.display = 'block';
+                recorder.style.display = 'block';   
+              $('#audio_record-icon').prop('checked', true);
+              document.getElementById('msg-input').style.visibility = 'hidden';
+              document.getElementById('mediaMenu').style.visibility = 'hidden';
+               document.getElementById('mediaBtn').style.visibility = 'hidden';
+
+              startRecording();
+        });
+
+
+
+
+
+ document.getElementById('stopBtn').addEventListener('click', function() {
+          var recorder = document.getElementById('recorder');
+
+              document.getElementById('recorder2').style.visibility = 'hidden';
+    document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('delete-audio2').style.display = 'block';
+               $('#audio_record-icon').prop('checked', false);
+               $('#toggle-recorder').text('');
+              stopRecording();
+
+        });
+
+
+
+
+
+ function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+    navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+  }
+
+  var mediaConstraints = {
+    audio: true
+  };
+
+  //Parto con la registrazione audio
+  function startRecording(idx) {
+    
+    $('#start-recording').disabled = true;
+    audiosContainer = document.getElementById('audios-container');
+    //document.getElementById("clicks").innerHTML = "Recording Started";
+
+    var f = document.getElementById('clicks');
+    setInterval(function () {
+        f.style.display = (f.style.display == 'none' ? '' : 'none');
+    }, 1000);
+
+    captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+  };
+  //Stoppo la registrazione audio
+  function stopRecording() {
+      $('#stop-recording').disabled = true;
+   
+      //document.getElementById("clicks").innerHTML = "Recording Stopped";
+
+      var f = document.getElementById('clicks');
+      setInterval(function () {
+          f.style.display = (f.style.display == 'none' ? '' : 'none');
+      }, 1000);
+    mediaRecorder.stop();
+    mediaRecorder.stream.stop();
+   
+   
+    $('.start-recording').disabled = false;
+  };
+
+
+  var mediaRecorder;
+
+$('#delete-audio2').on('click', function() {
+        $('#record-audio').empty(); 
+        document.getElementById("AudioData").value = "";
+        document.getElementById('recorder').style.display = 'none'; 
+  document.getElementById('msg-input').style.visibility = 'visible';
+   document.getElementById('mediaBtn').style.visibility = 'visible';
+   document.getElementById('mediaMenu').style.visibility = 'visible';
+    document.getElementById('delete-audio2').style.display = 'none';
   });
+
+  function onMediaSuccess(stream) {
+    mediaRecorder = new MediaStreamRecorder(stream);
+    mediaRecorder.stream = stream;
+    mediaRecorder.mimeType = 'audio/wav';  
+    //mediaRecorder.mimeType = 'audio/webm';  
+    mediaRecorder.audioChannels = 1;
+    mediaRecorder.ondataavailable = function(blob) {
+      $('#record-audio').html("<audio id='player1'  src=" + URL.createObjectURL(blob) + "  type='audio/mp3' controls >");
+       const player = new MediaElementPlayer('player1', {
+        features: ['playpause', 'progress']
+    }); 
+
+      
+      var reader = new FileReader();
+          reader.onloadend = function() {
+            var base64Audio = reader.result.split(',')[1];
+            document.getElementById("AudioData").value = base64Audio;
+          };
+          reader.readAsDataURL(blob);
+    };
+ 
+    var timeInterval = 360 * 1000;
+    mediaRecorder.start(timeInterval);
+    $('#stop-recording').disabled = false;
+  }
+
+
+
+
+  function onMediaError(e) {
+    console.error('media error', e);
+  }
+
+  function bytesToSize(bytes) {
+    var k = 1000;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes === 0) return '0 Bytes';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+    return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+  }
+
+  function getTimeLength(milliseconds) {
+    var data = new Date(milliseconds);
+    return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+  }
+
+  window.onbeforeunload = function() {
+    $('#start-recording').disabled = false;
+  };
+
+
+/*
+$(document).on('click','input[name="audio_record-icon"]',function(){
+  var checked = $('#audio_record-icon').prop('checked');
+  if(checked == true)
+    {
+        startRecording();
+    }
+  else
+    { 
+        stopRecording();
+    }
 });
-
-
-
+*/
 </script>
-
-
 
