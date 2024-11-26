@@ -1584,6 +1584,12 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+if ('setAppBadge' in navigator) {
+  navigator.setAppBadge(5).catch((err) => {
+    console.error('Error al establecer la insignia:', err);
+  });
+} 
+
 // Manejar el evento 'beforeinstallprompt'
 window.addEventListener('beforeinstallprompt', (e) => {
   if (isAndroid) {
