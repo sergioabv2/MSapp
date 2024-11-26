@@ -985,23 +985,6 @@ ion-side-menu .list .item:hover {
     <div class="dropdown-item" ng-click="goToChat()">
       <i class="ion-android-chat"></i> Soporte
     </div>
-    <div class="dropdown-item menubtn" ng-click="installApp()">
-      <i class="ion-android-download" ></i> Instalar App
-    </div>
-
- <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>
   </div>
 
     <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="markAsSeen(); $event.stopPropagation()">
@@ -1029,10 +1012,22 @@ ion-side-menu .list .item:hover {
     </ion-nav-bar>
 
      <ion-content>
-       
    <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses" frameborder="0" allowfullscreen></iframe></div>
-
       </ion-content>
+
+  <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
+    <p style="text-align: center; font-weight: bold;">
+      <br> Agrega a inicio:   </p> 
+        <p style="text-align: center;" >
+       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
+       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
+       3. Agregar
+       </p>
+    </div>
+  </div>           
 
     </ion-view>
   </script>   
@@ -1612,6 +1607,7 @@ $scope.installApp = function () {
   } else if (isIOS) {
     // Mostrar modal con la animación GIF para iOS
     $scope.isModalVisible = true;
+      $ionicSideMenuDelegate.toggleLeft();
   }
 };
 
