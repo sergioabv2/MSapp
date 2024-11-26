@@ -7,10 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js"></script>
 
 
-
-
-<style>
- :root {
+ <style>
+    :root {
   --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --msger-bg: #fff;
   --border: 2px solid #ddd;
@@ -171,36 +169,63 @@ body {
 
    .img-container {
     margin-top: 15px;
-    width: 250px; /* Ancho fijo del contenedor */
-    overflow: hidden; /* Por si la imagen tiene bordes extra */
+    width: 250px; 
+    overflow: hidden;
   }
 
   .img-container img {
-    width: 100%; /* Ancho fijo adaptado al contenedor */
-    height: auto; /* Altura proporcional según la imagen */
-    display: block; /* Evita espacios en blanco extra */
+    width: 100%; 
+    height: auto; 
+    display: block; 
   }
 
 
-   /*
-.img-container {
-  margin-top: 15px;
-  width: 250px; 
-  height: 300px;
-  overflow: hidden; 
+
+.image-modal {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
 }
 
-.img-container img {
-  width: 100%; 
-  height: 100%; 
-  object-fit: fill; 
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: hidden; /* Asegura que la imagen no desborde */
 }
-*/
 
+.modal-content .expanded-image {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: auto;
+}
 
+@media (min-width: 550px){
+  .modal-content .expanded-image {
+  max-width: 450px;
+}
+}
 
-
-
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1001;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 1.2);
+  text-shadow: 1px 2px 4px rgba(0, 0, 0, 1);
+}
 
 
 
@@ -373,6 +398,12 @@ body {
   padding: 10px;
   display: flex;
   flex-wrap: wrap;
+}
+
+@media (min-width: 700px){
+  .media-menu {
+     right: 100px ;
+  }
 }
 
 .media-grid {
@@ -550,8 +581,7 @@ body {
 
 
 
-</style>
- 
+ </style>
 
 <section class="msger" ng-app="App" ng-controller="msgCtrl">
   <header class="msger-header">
@@ -572,7 +602,7 @@ body {
     </div>
 
      <!--- <div class="msg" ng-repeat="message in messages" ng-class="{ 'right-msg': message.sender === 'admin', 'left-msg': message.sender === 'client' }"> --->
-     <div class="msg" ng-repeat="message in messages.slice().reverse()" ng-class="{ 'right-msg': message.sender === 'client', 'left-msg': message.sender === 'admin' }">
+     <div class="msg" ng-repeat="message in messages.slice().reverse()" ng-class="{ 'right-msg': message.sender === 'client', 'left-msg': message.sender === 'admin' }" ng-init="markAsRead(message)">
       <div class="msg-bubble" ng-style="$last && {'margin-bottom': '10px'}">
         <div class="msg-info" >
           <div class="msg-info-name">{{message.name}}</div>
@@ -580,9 +610,8 @@ body {
         </div>
         <div class="msg-text">
           {{message.content}}
-          
           <div class="img-container" ng-if="message.type == 'image'">
-          <img ng-src="{{message.url}}">
+          <img ng-src="{{message.url}}" ng-click="openImageModal(message.url)" >
           </div>
           
           <div  ng-if="message.type == 'audio'">
@@ -594,9 +623,18 @@ body {
           </div>
           
         </div>
+        <i class="ri-check-double-fill" style="float: right; color: green;" ng-if="message.read == true && message.sender == 'client'"> visto</i> 
       </div>
-    </div>
+    </div> 
     
+    
+    <div class="image-modal" ng-show="isModalOpen">
+  <div class="modal-content">
+    <span class="close" ng-click="closeImageModal()">&nbsp&times;&nbsp</span>
+    <img ng-src="{{modalImageUrl}}" class="expanded-image">
+  </div>
+</div>
+     
   </main>
   
   
@@ -617,7 +655,7 @@ body {
  
 
         
-<div id="record-audio" ></div>
+<div id="record-audio"></div>
 
   <input type="hidden" id="AudioData">
 <span id="clicks"></span>
@@ -635,7 +673,7 @@ body {
 </div>
      <div class="msger-record-btn" id="stopBtn" style="display: none;"> Detener</div> 
      <div class="msger-record-btn" id="delete-audio2" style="display: none;">Borrar</div> 
-    <div class="msger-record-btn" id="delete-image" style="display: none">Borrar</div> 
+    <div class="msger-record-btn" id="delete-image" style="display: none;" ng-click="deleteImg()">Borrar</div> 
    <div ng-click="sendMsg(newMessage)" class="msger-send-btn" >Enviar</div>
   </form>
   
@@ -648,10 +686,12 @@ body {
     </div>
          <input class="imageData" type="file" style="display: none;" accept="image/*"/>
      <div id="imageData" style="display: none;"> </div>
-    <div class="media-item" >
+    <div class="media-item" id="upload-audio">
       <i class="ri-volume-up-fill"></i>
       <span>Audio</span>
     </div> 
+    <input id="audioDataInput" type="file" style="display: none;" accept="audio/*" />
+     <div id="audioData" style="display: none;"> </div> 
     <div class="media-item upload-camera" >
       <i class="ri-camera-2-fill"></i>
       <span>Foto&nbsp&nbsp&nbsp&nbsp</span>
@@ -670,7 +710,7 @@ body {
 
 
 <script>
- var alertsApp = angular.module('App', []);
+   var alertsApp = angular.module('App', []);
 
 alertsApp.controller('msgCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
   $scope.userDataLoaded = false;
@@ -678,7 +718,7 @@ alertsApp.controller('msgCtrl', ['$http', '$scope', '$sce', '$timeout', function
   function getData(){
 var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1+/bx4IRUs+4OVF2BXGHKcse6X5vQSs/AdPqn4wm882qjpkDxXz36kp"
   };
  
   var config = {
@@ -710,6 +750,8 @@ var requestData = {
      angular.element(".cameraInput").on('change', function() {
       readURL(this);
     });
+     
+     
   })
    
 
@@ -731,7 +773,9 @@ var requestData = {
             $scope.picture = e.target.result;
              $scope.uploadedFileName = '..' + file.name.slice(-14); 
         $scope.showMessageInput = false; 
-            $scope.showMediaMenu = false
+            $scope.showMediaMenu = false;
+             document.getElementById('delete-image').style.display = 'block';
+            document.getElementById('mediaBtn').style.display = 'none';
             document.getElementById("imageData").value = e.target.result
            // $scope.uploadImage() 
           });
@@ -740,6 +784,21 @@ var requestData = {
         reader.readAsDataURL(input.files[0]);
       } 
     };
+  
+  
+  
+  $scope.isModalOpen = false;
+  $scope.modalImageUrl = '';
+
+  $scope.openImageModal = function(imageUrl) {
+    $scope.isModalOpen = true;
+    $scope.modalImageUrl = imageUrl;
+  };
+
+  $scope.closeImageModal = function() {
+    $scope.isModalOpen = false;
+    $scope.modalImageUrl = '';
+  };
 
  
 
@@ -762,7 +821,8 @@ var requestData = {
      
     var requestData = {
     action: "postAudio",
-    token: localStorage.getItem('MStoken'),
+    token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
+      //token: localStorage.getItem('MStoken'),
     blob: base64Audio
   };
 
@@ -785,6 +845,20 @@ var requestData = {
             $scope.sendMsg($scope.newMessage);
         }
     };
+  
+    $scope.deleteImg = function() {
+     document.getElementById("imageData").value = ''
+     $scope.showMessageInput = true;
+        $scope.uploadedFileName = ''
+        document.getElementById('delete-image').style.display = 'none';
+            document.getElementById('mediaBtn').style.display = 'block';
+}
+  
+  $scope.markAsRead = function(message) {
+  if (message.sender === "admin" && !message.read) {
+    message.read = true; // Cambiar el estado a leído solo si es un mensaje de admin
+  }
+};
   
   $scope.sendMsg = function(message) {
     var name = $scope.userData.name.split(" ")
@@ -816,6 +890,9 @@ var requestData = {
     "content": "Esta función esta solo disponible para el plan Híbrido y el plan PREMIUM. Actualiza tu plan para recibir este beneficio",
     "timestamp": ""
   }
+  
+    document.getElementById('delete-image').style.display = 'none';
+            document.getElementById('mediaBtn').style.display = 'block';
     
    $timeout(function() {
         $scope.messages.push(autoresponse);
@@ -828,7 +905,8 @@ var requestData = {
     $scope.sendMsgtoserver = function(message){
  var requestData = {
         action: "newMsgChat",
-        token: localStorage.getItem('MStoken'),
+        token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
+        //token: localStorage.getItem('MStoken'),
         msg: message
     };
 
@@ -1014,6 +1092,43 @@ $('#delete-audio2').on('click', function() {
   };
 
 
+
+
+document.getElementById('upload-audio').addEventListener('click', function () {
+    document.getElementById('audioDataInput').click();
+});
+
+
+document.getElementById('audioDataInput').addEventListener('change', function (event) {
+  
+  document.getElementById('msg-input').style.visibility = 'hidden';
+              document.getElementById('mediaMenu').style.visibility = 'hidden';
+               document.getElementById('mediaBtn').style.visibility = 'hidden';
+  
+  
+  
+    const file = event.target.files[0]; 
+
+    const audioURL = URL.createObjectURL(file);
+
+    $('#record-audio').html(`<audio id="player2" src="${audioURL}" controls></audio>`);
+
+      const player = new MediaElementPlayer('player2', {
+        features: ['playpause', 'progress']
+    }); 
+
+    const reader = new FileReader();
+    reader.onloadend = function () {
+        const base64Audio = reader.result.split(',')[1];
+        document.getElementById("AudioData").innerText = base64Audio; 
+            document.getElementById('delete-audio2').style.display = 'block';
+        document.getElementById('recorder').style.display = 'block';
+      document.getElementById('recorder2').style.visibility = 'hidden';
+    };
+    reader.readAsDataURL(file);  
+})
+ 
+
 /*
 $(document).on('click','input[name="audio_record-icon"]',function(){
   var checked = $('#audio_record-icon').prop('checked');
@@ -1028,4 +1143,3 @@ $(document).on('click','input[name="audio_record-icon"]',function(){
 });
 */
 </script>
-
