@@ -683,11 +683,25 @@ ion-side-menu .list .item:hover {
      
         </ion-content>
  <ion-footer-bar style="z-index: 999 !important;">
-         <button class="button button-royal" style="font-size: 15px; text-align: center; z-index: 999; top: -50px; width: 100%; "><i class="ri-download-cloud-2-line" ng-click="alertThis()"></i> Descargar</button>
+         <button class="button button-royal menubtn" ng-click="installApp()" style="font-size: 15px; text-align: center; z-index: 999; top: -50px; width: 100%; "><i class="ri-download-cloud-2-line" ></i> Descargar</button>
   <button class="button pull-right" ng-click="logout()"><i class="icon ri-logout-box-r-line"></i>Salir</button>
 </ion-footer-bar>
-      </ion-side-menu>
 
+      <div id="myModal" class="modal" ng-show="isModalVisible">
+    <div class="modal-content">
+      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
+       <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
+    <p style="text-align: center; font-weight: bold;">
+      <br> Agrega a inicio:   </p> 
+        <p style="text-align: center;" >
+       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
+       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
+       3. Agregar
+       </p>
+    </div>
+  </div>
+     
+      </ion-side-menu>
       <ion-side-menu-content >        
         <ion-nav-view name="menuContent"></ion-nav-view>
       </ion-side-menu-content>
@@ -942,15 +956,15 @@ ion-side-menu .list .item:hover {
 
               <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
 <i class="ri-question-answer-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
-        <div style="font-size: 13px; color: white;"> 2</div>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="chats.length > 0">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}} </div>
     </div>
 </button>
           
      <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
   <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
-        <div style="font-size: 13px; color: white;"> 9</div>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="alerts.length > 0">
+        <div style="font-size: 13px; color: white;"> {{alerts.length}} </div>
     </div>
 </button>
 
@@ -989,7 +1003,7 @@ ion-side-menu .list .item:hover {
       <i class="ion-android-download" ></i> Instalar App
     </div>
 
- <div id="myModal" class="modal" ng-show="isModalVisible">
+<!-- <div id="myModal" class="modal" ng-show="isModalVisible">
     <div class="modal-content">
       <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
        <img src="https://lh3.googleusercontent.com/d/14h1sox3jQT6akLOHzvt_RK2y6cEsT_Di" alt="Agregar a inicio" style="max-width: 100%;" />
@@ -1001,27 +1015,30 @@ ion-side-menu .list .item:hover {
        3. Agregar
        </p>
     </div>
-  </div>
-  </div>
-
-            <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
-    <div class="dropdown-item" ng-click="goToChat()">
-      <i class="ri-feedback-line"></i>Tienes 2 nuevos mensajes
-    </div>
+  </div> -->
   </div>
 
-
-<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-    <div class="dropdown-item" >
-      <i class="ri-alert-line"></i> Entrega atrasada
-    </div>
-    <div class="dropdown-item" >
-      <i class="ri-flag-line"></i> Nuevas actividades asignadas
-    </div>
-    <div class="dropdown-item" >
-      <i class="ion-android-chat"></i> Nueva corrección de actividad
-    </div>
+    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="markAsSeen(); $event.stopPropagation()">
+  <div class="dropdown-item" 
+       ng-click="goToChat()" 
+       ng-if="(chats | filter:{read: false}).length > 0">
+    <i class="ri-feedback-line alertIcon"></i>
+    Tienes {{(chats | filter:{read: false}).length}} nuevos mensajes  
   </div>
+  <span style="margin-left: 15px;" 
+        ng-if="(chats | filter:{read: false}).length == 0"> 
+    No hay mensajes 
+  </span>
+</div>
+
+
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="markAsSeen2();$event.stopPropagation()">
+   <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
+      <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
+         <div style="font-size: 10px; position: absolute; margin-top: 30px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
+    </div> 
+      <span style="margin-left: 15px;" ng-if="alerts.length == 0"> No hay alertas </span>
+  </div>  
         
     </ion-nav-bar>
 
@@ -1525,7 +1542,9 @@ app
   
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
-       $scope.userPlan = data.data.plan.split(" ")[0]
+       $scope.userPlan = data.data.plan.split(" ")[0];
+      $scope.chats = JSON.parse(data.data.messages);
+    $scope.alerts = JSON.parse(data.data.alerts);
   }) 
 
      $scope.isDropdownVisible = false;
@@ -1549,6 +1568,13 @@ app
       $scope.dropdownChatVisible = false;
     };
   
+ $scope.calculateDaysAgo = function(alertDate) {
+  const alertDateObj = new Date(alertDate); // Convierte la fecha del string a un objeto Date
+  const today = new Date(); // Fecha actual
+  const timeDiff = Math.abs(today - alertDateObj); // Diferencia en milisegundos
+  const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Conversión a días
+  return daysDiff;
+};
 
    $scope.goToProfile = function() {
   window.location.href = '#/menu/profile';
