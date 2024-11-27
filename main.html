@@ -599,7 +599,9 @@ ion-side-menu .list .item:hover {
   text-align: center;
 }
    
-
+.alertIcon{
+  font-size: 18px;
+}
 
 .content {
   display: grid;
@@ -940,18 +942,18 @@ ion-side-menu .list .item:hover {
       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-              <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
 <i class="ri-question-answer-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="chats.length > 0">
-        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}} </div>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button>
+</button> 
           
      <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
   <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="alerts.length > 0">
-        <div style="font-size: 13px; color: white;"> {{alerts.length}} </div>
-    </div>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
+    </div> 
 </button>
 
        <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
@@ -987,7 +989,7 @@ ion-side-menu .list .item:hover {
     </div>
   </div>
 
-    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="markAsSeen(); $event.stopPropagation()">
+    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="dropdown-item" 
        ng-click="goToChat()" 
        ng-if="(chats | filter:{read: false}).length > 0">
@@ -1001,7 +1003,7 @@ ion-side-menu .list .item:hover {
 </div>
 
 
-<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="markAsSeen2();$event.stopPropagation()">
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
    <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
       <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
          <div style="font-size: 10px; position: absolute; margin-top: 30px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
@@ -1534,12 +1536,16 @@ app
       $scope.dropdownChatVisible = false;
       $scope.dropdownNotifVisible = false;
     };
-  
+    
+ $scope.chatCounter = true;
+ $scope.alertCounter = true;
+    
     $scope.dropdownChatVisible = false;
     $scope.dropdownChat = function() {
       $scope.dropdownChatVisible = !$scope.dropdownChatVisible;
       $scope.isDropdownVisible = false;
       $scope.dropdownNotifVisible = false;
+      $scope.chatCounter = false;  
     };
 
     $scope.dropdownNotifVisible = false;
@@ -1547,6 +1553,7 @@ app
       $scope.dropdownNotifVisible = !$scope.dropdownNotifVisible;
       $scope.isDropdownVisible = false;
       $scope.dropdownChatVisible = false;
+      $scope.alertCounter = false;  
     };
   
  $scope.calculateDaysAgo = function(alertDate) {
