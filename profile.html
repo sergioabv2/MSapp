@@ -1663,31 +1663,20 @@ body::-webkit-scrollbar-thumb {
 
 /* MEDIA QUERIES */
 
-@media (max-width: 760px) {
-  .content {
-    grid-template-columns: 100%;
-    grid-template-areas:
-      "leftContent"
-      "rightContent";
-    overflow: auto;
+@media (min-width: 761px) {
+  .logContainer{
+    height: 180px !important;
+  }
   }
 
-  .left-content {
+@media (max-width: 760px) {
+  .logContainer{
+    height: 500px !important;
+  }
+  .whatsContainer{
     display: none;
   }
-   .iframe-container {
-            height: 700px !important;
-        }
-
-
-  .right-content {
-    grid-area: rightContent;
-    border-left: unset;
-    height: auto;
-    overflow: unset;
   }
-}
-
 
   .iframe-container {
             position: relative;
@@ -1771,7 +1760,7 @@ body::-webkit-scrollbar-thumb {
         <h4><i class="fa fa-fw fa-flag"></i> Actividad</h4>
           
           </div>
-          <div class="panel-body log-list-container logContainer" style="height: 180px !important; transform: scale(0.95)"> 
+          <div class="panel-body log-list-container logContainer" style="transform: scale(0.95)"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
                 <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="showModal(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
@@ -1792,7 +1781,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
           </div>
           
          
-      <div class="iframe-container" style="height: 400px !important; transform: scale(0.95)"><iframe src="https://app.mozartacademy.mx/chat2" frameborder="0"  allowfullscreen></iframe></div>     
+      <div class="iframe-container whatsContainer" style="height: 400px !important; transform: scale(0.95)"><iframe src="https://app.mozartacademy.mx/chat2" frameborder="0"  allowfullscreen></iframe></div>     
           
           
         </div>
