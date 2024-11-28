@@ -101,6 +101,17 @@ body {
   text-align: center;
 }
 
+ #loadingProfile {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  left: 50%;
+  background-image: url(https://raw.githubusercontent.com/niklausgerber/PreLoadMe/master/img/status.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: -50px 0 0 -100px;
+}
+
 ion-side-menu {
   background-color: #f8f9fc; /* Fondo claro */
   color: #3a3b3c; /* Texto oscuro */
@@ -654,10 +665,11 @@ ion-side-menu .list .item:hover {
         <ion-content>
 
       <div class="profile-user-data clearfix">
+        <div id="loadingProfile" ng-if="loadingProfile"></div>
           <div class="circle">
               <img class="profile-pic" src="{{userData.photo}}">
           </div>
-          <div class="main-data" style="margin-top: 12px;">
+          <div class="main-data" style="margin-top: 12px;" ng-if="!loadingProfile">
             <h4 >{{userData.name}}</h4>
         <div class="pull-left planTag" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN PREMIUM
             <i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
@@ -1486,12 +1498,14 @@ app
       $scope.isDropdownVisible = false;
       $scope.dropdownChatVisible = false;
 };
-  
+
+    $scope.loadingProfile = true;
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
        $scope.userPlan = data.data.plan.split(" ")[0];
       $scope.chats = JSON.parse(data.data.messages);
     $scope.alerts = JSON.parse(data.data.alerts);
+      $scope.loadingProfile = false;
   }) 
 
      $scope.isDropdownVisible = false;
