@@ -511,10 +511,68 @@ ion-side-menu .list .item:hover {
   .menubtn{
     display: none;
   }
+    .hintMsg{
+        display: none;
+    }
   ion-side-menu .list .item {
   font-size: 15px;
   }
 }
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    color: #9c63ce;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.pulseTab {
+  animation: pulse 1s ease-in-out 3;
+}
+
+.hintMsg {
+  position: fixed;
+  bottom: 70px; /* Just above the tab bar */
+  left: 50%;
+  transform: translateX(-50%);
+ /* background-color: rgba(0, 0, 0, 0.8);
+  color: white;*/
+  color: black;
+  padding: 10px 15px; 
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeInOut 4s forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+}
+     
 
 .profile-user-data > * {float: left; margin-left: 5px;}
  .profile-user-data   .circle {
@@ -1074,9 +1132,9 @@ ion-side-menu .list .item:hover {
         
     </ion-nav-bar>
 
-
+<div class="hintMsg"><i class="ri-information-2-line" style="font-size: 20px;"></i> Explora más funciones</div>
     <ion-tabs class="tabs-striped tabs-icon-top tabs-stable ">
-      <ion-tab title="Puntaje" icon="ri-line-chart-fill" href="#/menu/reel/score">
+      <ion-tab title="Puntaje" icon="ri-line-chart-fill" href="#/menu/reel/score" class="pulseTab">
         <ion-nav-view name="score-tab"></ion-nav-view>
       </ion-tab>
       <ion-tab title="Logros" icon="ri-trophy-fill" href="#/menu/reel/achievements">
@@ -1125,9 +1183,10 @@ ion-side-menu .list .item:hover {
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
-
+    
+<div class="hintMsg"><i class="ri-information-2-line" style="font-size: 20px;"></i> Explora más funciones</div>
     <ion-tabs class="tabs-striped tabs-icon-top tabs-stable ">
-      <ion-tab title="Lecciones" icon="ri-graduation-cap-fill" href="#/menu/tab/theory">
+      <ion-tab title="Lecciones" icon="ri-graduation-cap-fill" href="#/menu/tab/theory" class="pulseTab">
         <ion-nav-view name="theory-tab"></ion-nav-view>
       </ion-tab>
       <ion-tab title="Evaluación" icon="ri-aed-fill" href="#/menu/tab/practice">
