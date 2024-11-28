@@ -967,7 +967,8 @@ ion-side-menu .list .item:hover {
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
       <div class="profileImageContainer">
-        <img src="{{userData.photo}}"  />
+     <div id="loading2" ng-if="loadingProfile" style="height: 100px;"></div>
+        <img src="{{userData.photo}}"  ng-if="!loadingProfile"/>
       </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
