@@ -1,6 +1,7 @@
 
  <link href="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.css" rel="stylesheet"/>
 <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet"/> 
+ <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Shuffle/4.0.0/shuffle.min.js"></script>
@@ -632,6 +633,20 @@ p.author {
     stroke: #ffa700;
   }
 }
+
+
+ .no-items-message {
+  text-align: center;
+  margin-top: 100px;
+  padding: 30px;
+  font-size: 1.2em;
+  color: #666;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+ 
 </style>
 
 
@@ -658,7 +673,7 @@ p.author {
             <a href="#" 
                class="filter-item" 
                ng-class="{active: filterGenre === 'sheet'}" 
-               ng-click="filterGenre = 'sheet'">Piezas</a>
+               ng-click="filterGenre = 'sheet'">Repertorio</a>
             <a href="#" 
                class="filter-item" 
                ng-class="{active: filterGenre === 'repertoire'}" 
@@ -683,8 +698,27 @@ p.author {
         </svg>
       </div>
     </div>
-     
-          <ul id="grid" class="row">
+          
+            <div ng-if="status != 'ACTIVO'" class="no-items-message" >
+    <p style="color: red; font-weight: 400;">No disponible. </p>
+               <p>Actualiza tu pago para acceder al contenido.   
+                 <br><a style="color: #2980b9; font-weight: 600;"  onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment';">Ir a pagos <i class="ri-bank-card-fill"></i></a></p>
+  
+  </div>
+      
+          <ul id="grid" class="row" ng-if="status == 'ACTIVO'">
+  
+  <div ng-if="filterGenre === 'sheet' && !antology.length" class="no-items-message">
+   <p>No tienes piezas para mostrar aún. </p>
+    <p> Avanza en más actividades para acceder a nuevo contenido. </p>
+  </div>
+  <div ng-if="filterGenre === 'repertoire' && !repertoire.length" class="no-items-message">
+    <p>No tienes piezas finales para mostrar aún.</p>
+    <p> Avanza en más actividades para acceder a nuevo contenido.
+    </p>
+  </div>
+
+            
             <li class="book-item small-12 medium-6 columns" 
                 ng-repeat="sheet in repertoire | filter:genreFilter | orderBy:sortOption">
               <div class="bk-img">
@@ -702,6 +736,7 @@ p.author {
               </div>
             </li> 
             <li class="book-item small-12 medium-6 columns" ng-repeat="sheet in antology | filter:genreFilter | orderBy:sortOption" ng-if="lvl > sheet.lvl || (sheet.lvl == lvl && sheet.lsn <= lsn)">
+            
               <div class="bk-img">
             
                     <div class="bk-front">
@@ -718,6 +753,7 @@ p.author {
               </div>
             </li>
               <li class="book-item small-12 medium-6 columns" ng-repeat="manual in manuals | filter:genreFilter | orderBy:sortOption" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
+                
               <div class="bk-img">
             
                     <div class="bk-front">
@@ -770,6 +806,7 @@ p.author {
       $scope.lvl = response.data.lvl;
     $scope.blq = response.data.blq;
      $scope.lsn = response.data.lsn;
+    $scope.status = response.data.status;
     $scope.repertoire = response.data.repertoire;
       $scope.userDataLoaded = true;
     })          
@@ -802,7 +839,7 @@ $scope.manuals = [
   
 
 
-  $scope.filterGenre = 'all'; // Filtro inicial
+  $scope.filterGenre = 'manual'; // Filtro inicial
   $scope.sortOption = '';     // Sin orden inicial
 
   $scope.genreFilter = function(sheet) {
