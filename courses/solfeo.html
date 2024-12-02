@@ -1489,7 +1489,7 @@ input[type="radio"]:checked + label.green-bg::after {
           </a>
           </li>
         <li class="tab level2" >
-          <a href="#test3">  <span class="titlelvlrow">Afinación</span>
+          <a href="#test3">  <span class="titlelvlrow">Aural</span>
             <div class="job-overview-card">
         <div class="job-card overview-card"> 
           <div class="overview-wrapper">
@@ -1497,7 +1497,7 @@ input[type="radio"]:checked + label.green-bg::after {
             <div class="overview-detail"> 
               <div class="job-card-title">Solfeo</div>
               <div class="job-card-subtitle" style="margin-left: 2px">
-   Afinación
+Aural
               </div> 
             </div>
          
@@ -1983,7 +1983,8 @@ app.factory('SharedState', function($http, $q) {
       .then(function(response) {
         deferred.resolve({
           lvl: response.data.lvl,
-          lsn: response.data.lsn,
+          lsn: response.data.lsn, 
+          lsn: 8,
           progress: response.data.progress,
           lssons: response.data.lessons,
           status: response.data.status,
@@ -2011,13 +2012,6 @@ app.factory('SharedState', function($http, $q) {
      $scope.status = data.status;
       $scope.counter = data.counterLvl[0]
         
-        if(data.lvl == 1){
-          $('ul.tabs').tabs('select_tab', 'test2');
-        }else if(data.lvl == 2){
-          $('ul.tabs').tabs('select_tab', 'test3');
-        }else if(data.lvl == 3){
-          $('ul.tabs').tabs('select_tab', 'test4');
-        }
         
   })
 
@@ -2028,7 +2022,8 @@ app.factory('SharedState', function($http, $q) {
   
   
     SharedState.getNum().then(function(data) {
-    $scope.lsn = data.lsn;
+     $scope.lsn = data.lsn;
+      $scope.lsn = 8;
       $scope.lvl = data.lvl;
       $scope.progress = data.progress;
       $scope.counter = data.counterLvl[0]
@@ -2060,617 +2055,463 @@ app.factory('SharedState', function($http, $q) {
 
     $scope.allData = [
      {
-          block: "Clave de sol 𝄞",
+          block: "Nivel 1",
           lessons: [{
-              name: 'Lección 1: Posición de Do',
+              name: '1. Notas de referencia',
               id: 1,
               material:[
-                {
-                title: 'Ritmo y métrica',
+               {
+                title: 'Introducción',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/qh-4OyTcuJw'
-                  },
-            /*{
-                  title: 'Intervalos de 4ta y 5ta',
-                  icon: 'quiz',
-                  type: 'Block Test',
-                  media: 'quiz',
-                  package: 2
-                  },*/
-                {
-                  title: 'Ritmo y métrica',
-                  icon: 'bolt',
-                  type: 'Quick Test',
-                  media: 'quiz',
-                  package: 1
+                  url: 'https://www.youtube.com/embed/'
+                  },{
+                  icon: 'description',
+                  type: 'Referencia',
+                  media: 'pdf',
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
-              {
-                title: 'Posición de Do',
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/3wn33KNLy5M'
-                  },{
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1WqVnSwujAS7Rps02XNfqueu7PtiNVG7D/preview'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Ode to Joy - var 2',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/bVWXlV8Neic'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1frOQ8O1QNfFf8GUKFYH2-lEYvWhSG6RS/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           },
-          {
-              name: 'Lección 2: Grand Staff',
+         {
+              name: '2. Notas contiguas',
               id: 2,
               material:[
-              {
-                title: 'El Pentagrama y el Grand Staff',
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/HHF95sBbmwQ'
-                  },{
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1HKC6x6ca-whFRxlYAUKOQo7M-dpR8dtY/preview'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1Ys_fybQsMIjS4zaCRLO9lV8qsvmvooXq/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Ode to Joy - var 3',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/ec4ZRGMYgrY'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/15amNYqOJwINhWNjw8I77uRWZ-6sh15-e/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           },
-
-          {
-              name: 'Lección 3: Intervalos',
+            {
+              name: '3. Reforzamiento',
               id: 3,
-              material:[{
-                title: 'Intervalos de 2da y 3era',
+              material:[
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/H4x0TPlSoaQ'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1Wu2qa7B3hyVoOHkPWdVcDHklBgn5nk0T/preview'
-                  },
-                  {
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1Dom_0ZjNoslBKZpUa3IUDN8XMzcxZ1Jd/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Mountain Climbing',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/XfUF1yv0Ook'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1jo4LcVuPV-Q0eytfVFyDdCPqbTDX1aU9/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
-                ] 
+                ]
               }
             ]
           },
 
           {
-              name: 'Lección 4: Intervalos (2da parte)',
+              name: '4. Referencia indirecta',
               id: 4,
-              material:[{
-                title: 'Intervalos de 4ta y 5ta',
+              material:[
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/M6DCHr2wVh8'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/178foCLFrPUNg1Tr536m0oBNLU3JY87JY/preview'
-                  },
-                  {
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1G3Cun9yL_xl8ZJUhDJE5CAYTXMQUCIZY/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Jingle Bells',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/JCogx6-fQ0Q'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/19_81QSEylsakl04ZEnFXHKTDThcnI3MC/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           }
 
+
         ]
       },
 
 
-//BLOQUE 2
-     {
-          block: "Clave de fa 𝄢",
-          lessons: [
-            {
-              name: 'Lección 5: Frases',
+//Nivel 2
+{
+          block: "Nivel 2",
+          lessons: [{
+              name: '5. Terceras contiguas',
               id: 5,
-              material:[{
-                title: 'Construcción de frases',
+              material:[
+               {
+                title: 'Introducción',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/RJnwVQHexW0'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
+                  url: 'https://www.youtube.com/embed/'
+                  },{
+                  icon: 'description',
+                  type: 'Referencia',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1V15F3hT0JQYYBP90XIMT2lHogik6s2Kj/preview'
-                  },
-
-                  {
+                  url: 'https://drive.google.com/file/d//preview'
+                  }
+                ]
+              },
+                {
+                title: 'Clave de sol 𝄞',
+                icon: 'library_books',
+                activity:[{
+                  icon: 'smart_display',
+                  type: 'Video',
+                  media: 'video',
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1gum-qE-LUdxxRNmjh39A1xImbqYRABAX/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Run Away River',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/kl_V1GltXDc'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1pHinigt3CUDZeBMYowtaHHP_yGjRigWo/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           },
-          {
-              name: 'Lección 6: Acordes',
+         {
+              name: '6. Lineas adicionales',
               id: 6,
-              material:[{
-                title: 'Construcción de acordes',
+              material:[
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/Y2MokfVUSqs'
+                  url: 'https://www.youtube.com/embed/'
                   },{
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1zhyiUNAagb5l-Z8pkWSrDt5EOtUGCf0h/preview'
-                  }
-                ]
-              },
-              {
-                title: 'Acorde C y G7',
-                icon: 'library_books',
-                activity:[{
-                  icon: 'smart_display',
-                  type: 'Lección',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/n7qaCP5a-Pc'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/14g5yaRgRo66fJtigaCVpN7zcZ6AusP05/preview'
-                  },
-                  {
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1UtQsQYtjkYxqbVnCGfTmNa85xtnhG3W7/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Trumpet Voluntary',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/k7ZlQezPHPk'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1-b7JbEAe5M5j_3KoSOCIs8Ss5uzez2Rw/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           },
-              {
-              name: 'Lección 7: Corcheas y Staccato',
+            {
+              name: '7. Octavas',
               id: 7,
-              material:[{
-                title: 'Definición',
+              material:[
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Corcheas',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/LJIBynkI1Cs'
-                  },
-                   {
-                  icon: 'smart_display',
-                  type: 'Staccato',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/5zX6CFXf6cQ'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1rEgkVVzKMuvyvXJATJ9mUdkm_oWy5lQW/preview'
-                  }
-                 
-                ]
-              },
-              {
-                title: 'Ejercicios',
-                icon: 'library_books',
-                activity:[
-                 /*{
-                  icon: 'smart_display',
-                  type: 'Explicación adicional',
+                  type: 'Video',
                   media: 'video',
                   url: 'https://www.youtube.com/embed/'
-                  },*/
-                  {
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1DquyL0GuDR3zojHcmzBLPZaA598DMLbu/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               },
               {
-                title: 'Pieza: Old German Dance',
-                icon: 'audio_file',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
                 activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/2R4VsyAvL60'
+                  url: 'https://www.youtube.com/embed/'
                   },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1ZR5HKyTC22IR0kr8hFLLZl2eX9I6KJPO/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           },
+
           {
-              name: 'Lección 8: Ejercicios de coordinación',
+              name: '8. Flujo de lectura',
               id: 8,
-              material:[{
-                title: 'Transposición',
+              material:[
+                {
+                title: 'Clave de sol 𝄞',
                 icon: 'library_books',
-                activity:[/*{
+                activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
                   url: 'https://www.youtube.com/embed/'
-                  },*/
-                  {
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1i7yEW2-HS26JozRu_YWd0pm-mneAgk5V/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
-                 
                 ]
               },
               {
-                title: 'Pieza: Allegretto',
-                icon: 'audio_file',
-                activity:[/*{
-                  icon: 'piano',
-                  type: 'Ejemplo',
+                title: 'Clave de fa 𝄢',
+                icon: 'library_books',
+                activity:[{
+                  icon: 'smart_display',
+                  type: 'Video',
                   media: 'video',
                   url: 'https://www.youtube.com/embed/'
-                  },*/{
+                  },{
                   icon: 'description',
-                  type: 'Partitura',
+                  type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/15bxfUEOjjddNaqp7ztMJPxSX10dYOiWw/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
             ]
           }
+
 
         ]
       },
 
-//BLOQUE 3
-       {
-          block: "Grand staff 𝄆",
-          lessons: [
-            {
-              name: 'Lección 9: Posición de Do II',
+
+      {
+          block: "Nivel 3",
+          lessons: [{
+              name: '9. Grand Staff 1',
               id: 9,
-              material:[{
-                title: 'Posición de Do II',
+              material:[
+               {
+                title: 'Serie de ejercicios',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/KopYT505jHA'
-                  },
-                  {
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1uuu7dX6SRoOIi1aqzTEJ1xj8CbfW6Uft/preview'
-                  }
-                ]
-              },
-              {
-                title: 'Marcas de Tempo y Dinámicas',
-                icon: 'library_books',
-                activity:[{
-                  icon: 'smart_display',
-                  type: 'Lección',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/fOHFGsq-cGw'
-                  },
-                          {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1cyGlwmsc3PMV3ECaA6J57LMw7f-Oxw6C/preview'
-                  },{
-                  icon: 'description',
-                  type: 'Partitura',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1lLMYCMDiL40krhqNKmG6rRtg3elF_ZKE/preview'
-                  }                   
-                ]
-              },
-              {
-                title: 'Pieza: Little Playmates',
-                icon: 'audio_file',
-                activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/FivvBFEW1a0'
-                  },{
-                  icon: 'description',
-                  type: 'Partitura',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/16DBduII3mLFYdSytK-0DA0kg8jWA_KtO/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
+                
             ]
           },
-          {
-              name: 'Lección 10: Escala de Do Mayor',
+         {
+              name: '10. Grand Staff 2',
               id: 10,
-              material:[{
-                title: 'Definición y ejercicios',
+              material:[
+               {
+                title: 'Serie de ejercicios',
                 icon: 'library_books',
-                activity:[/*{
+                activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
                   url: 'https://www.youtube.com/embed/'
-                  },*/{
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1VhR-5CT2GwbonlTQW12gwiVo1_bp2h4d/preview'
-                  }
-                ]
-              },
-
-              {
-                title: 'Pieza: Fish Scales',
-                icon: 'audio_file',
-                activity:[/*{
-                  icon: 'piano',
-                  type: 'Ejemplo',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/'
-                  },*/{
-                  icon: 'description',
-                  type: 'Partitura',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1Iw8_UXSYqCTWT0c4ORTZst1ak3PCtfCs/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
+                
             ]
           },
-
-           {
-              name: 'Lección 11: Posición de Sol',
+            {
+              name: '11. Grand Staff 3',
               id: 11,
-              material:[{
-                title: 'Definición y ejercicios',
+              material:[
+               {
+                title: 'Serie de ejercicios',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/jGM_qOcewYg'
-                  },
-                  {
-                  icon: 'auto_stories',
-                  type: 'Teoría',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1qf6vWHGkllTXZ4OYmQNGy2_Bjrqvs_Jr/preview'
-                  },
-                  {
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/1CfqcsxDsyCwxo8ZhhOrejiiJcgyEzxCE/preview'
-                  }
-                 
-                ]
-              },
-              {
-                title: 'Pieza: Bagpipe',
-                icon: 'audio_file',
-                activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/il7CTAteqhE'
-                  },{
-                  icon: 'description',
-                  type: 'Partitura',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/16hYD36HcMS-WRqzR9pBvSLHCxifOTkWc/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
+                
             ]
           },
-          {
-              name: 'Lección 12: Ligadura de prolongación',
+         {
+              name: '12. Grand Staff 4',
               id: 12,
-              material:[{
-                title: 'Definición y ejercicios',
+              material:[
+               {
+                title: 'Serie de ejercicios',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
-                  type: 'Lección',
+                  type: 'Video',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/edjG-czdX2Y'
-                  },
-                  {
+                  url: 'https://www.youtube.com/embed/'
+                  },{
                   icon: 'description',
                   type: 'Ejercicios',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/16dc7Bkc7KtoP95hA1Tcni_i4M7eDfNLf/preview'
-                  }                 
-                ]
-              },
-              {
-                title: 'Pieza: Sonatina',
-                icon: 'audio_file',
-                activity:[{
-                  icon: 'piano',
-                  type: 'Ejemplo',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/09dONQwMtv8'
-                  },{
-                  icon: 'description',
-                  type: 'Partitura',
-                  media: 'pdf',
-                  url: 'https://drive.google.com/file/d/14f3fDZf4Fj13zYgXwNSDPIerGGIG_GtS/preview'
+                  url: 'https://drive.google.com/file/d//preview'
                   }
                 ]
               }
+                
             ]
-          }
+          },
+
 
         ]
-      }     
+      },
+ 
+
+
+
+
 ]
   
   }])
