@@ -718,7 +718,7 @@ alertsApp.controller('msgCtrl', ['$http', '$scope', '$sce', '$timeout', function
   function getData(){
 var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1+/bx4IRUs+4OVF2BXGHKcse6X5vQSs/AdPqn4wm882qjpkDxXz36kp"
+    token: localStorage.getItem('MStoken')
   };
  
   var config = {
@@ -821,8 +821,7 @@ var requestData = {
      
     var requestData = {
     action: "postAudio",
-    token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
-      //token: localStorage.getItem('MStoken'),
+    token: localStorage.getItem('MStoken'),
     blob: base64Audio
   };
 
@@ -905,8 +904,7 @@ var requestData = {
     $scope.sendMsgtoserver = function(message){
  var requestData = {
         action: "newMsgChat",
-        token: "U2FsdGVkX1/nUuDQw51xvgUc1SJbNB7ovqirHxEhFI0Mq6tuxq5e/7jiW0KqEp3D",
-        //token: localStorage.getItem('MStoken'),
+        token: localStorage.getItem('MStoken'),
         msg: message
     };
 
