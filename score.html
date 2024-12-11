@@ -331,11 +331,11 @@
                                 <div class="medal-gold"></div>
                             </div>
                             <div class="ranking-table-data">
-                              {{userData.ranking[0].name}} 
-                <br>  <span style="font-size: 12px; color: {{userData.ranking[0].color}}">  {{userData.ranking[0].lvl}}</span>
+                              {{ranking[0].name}} 
+                <br>  <span style="font-size: 12px; color: {{ranking[0].color}}">  {{ranking[0].lvl}}</span>
                           </div>
                             <div class="ranking-table-data">
-                                <div class="complete" style="color: orange !important; text-shadow: 0 0 10px orange; font-weight: 700; font-size: 20px !important;">{{userData.ranking[0].score}}</div>
+                                <div class="complete" style="color: orange !important; text-shadow: 0 0 10px orange; font-weight: 700; font-size: 20px !important;">{{ranking[0].score}}</div>
                             </div>
                         </div>
                         <div class="ranking-table-row-leader-2">
@@ -343,11 +343,11 @@
                                 <div class="medal-silver"></div>
                             </div> 
                             <div class="ranking-table-data">
-                                {{userData.ranking[1].name}}
-        <br>  <span style="font-size: 12px; color: {{userData.ranking[1].color}}">  {{userData.ranking[1].lvl}}</span>
+                                {{ranking[1].name}}
+        <br>  <span style="font-size: 12px; color: {{ranking[1].color}}">  {{ranking[1].lvl}}</span>
                         </div>
                             <div class="ranking-table-data">
-                                <div class="complete" style="color: #2980b9  !important; text-shadow: 0 0 10px #85c1e9 ; font-weight: 500; font-size: 18px !important;">{{userData.ranking[1].score}}</div>
+                                <div class="complete" style="color: #2980b9  !important; text-shadow: 0 0 10px #85c1e9 ; font-weight: 500; font-size: 18px !important;">{{ranking[1].score}}</div>
                             </div> 
                         </div>
                         <div class="ranking-table-row-leader-3">
@@ -355,17 +355,17 @@
                                 <div class="medal-bronze"></div>
                             </div>
                             <div class="ranking-table-data">
-                               {{userData.ranking[2].name}}
-                               <br>  <span style="font-size: 12px; color: {{userData.ranking[2].color}}">  {{userData.ranking[2].lvl}}</span>
+                               {{ranking[2].name}}
+                               <br>  <span style="font-size: 12px; color: {{ranking[2].color}}">  {{ranking[2].lvl}}</span>
 </div>
                             <div class="ranking-table-data">
-                                <div class="complete" style="color: #85929e   !important; text-shadow: 0 0 5px #85929e; font-size: 16.5px !important;">{{userData.ranking[2].score}}</div>
+                                <div class="complete" style="color: #85929e   !important; text-shadow: 0 0 5px #85929e; font-size: 16.5px !important;">{{ranking[2].score}}</div>
                             </div>
                         </div>
 
 
                          <div class="ranking-table-body">
-        <div class="ranking-table-row" ng-repeat="user in userData.ranking.slice(3)">
+        <div class="ranking-table-row" ng-repeat="user in ranking.slice(3)">
             <div class="ranking-table-data">{{ $index + 4 }}</div> <!-- Muestra posición -->
             <div class="ranking-table-data">{{ user.name }}<br>  <span style="font-size: 12px; color: {{user.color}}">  {{user.lvl}}</span></div>
             <div class="ranking-table-data"><div class="complete">{{ user.score }}</div></div>
@@ -411,7 +411,7 @@ var app = angular.module('postApp', [])
     }).then(function(response) {
       $scope.data = response.data.posts; 
        $scope.profileData = response.data.profiles
-	    
+	$scope.ranking = response.data.ranking    
       $scope.filterPosts('all');
       $scope.updatePagination();
       $scope.userDataLoaded = false
