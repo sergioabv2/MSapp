@@ -630,7 +630,6 @@ iframe#instagram-embed-0{height: auto;}
     justify-content: center;
     align-items: center;
     height: 60vh;
-  margin-top: 80px;
 }
 
 .loader {
@@ -1205,21 +1204,11 @@ iframe#instagram-embed-0{height: auto;}
 <div class="page-wrapper chiller-theme content">
         <main class="page-content left-content"> 
             <div class="container-fluid">
-              
                 <div class="row">
-                 
                     <div class="col-md-12 posts-group">
                        
-      <div class="showbox" ng-if="userDataLoaded">
-      <div class="loader">
-        <svg class="circular" viewbox="25 25 50 50">
-          <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
-        </svg>
-      </div>
-    </div>  
-
-                      
-                        <ul class="filtermenu" ng-if="!userDataLoaded">
+        
+                        <ul class="filtermenu" >
                         <li ng-click="filterPosts('all')" ng-class="{active: filter === 'all'}">Recientes</li>
                               <li ng-click="filterPosts('both')" 
     ng-class="{active: filter === 'both' }">Post</li>
@@ -1227,7 +1216,7 @@ iframe#instagram-embed-0{height: auto;}
                         <li ng-click="filterPosts('audio')" ng-class="{active: filter === 'audio'}">Audio</li>
                     </ul>
                       
-<div class="fixed-bottom-bar" ng-if="!userDataLoaded">
+<div class="fixed-bottom-bar" >
   <!-- Grupo del input -->
   <div class="input-group">
     <img 
@@ -1260,6 +1249,14 @@ iframe#instagram-embed-0{height: auto;}
   </div>
 </div>
 
+  <div class="showbox" ng-if="userDataLoaded">
+      <div class="loader">
+        <svg class="circular" viewbox="25 25 50 50">
+          <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+        </svg>
+      </div>
+    </div>  
+                      
     <div ng-repeat="post in filteredData.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" >
                         <div class="post " >
                           <div class="post_header" ng-if="post.type != 'instagram'"> 
