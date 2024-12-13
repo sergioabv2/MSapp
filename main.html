@@ -712,6 +712,35 @@ width: 155px;
      height: 55px;
       box-shadow:  0 2px 4px 0px rgba(0,0,0,0.1);
    }
+
+
+  .barImage:before {
+    position: absolute;
+    content: "";
+    height: 50px;
+    width: 50px;
+    top: -5px;
+    left: -3px;
+    border-radius: 50%;
+    border: 1px solid silver;
+    animation: 1.5s linear 0s normal none infinite focuse;
+}
+   
+   @keyframes focuse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1; }
+  75% {
+    transform: scale(1.2);
+    opacity: 0; }
+  100% {
+    transform: scale(1.2);
+    opacity: 0; } }
+@keyframes slide {
+  from {
+    background-position: 0 0; }
+  to {
+    background-position: 40px 0; } }
      
 </style>
 
@@ -1125,7 +1154,7 @@ width: 155px;
     </div> 
 </button>
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
+       <button class="button button-clear" ng-class="{ 'barImage': btnBar }" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
       <img src="{{userData.photo}}" width="35" height="35" style="border-radius: 50%;" />
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
@@ -1697,10 +1726,12 @@ app
   }) 
 
      $scope.isDropdownVisible = false;
+    $scope.btnBar = true;
     $scope.toggleDropdown = function() {
       $scope.isDropdownVisible = !$scope.isDropdownVisible;
       $scope.dropdownChatVisible = false;
       $scope.dropdownNotifVisible = false;
+        $scope.btnBar = false;
     };
     
  $scope.chatCounter = true;
