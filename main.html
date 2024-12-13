@@ -758,32 +758,13 @@ width: 155px;
           </div>  
         </div>
      
-     <ul class="list">
-  <a href="#/menu/courses" 
-     class="item" 
-     ng-class="isActive('/menu/courses') ? 'menuSelectedColor' : ''" 
-     menu-toggle="left">
-    <i class="ri-presentation-line"></i>&nbsp;&nbsp;Inicio
-  </a>
-  <a href="#/menu/agenda" 
-     class="item" 
-     ng-class="isActive('/menu/agenda') ? 'menuSelectedColor' : ''" 
-     menu-toggle="left">
-    <i class="ri-calendar-todo-line"></i>&nbsp;&nbsp;Agenda
-  </a>
-  <a href="#/menu/library" 
-     class="item" 
-     ng-class="isActive('/menu/library') ? 'menuSelectedColor' : ''" 
-     menu-toggle="left">
-    <i class="ri-book-shelf-line"></i>&nbsp;&nbsp;Biblioteca
-  </a>
-  <a href="#/menu/reel/achievements" 
-     class="item" 
-     ng-class="isActive('/menu/reel/achievements') ? 'menuSelectedColor' : ''" 
-     menu-toggle="left">
-    <i class="ri-user-community-line"></i>&nbsp;&nbsp;Comunidad
-  </a>
-</ul>
+ <ul class="list">
+           <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="left"><i class="ri-presentation-line" ></i>&nbsp&nbspInicio</a> 
+<a href="#/menu/agenda" class="item" ng-class="(activeMenuClr=='agenda')?'menuSelectedColor':''" ng-click="activeMenuClr = 'agenda'" menu-toggle="left"><i class="ri-calendar-todo-line"></i>&nbsp&nbspAgenda</a> 
+                           <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-shelf-line" ></i>&nbsp&nbspBiblioteca</a>
+                              
+       <a href="#/menu/reel/achievements" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-user-community-line"></i></i>&nbsp&nbspComunidad</a>    
+          </ul>
 
      
         </ion-content>
@@ -1685,7 +1666,7 @@ app
   });
  })       
 
-.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', 'SharedState', '$location', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, SharedState, $location) {
+.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', 'SharedState', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, SharedState) {
   $scope.toggleRight = function() {
     $('.item').removeClass('anim');
     setTimeout(function() {
@@ -1694,9 +1675,7 @@ app
         });
     }, 10);
 
-      $scope.isActive = function(route) {
-    return $location.path() === route;
-  };
+ 
       
     $ionicSideMenuDelegate.toggleLeft();
       $scope.dropdownNotifVisible = false;
