@@ -44,20 +44,46 @@ a {color: #f27275;}a:hover, a:focus {color:#666;}
 
 /*** FILTER POSTS ***/
 .filtermenu {
-  width: 100%;
-  margin-left: -20px;
-  text-align: center;
+  display: flex; /* Alineación horizontal */
+  justify-content: center; /* Centra los elementos */
+  gap: 30px; /* Espaciado entre los elementos */
+  list-style: none; /* Elimina los puntos de la lista */
+  padding: 0;
+  margin: 20px;
+  border-bottom: 1px solid #e1e8ed; /* Línea inferior */
 }
+  
+  @media (min-width: 650px){
+    .filtermenu{
+      gap: 100px; 
+    }
+  }
+
 .filtermenu li {
-  border: 1px solid #CCC;
-  padding: 4px 12px;
-  display: inline-block;
-  border-radius: 6px;
+  font-weight: bold;
+  color: #657786; /* Color del texto no activo */
   cursor: pointer;
+  position: relative; /* Necesario para la línea activa */
+  padding-bottom: 10px; /* Espaciado inferior */
+  transition: color 0.3s ease; /* Transición en color */
 }
+
 .filtermenu li.active {
-  background: #CCC;
+  color: #1da1f2; /* Color azul para el activo */
 }
+
+.filtermenu li.active::after {
+  content: ''; /* Línea inferior para el activo */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #1da1f2; /* Azul para la línea activa */
+  border-radius: 2px; /* Línea redondeada */
+}
+
+
 
 /*** POSTS ***/
 .post {
@@ -218,7 +244,9 @@ iframe#instagram-embed-0{height: auto;}
   display: inline-block;
   width: 100%;
   padding-left: 0px;
+
 }
+
 
 
 .page-wrapper .page-content {
@@ -229,7 +257,7 @@ iframe#instagram-embed-0{height: auto;}
 
    
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 
@@ -255,13 +283,16 @@ iframe#instagram-embed-0{height: auto;}
 }
 
 
-.btn-outline-danger.active {
-  color: #dc3545;
-  background-color: transparent;
-  border-color: #dc3545;
+/* Cambia el color del ícono activo */
+.btn-outline-danger.active i {
+  color: #dc3545; /* Cambia el color del ícono al rojo */
 }
 
-
+/* Asegúrate de que el fondo del botón sea transparente */
+.btn-outline-danger.active {
+  background-color: transparent !important;
+  border-color: #dc3545; /* Bordes opcionales */
+}
 
 
 
@@ -718,8 +749,9 @@ iframe#instagram-embed-0{height: auto;}
 }
   
   
+
   
- @media (min-width: 600px) {  
+  @media (min-width: 500px) {  
     .youtubeframe{
       height: 320px !important;
     }
@@ -732,7 +764,7 @@ iframe#instagram-embed-0{height: auto;}
   
   .content {
   display: grid;
-  grid-template-columns: auto 330px; 
+  grid-template-columns: auto 340px; 
   height: 100vh;
 }
 
@@ -747,7 +779,7 @@ iframe#instagram-embed-0{height: auto;}
   overflow-y: auto;
   position: fixed; 
   right: 0;
-  width: 330px; 
+  width: 340px; 
 }
 
 
@@ -952,82 +984,76 @@ iframe#instagram-embed-0{height: auto;}
     font-weight: 400;
     src: local("Open Sans Italic"), local("OpenSans-Italic"), url(https://fonts.gstatic.com/s/opensans/v13/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff) format("woff");
 }
+  
+  
+  
 
+.fixed-bottom-bar {
+  display: flex;
+  flex-direction: column; /* Elementos principales alineados verticalmente */
+  gap: 10px; /* Espacio entre los grupos */
+  background-color: #fefefe; /* Fondo blanco */
+  border: 1px solid #e1e8ed; /* Borde claro */
+  padding: 15px; /* Espaciado interno */
 
-
-  .fixed-bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #f8f9fa; /* Fondo claro */
-  border-top: 1px solid #ddd; /* Línea superior */
-  padding: 10px; /* Padding para la barra */
-  z-index: 1000; /* Encima de otros elementos */
+  margin: 0 auto; /* Centrado horizontal */
 }
 
 .fixed-bottom-bar .input-group {
-  max-width: 1000px; /* Limitar ancho */
-  margin: 0 auto; /* Centrar en pantallas grandes */
+  display: flex;
+  align-items: center; /* Centra verticalmente los elementos */
+  gap: 10px; /* Espacio entre imagen e input */
 }
 
 .fixed-bottom-bar .form-control {
-  margin-right: 10px; /* Espacio entre el input y los botones */
+  flex: 1; /* Input ocupa todo el espacio disponible */
+  border: none; /* Sin borde */
+  border-radius: 20px; /* Bordes redondeados */
+  padding: 10px 15px; /* Espaciado interno */
+  font-size: 16px; /* Tamaño de la fuente */
+  outline: none; /* Sin contorno */
+  box-shadow: none; /* Sin sombra */
 }
 
-.fixed-bottom-bar .btn {
-  display: flex;
+.fixed-bottom-bar .button-group {
+  display: flex; /* Botones e íconos alineados horizontalmente */
   align-items: center;
-  justify-content: center;
-  margin-right: 5px;
+  justify-content: space-between; /* Espacio entre los íconos y el botón */
+  gap: 10px; /* Espacio entre los elementos */
 }
 
-
-
-
-
-
-.media-menu {
-  position: absolute;
-  bottom: 60px; /* Justo debajo del botón */
-  right: 20px;
-  background: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  padding: 10px;
-  display: flex;
-  flex-wrap: wrap;
+.fixed-bottom-bar .icon-group {
+  display: flex; /* Íconos alineados horizontalmente */
+  gap: 10px; /* Espacio entre íconos */
 }
 
-@media (min-width: 700px){
-  .media-menu {
-     right: 100px ;
-  }
-}
-
-.media-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.media-item {
-  text-align: center;
+.fixed-bottom-bar .icon-group i {
+  color: #1da1f2; /* Azul Twitter */
+  font-size: 20px; /* Tamaño del ícono */
   cursor: pointer;
-  padding: 5px;
+  transition: color 0.3s ease;
 }
 
-.media-item i {
-  font-size: 24px;
-  color: #3a3b3c;
+.fixed-bottom-bar .icon-group i:hover {
+  color: #007ab8; /* Azul más oscuro al pasar el mouse */
 }
 
-.media-item span {
-  font-size: 12px;
-  color: #3a3b3c;
-} 
+.fixed-bottom-bar .btn-primary {
+  background-color: #657786; /* Gris oscuro */
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 30px; /* Bordes redondeados */
+  padding: 10px 20px; /* Espaciado interno */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fixed-bottom-bar .btn-primary:hover {
+  background-color: #556677; /* Gris más oscuro al pasar el mouse */
+}
+
 
 
 
@@ -1178,6 +1204,7 @@ iframe#instagram-embed-0{height: auto;}
 <div class="page-wrapper chiller-theme content">
         <main class="page-content left-content"> 
             <div class="container-fluid">
+              
                 <div class="row">
                  
                     <div class="col-md-12 posts-group">
@@ -1189,8 +1216,50 @@ iframe#instagram-embed-0{height: auto;}
         </svg>
       </div>
     </div>  
+
                       
-    <div ng-repeat="post in filteredData.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                        <ul class="filtermenu" ng-if="!userDataLoaded">
+                        <li ng-click="filterPosts('all')" ng-class="{active: filter === 'all'}">Recientes</li>
+                              <li ng-click="filterPosts('both')" 
+    ng-class="{active: filter === 'both' }">Post</li>
+                        <li ng-click="filterPosts('youtube')" ng-class="{active: filter === 'youtube'}">Video</li>
+                        <li ng-click="filterPosts('audio')" ng-class="{active: filter === 'audio'}">Audio</li>
+                    </ul>
+                      
+<div class="fixed-bottom-bar" ng-if="!userDataLoaded">
+  <!-- Grupo del input -->
+  <div class="input-group">
+    <img 
+      src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" 
+      alt="Usuario" 
+      style="width: 40px; height: 40px; border-radius: 50%;"
+    >
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="¿Qué hay de nuevo?" 
+      ng-model="newText"
+    >
+  </div>
+
+  <!-- Grupo de botones e íconos -->
+  <div class="button-group">
+    <div class="icon-group">
+      <i class="fas fa-image"></i>
+      <i class="fas fa-film"></i>
+      <i class="fas fa-music"></i>
+      <i class="fas fa-chart-bar"></i>
+    </div>
+    <button 
+      class="btn btn-primary" 
+      type="button" 
+      ng-click="newPost(newText)">
+      Postear
+    </button>
+  </div>
+</div>
+
+    <div ng-repeat="post in filteredData.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" >
                         <div class="post " >
                           <div class="post_header" ng-if="post.type != 'instagram'"> 
                              <div class="profile-info">
@@ -1249,9 +1318,13 @@ iframe#instagram-embed-0{height: auto;}
   
                <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group ml-2" role="group" aria-label="First group">
-    <button type="button" class="btn btn-outline-danger btn-sm"  ng-class="{ 'active': dangerButtonActive[$index] }" ng-click="newLike($index, post)">
-      <i class="far fa-heart" aria-hidden="true"></i>
-    </button>
+   <button 
+  type="button" 
+  class="btn btn-outline-danger btn-sm"  
+  ng-class="{ 'active': dangerButtonActive[$index] }" 
+  ng-click="newLike($index, post)">
+  <i class="{{ dangerButtonActive[$index] ? 'fas fa-heart' : 'far fa-heart' }}" aria-hidden="true"></i>
+</button>
     <button type="button" class="btn btn-outline-info btn-sm" ng-click="openModal(post)">
       <i class="far fa-comments" aria-hidden="true"></i>
     </button>
@@ -1270,17 +1343,14 @@ iframe#instagram-embed-0{height: auto;}
     </div> 
    </div>
             
-                             
+                        
+     
                       </div>
 
                     </div>
                 </div>
-       <ul class="filtermenu">
-                        <li ng-click="filterPosts('all')" ng-class="{active: filter === 'all'}">Recientes</li>
-                        <li ng-click="filterPosts('youtube')" ng-class="{active: filter === 'youtube'}">Videos</li>
-                        <li ng-click="filterPosts('audio')" ng-class="{active: filter === 'audio'}">Audios</li>
-                    </ul>
-              
+       
+              <br>
                <div class="row">
                     <div class="form-group col-md-12">           
          <nav aria-label="Page navigation pagination">
@@ -1306,58 +1376,7 @@ iframe#instagram-embed-0{height: auto;}
         <!-- page-content" -->
 
 
-<div class="fixed-bottom-bar">
-  <div class="input-group">
-    <input 
-      type="text" 
-      class="form-control" 
-      placeholder="Escribe algo..." 
-      ng-model="newPostContent"
-    >
-    <div class="input-group-append">
-      <button 
-        class="btn btn-secondary" 
-        type="button" 
-        ng-click="toggleMediaMenu()"
-      >
-        <i class="fas fa-paperclip"></i> <!-- Ícono para multimedia -->
-      </button>
-      <button 
-        class="btn btn-primary" 
-        type="button" 
-        ng-click="postContent()"
-      >
-        Postear
-      </button>
-    </div>
-  </div>
-</div>
 
-  <div class="media-menu" id="mediaMenu" ng-show="showMediaMenu">
-  <div class="media-grid">
-    <div class="media-item upload-image" >
-      <i class="ri-image-fill"></i>
-      <span>Imagen</span>
-    </div>
-         <input class="imageData" type="file" style="display: none;" accept="image/*"/>
-     <div id="imageData" style="display: none;"> </div>
-    <div class="media-item" id="upload-audio">
-      <i class="ri-volume-up-fill"></i>
-      <span>Audio</span>
-    </div> 
-    <input id="audioDataInput" type="file" style="display: none;" accept="audio/*" />
-     <div id="audioData" style="display: none;"> </div> 
-    <div class="media-item upload-camera" >
-      <i class="ri-movie-fill"></i>
-      <span>Video&nbsp&nbsp</span>
-    </div>
-    <input type="file" class="cameraInput" accept="image/*" capture="environment"  style="display: none;">
-    <div class="media-item" id="recordBtn">
-      <i class="ri-bar-chart-fill"></i>
-      <span>Encuesta</span>
-    </div>
-  </div>
-</div>  
   
    
   <div class="right-content">
@@ -1365,7 +1384,7 @@ iframe#instagram-embed-0{height: auto;}
 
 
 
-       <h2 style=" margin-left: 20px; margin-top: 20px;">Ranking</h2>
+          <h2 style=" margin-left: 20px; margin-top: 20px;">Ranking</h2>
              <div class="page-leaderboard">
  <section class="ranking">
                 <div class="contain">
@@ -1696,6 +1715,11 @@ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7
    
     if (type === 'all') {
       $scope.filteredData = $scope.data;
+    }else if(type === 'both'){
+      $scope.filteredData = $scope.data.filter(function(post) {
+        return post.type === 'text' || post.type === 'poll';
+      });
+      
     } else {
       $scope.filteredData = $scope.data.filter(function(post) {
         return post.type === type;
@@ -1727,12 +1751,24 @@ $scope.openModal = function(post) {
         }
     }
 };
+   
+   
+   
+    $scope.newPost = function(data) {
+     var post =  {
+    "user": "Test",
+    "type": "text",
+       "height": 0,
+    "url": data,
+    "date": [1], 
+    "likes": [],
+     "comments": []  
+  }
+    $scope.data.unshift(post)
+      $scope.newText = ""; 
+}
+   
 
-  $scope.showMediaMenu = false;
-
-$scope.toggleMediaMenu = function () {
-  $scope.showMediaMenu = !$scope.showMediaMenu;
-};
 
    $scope.dangerButtonActive = []; 
 
