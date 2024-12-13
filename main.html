@@ -822,11 +822,25 @@ width: 155px;
  <script id="agenda.html" type="text/ng-template">
     <ion-view >
       
-     <ion-nav-bar class="bar-light" >      
+    <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
-      <img src="{{userData.photo}}" width="35" height="35" style="border-radius: 50%;" />
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+<i class="ri-question-answer-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
+    </div>
+</button> 
+          
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+  <i class="ri-notification-3-line" ></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
+    </div> 
+</button>
+
+       <button class="button button-clear" ng-class="{ 'barImage': btnBar }" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
+      <img src="{{userData.photo}}" width="40" height="40" style="border-radius: 50%;" />
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
@@ -835,12 +849,15 @@ width: 155px;
        
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>   
+        </ion-nav-buttons>  
+
+            
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
       <div class="profileImageContainer">
-        <img src="{{userData.photo}}"  />
+     <div id="loading" ng-if="loadingProfile" style="height: 60px;"></div>
+        <img src="{{userData.photo}}"  ng-if="!loadingProfile"/>
       </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -848,13 +865,35 @@ width: 155px;
     <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-  <div class="dropdown-item" ng-click="goToStatus()">
+             <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-card"></i> Pagos
     </div>
-     <div class="dropdown-item" ng-click="goToChat()">
+    <div class="dropdown-item" ng-click="goToChat()">
       <i class="ion-ios-chatboxes-outline"></i> Tutoría
     </div>
   </div>
+
+    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+  <div class="dropdown-item" 
+       ng-click="goToChat()" 
+       ng-if="(chats | filter:{read: false}).length > 0">
+    <i class="ri-feedback-line alertIcon"></i>
+    Tienes {{(chats | filter:{read: false}).length}} nuevos mensajes  
+  </div>
+  <span style="margin-left: 15px;" 
+        ng-if="(chats | filter:{read: false}).length == 0" ng-click="goToChat()"> 
+    No hay mensajes 
+  </span>
+</div>
+
+
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
+   <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
+      <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
+         <div style="font-size: 10px; position: absolute; margin-top: 30px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
+    </div> 
+      <span style="margin-left: 15px;" ng-if="alerts.length == 0"> No hay alertas </span>
+  </div>  
         
     </ion-nav-bar>
 
@@ -1245,8 +1284,22 @@ width: 155px;
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
-      <img src="{{userData.photo}}" width="35" height="35" style="border-radius: 50%;" />
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+<i class="ri-question-answer-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
+    </div>
+</button> 
+          
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+  <i class="ri-notification-3-line" ></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
+    </div> 
+</button>
+
+       <button class="button button-clear" ng-class="{ 'barImage': btnBar }" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
+      <img src="{{userData.photo}}" width="40" height="40" style="border-radius: 50%;" />
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
@@ -1255,12 +1308,15 @@ width: 155px;
        
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>   
+        </ion-nav-buttons>  
+
+            
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
       <div class="profileImageContainer">
-        <img src="{{userData.photo}}"  />
+     <div id="loading" ng-if="loadingProfile" style="height: 60px;"></div>
+        <img src="{{userData.photo}}"  ng-if="!loadingProfile"/>
       </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -1268,13 +1324,35 @@ width: 155px;
     <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-           <div class="dropdown-item" ng-click="goToStatus()">
+             <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-card"></i> Pagos
     </div>
-     <div class="dropdown-item" ng-click="goToChat()">
+    <div class="dropdown-item" ng-click="goToChat()">
       <i class="ion-ios-chatboxes-outline"></i> Tutoría
     </div>
-  </div> 
+  </div>
+
+    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+  <div class="dropdown-item" 
+       ng-click="goToChat()" 
+       ng-if="(chats | filter:{read: false}).length > 0">
+    <i class="ri-feedback-line alertIcon"></i>
+    Tienes {{(chats | filter:{read: false}).length}} nuevos mensajes  
+  </div>
+  <span style="margin-left: 15px;" 
+        ng-if="(chats | filter:{read: false}).length == 0" ng-click="goToChat()"> 
+    No hay mensajes 
+  </span>
+</div>
+
+
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
+   <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
+      <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
+         <div style="font-size: 10px; position: absolute; margin-top: 30px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
+    </div> 
+      <span style="margin-left: 15px;" ng-if="alerts.length == 0"> No hay alertas </span>
+  </div>  
         
     </ion-nav-bar>
 
@@ -1410,8 +1488,22 @@ width: 155px;
       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-       <button class="button button-clear" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
-      <img src="{{userData.photo}}" width="35" height="35" style="border-radius: 50%;" />
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+<i class="ri-question-answer-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
+    </div>
+</button> 
+          
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+  <i class="ri-notification-3-line" ></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
+    </div> 
+</button>
+
+       <button class="button button-clear" ng-class="{ 'barImage': btnBar }" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
+      <img src="{{userData.photo}}" width="40" height="40" style="border-radius: 50%;" />
   <div style="position: absolute; bottom: -5px; left: 25px; width: 15px; height: 15px; background-color: #d3d3d3; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
         <i class="icon ion-chevron-down" style="font-size: 8px; color: black; transform: scale(0.27);"></i>
     </div>
@@ -1420,12 +1512,15 @@ width: 155px;
        
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>   
+        </ion-nav-buttons>  
+
+            
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
       <div class="profileImageContainer">
-        <img src="{{userData.photo}}"  />
+     <div id="loading" ng-if="loadingProfile" style="height: 60px;"></div>
+        <img src="{{userData.photo}}"  ng-if="!loadingProfile"/>
       </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -1433,13 +1528,35 @@ width: 155px;
     <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-        <div class="dropdown-item" ng-click="goToStatus()">
+             <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ion-card"></i> Pagos
     </div>
     <div class="dropdown-item" ng-click="goToChat()">
       <i class="ion-ios-chatboxes-outline"></i> Tutoría
-    </div>       
+    </div>
   </div>
+
+    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+  <div class="dropdown-item" 
+       ng-click="goToChat()" 
+       ng-if="(chats | filter:{read: false}).length > 0">
+    <i class="ri-feedback-line alertIcon"></i>
+    Tienes {{(chats | filter:{read: false}).length}} nuevos mensajes  
+  </div>
+  <span style="margin-left: 15px;" 
+        ng-if="(chats | filter:{read: false}).length == 0" ng-click="goToChat()"> 
+    No hay mensajes 
+  </span>
+</div>
+
+
+<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
+   <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
+      <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
+         <div style="font-size: 10px; position: absolute; margin-top: 30px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
+    </div> 
+      <span style="margin-left: 15px;" ng-if="alerts.length == 0"> No hay alertas </span>
+  </div>  
         
     </ion-nav-bar>
 
