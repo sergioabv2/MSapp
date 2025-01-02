@@ -17,8 +17,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
 
-<script src="https://cdn.plyr.io/3.4.6/plyr.js"></script>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.4.6/plyr.css"></link>
     <!--
 <script src="https://assets.codepen.io/16327/InertiaPlugin.min.js"></script>
     -->
@@ -28,7 +26,7 @@
 
 
 <style>
-	@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 *,
 ::after,
 ::before {
@@ -356,7 +354,7 @@ body::-webkit-scrollbar-thumb {
 
 
 /* set the iframe element to stretch to fit its parent element */
-iframe#youtube {
+iframe#youtube, .videoslider {
   position: absolute;
   top: 0;
   right: 0;
@@ -368,7 +366,7 @@ iframe#youtube {
 }
 
 @media (max-width: 600px){
-  iframe#youtube {
+  iframe#youtube, .videoslider {
     height: 70vh;
     padding-top: 150px;
   }
@@ -1511,13 +1509,9 @@ section {
 
 
 
-
-
-
-
-.story-video{
-  width: 100%;
-}
+  .video-slider{
+    
+  }
 
 .progress {
   position: relative;
@@ -2404,7 +2398,7 @@ section {
             <p>We all need a full-screen slider from time to time.</p>
         </section> 
         <section class="slide"> 
-      <video class="plyr"  controls >
+      <video class="videoslider" controls >
  <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4"> 
 </video>
 
@@ -2416,11 +2410,11 @@ section {
       </section>
 
         <section class="slide"> 
-      <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4"  controls >
+      <video class="videoslider" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4"  controls >
 </video>
 
       </section>
-	    
+      
     </div>
       </div>
     <div class="dots">
@@ -2622,7 +2616,7 @@ getActivity: function() {
   
   
   
-.controller('slider', ["$scope", "SharedState", "$sce", "$timeout", function($scope, SharedState, $sce, $timeout) {
+.controller('slider', ["$scope", "SharedState", "$sce", function($scope, SharedState, $sce) {
   
    $scope.trustAsResourceUrl = function(url) {
     return $sce.trustAsResourceUrl(url);
@@ -2633,13 +2627,7 @@ getActivity: function() {
   }, function(newActivity) {
     $scope.currentActivity = newActivity;
 
-	   $timeout(function() {
-const player = new Plyr('.plyr', {
-  autoplay: true,
-    controls: ['play','play-large', 'progress', 'current-time',  'fullscreen', 'settings']
-  });
-})
-	   
+     
   });
   
    
