@@ -2622,7 +2622,7 @@ getActivity: function() {
   
   
   
-.controller('slider', ["$scope", "SharedState", "$sce", function($scope, SharedState, $sce) {
+.controller('slider', ["$scope", "SharedState", "$sce", "$timeout", function($scope, SharedState, $sce, $timeout) {
   
    $scope.trustAsResourceUrl = function(url) {
     return $sce.trustAsResourceUrl(url);
@@ -2632,6 +2632,14 @@ getActivity: function() {
     return SharedState.getActivity().getCurrentActivity();
   }, function(newActivity) {
     $scope.currentActivity = newActivity;
+
+	   $timeout(function() {
+const player = new Plyr('.plyr', {
+  autoplay: true,
+    controls: ['play','play-large', 'progress', 'current-time',  'fullscreen', 'settings']
+  });
+})
+	   
   });
   
    
@@ -5733,10 +5741,7 @@ function newSize() {
 
 
 
-const player = new Plyr('.plyr', {
-  autoplay: true,
-    controls: ['play','play-large', 'progress', 'current-time',  'fullscreen', 'settings']
-  });
+
 
  
 const video = document.querySelector("video");
