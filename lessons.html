@@ -353,7 +353,7 @@ body::-webkit-scrollbar-thumb {
 
 
 
-iframe#youtube, .videoslider {
+iframe#youtube {
   position: absolute;
   top: 20px; /* Aumentado el margen superior */
   right: 0;
@@ -366,7 +366,7 @@ iframe#youtube, .videoslider {
 }
 
 @media (max-width: 510px) {
-  iframe#youtube, .videoslider {
+  iframe#youtube{
     top: 25px; /* Mayor margen superior */
     bottom: 15px; /* Mantén margen inferior */
     height: calc(70vh - 40px); /* Ajuste proporcional */
@@ -375,14 +375,13 @@ iframe#youtube, .videoslider {
 }
 
 @media (min-width: 750px) {
-  iframe#youtube, .videoslider {
-    top: 15px; /* Margen superior incrementado */
+  iframe#youtube{
+    top: 12px; /* Margen superior incrementado */
     bottom: 10px; /* Margen inferior */
-    height: calc(90vh - 25px); /* Ajuste proporcional */
+    height: calc(90vh - 22px); /* Ajuste proporcional */
     padding-top: 50px;
   }
 }
-
 
 
 
@@ -1521,26 +1520,32 @@ section {
 
 
 
-  .video-slider{
-    
-  }
+ .videoslider {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0; /* Asegúrate de que no haya márgenes que lo desplacen */
+}
+
 
 .progress {
   position: relative;
   width: 100%;
-  display: block;
+  height: 10px;
   background-color: #cdcdcd;
 }
+
 .progress__bar {
   display: block;
   background-color: red;
-  width: 0%;
-  height: 10px;
+  width: 0%; /* Cambiar dinámicamente según el progreso */
+  height: 100%; /* Ocupa toda la altura de la barra */
   z-index: 1;
 }
+
 .progress .keyframe {
   position: absolute;
-  top: -2px;
+  top: -6px; /* Ajuste para que el círculo esté centrado sobre la barra */
   display: block;
   width: 1rem;
   height: 1rem;
