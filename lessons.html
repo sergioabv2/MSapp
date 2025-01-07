@@ -1609,7 +1609,7 @@ footer button.show{
                 <i class="material-icons" style="position: absolute; font-size: 15px; margin-left: -15px; margin-top: 10px; " ng-if="activity.media != 'video' && (lvl > 0 || lesson.id < lsn)">verified</i> 
                     <i class="material-icons" style="position: absolute; font-size: 15px; margin-left: -15px; margin-top: 10px; " ng-if="activity.media != 'video' && lvl === 0 && lsn === lesson.id && currentlsns[activity.index].status == 'Evaluada'">verified</i> 
              
-    <span class="text-inside"  onclick="window.top.location.href='{{activity.url}}'"  current-status="{{currentlsns[activity.index].status}}"  ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
+    <span class="text-inside"  ng-click="goTo(activity.url)"  current-status="{{currentlsns[activity.index].status}}"  ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
     
             
   <!--          
@@ -2430,7 +2430,10 @@ $scope.toggle_video_modal = function(activity) {
   SharedState.getActivity().setCurrentActivity(activity);
         $("body").addClass("show-video-modal");
 };
- 
+
+   $scope.goTo = function(url) {
+  $window.location.href = url;
+};
 
 
 
