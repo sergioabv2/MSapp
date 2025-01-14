@@ -759,9 +759,17 @@ iframe#instagram-embed-0{height: auto;}
     }
 }
 
+.ytContainer{
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; 
+}
+
    .youtubeframe{
       border-radius: 10px !important;
       height: 200px ;
+      max-width: 500px;
+
     }
   
   .content {
@@ -1109,6 +1117,7 @@ iframe#instagram-embed-0{height: auto;}
   width: 300px; /* Ancho fijo para la imagen */
   height: auto; /* Mantiene la proporción de la imagen */
   border-radius: 8px; /* (Opcional) Bordes redondeados */
+  max-width: 600px;
 }
 
  
@@ -1215,7 +1224,7 @@ iframe#instagram-embed-0{height: auto;}
                               <li ng-click="filterPosts('both')" 
     ng-class="{active: filter === 'both' }">Post</li>
                         <li ng-click="filterPosts('youtube')" ng-class="{active: filter === 'youtube'}">Video</li>
-                        <li ng-click="filterPosts('audio')" ng-class="{active: filter === 'audio'}">Audio</li>
+                        <li ng-click="filterPosts('img')" ng-class="{active: filter === 'img'}">Imagen</li>
                     </ul>
                       
 <div class="fixed-bottom-bar" >
@@ -1239,7 +1248,6 @@ iframe#instagram-embed-0{height: auto;}
     <div class="icon-group">
       <i class="fas fa-image"></i>
       <i class="fas fa-film"></i>
-      <i class="fas fa-music"></i>
       <i class="fas fa-chart-bar"></i>
     </div>
     <button 
@@ -1276,7 +1284,7 @@ iframe#instagram-embed-0{height: auto;}
    <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" height="160">
  
 </div>                           
-                               <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe> 
+                            <div class="ytContainer">   <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>  </div>
                             
                   
   <div class="image-container" ng-if="post.type == 'img'">
@@ -1384,7 +1392,7 @@ iframe#instagram-embed-0{height: auto;}
 
 
 
-          <h2 style=" margin-left: 20px; margin-top: 20px;">Ranking</h2>
+          <h2 style=" margin-left: 20px; margin-top: 20px; display: none">Ranking</h2>
              <div class="page-leaderboard">
  <section class="ranking">
                 <div class="contain" style="padding: 20px;">
