@@ -996,6 +996,65 @@ iframe#instagram-embed-0{height: auto;}
 }
   
   
+
+  
+  
+ .contacts h1 {
+  margin: 20px 0;
+}
+
+.contact-status {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px;
+  border-bottom: 2px solid rgba(131, 135, 193, 0.4);
+
+}
+
+.contact-status:last-child {
+  border-bottom: unset;
+}
+
+.contact-activity {
+  display: flex;
+  align-items: center;
+  column-gap: 14px;
+}
+
+.contact-activity img {
+  max-width: 45px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.contact-activity i{
+  max-width: 45px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.contact-activity p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding-right: 10px;
+}
+
+.contact-activity p span {
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+
+
+.contact-status small {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  margin-left: auto;
+}
+  
+  
   
 
 .fixed-bottom-bar {
@@ -1390,71 +1449,19 @@ iframe#instagram-embed-0{height: auto;}
   <div class="right-content">
 
 
+ <div class="contacts">
 
-
-          <h2 style=" margin-left: 20px; margin-top: 20px; display: none">Ranking</h2>
-             <div class="page-leaderboard">
- <section class="ranking">
-                <div class="contain" style="padding: 20px;">
-                    <div class="ranking-table">
-                        <div class="ranking-table-header-row">
-                            <div class="ranking-table-header-data h6"></div>
-                            <div class="ranking-table-header-data h6">Alumno</div>
-                            <div class="ranking-table-header-data h6">Puntaje</div>
-                        </div>
-                        <div class="ranking-table-row-leader-1">
-                            <div class="ranking-table-data-leader-1">
-                                <div class="medal-gold"></div>
-                            </div>
-                            <div class="ranking-table-data">
-                              {{ranking[0].name}} 
-                <br>  <span style="font-size: 12px; color: {{userData.ranking[0].color}}">  {{ranking[0].lvl}}</span>
-                          </div>
-                            <div class="ranking-table-data">
-                                <div class="complete" style="color: orange !important; text-shadow: 0 0 10px orange; font-weight: 700; font-size: 20px !important;">{{ranking[0].score}}</div>
-                            </div>
-                        </div>
-                        <div class="ranking-table-row-leader-2">
-                            <div class="ranking-table-data-leader-2">
-                                <div class="medal-silver"></div>
-                            </div> 
-                            <div class="ranking-table-data">
-                                {{ranking[1].name}}
-        <br>  <span style="font-size: 12px; color: {{ranking[1].color}}">  {{ranking[1].lvl}}</span>
-                        </div>
-                            <div class="ranking-table-data">
-                                <div class="complete" style="color: #2980b9  !important; text-shadow: 0 0 10px #85c1e9 ; font-weight: 500; font-size: 18px !important;">{{ranking[1].score}}</div>
-                            </div> 
-                        </div>
-                        <div class="ranking-table-row-leader-3">
-                            <div class="ranking-table-data-leader-3">
-                                <div class="medal-bronze"></div>
-                            </div>
-                            <div class="ranking-table-data">
-                               {{ranking[2].name}}
-                               <br>  <span style="font-size: 12px; color: {{ranking[2].color}}">  {{ranking[2].lvl}}</span>
-</div>
-                            <div class="ranking-table-data">
-                                <div class="complete" style="color: #85929e   !important; text-shadow: 0 0 5px #85929e; font-size: 16.5px !important;">{{ranking[2].score}}</div>
-                            </div>
-                        </div>
-
-
-                         <div class="ranking-table-body">
-        <div class="ranking-table-row" ng-repeat="user in ranking.slice(3)">
-            <div class="ranking-table-data">{{ $index + 4 }}</div> <!-- Muestra posición -->
-            <div class="ranking-table-data">{{ user.name }}<br>  <span style="font-size: 12px; color: {{user.color}}">  {{user.lvl}}</span></div>
-            <div class="ranking-table-data"><div class="complete">{{ user.score }}</div></div>
+          <div class="contacts-container">
+            <div class="contact-status" ng-repeat="user in feed | limitTo:-6">
+              <div class="contact-activity">
+                <img src="{{user.img}}" />
+                <p>{{user.name}}{{getEvent(user.task)}} <br>
+                  <span style="color: {{lvlColor(user.lvl)}}"><i class='fa fa-trophy' ng-if="getEvent(user.task) == ' ha subido de nivel'"></i> {{user.task}} </span></p>
+              </div>
+              <small>hace 1 hora</small>
+            </div>
+          </div>
         </div>
-    </div>
-                        </div>
-                    </div>
-
-            </section>  
-    
-                <div class="contain contain--small"></div>
-    
-     </div>
 
 
     </div>
@@ -1578,7 +1585,7 @@ var app = angular.module('postApp', [])
   $scope.itemsPerPage = 6;
   $scope.totalPages = 1;
 
-
+ 
     $http({
       method: 'GET',
       url: 'https://script.google.com/macros/s/AKfycbxN34IjjTFdUaPKeyLFI5-VCzDcBznvBB96B1IbWLAlSbqjISYOTK08Z07XrC2xDuwV/exec',
@@ -1593,11 +1600,16 @@ var app = angular.module('postApp', [])
       $scope.filterPosts('all');
       $scope.updatePagination();
       $scope.userDataLoaded = false
+       
+      $scope.feed = response.data.feed;
+
+      
        $scope.data.forEach(post => {
         if (post.type === 'poll') {
             processPollData(post);
         }
     });
+          
     });
    
    function processPollData(post) {
