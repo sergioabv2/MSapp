@@ -1008,7 +1008,6 @@ iframe#instagram-embed-0{height: auto;}
   flex-direction: column;
   padding: 5px 10px;
   border-bottom: 2px solid rgba(131, 135, 193, 0.4);
-
 }
 
 .contact-status:last-child {
@@ -1039,6 +1038,7 @@ iframe#instagram-embed-0{height: auto;}
   font-size: 0.9rem;
   line-height: 1.5;
   padding-right: 10px;
+  margin-top: 10px;
 }
 
 .contact-activity p span {
@@ -1052,6 +1052,7 @@ iframe#instagram-embed-0{height: auto;}
   font-size: 0.8rem;
   opacity: 0.5;
   margin-left: auto;
+  margin-top: -5px;
 }
   
   
@@ -1507,7 +1508,7 @@ iframe#instagram-embed-0{height: auto;}
                     <span class="site-name">Nivel {{user.lvl}}</span>
                 </h2>
               
-    
+      
             </div>
           
             <div class="card-main">
@@ -1609,8 +1610,46 @@ var app = angular.module('postApp', [])
             processPollData(post);
         }
     });
+      
+     
           
     });
+   
+   
+    $scope.lvlColor = function(lvl){
+  if(lvl == 0){
+    return "#F44336"
+  }else if(lvl == 1){
+    return "#9024dc"
+  }else if(lvl == 2){
+    return "#1894cc"
+  }else if(lvl == 3){
+    return "#489454"
+  }else if(lvl == 4){
+    return "#f0ac14"
+  }else if(lvl == 5){
+    return "#485cb4"
+  }else if(lvl == 6){
+    return "#08949c"
+  }
+}     
+     
+$scope.getEvent = function(task){
+  if(task.split(" ")[0] == "Nivel"){
+    return " ha subido de nivel"
+  }else{
+    return " ha entregado"
+  }
+}
+     
+    
+     $scope.getLevel = function(lvl){
+  if(lvl == 0){
+     return "Nivel Preparatorio"
+  }else{
+    return "Nivel "+lvl.toString()
+  }
+}
    
    function processPollData(post) {
     post.totalVotes = post.likes.reduce((total, opt) => total + opt.votes.length, 0);
