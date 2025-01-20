@@ -1953,7 +1953,7 @@ function search() {
   let q = $('#query').val();
 
   // Solicita datos a la API de YouTube
-  $.get(
+  /*$.get(
     "https://www.googleapis.com/youtube/v3/search",
     {
       part: 'snippet, id',
@@ -1963,14 +1963,34 @@ function search() {
     },
     function (data) {
       $.each(data.items, function (i, item) {
-        // Genera el HTML de cada resultado
         let output = getOutput(item);
-
-        // Añade los resultados al DOM
         $('#results').append(output);
       });
     }
-  );
+  );*/
+
+	$.ajax({
+  url: "https://www.googleapis.com/youtube/v3/search",
+  method: "GET",
+  data: {
+    part: "snippet,id",
+    q: q,
+    type: "video",
+    key: "AIzaSyBRfk0b73-DtIk7UNdpItlZHlmMtNcVsUA",
+  },
+  xhrFields: {
+    withCredentials: false, // Asegúrate de que no se incluyan cookies
+  },
+  success: function (data) {
+    data.items.forEach(item => {
+      $('#results').append(getOutput(item));
+    });
+  }
+});
+
+
+
+	
 }
 
 function getOutput(item) {
@@ -2009,8 +2029,6 @@ function getOutput(item) {
   return output;
 }
 
-
-document.cookie = "myCookieName=myCookieValue; SameSite=None; Secure";
 
 </script>
   
