@@ -12,8 +12,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js">
 <script async defer src="//www.instagram.com/embed.js"></script>
-</head>
+</head> 
 
 
 <style>
@@ -431,39 +432,25 @@ iframe#instagram-embed-0{height: auto;}
   margin: 0;
   font-weight: 400;
   font-family: "DM Sans", sans-serif;
+  margin-bottom: -20px;
 }
 
 .card-social {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  margin-bottom: 30px;
 }
-.card-social svg {
-  fill: #a5b5ce;
-  width: 16px;
-  display: block;
-  transition: 0.3s;
-}
+
 .card-social a {
-  color: #8797a1;
-  height: 32px;
-  width: 32px;
-  border-radius: 50%;
+  color: green;
+  border-radius: 10%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: 0.3s;
   background-color: rgba(93, 133, 193, 0.05);
-  border-radius: 50%;
-  margin-right: 10px;
 }
-.card-social a:hover svg {
-  fill: #637faa;
-}
-.card-social a:last-child {
-  margin-right: 0;
-}
+
 
 .card-buttons {
   display: flex;
@@ -1076,6 +1063,93 @@ iframe#instagram-embed-0{height: auto;}
     background-color: #92a8d1;
 }
 
+
+
+  
+
+
+#search-form {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.fieldcontainer {
+  display: block;
+  position: relative;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.search-field {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 11px 7px;
+  margin-top: 10px;
+  padding-right: 43px;
+  background: #fff;
+  color: #555;
+  border: 1px solid #c8c8c8;
+  font-size: 1.6em;
+  border-bottom-color: #d2e2e7;
+  border-radius: 1px;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 0 0 6px #f0f0f0;
+  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 0 0 6px #f0f0f0;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 0 0 6px #f0f0f0;
+}
+
+#search-btn {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  height: 32px;
+  width: 32px;
+  border: 0;
+  cursor: pointer;
+  zoom: 1.01;
+  filter: alpha(opicity=65);
+  opacity: 0.65;
+
+}
+
+#search-btn:hover {
+		filter:alpha(opacity=90);
+		opacity: 0.9;
+}
+
+#results li {
+		padding: 10px 0;
+		border-bottom: 1px #ccc dotted;
+		list-style: none;
+		overflow: auto;
+}
+
+.list-left {
+		float: left;
+		width: 20%;
+}
+
+.list-left img {
+		width: 100%;
+		padding: 3px;
+		border: solid #ccc 1px;
+}
+
+.list-right {
+		float: right;
+		width: 78%;
+}
+
+.cTitle {
+	color: #dd2826;
+}
+
+
+
 </style>
 
  
@@ -1104,23 +1178,28 @@ iframe#instagram-embed-0{height: auto;}
   <div class="input-group">
     <img 
       src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" 
-      alt="Usuario" 
       style="width: 40px; height: 40px; border-radius: 50%;"
     >
     <input 
       type="text" 
       class="form-control" 
-      placeholder="¿Qué hay de nuevo?" 
+      placeholder="¡¿Qué está pasando?!" 
+     id="form-control"
       ng-model="newText"
     >
   </div>
+ <div id="ytVideoURL" ytVideoURL="" style="display: none"></div>
+  <div id="video-details" ></div>
+  
+  <div id="imgData" imgData=""  style="display: none"></div>
+  <input type="file" id="uploadImage" accept="image/*" style="display: none;">
+  <div id="img-details"></div>
 
   <!-- Grupo de botones e íconos -->
   <div class="button-group">
     <div class="icon-group">
-      <i class="fas fa-image"></i>
-      <i class="fas fa-film"></i>
-      <i class="fas fa-chart-bar"></i>
+      <i class="fas fa-image" id="uploadBtn"></i>
+      <i class="fas fa-film" ng-click="youtubeModal()"></i>
     </div>
     <button 
       class="btn btn-primary" 
@@ -1144,20 +1223,20 @@ iframe#instagram-embed-0{height: auto;}
                           <div class="post_header" ng-if="post.type != 'instagram'"> 
                              <div class="profile-info">
                              <div class="profile-pic">
-              <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V">
+              <img ng-src="{{post.photo}}">
           </div>
                             <a href="#" ng-click="handleUserProfile(post.user)">{{post.user}}</a>
                                </div>
-                            <div style="float:right;">hace {{post.date[0]}} días </div>
                           </div>
                           <div class="post_thumbnail" >
   <div style="height: 150px; background: #343434; display: flex; justify-content: center; align-items: center; " ng-if="post.type == 'audio'">
                        
    <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" height="160">
- 
+  
 </div>                           
-                            <div class="ytContainer">   <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>  </div>
+                            <div class="ytContainer" ng-if="post.type == 'youtube'">   <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>  </div>
                             
+                     
                   
   <div class="image-container" ng-if="post.type == 'img'">
     <img src="{{post.url}}"   class="post-image" />
@@ -1194,7 +1273,7 @@ iframe#instagram-embed-0{height: auto;}
                           <div class="post_footer" ng-if="post.type != 'instagram' && post.type != 'poll'">
                              
     
-<div class="row">
+<div class="row align-items-center justify-content-between">
   
                <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group ml-2" role="group" aria-label="First group">
@@ -1208,9 +1287,10 @@ iframe#instagram-embed-0{height: auto;}
     <button type="button" class="btn btn-outline-info btn-sm" ng-click="openModal(post)">
       <i class="far fa-comments" aria-hidden="true"></i>
     </button>
-    
-  </div>
+      
+  </div>       
 </div> 
+  <div style="float: right !important;">hace {{calculateTimeAgo(post.date)}} </div>
 </div>
  <div class="row">
     <p style="margin-left: 5px; margin-top: 10px; margin-bottom: 5px; font-weight: 700">{{post.likes.length}} Me gusta</p>
@@ -1255,7 +1335,7 @@ iframe#instagram-embed-0{height: auto;}
         </main>
         <!-- page-content" -->
 
-
+ 
 
   
    
@@ -1265,18 +1345,18 @@ iframe#instagram-embed-0{height: auto;}
  <div class="contacts">
 
           <div class="contacts-container">
-            <div class="contact-status" ng-repeat="user in feed | limitTo:-8">
+            <div class="contact-status" ng-repeat="user in feed | limitTo:8"> 
               <div class="contact-activity">
                 <img src="{{user.img}}" />
-                <p>{{user.name}}{{getEvent(user.task)}} <br>
+                <p> <a href="#" ng-click="handleUserProfile(user.name)">{{user.name}}</a>{{getEvent(user.task)}} <br>
                   <span style="color: {{lvlColor(user.lvl)}}"><i class='fa fa-trophy' ng-if="getEvent(user.task) == ' ha subido de nivel'"></i> {{user.task}} </span></p>
               </div>
-              <small>hace 1 hora</small>
+              <small>hace {{calculateTimeAgo(user.date)}}</small>
             </div>
           </div>
         </div>
 
-
+ 
     </div>
   
   
@@ -1285,21 +1365,38 @@ iframe#instagram-embed-0{height: auto;}
     </div>
     <!-- page-wrapper -->
   
-   
+
+  <div class="modal fade" id="youtubeModal" tabindex="-1" role="dialog" >
+    <div class="modal-dialog " role="document" >
+       <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+      
+        <div class="modal-content" style="margin: 0;">
+  <section>
+      <form id="search-form" name="search-form" onsubmit="return search()">
+        <div class="fieldcontainer">
+          <input type="search" id="query" class="search-field" placeholder="Busca en YouTube...">
+         <input type="submit" name="search-btn" id="search-btn" value=""> </input>
+        </div>
+      </form>
+      <ul id="results"></ul>
+
+    </section>
+        </div> 
+    </div> 
+</div>
+  
+  
   
   
 <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true" >
-   
     <div class="modal-dialog " role="document" >
-      
        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
       
         <div class="modal-content" style="margin: 0;">
-          
-          
-        
 
   <!--- open modal content--->
   
@@ -1327,16 +1424,11 @@ iframe#instagram-embed-0{height: auto;}
                 <div class="card-section" ng-if="currentSection === '#about'" id="about">
                     <div class="card-content">
                         <div class="card-subtitle">{{user.username}}</div>
-                        <p class="card-desc">Insignias:</p>
+                        <p class="card-desc">Puntaje</p>
                     </div>
                     <div class="card-social">
-                        <a href="#"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M15.997 3.985h2.191V.169C17.81.117 16.51 0 14.996 0c-3.159 0-5.323 1.987-5.323 5.639V9H6.187v4.266h3.486V24h4.274V13.267h3.345l.531-4.266h-3.877V6.062c.001-1.233.333-2.077 2.051-2.077z" />
-                            </svg></a>
-                        <a href="#"></a>
-                        <a href="#"></a>
-                        <a href="#"> <i class="far fa-heart" aria-hidden="true"></i></a>
+                        <a href="#"> 230 Puntos</a>
+
                     </div>
                 </div>
                 <div class="card-section" ng-if="currentSection === '#experience'" id="experience" style="margin-top: -20px; ">
@@ -1344,7 +1436,7 @@ iframe#instagram-embed-0{height: auto;}
                         <div class="card-subtitle">ÚLTIMA ACTIVIDAD</div>
                         <div class="card-timeline" style=" overflow-y: auto; max-height: 208px;">
 
-                           <div class="card-item" ng-repeat="lsn in user.history | filter:filterByLevel(user.lsn)">
+                           <div class="card-item" ng-repeat="lsn in user.history | filter:filterByLevel(user.lsn) | limitTo:6">
                                 <div class="card-item-title">{{lsn.name}}</div>
                                 <div class="card-item-desc">{{lsn.status}}</div>
                             </div>
@@ -1423,7 +1515,7 @@ var app = angular.module('postApp', [])
     });
       
      
-          
+           
     });
    
    
@@ -1453,7 +1545,7 @@ $scope.getEvent = function(task){
   }
 }
      
-    
+     
      $scope.getLevel = function(lvl){
   if(lvl == 0){
      return "Nivel Preparatorio"
@@ -1625,17 +1717,33 @@ $scope.openModal = function(post) {
    
    
     $scope.newPost = function(data) {
-     var post =  {
+      let ytVideoURL = $('#ytVideoURL').attr('ytVideoURL');
+      
+      if(ytVideoURL){
+        var post =  {
     "user": "Test",
-    "type": "text",
-       "height": 0,
-    "url": data,
+    "type": "youtube",
+           "height": 150,
+    "url": ytVideoURL,
     "date": [1], 
     "likes": [],
      "comments": []  
-  }
+        }
+      }else{
+           var post =  {
+          "user": "Test",
+          "type": "text",
+             "height": 0,
+          "url": data,
+          "date": [1], 
+          "likes": [],
+           "comments": []  
+        }
+     }
     $scope.data.unshift(post)
       $scope.newText = ""; 
+       $('#video-details').html('');
+     $('#ytVideoURL').attr('ytVideoURL', '');
 }
    
 
@@ -1663,6 +1771,26 @@ $scope.newLike = function(index, post) {
     }
 };
    
+   
+$scope.calculateTimeAgo = function(alertDate) {
+  const alertDateObj = new Date(alertDate);
+  const today = new Date(); // Fecha actual
+  const timeDiff = Math.abs(today - alertDateObj); // Diferencia en milisegundos
+
+  const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Días completos
+  const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // Horas restantes
+  const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)); // Minutos restantes
+
+  if (days > 0) {
+    return `${days} día(s)`;
+  } else if (hours > 0) {
+    return `${hours} hora(s)`;
+  } else {
+    return `${minutes} minuto(s)`;
+  }
+};
+
+
  
 
    $scope.currentSection = '#about';
@@ -1671,10 +1799,17 @@ $scope.newLike = function(index, post) {
     };
    $scope.handleUserProfile = function(username) {
       $scope.currentMain = username;
-      $('#profileModal').modal('show');
+     if(username != "Mozart Appcademy"){
+        $('#profileModal').modal('show');
+     }
+     
+    }; 
+    
+   
+   $scope.youtubeModal = function() {
+      $('#youtubeModal').modal('show');
     };
-   
-   
+ 
    
      $scope.filterByLevel = function(lsn) {
     return function(entry) {
@@ -1688,6 +1823,191 @@ $scope.newLike = function(index, post) {
 
 
 
+$(document).ready(function () {
+  // Inicializa fancybox
+  $(".fancybox").fancybox();
+
+  // Evita que el formulario recargue la página
+  $('#search-form').submit(function (e) {
+    e.preventDefault();
+  });
+
+$('#results').on('click', '.select-video', function (e) {
+  e.preventDefault();
+
+  // Obtiene los datos del video seleccionado
+  let videoTitle = $(this).data('title');
+  let videoUrl = $(this).data('url');
+  let videoThumbnail = $(this).data('thumb');
+
+
+  // Actualiza el atributo ytVideoURL con la URL del video
+  $('#ytVideoURL').attr('ytVideoURL', videoUrl);
+
+    $('#video-details').html(`
+    <div class="video-info" style="position: relative; display: inline-block;">
+      <img src="${videoThumbnail}" style="width: 120px; height: 90px; margin-right: 10px;">
+      <span>${videoTitle}</span>
+       <button 
+  class="remove-youtube-btn" 
+  style="
+    position: absolute; 
+    top: -5px; 
+    right: -5px; 
+    background: red; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    font-size: 15px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;"
+>
+  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
+</button>
+    </div>
+  `);
+
+  $('#video-details').on('click', '.remove-youtube-btn', function () {
+  $('#video-details').html('');
+  $('#ytVideoURL').attr('ytVideoURL', '');
+});
+  
+  // Cierra el modal
+  $('#youtubeModal').modal('hide');
+  $('#results').html('');
+   $('#query').val('');
+});
+
+
+  
+   $('#uploadBtn').on('click', function () {
+    $('#uploadImage').click();
+  });
+
+  // Maneja la subida de imagen
+  $('#uploadImage').on('change', function (event) {
+    let file = event.target.files[0]; // Obtén el archivo
+    if (file) {
+      let reader = new FileReader();
+
+      // Convierte el archivo a Base64
+      reader.onload = function (e) {
+        let base64Image = e.target.result;
+
+        // Muestra la imagen en el contenedor #img-details
+       $('#img-details').html(`
+  <div class="uploaded-img-container" style="position: relative; display: inline-block;">
+    <img src="${base64Image}" alt="Uploaded Image" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc; border-radius: 5px;">
+   <button 
+  class="remove-image-btn" 
+  style="
+    position: absolute; 
+    top: -5px; 
+    right: -5px; 
+    background: red; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    font-size: 15px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;"
+>
+  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
+</button>
+
+  </div>
+`);
+
+        // Guarda el Base64 en el atributo imgData
+        $('#imgData').attr('imgData', base64Image);
+      };
+
+      // Lee el archivo como Base64
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  
+  $('#img-details').on('click', '.remove-image-btn', function () {
+  // Limpia el contenedor de imagen
+  $('#img-details').html('');
+  // Limpia el atributo imgData
+  $('#imgData').attr('imgData', '');
+});
+
+}); 
+
+function search() {
+  // Limpia resultados anteriores
+  $('#results').html('');
+
+  // Obtén el valor del input
+  let q = $('#query').val();
+
+  // Solicita datos a la API de YouTube
+  $.get(
+    "https://www.googleapis.com/youtube/v3/search",
+    {
+      part: 'snippet, id',
+      q: q,
+      type: 'video', 
+      key: 'AIzaSyBRfk0b73-DtIk7UNdpItlZHlmMtNcVsUA'
+    },
+    function (data) {
+      $.each(data.items, function (i, item) {
+        // Genera el HTML de cada resultado
+        let output = getOutput(item);
+
+        // Añade los resultados al DOM
+        $('#results').append(output);
+      });
+    }
+  );
+}
+
+function getOutput(item) {
+  // Extrae información del video
+  let videoId = item.id.videoId;
+  let title = item.snippet.title;
+  let description = item.snippet.description;
+  let thumb = item.snippet.thumbnails.high.url;
+  let channelTitle = item.snippet.channelTitle;
+
+  // Construye el HTML de salida con atributos data-* para los datos
+  let output = `
+    <li>
+      <div class="list-left">
+        <img src="${thumb}" alt="${title}">
+      </div>
+      <div class="list-right">
+        <h3 style="font-size: 15px;">
+          <a 
+            href="#" 
+            class="select-video" 
+            data-title="${title}" 
+            data-url="https://www.youtube.com/embed/${videoId}"
+            data-thumb="${thumb}"
+            >
+            ${title}
+          </a>
+        </h3>
+        <small>por <span class="cTitle">${channelTitle}</span></small>
+        <p style="font-size: 10px;">${description}</p>
+      </div>
+    </li>
+    <div class="clearfix"></div>
+  `;
+
+  return output;
+}
 
 
 
