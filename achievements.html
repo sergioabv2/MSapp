@@ -2,7 +2,7 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css"></link> 
 <!---
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
@@ -13,7 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js">
-<script async defer src="https://www.instagram.com/embed.js"></script>
+<script async defer src="//www.instagram.com/embed.js"></script>
 </head> 
 
 
@@ -36,7 +36,7 @@ a {color: #f27275;}a:hover, a:focus {color:#666;}
   width: 100%;
   align-items: center;
   justify-content: space-around;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee; 
   z-index: 99;
 }
 .kol_header .logo{}
@@ -1063,8 +1063,7 @@ iframe#instagram-embed-0{height: auto;}
     background-color: #92a8d1;
 }
 
-
-
+  
   
 
 
@@ -1149,7 +1148,6 @@ iframe#instagram-embed-0{height: auto;}
 }
 
 
-
 </style>
 
  
@@ -1229,17 +1227,18 @@ iframe#instagram-embed-0{height: auto;}
                                </div>
                           </div>
                           <div class="post_thumbnail" >
-
-<!-- 				  
-  <div style="height: 150px; background: #343434; display: flex; justify-content: center; align-items: center; " ng-if="post.type == 'audio'">                
+  <div style="height: 150px; background: #343434; display: flex; justify-content: center; align-items: center; " ng-if="post.type == 'audio'">
+                       
    <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" height="160">
-</div>        
-				  
-  <div class="ytContainer" ng-if="post.type == 'youtube'">   <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>  </div>
-        
+  
+</div>                           
+                            <div class="ytContainer" ng-if="post.type == 'youtube'">   <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>  </div>
+                            
+                     
+                  
   <div class="image-container" ng-if="post.type == 'img'">
     <img src="{{post.url}}"   class="post-image" />
-  </div> -->
+  </div>
                             
      <div class="text-container" ng-if="post.type == 'text'">
     {{post.url}}
@@ -1578,7 +1577,7 @@ $scope.isButton = true;
 
 
 
-  /* 
+   
       
     $scope.user = "@anonimo"
 
@@ -1587,7 +1586,7 @@ $scope.isButton = true;
         token: localStorage.getItem('MStoken')
     };
 
-    var config = {
+    var config = { 
         headers: {
             "Content-Type": "text/plain;charset=utf-8"
         }
@@ -1596,7 +1595,7 @@ $scope.isButton = true;
 $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
       $scope.user = response.data
-    });
+    }); 
 
    
    
@@ -1637,7 +1636,7 @@ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7
     .then(function(response) {
     });
 }
-  */ 
+   
    
 
   $scope.updatePagination = function() {
@@ -1822,7 +1821,13 @@ $scope.calculateTimeAgo = function(alertDate) {
 
 
 
-$(document).ready(function () {
+
+
+
+</script>
+  
+<script>
+  $(document).ready(function () {
   // Inicializa fancybox
   $(".fancybox").fancybox();
 
@@ -1941,7 +1946,7 @@ $('#results').on('click', '.select-video', function (e) {
   // Limpia el atributo imgData
   $('#imgData').attr('imgData', '');
 });
-
+ 
 }); 
 
 function search() {
@@ -1951,7 +1956,7 @@ function search() {
   // Obtén el valor del input
   let q = $('#query').val();
 
-  // Solicita datos a la API de YouTube
+ 
   $.get(
     "https://www.googleapis.com/youtube/v3/search",
     {
@@ -1962,14 +1967,16 @@ function search() {
     },
     function (data) {
       $.each(data.items, function (i, item) {
+        // Genera el HTML de cada resultado
         let output = getOutput(item);
+
+        // Añade los resultados al DOM
         $('#results').append(output);
       });
     }
   );
-
-
-	/*
+   
+  /*
     var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
 
     var validationData = {
@@ -1980,22 +1987,24 @@ function search() {
       },
       body: JSON.stringify({
         action: "youtubeApi",
-        q: q
+        q: q 
       }),
-     credentials: "omit"
+      credentials: "omit"
     };
 
   fetch(api, validationData)
   .then(response => response.text())
   .then(res => {
     var validation = JSON.parse(res);
-      validation.forEach(item => {
+    validation.forEach(item => {
           $('#results').append(getOutput(item));
         });
   })
 */
 
-	
+  
+  
+  
 }
 
 function getOutput(item) {
@@ -2034,7 +2043,5 @@ function getOutput(item) {
   return output;
 }
 
-
 </script>
-  
 </body>
