@@ -1987,16 +1987,9 @@ function search() {
   .then(response => response.text())
   .then(res => {
     var validation = JSON.parse(res);
-    validation.forEach(item => {
-      $('#results').append(`
-        <div class="video-item">
-          <img src="${item.thumbnail}" alt="${item.title}" />
-          <h3>${item.title}</h3>
-          <p>${item.description}</p>
-          <small>${item.channelTitle}</small>
-        </div>
-      `);
-    });
+      validation.forEach(item => {
+          $('#results').append(getOutput(item));
+        });
   })
 
 
