@@ -1969,25 +1969,19 @@ function search() {
     }
   );*/
 
-	$.ajax({
-  url: "https://www.googleapis.com/youtube/v3/search",
+$.ajax({
+  url: "https://script.google.com/macros/s/AKfycbwCM-I8XeyywwU0faLzhc5-d1jUWh758_mTVD3vy3PI0hDCn165645s2EpMj-aoggzoPw/exec", // Cambia esta URL por la de tu Apps Script
   method: "GET",
-  data: {
-    part: "snippet,id",
-    q: q,
-    type: "video",
-    key: "AIzaSyBRfk0b73-DtIk7UNdpItlZHlmMtNcVsUA",
-  },
-  xhrFields: {
-    withCredentials: false, // Asegúrate de que no se incluyan cookies
-  },
+  data: { q: q }, // Pasa el parámetro de consulta al Apps Script
   success: function (data) {
     data.items.forEach(item => {
       $('#results').append(getOutput(item));
     });
+  },
+  error: function (xhr, status, error) {
+    console.error("Error:", error);
   }
 });
-
 
 
 	
