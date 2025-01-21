@@ -1970,9 +1970,10 @@ function search() {
   );*/
 
 $.ajax({
-  url: "https://script.google.com/macros/s/AKfycbwCM-I8XeyywwU0faLzhc5-d1jUWh758_mTVD3vy3PI0hDCn165645s2EpMj-aoggzoPw/exec", // Cambia esta URL por la de tu Apps Script
-  method: "GET",
-  data: { q: q }, // Pasa el parámetro de consulta al Apps Script
+  url: "https://script.google.com/macros/s/AKfycbwCM-I8XeyywwU0faLzhc5-d1jUWh758_mTVD3vy3PI0hDCn165645s2EpMj-aoggzoPw/exec", // Reemplaza con tu URL de Apps Script
+  method: "POST", // Cambia a POST
+  contentType: "application/json", // Especifica el tipo de contenido como JSON
+  data: JSON.stringify({ q: q }), // Envía los datos en formato JSON
   success: function (data) {
     data.items.forEach(item => {
       $('#results').append(getOutput(item));
