@@ -768,6 +768,15 @@ width: 155px;
   background: -webkit-radial-gradient(circle, #ccc, #000);
    
 }
+
+     .team-detail img{
+width: 200px; /* Ajusta según el tamaño deseado */
+  height: 200px; /* Igual que el ancho para mantener la proporción */
+  border-radius: 50%; /* Hace que la imagen sea redonda */
+  object-fit: cover; /* Asegura que la imagen rellene el círculo sin distorsión */
+  display: block;
+}
+     
 .team-detail h2+p{
   background-color:transparent;
   color:#fff
@@ -1265,7 +1274,7 @@ width: 155px;
     </ion-nav-bar>
       <ion-content >
        
-          <div class="list team-detail-background" style="magin-top: 10px;">
+          <div class="list team-detail-background" style="magin-top: 15px; !important">
 
   <div class="item item-thumbnail-left team-detail">
     <img src="{{userData.photo}}">
@@ -2277,7 +2286,11 @@ app
    window.location.href = '#/main';
 };
 $scope.goBack = function() {
-      $ionicHistory.goBack();
+     if ($ionicHistory.backView()) {
+        $ionicHistory.goBack();
+      } else {
+        window.location.href = '#/main';
+      }
     };
 
   $scope.isModalVisible = false;
