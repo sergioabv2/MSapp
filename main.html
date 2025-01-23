@@ -502,14 +502,25 @@ ion-side-menu .list .item:hover {
     .tabframe-container{
       display: none;
     }
-      .right-content{
+      .contentHide{
      display: none !important;
   }
+    
   .content {
   grid-template-columns: 100% 0 !important;
   }
+   .content2 {
+  grid-template-columns: 0 100% !important;
+  }
+  .rWide{
+    width: 100% !important;
+  }
+
      #chatFrame{
-   height: 83vh !important;
+   height: 90vh !important;
+}
+ #chatFrame2
+   height: 90vh !important;
 }
 }
 
@@ -705,10 +716,19 @@ width: 155px;
  #chatFrame{
      height: 90vh;
 }
+#chatFrame2{
+     height: 90vh;
+}
      
 .content {
   display: grid;
-  grid-template-columns: auto 330px; /* Deja que el lado izquierdo sea flexible */
+  grid-template-columns: auto 300px; /* Deja que el lado izquierdo sea flexible */
+  height: 92.5vh;
+}   
+
+.content2 {
+  display: grid;
+  grid-template-columns: auto 300px; /* Deja que el lado izquierdo sea flexible */
   height: 92.5vh;
 }   
 
@@ -722,12 +742,12 @@ width: 155px;
   display: flex;
   flex-direction: column;
   border: 1px solid #e1e8ed;
-  height: 100vh;
+  height: 85vh;
   overflow-y: auto;
   position: fixed; 
   right: 0;
     top: 15px;
-  width: 330px; 
+  width: 300px; 
 }
        
 
@@ -984,7 +1004,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         </div>
 
 
-        <div class="right-content " >
+        <div class="right-content contentHide" >
 <div class="list">
   
           <ion-list > 
@@ -1689,16 +1709,94 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-nav-bar>
     
       <ion-content>
- <section class="content" style="grid-template-columns: auto 360px; !important;">
-      <div class="left-content" >
-       <div class="iframe-container"><iframe id="chatFrame" src="https://app.mozartacademy.mx/chat2" frameborder="0" allowfullscreen></iframe></div>
-      </div>
+ <section class="content2"  >
+      <div class="left-content contentHide" >
 
-      <div class="right-content" style="width: 360px !important;">
-         <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/profile" frameborder="0" allowfullscreen></iframe></div>
+
+  <div class="iframe-container"><iframe id="chatFrame" src="https://app.mozartacademy.mx/chat2" frameborder="0" allowfullscreen></iframe></div>
+      </div>  
+
+
+      <div class="right-content rWide" >
+        
+
+
+        <div class="list">
+          <div class="item item-divider">
+           Chats
+          </div>  
+      <a class="item item-avatar" ng-click="openChat('profesor')">
+        <img src="https://play-lh.googleusercontent.com/KaoxPO-T9pgdey79_qF8FFN8rT1EUKpazXwprczLKNFlO47iJP24eUiZw_Ik1oAmyj-7=w480-h960-rw">
+           <h2> Prof. Daniel</h2>
+     <p> metronome beats </p>
+          </a>
+          
+          <a class="item item-avatar" ng-click="openChat('soporte')">
+            <img src="https://play-lh.googleusercontent.com/qsUNe9HaXxap4yi2i6oUeBlAFdu8xAn8fgfu-yZ8vFqa3luvQ0i3taOt4NaQZHxhuKE=w480-h960-rw">
+           <h2> Soporte </h2>
+     <p> Tus actividades finalizadas</p>
+          </a>
+
+           <a class="item item-avatar" ng-click="openChat('chatIA')">
+            <img src="https://play-lh.googleusercontent.com/hk5zZ8Xup9HgoP-Xxgoav8geLOAPn2X_a8_fcYJA02uYt8CbxQBkkMChi5gbq5goNA=w480-h960-rw">
+           <h2> Mozart IA </h2>
+     <p> Tus actividades finalizadas</p>
+          </a>
+     
+      <div class="item item-divider">
+          Grupos
+          </div>  
+     
+     
+      <a class="item item-avatar" >
+            <img src="">
+           <h2> Lectura de notas </h2>
+     <p> Entrenamiento melódico</p>
+          </a>
+     
+      <a class="item item-avatar" >
+            <img src="">
+           <h2> Dictado ritmico </h2>
+     <p> Entrenamiento rítmico</p>
+          </a>
+     
+       <a class="item item-avatar" href="#/menu/chords">
+            <img src="">
+           <h2> Chord Master </h2>
+     <p> Entrenamiento armónico</p>
+          </a>
+
+      <a class="item item-avatar" href="#/menu/circlefifths">
+            <img src="">
+           <h2> Circulo de quintas </h2>
+     <p> Entrenamiento armónico</p>
+          </a>
+
+
       </div>
  </section>
 
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+
+   <script id="chatDetail.html" type="text/ng-template">
+    <ion-view >
+
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBackward()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+    
+      <ion-content>
+        {{chatUrl}}
+        <div class="iframe-container"><iframe id="chatFrame2" src="https://www.google.com" frameborder="0" allowfullscreen></iframe></div>
+      </div>  
       </ion-content>
     </ion-view>
   </script>
@@ -2077,10 +2175,23 @@ app
       url: "/chat",
       views: {
         'menuContent': {
-          templateUrl: "chat.html"
+          templateUrl: "chat.html",
+          controller: 'chatCtrl'
         }
       }
     })
+  .state('menu.chatDetail', {
+      url: "/chatDetail",
+      views: {
+        'menuContent': {
+          templateUrl: "chatDetail.html",
+          controller: 'chatDetailCtrl'
+        }
+      }
+    })
+
+
+  
  .state('menu.payment', {
       url: "/payment",
       views: {
@@ -2296,7 +2407,6 @@ $scope.closeModal = function () {
  }])
 
       .controller('StatusCtrl', ['$scope', 'SharedState', function($scope, SharedState){
-    
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
       $scope.userPlan = data.data.plan.split(" ")[0]
@@ -2305,11 +2415,9 @@ $scope.closeModal = function () {
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
 };
-      
     }])
   
   .controller('accountCtrl', ['$scope', 'SharedState', function($scope, SharedState){
-    
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
       $scope.userPlan = data.data.plan.split(" ")[0]
@@ -2317,9 +2425,41 @@ $scope.closeModal = function () {
  
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
-};
-      
+}; 
     }])
+
+  .constant('CHAT_BASE_URL', 'https://app.mozartacademy.mx/chats/')
+.controller('chatCtrl', ['$scope', '$window', '$location', '$timeout', 'CHAT_BASE_URL', function($scope, $window, $location, $timeout, CHAT_BASE_URL) {
+
+   $scope.openChat = function (chatUrl) {
+     const isMobile = $window.innerWidth <= 850;
+
+     if (isMobile) {
+       $location.path('/menu/chatDetail');
+       $timeout(() => {
+         const chatFrame2 = document.getElementById('chatFrame2');
+         if (chatFrame2) {
+           chatFrame2.src = `${CHAT_BASE_URL}${chatUrl}`;
+         }
+       }, 0);
+     } else {
+       const chatFrame = document.getElementById('chatFrame');
+       if (chatFrame) {
+         chatFrame.src = `${CHAT_BASE_URL}${chatUrl}`;
+       }
+     }
+   };
+ }])
+  .controller('chatDetailCtrl', function ($scope, $ionicHistory) {
+  $scope.goBackward = function() {
+     if ($ionicHistory.backView()) {
+        $ionicHistory.goBack();
+      } else {
+        window.location.href = '#/menu/chat';
+      }
+    }
+})
+
 
    .controller('agendaCtrl', ['$scope', 'SharedState', '$ionicPopup', function($scope, SharedState, $ionicPopup){
 
@@ -2751,41 +2891,3 @@ $scope.updateAvailableTimes = function() {
 
     </script>
 
-
-<script>
-$(window).on('load', function() { 
-  var storedToken = localStorage.getItem('MStoken');
-  if (storedToken) {
-    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
-
-    var validationData = {
-      redirect: "follow",
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        action: "validateToken",
-        token: storedToken
-      })
-    };
-
-  fetch(api, validationData)
-  .then(response => response.text())
-  .then(res => {
-    var validation = JSON.parse(res);
-    if (validation.status == "success") {
-      $('.preloader').css({'display':'none'})  
-      $('.mainSection').fadeIn('slow')  
-    } else {
-      localStorage.removeItem('MStoken');
-     window.location.href = 'https://app.mozartacademy.mx/';
-    }
-  })
-  } else {
-    window.location.href = 'https://app.mozartacademy.mx/';
-  }
-});
-
-
-</script>
