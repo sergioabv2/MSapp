@@ -766,7 +766,7 @@ width: 155px;
 
 .team-detail{
   background: -webkit-radial-gradient(circle, #ccc, #000);
-   
+   margin-top: 15px !important;
 }
 
      .team-detail img{
@@ -782,6 +782,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   color:#fff
 }
 .team-detail h2{
+    margin-top: 20px !important;
   background-color:transparent;
   color:#fff
 }
@@ -820,6 +821,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   font-size: 0.7em;
   border: 1px solid;
   border-radius: 15px;
+    margin-top: 7px;
   /* padding-left: 5px; */
   text-align: center;
 }   
@@ -1224,7 +1226,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <img data-ng-src="{{userData.photo}}">    
            <h2>{{userData.name}}</h2>       
           <p>{{userData.mail}}</p>    
-          <ion-option-button class="button-calm" >Editar</ion-option-button>
           </ion-item>
      </ion-list>    
           <ion-list>
@@ -1278,57 +1279,57 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
   <div class="item item-thumbnail-left team-detail">
     <img src="{{userData.photo}}">
-    <h2>{{userData.name}}Ey</h2>
-    <div class="team-country-tag">{{userData.mail}} no</div>
+    <h2>{{userData.name}}</h2>
+    <div class="team-country-tag"> Nivel {{userData.lvl}} </div>
   </div>
 
   <div class="item tabs tabs-secondary">
-    <a class="tab-item team-detail-tab-item" href="#">      
-      <span class="tab-heading">{{topics}}si</span> 
-      <span class="tab-sub">Topics<span>
+    <a class="tab-item team-detail-tab-item">      
+      <span class="tab-heading">11</span> 
+      <span class="tab-sub">Repertorio<span>
     </a>
-    <a class="tab-item team-detail-tab-item" href="#">
-      <span class="tab-heading">{{followers}}omk</span>
-      <span class="tab-sub">Followers</span>
+    <a class="tab-item team-detail-tab-item" >
+      <span class="tab-heading" style="color: green"> +400 Pts</span>
+      <span class="tab-sub">Score</span>
     </a>
 
   </div>
   
 </div>
     
-      <div class="list list-inset">
-
-  <div class="item item-divider itemDividerforitem">
+       <ion-list>
+      <ion-item class="item-divider itemDividerforitem" >
     Datos de usuario
-  </div>
+        </ion-item>
 
-  <a class="item" href="#" >
-   Nombre
-    <span class="item-note">
-    Sergio Abelardo Bello Valenzo
-    </span>
-  </a>
-  <a class="item" href="#" >
-   Correo
-    <span class="item-note">
-     sergioabv2@gmail.com
-    </span>
-  </a>
-               <a class="item" href="#" >
-   Foto
+      <ion-item class="item-icon-left">
+         <i class="icon ri-user-fill" ></i>
+       Nombre
+          <p style="color: brown;" > {{userData.name}} </p> 
+            <ion-option-button class="button-calm" ng-click="">Editar</ion-option-button>
+          </ion-item>
 
-   <button class="item-note button-dark" style="transform: scale(.8); " >
-            editar        
-          </button>
-  </a>
-   
-   <div class="item item-divider itemDividerforitem">
-    Leagues
-    <span class="league-position">Position</span>
-  </div>
+           <ion-item class="item-icon-left">
+         <i class="icon ri-mail-fill" ></i>
+       Correo
+          <p style="color: brown;" > {{userData.mail}} </p> 
+          </ion-item>
 
- <ion-list>
- <ion-item class="item-icon-left item-icon-right">
+
+          <ion-item class="item-icon-left">
+         <i class="icon ri-camera-fill" ></i>
+       Foto
+            <ion-option-button class="button-calm" ng-click="">Cambiar</ion-option-button>
+          </ion-item>
+
+ <ion-item class="item-divider itemDividerforitem" >
+    Datos académicos
+        </ion-item>
+        <ion-item class="item-icon-left" >
+      <i class="icon ri-calendar-event-fill" ></i> Horario de clase
+        <p>{{userData.classtime[0]}} <br> {{userData.classtime[1]}}</p>   
+        </ion-item>
+          <ion-item class="item-icon-left item-icon-right">
     <i class="icon ri-video-chat-fill" style="color: blue;"></i> Datos de ZOOM
     <p> ID: 296 313 4430<br> Password: bartok</p>
     <i class="icon ri-arrow-left-double-fill slide-hint-left" style="margin-top: 50px;"></i>
@@ -1337,8 +1338,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
         Ingresar
     </ion-option-button>
 </ion-item>
- </ion-list>
-</div>
+
+    </ion-list>  
         
       </ion-content>
     </ion-view>
