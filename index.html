@@ -571,8 +571,8 @@ h1 {
             data-logo_alignment="left" onclick="showLoader()">
         </div>
 
-   <button class="login-btn login-btn-email" onclick="showMailLogin()" style="margin-top: -4px;"><i class="ri-mail-line login-btn-icon" ></i> Acceder con email</button>   
-       <button class="login-btn login-btn-email" onclick="showWhatsappLogin()"><i class="ri-whatsapp-fill login-btn-icon" style=" color: green;"></i> <span >Acceder con WhatsApp</span></button> 
+      <button class="login-btn login-btn-email" onclick="showWhatsappLogin()" style="margin-top: -4px;"><i class="ri-whatsapp-fill login-btn-icon" style=" color: green;"></i> <span >Acceder con WhatsApp</span></button>
+   <button class="login-btn login-btn-email" onclick="showMailLogin()" ><i class="ri-mail-line login-btn-icon" ></i> Acceder con email</button>   
 
          </div>
     </div>
@@ -582,8 +582,14 @@ h1 {
                 
        <section id="whatsapp-login" style="display: none;">
     <h4>Inicia sesión con WhatsApp</h4>
-   <div id="WA-error" class="alert alert-danger" style="display: none;">
-          Número no registrado, intenta otro método de inicio de sesión.
+  <div id="WA-error" class="alert alert-danger" style="display: none;">
+          Número no registrado, intenta con otro método de inicio de sesión.
+        </div>
+         <div id="WA-error2" class="alert alert-danger" style="display: none;">
+          Código incorrecto
+        </div>
+         <div id="WA-success" class="alert alert-info" style="display: none;">
+          Código enviado a tu número de whatsapp
         </div>
       
       <div class="input-group" style="margin-bottom: 30px; margin-top: 70px;">
@@ -597,6 +603,8 @@ h1 {
       </select>
     </div>
     <input type="text" inputmode="numeric" maxlength="10" pattern="[0-9]*" class="form-control" id="phone-login" autocomplete="off" placeholder="Número de teléfono" >
+          <input type="text" id="WAcode" placeholder="Ingresa el código" style="width: 100%; padding: 10px; margin-bottom: 10px; margin-top: 20px; border-radius: 5px; border: 1px solid #ccc; display: none">
+        <div id="mailVar" mail="" style="display:none"> </div>
   </div>
          <button class="login-btn" onclick="WAlogin(this)">Enviar mensaje</button>
     <button class="back-btn" onclick="showLoginOptions()">Atrás</button>
@@ -754,6 +762,105 @@ function showLoader() {
 }
 
 
+
+
+  
+
+
+function WAlogin(button) {
+  var phone = document.getElementById('phone-login').value;
+  var code = document.getElementById('WAcode').value;
+  var mail = $("#mailVar").attr("mail")
+  var $button = $(button);
+  
+  if(phone != ""){
+    $button.html("<i class='fa fa-spinner fa-spin'></i> Cargando...");
+    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
+   
+   if(code == ""){
+
+
+      var validationData = {
+        redirect: "follow",
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify({
+          action: "WArequest",
+          phone: phone
+        })
+      };
+
+      fetch(api, validationData)
+        .then(response => response.text())
+        .then(res => {
+            var validation = JSON.parse(res);
+            if (validation.status == "success") {
+              $("#mailVar").attr("mail", validation.mail)
+              document.getElementById('WAcode').style.display = 'block'; 
+              document.getElementById('WA-success').style.display = 'block';
+              setTimeout(function() {
+                     document.getElementById('WA-success').style.display = 'none';
+                  }, 5000);
+              $button.html("Iniciar sesión");
+            }else{
+                document.getElementById('WA-error').style.display = 'block';
+                $button.html("Enviar mensaje");
+                setTimeout(function() {
+                     document.getElementById('WA-error').style.display = 'none';
+                  }, 5000);
+            }
+        })
+
+    }else{
+      if(mail != ""){
+        var validationData = {
+        redirect: "follow",
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify({
+          action: "validateUser",
+          email: mail,
+          password: code
+        })
+      };
+
+      fetch(api, validationData)
+        .then(response => response.text())
+        .then(res => {
+          var validation = JSON.parse(res);
+          if (validation.status == "success") {
+            localStorage.setItem('MStoken', validation.token); 
+            window.location.href = 'https://app.mozartacademy.mx/main'; 
+            document.getElementById('WAcode').style.display = 'none';
+            document.getElementById('phone-login').value = ""; 
+          } else {
+            document.getElementById('WA-error2').style.display = 'block';
+                setTimeout(function() {
+                     document.getElementById('WA-error2').style.display = 'none';
+                  }, 5000);  
+          }
+        document.getElementById('WAcode').value = "";
+        $button.html("Iniciar sesión");
+        })  
+
+       }
+    }
+   
+    
+  }else{
+        alert("Ingresa tu número")
+  }
+}
+
+
+
+
+
+  /*
 function WAlogin(button) {
   var phone = document.getElementById('phone-login').value;
   //var code = document.getElementById('code-login').value;
@@ -771,6 +878,7 @@ function WAlogin(button) {
     alert("Ingresa tu número")
   }
 }
+*/
 
 
 
