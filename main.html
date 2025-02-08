@@ -2,7 +2,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" href="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" type="image/x-icon">
-    <title>Mozart Appcademy</title>
+    <title>Mozart App</title>
   
 <link href="https://code.ionicframework.com/1.3.3/css/ionic.min.css" rel="stylesheet">
   <script src="https://code.ionicframework.com/1.3.3/js/ionic.bundle.min.js"></script>
@@ -1244,11 +1244,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </ion-item>
 
 
-          <ion-item class="item-icon-left item-icon-right">
+          <ion-item class="item-icon-left " href="#/menu/profileImages">
          <i class="icon ri-camera-fill" style="font-size: 25px"></i>
        Foto
-       <i class="icon ri-arrow-left-double-fill slide-hint-left" style="margin-top: 27px;"></i>
-            <ion-option-button class="button-calm" ng-click="">Cambiar</ion-option-button>
+   
           </ion-item>
 
  
@@ -1256,6 +1255,53 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </ion-content>
     </ion-view>
   </script>
+
+
+
+
+
+      <script id="profileImages.html" type="text/ng-template">
+    <ion-view>
+           <ion-nav-bar class="bar-light" >     
+       <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goBack()">
+      <i class="ri-arrow-left-s-line"></i> regresar
+    </button>
+  </ion-nav-buttons>  
+    </ion-nav-bar>
+      <ion-content >
+<div class="list" style="margin-top: 10px;">
+
+           <a class="item item-avatar item-icon-right" ng-repeat="image in images" ng-click="openImage(image)">
+        <img src="{{image.img}}">
+           <h2> {{image.name}}</h2>
+
+      <i class="icon ri-lock-2-fill" style="font-size: 27px margin-right: 10px"></i>
+          </a>
+
+
+  </div>        
+      </ion-content>
+    </ion-view>
+  </script>
+
+  <script id="profileImageDetail.html" type="text/ng-template">
+    <ion-view>
+        <ion-nav-bar class="bar-light">     
+            <ion-nav-buttons side="left">
+                <button class="button button-clear" ng-click="goToImgProfile()">
+                    <i class="ri-arrow-left-s-line"></i> Regresar
+                </button>
+            </ion-nav-buttons>  
+        </ion-nav-bar>
+
+        <ion-content class="center-content">
+            <img ng-src="{{selectedImage.img}}" class="full-image">
+        </ion-content>
+    </ion-view>
+</script>
+
+
 
       
       
@@ -2035,7 +2081,22 @@ app
           controller: 'accountCtrl'
         }
       }
+    })   
+    .state('menu.profileImages', {
+      url: "/profileImages",
+      views: {
+        'menuContent': {
+          templateUrl: "profileImages.html",
+          controller: 'profileImagesCtrl'
+        }
+      }
     })
+    .state('profileImageDetail', {
+            url: "/profile-image-detail",
+            templateUrl: "profileImageDetail.html",
+            controller: "profileImageDetailCtrl",
+            params: { selectedImage: null }
+        })
     .state('menu.agenda', {
       url: "/agenda",
       views: {
@@ -2299,10 +2360,10 @@ app
     };
   
  $scope.calculateDaysAgo = function(alertDate) {
-  const alertDateObj = new Date(alertDate); // Convierte la fecha del string a un objeto Date
-  const today = new Date(); // Fecha actual
-  const timeDiff = Math.abs(today - alertDateObj); // Diferencia en milisegundos
-  const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Conversión a días
+  const alertDateObj = new Date(alertDate); 
+  const today = new Date(); 
+  const timeDiff = Math.abs(today - alertDateObj); 
+  const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); 
   return daysDiff;
 };
 
@@ -2438,6 +2499,68 @@ $scope.closeModal = function () {
   window.location.href = '#/menu/payment';
 }; 
     }])
+
+   .controller('profileImagesCtrl', ['$scope', '$state', 'SharedState', function($scope, $state, SharedState){
+  SharedState.getNum().then(function(data) {
+       $scope.userData = data.data;
+  })
+  $scope.openImage = function(image) {
+        $state.go('profileImageDetail', { selectedImage: image });
+    };
+  $scope.images = [
+{"name": "Mexicano", "img": "https://lh3.googleusercontent.com/d/1OU-iMgH5Zq5ci3WwOydCxuYFkGqLJW2U", "lvl": 0},
+{"name": "Francés", "img": "https://lh3.googleusercontent.com/d/135fMCURNJql4oAys1TtpZO5Vrp-0bRrs", "lvl": 0},
+{"name": "Lentes", "img": "https://lh3.googleusercontent.com/d/1wvudBoQiNTJABssMb8lcLWBFK_dXGUMN", "lvl": 0},
+{"name": "Estudiante", "img": "https://lh3.googleusercontent.com/d/1_sm6uH3FZOiuLDVrh_i99_tMjT2m9kP5", "lvl": 0},
+{"name": "Nórdico 1", "img": "https://lh3.googleusercontent.com/d/1idGA9aTgukmD8XnsTZ0iRQH_NQ4k2T7F", "lvl": 0},
+{"name": "Nórdico 2", "img": "https://lh3.googleusercontent.com/d/1_YNrCYx1nR87cQ9GN6a58eavu0yOLErk", "lvl": 0},
+{"name": "Elegante", "img": "https://lh3.googleusercontent.com/d/1XKP3aQuE4jCWD32Q2t0zF-v7xJNbQvA3", "lvl": 0},
+{"name": "Ranchero", "img": "https://lh3.googleusercontent.com/d/1d8oziGqG_irj0TpG2ybv9MoLeEYQvZaG", "lvl": 0},
+{"name": "Sport", "img": "https://lh3.googleusercontent.com/d/12XcMuRouZZqwwlHlbaq8bVVpPRSg5T5B", "lvl": 0},
+{"name": "Médico", "img": "https://lh3.googleusercontent.com/d/196Fzf-rC_xS6jtiSld0wqRfuBYU3Q-E2", "lvl": 0},
+{"name": "A mimir", "img": "https://lh3.googleusercontent.com/d/1v72a86Pz_l0zFyopogj8f1W64XtYIGuM", "lvl": 0},
+{"name": "Tech", "img": "https://lh3.googleusercontent.com/d/1Ga2QuGYIe-gn8UMqsN_mBDBYJeAD6jr5", "lvl": 0},
+{"name": "Químico", "img": "https://lh3.googleusercontent.com/d/1B1bVy14H0dSMf-iOhY-Nk9h1e2VMmVUg", "lvl": 0},
+{"name": "Ingeniero", "img": "https://lh3.googleusercontent.com/d/1lGsjIu3OyK82NOl8kNjXZUpxne8aBsBI", "lvl": 0},
+{"name": "Biólogo", "img": "https://lh3.googleusercontent.com/d/1aTuTvF-Gh99AoZVKeWScvir_xK5SJwKh", "lvl": 0},
+{"name": "Chef", "img": "https://lh3.googleusercontent.com/d/1nmyGfxvW1A_pBQjwyzkxJTeGskj6qESD", "lvl": 0},
+{"name": "Poker", "img": "https://lh3.googleusercontent.com/d/1-cPk4doMpcl3hmH3Kz8USKDcl_69AfGg", "lvl": 0},
+{"name": "Inversionista", "img": "https://lh3.googleusercontent.com/d/1uhlREB8cKTUS6HgWg9MYmOlGPEXo5bOV", "lvl": 0},
+{"name": "Trader", "img": "https://lh3.googleusercontent.com/d/1V9pQd8dtUyovYN4vrjKfUtpLrGHGPvQA", "lvl": 0},
+{"name": "Comandante", "img": "https://lh3.googleusercontent.com/d/1qXpcScJJCKLH33hmMOTbXLu42GCJEJOZ", "lvl": 0},
+{"name": "Inversionista", "img": "https://lh3.googleusercontent.com/d/1uhlREB8cKTUS6HgWg9MYmOlGPEXo5bOV", "lvl": 0},
+{"name": "Aviador", "img": "https://lh3.googleusercontent.com/d/1ImLqo-j8C03b-zAStVSs4zvyO5XP_zN8", "lvl": 0},
+{"name": "Conejo 1", "img": "https://lh3.googleusercontent.com/d/1aZfwi2IvESEOlcVrJG09hiZQ5MqPJ1Qz", "lvl": 0},
+{"name": "Conejo 2", "img": "https://lh3.googleusercontent.com/d/13PH1mvMf6Rfl3tYd_5zTO5U7ObnnMGw3", "lvl": 0},
+{"name": "Fiesta", "img": "https://lh3.googleusercontent.com/d/1kpioyQDHlo0CHNvilUU4UVBA3Nh1fJPw", "lvl": 0},
+{"name": "Coquette", "img": "https://lh3.googleusercontent.com/d/1N0fcNsBu91yvPr2RVjy7fIFAwNrDmbWh", "lvl": 0},
+{"name": "Cute", "img": "https://lh3.googleusercontent.com/d/1GLqRR-0TEAG1rUMBE-B5-L9xDtS7L0ZR", "lvl": 0},
+{"name": "Tierno", "img": "https://lh3.googleusercontent.com/d/1Fd6pJtHqEEgSYjOS2X3OBv1_U3yryIsj", "lvl": 0},
+{"name": "Rey", "img": "https://lh3.googleusercontent.com/d/1DqHvSyZEUVm3zgAxCLHkx23dDEvTY39I", "lvl": 0},
+{"name": "Reina", "img": "https://lh3.googleusercontent.com/d/1BHSU81FVrMBlX_8qxDsNJynxhWX43FdN", "lvl": 0},
+{"name": "Robin Hood", "img": "https://lh3.googleusercontent.com/d/1jaNlxUVfgCIvLqZ_JkvH2rGi4ssPh_IS", "lvl": 0},
+{"name": "Mago", "img": "https://lh3.googleusercontent.com/d/1YbREdCmoR4Yx9x3oYNkAD_axtj5otEIJ", "lvl": 0},
+{"name": "Adivino", "img": "https://lh3.googleusercontent.com/d/1GP0GLotqyuABoX4jOH2Wl1OeGqtGviY1", "lvl": 0},
+{"name": "Detective", "img": "https://lh3.googleusercontent.com/d/1P07Wfydk8btiCuAzdwqnxN47yEEdObJk", "lvl": 0},
+{"name": "Pirata", "img": "https://lh3.googleusercontent.com/d/1Oglhd-RZH5ACyveCZPbDYvmAl_Ei5XgK", "lvl": 0},
+{"name": "Disney", "img": "https://lh3.googleusercontent.com/d/1maVLgDTBqhaZHxL_YfoJXLHEbMRLqNI8", "lvl": 0},
+{"name": "De la suerte", "img": "https://lh3.googleusercontent.com/d/1VSKvobqu6y7P2QjDAgTL27PRIQpdZISE", "lvl": 0},
+{"name": "Starbucks", "img": "https://lh3.googleusercontent.com/d/1f-BmVUT-nTOZiJby6Kxkv1UR19tNjRWm", "lvl": 0},
+{"name": "Gordito", "img": "https://lh3.googleusercontent.com/d/121Cgo6d-QNRSOGLFYKosUta2K76PZPMZ", "lvl": 0},
+{"name": "Salt Bae", "img": "https://lh3.googleusercontent.com/d/1n_DFnV60r7BkvmolHFvrfCPB0Bbf2SkX", "lvl": 0},
+{"name": "Cumpleaños", "img": "https://lh3.googleusercontent.com/d/1bd1xR2PtYwaee2WwsOW7qDLqbq4AL8ON", "lvl": 0},
+{"name": "Vino", "img": "https://lh3.googleusercontent.com/d/1Ctrlnq9JXcCTtR-hoOrY6r4-gDjxH0Io", "lvl": 0},
+{"name": "Champagne", "img": "https://lh3.googleusercontent.com/d/1z-0HAdwRezkfmtXyMzYyMv70ADdmK_yH", "lvl": 0},
+]
+    }])
+
+.controller('profileImageDetailCtrl', ['$scope', '$stateParams', function($scope, $stateParams) {
+    $scope.selectedImage = $stateParams.selectedImage;
+    $scope.goToImgProfile = function() {
+  window.location.href = '#/menu/profileImages';
+};
+}])
+
 
   .constant('CHAT_BASE_URL', 'https://app.mozartacademy.mx/chats/')
 .controller('chatCtrl', ['$scope', '$window', '$location', '$timeout', 'CHAT_BASE_URL', function($scope, $window, $location, $timeout, CHAT_BASE_URL) {
@@ -2902,41 +3025,3 @@ $scope.updateAvailableTimes = function() {
 
     </script>
 
-
-<script>
-$(window).on('load', function() { 
-  var storedToken = localStorage.getItem('MStoken');
-  if (storedToken) {
-    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
-
-    var validationData = {
-      redirect: "follow",
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        action: "validateToken",
-        token: storedToken
-      })
-    };
-
-  fetch(api, validationData)
-  .then(response => response.text())
-  .then(res => {
-    var validation = JSON.parse(res);
-    if (validation.status == "success") {
-      $('.preloader').css({'display':'none'})  
-      $('.mainSection').fadeIn('slow')  
-    } else {
-      localStorage.removeItem('MStoken');
-     window.location.href = 'https://app.mozartacademy.mx/';
-    }
-  })
-  } else {
-    window.location.href = 'https://app.mozartacademy.mx/';
-  }
-});
-
-
-</script>
