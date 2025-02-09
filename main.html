@@ -782,7 +782,25 @@ width: 155px;
     background-position: 40px 0; } }
 
 
-     
+    .popup-custom .popup {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    text-align: center;
+}
+
+.popup-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.popup-full-image {
+    max-width: 100%;
+    max-height: 60vh;
+    border-radius: 10px;
+}
+ 
  
    .team-detail-background{
      margin-bottom: 2px;
@@ -1272,7 +1290,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <ion-content >
 <div class="list" style="margin-top: 10px;">
 
-           <a class="item item-avatar item-icon-right" ng-repeat="image in images" ng-click="openImage(image)">
+           <a class="item item-avatar item-icon-right" ng-repeat="image in images" ng-click="showImg(image)">
         <img src="{{image.img}}">
            <h2> {{image.name}}</h2>
 
@@ -1285,21 +1303,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-view>
   </script>
 
-  <script id="profileImageDetail.html" type="text/ng-template">
-    <ion-view>
-        <ion-nav-bar class="bar-light">     
-            <ion-nav-buttons side="left">
-                <button class="button button-clear" ng-click="goToImgProfile()">
-                    <i class="ri-arrow-left-s-line"></i> Regresar
-                </button>
-            </ion-nav-buttons>  
-        </ion-nav-bar>
-
-        <ion-content class="center-content">
-            <img ng-src="{{selectedImage.img}}" class="full-image">
-        </ion-content>
-    </ion-view>
-</script>
 
 
 
@@ -2091,12 +2094,7 @@ app
         }
       }
     })
-    .state('profileImageDetail', {
-            url: "/profile-image-detail",
-            templateUrl: "profileImageDetail.html",
-            controller: "profileImageDetailCtrl",
-            params: { selectedImage: null }
-        })
+
     .state('menu.agenda', {
       url: "/agenda",
       views: {
@@ -2500,13 +2498,12 @@ $scope.closeModal = function () {
 }; 
     }])
 
-   .controller('profileImagesCtrl', ['$scope', '$state', 'SharedState', function($scope, $state, SharedState){
+   .controller('profileImagesCtrl', ['$scope', '$ionicPopup', 'SharedState', function($scope, $ionicPopup, SharedState){
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
   })
-  $scope.openImage = function(image) {
-        $state.go('profileImageDetail', { selectedImage: image });
-    };
+  
+
   $scope.images = [
 {"name": "Mexicano", "img": "https://lh3.googleusercontent.com/d/1OU-iMgH5Zq5ci3WwOydCxuYFkGqLJW2U", "lvl": 0},
 {"name": "Francés", "img": "https://lh3.googleusercontent.com/d/135fMCURNJql4oAys1TtpZO5Vrp-0bRrs", "lvl": 0},
@@ -2552,14 +2549,28 @@ $scope.closeModal = function () {
 {"name": "Vino", "img": "https://lh3.googleusercontent.com/d/1Ctrlnq9JXcCTtR-hoOrY6r4-gDjxH0Io", "lvl": 0},
 {"name": "Champagne", "img": "https://lh3.googleusercontent.com/d/1z-0HAdwRezkfmtXyMzYyMv70ADdmK_yH", "lvl": 0},
 ]
+
+  $scope.showImg = function(image) {
+        var myPopup = $ionicPopup.show({
+            template: `
+                <div class="popup-image-container">
+                    <img src="${image.img}" class="popup-full-image">
+                </div>
+            `,
+            title: image.name, // Nombre del avatar como título
+            cssClass: 'popup-custom',
+            buttons: [
+                { 
+                    text: 'Cerrar',
+                    type: 'button-positive'
+                }
+            ]
+        });
+    };
+
+
     }])
 
-.controller('profileImageDetailCtrl', ['$scope', '$stateParams', function($scope, $stateParams) {
-    $scope.selectedImage = $stateParams.selectedImage;
-    $scope.goToImgProfile = function() {
-  window.location.href = '#/menu/profileImages';
-};
-}])
 
 
   .constant('CHAT_BASE_URL', 'https://app.mozartacademy.mx/chats/')
@@ -3066,7 +3077,3 @@ $(window).on('load', function() {
 
 
 </script>
-
-
-
-
