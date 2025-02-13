@@ -2188,6 +2188,7 @@ var currentActivity = null;
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
         deferred.resolve({
+          name: response.data.name,
           lvl: response.data.lvl,
           lsn: response.data.lsn,
           progress: response.data.progress,
@@ -2257,6 +2258,7 @@ getActivity: function() {
   
   
     SharedState.getNum().then(function(data) {
+      $scope.name = data.name.split(" ")[0];
     $scope.lsn = data.lsn;
       $scope.lvl = data.lvl;
       $scope.progress = data.progress;
@@ -2295,8 +2297,8 @@ $scope.toggle_video_modal = function(act) {
     if (item.sort === 'intro') {
         slidesHtml += `
             <section class="slide">
-                <h3>Lección 5</h3>
-                <p>${item.sort}</p>
+                <h4>${item.lesson}</h4>
+                <p>Desliza la pantalla o da click en los botones para navegar entre páginas.</p>
                 <div class="iconWrap">
                 <div class="icon"> 
                     <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#fff">
@@ -2317,15 +2319,30 @@ $scope.toggle_video_modal = function(act) {
                 </div>
             </section>
         `;
-    } else if (item.sort === 'explain2') {
+    } else if (item.sort === 'end') {
         slidesHtml += `
             <section class="slide">
                 <img src="https://lh3.googleusercontent.com/d/1Hv9WGtVuOhTwTcolJyMO7IIlZjjydQsU"  width="360">
                 <h3 style="margin-top: -10px">Actividad completada</h3>
-                <p>This slider demo is powered by GSAP along with the Draggable and Inertia plugins.</p>
+                <p>Has completado todos los pasos de esta lección. Pulsa la X para salir.</p>
             </section>
         `; 
-    } else if (item.sort === 'quiz') {
+    } else if (item.sort === 'explainImg') {
+        slidesHtml += `
+            <section class="slide">
+                <img  src="${item.img}"  style="border-radius: 10px !important; width: 90%; max-width: 500px">
+                <h4>${item.greet1}${$scope.name}${item.greet2}</h4>
+                <p>${item.desc2}</p>
+            </section>
+        `; 
+    } else if (item.sort === 'img') {
+        slidesHtml += `
+            <section class="slide">
+                <img  src="${item.img}"   style="width: 90%; max-width: 500px">
+                <p>${item.desc}</p>
+            </section>
+        `; 
+    }else if (item.sort === 'quiz') {
       var itemQuestions = JSON.stringify(item.questions)
         slidesHtml += `
             <section class="slide" style="color: black">
@@ -2402,7 +2419,7 @@ $scope.toggle_video_modal = function(act) {
         slidesHtml += `
             <section class="slide">
                 <video class="videoslider" controls>
-                    <source src="${item.url}" type="video/mp4">
+                    <source src="${item.currentActivity}" type="video/mp4">
                 </video>
             </section>
         `;
@@ -2801,8 +2818,7 @@ function queCounter(index) {
 }; 
 
 
-
-    $scope.allData = [
+  $scope.allData = [
      {
           block: "Bloque 1",
           lessons: [{
@@ -2821,13 +2837,14 @@ function queCounter(index) {
                   [
                     {
                       sort: 'intro',
-                      url: '',
-                      text: ''
+                      lesson: 'Lección 1: Rítmo'
                     },
-                      { 
-                      sort: 'video',
-                      url: 'https://www.mozart.studio/videos/leccion6.mp4',
-                      text: ''
+                    {
+                      sort: 'explainImg',
+                      greet1: '¡Hola ',
+                      greet2: '!, soy Mozart el gato' ,
+                      desc2: 'Seré tu profesor y en esta lección vamos a estudiar el primero de los 3 elementos más importantes en la música, el rítmo',
+                      img: 'https://lh3.googleusercontent.com/d/1smys9TBeetNUVB7fJlTxrf6AJl73mpS5'
                     },
                     {
                       sort: 'youtube',
@@ -2835,13 +2852,22 @@ function queCounter(index) {
                       text: ''
                     },
                     {
+                      sort: 'img',
+                      desc: 'Diagrama de ritmos',
+                      img: 'https://lh3.googleusercontent.com/d/1zhg--goushq7wK1IHdit5baxaojuK3Pr'
+                    },
+                    {
                       sort: 'quiz',
                       url: '',
                       text: ''
                     },
-                   
+                    { 
+                      sort: 'video',
+                      url: '',
+                      text: ''
+                    },
                     {
-                      sort: 'explain2',
+                      sort: 'end',
                       url: '',
                       text: ''
                     }
@@ -3555,6 +3581,7 @@ function queCounter(index) {
         ]
       }     
 ]
+  
   
   }])
 
