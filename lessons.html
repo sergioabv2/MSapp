@@ -2324,10 +2324,10 @@ $scope.toggle_video_modal = function(act) {
             <section class="slide">
                 <img src="https://lh3.googleusercontent.com/d/1Hv9WGtVuOhTwTcolJyMO7IIlZjjydQsU"  width="360">
                 <h3 style="margin-top: -10px">Actividad completada</h3>
-                <p>Has completado todos los pasos de esta lección. Pulsa la X para salir.</p>
+                <p>${item.desc}</p>
             </section>
         `; 
-    } else if (item.sort === 'explainImg') {
+    } else if (item.sort === 'catIntro') {
         slidesHtml += `
             <section class="slide">
                 <img  src="${item.img}"  style="border-radius: 10px !important; width: 90%; max-width: 500px">
@@ -2415,7 +2415,7 @@ $scope.toggle_video_modal = function(act) {
                 <p style="position: absolute; top: 20px;">Dale play al video</p>
             </section>  
         `;
-    } else if (item.sort === 'video') {
+    } /*else if (item.sort === 'video') {
         slidesHtml += `
             <section class="slide">
                 <video class="videoslider" controls>
@@ -2423,7 +2423,7 @@ $scope.toggle_video_modal = function(act) {
                 </video>
             </section>
         `;
-    }
+    }*/
   });
 
   // Inyectar el contenido de slides en el contenedor #panelWrap
@@ -2858,34 +2858,35 @@ function queCounter(index) {
                     },
                     {
                       sort: 'quiz',
-                      url: '',
-                      text: ''
-                    },
-                    { 
-                      sort: 'video',
-                      url: '',
-                      text: ''
+                      questions: [
+  {
+    numb: 1,
+    question: "¿Qué es el rítmo?",
+    answer: "La organización de los sonidos en el tiempo.",
+    options: [
+      "La velocidad a la que se toca una pieza musical.",
+      "La organización de los sonidos en el tiempo.",
+      "La altura de los sonidos dentro de una melodía.",
+      "El número de compases en una partitura."
+    ]
+  },
+  {
+    numb: 2,
+    question: "¿Qué es la métrica en música?",
+    answer: "La estructura rítmica que organiza los tiempos en compases.",
+    options: [
+      "La cantidad de notas en una escala musical.",
+      "La velocidad con la que se ejecuta una obra.",
+      "La intensidad con la que se tocan las notas.",
+      "La estructura rítmica que organiza los tiempos en compases."
+    ]
+  }]
                     },
                     {
                       sort: 'end',
-                      url: '',
-                      text: ''
+                      desc: 'Has completado todos los pasos de esta lección. Pulsa la X para salir y avanzar con la siguiente actividad.'
                     }
                   ]
-                  },
-            /*{
-                  title: 'Intervalos de 4ta y 5ta',
-                  icon: 'quiz',
-                  type: 'Block Test',
-                  media: 'quiz',
-                  package: 2
-                  },*/
-                {
-                  title: 'Ritmo y métrica',
-                  icon: 'bolt',
-                  type: 'Quick Test',
-                  media: 'quiz',
-                  package: 1
                   }
                 ]
               },
