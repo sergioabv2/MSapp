@@ -1307,6 +1307,26 @@ footer button.show{
     background: #007bff;
 }
 
+  
+  .button-container {
+    display: flex;
+    gap: 20px;
+    margin-top: -50px; 
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    font-size: 33px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
 </style>
 
 <body ng-app="materializeApp">
@@ -2157,7 +2177,8 @@ var app = angular.module('materializeApp', ['ui.materialize']);
 app.factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2415,22 +2436,32 @@ $scope.toggle_video_modal = function(act) {
                 <p style="position: absolute; top: 20px;">Dale play al video</p>
             </section>  
         `;
-    } /*else if (item.sort === 'video') {
+    } else if (item.sort === 'video') {
         slidesHtml += `
             <section class="slide">
-                <video class="videoslider" controls>
-                    <source src="${item.currentActivity}" type="video/mp4">
-                </video>
-            </section>
+             <div class="button-container">
+                        <button id="playButton${index}" class="control-btn" onclick="playVideo(${index})">
+                            <i class="ri-play-circle-fill"></i>
+                        </button>
+                        <button id="metronomeButton${index}" class="control-btn" onclick="playMetronome(${index})">
+                            <i class="ri-timer-fill"></i>
+                        </button>
+                    </div>
+                    <video class="videoslider" id="videoPlayer${index}" onended="showButton(${index})">
+                        <source src="${item.url}" type="video/mp4">
+                    </video>
+        <audio id="metronomeAudio${index}" src="https://www.mozart.studio/videos/metronome.mp3" style="display: none;"></audio>
+         
+                </section>
         `;
-    }*/
+    }
   });
 
   // Inyectar el contenido de slides en el contenedor #panelWrap
   $("#panelWrap").html(slidesHtml);
 
   
-  
+ 
 
 //const colorArray = ["#426F42", "#262626", "#36648B", "#683A5E", "#000000", "#36648B"];
   const colorArray = act.colors
@@ -2849,6 +2880,14 @@ function queCounter(index) {
                     {
                       sort: 'youtube',
                       url: 'https://www.youtube.com/embed/Q4r5gnfAtzs',
+                    },
+                     {
+                      sort: 'video',
+                      url: 'https://www.mozart.studio/videos/new.mp4',
+                    },
+                     {
+                      sort: 'video',
+                      url: 'https://www.mozart.studio/videos/new2.mp4',
                     },
                     {
                       sort: 'img',
@@ -5546,6 +5585,64 @@ let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
   }
   next_btn.classList.add("show"); //show the next button if user selected any option
 }
+  
+  
+  
+  
+  
+  
+function playVideo(index) {
+    const video = document.getElementById(`videoPlayer${index}`);
+    const button = document.getElementById(`playButton${index}`);
+  const audio = document.getElementById(`metronomeAudio${index}`);
+  const audioBtn = document.getElementById(`metronomeButton${index}`);
+
+    if (video) {
+        video.play();
+        button.style.display = 'none'; // Oculta el botón al reproducir
+      audioBtn.style.display = 'none';
+      audio.pause();
+    }
+}
+
+function showButton(index) {
+    const button = document.getElementById(`playButton${index}`);
+  const audio = document.getElementById(`metronomeButton${index}`);
+    if (button) {
+        button.style.display = 'block'; // Muestra el botón al terminar el video
+      audio.style.display = 'block';
+    }
+} 
+
+
+
+let metronomeSpeedIndex = {};
+
+function playMetronome(index) {
+    const audio = document.getElementById(`metronomeAudio${index}`);
+    
+    if (!audio) return;
+
+    if (!metronomeSpeedIndex[index]) {
+        metronomeSpeedIndex[index] = 0;
+    }
+
+    const speeds = [0.85, 1, 1.2, 0]; // La cuarta opción es detener
+
+    if (metronomeSpeedIndex[index] === 3) {
+        // Si es la cuarta vez, detener el audio y reiniciar el ciclo
+        audio.pause();
+        audio.currentTime = 0;
+        metronomeSpeedIndex[index] = 0;
+    } else {
+        // Ajustar la velocidad y reproducir
+        audio.playbackRate = speeds[metronomeSpeedIndex[index]];
+        audio.play();
+        metronomeSpeedIndex[index]++;
+    }
+}
+ 
+  
  /*
 const video = document.querySelector("video");
 const progress = document.querySelector(".progress__bar");
