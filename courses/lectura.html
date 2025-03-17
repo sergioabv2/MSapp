@@ -661,35 +661,7 @@ p.author {
       <div class="page-title category-title"></div>
 
       <section id="book_list">
-        <div class="toolbar row">
-          <div class="filter-options small-12 medium-9 columns">
-            <a href="#" 
-               class="filter-item" 
-               ng-class="{active: filterGenre === 'all'}" 
-               ng-click="filterGenre = 'all'">Todos</a>
-            <a href="#" 
-               class="filter-item" 
-               ng-class="{active: filterGenre === 'manual'}" 
-               ng-click="filterGenre = 'manual'">Manuales</a>
-            <a href="#" 
-               class="filter-item" 
-               ng-class="{active: filterGenre === 'sheet'}" 
-               ng-click="filterGenre = 'sheet'">Repertorio</a>
-            <a href="#" 
-               class="filter-item" 
-               ng-class="{active: filterGenre === 'repertoire'}" 
-               ng-click="filterGenre = 'repertoire'">Piezas finales</a>
-           
-          </div>
-
-          <div class="small-12 medium-3 columns">
-            <select class="sort-options" ng-model="sortOption">
-              <option value="" disabled selected>Ordenar por</option>
-              <option value="title">Alfabético</option>
-              <option value="-dateCreated">Más reciente</option>
-            </select>
-          </div>
-        </div>
+     
         <div class="grid-shuffle">
 
      <div class="showbox" ng-if="!userDataLoaded">
@@ -709,50 +681,12 @@ p.author {
       
           <ul id="grid" class="row" ng-if="status == 'ACTIVO'">
   
-  <div ng-if="filterGenre === 'sheet' && !antology.length" class="no-items-message">
-   <p>No tienes piezas para mostrar aún. </p>
-    <p> Avanza en más actividades para acceder a nuevo contenido. </p>
+ <div ng-if="lvl < 1" class="no-items-message">
+    <p> Avanza de nivel para acceder a nuevo contenido. </p>
   </div>
-  <div ng-if="filterGenre === 'repertoire' && !repertoire.length" class="no-items-message">
-    <p>No tienes piezas finales para mostrar aún.</p>
-    <p> Avanza en más actividades para acceder a nuevo contenido.
-    </p>
-  </div>
-
             
-            <li class="book-item small-12 medium-6 columns" 
-                ng-repeat="sheet in repertoire | filter:genreFilter | orderBy:sortOption">
-              <div class="bk-img">
-
-                    <div class="bk-front">
-                      <div class="bk-cover" 
-                           style="background-image: url('{{sheet.background}}')"></div>
-                    </div>
-              </div>
-              <div class="item-details">
-                <h3 class="book-item_title">{{sheet.title}}</h3>
-                <p class="author">por {{sheet.author}}</p>
-                <p> Grado {{sheet.lvl}}<br> {{sheet.style}}  </p>
-                <button ng-click="openPDF(sheet.url)" class="btn">Abrir</button>
-              </div>
-            </li> 
-            <li class="book-item small-12 medium-6 columns" ng-repeat="sheet in antology | filter:genreFilter | orderBy:sortOption" ng-if="lvl > sheet.lvl || (sheet.lvl == lvl && sheet.lsn <= lsn)">
-            
-              <div class="bk-img">
-            
-                    <div class="bk-front">
-                      <div class="bk-cover" 
-                           style="background-image: url('{{sheet.background}}')"></div>
-                    </div>
-          
-              </div>
-              <div class="item-details">
-                <h3 class="book-item_title">{{sheet.title}}</h3>
-                <p class="author">por {{sheet.author}}</p>
-                <p>Grado {{sheet.lvl}} </p>
-                <button ng-click="openPDF(sheet.url)" class="btn">Abrir</button>
-              </div>
-            </li>
+         
+  
               <li class="book-item small-12 medium-6 columns" ng-repeat="manual in manuals | filter:genreFilter | orderBy:sortOption" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq <= blq)">
                 
               <div class="bk-img">
@@ -766,7 +700,7 @@ p.author {
               <div class="item-details">
                 <h3 class="book-item_title">{{manual.title}}</h3>
                 <p class="author">Grado {{manual.lvl}}</p>
-                <p>Bloque {{manual.blq}} </p>
+                <p>ABRSM  </p>
                 <button ng-click="openPDF(manual.url)" class="btn">Abrir</button>
               </div>
             </li>
@@ -793,7 +727,8 @@ p.author {
 
   var requestData = { 
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -805,8 +740,6 @@ p.author {
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) { 
       $scope.lvl = response.data.lvl;
-    $scope.blq = response.data.blq;
-     $scope.lsn = response.data.lsn;
     $scope.status = response.data.status;
     $scope.repertoire = response.data.repertoire;
       $scope.userDataLoaded = true;
@@ -819,28 +752,18 @@ $scope.openURL = function(index) {
   window.open(url, '_blank');
 };
 
-
+  
 $scope.manuals = [
-    { 'title': 'Nivel 2 - B1', 'background': 'https://lh3.googleusercontent.com/d/1qsgmUvohMMn8LcQZLp-Zkk283MV2VmNy', 'url': 'https://drive.google.com/file/d/1zs8OzO57s1b0MTavriKWjMohnLjr39-d', 'lvl': 2, 'blq': 1, 'genre': 'manual'  },
-    { 'title': 'Nivel 1 - B3', 'background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'url': 'https://drive.google.com/file/d/1VuxMiv3W89OBAzxXaz6kzBkEyRxonnJB', 'lvl': 1, 'blq': 3, 'genre': 'manual'  },
-    { 'title': 'Nivel 1 - B2', 'background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'url': 'https://drive.google.com/file/d/10Q34O2uDPaj5ZG7bpYpx8BGHZ4Q18ZLB', 'lvl': 1, 'blq': 2, 'genre': 'manual'  },
-    { 'title': 'Nivel 1 - B1', 'background': 'https://lh3.googleusercontent.com/d/1Uf_sUg2ELZPF8t0fcuCdH6ZZOWrwzghM', 'url': 'https://drive.google.com/file/d/1Kghxri_BvRE0Ho4c2vMfrdBGp8HTmrGJ', 'lvl': 1, 'blq': 1, 'genre': 'manual'  },
-    { 'title': 'Nivel Preparatorio - B3', 'background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'url': 'https://drive.google.com/file/d/1vYZFwqvHFg6m097Ivk4uRGAY38-EUvEu', 'lvl': 0, 'blq': 3, 'genre': 'manual'  },
-    { 'title': 'Nivel Preparatorio - B2', 'background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'url': 'https://drive.google.com/file/d/1nxK06XODrHt2J6lScQz4JjthmPoc16Ec', 'lvl': 0, 'blq': 2, 'genre': 'manual'  },
-    { 'title': 'Nivel Preparatorio - B1', 'background': 'https://lh3.googleusercontent.com/d/12_KSNMB0Z3z9knY_8vIofHT3Xvl-JUj-', 'url': 'https://drive.google.com/file/d/1bufcRACzv0QKKJDoc6RYhC1m7irb-UPa', 'lvl': 0, 'blq': 1, 'genre': 'manual'  }
+  { 'title': 'SightReading 5', 'background': 'https://lh3.googleusercontent.com/d/13cqz3rAH7dPmLZovBPlTNkmjQF4O-W3z', 'url': 'https://drive.google.com/file/d/1a0XmQBAxtiXGZiYyo0yefeh1YbhdHsyF', 'lvl': 5, 'genre': 'basic'  },
+  { 'title': 'SightReading 4', 'background': 'https://lh3.googleusercontent.com/d/13cqz3rAH7dPmLZovBPlTNkmjQF4O-W3z', 'url': 'https://drive.google.com/file/d/1Reuj89M_b59o-Gyq73P6t-9OL7SbcN5z', 'lvl': 4, 'genre': 'basic'  },
+  { 'title': 'SightReading 3', 'background': 'https://lh3.googleusercontent.com/d/13cqz3rAH7dPmLZovBPlTNkmjQF4O-W3z', 'url': 'https://drive.google.com/file/d/1SQQWmqZcGTga4cOCf-reC0MdJP8E3V03', 'lvl': 3, 'genre': 'basic'  },
+  { 'title': 'SightReading 2', 'background': 'https://lh3.googleusercontent.com/d/13cqz3rAH7dPmLZovBPlTNkmjQF4O-W3z', 'url': 'https://drive.google.com/file/d/1czfZCFnOl6pQar9MoDJt3M1bAOF94JaR', 'lvl': 2, 'genre': 'basic'  },
+    { 'title': 'SightReading 1', 'background': 'https://lh3.googleusercontent.com/d/13cqz3rAH7dPmLZovBPlTNkmjQF4O-W3z', 'url': 'https://drive.google.com/file/d/1TClIYheHh-M0KJs1_17KJEYU8VVmK2DP', 'lvl': 1, 'genre': 'basic'  }
 ]; 
-  
-  $scope.antology = [
-    { 'title': 'Aria', 'author': 'Johann Sebastian Bach', 'background': 'https://lh3.googleusercontent.com/d/1WhaTn70R8qil68wjWdMAmLfa6Ij77dzC', 'url': 'https://drive.google.com/file/d/1WhaTn70R8qil68wjWdMAmLfa6Ij77dzC', 'lvl': 2, 'genre': 'sheet'  },
-    { 'title': 'Minuet', 'author': 'Leopold Mozart', 'background': 'https://lh3.googleusercontent.com/d/1wEngXDEnzxCH-nUdvqpyP9TJl2LT7Z0X', 'url': 'https://drive.google.com/file/d/1wEngXDEnzxCH-nUdvqpyP9TJl2LT7Z0X', 'lvl': 2, 'genre': 'sheet'  },
-    { 'title': 'Allemande', 'author': 'Johann Herman Shein', 'background': 'https://lh3.googleusercontent.com/d/1ArvTOodKca-OExVvFaQnMYw3aj71mizc', 'url': 'https://drive.google.com/file/d/1ArvTOodKca-OExVvFaQnMYw3aj71mizc', 'lvl': 2, 'genre': 'sheet'  },
-    { 'title': 'The old windmill', 'author': 'Dunhill', 'background': 'https://lh3.googleusercontent.com/d/1Yf667gGJI9QBfA0xMqvAiiyKUhF-HvaZ', 'url': 'https://drive.google.com/file/d/1Yf667gGJI9QBfA0xMqvAiiyKUhF-HvaZ', 'lvl': 1, 'genre': 'sheet'  },
-    { 'title': 'Sonatina', 'author': 'Cornelius Gurlitt', 'background': 'https://lh3.googleusercontent.com/d/1F7mj27XUDWz6-8R6adN6f6vLUnJAEOio', 'url': 'https://drive.google.com/file/d/1F7mj27XUDWz6-8R6adN6f6vLUnJAEOio', 'lvl': 0, 'genre': 'sheet'  }
-]; 
-  
 
 
-  $scope.filterGenre = 'manual'; // Filtro inicial
+
+  $scope.filterGenre = 'all'; // Filtro inicial
   $scope.sortOption = '';     // Sin orden inicial
 
   $scope.genreFilter = function(sheet) {
