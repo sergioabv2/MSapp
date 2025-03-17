@@ -1642,7 +1642,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-  <script id="solfeo.html" type="text/ng-template">
+  <script id="books.html" type="text/ng-template">
     <ion-view>
      <ion-nav-bar class="bar-light">
       <ion-nav-buttons side="left">
@@ -1652,13 +1652,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </ion-nav-buttons>
     </ion-nav-bar>
       <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/solfeo" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/books" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
     </ion-view>
   </script>
 
   
-  <script id="armonia.html" type="text/ng-template">
+  <script id="theory.html" type="text/ng-template">
     <ion-view>
      <ion-nav-bar class="bar-light">
       <ion-nav-buttons side="left">
@@ -1668,7 +1668,22 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </ion-nav-buttons>
     </ion-nav-bar>
       <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/armonia" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/theory" frameborder="0" allowfullscreen ></iframe></div> 
+      </ion-content>
+    </ion-view>
+  </script>
+
+         <script id="repertoire.html" type="text/ng-template">
+    <ion-view>
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBack()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+      <ion-content>
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/repertoire" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
     </ion-view>
   </script>
@@ -1705,20 +1720,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-view>
   </script>
 
-       <script id="biografias.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/biografias" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
+    
 
         <script id="historia.html" type="text/ng-template">
     <ion-view>
@@ -2190,19 +2192,27 @@ app
         }
       }
     }) 
-       .state('menu.solfeo', {
-      url: "/solfeo",
+       .state('menu.books', {
+      url: "/books",
       views: {
         'menuContent': {
-          templateUrl: "solfeo.html"
+          templateUrl: "books.html"
         }
       }
     })
-        .state('menu.armonia', {
-      url: "/armonia",
+        .state('menu.theory', {
+      url: "/theory",
       views: {
         'menuContent': {
-          templateUrl: "armonia.html"
+          templateUrl: "theory.html"
+        }
+      }
+    })
+          .state('menu.repertoire', {
+      url: "/repertoire",
+      views: {
+        'menuContent': {
+          templateUrl: "repertoire.html"
         }
       }
     })
@@ -2219,14 +2229,6 @@ app
       views: {
         'menuContent': {
           templateUrl: "lectura.html"
-        }
-      }
-    })
-        .state('menu.biografias', {
-      url: "/biografias",
-      views: {
-        'menuContent': {
-          templateUrl: "biografias.html"
         }
       }
     })
