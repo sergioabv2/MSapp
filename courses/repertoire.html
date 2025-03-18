@@ -750,8 +750,8 @@ p.author {
     <p> Avanza de nivel para acceder a nuevo contenido. </p>
   </div>
   
-              <li class="book-item small-12 medium-6 columns" ng-repeat="manual in manuals | filter:genreFilter | orderBy:sortOption" ng-if="lvl > manual.lvl || (manual.lvl == lvl && manual.blq > blq) || (manual.lvl == lvl && manual.blq == blq && manual.lsn >= lsn)">
-                
+              <li class="book-item small-12 medium-6 columns" ng-repeat="manual in manuals | filter:genreFilter | orderBy:sortOption" ng-if="lvl > manual.lvl || (manual.lvl == lvl && blq > manual.blq) || (manual.lvl == lvl && manual.blq == blq && lsn >= manual.lsn)">
+                 
               <div class="bk-img">
             
                     <div class="bk-front">
@@ -791,7 +791,8 @@ p.author {
 
   var requestData = { 
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
