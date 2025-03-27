@@ -8,7 +8,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 
 
+<style>
+  article{
+  background-color: #f5f6f6 !important;
+}
+input{
+  background-color: white !important;
+}
 
+dialog{
+  background-color: #f5f6f6 !important;
+}
+
+
+
+  @media (min-width: 500px) {  
+    .youtubeframe{
+      height: 320px !important;
+    }
+}
+
+ .youtubeframe{
+      border-radius: 10px !important;
+      height: 200px ;
+      max-width: 500px;
+
+    }
+</style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
 
@@ -206,3 +232,581 @@
     </dialog>
   </main>
 </body>
+
+
+
+<script>
+  
+import confetti from "https://esm.run/canvas-confetti@1";
+
+   /*   
+window.anim = function() {
+            confetti({
+                particleCount: 150,
+                spread: 60
+            });
+        };*/
+
+ 
+var app = angular.module('postApp', [])
+ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$timeout', function($scope, $http, $interval, $sce, $timeout) {
+    $scope.trustAsResourceUrl = function(url) {
+        return $sce.trustAsResourceUrl(url);
+    };
+   $scope.userDataLoaded = true
+     $scope.data = [];
+  $scope.filteredData = [];
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 6;
+  $scope.totalPages = 1;
+
+ 
+    $http({
+      method: 'GET',
+      url: 'https://script.google.com/macros/s/AKfycbxN34IjjTFdUaPKeyLFI5-VCzDcBznvBB96B1IbWLAlSbqjISYOTK08Z07XrC2xDuwV/exec',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      } 
+    }).then(function(response) {
+      $scope.data = response.data.posts; 
+       $scope.profileData = response.data.profiles
+      $scope.filterPosts('all');
+      $scope.updatePagination();
+      $scope.userDataLoaded = false
+       
+      $scope.feed = response.data.feed;
+
+      
+       $scope.data.forEach(post => {
+        if (post.type === 'poll') {
+            processPollData(post);
+        }
+    });
+      
+     
+           
+    });
+   
+   
+    $scope.lvlColor = function(lvl){
+  if(lvl == 0){
+    return "#F44336"
+  }else if(lvl == 1){
+    return "#9024dc"
+  }else if(lvl == 2){
+    return "#1894cc"
+  }else if(lvl == 3){
+    return "#489454"
+  }else if(lvl == 4){
+    return "#f0ac14"
+  }else if(lvl == 5){
+    return "#485cb4"
+  }else if(lvl == 6){
+    return "#08949c"
+  }
+}     
+     
+$scope.getEvent = function(task){
+  if(task.split(" ")[0] == "Nivel"){
+    return " ha subido de nivel"
+  }else{
+    return " ha entregado"
+  }
+}
+     
+     
+     $scope.getLevel = function(lvl){
+  if(lvl == 0){
+     return "Nivel Preparatorio"
+  }else{
+    return "Nivel "+lvl.toString()
+  }
+}
+   
+   function processPollData(post) {
+    post.totalVotes = post.likes.reduce((total, opt) => total + opt.votes.length, 0);
+    post.likes.forEach(opt => {
+        opt.pct = post.totalVotes > 0 ? (opt.votes.length / post.totalVotes) * 100 : 0;
+    });
+}
+   
+$scope.isButton = true;
+
+ $scope.addVote = function(post, opt) {
+    if ($scope.isButton) {
+        $scope.isButton = false;
+      
+        opt.votes.push("Usuario");
+        processPollData(post);
+        opt.animate = false;
+       post.likes.forEach(option => {
+         option.isButton = false; 
+         option.animate = true; 
+            });
+    } 
+};
+
+
+
+   
+      
+    $scope.user = "@anonimo"
+
+ var requestData = { 
+        action: "getUserName",
+        token: localStorage.getItem('MStoken')
+    };
+
+    var config = { 
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+
+$http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+      $scope.user = response.data
+    }); 
+
+   
+   
+     $scope.sendLike = function(postid){
+ var requestData = {
+        action: "newLike",
+        token: localStorage.getItem('MStoken'),
+        postid: postid
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+    });
+}
+
+
+
+    $scope.sendComment = function(postid, comment){
+ var requestData = {
+        action: "newComment",
+        token: localStorage.getItem('MStoken'),
+        comment: comment,
+        postid: postid
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+    });
+}
+   
+   
+
+  $scope.updatePagination = function() {
+    $scope.totalPages = Math.ceil($scope.filteredData.length / $scope.itemsPerPage);
+    $scope.currentPage = 1;
+  };
+
+  $scope.getPages = function() {
+    var pages = [];
+    for (var i = 1; i <= $scope.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  $scope.setPage = function(page) {
+    if (page >= 1 && page <= $scope.totalPages) {
+      $scope.currentPage = page;
+    }
+  };
+
+  $scope.prevPage = function() {
+    if ($scope.currentPage > 1) {
+      $scope.currentPage--;
+    }
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.totalPages) {
+      $scope.currentPage++;
+    }
+  };
+
+  $scope.filterPosts = function(type) {
+    $scope.filter = type;
+   
+    if (type === 'all') {
+      $scope.filteredData = $scope.data;
+    }else if(type === 'both'){
+      $scope.filteredData = $scope.data.filter(function(post) {
+        return post.type === 'text' || post.type === 'poll';
+      });
+      
+    } else {
+      $scope.filteredData = $scope.data.filter(function(post) {
+        return post.type === type;
+      });
+    }
+   
+  
+     $timeout(function() {
+            $('.post').hide().fadeIn(400);
+        }, 100);
+    $scope.updatePagination();
+  };
+
+
+   
+$scope.openModal = function(post) {
+    $scope.selectedPost = post;
+    var userInput = prompt("Agregar comentario:");
+
+    if (userInput !== null) {
+        var newComment = { user: $scope.user, comment: userInput };
+        
+        // Encuentra el objeto correspondiente en $scope.data
+        var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
+        if (selectedDataItem) {
+            // Agrega el nuevo comentario al arreglo de comentarios
+            selectedDataItem.comments.push(newComment);
+          $scope.sendComment(post.id, userInput)
+        }
+    }
+};
+   
+   
+   
+    $scope.newPost = function(data) {
+      let ytVideoURL = $('#ytVideoURL').attr('ytVideoURL');
+      
+      if(ytVideoURL){
+        var post =  {
+    "user": "Test",
+    "type": "youtube",
+           "height": 150,
+    "url": ytVideoURL,
+    "date": [1], 
+    "likes": [],
+     "comments": []  
+        }
+      }else{
+           var post =  {
+          "user": "Test",
+          "type": "text",
+             "height": 0,
+          "url": data,
+          "date": [1], 
+          "likes": [],
+           "comments": []  
+        }
+     }
+    $scope.data.unshift(post)
+      $scope.newText = ""; 
+       $('#video-details').html('');
+     $('#ytVideoURL').attr('ytVideoURL', '');
+}
+   
+
+
+   $scope.dangerButtonActive = []; 
+
+$scope.newLike = function(index, post) {
+    if (!$scope.dangerButtonActive[index]) {
+        confetti({
+            particleCount: 150,
+            spread: 60
+        }); 
+        $scope.dangerButtonActive[index] = true;
+      $scope.sendLike(post.id)
+    } 
+    $scope.selectedPost = post;
+    var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
+
+    if (selectedDataItem) {
+        // Verifica si el usuario ya ha dado "like"
+        if (!selectedDataItem.likes.includes($scope.user)) {
+            // Agrega el nuevo "like" al arreglo de likes
+            selectedDataItem.likes.push($scope.user);
+        } 
+    }
+};
+   
+   
+$scope.calculateTimeAgo = function(alertDate) {
+  const alertDateObj = new Date(alertDate);
+  const today = new Date(); // Fecha actual
+  const timeDiff = Math.abs(today - alertDateObj); // Diferencia en milisegundos
+
+  const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Días completos
+  const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // Horas restantes
+  const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)); // Minutos restantes
+
+  if (days > 0) {
+    return `${days} día(s)`;
+  } else if (hours > 0) {
+    return `${hours} hora(s)`;
+  } else {
+    return `${minutes} minuto(s)`;
+  }
+};
+
+
+ 
+
+   $scope.currentSection = '#about';
+   $scope.handleButtonClick = function(section) {
+        $scope.currentSection = section;
+    };
+   $scope.handleUserProfile = function(username) {
+      $scope.currentMain = username;
+     if(username != "Mozart Appcademy"){
+        $('#profileModal').modal('show');
+     }
+     
+    }; 
+    
+   
+   $scope.youtubeModal = function() {
+      $('#youtubeModal').modal('show');
+    };
+ 
+   
+     $scope.filterByLevel = function(lsn) {
+    return function(entry) {
+    return entry.index <= lsn;
+  };
+};
+
+
+   
+}]);
+
+
+
+
+  $(document).ready(function () {
+  // Inicializa fancybox
+  $(".fancybox").fancybox();
+
+  // Evita que el formulario recargue la página
+  $('#search-form').submit(function (e) {
+    e.preventDefault();
+  });
+
+$('#results').on('click', '.select-video', function (e) {
+  e.preventDefault();
+
+  // Obtiene los datos del video seleccionado
+  let videoTitle = $(this).data('title');
+  let videoUrl = $(this).data('url');
+  let videoThumbnail = $(this).data('thumb');
+
+
+  // Actualiza el atributo ytVideoURL con la URL del video
+  $('#ytVideoURL').attr('ytVideoURL', videoUrl);
+
+    $('#video-details').html(`
+    <div class="video-info" style="position: relative; display: inline-block;">
+      <img src="${videoThumbnail}" style="width: 120px; height: 90px; margin-right: 10px;">
+      <span>${videoTitle}</span>
+       <button 
+  class="remove-youtube-btn" 
+  style="
+    position: absolute; 
+    top: -5px; 
+    right: -5px; 
+    background: red; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    font-size: 15px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;"
+>
+  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
+</button>
+    </div>
+  `);
+
+  $('#video-details').on('click', '.remove-youtube-btn', function () {
+  $('#video-details').html('');
+  $('#ytVideoURL').attr('ytVideoURL', '');
+});
+  
+  // Cierra el modal
+  $('#youtubeModal').modal('hide');
+  $('#results').html('');
+   $('#query').val('');
+});
+
+
+  
+   $('#uploadBtn').on('click', function () {
+    $('#uploadImage').click();
+  });
+
+  // Maneja la subida de imagen
+  $('#uploadImage').on('change', function (event) {
+    let file = event.target.files[0]; // Obtén el archivo
+    if (file) {
+      let reader = new FileReader();
+
+      // Convierte el archivo a Base64
+      reader.onload = function (e) {
+        let base64Image = e.target.result;
+
+        // Muestra la imagen en el contenedor #img-details
+       $('#img-details').html(`
+  <div class="uploaded-img-container" style="position: relative; display: inline-block;">
+    <img src="${base64Image}" alt="Uploaded Image" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc; border-radius: 5px;">
+   <button 
+  class="remove-image-btn" 
+  style="
+    position: absolute; 
+    top: -5px; 
+    right: -5px; 
+    background: red; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    font-size: 15px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;"
+>
+  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
+</button>
+
+  </div>
+`);
+
+        // Guarda el Base64 en el atributo imgData
+        $('#imgData').attr('imgData', base64Image);
+      };
+
+      // Lee el archivo como Base64
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  
+  $('#img-details').on('click', '.remove-image-btn', function () {
+  // Limpia el contenedor de imagen
+  $('#img-details').html('');
+  // Limpia el atributo imgData
+  $('#imgData').attr('imgData', '');
+});
+ 
+}); 
+
+function search() {
+  // Limpia resultados anteriores
+  $('#results').html('');
+
+  // Obtén el valor del input
+  let q = $('#query').val();
+
+ 
+  $.get(
+    "https://www.googleapis.com/youtube/v3/search",
+    {
+      part: 'snippet, id',
+      q: q,
+      type: 'video', 
+      key: 'AIzaSyBRfk0b73-DtIk7UNdpItlZHlmMtNcVsUA'
+    },
+    function (data) {
+      $.each(data.items, function (i, item) {
+        // Genera el HTML de cada resultado
+        let output = getOutput(item);
+
+        // Añade los resultados al DOM
+        $('#results').append(output);
+      });
+    }
+  );
+   
+  /*
+    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
+
+    var validationData = {
+      redirect: "follow",
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify({
+        action: "youtubeApi",
+        q: q 
+      }),
+      credentials: "omit"
+    };
+
+  fetch(api, validationData)
+  .then(response => response.text())
+  .then(res => {
+    var validation = JSON.parse(res);
+    validation.forEach(item => {
+          $('#results').append(getOutput(item));
+        });
+  })
+*/
+
+  
+  
+  
+}
+
+function getOutput(item) {
+  // Extrae información del video
+  let videoId = item.id.videoId;
+  let title = item.snippet.title;
+  let description = item.snippet.description;
+  let thumb = item.snippet.thumbnails.high.url;
+  let channelTitle = item.snippet.channelTitle;
+
+  // Construye el HTML de salida con atributos data-* para los datos
+  let output = `
+    <li>
+      <div class="list-left">
+        <img src="${thumb}" alt="${title}">
+      </div>
+      <div class="list-right">
+        <h3 style="font-size: 15px;">
+          <a 
+            href="#" 
+            class="select-video" 
+            data-title="${title}" 
+            data-url="https://www.youtube.com/embed/${videoId}"
+            data-thumb="${thumb}"
+            >
+            ${title}
+          </a>
+        </h3>
+        <small>por <span class="cTitle">${channelTitle}</span></small>
+        <p style="font-size: 10px;">${description}</p>
+      </div>
+    </li>
+    <div class="clearfix"></div>
+  `;
+
+  return output;
+}
+</script>
