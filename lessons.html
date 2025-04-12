@@ -2177,7 +2177,8 @@ var app = angular.module('materializeApp', ['ui.materialize']);
 app.factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2362,72 +2363,6 @@ $scope.toggle_video_modal = function(act) {
                 <p>${item.desc}</p>
             </section>
         `; 
-    }else if (item.sort === 'quiz') {
-      var itemQuestions = JSON.stringify(item.questions)
-        slidesHtml += `
-            <section class="slide" style="color: black">
-               <p style="position: absolute; top: 20px; color: white !important;">Dale click en comenzar para contestar el Quiz</p>
-                 <div class="start_btn"><button>Comenzar</button></div>
-
-
-    <div class="info_box">
-        <div class="info-title"><span>Reglas del Quiz</span></div>
-        <div class="info-list">
-           <div class="info">1. Responderás 10 preguntas</div>
-            <div class="info">2. Tienes <span>15 segundos</span> para responder cada pregunta.</div>
-            <div class="info">3. Una vez respondas, no puedes cambiar tu respuesta.</div>
-            <div class="info">4. No puedes salir del quiz mientras hayas iniciado.</div>
-            <div class="info">5. Tu puntaje se calcula de acuerdo a la cantidad de respuestas correctas.</div>
-        </div>
-        <div class="buttons">
-            <button class="quit">Salir</button>
-            <button class="restart">Continuar</button>
-        </div>
-    </div>
-
-    <div class="quiz_box">
-        <header>
-            <div class="title">Quick quiz</div>
-            <div class="timer">
-                <div class="time_left_txt">Tiempo</div>
-                <div class="timer_sec">15</div>
-            </div>
-            <div class="time_line"></div>
-        </header>
-        <section style="margin-top: 10px;">
-            <div class="que_text">
-            </div>
-            <div class="option_list">
-            </div>
-            <div id="currentQuestion" currentQuestion=0 style="display: none">
-            </div>
-             <div id="userScore" userScore=0 style="display: none">
-            </div>
-             <div id="questions" data-questions='${itemQuestions}' style="display: none">
-            </div>
-        </section>
-
-        <footer>
-            <div class="total_que">
-            </div>
-            <button class="next_btn">Siguiente</button>
-        </footer>
-    </div>
-
-    <div class="result_box">
-        <div class="icon">
-            <i class="fas fa-crown"></i>
-        </div>
-        <div class="complete_text">Has completado el Quiz!</div>
-        <div class="score_text">
-        </div>
-        <div class="buttons">
-          <button class="quit">Salir</button>
-            <button class="restart">Reiniciar</button>
-        </div>
-    </div>
-            </section>
-        `;
     } else if (item.sort === 'youtube') {
         slidesHtml += `
             <section class="slide" >
@@ -2605,243 +2540,7 @@ function newSize() {
   });
 }
 
-
-
-  
-//selecting all required elements
-const start_btn = document.querySelector(".start_btn button");
-const info_box = document.querySelector(".info_box");
-const exit_btn = info_box.querySelector(".buttons .quit");
-const continue_btn = info_box.querySelector(".buttons .restart");
-const quiz_box = document.querySelector(".quiz_box");
-const result_box = document.querySelector(".result_box");
-const option_list = document.querySelector(".option_list");
-const time_line = document.querySelector("header .time_line");
-const timeText = document.querySelector(".timer .time_left_txt");
-const timeCount = document.querySelector(".timer .timer_sec");
-  var currentQuestion = document.getElementById("currentQuestion")
-  const questionsElement = document.querySelector("#questions");
-// const questionsRaw = questionsElement.dataset.questions;
-   const questions = JSON.parse(questionsElement.dataset.questions);
-  
-
-// if startQuiz button clicked 
-start_btn.onclick = () => {
-  info_box.classList.add("activeInfo"); 
- // alert(questionsRaw)
-  //  alert(questions)
-};
-
-// if exitQuiz button clicked
-exit_btn.onclick = () => {
-  info_box.classList.remove("activeInfo"); //hide info box
-};
-
-// if continueQuiz button clicked
-continue_btn.onclick = () => {
-  info_box.classList.remove("activeInfo"); //hide info box
-  quiz_box.classList.add("activeQuiz"); //show quiz box
-  showQuetions(0); //calling showQestions function
-  queCounter(1); //passing 1 parameter to queCounter
-  startTimer(15); //calling startTimer function
-  startTimerLine(0); //calling startTimerLine function
-};
-
-let timeValue = 15;
-let que_count = 0;
-let que_numb = 1;
-let userScore = 0;
-let counter;
-let counterLine;
-let widthValue = 0;
- 
-
-const restart_quiz = result_box.querySelector(".buttons .restart");
-const quit_quiz = result_box.querySelector(".buttons .quit");
-
-// if restartQuiz button clicked
-restart_quiz.onclick = () => {
-  quiz_box.classList.add("activeQuiz"); //show quiz box
-  result_box.classList.remove("activeResult"); //hide result box
-  timeValue = 15;
-  que_count = 0;
-  que_numb = 1;
-  userScore = 0;
-  widthValue = 0;
-   $("#currentQuestion").attr('currentQuestion', 0);  
-  showQuetions(que_count); //calling showQestions function
-  queCounter(que_numb); //passing que_numb value to queCounter
-  clearInterval(counter); //clear counter
-  clearInterval(counterLine); //clear counterLine
-  startTimer(timeValue); //calling startTimer function
-  startTimerLine(widthValue); //calling startTimerLine function
-  timeText.textContent = "Time Left"; //change the text of timeText to Time Left
-  next_btn.classList.remove("show"); //hide the next button
-};
-
-// if quitQuiz button clicked
-quit_quiz.onclick = () => {
-  window.location.reload(); //reload the current window
-};
-
-const next_btn = document.querySelector("footer .next_btn");
-const bottom_ques_counter = document.querySelector("footer .total_que");
-
-// if Next Que button clicked
-next_btn.onclick = () => {
-  if (que_count < questions.length - 1) {
-    //if question count is less than total question length
-    que_count++; //increment the que_count value
-    que_numb++; //increment the que_numb value
-     $("#currentQuestion").attr('currentQuestion', que_count);  
-    showQuetions(que_count); //calling showQestions function
-    queCounter(que_numb); //passing que_numb value to queCounter
-    clearInterval(counter); //clear counter
-    clearInterval(counterLine); //clear counterLine
-    startTimer(timeValue); //calling startTimer function
-    startTimerLine(widthValue); //calling startTimerLine function
-    timeText.textContent = "Time Left"; //change the timeText to Time Left
-    next_btn.classList.remove("show"); //hide the next button
-  } else {
-    clearInterval(counter); //clear counter
-    clearInterval(counterLine); //clear counterLine
-    showResult(); //calling showResult function
-  }
-};
-
-// getting questions and options from array
-function showQuetions(index) {
-  const que_text = document.querySelector(".que_text");
-
-  //creating a new span and div tag for question and option and passing the value using array index
-  let que_tag =
-    "<span>" +
-    questions[index].numb +
-    ". " +
-    questions[index].question +
-    "</span>";
-  let option_tag =
-    '<div class="option"><span>' +
-    questions[index].options[0] + 
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[1] +
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[2] +
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[3] +
-    "</span></div>";
-  que_text.innerHTML = que_tag; //adding new span tag inside que_tag
-  option_list.innerHTML = option_tag; //adding new div tag inside option_tag
-
-  const option = option_list.querySelectorAll(".option");
-
-  // set onclick attribute to all available options
-  for (i = 0; i < option.length; i++) {
-    option[i].setAttribute("onclick", "optionSelected(this)");
-  }
 }
-// creating the new div tags which for icons
-let tickIconTag = '<div class="icon tick"><i class="fas fa-check"></i></div>';
-let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
-  
-  
-
-
-function showResult() {
-  info_box.classList.remove("activeInfo"); //hide info box
-  quiz_box.classList.remove("activeQuiz"); //hide quiz box
-  result_box.classList.add("activeResult"); //show result box
-  const scoreText = result_box.querySelector(".score_text");
-  if (userScore > 7) {
-    // if user scored more than 3
-    //creating a new span tag and passing the user score number and total question number
-    let scoreTag =
-      "<span>Excelente trabajo!, obtuviste " +
-      userScore +
-      " de " +
-      questions.length +
-      " preguntas </span>";
-    scoreText.innerHTML = scoreTag; //adding new span tag inside score_Text
-  } else if (userScore > 4) {
-    // if user scored more than 1
-    let scoreTag =
-      "<span>Gran trabajo!, obtuviste " +
-      userScore +
-      " de " +
-      questions.length +
-      " preguntas </span>";
-    scoreText.innerHTML = scoreTag;
-  } else {
-    // if user scored less than 1
-    let scoreTag =
-      "<span>Buen intento!, obtuviste " +
-      userScore +
-      " de " +
-      questions.length +
-      " preguntas </span>";
-    scoreText.innerHTML = scoreTag;
-  }
-}
-
-function startTimer(time) {
-  counter = setInterval(timer, 1000);
-  function timer() {
-    timeCount.textContent = time; //changing the value of timeCount with time value
-    time--; //decrement the time value
-    if (time < 9) {
-      //if timer is less than 9
-      let addZero = timeCount.textContent;
-      timeCount.textContent = "0" + addZero; //add a 0 before time value
-    }
-    if (time < 0) {
-      //if timer is less than 0
-      clearInterval(counter); //clear counter
-      timeText.textContent = "Time Off"; //change the time text to time off
-      const allOptions = option_list.children.length; //getting all option items
-      let correcAns = questions[que_count].answer; //getting correct answer from array
-      for (i = 0; i < allOptions; i++) {
-        if (option_list.children[i].textContent == correcAns) {
-          //if there is an option which is matched to an array answer
-          option_list.children[i].setAttribute("class", "option correct"); //adding green color to matched option
-          option_list.children[i].insertAdjacentHTML("beforeend", tickIconTag); 
-        }
-      }
-      for (i = 0; i < allOptions; i++) {
-        option_list.children[i].classList.add("disabled"); //once user select an option then disabled all options
-      }
-      next_btn.classList.add("show"); //show the next button if user selected any option
-    }
-  }
-}
-
-function startTimerLine(time) {
-  counterLine = setInterval(timer, 29);
-  function timer() {
-    time += 1; //upgrading time value with 1
-    time_line.style.width = time + "px"; //increasing width of time_line with px by time value
-    if (time > 549) {
-      //if time value is greater than 549
-      clearInterval(counterLine); //clear counterLine
-    }
-  }
-}
-
-function queCounter(index) {
-  //creating a new span tag and passing the question number and total question
-  let totalQueCounTag =
-    "<span><p>" +
-    index +
-    " de " +
-    questions.length +
-    " preguntas</span>";
-  bottom_ques_counter.innerHTML = totalQueCounTag; //adding new span tag inside bottom_ques_counter
-}
-
-
-};
 
    $scope.goTo = function(url) {
   $window.open(url, '_blank');
@@ -2862,7 +2561,7 @@ function queCounter(index) {
                   icon: 'smart_display',
                   type: 'Lección',
                   media: 'video',
-                  colors: ["#426F42", "#262626", "#36648B", "#683A5E", "#000000", "#36648B"],
+                  colors: ["#426F42", "#262626", "#36648B", "#683A5E", "#000000", "#36648B", "#000000"],
                   content: 
                   [
                     {
@@ -2893,32 +2592,7 @@ function queCounter(index) {
                       desc: 'Diagrama de ritmos',
                       img: 'https://lh3.googleusercontent.com/d/1zhg--goushq7wK1IHdit5baxaojuK3Pr'
                     },
-                    {
-                      sort: 'quiz',
-                      questions: [
-  {
-    numb: 1,
-    question: "¿Qué es el rítmo?",
-    answer: "La organización de los sonidos en el tiempo.",
-    options: [
-      "La velocidad a la que se toca una pieza musical.",
-      "La organización de los sonidos en el tiempo.",
-      "La altura de los sonidos dentro de una melodía.",
-      "El número de compases en una partitura."
-    ]
-  },
-  {
-    numb: 2,
-    question: "¿Qué es la métrica en música?",
-    answer: "La estructura rítmica que organiza los tiempos en compases.",
-    options: [
-      "La cantidad de notas en una escala musical.",
-      "La velocidad con la que se ejecuta una obra.",
-      "La intensidad con la que se tocan las notas.",
-      "La estructura rítmica que organiza los tiempos en compases."
-    ]
-  }]
-                    },
+                   
                     {
                       sort: 'end',
                       desc: 'Has completado todos los pasos de esta lección. Pulsa la X para salir y avanzar con la siguiente actividad.'
@@ -2942,102 +2616,7 @@ function queCounter(index) {
                       url: '',
                       text: ''
                     },
-                    {
-                      sort: 'quiz',
-                      url: '',
-                      questions: [
-  {
-    numb: 1,
-    question: "What does HTML stand for?",
-    answer: "Hyper Text Markup Language",
-    options: [
-      "Hyper Text Preprocessor",
-      "Hyper Text Markup Language",
-      "Hyper Text Multiple Language",
-      "Hyper Tool Multi Language"
-    ]
-  },
-  {
-    numb: 2,
-    question: "What does CSS stand for?",
-    answer: "Cascading Style Sheet",
-    options: [
-      "Common Style Sheet",
-      "Colorful Style Sheet",
-      "Computer Style Sheet",
-      "Cascading Style Sheet"
-    ]
-  },
-  {
-    numb: 3,
-    question: "What does PHP stand for?",
-    answer: "Hypertext Preprocessor",
-    options: [
-      "Hypertext Preprocessor",
-      "Hypertext Programming",
-      "Hypertext Preprogramming",
-      "Hometext Preprocessor"
-    ]
-  },
-  {
-    numb: 4,
-    question: "What does SQL stand for?",
-    answer: "Structured Query Language",
-    options: [
-      "Stylish Question Language",
-      "Stylesheet Query Language",
-      "Statement Question Language",
-      "Structured Query Language"
-    ]
-  },
-  {
-    numb: 5,
-    question: "What does XML stand for?",
-    answer: "eXtensible Markup Language",
-    options: [
-      "eXtensible Markup Language",
-      "eXecutable Multiple Language",
-      "eXTra Multi-Program Language",
-      "eXamine Multiple Language"
-    ]
-  },
-  {
-    numb: 6,
-    question: "When was HTML5 created?",
-    answer: "1993",
-    options: ["1157", "1985", "1993", "1991"]
-  },
-  {
-    numb: 7,
-    question: "When was CSS proposed?",
-    answer: "1994",
-    options: ["1994", "1986", "1997", "2003"]
-  },
-  {
-    numb: 8,
-    question: "When was CodePen.io created?",
-    answer: "2012",
-    options: ["2013", "2012", "2009", "2010"]
-  },
-  {
-    numb: 9,
-    question: "What are the three coding languages featured in CodePen?",
-    answer: "HTML,CSS and JavaScript",
-    options: [
-      "HTML,C++ and JSON",
-      "Javascript,CSS and SQL",
-      "HTML,CSS and JavaScript",
-      "C++,C# and C"
-    ]
-  },
-  {
-    numb: 10,
-    question: "When was JavaScript created?",
-    answer: "1996",
-    options: ["2005", "1991", "1996", "2001"]
-  }
-]
-                    },
+               
                   
                     {
                       sort: 'explain2',
@@ -5537,56 +5116,6 @@ function queCounter(index) {
 
 
 
-
-function optionSelected(answer) {
-  
-  const start_btn = document.querySelector(".start_btn button");
-const info_box = document.querySelector(".info_box");
-const exit_btn = info_box.querySelector(".buttons .quit");
-const continue_btn = info_box.querySelector(".buttons .restart");
-const quiz_box = document.querySelector(".quiz_box");
-const result_box = document.querySelector(".result_box");
-const option_list = document.querySelector(".option_list");
-const time_line = document.querySelector("header .time_line");
-const timeText = document.querySelector(".timer .time_left_txt");
-const timeCount = document.querySelector(".timer .timer_sec");
-  let tickIconTag = '<div class="icon tick"><i class="fas fa-check"></i></div>';
-let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
-  const next_btn = document.querySelector("footer .next_btn");
- var que_counter = $("#currentQuestion").attr("currentQuestion");
-   var userScore = $("#userScore").attr("userScore"); 
-  const questionsElement = document.querySelector("#questions");
-   const questions = JSON.parse(questionsElement.dataset.questions);
-  let userAns = answer.textContent; //getting user selected option
-  let correcAns = questions[que_counter].answer; //getting correct answer from array
-  const allOptions = option_list.children.length; //getting all option items
- 
-
-  if (userAns == correcAns) {
-    //if user selected option is equal to array's correct answer
-    $("#userScore").attr("userScore", userScore+1); //upgrading score value with 1
-    answer.classList.add("correct"); //adding green color to correct selected option
-    answer.insertAdjacentHTML("beforeend", tickIconTag); 
-  } else {
-    answer.classList.add("incorrect"); //adding red color to correct selected option
-    answer.insertAdjacentHTML("beforeend", crossIconTag);
-
-    for (i = 0; i < allOptions; i++) {
-      if (option_list.children[i].textContent == correcAns) {
-        //if there is an option which is matched to an array answer
-        option_list.children[i].setAttribute("class", "option correct"); 
-        option_list.children[i].insertAdjacentHTML("beforeend", tickIconTag);
-      }
-    }
-  }
-  for (i = 0; i < allOptions; i++) {
-    option_list.children[i].classList.add("disabled"); //once user select an option then disabled all options
-  }
-  next_btn.classList.add("show"); //show the next button if user selected any option
-}
-  
-  
-  
   
   
   
