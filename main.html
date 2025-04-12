@@ -1825,6 +1825,22 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-view>
   </script>
 
+
+    <script id="pieces.html" type="text/ng-template">
+    <ion-view>
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBack()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+      <ion-content>
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/pieces" frameborder="0" allowfullscreen ></iframe></div> 
+      </ion-content>
+    </ion-view>
+  </script>
+
   
 
        <script id="scales.html" type="text/ng-template">
@@ -2291,6 +2307,14 @@ app
         }
       }
     })
+            .state('menu.pieces', {
+      url: "/pieces",
+      views: {
+        'menuContent': {
+          templateUrl: "pieces.html"
+        }
+      }
+    })
         .state('menu.scales', {
       url: "/scales",
       views: {
@@ -2360,6 +2384,8 @@ app
         }
       }
     })
+
+   
 
 
 
