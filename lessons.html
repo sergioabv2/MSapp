@@ -2309,6 +2309,9 @@ getActivity: function() {
   return `${nombreDia} ${dia} de ${nombreMes}`;
 }
 
+ function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
 
 $scope.toggle_video_modal = function(act) {
   var activity = act.content
@@ -2372,6 +2375,7 @@ $scope.toggle_video_modal = function(act) {
             </section>  
         `;
     } else if (item.sort === 'video') {
+       const controlsAttr = isMobileDevice() ? 'controls' : '';
         slidesHtml += `
             <section class="slide">
              <div class="button-container">
@@ -2382,7 +2386,7 @@ $scope.toggle_video_modal = function(act) {
                             <i class="ri-timer-fill"></i>
                         </button>
                     </div>
-                    <video class="videoslider" id="videoPlayer${index}" onended="showButton(${index})" controls>
+                    <video class="videoslider" id="videoPlayer${index}" onended="showButton(${index})" ${controlsAttr}>
                         <source src="${item.url}" type="video/mp4">
                     </video>
         <audio id="metronomeAudio${index}" src="https://www.mozart.studio/videos/metronome.mp3" style="display: none;"></audio>
@@ -5153,9 +5157,9 @@ function playMetronome(index) {
         metronomeSpeedIndex[index] = 0;
     }
 
-    const speeds = [0.85, 1, 1.2, 0]; // La cuarta opción es detener
+    const speeds = [0.85, 1.2, 0]; // La cuarta opción es detener
 
-    if (metronomeSpeedIndex[index] === 3) {
+    if (metronomeSpeedIndex[index] === 2) {
         // Si es la cuarta vez, detener el audio y reiniciar el ciclo
         audio.pause();
         audio.currentTime = 0;
