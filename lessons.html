@@ -2168,7 +2168,60 @@ footer button.show{
 });
 
  
+  
+  
+function playVideo(index) {
+    const video = document.getElementById(`videoPlayer${index}`);
+    const button = document.getElementById(`playButton${index}`);
+  const audio = document.getElementById(`metronomeAudio${index}`);
+  const audioBtn = document.getElementById(`metronomeButton${index}`);
 
+    if (video) {
+        video.play();
+        button.style.display = 'none'; // Oculta el botón al reproducir
+      audioBtn.style.display = 'none';
+      audio.pause();
+    }
+}
+
+function showButton(index) {
+    const button = document.getElementById(`playButton${index}`);
+  const audio = document.getElementById(`metronomeButton${index}`);
+    if (button) {
+        button.style.display = 'block'; // Muestra el botón al terminar el video
+      audio.style.display = 'block';
+    }
+} 
+
+
+
+let metronomeSpeedIndex = {};
+
+function playMetronome(index) {
+    const audio = document.getElementById(`metronomeAudio${index}`);
+    
+    if (!audio) return;
+
+    if (!metronomeSpeedIndex[index]) {
+        metronomeSpeedIndex[index] = 0;
+    }
+
+    const speeds = [0.85, 1, 1.2, 0]; // La cuarta opción es detener
+
+    if (metronomeSpeedIndex[index] === 3) {
+        // Si es la cuarta vez, detener el audio y reiniciar el ciclo
+        audio.pause();
+        audio.currentTime = 0;
+        metronomeSpeedIndex[index] = 0;
+    } else {
+        // Ajustar la velocidad y reproducir
+        audio.playbackRate = speeds[metronomeSpeedIndex[index]];
+        audio.play();
+        metronomeSpeedIndex[index]++;
+    }
+}
+ 
+  
 
   //Angular Materialize
 
@@ -2177,8 +2230,7 @@ var app = angular.module('materializeApp', ['ui.materialize']);
 app.factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-    //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -5117,60 +5169,7 @@ function newSize() {
 
 
   
-  
-  
-function playVideo(index) {
-    const video = document.getElementById(`videoPlayer${index}`);
-    const button = document.getElementById(`playButton${index}`);
-  const audio = document.getElementById(`metronomeAudio${index}`);
-  const audioBtn = document.getElementById(`metronomeButton${index}`);
 
-    if (video) {
-        video.play();
-        button.style.display = 'none'; // Oculta el botón al reproducir
-      audioBtn.style.display = 'none';
-      audio.pause();
-    }
-}
-
-function showButton(index) {
-    const button = document.getElementById(`playButton${index}`);
-  const audio = document.getElementById(`metronomeButton${index}`);
-    if (button) {
-        button.style.display = 'block'; // Muestra el botón al terminar el video
-      audio.style.display = 'block';
-    }
-} 
-
-
-
-let metronomeSpeedIndex = {};
-
-function playMetronome(index) {
-    const audio = document.getElementById(`metronomeAudio${index}`);
-    
-    if (!audio) return;
-
-    if (!metronomeSpeedIndex[index]) {
-        metronomeSpeedIndex[index] = 0;
-    }
-
-    const speeds = [0.85, 1, 1.2, 0]; // La cuarta opción es detener
-
-    if (metronomeSpeedIndex[index] === 3) {
-        // Si es la cuarta vez, detener el audio y reiniciar el ciclo
-        audio.pause();
-        audio.currentTime = 0;
-        metronomeSpeedIndex[index] = 0;
-    } else {
-        // Ajustar la velocidad y reproducir
-        audio.playbackRate = speeds[metronomeSpeedIndex[index]];
-        audio.play();
-        metronomeSpeedIndex[index]++;
-    }
-}
- 
-  
  /*
 const video = document.querySelector("video");
 const progress = document.querySelector(".progress__bar");
