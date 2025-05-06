@@ -359,7 +359,7 @@ var app = angular.module('postApp', [])
         'Accept': 'application/json'
       } 
     }).then(function(response) {
-      $scope.data = response.data.posts; 
+      $scope.data = shuffleArray(response.data.posts); 
        $scope.profileData = response.data.profiles
       $scope.filterPosts('all');
       $scope.updatePagination();
@@ -377,6 +377,18 @@ var app = angular.module('postApp', [])
      
            
     });
+
+
+
+
+      function shuffleArray(array) {
+  const shuffled = array.slice(); // copia del array original
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
    
    
     $scope.lvlColor = function(lvl){
