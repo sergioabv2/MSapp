@@ -11,6 +11,7 @@
 <style>
   article{
   background-color: #f5f6f6 !important;
+    color: black !important;
 }
 input{
   background-color: white !important;
@@ -143,6 +144,12 @@ dialog{
     stroke: #ffa700;
   }
 }
+  
+  @media (max-width: 700px){
+    .hidemobile{
+      display: none;
+    }
+  }
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
@@ -183,26 +190,28 @@ dialog{
         
          <article class="no-elevate round" ng-repeat="post in filteredData.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
           <div class="row top-align">
-            <div>
-              <nav class="vertical no-space grey-text center-align">
-                <button class="transparent circle"><i>thumb_up</i></button>
-                <div>Votar</div>
-                <button class="transparent circle"><i>thumb_down</i></button>
-              </nav>
-            </div>
             <div class="max" >
               
               
               <div >
-                <div class="row"><img class="circle small" ng-src="{{post.photo}}"/>
+                
+                 <div class="row"> <img class="circle small" ng-src="{{post.photo}}"/>  
+            <div><b>   <label ><a href="#" >{{post.user}}</a></label></b>
+              <div>   <label class="grey-text">Nivel 1  ● {{calculateTimeAgo(post.date)}}</label></div>
+            </div>
+          </div>
+                
+   
+                
+                <div class="row">
                   <div class="max">
                     <h6 class="no-margin">{{post.id}}</h6>
-                      <label class="grey-text">Posteado por <a href="#" >{{post.user}}</a> hace {{calculateTimeAgo(post.date)}}</label>
+                 
                   </div>
                 </div>  
                 <div class="medium-space"></div>
                 
-                <div ng-if="post.type == 'text'">{{post.url}}
+                <div ng-if="post.type == 'text'" >{{post.url}}
               </div>
                 <a  ng-if="post.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{post.url}}</span><i>link</i></a>
                 
@@ -215,6 +224,13 @@ dialog{
               
               
           </div>
+              <div>
+              <nav class="vertical no-space grey-text center-align">
+                <button class="transparent circle"><i>thumb_up</i></button>
+                <div>Votar</div>
+                <button class="transparent circle"><i>thumb_down</i></button>
+              </nav>
+            </div>
         </article>
         
         
