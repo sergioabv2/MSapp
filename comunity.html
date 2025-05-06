@@ -195,7 +195,7 @@ dialog{
               <div >
                 
                  <div class="row"> <img class="circle small" ng-src="{{post.photo}}"/>  
-            <div><b>   <label ><a href="#" >{{post.user}}</a></label></b>
+            <div><b>   <label style="font-size: 14px;"><a href="#" >{{post.user}}</a></label></b>
               <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(post.date)}}</label></div>
             </div>
           </div>
@@ -262,7 +262,7 @@ dialog{
             <div class="max" >
               <div >
                  <div class="row"> <img class="circle small" ng-src="{{selectedPostForComments.photo}}"/>  
-            <div><b>   <label ><a href="#" >{{selectedPostForComments.user}}</a></label></b>
+            <div><b>   <label style="font-size: 14px;"><a href="#" >{{selectedPostForComments.user}}</a></label></b>
               <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(selectedPostForComments.date)}}</label></div>
             </div>
           </div>
@@ -282,13 +282,30 @@ dialog{
           </div>  
         </article>
   <section class="p">
-    <h5 class="mb">Comentarios</h5>
+
+     <div class="input-group">
+    <img 
+      src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" 
+      style="width: 40px; height: 40px; border-radius: 50%;"
+    >
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Escribe tu respuesta" 
+     id="form-control"
+      ng-model="newText"
+    >
+        <button class="responsive" style="width: 60px !important;">Responder</button>
+  </div>
+    <br>
+   
     <div ng-if="selectedPostForComments.comments.length > 0" ng-repeat="comment in selectedPostForComments.comments">
      <div class="row"><img class="circle small" src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V"/>
             <div><b>{{comment.user}}</b>
               <div> {{comment.comment}}</div>
             </div>
           </div>
+       <hr style="color: #E5E4E2; opacity: 0.5; margin-top: 5px; margin-bottom: 5px;">
     </div>
     <div class="card p mb" ng-if=" selectedPostForComments.comments.length === 0">
      Aún no hay comentarios.
