@@ -224,10 +224,11 @@ dialog{
               
           </div>
               <div>
-              <nav class="vertical no-space grey-text center-align">
-                <button class="transparent circle"><i>thumb_up</i></button>
+             <nav class="vertical no-space grey-text center-align">
+                  <div>{{post.likes.length}}</div>
+                <button class="transparent circle" ng-click="newLike($index, post)"><i>thumb_up</i></button>
                 <div>Top</div>
-                <button class="transparent circle"><i>thumb_down</i></button>
+                <button class="transparent circle" ng-click="removeLike($index, post)"><i>thumb_down</i></button>
               </nav>
             </div>
         </article>
@@ -610,14 +611,7 @@ $scope.openModal = function(post) {
    $scope.dangerButtonActive = []; 
 
 $scope.newLike = function(index, post) {
-    if (!$scope.dangerButtonActive[index]) {
-        confetti({
-            particleCount: 150,
-            spread: 60
-        }); 
-        $scope.dangerButtonActive[index] = true;
-      $scope.sendLike(post.id)
-    } 
+  
     $scope.selectedPost = post;
     var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
 
@@ -627,6 +621,21 @@ $scope.newLike = function(index, post) {
             // Agrega el nuevo "like" al arreglo de likes
             selectedDataItem.likes.push($scope.user);
         } 
+    }
+};
+   
+   
+$scope.removeLike = function(index, post) {
+    $scope.selectedPost = post;
+    var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
+
+    if (selectedDataItem) {
+        const userIndex = selectedDataItem.likes.indexOf($scope.user);
+
+        if (userIndex !== -1) {
+            // Elimina al usuario del array de likes
+            selectedDataItem.likes.splice(userIndex, 1);
+        }
     }
 };
    
