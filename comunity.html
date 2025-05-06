@@ -234,7 +234,12 @@ dialog{
         </article>
         
         
-      
+
+  <nav style="justify-content: center; flex-wrap: wrap; ">
+  <button class="chip" ng-click="loadMorePosts()" ng-if="itemsPerPage < filteredData.length">
+    Cargar más posts
+  </button>
+</nav>
       
        
       </section>
@@ -379,7 +384,9 @@ var app = angular.module('postApp', [])
     });
 
 
-
+ $scope.loadMorePosts = function () {
+  $scope.itemsPerPage += 5;
+};
 
       function shuffleArray(array) {
   const shuffled = array.slice(); // copia del array original
