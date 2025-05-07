@@ -34,9 +34,36 @@
 }
 .mhn-slide .owl-prev{left:-10px}
 .mhn-slide .owl-next{right:-10px}
+  
+  .carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 15px 10px;
+}
+
+.carousel-header h2 {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 0;
+}
+
+.carousel-header .arrow {
+  font-size: 1.1em;
+  color: silver;
+}
+
+  
 </style>
 
 <div class="container" ng-app="books" ng-controller="main">
+  
+  
+  
+<div class="carousel-header">
+  <h2>Manuales  <span class="arrow">&gt;</span> </h2>
+</div>
+
   
 	<div class="mhn-slide owl-carousel">
 		<div class="mhn-item" ng-repeat="manual in manuals">
@@ -48,6 +75,9 @@
 		</div>
 	</div>
   
+  <div class="carousel-header">
+  <h2>Piezas  <span class="arrow">&gt;</span> </h2>
+</div>
   
   <div class="mhn-slide owl-carousel">
 		<div class="mhn-item" ng-repeat="manual in manuals">
@@ -57,6 +87,9 @@
 		</div>
 	</div>
   
+  <div class="carousel-header">
+  <h2>Repertorio  <span class="arrow">&gt;</span> </h2>
+</div>
   
    <div class="mhn-slide owl-carousel">
 		<div class="mhn-item" ng-repeat="manual in manuals">
@@ -93,21 +126,19 @@ $(function(){
 		//loop:true,
 		slideBy:'page',
 		rewind:false,
-    items: 2,
-  margin: 10,             
-  stagePadding: 40, 
+
 		responsive: {
     0: {
       items: 2,
-      stagePadding: 40
+      stagePadding: 20
     },
     600: {
       items: 3,
-      stagePadding: 60
+      stagePadding: 40
     },
     1000: {
       items: 4,
-      stagePadding: 80
+      stagePadding: 60
     }
   },
 		smartSpeed:70,
