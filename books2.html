@@ -189,7 +189,7 @@
   height: 100%;
   z-index: 1050;
   display: flex;
-
+background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(7px);
   align-items: center;
   justify-content: center;
@@ -209,6 +209,25 @@
   width: 1px;
   height: 1px;
   z-index: 1040;
+}
+
+  .lock-icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(0, 0, 0, 0.6); /* gris claro translúcido */
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.lock-icon i {
+  font-size: 16px;
+  color: white;
 }
 
   
@@ -250,8 +269,11 @@
 </div>
   
    <div class="mhn-slide owl-carousel">
-		<div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual)">
+		<div class="mhn-item" ng-repeat="manual in manuals" ng-click="marcarPreferencia()">
 			<div class="mhn-inner">
+         <div class="lock-icon">
+        <i class="ri-lock-fill"></i>
+      </div>
 				<img ng-src="{{manual.background}}">
 			</div>
 		</div>
@@ -275,7 +297,7 @@
     </div>
 
     <div class="action-buttons">
-      <button class="buy-btn" id="meInteresaBtn" ng-click="marcarPreferencia()">ABRIR</button>
+      <button class="buy-btn" onclick="window.top.location.href='{selectedManual.pdf}';" >ABRIR</button>
   
       <button class="secondary" ng-click="selectedManual = null">CERRAR</button>
     </div>
