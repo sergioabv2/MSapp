@@ -1,0 +1,162 @@
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Oda a la Alegría - Juego MIDI</title>
+  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #staff { border: 1px solid #ccc; margin-top: 20px; overflow-x: auto; }
+    #status { margin-top: 10px; font-size: 18px; }
+    .correct { color: green; }
+    .wrong { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Oda a la Alegría (Mano Derecha)</h1>
+  <p>Toca las notas en orden en tu teclado MIDI</p>
+ <!-- Dentro del <body> como antes -->
+<div id="staff"></div>
+<p id="status">Cargando...</p>
+
+<!-- Dentro del <body> como antes -->
+<div id="staff"></div>
+<p id="status">Cargando...</p>
+
+<script>
+  const { Renderer, Stave, StaveNote, Voice, Formatter, Accidental, BarNote } = Vex.Flow;
+
+  const rightSequence = [64, 64, 65, 67, 67, 65, 64, 62, 60, 60, 62, 64, 62, 60, 60, 60];
+  const leftSequence  = [48, 48, 50, 52, 52, 50, 48, 47, 45, 45, 47, 48, 47, 45, 45, 45];
+
+  let currentIndex = 0;
+  let pendingNotes = new Set();
+
+  function midiToNoteName(midi) {
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const name = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return name + octave;
+  }
+
+  function midiToVexflowKey(midi) {
+    const names = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+    const name = names[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return `${name}/${octave}`;
+  }
+
+  function renderScore() {
+    const div = document.getElementById("staff");
+    div.innerHTML = "";
+
+    const renderer = new Renderer(div, Renderer.Backends.SVG);
+    renderer.resize(720, 250);
+    const context = renderer.getContext();
+
+    const staveTop = new Stave(10, 40, 700);
+    staveTop.addClef("treble").addTimeSignature("4/4").setContext(context).draw();
+
+    const staveBottom = new Stave(10, 140, 700);
+    staveBottom.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
+
+    const rightNotes = [];
+    const leftNotes = [];
+
+    for (let i = 0; i < rightSequence.length; i++) {
+      const rightKey = midiToVexflowKey(rightSequence[i]);
+      const rn = new StaveNote({ keys: [rightKey], duration: "q" });
+
+      if (rightKey.includes("#")) rn.addAccidental(0, new Accidental("#"));
+      if (i < currentIndex) rn.setStyle({ fillStyle: "green", strokeStyle: "green" });
+      else if (i === currentIndex) rn.setStyle({ fillStyle: "orange", strokeStyle: "orange" });
+      rightNotes.push(rn);
+
+      const leftKey = midiToVexflowKey(leftSequence[i]);
+      const ln = new StaveNote({ keys: [leftKey], duration: "q", clef: "bass" });
+
+      if (leftKey.includes("#")) ln.addAccidental(0, new Accidental("#"));
+      if (i < currentIndex) ln.setStyle({ fillStyle: "green", strokeStyle: "green" });
+      else if (i === currentIndex) ln.setStyle({ fillStyle: "orange", strokeStyle: "orange" });
+      leftNotes.push(ln);
+
+      if ((i + 1) % 4 === 0 && i !== rightSequence.length - 1) {
+        rightNotes.push(new BarNote());
+        leftNotes.push(new BarNote());
+      }
+    }
+
+    const voiceRight = new Voice({ num_beats: 16, beat_value: 4 });
+    voiceRight.addTickables(rightNotes);
+
+    const voiceLeft = new Voice({ num_beats: 16, beat_value: 4 });
+    voiceLeft.addTickables(leftNotes);
+
+    new Formatter().joinVoices([voiceRight]).format([voiceRight], 650);
+    new Formatter().joinVoices([voiceLeft]).format([voiceLeft], 650);
+
+    voiceRight.draw(context, staveTop);
+    voiceLeft.draw(context, staveBottom);
+  }
+
+  function advanceNote() {
+    currentIndex++;
+    pendingNotes.clear();
+
+    if (currentIndex >= rightSequence.length) {
+      document.getElementById("status").textContent = "🎉 ¡Completado!";
+      document.getElementById("status").className = "correct";
+    } else {
+      renderScore();
+      document.getElementById("status").textContent = "Toca ambas notas...";
+      document.getElementById("status").className = "";
+    }
+  }
+
+  let piano;
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  Soundfont.instrument(audioContext, "acoustic_grand_piano").then((p) => {
+    piano = p;
+    renderScore();
+    document.getElementById("status").textContent = "MIDI listo. Toca ambas notas...";
+  });
+
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess().then((midiAccess) => {
+      for (let input of midiAccess.inputs.values()) {
+        input.onmidimessage = (msg) => {
+          const [command, note, velocity] = msg.data;
+          if (command === 144 && velocity > 0) {
+            if (piano) piano.play(midiToNoteName(note), audioContext.currentTime, { gain: velocity / 127 });
+
+            const expectedRight = rightSequence[currentIndex];
+            const expectedLeft = leftSequence[currentIndex];
+
+            if (note === expectedRight || note === expectedLeft) {
+              pendingNotes.add(note);
+            }
+
+            if (pendingNotes.has(expectedRight) && pendingNotes.has(expectedLeft)) {
+              document.getElementById("status").textContent = "✔ ¡Correcto!";
+              document.getElementById("status").className = "correct";
+              advanceNote();
+            } else if (note !== expectedRight && note !== expectedLeft) {
+              document.getElementById("status").textContent = "✘ Incorrecto";
+              document.getElementById("status").className = "wrong";
+            }
+          }
+        };
+      }
+    }, () => {
+      document.getElementById("status").textContent = "No se pudo acceder a la entrada MIDI";
+    });
+  } else {
+    document.getElementById("status").textContent = "Tu navegador no soporta la Web MIDI API";
+  }
+</script>
+
+
+  
+</body>
+</html>
