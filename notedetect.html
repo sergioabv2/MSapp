@@ -1,0 +1,108 @@
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego de Notas por Micrófono</title>
+  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #staff { border: 1px solid #ccc; margin-top: 20px; }
+    #status { margin-top: 10px; font-size: 18px; }
+    .correct { color: green; }
+    .wrong { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Juego de Notas (Micrófono + Piano)</h1>
+  <p>Toca en tu piano acústico la nota mostrada</p>
+  <div id="staff"></div>
+  <p id="status">Cargando modelo...</p>
+
+  <script>
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    function midiToNoteName(midiNumber) {
+      const name = noteNames[midiNumber % 12];
+      const octave = Math.floor(midiNumber / 12) - 1;
+      return name + octave;
+    }
+
+    function midiToVexflowKey(midiNumber) {
+      const names = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+      const name = names[midiNumber % 12];
+      const octave = Math.floor(midiNumber / 12) - 1;
+      return `${name}/${octave}`;
+    }
+
+    function getRandomMidiNote() {
+      const trebleRange = [60, 81]; // C4 to A5
+      return Math.floor(Math.random() * (trebleRange[1] - trebleRange[0] + 1)) + trebleRange[0];
+    }
+
+    function renderNote(midiNumber) {
+      const { Renderer, Stave, StaveNote, Formatter, Accidental } = Vex.Flow;
+
+      document.getElementById('staff').innerHTML = '';
+      const div = document.getElementById("staff");
+      const renderer = new Renderer(div, Renderer.Backends.SVG);
+      renderer.resize(350, 180);
+      const context = renderer.getContext();
+
+      const stave = new Stave(10, 40, 320);
+      stave.addClef("treble").setContext(context).draw();
+
+      const key = midiToVexflowKey(midiNumber);
+      const note = new StaveNote({ keys: [key], duration: "q" });
+      if (key.includes("#")) note.addAccidental(0, new Accidental("#"));
+
+      Formatter.FormatAndDraw(context, stave, [note]);
+    }
+
+    let targetMidiNote = getRandomMidiNote();
+    renderNote(targetMidiNote);
+
+    function nextNote() {
+      targetMidiNote = getRandomMidiNote();
+      renderNote(targetMidiNote);
+      document.getElementById('status').textContent = 'Toca la nota...';
+      document.getElementById('status').className = '';
+    }
+
+    // Pitch detection con ml5.js
+    let pitch;
+    async function startPitchDetection() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+
+      const model_url = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
+      pitch = ml5.pitchDetection(model_url, audioContext, source, modelReady);
+    }
+
+    function modelReady() {
+      document.getElementById('status').textContent = 'Micrófono activado. Toca la nota mostrada...';
+      detectPitch();
+    }
+
+    function detectPitch() {
+      pitch.getPitch(function(err, frequency) {
+        if (frequency) {
+          const midiNote = Math.round(69 + 12 * Math.log2(frequency / 440));
+          if (midiNote === targetMidiNote) {
+            document.getElementById('status').textContent = '✔ ¡Correcto!';
+            document.getElementById('status').className = 'correct';
+            setTimeout(nextNote, 1200);
+          } else {
+            document.getElementById('status').textContent = `✘ Incorrecto: Detectado ${midiToNoteName(midiNote)}`;
+            document.getElementById('status').className = 'wrong';
+          }
+        }
+        requestAnimationFrame(detectPitch);
+      });
+    }
+
+    startPitchDetection();
+  </script>
+</body>
+</html>
