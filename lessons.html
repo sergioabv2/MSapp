@@ -1327,6 +1327,66 @@ footer button.show{
     transform: scale(1.1);
 }
 
+
+   
+.example-two{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  max-width: 360px;
+  margin: 15px auto;
+  color: #64cce3;
+  line-height: 1.5;
+  box-sizing: border-box !important;
+  font-weight: 500;
+   text-shadow: 0 0 10px white;
+}
+
+.scroll {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.example-two-header nav {
+  width: 75%;
+  height: 40px;
+  background-color: #2b2c3b;
+   border-radius: 7px;
+}
+
+.example-two-header {
+  border-radius: 3px;
+}
+
+.nav-item {
+  
+  cursor: pointer;
+  padding: 0 16px;
+  margin-top: -18px !important;
+  font-size: 14px;
+ 
+}
+
+
+.nav-item:not(:last-child) {
+  border-right: 1px solid rgba(114, 124, 135, 0.2);
+
+}
+
+
+
+.nav-item,
+.vertical-align-middle {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+   
 </style>
 
 <body ng-app="materializeApp">
@@ -2378,17 +2438,21 @@ $scope.toggle_video_modal = function(act) {
        const controlsAttr = isMobileDevice() ? 'controls' : '';
         slidesHtml += `
             <section class="slide">
-             <div class="button-container">
-                        <button id="playButton${index}" class="control-btn" onclick="playVideo(${index})">
-                            <i class="ri-play-circle-fill"></i>
-                        </button>
-                        <button id="metronomeButton${index}" class="control-btn" onclick="playMetronome(${index})">
-                            <i class="ri-timer-fill"></i>
-                        </button>
-                    </div>
+            
                     <video class="videoslider" id="videoPlayer${index}" onended="showButton(${index})" ${controlsAttr}>
                         <source src="${item.url}" type="video/mp4">
                     </video>
+                         <div class='example-two'>
+  <header class='example-two-header'>
+    <nav class='vertical-align-middle scroll'>
+      <span class='nav-item' id="playButton${index}" onclick="playVideo(${index})"> <i class="ri-video-line"></i></span>
+      <span class='nav-item' id="metronomeButton${index}" onclick="playMetronome(${index})"><i class="ri-timer-line"></i>  </span>
+      <span class='nav-item'><i class="ri-mic-line"></i> </span>
+      <span class='nav-item'>Send</span>
+      <span class='nav-item'>Contact</span>
+    </nav>
+  </header>
+</div>
         <audio id="metronomeAudio${index}" src="https://www.mozart.studio/videos/metronome.mp3" style="display: none;"></audio>
          
                 </section>
