@@ -2439,7 +2439,7 @@ $scope.toggle_video_modal = function(act) {
         slidesHtml += `
             <section class="slide">
             
-                    <video class="videoslider" id="videoPlayer${index}" onended="showButton(${index})" ${controlsAttr}>
+                    <video class="videoslider" id="videoPlayer${index}" ${controlsAttr}>
                         <source src="${item.url}" type="video/mp4">
                     </video>
                          <div class='example-two'>
@@ -5187,26 +5187,15 @@ function newSize() {
   
 function playVideo(index) {
     const video = document.getElementById(`videoPlayer${index}`);
-    const button = document.getElementById(`playButton${index}`);
   const audio = document.getElementById(`metronomeAudio${index}`);
-  const audioBtn = document.getElementById(`metronomeButton${index}`);
 
     if (video) {
         video.play();
-        button.style.display = 'none'; // Oculta el botón al reproducir
-      audioBtn.style.display = 'none';
       audio.pause();
     }
 }
 
-function showButton(index) {
-    const button = document.getElementById(`playButton${index}`);
-  const audio = document.getElementById(`metronomeButton${index}`);
-    if (button) {
-        button.style.display = 'block'; // Muestra el botón al terminar el video
-      audio.style.display = 'block';
-    }
-} 
+
 
 
 
