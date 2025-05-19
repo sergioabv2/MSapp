@@ -27,16 +27,16 @@
 .mhn-slide .owl-nav .disabled{display:none}
 .mhn-slide .owl-prev,
 .mhn-slide .owl-next{
-	top:110px;
-	z-index:2;
-	width:40px;
-	height:40px;
-	padding:8px;
-	margin-top:-20px;
-	position:absolute;
-	border-radius:50%;
-	background-color:#fff;
-	box-shadow:0 4px 4px rgba(0,0,0,.3),0 0 4px rgba(0,0,0,.2)
+  top:110px;
+  z-index:2;
+  width:40px;
+  height:40px;
+  padding:8px;
+  margin-top:-20px;
+  position:absolute;
+  border-radius:50%;
+  background-color:#fff;
+  box-shadow:0 4px 4px rgba(0,0,0,.3),0 0 4px rgba(0,0,0,.2)
 }
 .mhn-slide .owl-prev{left:-10px}
 .mhn-slide .owl-next{right:-10px}
@@ -161,7 +161,7 @@
   gap: 0.5rem;
 }
 
-.buy-btn {
+.action-buttons button {
   background: #444;
   color: white;
   padding: 0.75rem;
@@ -170,6 +170,8 @@
   border-radius: 8px;
   cursor: pointer;
 }
+  
+   .noDisplay{display: none;}
 
 .secondary {
   background: transparent;
@@ -230,6 +232,56 @@ background-color: rgba(0, 0, 0, 0.5);
   color: white;
 }
 
+
+  @media (min-width: 768px) {
+  .preview-content {
+    max-width: 700px !important;
+    display: flex;
+    flex-direction: row;
+    padding: 2rem;
+    text-align: left;
+    gap: 2rem;
+  }
+
+  .cover-large {
+    width: 40% !important;
+    height: auto;
+    margin-bottom: 0;
+    border-radius: 8px;
+  }
+
+  .right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .text-content {
+    margin-top: 3rem;
+  }
+
+  .separator {
+    margin: 0.5rem 0 1rem 0;
+    width: 100%;
+  }
+
+  .action-buttons {
+    margin-bottom: 3rem;
+    flex-direction: row;
+    gap: 0.8rem !important;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .action-buttons button {
+    flex: 1 1 auto;
+  }
+  
+  .noDisplay{display: block !important;}
+}
+
+
   
 </style>
 
@@ -242,53 +294,54 @@ background-color: rgba(0, 0, 0, 0.5);
 </div>
 
   
-	<div class="mhn-slide owl-carousel">
-		<div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual)">
-     <!--	<h4>{{manual.level}}</h4>
-					<p>{{manual.block}}</p>  -->
-			<div class="mhn-inner">
-				<img ng-src="{{manual.background}}">
-			</div>
-		</div>
-	</div>
+  <div class="mhn-slide owl-carousel">
+    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual)">
+     <!-- <h4>{{manual.level}}</h4>
+          <p>{{manual.block}}</p>  -->
+      <div class="mhn-inner">
+        <img ng-src="{{manual.background}}">
+      </div>
+    </div>
+  </div>
   
   <div class="carousel-header">
   <h2>Piezas  <span class="arrow">&gt;</span> </h2>
 </div>
   
   <div class="mhn-slide owl-carousel">
-		<div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual)">
-			<div class="mhn-inner">
-				<img ng-src="{{manual.background}}">
-			</div>
-		</div>
-	</div>
+    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual)">
+      <div class="mhn-inner">
+        <img ng-src="{{manual.background}}">
+      </div>
+    </div>
+  </div>
   
   <div class="carousel-header">
   <h2>Repertorio  <span class="arrow">&gt;</span> </h2>
 </div>
   
    <div class="mhn-slide owl-carousel">
-		<div class="mhn-item" ng-repeat="manual in manuals" ng-click="marcarPreferencia()">
-			<div class="mhn-inner">
+    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="marcarPreferencia()">
+      <div class="mhn-inner">
          <div class="lock-icon">
         <i class="ri-lock-fill"></i>
       </div>
-				<img ng-src="{{manual.background}}">
-			</div>
-		</div>
-	</div>
+        <img ng-src="{{manual.background}}">
+      </div>
+    </div>
+  </div>
   
   
   
 <div class="preview-modal" ng-show="selectedManual">
   <div class="preview-backdrop"></div>
 
-  <div class="preview-content">
-    <button class="close-btn" ng-click="selectedManual = null">✕</button>
-    
-    <img class="cover-large" ng-src="{{selectedManual.background}}" />
-    
+   <div class="preview-content">
+  <button class="close-btn" ng-click="selectedManual = null">✕</button>
+  
+  <img class="cover-large" ng-src="{{selectedManual.background}}" />
+
+  <div class="right-column">
     <div class="text-content">
       <p class="collection">Mozart Academy</p>
       <hr class="separator">
@@ -297,11 +350,14 @@ background-color: rgba(0, 0, 0, 0.5);
     </div>
 
     <div class="action-buttons">
-      <button class="buy-btn" onclick="window.top.location.href='{selectedManual.pdf}';" >ABRIR</button>
-  
-      <button class="secondary" ng-click="selectedManual = null">CERRAR</button>
+      <button  onclick="window.top.location.href='{selectedManual.pdf}';">Play </button>
+      <button class="noDisplay">Play (MIDI)</button>
+      <button  >PDF</button>
     </div>
   </div>
+</div>
+
+  
 </div>
 
 
@@ -367,13 +423,13 @@ $scope.marcarPreferencia = function () {
   
   
 $(function(){
-	$('.mhn-slide').owlCarousel({
-		nav:true,
-		//loop:true,
-		slideBy: 1,
-		rewind:false,
+  $('.mhn-slide').owlCarousel({
+    nav:true,
+    //loop:true,
+    slideBy: 1,
+    rewind:false,
 
-		responsive: {
+    responsive: {
     0: {
       items: 3,
       stagePadding: 20,
@@ -388,10 +444,10 @@ $(function(){
       stagePadding: 60
     }
   },
-		smartSpeed:70,
-		
-		navText:['<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>','<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>']
-	});
+    smartSpeed:70,
+    
+    navText:['<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>','<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>']
+  });
 });
   
   
