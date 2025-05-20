@@ -1031,7 +1031,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-         <div class="dropdown-item" ng-click="goToStatus()">
+         <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -1153,6 +1153,25 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
         <div class="iframe-container"><iframe id="profileFrame" src="https://app.mozartacademy.mx/profile" frameborder="0" allowfullscreen></iframe></div>   
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+     <script id="statistics.html" type="text/ng-template">
+    <ion-view >
+      
+     <ion-nav-bar class="bar-light" >     
+       <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goBack()">
+      <i class="ri-arrow-left-s-line"></i> regresar
+    </button>
+  </ion-nav-buttons>  
+    </ion-nav-bar>
+      
+      <ion-content > 
+
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/statistics" frameborder="0" allowfullscreen></iframe></div>   
       </ion-content>
     </ion-view>
   </script>
@@ -1398,7 +1417,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-        <div class="dropdown-item" ng-click="goToStatus()">
+        <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -1543,7 +1562,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-     <div class="dropdown-item" ng-click="goToStatus()">
+     <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -1683,7 +1702,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-       <div class="dropdown-item" ng-click="goToStatus()">
+       <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -1817,7 +1836,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-       <div class="dropdown-item" ng-click="goToStatus()">
+       <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -2139,7 +2158,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-       <div class="dropdown-item" ng-click="goToStatus()">
+       <div class="dropdown-item" ng-click="goToStats()">
       <i class="ri-line-chart-fill"></i> Estadísticas
     </div>
            
@@ -2331,6 +2350,14 @@ app
       views: {
         'menuContent': {
           templateUrl: "profile.html"
+        }
+      }
+    })
+  .state('menu.statistics', {
+      url: "/statistics",
+      views: {
+        'menuContent': {
+          templateUrl: "statistics.html"
         }
       }
     })
@@ -2574,6 +2601,9 @@ app
 }; 
      $scope.goToStatus = function() {
   window.location.href = '#/menu/status';
+};
+  $scope.goToStats = function() {
+  window.location.href = '#/menu/statistics';
 };
       $scope.goToAgenda = function() {
   window.location.href = '#/menu/agenda';
