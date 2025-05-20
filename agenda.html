@@ -1,5 +1,4 @@
-
-
+ <head>
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
  <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.3/angular.min.js"></script>
@@ -11,12 +10,170 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/locale-all.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.4.0/dist/fullcalendar.min.css" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
 
 
-
- 
 <style>
-	/*!
+    body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
+}
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+  --bg-body: rgb(245, 247, 255);
+  --primary-color: rgb(42, 51, 65);
+  --primary-hover-color: rgb(158, 161, 166);
+  --scrollbar-color: rgba(131, 135, 193, 0.4);
+  --card-bg-color: rgba(230, 231, 247, 0.1);
+  --pop-bg-color: rgb(245, 247, 255, 0.9);
+  --star-color: #ddcc14;
+  --border-color: rgba(131, 135, 193, 0.4);
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --accent-color: rgb(194, 33, 105);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+
+
+
+body {
+  position: relative;
+  background: var(--bg-body);
+  overflow: hidden;
+}
+
+/* MAIN MENU */
+
+
+
+.content {
+
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: auto 350px;
+}
+
+
+ /*
+.left-content {
+  color: var(--primary-color);
+  height: 100vh;
+  width: 100% !important;
+  overflow: auto;
+}
+*/
+
+
+/* RIGHT CONTENT */
+
+.right-content {
+  background-color: white;
+ position: fixed; 
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
+  color: var(--primary-color);
+  height: 100vh;
+ width: 350px; 
+ right: 0;
+  overflow: auto;
+}
+
+
+
+/* SCROLLBAR STYLE */
+
+.left-content::-webkit-scrollbar,
+.right-content::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left-content::-webkit-scrollbar-track,
+.right-content::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+
+.left-content::-webkit-scrollbar-thumb,
+.right-content::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color);
+  border-radius: 40px;
+}
+
+/* MEDIA QUERIES */
+
+@media (min-width: 761px) {
+  .logContainer{
+    height: 180px !important;
+  }
+  }
+
+@media (max-width: 760px) {
+  .content {
+    grid-template-columns: 1fr; 
+  }
+
+  .right-content {
+    display: none; 
+  }
+
+  .left-content {
+    width: 100%; 
+    height: auto; 
+  }
+  .logContainer{
+    height: 500px !important;
+  }
+  .whatsContainer{
+    display: none;
+  }
+}
+
+  .iframe-container {
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            height: 100%;
+    
+        }
+
+        /* Estilo para hacer el iframe responsivo */
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+
+
+
+		/*!
  * FullCalendar v2.6.1 Stylesheet
  * Docs & License: https://fullcalendar.io/
  * (c) 2015 Adam Shaw
@@ -32,6 +189,16 @@
 }
 
 
+.fc-header-toolbar .fc-center {
+  display: none !important;
+}
+
+/* Mostrar el header derecho solo en pantallas pequeñas */
+@media (max-width: 768px) {
+  .fc-header-toolbar .fc-center  {
+    display: inline-block !important;
+  }
+}
 
 .fc-rtl {
 	text-align: right;
@@ -403,6 +570,7 @@ hr.fc-divider {
 	border-collapse: collapse;
 	border-spacing: 0;
 	font-size: 1em; /* normalize cross-browser */
+
 }
 
 .fc th {
@@ -418,6 +586,16 @@ hr.fc-divider {
 	padding: 0px;
 	vertical-align: top;
 }
+
+.fc td {
+  background-color: white;
+}
+
+.fc-other-month {
+  background-color: rgb(245, 247, 255) !important;
+
+}
+
 
 .fc td.fc-today {
 /* 	border-style: double;  */
@@ -1167,23 +1345,24 @@ be a descendant of the grid when it is being dragged.
 
 
 
-/* Detalles del evento */
-.fc-list-item-time {
+/* 
+.fc-list-item {
   font-weight: bold;
   color: #444;
   padding: 10px !important;
 }
+*/
 
 .fc-list-item-title {
   color: #333;
   padding: 10px 20px !important;
+    cursor: pointer !important;
 }
 
 /* Puntos de evento */
 .fc-event-dot {
-  margin: 12px !important;
+  margin: 7px !important;
   background-color: #0fb;
-
 }
 
 
@@ -1280,12 +1459,18 @@ be a descendant of the grid when it is being dragged.
 			display: none;
 		}
 	}
+  
 </style>
 
 
 
-<div ng-app="myApp">
-    <div ng-controller="Ctrl">
+
+<div ng-app="myApp" ng-controller="Ctrl" >  
+    <section class="content">
+      <div class="left-content">
+  <!--<div class="iframe-container" ><iframe src="https://app.mozartacademy.mx/lessons" frameborder="0"  allowfullscreen></iframe></div>-->
+        
+  
         <p></p>
       
  <div class="formLoader">
@@ -1295,7 +1480,7 @@ be a descendant of the grid when it is being dragged.
       <li></li>
     </ul>
 </div>
-        <div class="container">
+        <div >
             <!--             <div class="row">s
                 <h3 uib-tooltip-html="htmlTooltip" tooltip-placement="bottom">{{teste}}</h3>
             </div> -->
@@ -1374,11 +1559,28 @@ be a descendant of the grid when it is being dragged.
      <div class="col-md-12">
            <button class="btn btn-default btnAtten" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/attendance';">Solicitar</button>
         </div>
-    </div>
-</div>
+   
+        
+      </div>
+
+      <div class="right-content">
+ 
+
+ <div select="renderCalender('myCalendar2');">
+                    <div class="calendar" ng-model="agendaSources" calendar="myCalendar2" ui-calendar="agendaConfig.calendar"></div>
+                </div>
+
+ 
+   </div> 
+   </section>  
+  
+ 
+ </div> 
+
+
 
 <script>
-	var app = angular.module('myApp', ['ui.bootstrap', 'ui.calendar']);
+		var app = angular.module('myApp', ['ui.bootstrap', 'ui.calendar']);
 
 app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCalendarConfig) {
     $scope.teste = "calendar";
@@ -1387,7 +1589,8 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   
    var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+     //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1403,17 +1606,24 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   
 
     $scope.eventSources = [$scope.events];
+    $scope.agendaSources = [$scope.events];
    if (uiCalendarConfig.calendars['myCalendar1']) {
      uiCalendarConfig.calendars['myCalendar1'].fullCalendar('removeEventSources');
      uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', $scope.events);
      uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
     }
+   
+   if (uiCalendarConfig.calendars['myCalendar2']) {
+     uiCalendarConfig.calendars['myCalendar2'].fullCalendar('addEventSource', $scope.events);
+    }
+   
+   
    $(".formLoader").css("display", "none");
     $(".fc").css("filter", "none");
   })
 
    
-
+ 
   
  $scope.bookpiano = function() {
     var modalInstance2 = $uibModal.open({
@@ -1500,11 +1710,31 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
             
             header: {
                 left: 'title',
-                right: 'month,listYear prev,next'
+              center: 'month,listYear',
+                right: 'prev,next'
             },
             eventClick: $scope.alertOnEventClick
         }
     };
+  
+  
+  $scope.agendaConfig = {
+  calendar: {
+    defaultView: 'listYear',
+    editable: false,
+     height: 600,
+            locale: "es",
+	    lang: "es-mx",
+            eventTextColor: '#fff',
+            eventBorderColor: 'white',
+    header: {
+      left: '',
+      center: 'title',
+      right: ''
+    },
+    eventClick: $scope.alertOnEventClick
+  }
+};
 
 });
 
@@ -1829,5 +2059,6 @@ $scope.sendData = function(service){
 
 	
 });
-
 </script>
+
+
