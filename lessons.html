@@ -2412,11 +2412,11 @@ $scope.toggle_video_modal = function(act) {
                 <p>${item.desc}</p>
             </section>
         `; 
-    } else if (item.sort === 'catIntro') {
+    } else if (item.sort === 'imgTxt') {
         slidesHtml += `
             <section class="slide">
-                <img  src="${item.img}"  style="border-radius: 10px !important; width: 90%; max-width: 500px">
-                <h4>${item.greet1}${$scope.name}${item.greet2}</h4>
+                <img  src="${item.img}"  style="border-radius: 7px !important; width: 90%; max-width: 500px">
+                <h4>${item.desc1}</h4>
                 <p>${item.desc2}</p>
             </section>
         `; 
@@ -2624,41 +2624,31 @@ function newSize() {
               id: 1,
               material:[
                 {
-                title: 'Notación',
+                title: 'Elementos de la música',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
                   type: 'Lesson',
                   media: 'video',
-                  colors: ["#426F42", "#262626", "#36648B", "#683A5E", "#36648B", "#000000"],
+                  colors: ["#426F42", "#36648B", "#c4302b", "#000000"],
                   content: 
                   [
                     {
                       sort: 'intro',
-                      lesson: 'Lección 1: Notación Básica'
+                      lesson: '1.1 Introducción'
                     },
-                    {
-                      sort: 'catIntro',
-                      greet1: '¡Hola ',
-                      greet2: '!, soy Mozart el gato' ,
-                      desc2: 'Seré tu profesor durante y en esta lección vamos a estudiar la notación musical básica',
-                      img: 'https://lh3.googleusercontent.com/d/1smys9TBeetNUVB7fJlTxrf6AJl73mpS5'
-                    },
+                   {
+                      sort: 'imgTxt',
+                      desc1: '¿Que es la música?' ,
+                      desc2: 'La música es un lenguaje, es el arte de combinar sonidos, melodías y ritmos para crear expresiones artísticas y emocionales',
+                      img: 'https://margaritoestudio.com/wp-content/uploads/2021/05/Margarito-Sonido2.jpg'
+                    }, 
                     {
                       sort: 'youtube',
                       url: 'https://www.youtube.com/embed/Q4r5gnfAtzs',
                     },
                     
-                     {
-                      sort: 'video',
-                      url: 'https://www.mozart.studio/videos/Chopin-2.mp4',
-                    },
-                    {
-                      sort: 'img',
-                      desc: 'Diagrama de ritmos',
-                      img: 'https://lh3.googleusercontent.com/d/1zhg--goushq7wK1IHdit5baxaojuK3Pr'
-                    },
-                   
+                    
                     {
                       sort: 'end',
                       desc: 'Has completado todos los pasos de esta lección. Pulsa la X para salir y avanzar con la siguiente actividad.'
@@ -2668,7 +2658,36 @@ function newSize() {
                 ]
               },
               {
-                title: 'C position',
+                title: 'Ritmo',
+                icon: 'library_books',
+                activity:[{
+                  icon: 'smart_display',
+                  type: 'Lesson',
+                  media: 'video',
+                  colors: ["#426F42", "#c4302b", "#000000"],
+                  content: 
+                  [
+                    {
+                      sort: 'intro',
+                      lesson: '1.1 Ritmo'
+                    },
+                  
+                    {
+                      sort: 'youtube',
+                      url: 'https://www.youtube.com/embed/Q4r5gnfAtzs',
+                    },
+                    
+                    
+                    {
+                      sort: 'end',
+                      desc: 'Has completado todos los pasos de esta lección. Pulsa la X para salir y avanzar con la siguiente actividad.'
+                    }
+                  ]
+                  }
+                ]
+              },
+              {
+                title: 'Melodía',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
@@ -2679,7 +2698,7 @@ function newSize() {
                   [
                     {
                       sort: 'intro',
-                      lesson: 'Posición de Do'
+                      lesson: '1.2 Melodía'
                     },
                     {
                       sort: 'youtube',
@@ -2705,13 +2724,20 @@ function newSize() {
                 ]
               },
               {
-                title: 'Pieza: Ode to Joy - var 2',
+                title: 'Pieza: Ode to Joy - var 1',
                 icon: 'audio_file',
                 activity:[{
                   icon: 'piano',
                   type: 'Ejemplo',
                   media: 'video',
-                  url: 'https://www.youtube.com/embed/bVWXlV8Neic'
+                  colors: ["#262626"],
+                  content: 
+                  [
+                    {
+                      sort: 'youtube',
+                      url: 'https://www.youtube.com/embed/bVWXlV8Neic',
+                    },                   
+                  ]
                   },{
                   icon: 'description',
                   type: 'Partitura',
@@ -2723,27 +2749,48 @@ function newSize() {
             ]
           },
           {
-              name: 'Lesson 2: Grand Staff',
+              name: 'Lesson 2: Pre Staff',
               id: 2,
               material:[
               {
-                title: 'El Pentagrama y el Grand Staff',
+                title: 'Posición de Do',
                 icon: 'library_books',
                 activity:[{
                   icon: 'smart_display',
                   type: 'Lección',
                   media: 'video',
-                  colors: ["#426F42", "#262626", "#000000"],
+                  colors: ["#426F42", "#36648B", "#683A5E", "#36648B", "#000000"],
                   content: 
                   [
                     {
                       sort: 'intro',
-                      lesson: 'Grand Staff'
+                      lesson: '2.1 Posición de Do'
                     },
+                   /* {
+                      sort: 'catIntro',
+                      greet1: '¡Hola ',
+                      greet2: '!, soy Mozart el gato' ,
+                      desc2: 'Seré tu profesor y en esta lección vamos a definir puntos importantes sobre la dinámica de trabajo en la plataforma',
+                      img: 'https://lh3.googleusercontent.com/d/1smys9TBeetNUVB7fJlTxrf6AJl73mpS5'
+                    }, */
                     {
                       sort: 'youtube',
-                      url: 'https://www.youtube.com/embed/HHF95sBbmwQ',
+                      url: 'https://www.youtube.com/embed/Q4r5gnfAtzs',
                     },
+                    
+                     {
+                      sort: 'video',
+                      url: 'https://www.mozart.studio/videos/Chopin-2.mp4',
+                    },
+                     {
+                      sort: 'video',
+                      url: 'https://www.mozart.studio/videos/Chopin-2.mp4',
+                    },
+                  /*  {
+                      sort: 'img',
+                      desc: 'Diagrama de ritmos',
+                      img: 'https://lh3.googleusercontent.com/d/1zhg--goushq7wK1IHdit5baxaojuK3Pr'
+                    }, */
                    
                     {
                       sort: 'end',
@@ -2783,7 +2830,7 @@ function newSize() {
           },
 
           {
-              name: 'Lesson 3: Intervals',
+              name: 'Lesson 3: The Grand Staff',
               id: 3,
               material:[{
                 title: 'Intervalos de 2da y 3era',
@@ -2844,7 +2891,7 @@ function newSize() {
           },
 
           {
-              name: 'Lesson 4: Intervals II',
+              name: 'Lesson 4: Intervals',
               id: 4,
               material:[{
                 title: 'Intervalos de 4ta y 5ta',
@@ -2913,7 +2960,7 @@ function newSize() {
           block: "Unit 2",
           lessons: [
             {
-              name: 'Lesson 5: Phrases',
+              name: 'Lesson 5: Intervals II',
               id: 5,
               material:[{
                 title: 'Construcción de frases',
@@ -2974,7 +3021,7 @@ function newSize() {
             ]
           },
           {
-              name: 'Lesson 6: Chords',
+              name: 'Lesson 6: Phrases',
               id: 6,
               material:[{
                 title: 'Construcción de acordes',
@@ -3066,7 +3113,7 @@ function newSize() {
             ]
           },
               {
-              name: 'Lección 7: Corcheas y Staccato',
+              name: 'Lección 7: Chords',
               id: 7,
               material:[{
                 title: 'Definición',
@@ -3145,7 +3192,7 @@ function newSize() {
             ]
           },
           {
-              name: 'Lesson 8: Coordination',
+              name: 'Lesson 8: Quavers and Staccato',
               id: 8,
               material:[{
                 title: 'Transposición',
