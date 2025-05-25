@@ -1,0 +1,343 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Oda a la Alegría - Juego de Melodía con Micrófono</title>
+  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background-color: #fef2cc; }
+    #staff { border: 1px solid #ccc; margin-top: 20px; overflow-x: auto;}
+    #status { margin-top: 10px; font-size: 18px; padding: 10px; border-radius: 5px; }
+    #debug { margin-top: 10px; font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 5px; }
+    .correct { color: green; background: #e8f5e9; }
+    .wrong { color: red; background: #ffebee; }
+    button { padding: 10px 20px; margin-top: 15px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Oda a la Alegría (Piano - Detección por Micrófono)</h1>
+  <p>Toca las notas en orden usando tu voz o instrumento</p>
+  <div id="staff"></div>
+  <div id="status">Haz clic en "Comenzar"</div>
+  <div id="debug"></div>
+  <button id="startBtn">Comenzar</button>
+
+<script>
+  const { Renderer, Stave, StaveNote, Voice, Formatter, Accidental, BarNote, StaveConnector } = Vex.Flow;
+
+  // Definimos dos sistemas (renglones) de melodías
+  const rightSequences = [
+    // Primer sistema
+    [64, 64, 65, 67, 67, 65, 64, 62, 60, 60, 62, 64, 62, 60, 60, 60],
+    // Segundo sistema
+    [64, 64, 65, 67, 67, 65, 64, 62, 60, 60, 62, 64, 62, 60, 60, 60]
+  ];
+
+  const leftSequences = [
+    // Primer sistema
+    [48, 55, 48, 55],
+    // Segundo sistema
+    [48, 55, 48, 55]
+  ];
+
+  let currentSystem = 0;
+  let currentIndex = 0;
+  let audioContext, analyser, microphone;
+  let isPlaying = false;
+  let lastDetectedNote = null;
+  let detectionCount = 0;
+  let waitForNoteRelease = false;
+  window.leftCompasesPlayed = [new Set(), new Set()];
+
+  const statusEl = document.getElementById("status");
+  const debugEl = document.getElementById("debug");
+  const startBtn = document.getElementById("startBtn");
+
+  function midiToNoteName(midi) {
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const name = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return name + octave;
+  }
+
+  function midiToVexflowKey(midi) {
+    const names = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+    const name = names[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return `${name}/${octave}`;
+  }
+
+  function renderScore() {
+    const div = document.getElementById("staff");
+    div.innerHTML = "";
+
+    const renderer = new Renderer(div, Renderer.Backends.SVG);
+    renderer.resize(800, 450);
+    const context = renderer.getContext();
+
+    // Primer sistema
+    const staveTop1 = new Stave(30, 30, 700);
+    staveTop1.addClef("treble").addTimeSignature("4/4").setContext(context).draw();
+
+    const staveBottom1 = new Stave(30, 120, 700);
+    staveBottom1.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
+
+    const brace1 = new StaveConnector(staveTop1, staveBottom1);
+    brace1.setType(StaveConnector.type.BRACE).setContext(context).draw();
+
+    const singleLeft1 = new StaveConnector(staveTop1, staveBottom1);
+    singleLeft1.setType(StaveConnector.type.SINGLE_LEFT).setContext(context).draw();
+
+    // Segundo sistema
+    const staveTop2 = new Stave(30, 230, 700);
+    staveTop2.addClef("treble").addTimeSignature("4/4").setContext(context).draw();
+
+    const staveBottom2 = new Stave(30, 320, 700);
+    staveBottom2.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
+
+    const brace2 = new StaveConnector(staveTop2, staveBottom2);
+    brace2.setType(StaveConnector.type.BRACE).setContext(context).draw();
+
+    const singleLeft2 = new StaveConnector(staveTop2, staveBottom2);
+    singleLeft2.setType(StaveConnector.type.SINGLE_LEFT).setContext(context).draw();
+
+    // Renderizar ambos sistemas
+    renderSystem(context, staveTop1, staveBottom1, 0);
+    renderSystem(context, staveTop2, staveBottom2, 1);
+  }
+
+  function renderSystem(context, staveTop, staveBottom, systemIndex) {
+    const rightSequence = rightSequences[systemIndex];
+    const leftSequence = leftSequences[systemIndex];
+
+    const rightNotes = [];
+    for (let i = 0; i < rightSequence.length; i++) {
+      const rightKey = midiToVexflowKey(rightSequence[i]);
+      const rn = new StaveNote({ keys: [rightKey], duration: "q" });
+
+      if (rightKey.includes("#")) rn.addAccidental(0, new Accidental("#"));
+      
+      if (systemIndex === currentSystem) {
+        if (i < currentIndex) rn.setStyle({ fillStyle: "green", strokeStyle: "green" });
+        else if (i === currentIndex) rn.setStyle({ fillStyle: "orange", strokeStyle: "orange" });
+      } else if (systemIndex < currentSystem) {
+        rn.setStyle({ fillStyle: "green", strokeStyle: "green" });
+      }
+
+      rightNotes.push(rn);
+
+      if ((i + 1) % 4 === 0 && i !== rightSequence.length - 1) {
+        rightNotes.push(new BarNote());
+      }
+    }
+
+    const leftNotes = [];
+    for (let i = 0; i < rightSequence.length; i += 4) {
+      const compasIndex = i / 4;
+      const leftKey = midiToVexflowKey(leftSequence[compasIndex] || 48);
+      const leftNote = new StaveNote({
+        keys: [leftKey],
+        duration: "w",
+        clef: "bass"
+      });
+
+      if (leftKey.includes("#")) leftNote.addAccidental(0, new Accidental("#"));
+
+      if (systemIndex === currentSystem) {
+        if (window.leftCompasesPlayed[systemIndex].has(compasIndex)) {
+          leftNote.setStyle({ fillStyle: "green", strokeStyle: "green" });
+        } else if (Math.floor(currentIndex / 4) === compasIndex) {
+          leftNote.setStyle({ fillStyle: "orange", strokeStyle: "orange" });
+        }
+      } else if (systemIndex < currentSystem) {
+        leftNote.setStyle({ fillStyle: "green", strokeStyle: "green" });
+      }
+
+      leftNotes.push(leftNote);
+
+      if (i + 4 < rightSequence.length) {
+        leftNotes.push(new BarNote());
+      }
+    }
+
+    const voiceRight = new Voice({ num_beats: 16, beat_value: 4 });
+    voiceRight.addTickables(rightNotes);
+
+    const voiceLeft = new Voice({ num_beats: 16, beat_value: 4 });
+    voiceLeft.addTickables(leftNotes);
+
+    const formatter = new Formatter();
+    formatter.joinVoices([voiceRight]);
+    formatter.joinVoices([voiceLeft]);
+    formatter.format([voiceRight, voiceLeft], 650);
+
+    voiceRight.draw(context, staveTop);
+    voiceLeft.draw(context, staveBottom);
+  }
+
+  function advanceNote() {
+    currentIndex++;
+    detectionCount = 0;
+    lastDetectedNote = null;
+    waitForNoteRelease = false;
+
+    if (currentIndex >= rightSequences[currentSystem].length) {
+      currentSystem++;
+      currentIndex = 0;
+      
+      if (currentSystem >= rightSequences.length) {
+        statusEl.textContent = "🎉 ¡Toda la partitura completada!";
+        statusEl.className = "correct";
+        isPlaying = false;
+        return;
+      }
+    }
+
+    renderScore();
+    statusEl.textContent = `Sistema ${currentSystem + 1}: Toca la nota resaltada...`;
+    statusEl.className = "";
+  }
+
+  async function start() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      microphone = audioContext.createMediaStreamSource(stream);
+      microphone.connect(analyser);
+      isPlaying = true;
+      detectPitch();
+      statusEl.textContent = "Detectando... toca la nota resaltada.";
+      renderScore();
+    } catch (e) {
+      statusEl.textContent = "Error: " + e.message;
+    }
+  }
+
+  function detectPitch() {
+    if (!isPlaying) return;
+
+    const buffer = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buffer);
+    const volume = getVolume(buffer);
+    if (volume < 0.01) {
+      requestAnimationFrame(detectPitch);
+      return;
+    }
+
+    const freq = autoCorrelate(buffer, audioContext.sampleRate);
+    if (freq) {
+      const midi = Math.round(69 + 12 * Math.log2(freq / 440));
+      const expectedRight = rightSequences[currentSystem][currentIndex];
+      const expectedLeftIndex = Math.floor(currentIndex / 4);
+      const expectedLeft = leftSequences[currentSystem][expectedLeftIndex];
+
+      debugEl.textContent = `Detectado: ${midiToNoteName(midi)} (${freq.toFixed(1)} Hz)`;
+
+      // Verificar nota de la mano derecha
+      if (midi === expectedRight) {
+        if (!waitForNoteRelease) {
+          if (lastDetectedNote === midi) {
+            detectionCount++;
+          } else {
+            lastDetectedNote = midi;
+            detectionCount = 1;
+          }
+
+          if (detectionCount > 4) {
+            // Verificar si también necesitamos la nota izquierda
+            if (window.leftCompasesPlayed[currentSystem].has(expectedLeftIndex)) {
+              statusEl.textContent = `✔ ${midiToNoteName(midi)} correcto`;
+              advanceNote();
+            } else {
+              statusEl.textContent = `✔ Nota derecha correcta, ahora toca la izquierda`;
+              statusEl.className = "correct";
+            }
+          }
+        }
+      } 
+      // Verificar nota de la mano izquierda
+      else if (midi === expectedLeft && !window.leftCompasesPlayed[currentSystem].has(expectedLeftIndex)) {
+        window.leftCompasesPlayed[currentSystem].add(expectedLeftIndex);
+        renderScore();
+        if (lastDetectedNote === expectedRight && detectionCount > 4) {
+          statusEl.textContent = `✔ Ambas notas correctas`;
+          advanceNote();
+        } else {
+          statusEl.textContent = `✔ Nota izquierda correcta, ahora toca la derecha`;
+          statusEl.className = "correct";
+        }
+      } 
+      // Nota incorrecta
+      else {
+        if (waitForNoteRelease && (midi !== lastDetectedNote)) {
+          waitForNoteRelease = false;
+          detectionCount = 0;
+        }
+        statusEl.textContent = `✘ ${midiToNoteName(midi)} (esperado ${midiToNoteName(expectedRight)})`;
+        statusEl.className = "wrong";
+      }
+    }
+
+    requestAnimationFrame(detectPitch);
+  }
+
+  function getVolume(buffer) {
+    let sum = 0;
+    for (let i = 0; i < buffer.length; i++) {
+      sum += buffer[i] * buffer[i];
+    }
+    return Math.sqrt(sum / buffer.length);
+  }
+
+  function autoCorrelate(buffer, sampleRate) {
+    const SIZE = buffer.length;
+    let rms = 0;
+    for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
+    rms = Math.sqrt(rms / SIZE);
+    if (rms < 0.01) return null;
+
+    let r1 = 0, r2 = SIZE - 1, threshold = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+      if (Math.abs(buffer[i]) < threshold) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+      if (Math.abs(buffer[SIZE - i]) < threshold) { r2 = SIZE - i; break; }
+    }
+
+    buffer = buffer.slice(r1, r2);
+    const newSize = buffer.length;
+
+    const c = new Array(newSize).fill(0);
+    for (let i = 0; i < newSize; i++) {
+      for (let j = 0; j < newSize - i; j++) {
+        c[i] = c[i] + buffer[j] * buffer[j + i];
+      }
+    }
+
+    let d = 0;
+    while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < newSize; i++) {
+      if (c[i] > maxval) {
+        maxval = c[i];
+        maxpos = i;
+      }
+    }
+
+    let T0 = maxpos;
+    return sampleRate / T0;
+  }
+
+  startBtn.addEventListener('click', () => {
+    currentSystem = 0;
+    currentIndex = 0;
+    window.leftCompasesPlayed = [new Set(), new Set()];
+    isPlaying = true;
+    start();
+  });
+
+  renderScore();
+</script>
+</body>
+</html>
