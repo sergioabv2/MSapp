@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -140,22 +140,28 @@
             }
         }
         
-        // Handle incoming MIDI messages
+        // Handle incoming MIDI messages - MODIFIED TO FILTER NON-NOTE MESSAGES
         function handleMIDIMessage(event) {
             if (!isRecording) return;
             
             const [command, note, velocity] = event.data;
             const timestamp = Date.now() - startTime;
             
-            // Record the event with timestamp
-            recordedEvents.push({
-                data: event.data,
-                timestamp: timestamp
-            });
+            // Filter only Note On (0x90-0x9F) and Note Off (0x80-0x8F) messages
+            const commandType = command & 0xF0; // Mask channel bits
             
-            // Display raw data in textarea
-            midiDataEl.value += `Time: ${timestamp}ms | Command: ${command.toString(16)} | Note: ${note} | Velocity: ${velocity}\n`;
-            midiDataEl.scrollTop = midiDataEl.scrollHeight;
+            if ((commandType === 0x90 || commandType === 0x80) && note !== undefined) {
+                // Record the event with timestamp
+                recordedEvents.push({
+                    data: event.data,
+                    timestamp: timestamp
+                });
+                
+                // Display raw data in textarea
+                const noteType = (commandType === 0x90 && velocity > 0) ? 'Note On' : 'Note Off';
+                midiDataEl.value += `Time: ${timestamp}ms | ${noteType} | Note: ${note} | Velocity: ${velocity}\n`;
+                midiDataEl.scrollTop = midiDataEl.scrollHeight;
+            }
         }
         
         // Start recording
@@ -206,9 +212,6 @@
         
         // Create a simple MIDI file from recorded events (simplified)
         function createSimpleMIDIFile(events) {
-            // This is a VERY simplified MIDI file creation
-            // In a real app, you would use a proper MIDI library like midi-writer-js
-            
             // MIDI file header (simplified)
             const header = new Uint8Array([
                 0x4D, 0x54, 0x68, 0x64,  // "MThd"
