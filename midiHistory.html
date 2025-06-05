@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,12 +52,22 @@
         .hidden {
             display: none;
         }
+       #deviceSelector {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <h1>MIDI Recorder & Visualizer</h1>
     
     <div id="status" class="disconnected">No MIDI device connected</div>
+  
+    <select id="deviceSelector" disabled>
+        <option value="">-- Selecciona dispositivo MIDI --</option>
+    </select>
     
     <div class="controls">
         <button id="recordBtn">Record</button>
@@ -74,7 +84,8 @@
     <script>
         // Global variables
         let midiAccess;
-        let midiInput;
+        let midiInput = null;
+        let midiDevices = [];
         let isRecording = false;
         let recordedEvents = [];
         let startTime;
@@ -94,9 +105,9 @@
         async function initMIDI() {
             try {
                 midiAccess = await navigator.requestMIDIAccess();
-                updateMIDIStatus();
+                updateDeviceList();
                 
-                midiAccess.onstatechange = updateMIDIStatus;
+                midiAccess.onstatechange =  updateDeviceList;
                 
                 // Set up event listeners
                 recordBtn.addEventListener('click', startRecording);
@@ -108,6 +119,55 @@
                 statusEl.textContent = 'MIDI access denied or not supported: ' + error.message;
                 console.error('MIDI initialization error:', error);
             }
+        }
+      
+        document.getElementById('deviceSelector').addEventListener('change', updateMIDIConnection);
+      
+        function updateDeviceList() {
+            const selector = document.getElementById('deviceSelector');
+            selector.innerHTML = '<option value="">-- Selecciona dispositivo MIDI --</option>';
+            midiDevices = [];
+            
+            // Obtener todos los dispositivos de entrada
+            const inputs = midiAccess.inputs.values();
+            let hasDevices = false;
+            
+            for (const input of inputs) {
+                midiDevices.push(input);
+                selector.innerHTML += `<option value="${input.id}">${input.name}</option>`;
+                hasDevices = true;
+            }
+            
+            selector.disabled = !hasDevices;
+            updateMIDIConnection();
+        }
+      
+      function updateMIDIConnection() {
+            const selector = document.getElementById('deviceSelector');
+            const deviceId = selector.value;
+            
+            // Desconectar el dispositivo actual si existe
+            if (midiInput) {
+                midiInput.onmidimessage = null;
+                midiInput = null;
+            }
+            
+            // Conectar el nuevo dispositivo seleccionado
+            if (deviceId) {
+                midiInput = midiDevices.find(device => device.id === deviceId);
+                if (midiInput) {
+                    midiInput.onmidimessage = handleMIDIMessage;
+                    statusEl.textContent = `Connected to: ${midiInput.name}`;
+                    statusEl.className = 'status connected';
+                    recordBtn.disabled = false;
+                    return;
+                }
+            }
+            
+            // Estado por defecto (desconectado)
+            statusEl.textContent = 'No MIDI device selected';
+            statusEl.className = 'status disconnected';
+            recordBtn.disabled = true;
         }
         
         // Update MIDI connection status
