@@ -17,7 +17,6 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            align-items: center;
         }
         button {
             padding: 10px 15px;
@@ -53,18 +52,6 @@
         .hidden {
             display: none;
         }
-        .tempo-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .tempo-control label {
-            font-weight: bold;
-        }
-        .tempo-control input {
-            width: 60px;
-            padding: 5px;
-        }
     </style>
 </head>
 <body>
@@ -77,11 +64,6 @@
         <button id="stopBtn" disabled>Stop</button>
         <button id="playBtn" disabled>Play Sequence</button>
         <button id="clearBtn" disabled>Clear</button>
-        <div class="tempo-control">
-            <label for="tempoInput">Tempo:</label>
-            <input type="number" id="tempoInput" value="120" min="40" max="300">
-            <span>BPM</span>
-        </div>
     </div>
     
     <textarea id="midiData" readonly placeholder="MIDI data will appear here..."></textarea>
@@ -107,7 +89,6 @@
         const midiDataEl = document.getElementById('midiData');
         const visualizer = document.getElementById('visualizer');
         const player = document.getElementById('player');
-        const tempoInput = document.getElementById('tempoInput');
         
         // Initialize MIDI access
         async function initMIDI() {
@@ -122,7 +103,6 @@
                 stopBtn.addEventListener('click', stopRecording);
                 playBtn.addEventListener('click', playSequence);
                 clearBtn.addEventListener('click', clearRecording);
-                tempoInput.addEventListener('change', updateTempo);
                 
             } catch (error) {
                 statusEl.textContent = 'MIDI access denied or not supported: ' + error.message;
@@ -160,7 +140,7 @@
             }
         }
         
-        // Handle incoming MIDI messages
+        // Handle incoming MIDI messages - MODIFIED TO FILTER NON-NOTE MESSAGES
         function handleMIDIMessage(event) {
             if (!isRecording) return;
             
@@ -181,17 +161,6 @@
                 const noteType = (commandType === 0x90 && velocity > 0) ? 'Note On' : 'Note Off';
                 midiDataEl.value += `Time: ${timestamp}ms | ${noteType} | Note: ${note} | Velocity: ${velocity}\n`;
                 midiDataEl.scrollTop = midiDataEl.scrollHeight;
-            }
-        }
-        
-        // Update playback tempo
-        function updateTempo() {
-            const tempo = parseInt(tempoInput.value);
-            if (tempo >= 40 && tempo <= 300) {
-                player.tempo = tempo + 'bpm';
-            } else {
-                tempoInput.value = 120; // Reset to default if invalid
-                player.tempo = '120bpm';
             }
         }
         
@@ -228,10 +197,111 @@
             
             // Convert recorded events to MIDI file and encode as Base64
             if (recordedEvents.length > 0) {
+                // Create a simple MIDI file structure (simplified for demo)
                 const midiFile = createSimpleMIDIFile(recordedEvents);
+                
+                // Convert to Base64
                 midiBase64 = arrayBufferToBase64(midiFile);
+                
+                // Enable play button
                 playBtn.disabled = false;
+                
+                console.log('MIDI Base64:', midiBase64.substring(0, 100) + '...');
             }
+        }
+        
+        // Create a simple MIDI file from recorded events (simplified)
+        function createSimpleMIDIFile(events) {
+            // MIDI file header (simplified)
+            const header = new Uint8Array([
+                0x4D, 0x54, 0x68, 0x64,  // "MThd"
+                0x00, 0x00, 0x00, 0x06,  // Header length
+                0x00, 0x01,             // Format 1
+                0x00, 0x01,             // 1 track
+                0x01, 0xE0              // 480 ticks per quarter note
+            ]);
+            
+            // Track data (simplified - just note events)
+            let trackData = [];
+            
+            // Add tempo event (120 BPM)
+            trackData.push(
+                0x00,                   // Delta time
+                0xFF, 0x51, 0x03,       // Set Tempo
+                0x07, 0xA1, 0x20        // 500,000 µs per quarter note (120 BPM)
+            );
+            
+            // Convert recorded events to MIDI track data
+            let lastTime = 0;
+            for (const event of events) {
+                const deltaTime = Math.round(event.timestamp / 2); // Simplified timing
+                const deltaTimeVar = toVariableLengthQuantity(deltaTime - lastTime);
+                lastTime = deltaTime;
+                
+                trackData.push(...deltaTimeVar);
+                trackData.push(...event.data);
+            }
+            
+            // End of track
+            trackData.push(
+                0x00,                   // Delta time
+                0xFF, 0x2F, 0x00        // End of track
+            );
+            
+            // Create track chunk
+            const trackLength = trackData.length;
+            const trackHeader = new Uint8Array([
+                0x4D, 0x54, 0x72, 0x6B,  // "MTrk"
+                (trackLength >> 24) & 0xFF,
+                (trackLength >> 16) & 0xFF,
+                (trackLength >> 8) & 0xFF,
+                trackLength & 0xFF
+            ]);
+            
+            // Combine all parts
+            const midiData = new Uint8Array(
+                header.length + trackHeader.length + trackData.length
+            );
+            
+            midiData.set(header, 0);
+            midiData.set(trackHeader, header.length);
+            midiData.set(new Uint8Array(trackData), header.length + trackHeader.length);
+            
+            return midiData.buffer;
+        }
+        
+        // Convert to variable-length quantity (MIDI format)
+        function toVariableLengthQuantity(value) {
+            let result = [];
+            let buffer = value & 0x7F;
+            
+            while ((value >>= 7) > 0) {
+                buffer <<= 8;
+                buffer |= 0x80;
+                buffer += (value & 0x7F);
+            }
+            
+            while (true) {
+                result.push(buffer & 0xFF);
+                if (buffer & 0x80) {
+                    buffer >>= 8;
+                } else {
+                    break;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Convert ArrayBuffer to Base64
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
         }
         
         // Play the recorded sequence
@@ -241,9 +311,8 @@
             // Create data URL from Base64
             const midiUrl = 'data:audio/midi;base64,' + midiBase64;
             
-            // Set the player source and tempo
+            // Set the player source
             player.src = midiUrl;
-            updateTempo(); // Apply current tempo setting
             
             // Show the visualizer and player
             visualizer.classList.remove('hidden');
@@ -253,8 +322,21 @@
             player.start();
         }
         
-        // [Resto de las funciones (createSimpleMIDIFile, toVariableLengthQuantity, etc.) permanecen igual]
-        // ... (Mantén todas las otras funciones igual que en el código anterior)
+        // Clear recording
+        function clearRecording() {
+            recordedEvents = [];
+            midiBase64 = '';
+            midiDataEl.value = '';
+            
+            // Hide visualizer and stop player
+            visualizer.classList.add('hidden');
+            player.classList.add('hidden');
+            player.stop();
+            player.src = '';
+            
+            playBtn.disabled = true;
+            clearBtn.disabled = true;
+        }
         
         // Initialize when page loads
         window.addEventListener('load', initMIDI);
