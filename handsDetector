@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediaPipe Hands Dual View</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.css" />
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+    .view {
+      flex: 1 1 50%;
+      position: relative;
+    }
+    video, canvas {
+      width: 100%;
+      height: auto;
+    }
+    .control-panel {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .control-panel.hidden {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  <div class="view">
+    <video id="video_left" autoplay playsinline muted></video>
+    <canvas id="canvas_left" width="1280" height="720"></canvas>
+  </div>
+  <div class="view">
+    <video id="video_right" autoplay playsinline muted></video>
+    <canvas id="canvas_right" width="1280" height="720"></canvas>
+  </div>
+  <button id="toggle-controls" style="
+   position: absolute;
+   z-index: 1000;                                   
+  background: #444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  right: 0;
+">
+  Ocultar panel
+</button>
+
+  <div class="control-panel"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js"></script>
+  <script type="module">
+    import DeviceDetector from "https://cdn.skypack.dev/device-detector-js@2.2.10";
+
+    const mpHands = window;
+    const drawingUtils = window;
+    const controls = window;
+
+    const videoLeft = document.getElementById('video_left');
+    const videoRight = document.getElementById('video_right');
+    const canvasLeft = document.getElementById('canvas_left');
+    const canvasRight = document.getElementById('canvas_right');
+    const ctxLeft = canvasLeft.getContext('2d');
+    const ctxRight = canvasRight.getContext('2d');
+    const controlsElement = document.querySelector('.control-panel');
+
+    const hands = new mpHands.Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`
+    });
+
+    hands.setOptions({
+      selfieMode: false,
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    hands.onResults(onResults);
+
+    const fpsControl = new controls.FPS();
+
+    function onResults(results) {
+      drawResults(canvasLeft, ctxLeft, results);
+      drawResults(canvasRight, ctxRight, results);
+    }
+
+    function drawResults(canvas, ctx, results) {
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+      if (results.multiHandLandmarks && results.multiHandedness) {
+        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+          const isRight = results.multiHandedness[i].label === 'Right';
+          const landmarks = results.multiHandLandmarks[i];
+
+          drawingUtils.drawConnectors(ctx, landmarks, mpHands.HAND_CONNECTIONS, {
+            color: isRight ? '#00FF00' : '#FF0000'
+          });
+          drawingUtils.drawLandmarks(ctx, landmarks, {
+            color: isRight ? '#00FF00' : '#FF0000',
+            fillColor: isRight ? '#FF0000' : '#00FF00',
+            radius: data => drawingUtils.lerp(data.from.z, -0.15, 0.1, 10, 1)
+          });
+        }
+      }
+
+      ctx.restore();
+    }
+
+    new controls
+      .ControlPanel(controlsElement, {
+        selfieMode: false,
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      })
+      .add([
+        new controls.StaticText({ title: 'MediaPipe Hands' }),
+        fpsControl,
+        new controls.Toggle({ title: 'Selfie Mode', field: 'selfieMode' }),
+        new controls.SourcePicker({
+          onFrame: async (input, size) => {
+            canvasLeft.width = canvasRight.width = size.width;
+            canvasLeft.height = canvasRight.height = size.height;
+            await hands.send({ image: input });
+          },
+          onSourceChanged: () => {
+            // Cuando el usuario cambia de cámara, desactiva modo espejo si no es selfie.
+            const options = panelState();
+            videoLeft.classList.toggle('selfie', options.selfieMode);
+            videoRight.classList.toggle('selfie', options.selfieMode);
+            hands.setOptions(options);
+          }
+        }),
+        new controls.Slider({
+          title: 'Max Number of Hands',
+          field: 'maxNumHands',
+          range: [1, 4],
+          step: 1
+        }),
+        new controls.Slider({
+          title: 'Model Complexity',
+          field: 'modelComplexity',
+          discrete: ['Lite', 'Full']
+        }),
+        new controls.Slider({
+          title: 'Min Detection Confidence',
+          field: 'minDetectionConfidence',
+          range: [0, 1],
+          step: 0.01
+        }),
+        new controls.Slider({
+          title: 'Min Tracking Confidence',
+          field: 'minTrackingConfidence',
+          range: [0, 1],
+          step: 0.01
+        }),
+      ])
+      .on(x => {
+        videoLeft.classList.toggle('selfie', x.selfieMode);
+        videoRight.classList.toggle('selfie', x.selfieMode);
+        hands.setOptions(x);
+      });
+
+    function panelState() {
+      return {
+        selfieMode: false,
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      };
+    }
+    
+    const toggleButton = document.getElementById('toggle-controls');
+const panel = document.querySelector('.control-panel');
+
+toggleButton.addEventListener('click', () => {
+  const controlsVisible = panel.classList.toggle('hidden');
+  toggleButton.textContent = controlsVisible ? 'Mostrar panel' : 'Ocultar panel';
+});
+
+  </script>
+</body>
+</html>
