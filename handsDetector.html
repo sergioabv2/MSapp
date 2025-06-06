@@ -8,7 +8,6 @@
   <style>
     body {
       margin: 0;
-      top:0;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
@@ -38,20 +37,6 @@
     .control-panel.hidden {
   display: none;
 }
-    
-    #record-button {
-  position: fixed;
-  top: 50px;
-  right: 10px;
-  z-index: 1000;
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 
   </style>
 </head>
@@ -77,7 +62,6 @@
 ">
   Ocultar panel
 </button>
-  <button id="record-button">Grabar</button>
 
   <div class="control-panel"></div>
 
@@ -218,47 +202,6 @@ const panel = document.querySelector('.control-panel');
 toggleButton.addEventListener('click', () => {
   const controlsVisible = panel.classList.toggle('hidden');
   toggleButton.textContent = controlsVisible ? 'Mostrar panel' : 'Ocultar panel';
-});
-
-    
-    let mediaRecorder;
-let recordedChunks = [];
-let isRecording = false;
-
-const recordButton = document.getElementById('record-button');
-
-recordButton.addEventListener('click', () => {
-  if (!isRecording) {
-    // Iniciar grabación
-    const stream = canvasLeft.captureStream(30); // 30 FPS
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
-    recordedChunks = [];
-
-    mediaRecorder.ondataavailable = event => {
-      if (event.data.size > 0) recordedChunks.push(event.data);
-    };
-
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'grabacion.webm';
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    mediaRecorder.start();
-    recordButton.textContent = 'Detener';
-    isRecording = true;
-  } else {
-    // Detener grabación
-    mediaRecorder.stop();
-    recordButton.textContent = 'Grabar';
-    isRecording = false;
-  }
 });
 
   </script>
