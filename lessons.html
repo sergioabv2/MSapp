@@ -256,28 +256,31 @@ iframe#youtube {
   bottom: 10px; /* Mantén margen inferior */
   left: 0;
   width: 100%;
-  height: calc(80vh - 30px); /* Altura ajustada restando márgenes */
+  height: calc(80vh - 10px); /* Altura ajustada restando márgenes */
   padding-top: 80px;
   box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.5);
 }
 
+
+   /*
 @media (max-width: 450px) {
   iframe#youtube{
-    top: 25px; /* Mayor margen superior */
-    bottom: 15px; /* Mantén margen inferior */
-    height: calc(70vh - 40px); /* Ajuste proporcional */
+    top: 25px; 
+    bottom: 15px; 
+    height: calc(70vh - 40px); 
     padding-top: 150px;
   }
 }
 
 @media (min-width: 750px) {
   iframe#youtube{
-    top: 12px; /* Margen superior incrementado */
-    bottom: 10px; /* Margen inferior */
-    height: calc(90vh - 22px); /* Ajuste proporcional */
+    top: 12px; 
+    bottom: 10px; 
+    height: calc(90vh - 22px); 
     padding-top: 50px;
   }
 }
+   */
 
 
 .videoslider {
@@ -2431,7 +2434,7 @@ $scope.toggle_video_modal = function(act) {
         slidesHtml += `
             <section class="slide" >
                 <iframe id="youtube" frameborder="0" src="${item.url}"></iframe>
-                <p style="position: absolute; top: 20px;">Dale play al video</p>
+                <p style="position: absolute; top: 20px;">${item.desc}</p>
             </section>  
         `;
     } else if (item.sort === 'video') {
@@ -2630,7 +2633,7 @@ function newSize() {
                   icon: 'smart_display',
                   type: 'Lesson',
                   media: 'video',
-                  colors: ["#426F42", "#36648B", "#c4302b", "#000000"],
+                  colors: ["#426F42", "#36648B", "#c4302b", "#36648B", "#000000"],
                   content: 
                   [
                     {
@@ -2645,9 +2648,14 @@ function newSize() {
                     }, 
                     {
                       sort: 'youtube',
+                       desc: 'Completa la actividad' ,
                       url: 'https://app.mozartacademy.mx/grandstaff',
                     },
-                    
+                     {
+                      sort: 'youtube',
+                        desc: 'Ahora grábate' ,
+                      url: 'https://app.mozartacademy.mx/renderMidi',
+                    },
                     
                     {
                       sort: 'end',
