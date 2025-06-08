@@ -1,31 +1,37 @@
 <html lang="es">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
   <title>Oda a la Alegría - Juego de Melodía con Micrófono</title>
   <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; background-color: #fef2cc; }
-    #staff { border: 1px solid #ccc; margin-top: 20px; overflow-x: auto;}
+    body { font-family: sans-serif;  background-color: #fef2cc; }
+  #staff { border: 1px solid #ccc; margin-top: 20px; overflow-x: auto;}
      #staff svg {
     width: 100% !important; 
     height: auto !important;
     display: block !important;
 }
-   
     #status { margin-top: 10px; font-size: 18px; padding: 10px; border-radius: 5px; }
     #debug { margin-top: 10px; font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 5px; }
     .correct { color: green; background: #e8f5e9; }
     .wrong { color: red; background: #ffebee; }
     button { padding: 10px 20px; margin-top: 15px; font-size: 16px; cursor: pointer; }
+    #startBtn{
+      position: absolute;
+      right: 10px;
+      top: -10px;
+      transform: scale(0.9);
+    }
   </style>
 </head>
 <body>
-  <h1>Oda a la Alegría (Piano - Detección por Micrófono)</h1>
-  <p>Toca las notas en orden usando tu voz o instrumento</p>
+  
+   <button id="startBtn">Comenzar</button>
+   <div id="status">Haz clic en "Comenzar"</div>   
+ 
   <div id="staff"></div>
-  <div id="status">Haz clic en "Comenzar"</div>
   <div id="debug"></div>
-  <button id="startBtn">Comenzar</button>
+
 
 <script>
   const { Renderer, Stave, StaveNote, Voice, Formatter, Accidental, BarNote, StaveConnector } = Vex.Flow;
@@ -77,7 +83,7 @@
     div.innerHTML = "";
 
     const renderer = new Renderer(div, Renderer.Backends.SVG);
-    renderer.resize(800, 450);
+    renderer.resize(750, 450);
     const context = renderer.getContext();
 
     // Primer sistema
