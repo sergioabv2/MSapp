@@ -83,8 +83,13 @@
     div.innerHTML = "";
 
     const renderer = new Renderer(div, Renderer.Backends.SVG);
-    renderer.resize(750, 450);
+    
+    const availableWidth = div.clientWidth || window.innerWidth * 0.95;
+  const scaleFactor = Math.min(availableWidth / 750, 1.2);
+    
+    renderer.resize(availableWidth, 450 * scaleFactor);
     const context = renderer.getContext();
+     context.scale(scaleFactor, scaleFactor);
 
     // Primer sistema
     const staveTop1 = new Stave(30, 30, 700);
