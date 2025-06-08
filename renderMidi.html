@@ -1,0 +1,422 @@
+  
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reproductor MIDI con Grand Staff</title>
+
+  <!-- Tone.js -->
+  <script src="https://unpkg.com/tone@latest/build/Tone.js"></script>
+
+  <!-- @tonejs/midi -->
+  <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+
+  <!-- ABCJS -->
+ <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+
+  
+  <script src="https://tonejs.github.io/audio/salamander/"></script>
+
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 30px;
+      background-color: #f7f7f7;
+    }
+    #staff-container {
+      background: #fef2cc;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .player-controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+ <div id="staff-container">
+    <div id="staff"></div>
+  </div>
+
+  <div class="player-controls" style="display:none;">
+    <button id="play" data-playing="false">Play</button>
+    <span id="bpm-display"></span>
+  </div>
+
+ 
+  
+  
+  <div id="intro" style="margin-top: 15px;">Carga un archivo MIDI para comenzar.</div>
+  <button id="load" style="margin-top: 10px;">Cargar MIDI</button>
+
+  <script>
+ // console.clear();
+
+var APP = {};
+
+document.documentElement.addEventListener('mousedown', () => {
+  if (Tone.context.state !== 'running') Tone.context.resume();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("load").addEventListener("click", loadMIDIFile);
+    document.getElementById("play").addEventListener("click", function(e) {
+        var $el = e.target;
+        if($el.getAttribute("data-playing") === "true") {
+            APP.MusicGenerator.pause();
+            $el.setAttribute("data-playing", "false");
+            $el.innerHTML = "Play";
+        } else {
+            APP.MusicGenerator.play();
+            $el.innerHTML = "Pause";
+            $el.setAttribute("data-playing", "true");
+        }
+    });
+    
+    APP.MusicGenerator.init();
+});
+
+(function() {
+  APP.MusicGenerator = {};
+  
+  var _container = document.getElementById("staff-container");
+  var _staff = document.getElementById("staff");
+  var _synth = null;
+  var _currentMIDI = null;
+  var _transport = null;
+  var _bpm = 120;
+  var _parts = [];
+  var _timeSignature = "4/4";
+  
+  // Inicialización
+  APP.MusicGenerator.init = function() {
+    _staff.innerHTML = "";
+    _setSynth();
+  };
+  
+  // Métodos públicos
+  APP.MusicGenerator.play = function() {
+    if (_transport) {
+      Tone.Transport.start();
+    }
+  };
+  
+  APP.MusicGenerator.pause = function() {
+    Tone.Transport.stop();
+  };
+  
+  APP.MusicGenerator.loadMIDI = function(midiArrayBuffer) {
+    if (_transport) {
+      Tone.Transport.cancel();
+      Tone.Transport.stop();
+    }
+
+    try {
+      const midi = new Midi(midiArrayBuffer);
+      APP.MusicGenerator.processMIDI(midi);
+    } catch (error) {
+      console.error("Error parsing MIDI:", error);
+      alert("Error al procesar el archivo MIDI. Asegúrate de que es un archivo válido.");
+    }
+  };
+  
+  APP.MusicGenerator.processMIDI = function(midi) {
+    _currentMIDI = midi;
+    _bpm = midi.header.tempos[0]?.bpm || 120;
+    _timeSignature = midi.header.timeSignatures[0]?.timeSignature.join("/") || "4/4";
+    
+    document.getElementById("bpm-display").textContent = `Tempo: ${_bpm} BPM | Compás: ${_timeSignature}`;
+    Tone.Transport.bpm.value = _bpm;
+
+    var abcNotation = _convertMIDIToABC(midi);
+    _renderABC(_staff, abcNotation);
+
+    _scheduleMIDIPlayback(midi);
+
+    document.querySelector(".player-controls").style.display = "flex";
+    document.getElementById("intro").style.display = "none";
+  };
+
+ function _setSynth() {
+  const pianoSamples = {
+    // Carga notas comunes; puedes extender a más octavas si gustas
+    "C4": "C4.mp3",
+    "D#4": "Ds4.mp3",
+    "F#4": "Fs4.mp3",
+    "A4": "A4.mp3"
+  };
+
+  const baseUrl = "https://tonejs.github.io/audio/salamander/";
+
+  const trebleSampler = new Tone.Sampler({
+    urls: pianoSamples,
+    release: 1,
+    baseUrl: baseUrl,
+    onload: () => console.log("Piano samples loaded")
+  }).toDestination();
+
+  const bassSampler = new Tone.Sampler({
+    urls: pianoSamples,
+    release: 1.5,
+    baseUrl: baseUrl,
+    onload: () => console.log("Piano samples loaded")
+  }).toDestination();
+
+  const reverb = new Tone.Freeverb({
+    roomSize: 0.7,
+    wet: 0.3
+  }).toDestination();
+
+  trebleSampler.connect(reverb);
+  bassSampler.connect(reverb);
+
+  _synth = {
+    treble: trebleSampler,
+    bass: bassSampler
+  };
+}
+
+
+  function _convertMIDIToABC(midi) {
+  const abcHeader = [
+    "X:1",
+    `T:${midi.name || "MIDI Importado"}`,
+    `M:${_timeSignature}`,
+    "L:1/4",  // Nueva unidad base: negra
+    `Q:1/4=${_bpm}`,
+    "K:C",
+    "%%staves {1 2}",
+    "V:1 clef=treble",
+    "V:2 clef=bass",
+    ""
+  ].join("\n");
+
+  const allNotes = [];
+  midi.tracks.forEach(track => {
+    track.notes.forEach(note => {
+      allNotes.push({
+        name: note.name,
+        midi: note.midi,
+        time: note.time,
+        duration: note.duration,
+        velocity: note.velocity
+      });
+    });
+  });
+
+  allNotes.sort((a, b) => a.time - b.time);
+
+  const trebleNotes = allNotes.filter(n => n.midi >= 60);
+  const bassNotes = allNotes.filter(n => n.midi < 60);
+
+  const measureDuration = _getMeasureDuration();
+  const totalDuration = Math.max(
+    trebleNotes.at(-1)?.time + trebleNotes.at(-1)?.duration || 0,
+    bassNotes.at(-1)?.time + bassNotes.at(-1)?.duration || 0
+  );
+  const totalMeasures = Math.ceil(totalDuration / measureDuration);
+
+  let abcContent = "";
+
+  for (let measure = 0; measure < totalMeasures; measure++) {
+    const start = measure * measureDuration;
+    const end = (measure + 1) * measureDuration;
+
+    const trebleMeasure = trebleNotes.filter(n => n.time >= start && n.time < end);
+    const bassMeasure = bassNotes.filter(n => n.time >= start && n.time < end);
+
+    abcContent += _generateMeasureABC(trebleMeasure, bassMeasure, start, end);
+  }
+
+  return abcHeader + abcContent.trim() + "\n";
+}
+
+  function _generateMeasureABC(trebleNotes, bassNotes, start, end) {
+  const trebleGrouped = _groupNotesByTime(trebleNotes, start, end);
+  const bassGrouped = _groupNotesByTime(bassNotes, start, end);
+
+  const trebleABC = "[V:1] " + _groupToABC(trebleGrouped) + "|\n";
+  const bassABC = "[V:2] " + _groupToABC(bassGrouped) + "|\n";
+
+  return trebleABC + bassABC;
+}
+
+function _groupNotesByTime(notes, startTime, endTime) {
+  const timeSlice = 1 / 64; // Resolución en negra/64
+  const grid = {};
+
+  notes.forEach(note => {
+    const roundedTime = Math.round(note.time / timeSlice) * timeSlice;
+    const key = roundedTime.toFixed(5);
+    if (!grid[key]) grid[key] = [];
+    grid[key].push(note);
+  });
+
+  // Asegura cobertura de compás completo
+  const keys = Object.keys(grid).map(k => parseFloat(k)).sort((a, b) => a - b);
+  const events = [];
+  let currentTime = startTime;
+
+  for (const t of keys) {
+    if (t > currentTime + 0.001) {
+      const restDuration = t - currentTime;
+      events.push({ rest: true, duration: restDuration });
+    }
+    const group = grid[t.toFixed(5)];
+    const duration = Math.max(...group.map(n => n.duration));
+    events.push({ notes: group, duration });
+    currentTime = t + duration;
+  }
+
+  if (currentTime < endTime - 0.001) {
+    events.push({ rest: true, duration: endTime - currentTime });
+  }
+
+  return events;
+}
+
+function _groupToABC(events) {
+  return events.map(event => {
+    if (event.rest) return "z" + _durationToABC(event.duration);
+    if (event.notes.length === 1) {
+      return _noteToABC(event.notes[0].name) + _durationToABC(event.duration);
+    }
+    const chord = event.notes.map(n => _noteToABC(n.name)).join("");
+    return "[" + chord + "]" + _durationToABC(event.duration);
+  }).join(" ");
+}
+
+  function _getMeasureDuration() {
+  const [beats, beatValue] = _timeSignature.split("/").map(Number);
+  return (60 / _bpm) * beats * (4 / beatValue);
+}
+
+function _durationToABC(duration) {
+  const q = 60 / _bpm;  // duración de negra
+  const ratios = [
+    { dur: 4 * q, abc: "4" },      // redonda
+    { dur: 3 * q, abc: "3" },      // blanca con puntillo
+    { dur: 2 * q, abc: "2" },      // blanca
+    { dur: 1.5 * q, abc: "3/2" },  // negra con puntillo
+    { dur: q, abc: "" },           // negra
+    { dur: 0.5 * q, abc: "/2" },   // corchea
+    { dur: 0.25 * q, abc: "/4" },  // semicorchea
+    { dur: 0.125 * q, abc: "/8" }, // fusa
+  ];
+
+  const margins = 0.12;
+
+  for (const { dur, abc } of ratios) {
+    if (Math.abs(duration - dur) < margins) return abc;
+  }
+
+  // Como fallback, devolvemos duración decimal
+  const approx = (duration / q).toFixed(2); // ej: 1.75
+  return approx === "1.00" ? "" : approx;
+}
+
+
+
+
+  function _noteToABC(noteName) {
+  const pitch = noteName.slice(0, -1);
+  const octave = parseInt(noteName.slice(-1));
+  let note = pitch[0].toUpperCase();
+
+  if (pitch.length === 2) {
+    if (pitch[1] === "#") note = "^" + note;
+    else if (pitch[1] === "b") note = "_" + note;
+  }
+
+  if (octave > 4) {
+    note = note.toLowerCase();
+    for (let i = 5; i < octave; i++) note += "'";
+  } else if (octave < 4) {
+    for (let i = octave; i < 4; i++) note += ",";
+  }
+
+  return note;
+}
+
+ function _scheduleMIDIPlayback(midi) {
+  _parts.forEach(part => part.dispose());
+  _parts = [];
+
+  const visualNotes = visualObj?.noteTimings || [];
+
+  midi.tracks.forEach(track => {
+    const part = new Tone.Part((time, note) => {
+      const synth = note.midi >= 60 ? _synth.treble : _synth.bass;
+      synth.triggerAttackRelease(note.name, note.duration, time, note.velocity);
+
+      // Resalta la nota correspondiente en la partitura
+      const match = visualNotes.find(n => Math.abs(n.seconds - time) < 0.05);
+      if (match && visualObj) {
+        visualObj.highlight(match);
+      }
+    }, track.notes).start(0);
+
+    _parts.push(part);
+  });
+
+  _transport = Tone.Transport;
+  _transport.bpm.value = _bpm;
+  _transport.loopStart = 0;
+  _transport.loopEnd = midi.duration;
+  _transport.loop = true;
+}
+
+
+function _renderABC(el, abc) {
+  el.innerHTML = "";
+
+  const options = {
+    staffwidth: 800,
+    scale: 1.2,
+    add_classes: true,
+    responsive: "resize",
+    wrap: {
+      preferredMeasuresPerLine: 4
+    },
+   
+  };
+
+  const result = ABCJS.renderAbc(el, abc, {}, options);
+  visualObj = result[0]; // Save the visual object for animation
+  
+  
+}
+
+})();
+
+function loadMIDIFile() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.mid,.midi';
+
+  fileInput.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      APP.MusicGenerator.loadMIDI(e.target.result);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  fileInput.click();
+}
+  </script>
+</body>
+</html>
