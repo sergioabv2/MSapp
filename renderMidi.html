@@ -15,7 +15,7 @@
 
   
   <script src="https://tonejs.github.io/audio/salamander/"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 
   <style>
     body {
@@ -30,10 +30,10 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .player-controls {
-      margin-top: 20px;
-      display: flex;
-      gap: 20px;
-      align-items: center;
+      z-index: 100;
+      position: absolute;
+margin-top: 10px;
+      margin-left: 10px;
     }
     button {
       padding: 10px 15px;
@@ -44,20 +44,19 @@
 </head>
 <body>
 
+   <div class="player-controls" style="display:none;">
+    <button id="play" data-playing="false"><i class="fa fa-play" aria-hidden="true"></i></button>
+    <span id="bpm-display" hidden></span>
+  </div>
+  
  <div id="staff-container">
     <div id="staff"></div>
   </div>
 
-  <div class="player-controls" style="display:none;">
-    <button id="play" data-playing="false">Play</button>
-    <span id="bpm-display"></span>
-  </div>
-
- 
   
   
   <div id="intro" style="margin-top: 15px;">Carga un archivo MIDI para comenzar.</div>
-  <button id="load" style="margin-top: 10px;">Cargar MIDI</button>
+  <button id="load" style="margin-top: 10px;"><i class="fa fa-upload" aria-hidden="true"></i></button>
 
   <script>
  // console.clear();
