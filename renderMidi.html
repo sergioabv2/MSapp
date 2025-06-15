@@ -1,6 +1,6 @@
   
-<html lang="es">
-<head>
+<html lang="es">  
+<head>   
   <meta charset="UTF-8">
   <title>Reproductor MIDI con Grand Staff</title>
 
@@ -9,13 +9,14 @@
 
   <!-- @tonejs/midi -->
   <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
-
-  <!-- ABCJS -->
- <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
-
+  
+  <!-- ABCJS -->   
+ <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.0/dist/abcjs-basic-min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.4.0/abcjs-audio.css">
+</link>
   
   <script src="https://tonejs.github.io/audio/salamander/"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
 
   <style>
     body {
@@ -24,43 +25,106 @@
       background-color: #f7f7f7;
     }
     #staff-container {
+       position: relative;
       background: #fef2cc;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .player-controls {
-      z-index: 100;
-      position: absolute;
-margin-top: 10px;
-      margin-left: 10px;
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
     button {
       padding: 10px 15px;
       font-size: 16px;
       cursor: pointer;
     }
+    
+    .note-error {
+  stroke: red !important;
+  fill: red !important;
+}
+
+
+.error-mark {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.2);
+    border: 2px solid red;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 100;
+    box-sizing: border-box;
+    transform: translate(-1px, -1px);
+}
+
+.error-mark.missing {
+    border-color: orange;
+    background-color: rgba(255, 165, 0, 0.2);
+}
+
+    .abcjs-note_active {
+  fill: red !important;
+  stroke: red !important;
+}
+
+
+#error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+.error-mark {
+  position: absolute;
+  font-size: 24px; /* Tamaño base */
+  color: red;
+  pointer-events: none;
+  transform: translate(-50%, -50%); /* Centrar la marca */
+  z-index: 100;
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+
+#play-mark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 103;
+  opacity: 0.7;
+}
+
   </style>
-</head>
+</head> 
 <body>
 
-   <div class="player-controls" style="display:none;">
-    <button id="play" data-playing="false"><i class="fa fa-play" aria-hidden="true"></i></button>
-    <span id="bpm-display" hidden></span>
-  </div>
-  
- <div id="staff-container">
-    <div id="staff"></div>
-  </div>
+  <h1>Reproductor de MIDI con Grand Staff</h1>
+ 
+  <div id="intro">Carga un archivo MIDI para comenzar.</div>
+  <button id="load">Cargar MIDI</button>
+    <button id="load-student">MIDI Student</button>
+    <button id="simulation" >Marks</button>
 
-  
-  
-  <div id="intro" style="margin-top: 15px;">Carga un archivo MIDI para comenzar.</div>
-  <button id="load" style="margin-top: 10px;"><i class="fa fa-upload" aria-hidden="true"></i></button>
+    
+   
+
+  <div id="staff-container">
+    <div id="staff"></div>
+    <div id="error-overlay"></div> 
+    <div id="play-mark"></div> 
+  </div>
+    <div id="notation"></div>
 
   <script>
- // console.clear();
-
 var APP = {};
 
 document.documentElement.addEventListener('mousedown', () => {
@@ -69,25 +133,15 @@ document.documentElement.addEventListener('mousedown', () => {
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("load").addEventListener("click", loadMIDIFile);
-    document.getElementById("play").addEventListener("click", function(e) {
-        var $el = e.target;
-        if($el.getAttribute("data-playing") === "true") {
-            APP.MusicGenerator.pause();
-            $el.setAttribute("data-playing", "false");
-            $el.innerHTML = "Play";
-        } else {
-            APP.MusicGenerator.play();
-            $el.innerHTML = "Pause";
-            $el.setAttribute("data-playing", "true");
-        }
-    });
-    
+    document.getElementById("load-student").addEventListener("click", loadStudentMIDI);
+    document.getElementById("simulation").addEventListener("click", () => simulateMarks([0, 2, 15]));
+
     APP.MusicGenerator.init();
 });
 
 (function() {
   APP.MusicGenerator = {};
-  
+
   var _container = document.getElementById("staff-container");
   var _staff = document.getElementById("staff");
   var _synth = null;
@@ -96,24 +150,15 @@ document.addEventListener('DOMContentLoaded', function() {
   var _bpm = 120;
   var _parts = [];
   var _timeSignature = "4/4";
-  
-  // Inicialización
+  var visualObj = null;
+
+  APP.MusicGenerator.currentMIDI = null;
+  APP.MusicGenerator.studentMIDI = null;
+
   APP.MusicGenerator.init = function() {
     _staff.innerHTML = "";
-    _setSynth();
   };
-  
-  // Métodos públicos
-  APP.MusicGenerator.play = function() {
-    if (_transport) {
-      Tone.Transport.start();
-    }
-  };
-  
-  APP.MusicGenerator.pause = function() {
-    Tone.Transport.stop();
-  };
-  
+
   APP.MusicGenerator.loadMIDI = function(midiArrayBuffer) {
     if (_transport) {
       Tone.Transport.cancel();
@@ -122,281 +167,400 @@ document.addEventListener('DOMContentLoaded', function() {
 
     try {
       const midi = new Midi(midiArrayBuffer);
+      APP.MusicGenerator.currentMIDI = midi;
       APP.MusicGenerator.processMIDI(midi);
     } catch (error) {
       console.error("Error parsing MIDI:", error);
       alert("Error al procesar el archivo MIDI. Asegúrate de que es un archivo válido.");
     }
   };
-  
+
+  APP.MusicGenerator.loadStudentMIDI = function(arrayBuffer) {
+    try {
+      const midi = new Midi(arrayBuffer);
+      APP.MusicGenerator.studentMIDI = midi;
+      APP.MusicGenerator.compareWithStudent(midi);
+    } catch (err) {
+      console.error("Error al cargar MIDI del alumno", err);
+    }
+  };
+
+APP.MusicGenerator.compareWithStudent = function(studentMIDI) {
+    const refMIDI = APP.MusicGenerator.currentMIDI;
+    if (!refMIDI) {
+        alert("Primero carga un archivo de referencia");
+        return;
+    }
+
+    waitForStaffRender(() => {
+        const timeTolerance = 0.25;
+
+        // Solo asignamos índices aquí
+        const rawRefNotes = flattenNotes(refMIDI);
+        const refNotes = rawRefNotes.map((note, index) => ({ ...note, index }));
+
+        const stuNotes = flattenNotes(studentMIDI);
+
+        const usedStuIndices = new Set();
+        const unmatchedRefIndices = [];
+
+        for (let refNote of refNotes) {
+            let matchFound = false;
+
+            for (let i = 0; i < stuNotes.length; i++) {
+                if (usedStuIndices.has(i)) continue;
+
+                const stuNote = stuNotes[i];
+                const pitchOk = refNote.midi === stuNote.midi;
+                const timeOk = Math.abs(refNote.time - stuNote.time) <= timeTolerance;
+
+                if (pitchOk && timeOk) {
+                    usedStuIndices.add(i);
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (!matchFound) {
+                unmatchedRefIndices.push(refNote.index); // solo índices de notas de referencia
+            }
+        }
+
+        alert(`Notas no encontradas en comparación: ${unmatchedRefIndices.join(', ')}`);
+        simulateMarks(unmatchedRefIndices);
+    });
+};
+
+
+
+function flattenNotes(midi) {
+    const notes = [];
+    midi.tracks.forEach(track => {
+        track.notes.forEach(note => {
+            if (note.duration > 0.01) { // evita notas fantasmas
+                notes.push({
+                    ...note,
+                    time: parseFloat(note.time.toFixed(3)),
+                    duration: parseFloat(note.duration.toFixed(3)),
+                    midi: note.midi,
+                });
+            }
+        });
+    });
+
+    notes.sort((a, b) => a.time - b.time);
+
+    return notes.map((note, index) => ({ ...note, index }));
+}
+
+
+
+
   APP.MusicGenerator.processMIDI = function(midi) {
     _currentMIDI = midi;
     _bpm = midi.header.tempos[0]?.bpm || 120;
     _timeSignature = midi.header.timeSignatures[0]?.timeSignature.join("/") || "4/4";
-    
-    document.getElementById("bpm-display").textContent = `Tempo: ${_bpm} BPM | Compás: ${_timeSignature}`;
+
     Tone.Transport.bpm.value = _bpm;
 
     var abcNotation = _convertMIDIToABC(midi);
     _renderABC(_staff, abcNotation);
 
-    _scheduleMIDIPlayback(midi);
-
-    document.querySelector(".player-controls").style.display = "flex";
     document.getElementById("intro").style.display = "none";
   };
 
- function _setSynth() {
-  const pianoSamples = {
-    // Carga notas comunes; puedes extender a más octavas si gustas
-    "C4": "C4.mp3",
-    "D#4": "Ds4.mp3",
-    "F#4": "Fs4.mp3",
-    "A4": "A4.mp3"
-  };
-
-  const baseUrl = "https://tonejs.github.io/audio/salamander/";
-
-  const trebleSampler = new Tone.Sampler({
-    urls: pianoSamples,
-    release: 1,
-    baseUrl: baseUrl,
-    onload: () => console.log("Piano samples loaded")
-  }).toDestination();
-
-  const bassSampler = new Tone.Sampler({
-    urls: pianoSamples,
-    release: 1.5,
-    baseUrl: baseUrl,
-    onload: () => console.log("Piano samples loaded")
-  }).toDestination();
-
-  const reverb = new Tone.Freeverb({
-    roomSize: 0.7,
-    wet: 0.3
-  }).toDestination();
-
-  trebleSampler.connect(reverb);
-  bassSampler.connect(reverb);
-
-  _synth = {
-    treble: trebleSampler,
-    bass: bassSampler
-  };
-}
-
-
   function _convertMIDIToABC(midi) {
-  const abcHeader = [
-    "X:1",
-    `T:${midi.name || "MIDI Importado"}`,
-    `M:${_timeSignature}`,
-    "L:1/4",  // Nueva unidad base: negra
-    `Q:1/4=${_bpm}`,
-    "K:C",
-    "%%staves {1 2}",
-    "V:1 clef=treble",
-    "V:2 clef=bass",
-    ""
-  ].join("\n");
+    const abcHeader = [
+      "X:1",
+      `T:${midi.name || "MIDI Importado"}`,
+      `M:${_timeSignature}`,
+      "L:1/4",
+      `Q:1/4=${_bpm}`,
+      "K:C",
+      "%%staves {1 2}",
+      "V:1 clef=treble",
+      "V:2 clef=bass",
+      ""
+    ].join("\n");
 
-  const allNotes = [];
-  midi.tracks.forEach(track => {
-    track.notes.forEach(note => {
-      allNotes.push({
-        name: note.name,
-        midi: note.midi,
-        time: note.time,
-        duration: note.duration,
-        velocity: note.velocity
+    const allNotes = [];
+    midi.tracks.forEach(track => {
+      track.notes.forEach(note => {
+        allNotes.push({
+          name: note.name,
+          midi: note.midi,
+          time: note.time,
+          duration: note.duration,
+          velocity: note.velocity
+        });
       });
     });
-  });
 
-  allNotes.sort((a, b) => a.time - b.time);
+    allNotes.sort((a, b) => a.time - b.time);
 
-  const trebleNotes = allNotes.filter(n => n.midi >= 60);
-  const bassNotes = allNotes.filter(n => n.midi < 60);
+    const trebleNotes = allNotes.filter(n => n.midi >= 60);
+    const bassNotes = allNotes.filter(n => n.midi < 60);
 
-  const measureDuration = _getMeasureDuration();
-  const totalDuration = Math.max(
-    trebleNotes.at(-1)?.time + trebleNotes.at(-1)?.duration || 0,
-    bassNotes.at(-1)?.time + bassNotes.at(-1)?.duration || 0
-  );
-  const totalMeasures = Math.ceil(totalDuration / measureDuration);
+    const measureDuration = _getMeasureDuration();
+    const totalDuration = Math.max(
+      trebleNotes.at(-1)?.time + trebleNotes.at(-1)?.duration || 0,
+      bassNotes.at(-1)?.time + bassNotes.at(-1)?.duration || 0
+    );
+    const totalMeasures = Math.ceil(totalDuration / measureDuration);
 
-  let abcContent = "";
+    let abcContent = "";
 
-  for (let measure = 0; measure < totalMeasures; measure++) {
-    const start = measure * measureDuration;
-    const end = (measure + 1) * measureDuration;
+    for (let measure = 0; measure < totalMeasures; measure++) {
+      const start = measure * measureDuration;
+      const end = (measure + 1) * measureDuration;
 
-    const trebleMeasure = trebleNotes.filter(n => n.time >= start && n.time < end);
-    const bassMeasure = bassNotes.filter(n => n.time >= start && n.time < end);
+      const trebleMeasure = trebleNotes.filter(n => n.time >= start && n.time < end);
+      const bassMeasure = bassNotes.filter(n => n.time >= start && n.time < end);
 
-    abcContent += _generateMeasureABC(trebleMeasure, bassMeasure, start, end);
+      abcContent += _generateMeasureABC(trebleMeasure, bassMeasure, start, end);
+    }
+
+    return abcHeader + abcContent.trim() + "\n";
   }
-
-  return abcHeader + abcContent.trim() + "\n";
-}
 
   function _generateMeasureABC(trebleNotes, bassNotes, start, end) {
-  const trebleGrouped = _groupNotesByTime(trebleNotes, start, end);
-  const bassGrouped = _groupNotesByTime(bassNotes, start, end);
+    const trebleGrouped = _groupNotesByTime(trebleNotes, start, end);
+    const bassGrouped = _groupNotesByTime(bassNotes, start, end);
 
-  const trebleABC = "[V:1] " + _groupToABC(trebleGrouped) + "|\n";
-  const bassABC = "[V:2] " + _groupToABC(bassGrouped) + "|\n";
+    const trebleABC = "[V:1] " + _groupToABC(trebleGrouped) + "|\n";
+    const bassABC = "[V:2] " + _groupToABC(bassGrouped) + "|\n";
 
-  return trebleABC + bassABC;
-}
-
-function _groupNotesByTime(notes, startTime, endTime) {
-  const timeSlice = 1 / 64; // Resolución en negra/64
-  const grid = {};
-
-  notes.forEach(note => {
-    const roundedTime = Math.round(note.time / timeSlice) * timeSlice;
-    const key = roundedTime.toFixed(5);
-    if (!grid[key]) grid[key] = [];
-    grid[key].push(note);
-  });
-
-  // Asegura cobertura de compás completo
-  const keys = Object.keys(grid).map(k => parseFloat(k)).sort((a, b) => a - b);
-  const events = [];
-  let currentTime = startTime;
-
-  for (const t of keys) {
-    if (t > currentTime + 0.001) {
-      const restDuration = t - currentTime;
-      events.push({ rest: true, duration: restDuration });
-    }
-    const group = grid[t.toFixed(5)];
-    const duration = Math.max(...group.map(n => n.duration));
-    events.push({ notes: group, duration });
-    currentTime = t + duration;
+    return trebleABC + bassABC;
   }
 
-  if (currentTime < endTime - 0.001) {
-    events.push({ rest: true, duration: endTime - currentTime });
+  function _groupNotesByTime(notes, startTime, endTime) {
+    const timeSlice = 1 / 64;
+    const grid = {};
+
+    notes.forEach(note => {
+      const roundedTime = Math.round(note.time / timeSlice) * timeSlice;
+      const key = roundedTime.toFixed(5);
+      if (!grid[key]) grid[key] = [];
+      grid[key].push(note);
+    });
+
+    const keys = Object.keys(grid).map(k => parseFloat(k)).sort((a, b) => a - b);
+    const events = [];
+    let currentTime = startTime;
+
+    for (const t of keys) {
+      if (t > currentTime + 0.001) {
+        const restDuration = t - currentTime;
+        events.push({ rest: true, duration: restDuration });
+      }
+      const group = grid[t.toFixed(5)];
+      const duration = Math.max(...group.map(n => n.duration));
+      events.push({ notes: group, duration });
+      currentTime = t + duration;
+    }
+
+    if (currentTime < endTime - 0.001) {
+      events.push({ rest: true, duration: endTime - currentTime });
+    }
+
+    return events;
   }
 
-  return events;
-}
-
-function _groupToABC(events) {
-  return events.map(event => {
-    if (event.rest) return "z" + _durationToABC(event.duration);
-    if (event.notes.length === 1) {
-      return _noteToABC(event.notes[0].name) + _durationToABC(event.duration);
-    }
-    const chord = event.notes.map(n => _noteToABC(n.name)).join("");
-    return "[" + chord + "]" + _durationToABC(event.duration);
-  }).join(" ");
-}
+  function _groupToABC(events) {
+    return events.map(event => {
+      if (event.rest) return "z" + _durationToABC(event.duration);
+      if (event.notes.length === 1) {
+        return _noteToABC(event.notes[0].name) + _durationToABC(event.duration);
+      }
+      const chord = event.notes.map(n => _noteToABC(n.name)).join("");
+      return "[" + chord + "]" + _durationToABC(event.duration);
+    }).join(" ");
+  }
 
   function _getMeasureDuration() {
-  const [beats, beatValue] = _timeSignature.split("/").map(Number);
-  return (60 / _bpm) * beats * (4 / beatValue);
-}
-
-function _durationToABC(duration) {
-  const q = 60 / _bpm;  // duración de negra
-  const ratios = [
-    { dur: 4 * q, abc: "4" },      // redonda
-    { dur: 3 * q, abc: "3" },      // blanca con puntillo
-    { dur: 2 * q, abc: "2" },      // blanca
-    { dur: 1.5 * q, abc: "3/2" },  // negra con puntillo
-    { dur: q, abc: "" },           // negra
-    { dur: 0.5 * q, abc: "/2" },   // corchea
-    { dur: 0.25 * q, abc: "/4" },  // semicorchea
-    { dur: 0.125 * q, abc: "/8" }, // fusa
-  ];
-
-  const margins = 0.12;
-
-  for (const { dur, abc } of ratios) {
-    if (Math.abs(duration - dur) < margins) return abc;
+    const [beats, beatValue] = _timeSignature.split("/").map(Number);
+    return (60 / _bpm) * beats * (4 / beatValue);
   }
 
-  // Como fallback, devolvemos duración decimal
-  const approx = (duration / q).toFixed(2); // ej: 1.75
-  return approx === "1.00" ? "" : approx;
-}
+  function _durationToABC(duration) {
+    const q = 60 / _bpm;
+    const ratios = [
+      { dur: 4 * q, abc: "4" },
+      { dur: 3 * q, abc: "3" },
+      { dur: 2 * q, abc: "2" },
+      { dur: 1.5 * q, abc: "3/2" },
+      { dur: q, abc: "" },
+      { dur: 0.5 * q, abc: "/2" },
+      { dur: 0.25 * q, abc: "/4" },
+      { dur: 0.125 * q, abc: "/8" },
+    ];
 
+    const margins = 0.12;
 
+    for (const { dur, abc } of ratios) {
+      if (Math.abs(duration - dur) < margins) return abc;
+    }
 
+    const approx = (duration / q).toFixed(2);
+    return approx === "1.00" ? "" : approx;
+  }
 
   function _noteToABC(noteName) {
-  const pitch = noteName.slice(0, -1);
-  const octave = parseInt(noteName.slice(-1));
-  let note = pitch[0].toUpperCase();
+    const pitch = noteName.slice(0, -1);
+    const octave = parseInt(noteName.slice(-1));
+    let note = pitch[0].toUpperCase();
 
-  if (pitch.length === 2) {
-    if (pitch[1] === "#") note = "^" + note;
-    else if (pitch[1] === "b") note = "_" + note;
-  }
+    if (pitch.length === 2) {
+      if (pitch[1] === "#") note = "^" + note;
+      else if (pitch[1] === "b") note = "_" + note;
+    }
 
-  if (octave > 4) {
-    note = note.toLowerCase();
-    for (let i = 5; i < octave; i++) note += "'";
-  } else if (octave < 4) {
-    for (let i = octave; i < 4; i++) note += ",";
-  }
+    if (octave > 4) {
+      note = note.toLowerCase();
+      for (let i = 5; i < octave; i++) note += "'";
+    } else if (octave < 4) {
+      for (let i = octave; i < 4; i++) note += ",";
+    }
 
-  return note;
-}
-
- function _scheduleMIDIPlayback(midi) {
-  _parts.forEach(part => part.dispose());
-  _parts = [];
-
-  const visualNotes = visualObj?.noteTimings || [];
-
-  midi.tracks.forEach(track => {
-    const part = new Tone.Part((time, note) => {
-      const synth = note.midi >= 60 ? _synth.treble : _synth.bass;
-      synth.triggerAttackRelease(note.name, note.duration, time, note.velocity);
-
-      // Resalta la nota correspondiente en la partitura
-      const match = visualNotes.find(n => Math.abs(n.seconds - time) < 0.05);
-      if (match && visualObj) {
-        visualObj.highlight(match);
-      }
-    }, track.notes).start(0);
-
-    _parts.push(part);
-  });
-
-  _transport = Tone.Transport;
-  _transport.bpm.value = _bpm;
-  _transport.loopStart = 0;
-  _transport.loopEnd = midi.duration;
-  _transport.loop = true;
-}
-
+    return note;
+  } 
 
 function _renderABC(el, abc) {
   el.innerHTML = "";
 
   const options = {
-    staffwidth: 800,
-    scale: 1.2,
+    staffwidth: 650,
+    scale: 1.3,
     add_classes: true,
     responsive: "resize",
     wrap: {
       preferredMeasuresPerLine: 4
-    },
-   
+    }
   };
 
   const result = ABCJS.renderAbc(el, abc, {}, options);
-  visualObj = result[0]; // Save the visual object for animation
-  
-  
+  visualObj = result[0];
+
+  waitForStaffRender(() => {
+    indexNotes();
+
+    if (ABCJS.synth && visualObj) {
+      const synth = new ABCJS.synth.CreateSynth();
+      const synthControl = new ABCJS.synth.SynthController();
+      synthControl.load("#notation", null, {
+        displayLoop: true,
+        displayRestart: true,
+        displayPlay: true,
+        displayProgress: true,
+        showCursor: true
+      });
+
+      synthControl.setTune(visualObj, false, {
+        chordsOff: true,
+        midiTranspose: 0
+      }).then(() => {
+        // Posicionamiento del marcador rojo
+        let playMark = document.getElementById('play-mark');
+        if (!playMark) {
+          playMark = document.createElement('div');
+          playMark.id = 'play-mark';
+          playMark.style.position = 'absolute';
+          playMark.style.width = '20px';
+          playMark.style.height = '20px';
+          playMark.style.borderRadius = '50%';
+          playMark.style.background = 'red';
+          playMark.style.pointerEvents = 'none';
+          playMark.style.transform = 'translate(-50%, -50%)';
+          document.getElementById('staff-container').appendChild(playMark);
+        }
+
+        document.getElementById('staff-container').style.position = 'relative';
+
+        visualObj.setTimingCallbacks({
+          eventCallback: (event) => {
+            if (!event || !event.elements) return;
+
+            for (const elementGroup of event.elements) {
+              for (const el of elementGroup) {
+                if (el.classList && el.classList.contains("abcjs-note")) {
+                  const container = document.getElementById("staff-container");
+                  const noteRect = el.getBoundingClientRect();
+                  const containerRect = container.getBoundingClientRect();
+                  const x = noteRect.left - containerRect.left + noteRect.width / 2;
+                  const y = noteRect.top - containerRect.top + noteRect.height / 2;
+
+                  playMark.style.left = `${x}px`;
+                  playMark.style.top = `${y}px`;
+                  playMark.style.display = "block";
+                  return;
+                }
+              }
+            }
+          },
+          lineEndCallback: () => {
+            playMark.style.display = 'none';
+          }
+        });
+      });
+    }
+  });
 }
 
 })();
+
+function waitForStaffRender(callback) {
+  const checkInterval = setInterval(() => {
+    const svg = document.querySelector('#staff svg');
+    if (svg && svg.querySelector('g.abcjs-note')) {
+      clearInterval(checkInterval);
+      callback();
+    }
+  }, 100);
+}
+
+function indexNotes() {
+  const noteGroups = document.querySelectorAll('#staff svg g.abcjs-note');
+  noteGroups.forEach((group, i) => {
+    group.setAttribute('data-note-index', i);
+  });
+}
+
+function simulateMarks(noteIndices) {
+  waitForStaffRender(() => {
+    indexNotes();
+
+    const overlay = document.getElementById('error-overlay');
+    overlay.innerHTML = '';
+
+    const svg = document.querySelector('#staff svg');
+    if (!svg) return;
+
+    const container = document.getElementById('staff-container');
+    const containerRect = container.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+    noteIndices.forEach(index => {
+      const noteGroup = svg.querySelector(`g.abcjs-note[data-note-index="${index}"]`);
+      if (noteGroup) {
+        const bbox = noteGroup.getBBox();
+        const x = bbox.x + svgRect.left - containerRect.left + scrollLeft;
+        const y = bbox.y + svgRect.top - containerRect.top + scrollTop;
+
+        const mark = document.createElement('div');
+        mark.className = 'error-mark';
+        mark.textContent = '❌';
+        mark.style.position = 'absolute';
+        mark.style.left = `${x}px`;
+        mark.style.top = `${y}px`;
+        mark.style.pointerEvents = 'none';
+
+        overlay.appendChild(mark);
+      }
+    });
+  });
+}
 
 function loadMIDIFile() {
   const fileInput = document.createElement('input');
@@ -416,6 +580,24 @@ function loadMIDIFile() {
 
   fileInput.click();
 }
+
+function loadStudentMIDI() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".mid,.midi";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      APP.MusicGenerator.loadStudentMIDI(ev.target.result);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  input.click();
+}
+
   </script>
 </body>
 </html>
+    
