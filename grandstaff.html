@@ -1,8 +1,11 @@
+
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Oda a la Alegría - Juego de Melodía con Micrófono</title>
-  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
+  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js">
+  </script>
+ <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
   <style>
     body { font-family: sans-serif;  background-color: #fef2cc; }
   #staff { border: 1px solid #ccc; margin-top: 2px;  overflow-x: auto;}
@@ -32,6 +35,7 @@
   <div id="staff"></div>
   <div id="debug"></div>
 
+  <button id="playBtn">Reproducir Partitura</button>
 
 <script>
   const { Renderer, Stave, StaveNote, Voice, Formatter, Accidental, BarNote, StaveConnector } = Vex.Flow;
@@ -355,6 +359,137 @@
   });
 
   renderScore();
+
+
+  // Agrega estas variables al inicio con las otras
+let audioContext2;
+let pianoInstrument = null;
+let isPlayingBack = false;
+let playbackTimeout;
+
+// Función para inicializar el instrumento
+async function initSoundfont() {
+  audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
+  try {
+    pianoInstrument = await Soundfont.instrument(audioContext2, 'acoustic_grand_piano');
+    document.getElementById('playBtn').disabled = false;
+  } catch (error) {
+    console.error('Error loading Soundfont:', error);
+    statusEl.textContent = "Error cargando el piano. Recargue la página.";
+  }
+}
+
+// Función para reproducir una nota MIDI con Soundfont
+function playMidiNote(midi, duration) {
+  if (!pianoInstrument) return;
+  
+  // Convertir duración a segundos (500ms = 0.5s)
+  const durationInSeconds = duration / 1000;
+  
+  // Reproducir la nota
+  pianoInstrument.play(midi, audioContext2.currentTime, {
+    duration: durationInSeconds,
+    gain: 1
+  });
+}
+
+// Función para reproducir toda la partitura
+async function playFullScore() {
+  if (!pianoInstrument) {
+    await initSoundfont();
+    if (!pianoInstrument) return;
+  }
+
+  if (isPlayingBack) {
+    stopPlayback();
+    return;
+  }
+
+  isPlayingBack = true;
+  const playBtn = document.getElementById("playBtn");
+  playBtn.textContent = "Detener Reproducción";
+  
+  // Guardar estado actual
+  const savedSystem = currentSystem;
+  const savedIndex = currentIndex;
+  const savedLeftPlayed = [new Set(window.leftCompasesPlayed[0]), new Set(window.leftCompasesPlayed[1])];
+  
+  // Resetear a inicio
+  currentSystem = 0;
+  currentIndex = 0;
+  window.leftCompasesPlayed = [new Set(), new Set()];
+  renderScore();
+  
+  // Iniciar reproducción
+  playNextNoteInSequence(0, 0, savedSystem, savedIndex, savedLeftPlayed);
+}
+
+function stopPlayback() {
+  isPlayingBack = false;
+  clearTimeout(playbackTimeout);
+  document.getElementById("playBtn").textContent = "Reproducir Partitura";
+  if (pianoInstrument) {
+    pianoInstrument.stop(); // Detener todas las notas
+  }
+}
+
+function playNextNoteInSequence(system, index, originalSystem, originalIndex, originalLeftPlayed) {
+  if (!isPlayingBack) return;
+
+  // Resaltar la nota actual
+  currentSystem = system;
+  currentIndex = index;
+  renderScore();
+  
+  // Reproducir notas
+  const rightNote = rightSequences[system][index];
+  const leftNoteIndex = Math.floor(index / 4);
+  const leftNote = leftSequences[system][leftNoteIndex];
+  
+  // Reproducir nota derecha (negra - 250ms)
+  playMidiNote(rightNote, 250);
+  
+  // Reproducir nota izquierda si es el inicio de un compás (redonda - 1000ms)
+  if (index % 4 === 0) {
+    playMidiNote(leftNote, 1000);
+  }
+  
+  // Avanzar al siguiente paso
+  index++;
+  
+  // Verificar si hemos terminado el sistema actual
+  if (index >= rightSequences[system].length) {
+    system++;
+    index = 0;
+    
+    // Verificar si hemos terminado toda la partitura
+    if (system >= rightSequences.length) {
+      // Restaurar estado original
+      setTimeout(() => {
+        currentSystem = originalSystem;
+        currentIndex = originalIndex;
+        window.leftCompasesPlayed = originalLeftPlayed;
+        renderScore();
+        isPlayingBack = false;
+        document.getElementById("playBtn").textContent = "Reproducir Partitura";
+      }, 1000);
+      return;
+    }
+  }
+  
+  // Programar el próximo paso (500ms entre notas = 120 BPM)
+  playbackTimeout = setTimeout(() => {
+    playNextNoteInSequence(system, index, originalSystem, originalIndex, originalLeftPlayed);
+  }, 500);
+}
+
+// Inicializar Soundfont al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  initSoundfont();
+});
+
+// Event listener para el botón
+document.getElementById('playBtn').addEventListener('click', playFullScore);
 </script>
 </body>
 </html>
