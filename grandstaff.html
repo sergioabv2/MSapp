@@ -217,6 +217,17 @@
     statusEl.textContent = `Sistema ${currentSystem + 1}: Toca la nota resaltada...`;
     statusEl.className = "";
   }
+  
+  let recording = [];
+let isRecording = false;
+let playbackActive = false;
+let playbackStartTime;
+let playbackIndex = 0;
+const playbackBtn = document.createElement('button');
+playbackBtn.textContent = 'Reproducir Grabación';
+playbackBtn.id = 'playbackBtn';
+playbackBtn.disabled = true;
+startBtn.insertAdjacentElement('afterend', playbackBtn);
 
   async function start() {
     try {
@@ -227,6 +238,9 @@
       microphone = audioContext.createMediaStreamSource(stream);
       microphone.connect(analyser);
       isPlaying = true;
+      isRecording = true;
+        recording = []; // Resetear grabación
+        playbackBtn.disabled = false;
       detectPitch();
       statusEl.textContent = "Detectando... toca la nota resaltada.";
       renderScore();
@@ -241,6 +255,7 @@
     const buffer = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(buffer);
     const volume = getVolume(buffer);
+    const currentTime = audioContext.currentTime;
     if (volume < 0.01) {
       requestAnimationFrame(detectPitch);
       return;
@@ -249,6 +264,24 @@
     const freq = autoCorrelate(buffer, audioContext.sampleRate);
     if (freq) {
       const midi = Math.round(69 + 12 * Math.log2(freq / 440));
+      
+       if (isRecording && (!recording.length || 
+                (midi !== recording[recording.length-1].midi || 
+                 currentTime - recording[recording.length-1].endTime > 0.1))) {
+                
+                // Guardar nota con timestamps
+                recording.push({
+                    midi: midi,
+                    startTime: currentTime,
+                    endTime: currentTime,
+                    system: currentSystem,
+                    index: currentIndex
+                });
+            } else if (isRecording && recording.length) {
+                // Actualizar endTime mientras se mantiene la nota
+                recording[recording.length-1].endTime = currentTime;
+            }
+      
       const expectedRight = rightSequences[currentSystem][currentIndex];
       const expectedLeftIndex = Math.floor(currentIndex / 4);
       const expectedLeft = leftSequences[currentSystem][expectedLeftIndex];
@@ -357,11 +390,27 @@
     isPlaying = true;
     start();
   });
+  
+  
+async function initSoundfont() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    try {
+        pianoInstrument = await Soundfont.instrument(audioContext, 'acoustic_grand_piano');
+        console.log("Piano listo");
+    } catch (error) {
+        console.error("Error cargando piano:", error);
+        statusEl.textContent = "Error al cargar el piano. Recargue la página.";
+    }
+}
+  
+  
+  
 
-  renderScore();
 
-
-  // Agrega estas variables al inicio con las otras
+// Agrega estas variables al inicio con las otras
 let audioContext2;
 let pianoInstrument = null;
 let isPlayingBack = false;
@@ -490,6 +539,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Event listener para el botón
 document.getElementById('playBtn').addEventListener('click', playFullScore);
+  
+  
+function playRecording() {
+    if (!recording.length || !pianoInstrument) return;
+    
+    playbackActive = true;
+    playbackIndex = 0;
+    playbackStartTime = audioContext.currentTime;
+    
+    statusEl.textContent = "Reproduciendo grabación...";
+    playbackBtn.textContent = "Detener Reproducción";
+    
+    function playbackLoop() {
+        if (!playbackActive) return;
+        
+        const currentPlaybackTime = audioContext.currentTime - playbackStartTime;
+        
+        while (playbackIndex < recording.length && 
+               recording[playbackIndex].startTime - recording[0].startTime <= currentPlaybackTime) {
+            
+            const note = recording[playbackIndex];
+            const duration = note.endTime - note.startTime;
+            
+            // Resaltar en la partitura
+            currentSystem = note.system;
+            currentIndex = note.index;
+            renderScore();
+            
+            // Reproducir sonido con Soundfont-player
+            const noteName = midiToNoteName(note.midi).replace(/#/g, 's'); // Ej: C4, D#4 -> Ds4
+            pianoInstrument.play(noteName, audioContext.currentTime, {
+                duration: duration,
+                gain: 0.3
+            });
+            
+            playbackIndex++;
+        }
+        
+        if (playbackIndex >= recording.length) {
+            stopPlayback2();
+            statusEl.textContent = "Grabación reproducida completamente";
+        } else {
+            requestAnimationFrame(playbackLoop);
+        }
+    }
+    
+    playbackLoop();
+}
+  
+  function stopPlayback2() {
+    playbackActive = false;
+    playbackBtn.textContent = "Reproducir Grabación";
+}
+
+
+playbackBtn.addEventListener('click', () => {
+    if (playbackActive) {
+        stopPlayback2();
+    } else {
+        playRecording(); // Llamada a la función principal
+    }
+});
+
+  renderScore();
 </script>
 </body>
 </html>
