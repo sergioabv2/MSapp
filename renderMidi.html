@@ -107,12 +107,7 @@
 </head> 
 <body>
 
-  <h1>Reproductor de MIDI con Grand Staff</h1>
- 
-  <div id="intro">Carga un archivo MIDI para comenzar.</div>
-  <button id="load">Cargar MIDI</button>
-    <button id="load-student">MIDI Student</button>
-    <button id="simulation" >Marks</button>
+
 
     
    
@@ -120,9 +115,15 @@
   <div id="staff-container">
     <div id="staff"></div>
     <div id="error-overlay"></div> 
-    <div id="play-mark"></div> 
+    <div id="play-mark" style="display: none"></div> 
   </div>
-    <div id="notation"></div>
+    <div id="notation" ></div>
+  
+    <div id="intro">Carga un archivo MIDI para comenzar.</div>
+    <button id="loadURL">Iniciar</button>
+  <button id="load">Cargar MIDI</button>
+    <button id="load-student">MIDI Student</button>
+    <button id="simulation" >Marks</button>
 
   <script>
 var APP = {};
@@ -135,6 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("load").addEventListener("click", loadMIDIFile);
     document.getElementById("load-student").addEventListener("click", loadStudentMIDI);
     document.getElementById("simulation").addEventListener("click", () => simulateMarks([0, 2, 15]));
+
+     const referenceMIDIUrl = 'https://dashboard.mozartacademy.mx/media/TrumpetV.mid';
+       document.getElementById("loadURL").addEventListener("click", () => loadMIDIFileFromURL(referenceMIDIUrl));
 
     APP.MusicGenerator.init();
 });
@@ -562,6 +566,23 @@ function simulateMarks(noteIndices) {
   });
 }
 
+function loadMIDIFileFromURL(url) {
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.arrayBuffer();
+    })
+    .then(arrayBuffer => {
+      APP.MusicGenerator.loadMIDI(arrayBuffer);
+    })
+    .catch(error => {
+      console.error('Error loading MIDI file:', error);
+      alert('Error al cargar el archivo MIDI desde la URL.');
+    });
+}
+
 function loadMIDIFile() {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
@@ -600,4 +621,3 @@ function loadStudentMIDI() {
   </script>
 </body>
 </html>
-    
