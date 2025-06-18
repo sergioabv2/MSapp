@@ -174,6 +174,111 @@ body::-webkit-scrollbar-thumb {
 
  
 
+
+  .modal-container {
+    position: fixed;
+    display: table;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    z-index: 1;
+  }
+
+  .modal-container.four {
+    z-index: 0;
+    transform: scale(1);
+  }
+
+   .modal-container.four .modal-background .modal-doc {
+    animation: blowUpModal 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+    .modal-container.four .modal-background .quiz {
+    animation: blowUpModal 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four + body {
+    z-index: 1;
+    animation: blowUpContent 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four.out .modal-background .modal-doc {
+    animation: blowUpModalTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  
+    .modal-container.four.out .modal-background .quiz {
+    animation: blowUpModalTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+ 
+  .modal-container.four.out + body {
+    animation: blowUpContentTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+
+  .modal-container .modal-background {
+    display: table-cell;
+    background: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    vertical-align: middle;
+  }
+  .modal-container .modal-background .modal-doc {
+    padding: 50px;
+    display: inline-block;
+    border-radius: 3px;
+    font-weight: 300;
+    position: relative;
+  }
+
+.close-modal {
+    display: block;
+    position: absolute;
+   top: 30px;
+    right: 0;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+  @keyframes blowUpContent {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    99.9% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes blowUpContentTwo {
+    0% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes blowUpModal {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes blowUpModalTwo {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
   
 
 
@@ -1389,6 +1494,515 @@ footer button.show{
   display: none;
 }
 
+
+
+     
+
+
+   
+.quiz *{
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.quiz {
+ font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 10px;
+  
+}
+
+.quiz-intro {
+    max-width: 350px;
+  }
+
+.imgQuizContainer{
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.imageQuiz{
+  height: 100px;
+  width: 300px;
+} 
+
+#quiz {
+  width: 100%;
+  margin: 10% auto 0 auto;
+  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  -webkit-transition: 0.5s all;
+  -o-transition: 0.5s all;
+  transition: 0.5s all;
+  background-color: #E6EAEF;
+}
+
+
+
+#quiz-content {
+ max-width: 350px;
+  margin: 10% auto 0 auto;
+
+  border-radius: 10px;
+  -webkit-transition: 0.5s all;
+  -o-transition: 0.5s all;
+  transition: 0.5s all;
+  background-color: #1c232b;
+  color: #E6EAEF;
+}
+
+#results {
+  max-width: 380px;
+  margin: 10% auto 0 auto;
+  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  -webkit-transition: 0.5s all;
+  -o-transition: 0.5s all;
+  transition: 0.5s all;
+  background-color: #1c232b;
+  color: #E6EAEF ;
+}
+
+.quiz-started {
+  padding: 10px;
+}
+
+#quiz-bg {
+
+  padding: 25px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-align: center;
+}
+
+#quiz-bg i {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 64px;
+  font-weight: 700;
+}
+
+
+
+#quiz-body {
+  padding: 15px;
+}
+
+#quiz-body h1 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+#progress-container {
+  background-color: #eee;
+  height: 6px;
+  border-radius: 50px;
+  text-align: left;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+#progress {
+  width: 0;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    from(#0288d1),
+    to(#4fc3f7)
+  );
+  background: -webkit-linear-gradient(left, #0288d1, #4fc3f7);
+  background: -o-linear-gradient(left, #0288d1, #4fc3f7);
+  background: linear-gradient(to right, #0288d1, #4fc3f7);
+  border-radius: 50px;
+  display: inline-block;
+  height: inherit;
+  position: absolute;
+  -webkit-transition: 0.75s width;
+  -o-transition: 0.75s width;
+  transition: 0.75s width;
+}
+
+#stats {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+#stats p {
+  margin: 0;
+  font-size: 14px;
+}
+
+#stats span {
+  color: #ADD8E6;
+  font-weight: 700;
+}
+
+#answers h2 {
+  margin: 50px 0;
+  color: #E6EAEF;
+  font-size: 20px;
+}
+
+.answer {
+  padding: 5px;
+   width: 49vh;
+}
+
+.answer-number {
+  display: inline-block;
+  margin-right: 10px;
+  border-top-left-radius: 5px;
+  font-weight: 700;
+  border-bottom-left-radius: 5px;
+}
+
+label {
+  display: block;
+  width: 100%;
+  padding: 7px;
+  height: 38px !important;
+  background-color: #28323E;
+  border-radius: 5px;
+  border: 1px solid #384656;
+  color: #E6EAEF !important;
+
+  
+}
+
+input[type="radio"]:hover:not(:disabled) + label {
+  background-color: #384656;
+}
+
+input[type="radio"] {
+ 
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+
+/* Crear el círculo manualmente */
+input[type="radio"] + label::before {
+content: none !important;
+}
+
+
+/* Punto interior al seleccionar */
+input[type="radio"]:checked + label.red-bg::after {
+  content: '\2716';
+  width: 30px;
+  height: 30px;
+  color: darkred;
+  background-color: transparent;
+  border: transparent;
+  border-radius: 50%;
+  position: absolute;
+
+  top: 7px;
+  text-align: center; /* Alinea horizontalmente el contenido */
+  line-height: 18px;
+}
+
+input[type="radio"]:checked + label.green-bg::after {
+  content: none !important;
+}
+
+
+
+
+
+
+#notification {
+  position: absolute;
+  margin-top: -380px;
+  height: 200px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 0 0 20px 0;
+  margin-left: -10px;
+  background-color: transparent;
+  text-align: center;
+}
+
+#notification p {
+  margin-bottom: 220px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #666;
+  text-shadow: 1px 1px 2px black;
+}
+
+#results {
+  padding: 20px;
+}
+
+#results h2 {
+  font-size: 20px;
+}
+
+#results h3 {
+  font-size: 16px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+#percentage {
+  font-size: 45px;
+  font-weight: 700;
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 35px;
+}
+
+.share-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 7px 20px;
+  border-radius: 3px;
+  display: inline-block;
+  font-size: 14px;
+  -webkit-transition: 0.3s background-color;
+  -o-transition: 0.3s background-color;
+  transition: 0.3s background-color;
+}
+
+
+.shortcuts-info {
+  position: absolute;
+  display: none;
+  right: 0;
+  bottom: 35px;
+  max-width: 40%;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #fff;
+  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+}
+
+.shortcuts-info p {
+  margin: 10px 0;
+}
+.tag {
+  display: inline-block;
+  padding: 3px;
+  background-color: #03a9f4;
+  color: #fff;
+  border-radius: 5px;
+  border-bottom: 1px solid #0288d1;
+  font-size: 14px;
+}
+
+
+
+.close-btn {
+  background-color: transparent !important;
+  border-radius: 5px !important;
+  color: #E6EAEF !important;
+  font-weight: 600 ;
+  border: 1px solid #384656 !important;
+}
+
+
+.close-btn:hover {
+  background-color: #1565c0;
+}
+
+.close-btn:active,
+.close-btn:focus {
+  background-color: #074286;
+}
+
+
+.next-btn {
+  font-weight: 700;
+  color: #36454F;
+  border-radius: 0.375rem;
+  --tw-ring-offset-width: 2px;
+  cursor: pointer;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  transition-duration: 0.3s;
+  --tw-ring-offset-color: #c7d2fe;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+    calc(1px + 2px) rgb(59 130 246 / 0.5);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+    var(--tw-shadow, 0 0 #0000);
+  --tw-ring-offset-color: #c7d2fe;
+    z-index: 1000 !important;
+   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.next-btn:hover {
+  background-color: #e0e4ea;
+}
+
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+.bold {
+  font-weight: 700;
+}
+.rounded-corners {
+  border-radius: 50px;
+}
+.display-block {
+  display: block;
+}
+
+
+.red-bg {
+  background-color: #f44336;
+  color: #fff;
+}
+.green-bg {
+  background-color: #8bc34a;
+  color: #fff;
+}
+
+.buttons-container{
+  display: flex;
+  justify-content: center; /* Centra horizontalmente los botones */
+  align-items: center; /* Centra verticalmente los botones */
+  gap: 10px; /* Espacio entre los botones */
+  margin-top: 60px; 
+  margin-bottom: 20px;
+}
+
+#next-btn,
+#show-results-btn {
+  margin: 0 auto;
+  padding: 10px 25px;
+}
+
+#shortcuts-info-btn {
+  display: none;
+}
+
+
+
+@media (min-width: 550px) {
+  .quiz-started {
+    max-width: 450px;
+  }
+  #quiz-content {
+ max-width: 400px;
+  }
+  
+  #notification{
+  margin-top: -260px;
+    margin-left: -15px;
+  }
+  
+  
+  .imgQuizContainer{
+  margin-bottom: 0px;
+}
+
+  .answer {
+    display: inline-block;
+    width: 49%;
+  }
+
+  #shortcuts-info-btn {
+    position: fixed;
+    display: block;
+    bottom: 0;
+    right: 0;
+    margin: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: 0;
+    border-radius: 50px;
+    color: #fff;
+    background-color: #aaa;
+    -webkit-transition: 0.3s all;
+    -o-transition: 0.3s all;
+    transition: 0.3s all;
+    z-index: 1;
+  }
+  #shortcuts-info-btn:hover {
+    background-color: #888;
+  }
+
+  #shortcuts-info-btn:active {
+    background-color: #555;
+  }
+}
+
+  .menu-bar {
+    position: absolute;
+            display: none;
+            justify-content: space-around;
+            background-color: black;
+             padding: 10px 20px;
+    color: white;
+            list-style: none;
+            margin: 0;
+    margin-left: -200px;
+    margin-top: -30px;
+             border-radius: 10px;
+            font-weight: 550;
+  box-shadow: 0px 8px 20px -8px rgba(26, 33, 43, 0.5), 0px 4px 12px 0px rgba(26, 33, 43, 0.05), 0px 1px 3px 0px rgba(26, 33, 43, 0.25), 0px 1.5px 0.5px 0px #454D57 inset, 0px -3px 1px 0px rgba(0, 0, 0, 0.5) inset;
+        }
+
+
+
+.menu-bar:hover {
+  color: white;
+            text-decoration: none;
+    transform: scaleX(1.03) scaleY(1.06) translateZ(0);
+}
+
+.menu-bar:active {
+   color: white;
+   text-decoration: none;
+    transform: scale(0.96) translateZ(0);
+}
+
+
+
+.exit-btn {
+
+
+  float: right;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+     z-index: 2000;
+}
+
+.exit-btn:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
    
 </style>
 
@@ -1704,6 +2318,7 @@ footer button.show{
       ng-if="activity.media === 'video'">
   <i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}
 </span>
+ <span class="text-inside"  this-lvl="{{lvl}}" quiz-icon="{{activity.icon}}" quiz-title="{{activity.type}}" quiz-subtitle="{{activity.title}}" data-package="{{activity.package}}" onclick="showQuiz(this)" ng-if="activity.media == 'quiz'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span> 
             
   </li>
       </ul> 
@@ -2212,7 +2827,72 @@ footer button.show{
   
   
   
-  
+    <div id="questionaire" class="modal-container">
+        <div class="modal-background">
+         
+            <div style="margin-top: -100px;">
+
+<div class="quiz">
+  <article id="quiz" class="quiz-intro">
+    <div id="quiz-bg">
+      <i class="material-icons" id="quizIco">quiz</i>
+      <span style="position: absolute; margin-top: 70px; margin-left: 40px; color: white" id="questionTotal">10 preguntas</span>
+    </div>
+    <section id="quiz-body"> 
+      <h4>Quiz</h4>      
+      <h1>Resumen de lección</h1> 
+      <div class="buttons-container">
+        <button type="button" class="btn blue-btn rounded-corners" onclick="closeQuiz()">Cerrar</button>
+        <button type="button" id="start-quiz-btn" class="btn blue-btn rounded-corners">Iniciar</button>
+      </div>
+    </section>
+  </article>
+
+  <!-- Contenido del quiz (oculto inicialmente) -->
+  <article id="quiz-content" class="quiz-started" style="display: none;">
+      <button class="exit-btn" onclick="destroyQuiz()"> <svg 
+            version="1.1" 
+            xmlns="http://www.w3.org/2000/svg" 
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0"
+            y="0"
+            viewBox="0 0 32 32" 
+            style="enable-background:new 0 0 32 32;" 
+            xml:space="preserve" 
+            width="24" 
+            height="24" 
+          >
+                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
+                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
+          </svg> </button>   
+  <div id="blurWrapper">
+    <div id="progress-container"><span id="progress"></span></div>
+    <div id="stats">
+      <p>Pregunta: <span id="questionNumber"></span></p> 
+      <p>Puntaje: <span id="score"></span></p>
+      <p>Tiempo: <span id="timer"></span></p>
+    </div>
+  </div>
+    <section id="answers"></section>
+
+  </article>  
+
+  <!-- Resultados del quiz (ocultos inicialmente) -->
+  <section id="results" class="text-center" style="display: none;">  
+    <h2 class="bold">Estos son tus resultados:</h2>
+    <p id="percentage"></p>
+    <p>Obtuviste <span class="bold" id="correctAnswers"></span> de <span class="bold" id="totalQuestions"></span> preguntas correctas.</p>
+    <p style="margin-top: 10px;">Tiempo empleado: <span class="bold" id="finalTime"></span></p>
+    <div class="buttons-container">
+      <button type="button" id="close-results-btn" class="btn close-btn">Cerrar</button>
+      <button type="button" id="start-over-btn" class="btn close-btn">De nuevo</button> 
+    </div>
+  </section>
+</div>
+
+</div>
+</div>
+</div>
   
 
 </body>
@@ -2691,10 +3371,11 @@ function newSize() {
                   ]
                   },
                           {
+                            title: 'Ritmo y métrica',
                   icon: 'bolt',
                   type: 'Quiz',
-                  media: 'video',
-                  url: 'https://www.youtube.com/embed/ec4ZRGMYgrY'
+                  media: 'quiz',
+                  package: 1
                   }
                 ]
               },
@@ -5446,6 +6127,347 @@ function newSize() {
 
 
 
+function showQuiz(element){
+  var thislvl = element.getAttribute('this-lvl');
+  var title= element.getAttribute('quiz-title');
+     var subtitle = element.getAttribute('quiz-subtitle');  
+  var icon = element.getAttribute('quiz-icon');  
+  var datapackage = element.getAttribute('data-package'); 
+  startQuiz(thislvl, title, subtitle, datapackage, icon)
+  document.getElementById('questionaire').classList.add('four');  
+}
+
+      function closeQuiz() {
+       const modal = document.getElementById('questionaire');
+        modal.classList.add('out');
+        setTimeout(() => {
+            modal.classList.remove('four', 'out');
+        }, 300); 
+      }
+
+
+
+
+function startQuiz(lvl, title, subtitle, datapackage, icon) {
+  "use strict";
+  let questions = [];
+  
+  if(datapackage == 1){
+   questions = [
+       {
+      question: "¿Nombre de la herramienta musical que gradua el tiempo?",
+      img: "",
+      answers: ["Reloj", "Cronómetro", "Metronemo", "Metrónomo"],
+      correctAnswer: 4
+    },
+    {
+      question: "¿Cómo se le llama a este parámetro musical?",
+      img: "https://lh3.googleusercontent.com/d/1DI-QO9klmH-QUpKAN1Re-Wj8Y4RQ6oKs",
+      answers: ["Ritmo", "Métrica", "Tempo", "Metro"],
+      correctAnswer: 2
+    }, {
+      question: "¿Cuantos clicks de metronomo dura esta nota?",
+      img: "https://lh3.googleusercontent.com/d/1C12iR5SYfg-2gwPO1jjarmkRO4BwPOnB",
+      answers: ["2", "3", "1", "4"],
+      correctAnswer: 2
+    },
+    {
+      question: "¿Cuantas teclas tiene un piano?",
+      img: "",
+      answers: ["85", "80", "88", "78"],
+      correctAnswer: 3
+    },
+        {
+      question: "¿Cuál debe ser la métrica?",
+      img: "https://lh3.googleusercontent.com/d/12ZXAwhvjV1t5rnODPdV_5l-9RNR9aOZp",
+      answers: ["2/4", "3/4", "4/4", "1/2"],
+      correctAnswer: 3
+    },
+    {
+      question: "¿Cómo se mide la velocidad de un metrónomo?",
+       img: "",
+      answers: ["En BPM", "En segundos", "Con clicks", "En BBM"],
+      correctAnswer: 1
+    },  {
+      question: "¿Cual es la traducción de measure al español?",
+      img: "https://lh3.googleusercontent.com/d/16pxirb4CtxRLx3PSNMNpgvEBdtBbAq9f",
+      answers: ["Medida", "Compás", "Medir", "Sección"],
+      correctAnswer: 2
+    },  {
+      question: "¿Que indice tiene la nota C central?",
+      img: "https://lh3.googleusercontent.com/d/1C12iR5SYfg-2gwPO1jjarmkRO4BwPOnB",
+      answers: ["C4", "C5", "C3", "C1"],
+      correctAnswer: 1
+    }
+  ];
+ }
+  var questionNumber = document.getElementById('questionTotal');
+questionNumber.innerText = questions.length + " preguntas"
+  
+    var quizBG = document.getElementById('quiz-bg');
+  
+  var closeButton = document.querySelector('.buttons-container .blue-btn:first-child');
+var startButton = document.getElementById('start-quiz-btn');
+  
+  if (lvl == 0) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #c52c20, #ff7961)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #c52c20, #ff7961)';
+  quizBG.style.background = 'linear-gradient(45deg, #c52c20, #ff7961)';
+    closeButton.style.backgroundColor = '#c52c20';  
+  startButton.style.backgroundColor = '#c52c20';
+} else if (lvl == 1) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #9024dc, #b57ff5)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #9024dc, #b57ff5)';
+  quizBG.style.background = 'linear-gradient(45deg, #9024dc, #b57ff5)';
+   closeButton.style.backgroundColor = '#9024dc';  
+  startButton.style.backgroundColor = '#9024dc';
+} else if (lvl == 2) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #1894cc, #63c9ff)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #1894cc, #63c9ff)';
+  quizBG.style.background = 'linear-gradient(45deg, #1894cc, #63c9ff)';
+   closeButton.style.backgroundColor = '#1894cc';  
+  startButton.style.backgroundColor = '#1894cc';
+} else if (lvl == 3) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #489454, #7fd583)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #489454, #7fd583)';
+  quizBG.style.background = 'linear-gradient(45deg, #489454, #7fd583)';
+   closeButton.style.backgroundColor = '#489454';  
+  startButton.style.backgroundColor = '#489454';
+} else if (lvl == 4) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #f0ac14, #f7d253)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #f0ac14, #f7d253)';
+  quizBG.style.background = 'linear-gradient(45deg, #f0ac14, #f7d253)';
+   closeButton.style.backgroundColor = '#f0ac14';  
+  startButton.style.backgroundColor = '#f0ac14';
+} else if (lvl == 5) {
+  quizBG.style.background = '-webkit-linear-gradient(45deg, #485cb4, #8091e8)';
+  quizBG.style.background = '-o-linear-gradient(45deg, #485cb4, #8091e8)';
+  quizBG.style.background = 'linear-gradient(45deg, #485cb4, #8091e8)';
+   closeButton.style.backgroundColor = '#485cb4';  
+  startButton.style.backgroundColor = '#485cb4';
+}
+  
+  let questionIndex, currentQuestion, score, timeSpent, quizTimer, questionIsAnswered;
+  
+  // Configurar la introducción del quiz
+  const quizIco = document.getElementById('quizIco');
+  quizIco.innerText = icon;
+  
+  const quizBody = document.getElementById('quiz-body');
+  quizBody.getElementsByTagName('h4')[0].innerText = title;
+  quizBody.getElementsByTagName('h1')[0].innerText = subtitle;
+  
+  let quizIntro = document.querySelector(".quiz-intro");
+  let quizContent = document.getElementById("quiz-content");
+  let resultsSection = document.getElementById("results");
+
+  // Función para inicializar el quiz
+  function initQuiz() {
+     resultsSection.style.display = "none";
+    quizIntro.style.display = "none"; // Esconde la introducción
+    quizContent.style.display = "block"; // Muestra el contenido del quiz
+    
+    questionIndex = 0;
+    currentQuestion = 1;
+    questionIsAnswered = 0;
+    score = 0;
+    timeSpent = "00:00";
+    
+    let progres = document.getElementById("progress");
+    progres.style.width = 0 + "%";
+
+    // Actualizar estadísticas iniciales
+    document.getElementById("questionNumber").textContent = `${currentQuestion}/${questions.length}`;
+    document.getElementById("score").textContent = score;
+    document.getElementById("timer").textContent = timeSpent;
+
+    displayQuestion();
+    startTimer();
+  }
+
+  // Función para mostrar la pregunta actual
+  function displayQuestion() {
+    let question = questions[questionIndex];
+    let answers = document.getElementById("answers");
+    let output = `<div id="question-container"><h2 class="text-center bold">${currentQuestion}. ${question.question}</h2>`;
+    
+    // Añadir imagen si está disponible
+    if (question.img) {
+      output += `<div class="imgQuizContainer"><img src="${question.img}" class="imageQuiz" /></div>`;
+    }
+    
+    // Generar las respuestas
+    output += `</div><div id="answers-container">`;
+
+// Generar las respuestas
+question.answers.forEach((answer, index) => {
+  output += `
+    <div class="answer">
+      <input type="radio" id="answer-${index + 1}" name="answers" value="${index + 1}">
+      <label for="answer-${index + 1}">
+        <span class="answer-number">${index + 1}.</span> ${answer}
+      </label>
+    </div>`;
+});
+
+// Cerrar el contenedor de respuestas
+output += `</div>`;
+
+    answers.innerHTML = output; // Actualiza el contenedor de respuestas
+  }
+
+  // Función para iniciar el temporizador
+  function startTimer() {
+    let s = 0, m = 0, h = 0;
+    let timer = document.getElementById("timer");
+
+    quizTimer = setInterval(() => {
+      s++;
+      if (s > 59) { s = 0; m++; }
+      if (m > 59) { m = 0; h++; }
+
+      let seconds = s < 10 ? "0" + s : s;
+      let minutes = m < 10 ? "0" + m : m;
+      let hours = h < 10 ? "0" + h : h;
+
+      timeSpent = h ? `${hours}:${minutes}:${seconds}` : `${minutes}:${seconds}`;
+      timer.textContent = timeSpent;
+    }, 1000);
+  }
+
+  // Función para mostrar los resultados
+  function displayResults() {
+    let notification = document.getElementById("notification");
+    notification.parentElement.removeChild(notification);
+    quizContent.style.display = "none"; // Esconde el contenido del quiz
+    resultsSection.style.display = "block"; // Muestra los resultados
+    
+    document.getElementById("percentage").textContent = `${scorePercentage()}%`;
+    document.getElementById("correctAnswers").textContent = score;
+    document.getElementById("totalQuestions").textContent = questions.length;
+    document.getElementById("finalTime").textContent = timeSpent;
+  }
+  
+   function goToNextQuestion() {
+    currentQuestion++;
+    questionIndex++;
+    questionIsAnswered = 0;
+
+    let notification = document.getElementById("notification");
+    notification.parentElement.removeChild(notification);
+
+    let questionNumber = document.getElementById("questionNumber");
+    questionNumber.textContent = `${currentQuestion}/${questions.length}`;
+
+
+    let container1 = document.getElementById("question-container");
+    let container2 = document.getElementById("blurWrapper");
+    container1.style.filter = "none";
+    container2.style.filter = "none";
+
+    displayQuestion();
+  }
+  
+  
+  function submitAnswer(e) {
+    let selectedAnswer = Number(e.target.value);
+    let rightAnswer = questions[questionIndex].correctAnswer;
+    let answers = document.getElementsByName("answers");
+    let progress = document.getElementById("progress");
+    let container1 = document.getElementById("question-container");
+    let container2 = document.getElementById("blurWrapper");
+
+
+    questionIsAnswered = 1;
+
+    progress.style.width = progressPercentage() + "%";
+
+    let notification = document.createElement("div");
+    let message = document.createElement("p");
+    let label = e.target.nextElementSibling;
+    notification.id = "notification";
+
+    if (selectedAnswer === rightAnswer) {
+      score++;
+      message.textContent = "Respuesta correcta!";
+        message.style.color = "#8bc34a";
+      label.classList.add("green-bg");
+    } else {
+      message.textContent = "Respuesta incorrecta";
+      message.style.color = "#f44336";
+      label.classList.add("red-bg");
+
+      answers.forEach(answer => {
+        if (Number(answer.value) !== rightAnswer) return;
+
+        answer.nextElementSibling.classList.add("green-bg");
+      });
+    }
+
+    let button = document.createElement("button");
+    button.classList.add("next-btn")
+    button.style.backgroundColor = "#E6EAEF";
+   container1.style.filter = "blur(5px) brightness(0.3)";
+    container2.style.filter = "blur(5px)";
+
+   
+
+    if (isLastQuestion()) {
+      button.id = "show-results-btn";
+      button.textContent = "Mostrar resultados";
+      clearInterval(quizTimer);
+      quizTimer = null;
+    } else {
+      button.id = "next-btn";
+      button.textContent = "Continuar";
+    }
+
+    notification.appendChild(message);
+    notification.appendChild(button);
+    quizContent.insertAdjacentElement("afterend", notification);
+
+    button.focus();
+
+    answers.forEach(answer => (answer.disabled = "disabled"));
+
+    document.getElementById("score").textContent = score;
+  }
+  
+  let scorePercentage = () => (score / questions.length * 100).toFixed(0);
+  let progressPercentage = () =>
+    (currentQuestion / questions.length * 100).toFixed(0);
+  let isLastQuestion = () => currentQuestion === questions.length;
+
+
+
+  // Eventos de botones
+  document.addEventListener("click", function(e) {
+    if (e.target.matches("#start-quiz-btn") || e.target.matches("#start-over-btn")) initQuiz();
+    if (e.target.matches("#next-btn")) goToNextQuestion();
+    if (e.target.matches("#show-results-btn")) displayResults();
+    if (e.target.matches("#close-results-btn")) destroyQuiz();
+  });
+
+ document.addEventListener("change", function(e) {
+   // if (e.target.matches('input[type="radio"]')) submitAnswer(e);
+    if (e.target.matches("[name='answers']")) submitAnswer(e);
+  });
+
+  // Resto de las funciones como `submitAnswer`, `goToNextQuestion`, etc.
+}
+
+function destroyQuiz() {
+  // Ocultra el quiz y resetea el estado si es necesario
+  document.querySelector(".quiz-intro").style.display = "block";
+  document.getElementById("quiz-content").style.display = "none";
+  document.getElementById("results").style.display = "none";
+
+}
+
+
+
+
+ /*
   
 function playVideo(index) {
     const video = document.getElementById(`videoPlayer${index}`);
@@ -5489,7 +6511,7 @@ function playMetronome(index) {
  
   
 
- /*
+
 const video = document.querySelector("video");
 const progress = document.querySelector(".progress__bar");
 const keyframes = [...document.querySelectorAll(".keyframe")];
