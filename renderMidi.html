@@ -21,7 +21,7 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 30px;
+      margin: 5px;
       background-color: #f7f7f7;
     }
     #staff-container {
@@ -103,6 +103,10 @@
   opacity: 0.7;
 }
 
+    button{
+      display: none;
+    }
+
   </style>
 </head> 
 <body>
@@ -119,7 +123,7 @@
   </div>
     <div id="notation" ></div>
   
-    <div id="intro">Carga un archivo MIDI para comenzar.</div>
+
     <button id="loadURL">Iniciar</button>
   <button id="load">Cargar MIDI</button>
     <button id="load-student">MIDI Student</button>
@@ -139,6 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
      const referenceMIDIUrl = 'https://dashboard.mozartacademy.mx/media/TrumpetV.mid';
        document.getElementById("loadURL").addEventListener("click", () => loadMIDIFileFromURL(referenceMIDIUrl));
+
+  loadMIDIFileFromURL(referenceMIDIUrl)
 
     APP.MusicGenerator.init();
 });
