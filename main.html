@@ -929,7 +929,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   
         </ion-content>
  <ion-footer-bar style="z-index: 999 !important;">
-         <button class="button button-royal menubtn pull-left" ng-click="installApp()" ><i class="ri-download-cloud-2-line" ></i> Descargar</button>
+         <button class="button button-royal pull-left" ng-if="isMobile" ng-click="installApp()" ><i class="ri-download-cloud-2-line" ></i> Descargar</button>
   <button class="button pull-right" ng-click=""><i class="icon ri-question-line"></i>Ayuda</button>
 </ion-footer-bar>
 
@@ -3042,9 +3042,8 @@ app
     $scope.goToMain = function() {
    window.location.href = '#/main';
 };
- $scope.isMobile = function () {
-    return window.innerWidth <= 768;
-  };
+$scope.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+  .test(navigator.userAgent);
 
 $scope.goBack = function() {
      if ($ionicHistory.backView()) {
@@ -3073,6 +3072,10 @@ if ('setAppBadge' in navigator) {
     console.error('Error al establecer la insignia:', err);
   });
 } 
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  $scope.isMobile = false; 
+}
 
 // Manejar el evento 'beforeinstallprompt'
 window.addEventListener('beforeinstallprompt', (e) => {
