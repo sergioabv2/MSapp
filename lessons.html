@@ -2019,8 +2019,26 @@ input[type="radio"]:checked + label.green-bg::after {
    }
 
 
+#fullscreen-btn {
+  display: none;                 /* Para centrar el SVG */
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 40px;                  /* Tamaño del círculo */
+  height: 40px;
+  border-radius: 50%;          /* Hace que el fondo sea circular */
+  background-color: black;     /* Círculo negro */
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+
   
-@media screen and (max-width:559px) {
+@media screen and (max-width:549px) {
      #drive{
     height: 430px;
     width: 160%;
@@ -2036,7 +2054,7 @@ input[type="radio"]:checked + label.green-bg::after {
 }
 
 
-    @media screen and (min-width:560px){
+    @media screen and (min-width:550px){
    #drive{
 
     height: 600px;
@@ -2919,7 +2937,8 @@ input[type="radio"]:checked + label.green-bg::after {
             <div class="modal-doc">
                         
     
-     <iframe id="drive" src="" frameborder="0" allow="microphone; midi"></iframe>     
+     <iframe id="drive" src="" frameborder="0" allow="microphone; midi"></iframe> 
+     <button id="fullscreen-btn" ><i class="ri-fullscreen-fill"></i></button>    
                 <a 
           href="#" 
           class="close-modal" onclick="closemodal()" 
@@ -6204,22 +6223,33 @@ function newSize() {
 <script>
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    var isMobile = /Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isMobile) {
+        document.getElementById('fullscreen-btn').style.display = 'flex';
+
+        document.getElementById('fullscreen-btn').addEventListener('click', function () {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        });
+    }
+});
+
+
+
 
 function showModal(element) {
      var url = element.getAttribute('data-pdf-id');
           $("#drive").attr('src', url);        
         document.getElementById('modalPDF').classList.add('four');
-    if (!/Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-   if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
-        document.documentElement.mozRequestFullScreen();
-    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari y Opera
-        document.documentElement.webkitRequestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
-        document.documentElement.msRequestFullscreen();
-    }
-}  
+   
 }
  
       function closemodal() {
