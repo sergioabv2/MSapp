@@ -2048,8 +2048,13 @@ input[type="radio"]:checked + label.green-bg::after {
 
    .close-modal {
       margin-top: 20px;
-       margin-right: -20px;
-       transform: scale(0.65);
+       margin-right: -15px;
+       transform: scale(0.7);
+     }
+     #fullscreen-btn{
+       margin-top: 20px;
+       margin-left: -15px;
+       transform: scale(.7);
      }
 }
 
@@ -2064,8 +2069,13 @@ input[type="radio"]:checked + label.green-bg::after {
   }
      .close-modal {
       margin-top: 10px;
-       margin-right: -40px;
-       transform: scale(0.8);
+       margin-right: -50px;
+    transform: scale(.8);
+     }
+      #fullscreen-btn{
+       margin-top: 10px;
+       margin-left: -50px;
+       transform: scale(.8);
      }
 }
 
@@ -2082,7 +2092,12 @@ input[type="radio"]:checked + label.green-bg::after {
      .close-modal {
       margin-top: 10px;
        margin-right: -140px;
-       transform: scale(0.8);
+       transform: scale(1);
+     }
+     #fullscreen-btn{
+       margin-top: 10px;
+       margin-left: -140px;
+       transform: scale(1);
      }
 }
   
@@ -2099,6 +2114,13 @@ input[type="radio"]:checked + label.green-bg::after {
      .close-modal {
       margin-top: 10px;
        margin-right: -150px;
+       transform: scale(1);
+     }
+
+     #fullscreen-btn{
+       margin-top: 10px;
+       margin-left: -150px;
+       transform: scale(1);
      }
 
      .menu-bar{
@@ -2938,28 +2960,8 @@ input[type="radio"]:checked + label.green-bg::after {
                         
     
      <iframe id="drive" src="" frameborder="0" allow="microphone; midi"></iframe> 
-     <button id="fullscreen-btn" ><i class="ri-fullscreen-fill"></i></button>    
-                <a 
-          href="#" 
-          class="close-modal" onclick="closemodal()" 
-        >
-          <!-- X close video icon -->
-          <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg> 
-        </a>
+     <button id="fullscreen-btn" ><i class="ri-fullscreen-fill" id="fullscreen-icon"></i></button>    
+    <button class="close-modal" onclick="closemodal()"><i class="ri-close-line" ></i></button>
               
 
             </div> 
@@ -2992,21 +2994,7 @@ input[type="radio"]:checked + label.green-bg::after {
 
   <!-- Contenido del quiz (oculto inicialmente) -->
   <article id="quiz-content" class="quiz-started" style="display: none;">
-      <button class="exit-btn" onclick="destroyQuiz()"> <svg 
-            version="1.1" 
-            xmlns="http://www.w3.org/2000/svg" 
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0"
-            y="0"
-            viewBox="0 0 32 32" 
-            style="enable-background:new 0 0 32 32;" 
-            xml:space="preserve" 
-            width="24" 
-            height="24" 
-          >
-                <path fill="#ffffff" d="M30.3448276,31.4576271 C29.9059965,31.4572473 29.4852797,31.2855701 29.1751724,30.980339 L0.485517241,2.77694915 C-0.122171278,2.13584324 -0.104240278,1.13679247 0.52607603,0.517159487 C1.15639234,-0.102473494 2.17266813,-0.120100579 2.82482759,0.477288136 L31.5144828,28.680678 C31.9872448,29.1460053 32.1285698,29.8453523 31.8726333,30.4529866 C31.6166968,31.0606209 31.0138299,31.4570487 30.3448276,31.4576271 Z" id="Shape"></path>
-                <path fill="#ffffff" d="M1.65517241,31.4576271 C0.986170142,31.4570487 0.383303157,31.0606209 0.127366673,30.4529866 C-0.12856981,29.8453523 0.0127551942,29.1460053 0.485517241,28.680678 L29.1751724,0.477288136 C29.8273319,-0.120100579 30.8436077,-0.102473494 31.473924,0.517159487 C32.1042403,1.13679247 32.1221713,2.13584324 31.5144828,2.77694915 L2.82482759,30.980339 C2.51472031,31.2855701 2.09400353,31.4572473 1.65517241,31.4576271 Z" id="Shape"></path>
-          </svg> </button>   
+      <button class="exit-btn" onclick="destroyQuiz()"> <i class="ri-close-line"></i> </button>   
   <div id="blurWrapper">
     <div id="progress-container"><span id="progress"></span></div>
     <div id="stats">
@@ -6228,21 +6216,25 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isMobile) {
         document.getElementById('fullscreen-btn').style.display = 'flex';
 
-        document.getElementById("fullscreen-btn").addEventListener("click", function () {
+      document.getElementById("fullscreen-btn").addEventListener("click", function () {
+  const icon = document.getElementById("fullscreen-icon");
+
   if (!document.fullscreenElement) {
     // Entrar a pantalla completa
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
     }
-    document.getElementById("fullscreen-icon").className = "ri-fullscreen-exit-fill";
+    icon.className = "ri-fullscreen-exit-fill";
   } else {
     // Salir de pantalla completa
     if (document.exitFullscreen) {
       document.exitFullscreen();
     }
-    document.getElementById("fullscreen-icon").className = "ri-fullscreen-fill";
+    icon.className = "ri-fullscreen-fill";
   }
 });
+
+
     }
 });
 
