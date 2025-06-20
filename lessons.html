@@ -228,15 +228,23 @@ body::-webkit-scrollbar-thumb {
   }
 
 .close-modal {
-    display: block;
-    position: absolute;
-   top: 30px;
-    right: 0;
-    text-decoration: none;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
+  display: flex;                 /* Para centrar el SVG */
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  width: 40px;                  /* Tamaño del círculo */
+  height: 40px;
+  border-radius: 50%;          /* Hace que el fondo sea circular */
+  background-color: black;     /* Círculo negro */
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
 }
+
 
   @keyframes blowUpContent {
     0% {
@@ -2003,22 +2011,60 @@ input[type="radio"]:checked + label.green-bg::after {
 .exit-btn:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
-
    
+
+
    #drive{
       border-radius: 12px;
    }
-   
+
+
+  
+@media screen and (max-width:559px) {
+     #drive{
+    height: 430px;
+    width: 160%;
+    margin-left: -70px;
+       
+  }
+
+   .close-modal {
+      margin-top: 20px;
+       margin-right: -20px;
+       transform: scale(0.65);
+     }
+}
+
+
+    @media screen and (min-width:560px){
+   #drive{
+
+    height: 600px;
+    width: 170%;
+    margin-left: -35%;
+    margin-top: -15px;
+  }
+     .close-modal {
+      margin-top: 10px;
+       margin-right: -40px;
+       transform: scale(0.8);
+     }
+}
+
 
 
     @media screen and (min-width:700px){
    #drive{
+
     height: 480px;
-    width: 280%;
-    margin-left: -90%;
+    width: 230%;
+    margin-left: -65%;
+    margin-top: -15px;
   }
      .close-modal {
-       margin-right: -250px;
+      margin-top: 10px;
+       margin-right: -140px;
+       transform: scale(0.8);
      }
 }
   
@@ -2044,15 +2090,7 @@ input[type="radio"]:checked + label.green-bg::after {
 }
 
 
-  
-@media screen and (max-width:699px) {
-     #drive{
-    height: 420px;
-    width: 120%;
-    margin-left: -25px;
-       
-  }
-}
+
   
 </style>
 
@@ -2879,7 +2917,8 @@ input[type="radio"]:checked + label.green-bg::after {
  <div id="modalPDF" class="modal-container">
         <div class="modal-background">
             <div class="modal-doc">
-        
+                        
+    
      <iframe id="drive" src="" frameborder="0" allow="microphone; midi"></iframe>     
                 <a 
           href="#" 
@@ -6170,7 +6209,7 @@ function showModal(element) {
      var url = element.getAttribute('data-pdf-id');
           $("#drive").attr('src', url);        
         document.getElementById('modalPDF').classList.add('four');
-    if (!/Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+   /* if (!/Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
    if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
     } else if (document.documentElement.mozRequestFullScreen) { // Firefox
@@ -6180,7 +6219,7 @@ function showModal(element) {
     } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
         document.documentElement.msRequestFullscreen();
     }
-} 
+}  */
 }
  
       function closemodal() {
