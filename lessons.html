@@ -6228,17 +6228,21 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isMobile) {
         document.getElementById('fullscreen-btn').style.display = 'flex';
 
-        document.getElementById('fullscreen-btn').addEventListener('click', function () {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) {
-                document.documentElement.msRequestFullscreen();
-            }
-        });
+        document.getElementById("fullscreen-btn").addEventListener("click", function () {
+  if (!document.fullscreenElement) {
+    // Entrar a pantalla completa
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    }
+    document.getElementById("fullscreen-icon").className = "ri-fullscreen-exit-fill";
+  } else {
+    // Salir de pantalla completa
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+    document.getElementById("fullscreen-icon").className = "ri-fullscreen-fill";
+  }
+});
     }
 });
 
