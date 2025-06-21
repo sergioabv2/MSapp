@@ -862,6 +862,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
   /* padding-left: 5px; */
   text-align: center;
 }   
+
+     .ion-scroll{
+  height: calc(100vh - 70px);
+}
+
+.ion-scroll::-webkit-scrollbar {
+  width: 0px; /* Cambia este valor para ajustar el grosor */
+}
+
 </style>
 
 <body>
@@ -886,7 +895,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <ion-side-menus >
       <ion-side-menu side="left" width='280'  expose-aside-when="large">
          
-        <ion-content>
+        <ion-content scroll="false">
 
       <div class="profile-user-data clearfix">
         <div id="loadingProfile" ng-if="loadingProfile" style="margin-top: 20px !important;"></div>
@@ -911,6 +920,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </div>  
         </div>
 
+      <ion-scroll direction="y" class="ion-scroll">
  <ul class="list">
               
             <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="left"><i class="ri-presentation-line" ></i>&nbsp&nbspLecciones</a>
@@ -925,7 +935,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-gemini-line"></i>&nbsp&nbspReel</a>  
     <a href="#/menu/chat" class="item" ng-class="(activeMenuClr=='chat')?'menuSelectedColor':''" ng-click="activeMenuClr = 'chat'" menu-toggle="left"><i class="ri-chat-ai-line" ></i>&nbsp&nbspChat</a> 
           </ul>
-
+ </ion-scroll>
   
         </ion-content>
  <ion-footer-bar style="z-index: 999 !important;">
