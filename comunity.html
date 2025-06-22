@@ -145,7 +145,7 @@ dialog{
   }
 }
   
-  @media (max-width: 1000px){
+  @media (max-width: 600px){
     .hidemobile{
       display: none !important;
     }
@@ -166,13 +166,23 @@ dialog{
   outline: none; /* Sin contorno */
   box-shadow: none; /* Sin sombra */
 }
+.infoProf {
+  border-radius: 16px;
+  position: absolute;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 13px;
+  width: 200px;
+  background: white;
+  z-index: 100;
+}
+
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
 
   <main class="responsive">
     <div class="grid">
-      <section class="s12 m12 l8" ng-if="!selectedPostForComments">
+      <section class="s12 m8 l8" ng-if="!selectedPostForComments">
         <article class="no-elevate large-round">
           <div class="row"><img class="circle small" src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V"/>
             <div class="max">
@@ -189,10 +199,10 @@ dialog{
           </div>
         </article>
       <nav  style="justify-content: center; flex-wrap: wrap; ">
-          <button class="chip"><i>local_fire_department</i><span>Trending</span></button>
+          <button class="chip" ng-click="filterPosts('youtube')"><i>local_fire_department</i><span>Trending</span></button>
                     <button class="chip"><i>arrow_circle_up</i><span>Top</span></button>
           <button class="chip"><i>news</i><span>New</span></button>
-          <button class="chip"><i>trending_up</i><span>Rising</span></button>
+
         </nav>
         
           <div class="showbox" ng-if="userDataLoaded">
@@ -204,15 +214,23 @@ dialog{
     </div> 
         
          <article class="no-elevate round" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
-          <div class="row top-align">
+          <div class="row top-align" >
             <div class="max" >
               
               
              
                 
-                 <div class="row"> <img class="circle small" ng-src="{{post.photo}}"/>  
+                 <div class="row" ng-click="toggleProfileInfo(post.id); $event.preventDefault()"> <img class="circle small" ng-src="{{post.photo}}"/>  
             <div><b>   <label style="font-size: 14px;"><a href="#" >{{post.user}}</a></label></b>
               <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(post.date)}}</label></div>
+
+              <div class="infoProf "
+         style="margin-top: 5px; padding: 8px;"
+         ng-if="showProfileInfo[post.id]">
+      <i class="ri-user-line"></i> {{post.user}}<br>
+      <small>Email: {{post.email}}</small><br>
+      <small>Plan: {{post.plan}}</small>
+    </div>
             </div>
           </div>
                 
@@ -227,20 +245,23 @@ dialog{
                 <div class="medium-space"></div>
                 
                  <div style="display: flex; justify-content: center;">
+                    <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>
+                   </div>
+
                 <div ng-if="post.type == 'text'" >{{post.url}}
               </div>
                 <a  ng-if="post.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{post.url}}</span><i>link</i></a>
                 
                 <a ng-if="post.type == 'img'" href="{{post.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{post.url}}"/></a>
                 
-                <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>
                 
-            </div>
+                
+           
 
                 <div class="row" style="display: flex; justify-content: space-between;">
                   <div>
                    <button class="transparent circle" ng-click="newLike($index, post)" ><i class="ri-heart-line"></i> {{post.likes.length}}</button>
-           <button class="transparent circle" ng-click="openComments(post)" ><i>chat_bubble</i>{{post.comments.length}}</button>
+           <button class="transparent circle" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
          </div>
 
 <button class="chip" ><i>share</i><span>Share</span></button>
@@ -327,7 +348,7 @@ dialog{
 </div>
 
       
-      <section class="s12 m12 l4 hidemobile" >
+      <section class="s12 m4 l4 hidemobile" >
         <article class="no-elevate round">
           <div class="row"><i>trophy</i>
             <div><b>Mozart Premium</b>
@@ -381,7 +402,7 @@ dialog{
             <label>Title</label>
           </div>
           <div class="field border label extra textarea">
-            <textarea></textarea>
+            <textarea ng-model="newText"></textarea>
             <label>Text (optional)</label>
           </div>
         </div>
@@ -415,7 +436,7 @@ dialog{
       <footer class="fixed">
         <nav class="right-align">
           <button class="border" data-ui="#dialog-post">Cancel</button>
-          <button data-ui="#dialog-post">Confirm</button>
+          <button data-ui="#dialog-post" ng-click="newPost(newText)">Confirm</button>
         </nav>
       </footer>
     </dialog>
@@ -550,6 +571,10 @@ $scope.isButton = true;
 };
 
 
+$scope.showProfileInfo = {};
+$scope.toggleProfileInfo = function(postId) {
+  $scope.showProfileInfo[postId] = !$scope.showProfileInfo[postId];
+};
 
    
       
@@ -618,31 +643,7 @@ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7
     $scope.currentPage = 1;
   };
 
-  $scope.getPages = function() {
-    var pages = [];
-    for (var i = 1; i <= $scope.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
 
-  $scope.setPage = function(page) {
-    if (page >= 1 && page <= $scope.totalPages) {
-      $scope.currentPage = page;
-    }
-  };
-
-  $scope.prevPage = function() {
-    if ($scope.currentPage > 1) {
-      $scope.currentPage--;
-    }
-  };
-
-  $scope.nextPage = function() {
-    if ($scope.currentPage < $scope.totalPages) {
-      $scope.currentPage++;
-    }
-  };
 
   $scope.filterPosts = function(type) {
     $scope.filter = type;
