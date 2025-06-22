@@ -208,7 +208,7 @@ dialog{
             <div class="max" >
               
               
-              <div >
+             
                 
                  <div class="row"> <img class="circle small" ng-src="{{post.photo}}"/>  
             <div><b>   <label style="font-size: 14px;"><a href="#" >{{post.user}}</a></label></b>
@@ -226,6 +226,7 @@ dialog{
                 </div>  
                 <div class="medium-space"></div>
                 
+                 <div style="display: flex; justify-content: center;">
                 <div ng-if="post.type == 'text'" >{{post.url}}
               </div>
                 <a  ng-if="post.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{post.url}}</span><i>link</i></a>
@@ -236,23 +237,19 @@ dialog{
                 
             </div>
 
-                <div class="row">
-           <button class="chip" ng-click="openComments(post)"><i>chat_bubble</i><span>Comment</span></button>
-<button class="chip"><i>bookmark</i><span>Save</span></button>
-<button class="chip"><i>share</i><span>Share</span></button>
+                <div class="row" style="display: flex; justify-content: space-between;">
+                  <div>
+                   <button class="transparent circle" ng-click="newLike($index, post)" ><i class="ri-heart-line"></i> {{post.likes.length}}</button>
+           <button class="transparent circle" ng-click="openComments(post)" ><i>chat_bubble</i>{{post.comments.length}}</button>
+         </div>
+
+<button class="chip" ><i>share</i><span>Share</span></button>
              </div>
               
               
               
           </div>
-              <div>
-             <nav class="vertical no-space grey-text center-align">
-                  <div>Top</div>
-                <button class="transparent circle" ng-click="newLike($index, post)"><i>thumb_up</i></button>
-                <div>{{post.likes.length}}</div>
-                <button class="transparent circle" ng-click="removeLike($index, post)"><i>thumb_down</i></button>
-              </nav>
-            </div>
+            
         </article>
         
         
@@ -728,14 +725,18 @@ $scope.openModal = function(post) {
 $scope.newLike = function(index, post) {
   
     $scope.selectedPost = post;
-    var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
+    var selectedDataItem = $scope.data.find(item => item.id === post.id);
 
     if (selectedDataItem) {
-        // Verifica si el usuario ya ha dado "like"
-        if (!selectedDataItem.likes.includes($scope.user)) {
-            // Agrega el nuevo "like" al arreglo de likes
+        const userIndex = selectedDataItem.likes.indexOf($scope.user);
+
+        if (userIndex === -1) {
+            // Si no ha dado like, lo agregamos
             selectedDataItem.likes.push($scope.user);
-        } 
+        } else {
+            // Si ya dio like, lo quitamos
+            selectedDataItem.likes.splice(userIndex, 1);
+        }
     }
 };
    
