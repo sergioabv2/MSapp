@@ -1422,12 +1422,37 @@ body::-webkit-scrollbar-thumb {
         }
 
         /* Estilo para hacer el iframe responsivo */
-        .iframe-container2 iframe {
+        .iframe-container2 .video-thumbnail-wrapper {
             width: 100%;
             height: 100%;
             border: 0;
         }
 
+
+
+.video-thumbnail-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.video-thumbnail-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.play-icon-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 70px;
+  color: #CD201F;
+  text-shadow: 0 0 10px white;
+  z-index: 10;
+  pointer-events: none; /* para que el click pase al div padre */
+}
 
 
 
@@ -1759,16 +1784,20 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
         <div class="msg-text">
           {{message.content}}
           <div class="img-container" ng-if="message.type == 'image'">
-          <img ng-src="{{message.url}}" ng-click="openImageModal(message.url)" >
+          <img ng-src="{{message.url}}" data-pdf-url="{{message.url}" onclick="showModal3(this)"  >
           </div>
           
           <div  ng-if="message.type == 'audio'">
    <iframe  ng-src="{{trustAsResourceUrl(message.url)}}" frameborder="0" height="50px" width="270px"></iframe>
           </div>
           
-      <div class="iframe-container2" ng-if="message.type == 'video'">
-   <iframe  ng-src="{{trustAsResourceUrl(message.url)}}" frameborder="0" ></iframe>
-          </div>
+    <div class="iframe-container2" ng-if="message.type == 'video'">
+  <div class="video-thumbnail-wrapper" data-youtube-id="{{message.url}}" onclick="toggle_video_modal(this)">
+    <img ng-src="{{getThumbnail(message.url)}}"/>
+    <div class="play-icon-overlay"> <i class="ri-youtube-fill"></i> </div>
+  </div>
+</div>
+
           
         </div>
         <i class="ri-check-double-fill" style="float: right; color: green;" ng-if="message.read == true && message.sender == 'client'"> visto</i> 
@@ -1996,7 +2025,8 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
    function getData(){
   var requestData = { 
     action: "getProfileData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2080,6 +2110,17 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
    $scope.filterByLevel = function(entry) {
     return entry.index <= $scope.lsn;
 };
+
+
+    $scope.getThumbnail = function(embedUrl) {
+  const match = embedUrl.match(/\/embed\/([^/?]+)/);
+  if (match && match[1]) {
+    const videoId = match[1];
+    return `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
+  } else {
+    return null; // o puedes lanzar un error
+  }
+}
 
 
    
@@ -2349,10 +2390,6 @@ function toggle_video_modal(element) {
      var url = element.getAttribute('data-youtube-id');
           $("#youtube").attr('src', url);        
           $("body").addClass("show-video-modal noscroll");  
-  var icon = element.querySelector('.yticon');
-    if (icon) {
-        icon.style.animation = 'none';
-    }
 }
 
       // Close and Reset the Video Modal
@@ -2373,10 +2410,6 @@ function toggle_video_modal(element) {
        var url = element.getAttribute('data-pdf-url');
           $("#drivemodal3").attr('src', url);   
         document.getElementById('modal-container3').classList.add('four');
-     var icon = element.querySelector('.yticon');
-    if (icon) {
-        icon.style.animation = 'none';
-    }
     };
 
 function closemodal() {
