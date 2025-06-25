@@ -1728,17 +1728,16 @@ body::-webkit-scrollbar-thumb {
 
 
           <div class="panel-header noPhone" style="transform: scale(0.95)">
-        <h4><i class="fa fa-fw fa-flag"></i> Actividad</h4>
+        <h4><i class="fa fa-fw fa-flag"></i> Desafíos</h4>
           
           </div>
           <div class="panel-body log-list-container logContainer " style="transform: scale(0.95)"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
-          <!--    <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="showModal(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
+           <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="showModal3(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
                   <button ng-if="entry.status == 'En revisión'" class="btn btn-danger btn-sm" ng-click="restoreEntry(entry)" style="float:right; margin-right: -19px; margin-top: 8px; font-size: 11px;"> Anular</button>  
 
 
--->
         
               
                <div style="float:right; margin-right: -15px; color: green; font-size: 15px; font-weight: 600;" ng-if="entry.status == 'Evaluada' && entry.score"><i class="ri-award-fill" style="font-size: 25px; color: orange; " ng-if="entry.score == 100"></i> +{{entry.score}}    </div> 
@@ -2010,8 +2009,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
    function getData(){
   var requestData = { 
     action: "getProfileData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-    //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
