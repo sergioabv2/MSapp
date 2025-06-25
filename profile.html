@@ -1734,7 +1734,7 @@ body::-webkit-scrollbar-thumb {
           <div class="panel-body log-list-container logContainer " style="transform: scale(0.95)"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
-           <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="showModal3(this)" ng-click="selectEntry(entry)" ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
+           <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="toggle_video_modal(this)"  ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
                   <button ng-if="entry.status == 'En revisión'" class="btn btn-danger btn-sm" ng-click="restoreEntry(entry)" style="float:right; margin-right: -19px; margin-top: 8px; font-size: 11px;"> Anular</button>  
 
 
@@ -1743,7 +1743,8 @@ body::-webkit-scrollbar-thumb {
                <div style="float:right; margin-right: -15px; color: green; font-size: 15px; font-weight: 600;" ng-if="entry.status == 'Evaluada' && entry.score"><i class="ri-award-fill" style="font-size: 25px; color: orange; " ng-if="entry.score == 100"></i> +{{entry.score}}    </div> 
                 <div style="float:right; margin-right: -15px;" ng-if="entry.status == 'Evaluada' && entry.quote"><i class="ri-award-fill" style="font-size: 25px; color: orange;"></i>  </div>
     
-               
+            
+             
      <!--       <div ng-if="entry.status == 'Límite de entrega: ' && entry.video" data-youtube-id="{{entry.video}}" 
 class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: red; cursor: pointer; padding: 0 5px"> <i class="ri-youtube-fill yticon" style="float:right;  font-size: 26px; "></i></div>    
                 <div ng-if="entry.status === 'A corrección' && entry.cVideo" data-youtube-id="{{entry.cVideo}}" 
@@ -1751,9 +1752,14 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
                <div ng-if="entry.status === 'A corrección' && entry.cPDF" data-pdf-url="{{entry.cPDF}}" onclick="showModal3(this)" ng-click="selectEntry(entry)" style="color: gray; cursor: pointer; "> <i class="ri-file-warning-line yticon" style="float:right; font-size: 26px; margin-right: -15px;"></i></div>  -->
 
                         <span style="font-size: 13px;">{{entry.name}}</span>  
-               <small style="font-size: 11px; margin-top: 2px;">{{entry.status}} <span ng-if="entry.status == 'Límite de entrega: '"> {{dateToString(entry.limitdate)}}</span></small>
-           
-               <small ng-if="entry.status == 'Límite de entrega: ' && stringToDate(entry.limitdate) < today" style="font-size: 9px; margin-top: 2px; position:absolute;">Entrega atrasada, envía un avance</small>
+
+
+          
+
+                <small ng-if="entry.status == 'Evaluada'" style="font-size: 11px; margin-top: 2px;">Completado </small>
+                    <small ng-if="entry.status == 'A corrección'" style="font-size: 11px; margin-top: 2px;">No completado </small>
+             <small ng-if="entry.status == 'Límite de entrega: '" style="font-size: 11px; margin-top: 2px;">Finaliza el: <span> {{dateToString(entry.limitdate)}}</span> </small>
+
                     </li>
             </ul>
           </div>
