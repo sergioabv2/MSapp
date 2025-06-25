@@ -1734,7 +1734,7 @@ body::-webkit-scrollbar-thumb {
           <div class="panel-body log-list-container logContainer " style="transform: scale(0.95)"> 
              <ul class="list-unstyled log-list">
              <li ng-repeat="entry in history | filter:filterByLevel" ng-class="{'status-pending': entry.status === 'En revisión', 'status-delayed': entry.status === 'Límite de entrega: ' && stringToDate(entry.limitdate) < today, 'status-completed': entry.status === 'Evaluada', 'status-error': entry.status === 'A corrección', 'status-default': (entry.status === 'Límite de entrega: '  && stringToDate(entry.limitdate) >= today) || entry.status === 'Asignado'}">
-           <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-pdf-url="{{entry.pdf}}" onclick="toggle_video_modal(this)"  ng-if="entry.status !== 'En revisión' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
+           <button style="float:right; margin-right: -15px; margin-top: 7px; font-size: 11px;" data-youtube-id="{{entry.pdf}}" onclick="toggle_video_modal(this)"  ng-if="entry.status !== 'A corrección' && entry.status !== 'Evaluada'" class="btn btn-dark btn-sm">Abrir </button>
                   <button ng-if="entry.status == 'En revisión'" class="btn btn-danger btn-sm" ng-click="restoreEntry(entry)" style="float:right; margin-right: -19px; margin-top: 8px; font-size: 11px;"> Anular</button>  
 
 
@@ -1758,7 +1758,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
 
                 <small ng-if="entry.status == 'Evaluada'" style="font-size: 11px; margin-top: 2px;">Completado </small>
                     <small ng-if="entry.status == 'A corrección'" style="font-size: 11px; margin-top: 2px;">No completado </small>
-             <small ng-if="entry.status == 'Límite de entrega: '" style="font-size: 11px; margin-top: 2px;">Finaliza el: <span> {{dateToString(entry.limitdate)}}</span> </small>
+             <small ng-if="entry.status == 'Límite de entrega: '" style="font-size: 11px; margin-top: 2px;">Finaliza: <span> {{dateToString(entry.limitdate)}}</span> </small>
 
                     </li>
             </ul>
