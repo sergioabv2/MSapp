@@ -3,7 +3,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.1/js/bootstrap.js"></script>
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css">
-  
+ 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -441,11 +441,14 @@
 
   
      .drive{
-      height: 450px;
+     /* height: 480px;*/
     width: 120%;
     margin-left: -25px;
   }
   
+  #drivemodal3{
+    height: 480px;
+  }
   
   .modal-container {
     position: fixed;
@@ -495,7 +498,7 @@
     display: block;
     position: absolute;
     top: -10px;
-    right: 55px;
+    right: -20px;
     text-decoration: none;
     font-size: 40px;
     font-weight: bold;
@@ -833,7 +836,7 @@ iframe#youtube {
    
      
      .close-modal {
-       margin-right: -150px;
+       margin-right: -50px;
      }
    
    
@@ -1332,8 +1335,10 @@ body::-webkit-scrollbar-thumb {
 
    .img-container {
     margin-top: 15px;
-    width: 250px; 
+    width: 240px; 
     overflow: hidden;
+    border-radius: 7px;
+    cursor: pointer;
   }
 
   .img-container img {
@@ -1419,6 +1424,7 @@ body::-webkit-scrollbar-thumb {
             overflow: hidden;
             max-width: 100%;
             height: 180px;
+            border-radius: 6px;
         }
 
         /* Estilo para hacer el iframe responsivo */
@@ -1426,6 +1432,7 @@ body::-webkit-scrollbar-thumb {
             width: 100%;
             height: 100%;
             border: 0;
+
         }
 
 
@@ -1899,33 +1906,6 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
    </div> 
    </section>  
   
-   <div id="modal-container2" class="modal-container">
-      <div id="rotate-screen" style="overflow: hidden; display: none;">
- 
-</div>
-     
-  <div class="modal-background"  >   
-    <div class="modal-msg" > 
-   
-      
-     
-   
-
-  
-        <iframe class="drive" id="drivemodal" src="" frameborder="0">
-        </iframe>
-    
-         
-   
-             </div>
-      <br>
-    <!--<button ng-click="uploadAudio()" style="float: right;">Subir</button>-->
-
-    </div>
-  </div>
-  
-  
-
 
 
 
@@ -2030,7 +2010,8 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
    function getData(){
   var requestData = { 
     action: "getProfileData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+    //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2222,20 +2203,7 @@ class="js-trigger-video-modal" onclick="toggle_video_modal(this)" style="color: 
   
   
   
-  $scope.isModalOpen = false;
-  $scope.modalImageUrl = '';
-
-  $scope.openImageModal = function(imageUrl) {
-    $scope.isModalOpen = true;
-    $scope.modalImageUrl = imageUrl;
-  };
-
-  $scope.closeImageModal = function() {
-    $scope.isModalOpen = false;
-    $scope.modalImageUrl = '';
-  };
-
- 
+  
 
     $scope.uploadImage = function() {
    var imageData = document.getElementById("imageData").value
@@ -2530,194 +2498,6 @@ background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQ
 
 
 
-
- document.getElementById('recordBtn').addEventListener('click', function() {
-          var recorder = document.getElementById('recorder');
-
-               document.getElementById('recorder2').style.visibility = 'visible';
-    document.getElementById('stopBtn').style.display = 'block';
-                recorder.style.display = 'block';   
-              $('#audio_record-icon').prop('checked', true);
-              document.getElementById('msg-input').style.visibility = 'hidden';
-              document.getElementById('mediaMenu').style.visibility = 'hidden';
-               document.getElementById('mediaBtn').style.visibility = 'hidden';
-
-              startRecording();
-        });
-
-
-
-
-
- document.getElementById('stopBtn').addEventListener('click', function() {
-          var recorder = document.getElementById('recorder');
-
-              document.getElementById('recorder2').style.visibility = 'hidden';
-    document.getElementById('stopBtn').style.display = 'none';
-      document.getElementById('delete-audio2').style.display = 'block';
-               $('#audio_record-icon').prop('checked', false);
-               $('#toggle-recorder').text('');
-              stopRecording();
-
-        });
-
-
-
-
-
- function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
-    navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
-  }
-
-  var mediaConstraints = {
-    audio: true
-  };
-
-  //Parto con la registrazione audio
-  function startRecording(idx) {
-    
-    $('#start-recording').disabled = true;
-    audiosContainer = document.getElementById('audios-container');
-    //document.getElementById("clicks").innerHTML = "Recording Started";
-
-    var f = document.getElementById('clicks');
-    setInterval(function () {
-        f.style.display = (f.style.display == 'none' ? '' : 'none');
-    }, 1000);
-
-    captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
-  };
-  //Stoppo la registrazione audio
-  function stopRecording() {
-      $('#stop-recording').disabled = true;
-   
-      //document.getElementById("clicks").innerHTML = "Recording Stopped";
-
-      var f = document.getElementById('clicks');
-      setInterval(function () {
-          f.style.display = (f.style.display == 'none' ? '' : 'none');
-      }, 1000);
-    mediaRecorder.stop();
-    mediaRecorder.stream.stop();
-   
-   
-    $('.start-recording').disabled = false;
-  };
-
-
-  var mediaRecorder;
-
-$('#delete-audio2').on('click', function() {
-        $('#record-audio').empty(); 
-        document.getElementById("AudioData").value = "";
-        document.getElementById('recorder').style.display = 'none'; 
-  document.getElementById('msg-input').style.visibility = 'visible';
-   document.getElementById('mediaBtn').style.visibility = 'visible';
-   document.getElementById('mediaMenu').style.visibility = 'visible';
-    document.getElementById('delete-audio2').style.display = 'none';
-  });
-
-  function onMediaSuccess(stream) {
-    mediaRecorder = new MediaStreamRecorder(stream);
-    mediaRecorder.stream = stream;
-    mediaRecorder.mimeType = 'audio/wav';  
-    //mediaRecorder.mimeType = 'audio/webm';  
-    mediaRecorder.audioChannels = 1;
-    mediaRecorder.ondataavailable = function(blob) {
-      $('#record-audio').html("<audio id='player1'  src=" + URL.createObjectURL(blob) + "  type='audio/mp3' controls >");
-       const player = new MediaElementPlayer('player1', {
-        features: ['playpause', 'progress']
-    }); 
-
-      
-      var reader = new FileReader();
-          reader.onloadend = function() {
-            var base64Audio = reader.result.split(',')[1];
-            document.getElementById("AudioData").value = base64Audio;
-          };
-          reader.readAsDataURL(blob);
-    };
- 
-    var timeInterval = 360 * 1000;
-    mediaRecorder.start(timeInterval);
-    $('#stop-recording').disabled = false;
-  }
-
-
-
-
-  function onMediaError(e) {
-    console.error('media error', e);
-  }
-
-  function bytesToSize(bytes) {
-    var k = 1000;
-    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (bytes === 0) return '0 Bytes';
-    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
-    return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-  }
-
-  function getTimeLength(milliseconds) {
-    var data = new Date(milliseconds);
-    return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
-  }
-
-  window.onbeforeunload = function() {
-    $('#start-recording').disabled = false;
-  };
-
-
-
-
-document.getElementById('upload-audio').addEventListener('click', function () {
-    document.getElementById('audioDataInput').click();
-});
-
-
-document.getElementById('audioDataInput').addEventListener('change', function (event) {
-  
-  document.getElementById('msg-input').style.visibility = 'hidden';
-              document.getElementById('mediaMenu').style.visibility = 'hidden';
-               document.getElementById('mediaBtn').style.visibility = 'hidden';
-  
-  
-  
-    const file = event.target.files[0]; 
-
-    const audioURL = URL.createObjectURL(file);
-
-    $('#record-audio').html(`<audio id="player2" src="${audioURL}" controls></audio>`);
-
-      const player = new MediaElementPlayer('player2', {
-        features: ['playpause', 'progress']
-    }); 
-
-    const reader = new FileReader();
-    reader.onloadend = function () {
-        const base64Audio = reader.result.split(',')[1];
-        document.getElementById("AudioData").innerText = base64Audio; 
-            document.getElementById('delete-audio2').style.display = 'block';
-        document.getElementById('recorder').style.display = 'block';
-      document.getElementById('recorder2').style.visibility = 'hidden';
-    };
-    reader.readAsDataURL(file);  
-})
- 
-
-/*
-$(document).on('click','input[name="audio_record-icon"]',function(){
-  var checked = $('#audio_record-icon').prop('checked');
-  if(checked == true)
-    {
-        startRecording();
-    }
-  else
-    { 
-        stopRecording();
-    }
-});
-*/
 
 
 </script> 
