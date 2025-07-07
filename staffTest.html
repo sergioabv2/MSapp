@@ -283,14 +283,17 @@ function calculateTotalBeats(sequence, upToIndex) {
 }
 
 function renderScore() {
-    const div = document.getElementById("staff");
+     const div = document.getElementById("staff");
     div.innerHTML = "";
     const numSystems = rightSequences.length;
+  const availableWidth = div.clientWidth || window.innerWidth * 0.95;
+  const scaleFactor = Math.min(availableWidth / 750, 1.2);
 
     const renderer = new Renderer(div, Renderer.Backends.SVG);
     const height = 180 * numSystems + 50;
-    renderer.resize(800, height);
+    renderer.resize(availableWidth+30, 450 * scaleFactor);
     const context = renderer.getContext();
+    context.scale(scaleFactor, scaleFactor);
 
     for (let i = 0; i < numSystems; i++) {
         const yOffset = 30 + i * 180;
