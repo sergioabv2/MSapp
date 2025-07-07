@@ -449,7 +449,31 @@ background-color: rgba(0, 0, 0, 0.5);
     stroke: #ffa700;
   }
 }
-  
+  .mhn-slide2 .mhn-item{width:100%;padding:10px}
+.mhn-slide2 .mhn-inner{width:100%;box-shadow:0 2px 10px 0 rgba(0,0,0,.16),0 2px 5px 0 rgba(0,0,0,.26);border-radius:3px;transition: transform 0.4s ease;}
+
+.mhn-slide2 .mhn-text{text-align:center;padding:0 10px}
+.mhn-slide2 .mhn-text h4{font-weight:700;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.mhn-slide2 .mhn-text p{max-height:4.5em;overflow:hidden}
+.mhn-slide2 .owl-stage-outer{z-index:1}
+.mhn-slide2 .owl-nav{color:#333;position:absolute;top:0;left:0;right:0;bottom:0}
+.mhn-slide2 .owl-nav svg{color:currentColor}
+.mhn-slide2 .owl-nav .disabled{display:none}
+.mhn-slide2 .owl-prev,
+.mhn-slide2 .owl-next{
+  top:110px;
+  z-index:2;
+  width:40px;
+  height:40px;
+  padding:8px;
+  margin-top:-20px;
+  position:absolute;
+  border-radius:50%;
+  background-color:#fff;
+  box-shadow:0 4px 4px rgba(0,0,0,.3),0 0 4px rgba(0,0,0,.2)
+}
+.mhn-slide2 .owl-prev{left:-10px}
+.mhn-slide2 .owl-next{right:-10px}
   
 </style>
 
@@ -464,7 +488,7 @@ background-color: rgba(0, 0, 0, 0.5);
     </div>
   
   
-  <div ng-if="datosCargados">
+  <div >
     <div class="carousel-header">
   <h2>Piezas  </h2>
 </div>
@@ -512,7 +536,7 @@ background-color: rgba(0, 0, 0, 0.5);
   <h2>Piezas finales  </h2>
 </div>
   
-   <div class="mhn-slide owl-carousel">
+   <div class="mhn-slide2 owl-carousel">
     <div class="mhn-item" ng-repeat="manual in repertoire" ng-click="showPreview2(manual)">
       <div class="mhn-inner">
        
@@ -661,8 +685,8 @@ angular.module('books', [])
      
     $scope.datosCargados = true;
       
-$(function(){
-  $('.mhn-slide').owlCarousel({
+      $(function(){
+  $('.mhn-slide2').owlCarousel({
     nav:true,
     //loop:true,
     slideBy: 1,
@@ -688,6 +712,7 @@ $(function(){
     navText:['<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>','<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>']
   });
 });
+
     })  
 
 
@@ -749,7 +774,33 @@ $scope.marcarPreferencia = function () {
 
   
 
-  
+  $(function(){
+  $('.mhn-slide').owlCarousel({
+    nav:true,
+    //loop:true,
+    slideBy: 1,
+    rewind:false,
+
+    responsive: {
+    0: {
+      items: 3,
+      stagePadding: 20,
+      margin: -5    
+    },
+    600: {
+      items: 4,
+      stagePadding: 40
+    },
+    1000: {
+      items: 5,
+      stagePadding: 60
+    }
+  },
+    smartSpeed:70,
+    
+    navText:['<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>','<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>']
+  });
+});
   
 }])
 
