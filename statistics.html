@@ -539,7 +539,7 @@ a {
  
   <div class="content">
     <div class="greeting">
-      <h2>¡Buenos días {{userName}}!</h2>
+      <h2>¡{{greet}} {{userName}}!</h2>
       <p>Es hora de practicar</p>
     </div>
 
@@ -756,8 +756,7 @@ a {
 .controller('main', ['$http', '$scope', '$sce', function($http, $scope, $sce){
     var requestData = {
     action: "getProfileData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-      //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -770,7 +769,22 @@ a {
     .then(function(response) { 
       $scope.data = response.data
     $scope.userName = $scope.data.name.split(" ")[0]
+    
   })
+  
+  $scope.greet = getCurrentGreet()
+  
+  function getCurrentGreet() {
+  const hour = new Date().getHours();
+  
+  if (hour >= 6 && hour < 12) {
+    return "Buenos días";
+  } else if (hour >= 12 && hour < 19) {
+    return "Buenas tardes";
+  } else {
+    return "Buenas noches";
+  }
+};
   
 }])
 </script>
