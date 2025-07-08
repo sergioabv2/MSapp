@@ -1,5 +1,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+
 
 <style>
   :root {
@@ -533,11 +535,11 @@ a {
 
 
 
-<div class="all">
+<div class="all" ng-app="app" ng-controller="main">
  
   <div class="content">
     <div class="greeting">
-      <h2>¡Buenos días Pianista!</h2>
+      <h2>¡Buenos días {{userName}}!</h2>
       <p>Es hora de practicar</p>
     </div>
 
@@ -745,3 +747,30 @@ a {
 
   
 </div>
+
+
+
+
+<script>
+  angular.module('app', [])
+.controller('main', ['$http', '$scope', '$sce', function($http, $scope, $sce){
+    var requestData = {
+    action: "getProfileData",
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+      //localStorage.getItem('MStoken')
+  };
+
+  var config = {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    } 
+  };
+           
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) { 
+      $scope.data = response.data
+    $scope.userName = $scope.data.name.split(" ")[0]
+  })
+  
+}])
+</script>
