@@ -1,0 +1,56 @@
+
+<html>
+<head>
+  <title>Staff View</title>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+</head>
+  
+  <style>
+    #myStaffVisualizer{
+      display: flex;
+justify-content: center;
+    }
+  </style>
+<body>
+  <div>
+    <label for="midiUrl">Enter MIDI URL:</label>
+    <input type="text" id="midiUrl" />
+    <button onclick="loadMidi()">Load MIDI</button>
+  </div>
+
+  <midi-player
+    id="player"
+    src="https://assets.codepen.io/81395/chopin.mid"
+    sound-font
+    visualizer="#myStaffVisualizer"
+    tempo="2">
+  </midi-player>
+
+  
+  <midi-visualizer
+    type="waterfall"
+    id="myStaffVisualizer"
+    src="https://assets.codepen.io/81395/chopin.mid">
+  </midi-visualizer>
+
+  <script>
+    function loadMidi() {
+      const midiUrlInput = document.getElementById('midiUrl');
+      const midiUrl = midiUrlInput.value;
+      const player = document.getElementById('player');
+      const visualizer = document.getElementById('myStaffVisualizer');
+
+      player.setAttribute('src', midiUrl);
+      visualizer.setAttribute('src', midiUrl);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      loadMidi();
+    });
+  </script>
+</body>
+</html>
+
