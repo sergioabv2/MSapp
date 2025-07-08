@@ -1,0 +1,128 @@
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MIDI Chord Analyzer – Grand Staff mejorado</title>
+  <script src="https://unpkg.com/vexflow@3.0.9/releases/vexflow-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #staff { border: 1px solid #ccc; margin-top: 20px; }
+    #controls { margin-top: 10px; }
+    #analysis { margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+    .chord-name { font-weight: bold; color: #0066cc; }
+  </style>
+</head>
+<body>
+
+  <p id="status">Haz clic para activar sonido y luego toca en tu controlador MIDI.</p>
+  <div id="controls">
+    <label><input type="checkbox" id="persistScore"> Mantener partitura visible</label>
+  </div>
+  <div id="staff"></div>
+  <div id="analysis"></div>
+
+  <script>
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const pressed = new Set();
+    const intervalNames = {
+      0:"Unísono",1:"Segunda menor",2:"Segunda mayor",3:"Tercera menor",
+      4:"Tercera mayor",5:"Cuarta justa",6:"Tritono",7:"Quinta justa",
+      8:"Sexta menor",9:"Sexta mayor",10:"Séptima menor",11:"Séptima mayor",12:"Octava"
+    };
+
+    function midiToName(n) {
+      const name = noteNames[n % 12];
+      const oct = Math.floor(n/12) -1;
+      return name + oct;
+    }
+
+    function anaylzeChord(notes) {
+      const unique = [...new Set(notes)].sort((a,b)=>a-b);
+      const classes = unique.map(n=>n%12);
+      if(unique.length<2) return "<p>Toca al menos 2 notas.</p>";
+      const ints = unique.slice(1).map(n=>n-unique[0]).filter(i=>i<=12);
+      let out = "<h3>Intervalos:</h3><ul>" + ints.map(i=>`<li>${intervalNames[i]|| i+" st"}</li>`).join("") + "</ul>";
+
+      if (classes.length>=3) {
+        let match = null;
+        classes.forEach(root=>{
+          const trans = classes.map(x=>(x-root+12)%12).sort();
+          const name = noteNames[root];
+          const patterns = {
+            "0,4,7":`${name} (mayor)`, "0,3,7":`${name}m (menor)`,
+          };
+          const key = trans.join(",");
+          if(patterns[key] && !match) match = patterns[key];
+        });
+        if(match) out+=`<h3>Acorde:</h3><p class="chord-name">${match}</p><p>Notas: ${unique.map(midiToName).join(", ")}</p>`;
+        else out+="<p>No se identificó acorde.</p>";
+      }
+      return out;
+    }
+
+    function render(notes) {
+      const VF = Vex.Flow;
+      const div = document.getElementById("staff");
+      div.innerHTML="";
+      const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+      renderer.resize(400,260);
+      const ctx = renderer.getContext();
+
+      const staveT = new VF.Stave(10,20,380).addClef("treble").setContext(ctx).draw();
+      const staveB = new VF.Stave(10,140,380).addClef("bass").setContext(ctx).draw();
+      new VF.StaveConnector(staveT, staveB).setType("brace").setContext(ctx).draw();
+      new VF.StaveConnector(staveT, staveB).setType("single").setContext(ctx).draw();
+
+      const treble = [], bass = [];
+      notes.forEach(n=>{
+        const idx = n >= 57 ? treble : bass;
+const name = noteNames[n % 12].replace("#", "n");
+let oct = Math.floor(n / 12) - 1;
+if (n < 57) oct += 2; // ajuste de octava para el bass staff
+
+        idx.push({ key:`${name}/${oct}`, acc: name.includes("n")?"#":null });
+      });
+
+      function makeNote(arr) {
+        if(!arr.length) return null;
+        const note = new VF.StaveNote({ keys: arr.map(e=>e.key), duration:"q" });
+        arr.forEach((e,i)=>e.acc && note.addAccidental(i,new VF.Accidental(e.acc)));
+        return note;
+      }
+
+      const notesT = makeNote(treble), notesB = makeNote(bass);
+      if(notesT) VF.Formatter.FormatAndDraw(ctx, staveT, [notesT]);
+      if(notesB) VF.Formatter.FormatAndDraw(ctx, staveB, [notesB]);
+    }
+
+    document.body.addEventListener("click", ()=>{})  // unmute placeholder
+
+    if(navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(ma=>{
+      document.getElementById("status").innerText="MIDI listo, toca...";
+      for(let input of ma.inputs.values()){
+        input.onmidimessage=msg=>{
+          const [cmd,note,vel]=msg.data;
+          const persist=document.getElementById("persistScore").checked;
+          if(cmd===144 && vel>0){
+            pressed.add(note);
+          } else if((cmd===128)||(cmd===144&&vel===0)){
+            pressed.delete(note);
+            if(persist) return;
+          }
+          const arr=[...pressed].sort((a,b)=>a-b);
+          if(arr.length){
+            document.getElementById("status").innerText="Activas: "+arr.map(n=>midiToName(n)).join(", ");
+            render(arr);
+            document.getElementById("analysis").innerHTML = anaylzeChord(arr);
+          } else {
+            document.getElementById("staff").innerHTML="";
+            document.getElementById("analysis").innerHTML="";
+            document.getElementById("status").innerText="Todas las notas soltadas";
+          }
+        };
+      }
+    },()=>alert("No MIDI"));
+  </script>
+</body>
+</html>
