@@ -471,16 +471,16 @@ background-color: rgba(0, 0, 0, 0.5);
 
   overflow: hidden;
   height: 12px;
-  width: 155px;
+  width: 130px;
   background: #e0e0e0;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 
 .progress-fill {
-    height: 10px;
-    background: #4CAF50; /* Green for the filled part */
-    border-radius: 6px;
+    height: 12px;
+    background: gray; /* Green for the filled part */
+    border-radius: 2px;
     transition: width 0.3s ease;
     display: block;
 }
@@ -684,7 +684,7 @@ background-color: rgba(0, 0, 0, 0.5);
     <div class="progress-bar-container">
       <div class="progress-label">Progreso: {{getProgressPercentage()}}%</div>
    <div class="progress-bar">
-  <div class="progress-fill" style="width: 60%; background: red;"></div>
+  <div class="progress-fill" ng-style="{'width': getProgressPercentage() + '%', 'background': getProgressColor()}"></div>
 </div>
 
     </div>
@@ -764,7 +764,7 @@ angular.module('books', [])
     "totalBars": 50,
     "practiceData": {
       "totalTime": 0,
-      "completedBars": 5,
+      "completedBars": 2,
       "sessions": []
     }
   },
@@ -779,7 +779,7 @@ angular.module('books', [])
     "totalBars": 50,
     "practiceData": {
       "totalTime": 0,
-      "completedBars": 0,
+      "completedBars": 15,
       "sessions": []
     }
   },
@@ -794,7 +794,7 @@ angular.module('books', [])
     "totalBars": 50,
     "practiceData": {
       "totalTime": 0,
-      "completedBars": 0,
+      "completedBars": 32,
       "sessions": []
     }
   },
@@ -809,7 +809,7 @@ angular.module('books', [])
     "totalBars": 50,
     "practiceData": {
       "totalTime": 0,
-      "completedBars": 0,
+      "completedBars": 47,
       "sessions": []
     }
   },
@@ -1034,8 +1034,7 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-      //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1087,7 +1086,7 @@ angular.module('books', [])
       const regex = /\/d\/([^\/]+)\//;
     const matches = URL.match(regex);
     var id = matches ? matches[1] : null;
-     var url = "https://drive.google.com/uc?export=download&id="+id
+     var url = "https://drive.google.com/file/d/"+id+"/view"
     window.open(url, '_blank');
   };
   
@@ -1134,12 +1133,17 @@ $scope.showPreview = function(manual, lvl, lsn) {
 
 // En tu controlador AngularJS
 $scope.getProgressPercentage = function() {
-  // Ejemplo: progreso actual entre total
-  if (!$scope.currentManual || !$scope.currentManual.practiceData) return 0;
-  const completed = $scope.currentManual.practiceData.completed || 0;
-  const total = $scope.currentManual.practiceData.total || 1;
-  return Math.min(100, Math.floor((completed / total) * 100));
+    if (!$scope.currentManual?.practiceData || !$scope.currentManual.totalBars) return 0;
+    return Math.round(($scope.currentManual.practiceData.completedBars / $scope.currentManual.totalBars) * 100);
 };
+  
+  $scope.getProgressColor = function() {
+  const percentage = $scope.getProgressPercentage() || 0;
+  // HSL: 0 (rojo) to 120 (verde)
+  const hue = Math.round((percentage / 100) * 120);
+  return 'hsl(' + hue + ', 85%, 50%)';
+};
+
 
 
 $scope.toggleMetronome = function() {
