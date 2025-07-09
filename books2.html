@@ -101,7 +101,7 @@
   border-radius: 2px;
   margin-bottom: 1rem;
 }
- 
+
 .close-btn {
   position: absolute;
   top: 1.7rem;
@@ -559,6 +559,98 @@ background-color: rgba(0, 0, 0, 0.5);
     margin-left: auto; /* Empuja a la derecha */
   }
 }
+
+
+/* Efecto vidrio para métricas en móvil */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Contenedor de métricas para móvil */
+.mobile-metrics {
+  display: flex;
+  justify-content: space-around;
+  margin-top: -30px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.metric-value {
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+/* Contenedor de métricas para desktop */
+.desktop-metrics {
+  margin-top: 20px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.progress-container {
+  grid-column: span 2;
+  margin-bottom: 25px; 
+}
+
+
+.progress-percentage {
+  font-size: 13px;
+  margin-top: -3px !important;
+  margin-right: 205px !important;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .desktop-metrics {
+    display: none;
+  }
+  
+  .mobile-metrics {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-metrics {
+    display: none;
+  }
+  
+  .desktop-metrics {
+    display: block;
+  }
+  
+  .preview-content {
+    flex-direction: row;
+  }
+}
 </style>
 
 <div class="container" ng-app="books" ng-controller="main">
@@ -633,29 +725,63 @@ background-color: rgba(0, 0, 0, 0.5);
   
 <div class="preview-modal" ng-show="selectedManual">
   <div class="preview-backdrop"></div>
-
-   <div class="preview-content">
-  <button class="close-btn" ng-click="selectedManual = null">✕</button>
-  
-  <img class="cover-large" ng-src="{{selectedManual.background}}" />
-
-  <div class="right-column">
-    <div class="text-content">
-      <p class="collection">Mozart Academy</p>
-      <hr class="separator">
-      <h2 class="title">{{selectedManual.title}}</h2>
-      <p class="author">{{selectedManual.subtitle}}</p>
+  <div class="preview-content">
+    <button class="close-btn" ng-click="selectedManual = null">✕</button>
+    <img class="cover-large" ng-src="{{selectedManual.background}}" />
+    
+    <!-- Contenedor de métricas para móvil -->
+    <div class="mobile-metrics glass-effect" ng-if="selectedManual.practiceData">
+      <div class="metric-item">
+        <span class="metric-value">{{selectedManual.practiceData.completedBars}}/{{selectedManual.totalBars}}</span>
+        <span class="metric-label">Compases</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-value">{{selectedManual.practiceData.totalTime | secondsToTime}}</span>
+        <span class="metric-label">Tiempo</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-value">{{getProgressPercentage2()}}%</span>
+        <span class="metric-label">Progreso</span>
+      </div>
     </div>
 
-    <div class="action-buttons">
-      <button ng-click="openPlayer(selectedManual)">Abrir </button>
-     <!-- <button class="noDisplay">Play (MIDI)</button>  -->
-      <button  ng-click="openPDF(selectedManual.pdf)" >Descargar</button>
+    <div class="right-column">
+      <div class="text-content">
+        <p class="collection">Mozart Academy</p>
+        <hr class="separator">
+        <h2 class="title">{{selectedManual.title}}</h2>
+        <p class="author">{{selectedManual.subtitle}}</p>
+        
+        <!-- Contenedor de métricas para desktop -->
+        <div class="desktop-metrics" ng-if="selectedManual.practiceData">
+            
+          <div class="metric-grid">
+             <div class="progress-container">
+              <div class="progress-bar">
+                <div class="progress-fill" ng-style="{'width': getProgressPercentage2() + '%'}"></div>
+              </div>
+              <span class="progress-percentage">{{getProgressPercentage2()}}%</span>
+            </div>
+            
+            <div class="metric-item">
+              <span class="metric-value">{{selectedManual.practiceData.completedBars}}/{{selectedManual.totalBars}}</span>
+              <span class="metric-label">Compases avanzados</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-value">{{selectedManual.practiceData.totalTime | secondsToTime}}</span>
+              <span class="metric-label">Tiempo total</span>
+            </div>
+         
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button ng-click="openPlayer(selectedManual)">Abrir</button>
+        <button ng-click="openPDF(selectedManual.pdf)">Descargar</button>
+      </div>
     </div>
   </div>
-</div>
-
-  
 </div>
 
 
@@ -1135,6 +1261,12 @@ $scope.showPreview = function(manual, lvl, lsn) {
 $scope.getProgressPercentage = function() {
     if (!$scope.currentManual?.practiceData || !$scope.currentManual.totalBars) return 0;
     return Math.round(($scope.currentManual.practiceData.completedBars / $scope.currentManual.totalBars) * 100);
+};
+  
+  // En tu controlador AngularJS
+$scope.getProgressPercentage2 = function() {
+  if (!$scope.selectedManual?.practiceData || !$scope.selectedManual.totalBars) return 0;
+  return Math.round(($scope.selectedManual.practiceData.completedBars / $scope.selectedManual.totalBars) * 100);
 };
   
   $scope.getProgressColor = function() {
