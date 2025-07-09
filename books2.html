@@ -6,6 +6,14 @@
  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
 
 
+
+<script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.2"></script>
+
+
 <style>
   body{font-family:Roboto,'Open Sans',sans-serif}
 
@@ -733,6 +741,62 @@ background-color: rgba(0, 0, 0, 0.5);
   from { opacity: 1; }
   to { opacity: 0.7; }
 }
+  
+  
+  .record-btn.active {
+  color: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+
+
+.recording-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content2 {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 800px;
+  position: relative;
+}
+
+#recordingVisualizer {
+  display: flex;
+  justify-content: center;
+  transform: scale(0.5);
+}
+
+@media (max-width: 600px){
+    #recordingVisualizer {
+  transform: scale(0.4);
+}
+}
+
+@media (max-width: 470px){
+    #recordingVisualizer {
+  transform: scale(0.3);
+}
+}
+
+
+.visualizer-container {
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+}
 </style>
 
 <div class="container" ng-app="books" ng-controller="main">
@@ -954,6 +1018,24 @@ background-color: rgba(0, 0, 0, 0.5);
       
     <div class="player-container">
       <iframe ng-src="{{trustSrc(currentManual.pdf)}}" frameborder="0" allowfullscreen></iframe>
+      
+      <div class="recording-modal" ng-show="showRecordingModal">
+    <div class="modal-content2">
+      <midi-player id="recordingPlayer" sound-font visualizer="#recordingVisualizer" src="https://assets.codepen.io/81395/chopin.mid"></midi-player>
+     <div class="visualizer-container">
+  <midi-visualizer id="recordingVisualizer" 
+                   type="waterfall"
+src="https://assets.codepen.io/81395/chopin.mid"> 
+
+  </midi-visualizer>
+</div>
+      
+      <button class="close-btn" ng-click="closeRecordingModal()">
+      <i class="ri-close-large-line"></i>
+      </button>
+    </div>
+  </div>
+      
     </div>
         
 </div>
@@ -980,7 +1062,7 @@ background-color: rgba(0, 0, 0, 0.5);
   
 
 angular.module('books', [])
-.controller('main', ['$http', '$scope', '$sce', function($http, $scope, $sce){
+.controller('main', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout){
   
   
  $scope.manuals = [ 
@@ -1283,7 +1365,8 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+      //localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1437,13 +1520,13 @@ $scope.adjustBPM = function(change, event) {
         $scope.$apply();
       }, 100);
     }, 500);
-  }
+  } 
 };
 
 function clearBPMTimers() {
   clearTimeout($scope.bpmTimeout);
   clearInterval($scope.bpmInterval);
-}
+} 
 
 $scope.playRecording = function() {
   // Lógica para reproducir grabación
@@ -1472,10 +1555,122 @@ $scope.getProgressPercentage2 = function() {
 
 
 
+// En tu controlador AngularJS
+$scope.isRecording = false;
+  $scope.recordings = []
+let recorder;
+let model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+
+// Inicializar el modelo
+model.initialize().then(() => {
+    console.log('Modelo de transcripción cargado');
+});
+
 $scope.toggleRecording = function() {
-    $scope.recordingActive = !$scope.recordingActive;
-    // Aquí iría la lógica para iniciar/detener la grabación
-    console.log('Grabación', $scope.recordingActive ? 'iniciada' : 'detenida');
+    if ($scope.isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
+};
+
+
+let audioChunks = [];
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            recorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+
+            recorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
+                    const newRecording = {
+                        id: Date.now(),
+                        data: noteSequence,
+                        date: new Date()
+                    };
+                    $scope.recordings.unshift(newRecording);
+                 $scope.showRecordingModal = true; 
+                    showRecording(newRecording);
+                     
+                    $scope.$apply();
+                }).catch(err => {
+                    console.error('Error en la transcripción:', err);
+                }).finally(() => {
+                    $scope.isRecording = false;
+                    $scope.$apply();
+                });
+            };
+
+            recorder.start();
+            $scope.isRecording = true;
+            $scope.$apply();
+        })
+        .catch(err => {
+            console.error('Error al acceder al micrófono:', err);
+            $scope.isRecording = false;
+            $scope.$apply();
+        });
+}
+
+function stopRecording() {
+    if (recorder && recorder.state === "recording") {
+        recorder.stop();
+    }
+}
+
+
+function showRecording(recording) {
+    $timeout(() => {
+        try {
+            const midiData = mm.sequenceProtoToMidi(recording.data);
+            const blob = new Blob([midiData], { type: 'audio/midi' });
+            const url = URL.createObjectURL(blob);
+
+            // Cerrar y volver a abrir el modal para reiniciar los componentes
+            $scope.showRecordingModal = false;
+            
+            $timeout(() => {
+                $scope.showRecordingModal = true;
+                
+                $timeout(() => {
+                    const visualizer = document.getElementById('recordingVisualizer');
+                    const player = document.getElementById('recordingPlayer');
+                    
+                    if (player && visualizer) {
+                        player.src = url;
+                        visualizer.src = url;
+                        
+                        // Forzar reinicio del player
+                        if (player.player) {
+                            player.player.stop();
+                            player.player.loadMIDI(url);
+                        }
+                    }
+                }, 100);
+            }, 100);
+        } catch (err) {
+            console.error('Error al mostrar grabación:', err);
+        }
+    });
+}
+
+
+
+
+
+  
+  $scope.closeRecordingModal = function() {
+  $scope.showRecordingModal = false;
 };
 
 // Modifica tu función closePlayer para guardar el progreso
@@ -1562,5 +1757,7 @@ $scope.marcarPreferencia = function () {
             .filter(Boolean).join(':');
     };
 });
+
+  
 
 </script>
