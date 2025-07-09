@@ -334,6 +334,7 @@ background-color: rgba(0, 0, 0, 0.5);
   .player-container {
     flex: 1;
     width: 100%;
+   
   }
   
   .player-container iframe {
@@ -383,7 +384,7 @@ background-color: rgba(0, 0, 0, 0.5);
 }
 
 .player-header {
-    padding: 10px 15px;
+    padding: 6px 15px;
     background: #f5f5f5;
     display: flex;
     justify-content: space-between;
@@ -398,7 +399,7 @@ background-color: rgba(0, 0, 0, 0.5);
 }
 
 .tool-btn {
-    background: #fff;
+    background: #f5f5f5;
     border: 1px solid #ddd;
     border-radius: 20px;
     padding: 5px 12px;
@@ -651,6 +652,87 @@ background-color: rgba(0, 0, 0, 0.5);
     flex-direction: row;
   }
 }
+  
+  
+.tool-btn.active {
+  background: white;
+  border-color: #bdbdbd;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+.recording-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+}
+
+.left-controls {
+  display: flex;
+  gap: 8px;
+  margin-right: auto; /* Empuja todo a la izquierda */
+}
+
+.right-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: auto; /* Empuja todo a la derecha */
+}
+
+.metronome-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bpm-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 4px 8px;
+}
+
+.bpm-buttons {
+  display: flex;
+}
+
+.bpm-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.bpm-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.bpm-label {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Estilos para estados activos */
+.record-btn.active {
+  color: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+.metronome-btn.active {
+  color: #ff9800;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
 </style>
 
 <div class="container" ng-app="books" ng-controller="main">
@@ -793,12 +875,17 @@ background-color: rgba(0, 0, 0, 0.5);
   
       <h4 id="pdfTitle">{{currentManual.title}}</h4>
       <div class="player-tools">
-        <button class="tool-btn" ng-click="toggleMetronome()">
-         <i class="ri-timer-flash-line"></i> Metrónomo
-        </button>
-        <button class="tool-btn" ng-click="toggleRecording()">
-          <i class="ri-record-circle-line"></i> Grabar
-        </button>
+         <button class="tool-btn recording-btn"
+          ng-click="setActivePanel('recording')"
+          ng-class="{'active': activePanel === 'recording'}">
+    <i class="ri-record-circle-line"></i> Grabación
+  </button>
+        <button class="tool-btn metrics-btn" 
+          ng-click="setActivePanel('session')"
+          ng-class="{'active': activePanel === 'session'}">
+     <i class="ri-timer-line"></i> Sesión
+  </button>
+
          <button class="close-btn2" ng-click="closePlayer()">
       <i class="ri-close-large-line"></i>
         </button>
@@ -806,7 +893,7 @@ background-color: rgba(0, 0, 0, 0.5);
     </div>
     
     <div class="progress-display">
-  <div class="progress-info">
+  <div class="progress-info" ng-show="activePanel === 'session'">
     <div class="progress-bar-container">
       <div class="progress-label">Progreso: {{getProgressPercentage()}}%</div>
    <div class="progress-bar">
@@ -825,6 +912,44 @@ background-color: rgba(0, 0, 0, 0.5);
       </div>
     </div>
   </div>
+      
+        <div class="progress-info" ng-show="activePanel === 'recording'">
+ <div class="recording-controls">
+  <!-- Controles izquierdos -->
+  <div class="left-controls">
+    <button class="tool-btn record-btn" ng-click="toggleRecording()" ng-class="{'active': isRecording}">
+     <i class="ri-mic-line"></i>
+    </button>
+    <button class="tool-btn play-btn" ng-click="playRecording()">
+      <i class="ri-play-fill"></i>
+    </button>
+  </div>
+  
+  <!-- Controles derechos -->
+  <div class="right-controls">
+    <div class="metronome-control">
+      <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
+        <i class="ri-timer-flash-line"></i>
+      </button>
+      <div class="bpm-control">
+        <div class="bpm-buttons">
+          <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
+            <i class="ri-subtract-line"></i>
+          </button>
+        </div>
+        <span class="bpm-label">{{metronomeBPM}} BPM</span>
+        <div class="bpm-buttons">
+          <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
+            <i class="ri-add-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+
+      
 </div>
     
         
@@ -1212,7 +1337,7 @@ angular.module('books', [])
       const regex = /\/d\/([^\/]+)\//;
     const matches = URL.match(regex);
     var id = matches ? matches[1] : null;
-     var url = "https://drive.google.com/file/d/"+id+"/view"
+     var url = "https://drive.google.com/uc?export=download&id="+id
     window.open(url, '_blank');
   };
   
@@ -1255,6 +1380,26 @@ $scope.showPreview = function(manual, lvl, lsn) {
             });
         }, 1000)
     };
+};
+  
+  $scope.activePanel = 'session'; // Panel por defecto
+$scope.setActivePanel = function(panel) {
+  if ($scope.activePanel === panel) return;
+  $scope.activePanel = panel;
+};
+  
+  // En tu controlador AngularJS
+$scope.showMetrics = false;
+$scope.metronomeBPM = 120; // Valor inicial
+
+$scope.adjustBPM = function(change) {
+  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+  // Aquí actualizarías la velocidad del metrónomo
+};
+
+$scope.playRecording = function() {
+  // Lógica para reproducir grabación
+  console.log('Reproduciendo grabación');
 };
 
 // En tu controlador AngularJS
