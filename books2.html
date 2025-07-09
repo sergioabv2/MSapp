@@ -725,13 +725,13 @@ background-color: rgba(0, 0, 0, 0.5);
 }
 
 .metronome-btn.active {
-  color: #ff9800;
+  color: #FF9800;
+  animation: pulse 0.5s infinite alternate;
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
+  from { opacity: 1; }
+  to { opacity: 0.7; }
 }
 </style>
 
@@ -927,24 +927,22 @@ background-color: rgba(0, 0, 0, 0.5);
   
   <!-- Controles derechos -->
   <div class="right-controls">
-    <div class="metronome-control">
-      <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
-        <i class="ri-timer-flash-line"></i>
-      </button>
-      <div class="bpm-control">
-        <div class="bpm-buttons">
-          <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
-            <i class="ri-subtract-line"></i>
-          </button>
-        </div>
-        <span class="bpm-label">{{metronomeBPM}} BPM</span>
-        <div class="bpm-buttons">
-          <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
-            <i class="ri-add-line"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+    <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
+   <div class="metronome-control">
+  <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
+    <i class="ri-timer-flash-line"></i>
+  </button>
+  <div class="bpm-control">
+    <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
+      <i class="ri-subtract-line"></i>
+    </button>
+    <span class="bpm-label">{{metronomeBPM}} BPM</span>
+    <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
+      <i class="ri-add-line"></i>
+    </button>
+  </div>
+</div>
+
   </div>
 </div>
   </div>
@@ -1228,7 +1226,7 @@ angular.module('books', [])
       "completedBars": 0,
       "sessions": []
     }
-  },
+  }, 
   {
     "title": "Aria in F",
     "subtitle": "J.S. Bach",
@@ -1390,12 +1388,62 @@ $scope.setActivePanel = function(panel) {
   
   // En tu controlador AngularJS
 $scope.showMetrics = false;
-$scope.metronomeBPM = 120; // Valor inicial
 
-$scope.adjustBPM = function(change) {
-  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
-  // Aquí actualizarías la velocidad del metrónomo
+  
+  $scope.metronomeActive = false;
+$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
+$scope.baseBPM = 60; // BPM del audio original
+$scope.metronomeAudio = document.getElementById('metronomeAudio');
+
+// Función para convertir BPM a velocidad de reproducción
+function bpmToPlaybackRate(bpm) {
+  return bpm / $scope.baseBPM;
+}
+
+$scope.toggleMetronome = function() {
+  $scope.metronomeActive = !$scope.metronomeActive;
+  
+  if ($scope.metronomeActive) {
+    // Configurar velocidad inicial
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+    $scope.metronomeAudio.currentTime = 0;
+    $scope.metronomeAudio.play()
+      .catch(e => console.error("Error al reproducir:", e));
+  } else {
+    $scope.metronomeAudio.pause();
+    $scope.metronomeAudio.currentTime = 0;
+  }
 };
+
+$scope.adjustBPM = function(change, event) {
+  // Actualizar valor BPM
+  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+  
+  // Ajustar velocidad de reproducción si está activo
+  if ($scope.metronomeActive) {
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+  }
+  
+  // Lógica para mantener presionado
+  if (event) {
+    const button = event.target;
+    button.addEventListener('mouseup', clearBPMTimers);
+    button.addEventListener('mouseleave', clearBPMTimers);
+    button.addEventListener('touchend', clearBPMTimers);
+    
+    $scope.bpmTimeout = setTimeout(() => {
+      $scope.bpmInterval = setInterval(() => {
+        $scope.adjustBPM(change);
+        $scope.$apply();
+      }, 100);
+    }, 500);
+  }
+};
+
+function clearBPMTimers() {
+  clearTimeout($scope.bpmTimeout);
+  clearInterval($scope.bpmInterval);
+}
 
 $scope.playRecording = function() {
   // Lógica para reproducir grabación
@@ -1423,11 +1471,6 @@ $scope.getProgressPercentage2 = function() {
 
 
 
-$scope.toggleMetronome = function() {
-    $scope.metronomeActive = !$scope.metronomeActive;
-    // Aquí iría la lógica para activar/desactivar el metrónomo
-    console.log('Metrónomo', $scope.metronomeActive ? 'activado' : 'desactivado');
-};
 
 $scope.toggleRecording = function() {
     $scope.recordingActive = !$scope.recordingActive;
