@@ -1568,7 +1568,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
            placeholder="Escribe tu mensaje..." 
            ng-keyup="$event.keyCode === 13 && sendMessage()">
     <button ng-click="sendMessage()">
-      <i class="ri-send-plane-fill"></i>
+      <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
 </div>
@@ -1580,9 +1580,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-    <button class="mark-all-read" ng-click="markAllAsRead()" ng-if="(alerts | filter:{seen: false}).length > 0">
-      Marcar todas como leídas
-    </button>
+  
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -1599,7 +1597,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
-          <i class="ri-arrow-right-line"></i>
+ <i class="ri-delete-back-2-line"></i>
         </button>
       </div>
     </div>
@@ -1788,7 +1786,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
            placeholder="Escribe tu mensaje..." 
            ng-keyup="$event.keyCode === 13 && sendMessage()">
     <button ng-click="sendMessage()">
-      <i class="ri-send-plane-fill"></i>
+      <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
 </div>
@@ -1800,9 +1798,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-    <button class="mark-all-read" ng-click="markAllAsRead()" ng-if="(alerts | filter:{seen: false}).length > 0">
-      Marcar todas como leídas
-    </button>
+ 
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -1819,7 +1815,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
-          <i class="ri-arrow-right-line"></i>
+       <i class="ri-delete-back-2-line"></i>
         </button>
       </div>
     </div>
@@ -2119,7 +2115,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
            placeholder="Escribe tu mensaje..." 
            ng-keyup="$event.keyCode === 13 && sendMessage()">
     <button ng-click="sendMessage()">
-      <i class="ri-send-plane-fill"></i>
+      <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
 </div>
@@ -2131,9 +2127,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-    <button class="mark-all-read" ng-click="markAllAsRead()" ng-if="(alerts | filter:{seen: false}).length > 0">
-      Marcar todas como leídas
-    </button>
+ 
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -2150,7 +2144,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
-          <i class="ri-arrow-right-line"></i>
+   <i class="ri-delete-back-2-line"></i>
         </button>
       </div>
     </div>
@@ -2267,9 +2261,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
             
        
-        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
+          <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
-     <div class="profile-avatar-container" style="transform: scale(0.9)">
+      <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
       <div class="profile-level">Nivel {{userData.lvl}}</div>
     </div>
@@ -2278,7 +2272,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </div>
     <div class="dropdown-item" ng-click="goToAccount()">
       <i class="ion-ios-contact-outline"></i> Perfil
-    </div>   
+    </div>
       <div class="dropdown-item" ng-click="goToStatus()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
@@ -2287,27 +2281,88 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </div>
   </div>
 
-    <div class="dropdownContent" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
-  <div class="dropdown-item" 
-       ng-click="goToChat()" 
-       ng-if="(chats | filter:{read: false}).length > 0">
-    <i class="ri-feedback-line alertIcon"></i>
-    Tienes {{(chats | filter:{read: false}).length}} nuevos mensajes  
+     <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+  <div class="chat-header">
+      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <i class="ri-close-line"></i>
+    </button>
+    <h4>Soporte Mozart</h4>
+    <p>Asistente virtual</p>
   </div>
-  <span style="margin-left: 15px;" 
-        ng-if="(chats | filter:{read: false}).length == 0" ng-click="goToChat()"> 
-    No hay mensajes 
-  </span>
+  
+  <div class="chat-messages" id="chatMessages">
+    <div class="message bot-message">
+      <div class="message-avatar">
+        <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
+      </div>
+      <div class="message-content">
+        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
+        <span class="message-time">Ahora</span>
+      </div>
+    </div>
+    
+    <div class="message user-message" ng-repeat="message in chatMessages">
+      <div class="message-content">
+        <p>Test</p>
+        <span class="message-time">Testnow</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="chat-input">
+    <input type="text" 
+           ng-model="newMessage" 
+           placeholder="Escribe tu mensaje..." 
+           ng-keyup="$event.keyCode === 13 && sendMessage()">
+    <button ng-click="sendMessage()">
+      <i class="ri-send-plane-2-fill"></i>
+    </button>
+  </div>
 </div>
 
 
-<div class="dropdownContent" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-   <div class="dropdown-item" ng-repeat="alert in alerts" style="color: {{alert.color}}">
-      <i class="{{alert.icon}} alertIcon" ></i> {{alert.subject}} 
-         <div style="font-size: 10px; position: absolute; margin-top: 40px;  color: gray;">Hace {{calculateDaysAgo(alert.date)}} días</div>
-    </div> 
-      <span style="margin-left: 15px;" ng-if="alerts.length == 0"> No hay alertas </span>
-  </div>  
+<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
+  <div class="notif-header">
+           <button class="close-dropdown" ng-click="closeDropdowns()">
+      <i class="ri-close-line"></i>
+    </button>
+    <h4>Notificaciones</h4>
+
+  </div>
+  
+  <div class="notif-list" ng-if="alerts.length > 0">
+    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" ng-class="{'unread': !alert.seen}">
+      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
+        <i class="{{alert.icon}}"></i>
+      </div>
+      <div class="notif-content">
+        <div class="notif-title">{{alert.subject}}</div>
+        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
+        <div class="notif-time">
+          <i class="ri-time-line"></i> Hace {{calculateTimeAgo(alert.date)}}
+        </div>
+      </div>
+      <div class="notif-actions">
+        <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
+        <i class="ri-delete-back-2-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="empty-notifs" ng-if="alerts.length === 0">
+    <i class="ri-notification-off-line"></i>
+    <p>No hay notificaciones</p>
+  </div>
+  
+  <div class="notif-footer" ng-if="alerts.length > 0">
+    <button class="view-all" ng-click="goToNotificationsPage()">
+      Ver todas las notificaciones
+    </button>
+  </div>
+</div>
+
+
         
     </ion-nav-bar>
 
@@ -2465,7 +2520,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
            placeholder="Escribe tu mensaje..." 
            ng-keyup="$event.keyCode === 13 && sendMessage()">
     <button ng-click="sendMessage()">
-      <i class="ri-send-plane-fill"></i>
+      <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
 </div>
@@ -2477,9 +2532,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-    <button class="mark-all-read" ng-click="markAllAsRead()" ng-if="(alerts | filter:{seen: false}).length > 0">
-      Marcar todas como leídas
-    </button>
+
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -2496,7 +2549,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
-          <i class="ri-arrow-right-line"></i>
+       <i class="ri-delete-back-2-line"></i>
         </button>
       </div>
     </div>
@@ -2807,7 +2860,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
            placeholder="Escribe tu mensaje..." 
            ng-keyup="$event.keyCode === 13 && sendMessage()">
     <button ng-click="sendMessage()">
-      <i class="ri-send-plane-fill"></i>
+      <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
 </div>
@@ -2819,9 +2872,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-    <button class="mark-all-read" ng-click="markAllAsRead()" ng-if="(alerts | filter:{seen: false}).length > 0">
-      Marcar todas como leídas
-    </button>
+
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -2838,7 +2889,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="handleNotifAction(alert)">
-          <i class="ri-arrow-right-line"></i>
+    <i class="ri-delete-back-2-line"></i>
         </button>
       </div>
     </div>
@@ -3415,6 +3466,3 @@ $(window).on('load', function() {
 
 
 </script>
-
-
-
