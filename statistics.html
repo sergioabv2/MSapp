@@ -4,12 +4,18 @@
 
 
 <style>
-  :root {
-    --color-primary: #4B888C;
-    --color-primary-light: #76B9BD;
-    --color-primary-lightest: #D6EBEC;
-    --color-secondary: #76BDA4;
-  }
+ :root {
+  --color-primary: #3A6B7E;  /* Azul más sofisticado */
+  --color-primary-light: #5D9DB5;
+  --color-primary-lightest: #E0F0F5;
+  --color-secondary: #7EB09B;  /* Verde azulado armónico */
+  --color-accent: #F5A623;     /* Color de acento dorado */
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-background: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-border: #E5E7EB;
+}
 
 *, *::before, *::after {
     margin: 0;
@@ -75,6 +81,7 @@ section {
     border-radius: .8rem;
     transition: 0.2s;
     cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 section > h2{
@@ -84,8 +91,9 @@ section > h2{
     color: var(--color-primary);
 }
 
-section:hover{
-      transform: scale(1.02)
+section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .greeting {
@@ -224,6 +232,30 @@ main {
     margin-left: 2rem;
 }
 
+
+
+th {
+  text-align: left;
+  padding: 1.2rem 1.5rem;
+  background-color: var(--color-primary-lightest);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+td {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--color-primary-lightest);
+}
+
 a {
     font-size: 1.6rem;
     color: var(--color-primary);
@@ -352,7 +384,7 @@ a {
 .challenges__bar {
     width: 100%;
     height: 1.4rem;
-    border-radius: .7rem;
+    border-radius: 4px;
     background-color: #D9D9D9;
     position: relative;
 }
@@ -360,8 +392,9 @@ a {
     content: '';
     position: absolute;
     height: 100%;
-    border-radius: .7rem;
+    border-radius: 4px;
     background-color: var(--color-primary);
+    transition: width 1s ease-in-out;
 }
 .challenges__bar--1::after {width: 20%;}
 .challenges__bar--2::after {width: 70%;}
@@ -747,7 +780,8 @@ a {
       </div>
     </main>
   </div>
-  
+
+
    <nav class="navigation">
     <!-- Navbar content -->
   </nav>
@@ -792,6 +826,9 @@ a {
     return "Buenas noches";
   }
 };
-  
+
+
 }])
+
+
 </script>
