@@ -1350,6 +1350,34 @@ width: 200px; /* Ajusta según el tamaño deseado */
 }
 
 
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 18px;
+  margin: 5px 0;
+  width: fit-content;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #666;
+  border-radius: 50%;
+  margin: 0 2px;
+  animation: typingAnimation 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingAnimation {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
 </style>
 
 <body>
@@ -1523,10 +1551,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -1536,7 +1564,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
    <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -1556,6 +1584,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -1572,7 +1607,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -1733,12 +1768,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
        
            
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -1750,7 +1785,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
  <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -1770,6 +1805,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -1786,7 +1828,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -2050,10 +2092,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -2063,7 +2105,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
      <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -2083,6 +2125,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -2099,7 +2148,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -2234,10 +2283,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -2247,7 +2296,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
     <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -2267,6 +2316,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -2283,7 +2339,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -2423,10 +2479,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>   
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -2436,7 +2492,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
     <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -2456,6 +2512,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -2472,7 +2535,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -2747,10 +2810,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
-    <div class="dropdown-item" ng-click="goToAccount()">
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
       <i class="ion-ios-contact-outline"></i> Perfil
     </div>  
-      <div class="dropdown-item" ng-click="goToStatus()">
+      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
       <i class="ri-settings-3-line"></i> Configuración
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -2760,7 +2823,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
    <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
-      <button class="close-dropdown" ng-click="closeDropdowns()">
+      <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Soporte Mozart</h4>
@@ -2780,6 +2843,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </div>
     </div>
   </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
   
   <div class="chat-input">
     <input type="text" 
@@ -2796,7 +2866,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
   <div class="notif-header">
-           <button class="close-dropdown" ng-click="closeDropdowns()">
+           <button class="close-dropdown" ng-click="dropdownNotif()">
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
@@ -3213,16 +3283,42 @@ app
     
     // Agregar el mensaje al chat
     $scope.chats.push(newUserMessage);
+    $scope.isTyping = true;
     
-    cleanChats() 
-    
-    // Opcional: Aquí podrías llamar a un servicio para enviar el mensaje al backend
-    // Ejemplo:
-    // ChatService.sendMessage($scope.newMessage).then(function(response) {
-    //   // Manejar respuesta del servidor si es necesario
-    // });
-    
-    // Opcional: Simular respuesta automática (bot)
+    cleanInput() 
+    $timeout(function() {
+       scrollAllChatsToBottom()
+      }, 10)
+
+     var requestData = {
+        action: "newMsgChat",
+        token: localStorage.getItem('MStoken'),
+        msg: JSON.stringify($scope.chats)
+    };
+
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        }
+    };
+  
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+    .then(function(response) {
+        var resp = response.data
+         $scope.chats.push(resp[resp.length-1])
+         $scope.isTyping = false
+ 
+$timeout(function() {
+       scrollAllChatsToBottom()
+      }, 10); 
+     
+
+    });  
+
+
+
+ /*
+
     setTimeout(function() {
       const botResponse = {
         sender: 'admin',
@@ -3233,11 +3329,17 @@ app
       };
       $scope.$apply(function() {
         $scope.chats.push(botResponse);
+         $scope.isTyping = false;
 $timeout(function() {
        scrollAllChatsToBottom()
       }, 100);
       });
-    }, 1000);
+    }, 1000); 
+
+*/
+
+
+
   };
 
 
@@ -3274,7 +3376,7 @@ function scrollAllChatsToBottom() {
 
 
 
-function cleanChats() {
+function cleanInput() {
    var inputContainers = [
     'inputMessage1',
     'inputMessage2', 
@@ -3486,7 +3588,7 @@ $(window).on('load', function() {
     window.location.href = 'https://app.mozartacademy.mx/';
   }
 });
-
+ 
 
 </script>
 
