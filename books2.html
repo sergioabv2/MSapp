@@ -15,6 +15,101 @@
 
 
 <style>
+
+  :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+        }
+        
+       .loader {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+      .loader    h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+      .loader    p {
+            color: var(--secondary-color);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        
+        .loading-container {
+            width: 300px;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+            animation: loading 2.5s ease-in-out infinite;
+        }
+        
+        .book-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .book-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 0.7; }
+        }
+        
+        /* Asignamos diferentes delays a los iconos de libros */
+        .book-icon:nth-child(1) { animation-delay: 0.3s; }
+        .book-icon:nth-child(2) { animation-delay: 0.6s; }
+        .book-icon:nth-child(3) { animation-delay: 0.9s; }
+        .book-icon:nth-child(4) { animation-delay: 1.2s; }
+        .book-icon:nth-child(5) { animation-delay: 1.5s; }
+
+ 
   body{font-family:Roboto,'Open Sans',sans-serif}
 
 .mhn-slide .mhn-item{width:100%;padding:10px}
