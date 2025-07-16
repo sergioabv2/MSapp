@@ -3325,9 +3325,8 @@ $scope.deleteAllNotif = function() {
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
     .then(function(response) {
          $scope.isTyping = false 
-    alert(response.data) 
     
-    if (response.data === false) {
+    if (!response) {
         $scope.chats.push("No se proceso respuesta, por favor intente otra vez");
     } else {
         $scope.chats.push(response.data);
