@@ -799,12 +799,33 @@ background-color: rgba(0, 0, 0, 0.5);
 }
 </style>
 
-<div class="container" ng-app="books" ng-controller="main">
+<div  ng-app="books" ng-controller="main">
   
 
+
+  <div class="loader" id="loader" >
+  <svg class="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h6v7l2.5-1.5L16 9V2h2a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2z" fill="#4a6fa5"/>
+    </svg> 
+    
+    <h1>Biblioteca</h1>
+    <p>Organizando tu biblioteca digital...</p>
+    
+    <div class="loading-container">
+        <div class="loading-bar"></div>
+    </div>
+    
+    <div class="book-icons">
+        <div class="book-icon">📕</div>
+        <div class="book-icon">📗</div>
+        <div class="book-icon">📘</div>
+        <div class="book-icon">📙</div>
+        <div class="book-icon">📖</div>
+    </div> 
+  </div >
   
   
-  <div >
+  <div class="container" id="container" style="display: none">
     <div class="carousel-header">
   <h2>Piezas  </h2>
 </div>
@@ -1760,3 +1781,15 @@ $scope.marcarPreferencia = function () {
   
 
 </script>
+
+
+
+ <script>
+        // Redirección después de 5 segundos (simulando carga)
+       setTimeout(function() {
+         var loader = document.getElementById("loader");
+    var main = document.getElementById("container");
+           loader.style.display = "none";
+          main.style.display = "block";
+        }, 4000);
+    </script>
