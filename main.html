@@ -1543,21 +1543,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages1">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -1566,8 +1561,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           id="inputMessage1"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -1752,7 +1748,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
   
 
-  <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+ <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
       <button class="close-dropdown" ng-click="closeDropdowns()">
       <i class="ri-close-line"></i>
@@ -1761,21 +1757,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages2">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -1783,9 +1774,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
   <div class="chat-input">
     <input type="text" 
            ng-model="newMessage" 
-           placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           placeholder="Escribe tu mensaje..."
+           id="inputMessage2"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -1840,19 +1832,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/statistics" frameborder="0" allowfullscreen></iframe></div>   
       </ion-content>
 
-       <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/1bJZN2UX0fspMxGdHpyinsx29oj6dyG5X" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>  
+   
 
     </ion-view>
   </script>
@@ -2090,21 +2070,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages3">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -2113,8 +2088,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           id="inputMessage3"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -2168,19 +2144,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
    <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses" frameborder="0" allowfullscreen></iframe></div>
       </ion-content>
  
-  <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/1bJZN2UX0fspMxGdHpyinsx29oj6dyG5X" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>           
+         
 
     </ion-view>
   </script>   
@@ -2281,7 +2245,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </div>
   </div>
 
-     <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+    <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
       <button class="close-dropdown" ng-click="closeDropdowns()">
       <i class="ri-close-line"></i>
@@ -2290,21 +2254,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages4">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -2313,8 +2272,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           id="inputMessage4"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -2372,19 +2332,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/lessons" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
 
-     <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/1bJZN2UX0fspMxGdHpyinsx29oj6dyG5X" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>  
+  
 
   </ion-view>
 </script>
@@ -2495,21 +2443,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages5">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -2518,8 +2461,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           id="inputMessage5"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -2574,19 +2518,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/comunity" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
 
-     <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/1bJZN2UX0fspMxGdHpyinsx29oj6dyG5X" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>  
+   
 
   </ion-view>
 </script>
@@ -2826,7 +2758,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </div>
   </div>
 
-    <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+   <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
   <div class="chat-header">
       <button class="close-dropdown" ng-click="closeDropdowns()">
       <i class="ri-close-line"></i>
@@ -2835,21 +2767,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Asistente virtual</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot-message">
-      <div class="message-avatar">
+  <div class="chat-messages" id="chatMessages6">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
         <img src="https://lh3.googleusercontent.com/d/1sIrZkDtFq63fzvicUDAGdBZT0mONcnLy">
       </div>
       <div class="message-content">
-        <p>¡Hola! Soy el asistente de Mozart Academy. ¿En qué puedo ayudarte hoy?</p>
-        <span class="message-time">Ahora</span>
-      </div>
-    </div>
-    
-    <div class="message user-message" ng-repeat="message in chatMessages">
-      <div class="message-content">
-        <p>Test</p>
-        <span class="message-time">Testnow</span>
+        <p>{{message.content}}</p>
+        <span class="message-time">hace {{ calculateDaysAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -2858,8 +2785,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           ng-keyup="$event.keyCode === 13 && sendMessage()">
-    <button ng-click="sendMessage()">
+           id="inputMessage6"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
     </button>
   </div>
@@ -2914,19 +2842,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/books2" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
       
-       <div id="myModal" class="modal" ng-show="isModalVisible">
-    <div class="modal-content">
-      <span class="close" ng-click="closeModal()" style="color: black">&times;</span>
-       <img src="https://lh3.googleusercontent.com/d/1bJZN2UX0fspMxGdHpyinsx29oj6dyG5X" style="max-width: 100%;" />
-    <p style="text-align: center; font-weight: bold;">
-      <br> Agrega a inicio:   </p> 
-        <p style="text-align: center;" >
-       1. <i class="ri-share-2-fill"></i> Icono de compartir  <br>
-       2. <i class="ri-add-box-line"></i> Agregar a inicio <br>
-       3. Agregar
-       </p>
-    </div>
-  </div>  
+       
 
      
     </ion-view>
@@ -3000,6 +2916,7 @@ app
     }
   };
 
+
   var getNum = function() {
     var deferred = $q.defer();
 
@@ -3009,7 +2926,7 @@ app
           lvl: response.data.lvl,
           blq: response.data.blq,
     lsn: response.data.lsn, 
-          data: response.data
+          data: response.data,
         });
       }, function(error) {
         deferred.reject(error);
@@ -3018,10 +2935,13 @@ app
     return deferred.promise;
   };
 
+
+
   return {
     getNum: getNum
   };
 })
+
 .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
    $stateProvider
@@ -3204,7 +3124,7 @@ app
   });
  })       
 
-.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', '$ionicHistory', 'SharedState', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, $ionicHistory, SharedState) {
+.controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', '$ionicHistory', '$timeout', 'SharedState', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, $ionicHistory, $timeout, SharedState) {
   $scope.toggleRight = function() {
     $('.item').removeClass('anim');
     setTimeout(function() {
@@ -3248,6 +3168,11 @@ app
       $scope.isDropdownVisible = false;
       $scope.dropdownNotifVisible = false;
       $scope.chatCounter = false;  
+
+      $timeout(function() {
+    scrollAllChatsToBottom();
+  }, 50);
+      
     };
 
     $scope.dropdownNotifVisible = false;
@@ -3257,6 +3182,10 @@ app
       $scope.dropdownChatVisible = false;
       $scope.alertCounter = false;  
     };
+
+ 
+
+
   
  $scope.calculateDaysAgo = function(alertDate) {
   const alertDateObj = new Date(alertDate); 
@@ -3265,6 +3194,109 @@ app
   const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); 
   return daysDiff;
 };
+
+
+
+  $scope.sendMessage = function(newMessage) {
+    if (!newMessage || newMessage.trim() === '') {
+      return; // No enviar mensajes vacíos
+    }
+    
+    // Crear nuevo mensaje del usuario
+    const newUserMessage = {
+      sender: 'client',
+      type: 'text',
+      content: newMessage,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    
+    // Agregar el mensaje al chat
+    $scope.chats.push(newUserMessage);
+    
+    cleanChats() 
+    
+    // Opcional: Aquí podrías llamar a un servicio para enviar el mensaje al backend
+    // Ejemplo:
+    // ChatService.sendMessage($scope.newMessage).then(function(response) {
+    //   // Manejar respuesta del servidor si es necesario
+    // });
+    
+    // Opcional: Simular respuesta automática (bot)
+    setTimeout(function() {
+      const botResponse = {
+        sender: 'admin',
+        type: 'text',
+        content: 'Gracias por tu mensaje. Estamos procesando tu solicitud.',
+        timestamp: new Date().toISOString(),
+        read: false
+      };
+      $scope.$apply(function() {
+        $scope.chats.push(botResponse);
+$timeout(function() {
+       scrollAllChatsToBottom()
+      }, 100);
+      });
+    }, 1000);
+  };
+
+
+function scrollAllChatsToBottom() {
+  // Array de IDs de contenedores
+  var chatContainers = [
+    'chatMessages1',
+    'chatMessages2', 
+    'chatMessages3',
+    'chatMessages4',
+    'chatMessages5',
+    'chatMessages6'
+  ];
+
+
+  // Recorremos todos los contenedores
+  for (var i = 0; i < chatContainers.length; i++) {
+    var container = document.getElementById(chatContainers[i]);
+    
+    // Validamos que el contenedor existe y tiene mensajes
+    if (container && container.lastElementChild) {
+      try {
+        container.lastElementChild.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end'
+        });
+      } catch (e) {
+        // Fallback para navegadores antiguos
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+  }
+}
+
+
+
+function cleanChats() {
+   var inputContainers = [
+    'inputMessage1',
+    'inputMessage2', 
+    'inputMessage3',
+    'inputMessage4',
+    'inputMessage5',
+    'inputMessage6'
+  ];
+
+  // Recorremos todos los contenedores
+  for (var i = 0; i < inputContainers.length; i++) {
+    var input = document.getElementById(inputContainers[i]);
+
+    if (input && input.value) {  // Solo si el input existe y no está vacío
+      input.value = '';          // Limpiar el valor
+      input.placeholder = '';    // Opcional: limpia placeholder
+    }
+   }  
+  }
+
+
+
 
    $scope.goToProfile = function() {
   window.location.href = '#/menu/profile';
@@ -3298,7 +3330,7 @@ $scope.goBack = function() {
       }
     };
 
-  $scope.isModalVisible = false;
+
 let deferredPrompt;
 const isAndroid = /Android/i.test(navigator.userAgent);
 const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -3344,15 +3376,10 @@ $scope.installApp = function () {
     });
   } else if (isIOS) {
     // Mostrar modal con la animación GIF para iOS
-    $scope.isModalVisible = true;
       $ionicSideMenuDelegate.toggleLeft();
   }
 };
 
-// Cerrar modal
-$scope.closeModal = function () {
-  $scope.isModalVisible = false;
-};
 
 
 
@@ -3420,11 +3447,7 @@ $scope.closeModal = function () {
 
 
 
-
-
     </script>
-
-
 
 
 
@@ -3466,3 +3489,4 @@ $(window).on('load', function() {
 
 
 </script>
+
