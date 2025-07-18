@@ -179,6 +179,9 @@ dialog{
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   font-size: 13px;
   width: 200px;
+  top: 30px;
+  left: 40px;
+  padding: 8px;
   background: white;
   z-index: 100;
 }
@@ -337,6 +340,7 @@ background: rgba(0, 0, 0, 0.3);
   color: black;
   font-size: 0.9rem;
   font-weight: 400;
+  margin-top: 5px;
 }
 
 .midi-modal-close {
@@ -419,6 +423,177 @@ background: rgba(0, 0, 0, 0.3);
   transform: scale(0.3);
 }
 }
+
+
+ /* Poll Container - Twitter Style */
+.poll-container {
+    padding: 12px 0;
+    background-color: transparent;
+}
+
+.poll-title {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0F1419;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.poll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vote-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    min-height: 44px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0 12px;
+}
+
+.vote-row:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Poll Option Styling */
+.poll-option {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.poll-option-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 20, 25, 0.07);
+    border-radius: 4px;
+}
+
+.poll-option-bg.voted {
+    background-color: rgba(29, 155, 240, 0.1);
+}
+
+.poll-option-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(29, 155, 240, 0.2);
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    width: 0;
+}
+
+.poll-option-text {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 8px;
+}
+
+.option-name {
+    font-size: 15px;
+    color: #0F1419;
+}
+
+.option-percent {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F1419;
+}
+
+/* Vote Button - Twitter Style */
+.poll-vote-button {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    margin-left: 12px;
+}
+
+.vote-circle {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #536471;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.vote-row:hover .vote-circle {
+    border-color: #1D9BF0;
+}
+
+/* Poll Footer */
+.poll-footer {
+    font-size: 13px;
+    color: #536471;
+    margin-top: 4px;
+    padding: 0 12px;
+}
+
+
+.poll-option-bg.selected-option {
+    border: 2px solid #91b9ff;       /* Borde azul claro */
+    background: rgba(29, 155, 240, 0.05);
+    border-radius: 6px;             /* Bordes redondeados */
+    padding: 10px 16px;              /* Espaciado interno */
+    font-weight: bold;              /* Texto más fuerte */
+    color: #000;                     /* Texto negro */
+    display: flex;                   /* Alineación tipo botón */
+    align-items: center;
+    gap: 8px;                        /* Espacio entre icono y texto */
+    transition: border 0.2s ease, background 0.2s ease;
+}
+
+
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-name a {
+  /* Estilo para el nombre de usuario */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1rem; /* Aproximadamente 16px, similar a la imagen */
+  font-weight: 500; /* Negrita similar a la imagen */
+  color: #000; /* Color del texto */
+  text-decoration: none; /* Elimina el subrayado del enlace */
+}
+
+.post-time label {
+  /* Estilo para la fecha/hora */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.875rem; /* Aproximadamente 14px */
+  font-weight: 300; /* Normal */
+  color: gray !important;
+}
+
+.imgHead{
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.textContent{
+  margin-top: -15px;
+  font-size: 1.1rem; /* Aproximadamente 16px, similar a la imagen */
+  font-weight: 450; 
+}
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
@@ -468,18 +643,23 @@ background: rgba(0, 0, 0, 0.3);
               
              
                 
-                 <div class="row" ng-click="toggleProfileInfo(post.id); $event.preventDefault()"> <img class="circle small" ng-src="{{post.photo}}"/>  
-            <div><b>   <label style="font-size: 14px;"><a href="#" >{{post.user}}</a></label></b>
-              <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(post.date)}}</label></div>
+                <div class="row" ng-click="toggleProfileInfo(post.id); $event.preventDefault()">
+  <img class="circle small imgHead" ng-src="{{post.photo}}"/>  
+  <div class="user-info">
+    <div class="user-name">
+      <a href="#">{{post.user}}</a>
+    </div>
+    <div class="post-time">
+      <label >{{calculateTimeAgo(post.date)}}</label>
+    </div>
+  </div>
 
-              <div class="infoProf "
-         style="margin-top: 5px; padding: 8px;"
-         ng-if="showProfileInfo[post.id]">
+              <div class="infoProf " ng-if="showProfileInfo[post.id]">
       <i class="ri-user-line"></i> {{post.user}}<br>
       <small>Email: {{post.email}}</small><br>
       <small>Plan: {{post.plan}}</small>
     </div>
-            </div>
+          
           </div>
                 
    
@@ -490,7 +670,7 @@ background: rgba(0, 0, 0, 0.3);
                     <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>
                    </div>
 
-                <div ng-if="post.type == 'text'" >{{post.url}}
+                <div ng-if="post.type == 'text'" class="textContent">{{post.url}}
               </div>
                 <a  ng-if="post.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{post.url}}</span><i>link</i></a>
                 
@@ -498,8 +678,8 @@ background: rgba(0, 0, 0, 0.3);
                 
                 
               
-    <div style="display: flex; justify-content: center;">
-<div ng-if="post.type == 'midi'" class="midi-thumbnail-container">
+    <div style="display: flex; justify-content: center;" ng-if="post.type == 'midi'">
+<div  class="midi-thumbnail-container">
   <div class="midi-thumbnail" ng-click="openMidiModal(post)">
     <div class="play-button">
       <i class="ri-play-fill"></i>
@@ -510,6 +690,36 @@ background: rgba(0, 0, 0, 0.3);
     </div>
   </div>
 </div>
+</div>
+              
+              
+              
+           <div class="poll-container" ng-if="post.type == 'poll'">
+    <div class="poll-voter">
+        <h4 class="poll-title">{{post.url}}</h4>
+        <div class="poll-list">
+            <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)">
+                <div class="poll-option">
+                    <div class="poll-option-bg"
+     ng-class="{
+        'voted': userVoted,
+        'selected-option': userVoted && opt.votedByCurrentUser
+     }"></div>
+                    <div class="poll-option-bar" ng-if="userVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
+                    <div class="poll-option-text">
+                        <span class="option-name">{{opt.name}}</span>
+                        <span class="option-percent" ng-show="userVoted">{{calculatePercentage(post, opt)}}%</span>
+                    </div>
+                </div>
+                <div class="poll-vote-button" ng-show="!userVoted">
+                    <div class="vote-circle"></div>
+                </div>
+            </div>
+        </div>
+        <div class="poll-footer" ng-show="userVoted">
+            {{getTotalVotes(post)}} votes · {{calculateTimeAgo(post.date)}}
+        </div>
+    </div>
 </div>
        
            
@@ -590,7 +800,7 @@ background: rgba(0, 0, 0, 0.3);
               <div >
                  <div class="row"> <img class="circle small" ng-src="{{selectedPostForComments.photo}}"/>  
             <div><b>   <label style="font-size: 14px;"><a href="#" >{{selectedPostForComments.user}}</a></label></b>
-              <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(selectedPostForComments.date)}}</label></div>
+               <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(selectedPostForComments.date)}}</label></div>
             </div>
           </div>
                 <div class="row">
@@ -628,7 +838,7 @@ background: rgba(0, 0, 0, 0.3);
    
     <div ng-if="selectedPostForComments.comments.length > 0" ng-repeat="comment in selectedPostForComments.comments">
      <div class="row"><img class="circle small" src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V"/>
-            <div><b>{{comment.user}}</b>
+            <div style="color: black !important;"><b>{{comment.user}}</b>
               <div> {{comment.comment}}</div>
             </div>
           </div>
@@ -829,7 +1039,7 @@ $scope.backToFeed = function() {
   }else if(lvl == 6){
     return "#08949c"
   }
-}     
+}      
      
 $scope.getEvent = function(task){
   if(task.split(" ")[0] == "Nivel"){
@@ -852,29 +1062,43 @@ $scope.getEvent = function(task){
   
    
    
-   function processPollData(post) {
-    post.totalVotes = post.likes.reduce((total, opt) => total + opt.votes.length, 0);
-    post.likes.forEach(opt => {
-        opt.pct = post.totalVotes > 0 ? (opt.votes.length / post.totalVotes) * 100 : 0;
-    });
-}
-   
-$scope.isButton = true;
+  // In your controller
+$scope.userVoted = false;
+$scope.currentUser = "user10"; // Replace with actual current user
 
- $scope.addVote = function(post, opt) {
-    if ($scope.isButton) {
-        $scope.isButton = false;
-      
-        opt.votes.push("Usuario");
-        processPollData(post);
-        opt.animate = false;
-       post.likes.forEach(option => {
-         option.isButton = false; 
-         option.animate = true; 
-            });
-    } 
+$scope.calculatePercentage = function(post, option) {
+    const totalVotes = post.likes.reduce((sum, opt) => sum + opt.users.length, 0);
+    if (totalVotes === 0) return 0;
+    return Math.round((option.users.length / totalVotes) * 100);
 };
 
+$scope.getTotalVotes = function(post) {
+    return post.likes.reduce((sum, opt) => sum + opt.users.length, 0);
+};
+
+$scope.addVote = function(post, option, index) {
+    if ($scope.userVoted) return;
+
+    const hasVoted = post.likes.some(opt => opt.users.includes($scope.currentUser));
+    if (hasVoted) return;
+
+    option.users.push($scope.currentUser);
+    option.votedByCurrentUser = true; // ← Esta línea es clave
+    $scope.userVoted = true;
+
+    // Trigger animation
+    post.likes.forEach((opt, i) => {
+        if (i === index) {
+            opt.animate = true;
+        }
+    });
+
+    $scope.sendVote(post.id, option.name);
+};
+
+
+
+   
    
    
    $scope.currentMidi = null;
@@ -1355,4 +1579,4 @@ function getOutput(item) {
 
   return output;
 }
-</script>
+</script>   
