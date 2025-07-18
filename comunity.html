@@ -8,6 +8,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 <script src="https://www.modelsofidentity.com/colosal/js/smoothscroll.js"></script>
 
+
+
+ <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+
 <style>
   article{
   background-color: #f5f6f6 !important;
@@ -20,7 +27,7 @@ input{
 dialog{
   background-color: #f5f6f6 !important;
 }
-
+ 
 
 
   @media (min-width: 500px) {  
@@ -178,9 +185,234 @@ dialog{
 .liked {
     color: red;
 }
+
+
+  /* Estilos para el thumbnail */
+.midi-thumbnail-container {
+  margin: 15px 0;
+  cursor: pointer;
+}
+
+.midi-thumbnail {
+  position: relative;
+  height: 180px;
+  background: linear-gradient(135deg, #4a6fa5 0%, #166088 100%);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  overflow: hidden;
+}
+
+.play-button {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.play-button i {
+  font-size: 30px;
+  margin-left: 5px;
+}
+
+.midi-thumbnail:hover .play-button {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.3);
+}
+
+/* Estilos del modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 800px;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+}
+
+
+
+/* Estilos del reproductor en el modal */
+#mainMidiPlayer {
+  width: 100%;
+  margin: 20px 0;
+}
+
+#mainMidiVisualizer {
+  width: 100%;
+  height: 200px;
+  margin-top: 15px;
+}
+
+
+ 
+/* MODAL MIDI - ESTILOS COMPLETOS */
+.midi-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  backdrop-filter: blur(4.5px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+} 
+
+.midi-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.midi-modal-container {
+  width: 90%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.midi-modal-overlay.active .midi-modal-container {
+  transform: translateY(0);
+}
+
+.midi-modal-header {
+  padding: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.midi-modal-title {
+  margin: 0;
+  color: black;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.midi-modal-user {
+  margin: 0;
+  color: black;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.midi-modal-close {
+  background: none;
+  border: none;
+  color: #a0a0c0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.midi-modal-close:hover {
+  color: black;
+}
+
+.midi-modal-body {
+  padding: 25px;
+}
+
+/* Reproductor MIDI personalizado */
+.midi-player-wrapper {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+/* Visualizador MIDI */
+.midi-visualizer-wrapper {
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 15px;
+  position: relative;
+}
+
+
+/* Efecto de onda animado (opcional) */
+.wave-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(74, 111, 165, 0.6), 
+    transparent);
+  animation: wave 2s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes wave {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+#mainMidiVisualizer {
+  display: flex;
+  justify-content: center;
+  transform: scale(0.5);
+}
+
+@media (max-width: 600px){
+    #mainMidiVisualizer {
+  transform: scale(0.4);
+}
+}
+
+@media (max-width: 470px){
+    #mainMidiVisualizer {
+  transform: scale(0.3);
+}
+}
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
+  
+   
 
   <main class="responsive">
     <div class="grid">
@@ -214,6 +446,9 @@ dialog{
         </svg>
       </div>
     </div> 
+        
+        
+      
         
          <article class="no-elevate round" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
           <div class="row top-align" >
@@ -257,7 +492,20 @@ dialog{
                 <a ng-if="post.type == 'img'" href="{{post.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{post.url}}"/></a>
                 
                 
-                
+              
+<!-- Dentro del ng-repeat -->
+<div ng-if="post.type == 'midi'" class="midi-thumbnail-container">
+  <div class="midi-thumbnail" ng-click="openMidiModal(post)">
+    <div class="play-button">
+      <i class="ri-play-fill"></i>
+    </div>
+    <div class="midi-info">
+      <h5>{{post.title || 'Composición MIDI'}}</h5>
+      <p>{{post.description || 'Haz clic para reproducir'}}</p>
+    </div>
+  </div>
+</div>
+       
            
 
                 <div class="row" style="display: flex; justify-content: space-between;">
@@ -288,6 +536,39 @@ dialog{
     <br><br>
 </nav>
       </section>
+        
+       
+        
+<div class="midi-modal-overlay" ng-class="{'active': midiModalOpen}">
+  <div class="midi-modal-container">
+    <div class="midi-modal-header">
+      <h4 class="midi-modal-title">{{currentMidi.id || 'Reproductor MIDI'}}
+      <p class="midi-modal-user">{{currentMidi.user}}</p><br></h4>
+        
+      <button class="midi-modal-close" ng-click="closeMidiModal()">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    
+    <div class="midi-modal-body">
+      <div class="midi-player-wrapper">
+        <midi-player id="mainMidiPlayer" 
+                    sound-font 
+                    visualizer="#mainMidiVisualizer">
+        </midi-player>
+      </div>
+      
+      <div class="midi-visualizer-wrapper">
+        <div class="wave-effect"></div>
+        <midi-visualizer id="mainMidiVisualizer" 
+                        type="waterfall">
+        </midi-visualizer>
+      </div>
+      
+    
+    </div>
+  </div>
+</div>
 
 
     <div ng-if="selectedPostForComments"  class="s12 m12 l8">
@@ -554,6 +835,10 @@ $scope.getEvent = function(task){
   }
 }
    
+   
+  
+   
+   
    function processPollData(post) {
     post.totalVotes = post.likes.reduce((total, opt) => total + opt.votes.length, 0);
     post.likes.forEach(opt => {
@@ -577,6 +862,44 @@ $scope.isButton = true;
     } 
 };
 
+   
+   
+   $scope.currentMidi = null;
+$scope.midiModalOpen = false;
+
+$scope.openMidiModal = function(post) {
+  $scope.currentMidi = post;
+  $scope.midiModalOpen = true;
+  
+  // Cargar el MIDI después de que el modal esté visible
+  $timeout(function() {
+    const player = document.getElementById('mainMidiPlayer');
+    const visualizer = document.getElementById('mainMidiVisualizer');
+    
+    if(player && visualizer) {
+      player.setAttribute('src', post.url);
+      visualizer.setAttribute('src', post.url);
+      
+      // Reiniciar el player si ya estaba cargado
+      if(player.player) {
+        player.player.stop();
+        player.player.loadMIDI(post.url);
+      }
+    }
+  }, 100);
+};
+
+$scope.closeMidiModal = function() {
+  const player = document.getElementById('mainMidiPlayer');
+  if(player && player.player) {
+    player.player.stop();
+  }
+  
+  $scope.midiModalOpen = false;
+  $scope.currentMidi = null;
+};
+   
+   
 
 $scope.showProfileInfo = {};
 $scope.toggleProfileInfo = function(postId) {
