@@ -186,6 +186,8 @@ dialog{
     color: red;
 }
 
+
+ 
  /* Estilos para el thumbnail */
 .midi-thumbnail-container {
   margin: 15px 0;
@@ -515,7 +517,7 @@ dialog{
     <i ng-if="!post.likes.includes(user)" class="ri-heart-line"></i>
     {{post.likes.length}}
 </button>
-           <button class="transparent circle" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
+           <button class="transparent circle" ng-if="post.type != 'midi'" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
          </div>
 
 <button class="chip" ><i class="ri-bookmark-line"></i><span>Save</span></button>
@@ -757,6 +759,20 @@ var app = angular.module('postApp', [])
         'Accept': 'application/json'
       } 
     }).then(function(response) {
+      
+      let posts = response.data.posts;
+
+  // Process the posts before using them
+  posts.forEach(post => {
+    if (post.type === 'midi') {
+      // Create a new key to store the MIDI URL
+      post.midi_url = post.url;
+      // Set the main URL to a placeholder to prevent downloading
+      post.url = 'about:blank'; 
+    }
+  });
+      
+      
       $scope.data = shuffleArray(response.data.posts); 
        $scope.profileData = response.data.profiles
       $scope.filterPosts('all');
@@ -877,8 +893,8 @@ $scope.openMidiModal = function(post) {
     const visualizer = document.getElementById('mainMidiVisualizer');
     
     if(player && visualizer) {
-      player.setAttribute('src', post.url);
-      visualizer.setAttribute('src', post.url);
+      player.setAttribute('src', post.midi_url);
+      visualizer.setAttribute('src', post.midi_url);
       
       // Reiniciar el player si ya estaba cargado
       if(player.player) {
