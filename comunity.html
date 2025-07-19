@@ -152,7 +152,7 @@ dialog{
   }
 }
   
-  @media (max-width: 600px){
+  @media (max-width: 700px){
     .hidemobile{
       display: none !important;
     }
@@ -431,13 +431,7 @@ background: rgba(0, 0, 0, 0.3);
     background-color: transparent;
 }
 
-.poll-title {
-    font-size: 15px;
-    font-weight: 400;
-    color: #0F1419;
-    margin-bottom: 12px;
-    line-height: 1.3;
-}
+
 
 .poll-list {
     display: flex;
@@ -591,6 +585,7 @@ background: rgba(0, 0, 0, 0.3);
 
 .textContent{
   margin-top: -15px;
+  margin-bottom: 20px !important;
   font-size: 1.1rem; /* Aproximadamente 16px, similar a la imagen */
   font-weight: 450; 
 }
@@ -607,21 +602,22 @@ background: rgba(0, 0, 0, 0.3);
           <div class="row"><img class="circle small" src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V"/>
             <div class="max">
               <div class="field fill round">
-                <input placeholder="Create Post" onclick="ui('#dialog-post')"/>
+                <input placeholder="Create Post" ng-model="newText2"/>
               </div>
             </div>
+
+            
             <button class="transparent circle" onclick="ui('#dialog-post')"><i>image</i>
               <div class="tooltip bottom">Create Media Post</div>
             </button>
-            <button class="transparent circle" onclick="ui('#dialog-post')"><i>link</i>
-              <div class="tooltip bottom">Create Link Post</div>
-            </button>
+                <button  ng-click="newPost(newText2)">Post</button>
+        
           </div>
         </article>
       <nav  style="justify-content: center; flex-wrap: wrap; ">
-          <button class="chip" ng-click="filterPosts('youtube')"><i>local_fire_department</i><span>Trending</span></button>
-                    <button class="chip"><i>arrow_circle_up</i><span>Top</span></button>
-          <button class="chip"><i>news</i><span>New</span></button>
+          <button class="chip" ng-click="filterPosts('all')"><i>local_fire_department</i><span>Trending</span></button>
+                    <button class="chip" ng-click="filterPosts('midi')"><i>arrow_circle_up</i><span>Midi</span></button>
+          <button class="chip" ng-click="filterPosts('both')"><i>news</i><span>Post</span></button>
 
         </nav>
         
@@ -656,8 +652,8 @@ background: rgba(0, 0, 0, 0.3);
 
               <div class="infoProf " ng-if="showProfileInfo[post.id]">
       <i class="ri-user-line"></i> {{post.user}}<br>
-      <small>Email: {{post.email}}</small><br>
-      <small>Plan: {{post.plan}}</small>
+      <small>Nivel: {{post.lvl}}</small><br>
+      <small>Plan: {{post.progress}}</small>
     </div>
           
           </div>
@@ -666,16 +662,14 @@ background: rgba(0, 0, 0, 0.3);
             
                 <div class="medium-space"></div>
                 
-                 <div style="display: flex; justify-content: center;">
-                    <iframe width="100%" height="{{post.height}}" ng-src="{{trustAsResourceUrl(post.url)}}" frameborder="0" ng-class="{'youtubeframe': post.type == 'youtube'}"></iframe>
-                   </div>
+           
 
                 <div ng-if="post.type == 'text'" class="textContent">{{post.url}}
               </div>
-                <a  ng-if="post.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{post.url}}</span><i>link</i></a>
-                
-                <a ng-if="post.type == 'img'" href="{{post.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{post.url}}"/></a>
-                
+             
+                  <div style="display: flex; justify-content: center;">
+                <a class="midi-thumbnail-container" ng-if="post.type == 'img'" href="{{post.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{post.url}}"/></a>
+                  </div>
                 
               
     <div style="display: flex; justify-content: center;" ng-if="post.type == 'midi'">
@@ -686,7 +680,7 @@ background: rgba(0, 0, 0, 0.3);
     </div>
     <div class="midi-info">
       <h5>{{post.id || 'Composición MIDI'}}</h5>
-      <p>{{post.description || 'Haz clic para reproducir'}}</p>
+      <p>Haz clic para reproducir</p>
     </div>
   </div>
 </div>
@@ -696,7 +690,7 @@ background: rgba(0, 0, 0, 0.3);
               
            <div class="poll-container" ng-if="post.type == 'poll'">
     <div class="poll-voter">
-        <h4 class="poll-title">{{post.url}}</h4>
+        <h4 class="textContent">{{post.url}}</h4>
         <div class="poll-list">
             <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)">
                 <div class="poll-option">
@@ -731,7 +725,7 @@ background: rgba(0, 0, 0, 0.3);
     <i ng-if="!post.likes.includes(user)" class="ri-heart-line"></i>
     {{post.likes.length}}
 </button>
-           <button class="transparent circle" ng-if="post.type != 'midi'" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
+           <button class="transparent circle" ng-if="post.type != 'poll'" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
          </div>
 
 <button class="chip" ><i class="ri-bookmark-line"></i><span>Save</span></button>
@@ -798,23 +792,49 @@ background: rgba(0, 0, 0, 0.3);
           <div class="row top-align">
             <div class="max" >
               <div >
-                 <div class="row"> <img class="circle small" ng-src="{{selectedPostForComments.photo}}"/>  
-            <div><b>   <label style="font-size: 14px;"><a href="#" >{{selectedPostForComments.user}}</a></label></b>
-               <div>   <label class="grey-text">Nivel 1  ● hace {{calculateTimeAgo(selectedPostForComments.date)}}</label></div>
-            </div>
-          </div>
-                <div class="row">
-                  <div class="max">
-                    <h6 class="no-margin">{{selectedPostForComments.id}}</h6>
-                  </div>
-                </div>  
+                 <div class="row" ng-click="toggleProfileInfo(selectedPostForComments.id); $event.preventDefault()">
+  <img class="circle small imgHead" ng-src="{{selectedPostForComments.photo}}"/>  
+  <div class="user-info">
+    <div class="user-name">
+      <a href="#">{{selectedPostForComments.user}}</a>
+    </div>
+    <div class="post-time">
+      <label >{{calculateTimeAgo(selectedPostForComments.date)}}</label>
+    </div>
+  </div>
+
+              <div class="infoProf " ng-if="showProfileInfo[selectedPostForComments.id]">
+      <i class="ri-user-line"></i> {{selectedPostForComments.user}}<br>
+      <small>Nivel: {{selectedPostForComments.lvl}}</small><br>
+      <small>Plan: {{selectedPostForComments.progress}}</small>
+    </div>
+          
+          </div> 
                 <div class="medium-space"></div>
                 
-                <div ng-if="selectedPostForComments.type == 'text'" >{{selectedPostForComments.url}}
+             
+
+                <div ng-if="selectedPostForComments.type == 'text'" class="textContent">{{selectedPostForComments.url}}
               </div>
-                <a  ng-if="selectedPostForComments.type == 'link'" class="row link" href="{{post.url}}" target="_blank"><span>{{selectedPostForComments.url}}</span><i>link</i></a>
-                <a ng-if="selectedPostForComments.type == 'img'" href="{{post.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{selectedPostForComments.url}}"/></a>
-                <iframe width="100%" height="{{selectedPostForComments.height}}" ng-src="{{trustAsResourceUrl(selectedPostForComments.url)}}" frameborder="0" ng-class="{'youtubeframe': selectedPostForComments.type == 'youtube'}"></iframe>
+          
+                
+                <a ng-if="selectedPostForComments.type == 'img'" href="{{selectedPostForComments.url}}" target="_blank"><img class="responsive" style="border-radius: 10px;" ng-src="{{selectedPostForComments.url}}"/></a>
+                
+                
+              
+    <div style="display: flex; justify-content: center;" ng-if="selectedPostForComments.type == 'midi'">
+<div  class="midi-thumbnail-container">
+  <div class="midi-thumbnail" ng-click="openMidiModal(selectedPostForComments)">
+    <div class="play-button">
+      <i class="ri-play-fill"></i>
+    </div>
+    <div class="midi-info">
+      <h5>{{selectedPostForComments.id || 'Composición MIDI'}}</h5>
+      <p>Haz clic para reproducir</p>
+    </div>
+  </div>
+</div>
+</div>
             </div> 
           </div>  
         </article>
@@ -867,15 +887,31 @@ background: rgba(0, 0, 0, 0.3);
         <article class="no-elevate round">
           <h6>Recent Activity</h6>
           <nav class="drawer max no-padding" ng-repeat="user in feed | limitTo:4">
-            <a class="small-round"><img class="small" src="{{user.img}}"/>
-              <div class="max wrap">
-                <div class="midi-indo">
-                <div>{{user.name}}</div>
-                 <div style="font-size: 12px; font-weight: 400">{{user.task}}</div>
-                </div>
-                <label class="grey-text">hace {{calculateTimeAgo(user.date)}}</label>
-              </div>
+            <a class="small-round" style="margin-top: -10px">
+
+
+              <div class="row" >
+  <img class="circle small" ng-src="{{user.img}}"/>  
+  <div class="user-info">
+    <div class="user-name">
+      <a href="#">{{user.name}}</a>
+    </div>
+    <div class="post-time" style="margin-top: -6px;">
+      <label style="font-size: 11px;">hace {{calculateTimeAgo(user.date)}}</label>
+    </div>
+  </div>
+    </div>
+
+
+    
+
+
+
+                  <div style="font-size: 15px; font-weight: 400; margin-bottom: 15px">{{user.task}}</div>
+             
+            
             </a>
+            <hr>
             </nav>
         </article>
 
@@ -1257,33 +1293,20 @@ $scope.openModal = function(post) {
    
    
     $scope.newPost = function(data) {
-      let ytVideoURL = $('#ytVideoURL').attr('ytVideoURL');
-      
-      if(ytVideoURL){
-        var post =  {
-    "user": "Test",
-    "type": "youtube",
-           "height": 150,
-    "url": ytVideoURL,
-    "date": [1], 
-    "likes": [],
-     "comments": []  
-        }
-      }else{
+     
            var post =  {
-          "user": "Test",
+          "user": "User",
           "type": "text",
-             "height": 0,
+          "height": 0,
+          "photo": "https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V",
           "url": data,
-          "date": [1], 
+          "date": new Date(), 
           "likes": [],
            "comments": []  
         }
-     }
+     
     $scope.data.unshift(post)
-      $scope.newText = ""; 
-       $('#video-details').html('');
-     $('#ytVideoURL').attr('ytVideoURL', '');
+      $scope.newText2 = ""; 
 }
    
 
@@ -1356,227 +1379,12 @@ $scope.calculateTimeAgo = function(alertDate) {
     return entry.index <= lsn;
   };
 };
-
+ 
 
    
 }]);
 
-
-
-
-  $(document).ready(function () {
-  // Inicializa fancybox
-  $(".fancybox").fancybox();
-
-  // Evita que el formulario recargue la página
-  $('#search-form').submit(function (e) {
-    e.preventDefault();
-  });
-
-$('#results').on('click', '.select-video', function (e) {
-  e.preventDefault();
-
-  // Obtiene los datos del video seleccionado
-  let videoTitle = $(this).data('title');
-  let videoUrl = $(this).data('url');
-  let videoThumbnail = $(this).data('thumb');
-
-
-  // Actualiza el atributo ytVideoURL con la URL del video
-  $('#ytVideoURL').attr('ytVideoURL', videoUrl);
-
-    $('#video-details').html(`
-    <div class="video-info" style="position: relative; display: inline-block;">
-      <img src="${videoThumbnail}" style="width: 120px; height: 90px; margin-right: 10px;">
-      <span>${videoTitle}</span>
-       <button 
-  class="remove-youtube-btn" 
-  style="
-    position: absolute; 
-    top: -5px; 
-    right: -5px; 
-    background: red; 
-    color: white; 
-    border: none; 
-    border-radius: 50%; 
-    width: 20px; 
-    height: 20px; 
-    font-size: 15px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center;"
->
-  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
-</button>
-    </div>
-  `);
-
-  $('#video-details').on('click', '.remove-youtube-btn', function () {
-  $('#video-details').html('');
-  $('#ytVideoURL').attr('ytVideoURL', '');
-});
-  
-  // Cierra el modal
-  $('#youtubeModal').modal('hide');
-  $('#results').html('');
-   $('#query').val('');
-});
-
-
-  
-   $('#uploadBtn').on('click', function () {
-    $('#uploadImage').click();
-  });
-
-  // Maneja la subida de imagen
-  $('#uploadImage').on('change', function (event) {
-    let file = event.target.files[0]; // Obtén el archivo
-    if (file) {
-      let reader = new FileReader();
-
-      // Convierte el archivo a Base64
-      reader.onload = function (e) {
-        let base64Image = e.target.result;
-
-        // Muestra la imagen en el contenedor #img-details
-       $('#img-details').html(`
-  <div class="uploaded-img-container" style="position: relative; display: inline-block;">
-    <img src="${base64Image}" alt="Uploaded Image" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc; border-radius: 5px;">
-   <button 
-  class="remove-image-btn" 
-  style="
-    position: absolute; 
-    top: -5px; 
-    right: -5px; 
-    background: red; 
-    color: white; 
-    border: none; 
-    border-radius: 50%; 
-    width: 20px; 
-    height: 20px; 
-    font-size: 15px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center;"
->
-  <i class="ri-close-fill" style="font-weight: 700; line-height: 0;"></i>
-</button>
-
-  </div>
-`);
-
-        // Guarda el Base64 en el atributo imgData
-        $('#imgData').attr('imgData', base64Image);
-      };
-
-      // Lee el archivo como Base64
-      reader.readAsDataURL(file);
-    }
-  });
-  
-  
-  $('#img-details').on('click', '.remove-image-btn', function () {
-  // Limpia el contenedor de imagen
-  $('#img-details').html('');
-  // Limpia el atributo imgData
-  $('#imgData').attr('imgData', '');
-});
  
-}); 
 
-function search() {
-  // Limpia resultados anteriores
-  $('#results').html('');
 
-  // Obtén el valor del input
-  let q = $('#query').val();
-
- 
-  $.get(
-    "https://www.googleapis.com/youtube/v3/search",
-    {
-      part: 'snippet, id',
-      q: q,
-      type: 'video', 
-      key: 'AIzaSyBRfk0b73-DtIk7UNdpItlZHlmMtNcVsUA'
-    },
-    function (data) {
-      $.each(data.items, function (i, item) {
-        // Genera el HTML de cada resultado
-        let output = getOutput(item);
-
-        // Añade los resultados al DOM
-        $('#results').append(output);
-      });
-    }
-  );
-   
-  /*
-    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
-
-    var validationData = {
-      redirect: "follow",
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        action: "youtubeApi",
-        q: q 
-      }),
-      credentials: "omit"
-    };
-
-  fetch(api, validationData)
-  .then(response => response.text())
-  .then(res => {
-    var validation = JSON.parse(res);
-    validation.forEach(item => {
-          $('#results').append(getOutput(item));
-        });
-  })
-*/
-
-  
-  
-  
-}
-
-function getOutput(item) {
-  // Extrae información del video
-  let videoId = item.id.videoId;
-  let title = item.snippet.title;
-  let description = item.snippet.description;
-  let thumb = item.snippet.thumbnails.high.url;
-  let channelTitle = item.snippet.channelTitle;
-
-  // Construye el HTML de salida con atributos data-* para los datos
-  let output = `
-    <li>
-      <div class="list-left">
-        <img src="${thumb}" alt="${title}">
-      </div>
-      <div class="list-right">
-        <h3 style="font-size: 15px;">
-          <a 
-            href="#" 
-            class="select-video" 
-            data-title="${title}" 
-            data-url="https://www.youtube.com/embed/${videoId}"
-            data-thumb="${thumb}"
-            >
-            ${title}
-          </a>
-        </h3>
-        <small>por <span class="cTitle">${channelTitle}</span></small>
-        <p style="font-size: 10px;">${description}</p>
-      </div>
-    </li>
-    <div class="clearfix"></div>
-  `;
-
-  return output;
-}
-</script>   
+</script>      
