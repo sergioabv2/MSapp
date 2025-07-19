@@ -615,9 +615,9 @@ background: rgba(0, 0, 0, 0.3);
           </div>
         </article>
       <nav  style="justify-content: center; flex-wrap: wrap; ">
-          <button class="chip" ng-click="filterPosts('all')"><i>local_fire_department</i><span>Trending</span></button>
-                    <button class="chip" ng-click="filterPosts('midi')"><i>arrow_circle_up</i><span>Midi</span></button>
-          <button class="chip" ng-click="filterPosts('both')"><i>news</i><span>Post</span></button>
+          <button class="chip" ng-click="filterPosts('all')"><i>explore</i><span>Explore</span></button>
+                    <button class="chip" ng-click="filterPosts('midi')"><i>piano</i><span>Piano</span></button>
+          <button class="chip" ng-click="filterPosts('both')"><i>article</i><span>Posts</span></button>
 
         </nav>
         
@@ -711,21 +711,21 @@ background: rgba(0, 0, 0, 0.3);
             </div>
         </div>
         <div class="poll-footer" ng-show="userVoted">
-            {{getTotalVotes(post)}} votes · {{calculateTimeAgo(post.date)}}
+            {{getTotalVotes(post)}} votes 
         </div>
     </div>
 </div>
        
            
 
-                <div class="row" style="display: flex; justify-content: space-between;">
+                <div class="row" style="display: flex; justify-content: space-between;" ng-if="post.type != 'poll'">
                   <div>
                   <button class="transparent circle" ng-click="newLike($index, post)">
     <i ng-if="post.likes.includes(user)" class="ri-heart-fill liked"></i>
     <i ng-if="!post.likes.includes(user)" class="ri-heart-line"></i>
     {{post.likes.length}}
 </button>
-           <button class="transparent circle" ng-if="post.type != 'poll'" ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
+           <button class="transparent circle"  ng-click="openComments(post); " ><i>chat_bubble</i>{{post.comments.length}}</button>
          </div>
 
 <button class="chip" ><i class="ri-bookmark-line"></i><span>Save</span></button>
@@ -814,7 +814,7 @@ background: rgba(0, 0, 0, 0.3);
                 
              
 
-                <div ng-if="selectedPostForComments.type == 'text'" class="textContent">{{selectedPostForComments.url}}
+                <div ng-if="selectedPostForComments.type == 'text'" class="textContent" style="margin-bottom: 30px !important">{{selectedPostForComments.url}}
               </div>
           
                 
@@ -926,7 +926,7 @@ background: rgba(0, 0, 0, 0.3);
       </nav>
       <div class="space"></div>
       <div class="medium-height large-width">
-        <div class="tabs scroll left-align m l"><a class="active" data-ui="#post"><i>news</i><span>Post</span></a><a data-ui="#image-video"><i>image</i><span>Image &amp; Video</span></a><a data-ui="#link"><i>link</i><span>Link</span></a><a class="grey-text"><i>insert_chart</i><span>Pool</span></a></div>
+        <div class="tabs scroll left-align m l"><a class="active" data-ui="#post"><i>news</i><span>Post</span></a><a data-ui="#image-video"><i>image</i><span>Image </span></a><a data-ui="#pool"><i>insert_chart</i><span>Pool</span></a></div>
         <div class="space"></div>
         <div class="page bottom active" id="post">
          
@@ -953,7 +953,7 @@ background: rgba(0, 0, 0, 0.3);
             </button>
           </div>
         </div>
-        <div class="page bottom" id="link">
+        <div class="page bottom" id="pool">
       
           <div class="field border label">
             <input/>
@@ -961,10 +961,18 @@ background: rgba(0, 0, 0, 0.3);
           </div>
           <div class="field border label">
             <textarea></textarea>
-            <label>Url</label>
+            <label>Opc 1</label>
+          </div>
+           <div class="field border label">
+            <textarea></textarea>
+            <label>Opc 2</label>
+          </div>
+           <div class="field border label">
+            <textarea></textarea>
+            <label>Opc 3</label>
           </div>
         </div>
-        <div class="page bottom" id="pool"></div>
+       
       </div>
       <footer class="fixed">
         <nav class="right-align">
@@ -1255,7 +1263,7 @@ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7
       $scope.filteredData = $scope.data;
     }else if(type === 'both'){
       $scope.filteredData = $scope.data.filter(function(post) {
-        return post.type === 'text' || post.type === 'poll';
+        return post.type === 'text' || post.type === 'img';
       });
       
     } else {
