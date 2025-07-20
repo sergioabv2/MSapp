@@ -1,0 +1,568 @@
+
+<html lang="es" ng-app="partiturasApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicScore - Buscador de Partituras (Lista)</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+
+            background-color: #f9f9f9;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+     
+        .search-container {
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* ESTILOS PARA LISTA (MODIFICADO) */
+        .partitura-item {
+            background: white;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            padding: 15px;
+        }
+        
+        .partitura-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .partitura-img {
+            width: 120px;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        
+        .partitura-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .partitura-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .partitura-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .partitura-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .partitura-author {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .partitura-description {
+            color: #555;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .partitura-stats {
+            display: flex;
+            font-size: 13px;
+            color: #95a5a6;
+        }
+        
+        .partitura-stat {
+            margin-right: 20px;
+        }
+        
+        .partitura-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            min-width: 120px;
+        }
+        
+        .partitura-price {
+            background-color: #2c3e50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .partitura-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .partitura-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        /* Resto de estilos se mantienen igual */
+        .filter-sidebar {
+            background: white;
+            padding: 15px;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            margin-bottom: 20px;
+        }
+        
+        .filter-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .filter-option {
+            margin-bottom: 10px;
+        }
+        
+      
+    </style>
+</head>
+<body>
+  
+    
+    <!-- Search Section (se mantiene igual) -->
+    <div class="search-container">
+        <div class="container">
+            <div class="search-box">
+                <h2>Encuentra las partituras que necesitas</h2>
+                <div class="input-group">
+                    <input type="text" class="form-control input-lg" placeholder="Buscar partituras..." ng-model="searchQuery" ng-keyup="$event.keyCode === 13 && search()">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary btn-lg" type="button" ng-click="search()">
+                            <i class="fa fa-search"></i> Buscar
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container" ng-controller="PartiturasController">
+
+
+      <div class="filters-bar">
+    <div class="filter-chip" ng-repeat="instrument in instruments">
+        <select class="form-control chip-select" ng-model="selectedInstruments[instrument]">
+            <option value="">{{instrument}}</option>
+            <option value="true">✓ {{instrument}}</option>
+        </select>
+    </div>
+    
+    <div class="filter-chip" ng-repeat="level in difficultyLevels">
+        <select class="form-control chip-select" ng-model="selectedLevels[level]">
+            <option value="">{{level}}</option>
+            <option value="true">✓ {{level}}</option>
+        </select>
+    </div>
+</div>
+
+
+        <div class="row">
+
+          <div class="col-md-3 upload-manager">
+    <div class="upload-box">
+        <h4><i class="fa fa-upload"></i> Subir nueva partitura</h4>
+        <div class="upload-area" ngf-drop ngf-select ng-model="files">
+            <i class="fa fa-cloud-upload fa-3x"></i>
+            <p>Arrastra archivos aquí o haz clic</p>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Título" ng-model="newScore.title">
+        </div>
+        <button class="btn btn-primary btn-block" ng-click="upload()">
+            <i class="fa fa-upload"></i> Subir
+        </button>
+    </div>
+</div>
+            
+            <!-- Results - AHORA EN FORMATO DE LISTA -->
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="pull-left">
+                            <strong>{{filteredPartituras.length}}</strong> resultados encontrados
+                        </div>
+                        <div class="pull-right">
+                            Ordenar por: 
+                            <select class="form-control input-sm" ng-model="sortOption" ng-change="applyFilters()">
+                                <option value="-views">Más populares</option>
+                                <option value="-date">Más recientes</option>
+                                <option value="title">A-Z</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" ng-show="loading">
+                    <i class="fa fa-spinner fa-spin fa-3x"></i>
+                    <p>Cargando partituras...</p>
+                </div>
+                
+                <!-- No Results -->
+                <div class="no-results" ng-show="!loading && filteredPartituras.length === 0">
+                    <i class="fa fa-search fa-4x" style="margin-bottom: 20px;"></i>
+                    <h3>No se encontraron partituras</h3>
+                    <p>Intenta con otros términos de búsqueda o ajusta los filtros</p>
+                </div>
+                
+                <!-- LISTA DE PARTITURAS (MODIFICADO) -->
+                <div ng-show="!loading && filteredPartituras.length > 0">
+                    <div class="partitura-item" ng-repeat="partitura in filteredPartituras | limitTo: itemsPerPage : (currentPage - 1) * itemsPerPage">
+                        <div class="partitura-img">
+                            <img ng-src="{{partitura.image}}" alt="{{partitura.title}}">
+                        </div>
+                        <div class="partitura-content">
+                            <div class="partitura-header">
+                                <div>
+                                    <h3 class="partitura-title">{{partitura.title}}</h3>
+                                    <div class="partitura-author">{{partitura.author}}</div>
+                                </div>
+                                <div class="partitura-stats">
+                                    <span class="partitura-stat"><i class="fa fa-eye"></i> {{partitura.views | number}}</span>
+                                    <span class="partitura-stat"><i class="fa fa-download"></i> {{partitura.downloads | number}}</span>
+                                    <span class="partitura-stat"><i class="fa fa-star"></i> {{partitura.rating}}</span>
+                                </div>
+                            </div>
+                            <div class="partitura-description">
+                                Partitura para {{partitura.instrument}} - Nivel {{partitura.level}}. {{partitura.type}}.
+                            </div>
+                            <div class="partitura-stats">
+                                <span class="partitura-stat"><i class="fa fa-file-text"></i> {{partitura.pages || '12'}} páginas</span>
+                                <span class="partitura-stat"><i class="fa fa-calendar"></i> {{partitura.date | date:'mediumDate'}}</span>
+                            </div>
+                        </div>
+                        <div class="partitura-actions">
+                            <div class="partitura-price" ng-if="partitura.price">
+                                {{partitura.price | currency}}
+                            </div>
+                            <div class="partitura-price" ng-if="!partitura.price">
+                                GRATIS
+                            </div>
+                            <button class="partitura-button">
+                                <i class="fa fa-download"></i> Descargar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination (se mantiene igual) -->
+                <div class="row" ng-show="filteredPartituras.length > itemsPerPage">
+                    <div class="col-xs-12 pagination-container">
+                        <ul class="pagination">
+                            <li ng-class="{disabled: currentPage == 1}">
+                                <a href="#" ng-click="setPage(currentPage - 1)">&laquo;</a>
+                            </li>
+                            <li ng-repeat="n in range(1, totalPages)" ng-class="{active: n == currentPage}">
+                                <a href="#" ng-click="setPage(n)">{{n}}</a>
+                            </li>
+                            <li ng-class="{disabled: currentPage == totalPages}">
+                                <a href="#" ng-click="setPage(currentPage + 1)">&raquo;</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+  
+    
+    <!-- jQuery, Bootstrap JS and AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    
+    <script>
+        var app = angular.module('partiturasApp', []);
+        
+        app.controller('PartiturasController', function($scope, $timeout) {
+            // Datos de ejemplo (ampliados)
+            $scope.partituras = [
+                {
+                    id: 1,
+                    title: "Moonlight Sonata - Beethoven",
+                    author: "Ludwig van Beethoven",
+                    instrument: "Piano",
+                    level: "Avanzado",
+                    type: "Partitura completa",
+                    views: 12543,
+                    downloads: 4321,
+                    rating: 4.8,
+                    date: new Date(2023, 0, 15),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 4.99,
+                    pages: 15
+                },
+                {
+                    id: 2,
+                    title: "Canon in D - Pachelbel",
+                    author: "Johann Pachelbel",
+                    instrument: "Violín",
+                    level: "Intermedio",
+                    type: "Partitura completa",
+                    views: 9876,
+                    downloads: 3210,
+                    rating: 4.5,
+                    date: new Date(2023, 1, 20),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 3.50,
+                    pages: 8
+                },
+                {
+                    id: 3,
+                    title: "Für Elise - Beethoven",
+                    author: "Ludwig van Beethoven",
+                    instrument: "Piano",
+                    level: "Principiante",
+                    type: "Partitura simplificada",
+                    views: 18765,
+                    downloads: 7654,
+                    rating: 4.7,
+                    date: new Date(2023, 2, 5),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 0,
+                    pages: 4
+                },
+                {
+                    id: 4,
+                    title: "The Four Seasons - Vivaldi",
+                    author: "Antonio Vivaldi",
+                    instrument: "Violín",
+                    level: "Avanzado",
+                    type: "Partitura completa",
+                    views: 8765,
+                    downloads: 2345,
+                    rating: 4.9,
+                    date: new Date(2023, 1, 15),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 7.99,
+                    pages: 32
+                },
+                {
+                    id: 5,
+                    title: "Clair de Lune - Debussy",
+                    author: "Claude Debussy",
+                    instrument: "Piano",
+                    level: "Intermedio",
+                    type: "Partitura completa",
+                    views: 11234,
+                    downloads: 4567,
+                    rating: 4.6,
+                    date: new Date(2023, 0, 30),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 5.50,
+                    pages: 12
+                },
+                {
+                    id: 6,
+                    title: "Symphony No. 5 - Beethoven",
+                    author: "Ludwig van Beethoven",
+                    instrument: "Orquesta",
+                    level: "Avanzado",
+                    type: "Partitura completa",
+                    views: 7654,
+                    downloads: 1987,
+                    rating: 4.7,
+                    date: new Date(2022, 11, 10),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 12.99,
+                    pages: 45
+                },
+                {
+                    id: 7,
+                    title: "Gymnopédie No. 1 - Satie",
+                    author: "Erik Satie",
+                    instrument: "Piano",
+                    level: "Principiante",
+                    type: "Partitura simplificada",
+                    views: 14321,
+                    downloads: 5432,
+                    rating: 4.4,
+                    date: new Date(2022, 10, 25),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 0,
+                    pages: 3
+                },
+                {
+                    id: 8,
+                    title: "Nocturne Op. 9 No. 2 - Chopin",
+                    author: "Frédéric Chopin",
+                    instrument: "Piano",
+                    level: "Intermedio",
+                    type: "Partitura completa",
+                    views: 15678,
+                    downloads: 6543,
+                    rating: 4.8,
+                    date: new Date(2022, 9, 15),
+                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+                    price: 6.25,
+                    pages: 9
+                }
+            ];
+            
+            // Filtros y opciones
+            $scope.instruments = ["Piano", "Violín", "Guitarra", "Flauta", "Saxofón", "Orquesta", "Coro"];
+            $scope.difficultyLevels = ["Principiante", "Intermedio", "Avanzado"];
+            $scope.documentTypes = ["Partitura completa", "Partitura simplificada", "Tablatura", "Lead sheet"];
+            
+            $scope.selectedInstruments = {};
+            $scope.selectedLevels = {};
+            $scope.selectedTypes = {};
+            
+            $scope.sortOption = "-views";
+            $scope.searchQuery = "";
+            $scope.filteredPartituras = [];
+            $scope.loading = false;
+            
+            // Paginación
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 5;  // Reducido para mejor visualización en lista
+            
+            // Función para generar un rango de números para la paginación
+            $scope.range = function(start, end) {
+                var result = [];
+                for (var i = start; i <= end; i++) {
+                    result.push(i);
+                }
+                return result;
+            };
+            
+            // Calcular total de páginas
+            $scope.$watch('filteredPartituras', function() {
+                $scope.totalPages = Math.ceil($scope.filteredPartituras.length / $scope.itemsPerPage);
+            }, true);
+            
+            // Cambiar página
+            $scope.setPage = function(page) {
+                if (page >= 1 && page <= $scope.totalPages) {
+                    $scope.currentPage = page;
+                }
+            };
+            
+            // Función de búsqueda
+            $scope.search = function() {
+                $scope.loading = true;
+                $scope.currentPage = 1;
+                
+                // Simular carga asíncrona
+                $timeout(function() {
+                    $scope.applyFilters();
+                    $scope.loading = false;
+                }, 800);
+            };
+            
+            // Aplicar filtros
+            $scope.applyFilters = function() {
+                $scope.filteredPartituras = $scope.partituras.filter(function(partitura) {
+                    // Filtrar por texto de búsqueda
+                    var matchesSearch = true;
+                    if ($scope.searchQuery) {
+                        var query = $scope.searchQuery.toLowerCase();
+                        matchesSearch = partitura.title.toLowerCase().includes(query) || 
+                                         partitura.author.toLowerCase().includes(query);
+                    }
+                    
+                    // Filtrar por instrumentos seleccionados
+                    var matchesInstruments = true;
+                    var selectedInstruments = Object.keys($scope.selectedInstruments).filter(function(key) {
+                        return $scope.selectedInstruments[key];
+                    });
+                    if (selectedInstruments.length > 0) {
+                        matchesInstruments = selectedInstruments.includes(partitura.instrument);
+                    }
+                    
+                    // Filtrar por niveles de dificultad seleccionados
+                    var matchesLevels = true;
+                    var selectedLevels = Object.keys($scope.selectedLevels).filter(function(key) {
+                        return $scope.selectedLevels[key];
+                    });
+                    if (selectedLevels.length > 0) {
+                        matchesLevels = selectedLevels.includes(partitura.level);
+                    }
+                    
+                    // Filtrar por tipos de documento seleccionados
+                    var matchesTypes = true;
+                    var selectedTypes = Object.keys($scope.selectedTypes).filter(function(key) {
+                        return $scope.selectedTypes[key];
+                    });
+                    if (selectedTypes.length > 0) {
+                        matchesTypes = selectedTypes.includes(partitura.type);
+                    }
+                    
+                    return matchesSearch && matchesInstruments && matchesLevels && matchesTypes;
+                });
+                
+                // Ordenar resultados
+                $scope.filteredPartituras.sort(function(a, b) {
+                    if ($scope.sortOption.startsWith('-')) {
+                        var field = $scope.sortOption.substring(1);
+                        return b[field] - a[field];
+                    } else {
+                        return a[$scope.sortOption] > b[$scope.sortOption] ? 1 : -1;
+                    }
+                });
+            };
+            
+            // Inicializar con todos los resultados
+            $scope.search();
+        });
+    </script>
+</body>
+</html>
