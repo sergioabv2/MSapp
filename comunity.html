@@ -425,13 +425,12 @@ background: rgba(0, 0, 0, 0.3);
 }
 
 
- /* Poll Container - Twitter Style */
+
+/* Poll Container - Twitter Style */
 .poll-container {
     padding: 12px 0;
     background-color: transparent;
 }
-
-
 
 .poll-list {
     display: flex;
@@ -463,7 +462,7 @@ background: rgba(0, 0, 0, 0.3);
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 
 .poll-option-bg {
@@ -472,7 +471,7 @@ background: rgba(0, 0, 0, 0.3);
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(15, 20, 25, 0.07);
+
     border-radius: 4px;
 }
 
@@ -507,7 +506,6 @@ background: rgba(0, 0, 0, 0.3);
 
 .option-percent {
     font-size: 15px;
-    font-weight: 700;
     color: #0F1419;
 }
 
@@ -539,20 +537,76 @@ background: rgba(0, 0, 0, 0.3);
     padding: 0 12px;
 }
 
-
 .poll-option-bg.selected-option {
-    border: 2px solid #91b9ff;       /* Borde azul claro */
-    background: rgba(29, 155, 240, 0.05);
-    border-radius: 6px;             /* Bordes redondeados */
-    padding: 10px 16px;              /* Espaciado interno */
-    font-weight: bold;              /* Texto más fuerte */
-    color: #000;                     /* Texto negro */
-    display: flex;                   /* Alineación tipo botón */
+    border: 2px solid #91b9ff;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-weight: bold;
+    color: #000;
+    display: flex;
     align-items: center;
-    gap: 8px;                        /* Espacio entre icono y texto */
+    gap: 8px;
     transition: border 0.2s ease, background 0.2s ease;
 }
 
+/*
+.poll-option-bg.selected-option::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231D9BF0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>');
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-right: 8px; 
+    position: relative;
+    z-index: 2;
+}*/
+
+/* =====================================
+   New CSS - Before Voting State
+   ===================================== */
+.poll-container:not(.poll-voted) .poll-list {
+    gap: 8px; /* Increased gap for spacing */
+}
+
+.poll-container:not(.poll-voted) .vote-row {
+    justify-content: center;
+    border: 1px solid #1D9BF0; /* Blue border */
+    border-radius: 9999px; /* Pill-shaped corners */
+    background-color: transparent; /* Blue background */
+}
+
+.poll-container:not(.poll-voted) .vote-row:hover {
+    background-color:rgba(29, 155, 240, 0.1);
+}
+
+.poll-container:not(.poll-voted) .poll-option-bg,
+.poll-container:not(.poll-voted) .poll-option-bar,
+.poll-container:not(.poll-voted) .poll-vote-button,
+.poll-container:not(.poll-voted) .option-percent,
+.poll-container:not(.poll-voted) .poll-footer {
+    display: none !important;
+}
+
+.poll-container:not(.poll-voted) .poll-option-text {
+    position: static;
+    z-index: 1;
+    width: auto;
+    padding: 0;
+}
+
+.poll-container:not(.poll-voted) .option-name {
+    color: #1D9BF0; /* White text */
+    font-size: 15px;
+    font-weight: 600; /* Bold text */
+}
+
+.poll-container:not(.poll-voted) .poll-option {
+    flex-grow: 0;
+    height: auto;
+    padding: 0;
+}
 
 
 .user-info {
@@ -617,7 +671,8 @@ background: rgba(0, 0, 0, 0.3);
       <nav  style="justify-content: center; flex-wrap: wrap; ">
           <button class="chip" ng-click="filterPosts('all')"><i>explore</i><span>Explore</span></button>
                     <button class="chip" ng-click="filterPosts('midi')"><i>piano</i><span>Piano</span></button>
-          <button class="chip" ng-click="filterPosts('both')"><i>article</i><span>Posts</span></button>
+          <button class="chip" ng-click="filterPosts('user')"><i>article</i><span>My Posts</span></button>
+                 <button class="chip" ng-click="filterPosts('saved')"><i>bookmark</i><span>Saved</span></button>
 
         </nav>
         
@@ -688,20 +743,21 @@ background: rgba(0, 0, 0, 0.3);
               
               
               
-           <div class="poll-container" ng-if="post.type == 'poll'">
+       <div class="poll-container" ng-if="post.type == 'poll'" ng-class="{'poll-voted': userVoted}">
     <div class="poll-voter">
         <h4 class="textContent">{{post.url}}</h4>
         <div class="poll-list">
-            <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)">
+          <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'selected-option': opt.votedByCurrentUser}">
                 <div class="poll-option">
                     <div class="poll-option-bg"
-     ng-class="{
-        'voted': userVoted,
-        'selected-option': userVoted && opt.votedByCurrentUser
-     }"></div>
+                         ng-class="{
+                             'voted': userVoted,
+                             'selected-option': userVoted && opt.votedByCurrentUser
+                         }"></div>
                     <div class="poll-option-bar" ng-if="userVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
                     <div class="poll-option-text">
-                        <span class="option-name">{{opt.name}}</span>
+                        <span class="option-name">{{opt.name}} <i ng-if="opt.votedByCurrentUser" 
+                        class="ri-checkbox-circle-line" style="margin-top: -2px; font-size: 20px"> </i></span> 
                         <span class="option-percent" ng-show="userVoted">{{calculatePercentage(post, opt)}}%</span>
                     </div>
                 </div>
@@ -1261,9 +1317,14 @@ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7
    
     if (type === 'all') {
       $scope.filteredData = $scope.data;
-    }else if(type === 'both'){
+    }else if(type === 'user'){
       $scope.filteredData = $scope.data.filter(function(post) {
-        return post.type === 'text' || post.type === 'img';
+        return post.user === $scope.user;
+      });
+      
+    }else if(type === 'saved'){
+      $scope.filteredData = $scope.data.filter(function(post) {
+        return post.saved === $scope.user;
       });
       
     } else {
