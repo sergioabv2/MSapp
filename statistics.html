@@ -1,6 +1,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+<!-- Agrega esto en el <head> -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 
 <style>
@@ -571,6 +573,31 @@ a {
         font-size: 50%;
     }
 }
+
+ /* Estilos para el contenedor del gráfico */
+#weekly-progress-chart {
+    margin-top: 15px;
+    border-radius: 8px;
+    padding: 10px;
+  max-width: 500px !important;
+}
+
+/* Estilos para tooltips */
+.google-visualization-tooltip {
+    border-radius: 8px !important;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.15) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Ajustes para modo oscuro si es necesario */
+.dark-mode #weekly-progress-chart {
+    background-color: #2a2a3a;
+}
+
+.dark-mode .google-visualization-tooltip {
+    background-color: #2a2a3a !important;
+    color: #fff !important;
+}
 </style>
 
 
@@ -604,7 +631,7 @@ a {
         </div>
 
         <section class="weekly">
-          <h2>Plan Semanal</h2>
+          <h2>Racha </h2>
           <table cellspacing="0" cellpadding="0">
             <tr>
               <th>Día</th>
@@ -641,7 +668,7 @@ a {
 
         <div class="grid-area-1-2">
           <section class="recent">
-            <h2>Últimas prácticas</h2>
+            <h2>Performance</h2>
             <table cellspacing="0" cellpadding="0">
               <tr>
                 <td><span class="material-icons" style="font-size: 25px; color: #4B888C; margin-left: 22px">schedule</span></td>
@@ -742,29 +769,18 @@ a {
           <p class="challenges__text">Aprender 3 piezas</p>
         </section>
 
-        <section class="last-week">
-          <h2>Progreso semanal</h2>
-          <div class="last-week__chart">
-            <div class="last-week__bar last-week__bar--1"><p>20min</p></div>
-            <div class="last-week__bar last-week__bar--2"><p>25min</p></div>
-            <div class="last-week__bar last-week__bar--3"><p>18min</p></div>
-            <div class="last-week__bar last-week__bar--4"><p>15min</p></div>
-            <div class="last-week__bar last-week__bar--5"><p>10min</p></div>
-            <div class="last-week__bar last-week__bar--6"><p>19min</p></div>
-          </div>
-          <div class="last-week__labels">
-            <p>Escalas</p>
-            <p>Piezas</p>
-            <p>Teoría</p>
-          </div>
-          <a href="#">Ver todo el progreso &rarr;</a>
-        </section>
+       <section class="last-week">
+ 
+  <h2>Progreso semanal</h2>
+  <div id="weekly-progress-chart" style="height: 300px; width: 100%;"></div>
+    
+</section>
 
         <div class="personal-bests">
           <section class="personal-bests__best personal-bests__best--run">
             <span class="material-icons" style="font-size: 32px; color: #4B888C;">speed</span>
-            <h2>Velocidad máxima</h2>
-            <p>120 bpm</p>
+            <h2>Horario preferido</h2>
+            <p>18:00 Hrs</p>
           </section>
           <section class="personal-bests__best personal-bests__best--lift">
             <span class="material-icons" style="font-size: 32px; color: #4B888C;">library_music</span>
@@ -790,45 +806,138 @@ a {
 </div>
 
 
-
-
 <script>
-  angular.module('app', [])
-.controller('main', ['$http', '$scope', '$sce', function($http, $scope, $sce){
-    var requestData = {
-    action: "getProfileData",
-    token: localStorage.getItem('MStoken')
-  };
-
-  var config = {
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    } 
-  };
-           
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-    .then(function(response) { 
-      $scope.data = response.data
-    $scope.userName = $scope.data.name.split(" ")[0]
+ // Modifica tu controlador AngularJS
+angular.module('app', [])
+.controller('main', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout){
+    // Carga la librería de Google Charts
+    google.charts.load('current', {packages: ['corechart']});
     
-  })
-  
-  $scope.greet = getCurrentGreet()
-  
-  function getCurrentGreet() {
-  const hour = new Date().getHours();
-  
-  if (hour >= 6 && hour < 12) {
-    return "Buenos días";
-  } else if (hour >= 12 && hour < 19) {
-    return "Buenas tardes";
-  } else {
-    return "Buenas noches";
-  }
-};
+    var requestData = {
+        action: "getProfileData",
+        token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
+      //localStorage.getItem('MStoken')
+    };
 
-
-}])
-
-
+    var config = {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        } 
+    };
+           
+    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+        .then(function(response) { 
+            $scope.data = response.data;
+            $scope.userName = $scope.data.name.split(" ")[0];
+            
+            // Datos de práctica semanal (puedes obtenerlos de tu API)
+            $scope.weeklyData = [
+                {day: 'Lunes', scales: 20, pieces: 30, theory: 10},
+                {day: 'Martes', scales: 25, pieces: 40, theory: 15},
+                {day: 'Miércoles', scales: 18, pieces: 25, theory: 12},
+                {day: 'Jueves', scales: 15, pieces: 35, theory: 20},
+                {day: 'Viernes', scales: 10, pieces: 20, theory: 5},
+                {day: 'Sábado', scales: 19, pieces: 45, theory: 15},
+                {day: 'Domingo', scales: 5, pieces: 15, theory: 0}
+            ];
+            
+            // Dibuja el gráfico cuando los datos estén listos
+            drawWeeklyProgressChart();
+        });
+    
+    $scope.greet = getCurrentGreet();
+    
+    function getCurrentGreet() {
+        const hour = new Date().getHours();
+        if (hour >= 6 && hour < 12) return "Buenos días";
+        if (hour >= 12 && hour < 19) return "Buenas tardes";
+        return "Buenas noches";
+    };
+    
+    function drawWeeklyProgressChart() {
+        google.charts.setOnLoadCallback(function() {
+            // Crea la tabla de datos
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Día');
+            data.addColumn('number', 'Escalas (min)');
+            data.addColumn('number', 'Piezas (min)');
+            data.addColumn('number', 'Teoría (min)');
+            
+            // Agrega los datos
+            $scope.weeklyData.forEach(function(day) {
+                data.addRow([day.day, day.scales, day.pieces, day.theory]);
+            });
+            
+            // Opciones del gráfico
+            var options = {
+                title: 'Minutos de práctica por día',
+                titleTextStyle: {
+                    color: '#4B888C',
+                    fontSize: 16,
+                    bold: false
+                },
+                colors: ['#3A6B7E', '#7EB09B', '#F5A623'],
+                backgroundColor: 'transparent',
+                chartArea: {
+                    width: '85%',
+                    height: '70%'
+                },
+                hAxis: {
+                    title: 'Día de la semana',
+                    textStyle: {
+                        color: '#666'
+                    },
+                    titleTextStyle: {
+                        color: '#666',
+                        italic: false
+                    }
+                },
+                vAxis: {
+                    title: 'Minutos',
+                    minValue: 0,
+                    textStyle: {
+                        color: '#666'
+                    },
+                    titleTextStyle: {
+                        color: '#666',
+                        italic: false
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'out'
+                },
+                isStacked: true // Para gráfico apilado
+            };
+            
+            // Dibuja el gráfico
+            var chart = new google.visualization.ColumnChart(
+                document.getElementById('weekly-progress-chart')
+            );
+            
+            chart.draw(data, options);
+            
+            // Redibuja al cambiar tamaño de ventana
+            window.addEventListener('resize', function() {
+                chart.draw(data, options);
+            });
+        });
+    }
+    
+    // Redibujar cuando cambien los datos
+    $scope.$watch('weeklyData', function(newVal) {
+        if(newVal) {
+            $timeout(function() {
+                drawWeeklyProgressChart();
+            }, 100);
+        }
+    }, true);
+}]);
 </script>
