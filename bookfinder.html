@@ -1,4 +1,5 @@
 
+
 <html lang="es" ng-app="partiturasApp">
 <head>
     <meta charset="UTF-8">
@@ -108,7 +109,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-end;
-            min-width: 120px;
+
         }
         
         .partitura-price {
@@ -214,6 +215,12 @@
     background: #e3f2fd;
     border-color: #3498db;
     color: #3498db;
+}
+
+@media(max-width: 600px){
+  .nomobile{
+    display: none !important;
+  }
 }
       
     </style>
@@ -322,11 +329,7 @@
                                     <h3 class="partitura-title">{{partitura.title}}</h3>
                                     <div class="partitura-author">{{partitura.author}}</div>
                                 </div>
-                                <div class="partitura-stats">
-                                    <span class="partitura-stat"><i class="fa fa-eye"></i> {{partitura.views | number}}</span>
-                                    <span class="partitura-stat"><i class="fa fa-download"></i> {{partitura.downloads | number}}</span>
-                                    <span class="partitura-stat"><i class="fa fa-star"></i> {{partitura.rating}}</span>
-                                </div>
+                            
                             </div>
                             <div class="partitura-description">
                                 Partitura para {{partitura.instrument}} - Nivel {{partitura.level}}. {{partitura.type}}.
@@ -334,6 +337,7 @@
                             <div class="partitura-stats">
                                 <span class="partitura-stat"><i class="fa fa-file-text"></i> {{partitura.pages || '12'}} páginas</span>
                                 <span class="partitura-stat"><i class="fa fa-calendar"></i> {{partitura.date | date:'mediumDate'}}</span>
+                                 <span class="partitura-stat"><i class="fa fa-star"></i> {{partitura.rating}}</span>
                             </div>
                         </div>
                         <div class="partitura-actions">
@@ -344,7 +348,7 @@
                                 GRATIS
                             </div>
                             <button class="partitura-button">
-                                <i class="fa fa-download"></i> Descargar
+                                <i class="fa fa-download nomobile"></i> Descargar
                             </button>
                         </div>
                     </div>
@@ -506,7 +510,7 @@
             ];
             
             // Filtros y opciones
-            $scope.instruments = ["Piano", "Violín", "Guitarra", "Flauta", "Saxofón", "Orquesta", "Coro"];
+            $scope.instruments = ["Piano"];
             $scope.difficultyLevels = ["Principiante", "Intermedio", "Avanzado"];
             $scope.documentTypes = ["Partitura completa", "Partitura simplificada", "Tablatura", "Lead sheet"];
             
