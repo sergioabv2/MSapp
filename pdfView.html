@@ -43,16 +43,44 @@
     right: auto;
 }
         
-        .controls-left {
-            position: fixed;
-            left: 10px;
-            top: 50px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+      .controls-left {
+   position: fixed;
+            right: 10px;
+            bottom: 17px;
+             display: flex;
+            flex-direction: row;
+             gap: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
             z-index: 100;
-        }
+}
+
+.control-btn2 {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px; /* Bordes ligeramente redondeados */
+    background-color: #555; /* Color de botón similar al original */
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.control-btn2:hover {
+    background-color: #666;
+}
+
+.control-btn2.active {
+    background-color: #4CAF50; /* Estilo activo igual */
+}
+
         
         .controls-right {
             position: fixed;
@@ -94,7 +122,7 @@
         .page-info {
             position: fixed;
             left: 10px;
-            bottom: 10px;
+            bottom: 17px;
             background-color: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 5px 10px;
@@ -124,14 +152,15 @@
 </head>
 <body>
     <div class="controls-left">
-        <button id="zoom-in" class="control-btn"><i class="ri-add-line"></i></button>
-        <button id="zoom-out" class="control-btn"><i class="ri-subtract-line"></i></button>
+        <button id="zoom-out" class="control-btn2"><i class="ri-subtract-line"></i></button>
+         <button id="zoom-in" class="control-btn2"><i class="ri-add-line"></i></button>
     </div>
     
     <div class="controls-right">
         <button id="draw-btn" class="control-btn"><i class="ri-edit-2-line"></i></button>
+           <button  class="control-btn"><i class="ri-eye-line"></i></button>
         <button id="undo-btn" class="control-btn"><i class="ri-arrow-go-back-line"></i></button>
-        <button id="redo-btn" class="control-btn"><i class="ri-arrow-go-forward-line"></i></button>
+        <button id="redo-btn" class="control-btn" style="display: none"><i class="ri-arrow-go-forward-line"></i></button>
     </div>
     
     <div class="page-info" id="page-num">Página: 1/1</div>
