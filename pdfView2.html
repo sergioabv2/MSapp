@@ -1,0 +1,439 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Visualizador de PDF con Anotaciones</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            touch-action: none;
+        }
+        
+        .toolbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            min-width: 60px;
+        }
+        
+        .toolbar button:hover {
+            background-color: #777;
+        }
+        
+        .toolbar span {
+            min-width: 70px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background-color: #525659;
+            width: 100%;
+        }
+        
+        #pdf-canvas {
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+        }
+        
+        #annotation-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            max-width: 100%;
+        }
+        
+        .drawing-mode {
+            background-color: #4CAF50 !important;
+        }
+
+        .loading {
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                gap: 5px;
+                padding: 5px;
+            }
+            
+            .toolbar button {
+                padding: 6px 8px;
+                font-size: 12px;
+                min-width: 50px;
+            }
+            
+            .toolbar span {
+                min-width: 60px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button id="prev-page">Anterior</button>
+        <button id="next-page">Siguiente</button>
+        <span id="page-num">Página: 1/1</span>
+        <button id="zoom-out">-</button>
+        <span id="zoom-level">100%</span>
+        <button id="zoom-in">+</button>
+        <button id="draw-btn">Lápiz</button>
+        <button id="undo-btn">Deshacer</button>
+        <button id="redo-btn">Rehacer</button>
+    </div>
+    
+    <div class="canvas-container">
+        <div id="loading" class="loading">Cargando PDF...</div>
+        <canvas id="pdf-canvas"></canvas>
+        <canvas id="annotation-canvas"></canvas>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script>
+        // Configuración de PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+        
+        // Variables de estado
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1.0,
+            canvas = document.getElementById('pdf-canvas'),
+            ctx = canvas.getContext('2d'),
+            annotationCanvas = document.getElementById('annotation-canvas'),
+            annotationCtx = annotationCanvas.getContext('2d'),
+            isDrawing = false,
+            isDrawingMode = false,
+            lastX = 0,
+            lastY = 0,
+            drawingHistory = [],
+            historyIndex = -1;
+        
+        // URL de tu PDF en cloud storage
+        const url = 'https://dashboard.mozartacademy.mx/media/sevilla.pdf';
+        
+        // Inicializar el visualizador de PDF
+        function initPdfViewer() {
+            document.getElementById('loading').style.display = 'block';
+            
+            const loadingTask = pdfjsLib.getDocument({
+                url: url,
+                withCredentials: false
+            });
+            
+            loadingTask.promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('page-num').textContent = `Página: 1/${pdfDoc.numPages}`;
+                
+                // Renderizar la primera página
+                renderPage(1);
+                
+                // Ajustar al cambiar tamaño de ventana
+                window.addEventListener('resize', throttle(function() {
+                    if (pdfDoc) {
+                        renderPage(pageNum);
+                    }
+                }, 200));
+                
+            }).catch(function(error) {
+                console.error('Error al cargar el PDF:', error);
+                document.getElementById('loading').textContent = 'Error al cargar el PDF. Verifica la consola para más detalles.';
+            });
+        }
+        
+        // Función para limitar la frecuencia de ejecución
+        function throttle(func, limit) {
+            let lastFunc;
+            let lastRan;
+            return function() {
+                const context = this;
+                const args = arguments;
+                if (!lastRan) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                } else {
+                    clearTimeout(lastFunc);
+                    lastFunc = setTimeout(function() {
+                        if ((Date.now() - lastRan) >= limit) {
+                            func.apply(context, args);
+                            lastRan = Date.now();
+                        }
+                    }, limit - (Date.now() - lastRan));
+                }
+            }
+        }
+        
+        // Renderizar una página específica
+        function renderPage(num) {
+            pageRendering = true;
+            
+            // Calcular el tamaño disponible
+            const container = document.querySelector('.canvas-container');
+            const containerWidth = container.clientWidth - 40; // 20px de margen a cada lado
+            
+            pdfDoc.getPage(num).then(function(page) {
+                const viewport = page.getViewport({ scale: 1.0 });
+                const newScale = containerWidth / viewport.width;
+                const scaledViewport = page.getViewport({ scale: newScale * scale });
+                
+                canvas.height = scaledViewport.height;
+                canvas.width = scaledViewport.width;
+                annotationCanvas.height = scaledViewport.height;
+                annotationCanvas.width = scaledViewport.width;
+                
+                // Ajustar posición del canvas de anotaciones
+                const pdfCanvasRect = canvas.getBoundingClientRect();
+                annotationCanvas.style.top = pdfCanvasRect.top + 'px';
+                annotationCanvas.style.left = pdfCanvasRect.left + 'px';
+                
+                // Renderizar la página PDF
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: scaledViewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            }).catch(function(error) {
+                console.error('Error al renderizar página:', error);
+            });
+            
+            document.getElementById('page-num').textContent = `Página: ${num}/${pdfDoc.numPages}`;
+        }
+        
+        // Manejar cola de renderizado
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        // Ir a página anterior
+        function onPrevPage() {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+            clearAnnotations();
+        }
+        
+        // Ir a página siguiente
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+            clearAnnotations();
+        }
+        
+        // Aumentar zoom
+        function zoomIn() {
+            if (scale >= 3.0) return;
+            scale += 0.1;
+            document.getElementById('zoom-level').textContent = `${Math.round(scale * 100)}%`;
+            queueRenderPage(pageNum);
+        }
+        
+        // Disminuir zoom
+        function zoomOut() {
+            if (scale <= 0.5) return;
+            scale -= 0.1;
+            document.getElementById('zoom-level').textContent = `${Math.round(scale * 100)}%`;
+            queueRenderPage(pageNum);
+        }
+        
+        // Alternar modo dibujo
+        function toggleDrawing() {
+            isDrawingMode = !isDrawingMode;
+            const drawBtn = document.getElementById('draw-btn');
+            
+            if (isDrawingMode) {
+                drawBtn.classList.add('drawing-mode');
+                annotationCanvas.style.pointerEvents = 'auto';
+            } else {
+                drawBtn.classList.remove('drawing-mode');
+                annotationCanvas.style.pointerEvents = 'none';
+                isDrawing = false; // Asegurarse de que no queda en estado de dibujo
+            }
+        }
+        
+        // Limpiar anotaciones
+        function clearAnnotations() {
+            annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+            drawingHistory = [];
+            historyIndex = -1;
+        }
+        
+        // Guardar estado actual del canvas
+        function saveCanvasState() {
+            const imageData = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
+            
+            if (historyIndex < drawingHistory.length - 1) {
+                drawingHistory = drawingHistory.slice(0, historyIndex + 1);
+            }
+            
+            drawingHistory.push(imageData);
+            historyIndex++;
+        }
+        
+        // Deshacer
+        function undo() {
+            if (historyIndex <= 0) {
+                clearAnnotations();
+                return;
+            }
+            
+            historyIndex--;
+            annotationCtx.putImageData(drawingHistory[historyIndex], 0, 0);
+        }
+        
+        // Rehacer
+        function redo() {
+            if (historyIndex >= drawingHistory.length - 1) return;
+            
+            historyIndex++;
+            annotationCtx.putImageData(drawingHistory[historyIndex], 0, 0);
+        }
+        
+        // Obtener posición relativa al canvas
+        function getCanvasPosition(canvas, event) {
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            
+            if (event.type.includes('touch')) {
+                x = event.touches[0].clientX - rect.left;
+                y = event.touches[0].clientY - rect.top;
+            } else {
+                x = event.clientX - rect.left;
+                y = event.clientY - rect.top;
+            }
+            
+            // Ajustar para el tamaño del canvas
+            x = x * (canvas.width / rect.width);
+            y = y * (canvas.height / rect.height);
+            
+            return { x, y };
+        }
+        
+        // Event listeners para botones
+        document.getElementById('prev-page').addEventListener('click', onPrevPage);
+        document.getElementById('next-page').addEventListener('click', onNextPage);
+        document.getElementById('zoom-in').addEventListener('click', zoomIn);
+        document.getElementById('zoom-out').addEventListener('click', zoomOut);
+        document.getElementById('draw-btn').addEventListener('click', toggleDrawing);
+        document.getElementById('undo-btn').addEventListener('click', undo);
+        document.getElementById('redo-btn').addEventListener('click', redo);
+        
+        // Eventos de dibujo (ratón)
+        annotationCanvas.addEventListener('mousedown', startDrawing);
+        annotationCanvas.addEventListener('mousemove', draw);
+        annotationCanvas.addEventListener('mouseup', stopDrawing);
+        annotationCanvas.addEventListener('mouseout', stopDrawing);
+        
+        // Eventos de dibujo (táctil)
+        annotationCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        annotationCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        annotationCanvas.addEventListener('touchend', stopDrawing);
+        
+        function handleTouchStart(e) {
+            if (e.cancelable) e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            startDrawing(mouseEvent);
+        }
+        
+        function handleTouchMove(e) {
+            if (e.cancelable) e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            draw(mouseEvent);
+        }
+        
+        function startDrawing(e) {
+            if (!isDrawingMode) return;
+            
+            isDrawing = true;
+            const pos = getCanvasPosition(annotationCanvas, e);
+            [lastX, lastY] = [pos.x, pos.y];
+            
+            // Comenzar nuevo trazo
+            annotationCtx.beginPath();
+            annotationCtx.moveTo(lastX, lastY);
+            annotationCtx.lineWidth = 2;
+            annotationCtx.strokeStyle = 'red';
+            annotationCtx.lineCap = 'round';
+            annotationCtx.lineJoin = 'round';
+            
+            // Guardar estado antes de empezar a dibujar
+            saveCanvasState();
+        }
+        
+        function draw(e) {
+            if (!isDrawing || !isDrawingMode) return;
+            
+            const pos = getCanvasPosition(annotationCanvas, e);
+            
+            annotationCtx.lineTo(pos.x, pos.y);
+            annotationCtx.stroke();
+            
+            [lastX, lastY] = [pos.x, pos.y];
+        }
+        
+        function stopDrawing() {
+            if (isDrawing && isDrawingMode) {
+                annotationCtx.closePath();
+            }
+            isDrawing = false;
+        }
+        
+        // Inicializar
+        initPdfViewer();
+    </script>
+</body>
+</html>
