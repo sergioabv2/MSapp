@@ -1,80 +1,108 @@
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     <title>Visualizador de PDF con Anotaciones</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
             height: 100vh;
             touch-action: none;
-        }
-        
-        .toolbar {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .toolbar button {
-            background-color: #555;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-            min-width: 60px;
-        }
-        
-        .toolbar button:hover {
-            background-color: #777;
-        }
-        
-        .toolbar span {
-            min-width: 70px;
-            text-align: center;
-            font-size: 14px;
+            overflow: hidden;
         }
         
         .canvas-container {
-            flex: 1;
-            overflow: auto;
             position: relative;
+            height: 100%;
+            overflow: auto;
             background-color: #525659;
             width: 100%;
         }
         
         #pdf-canvas {
             display: block;
-            margin: 20px auto;
+            margin: 0 auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             max-width: 100%;
         }
         
-        #annotation-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            max-width: 100%;
+       .pdf-page {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    margin: 0 auto; /* Centrado adicional */
+    padding: 20px 0; /* Espaciado vertical */
+}
+
+#annotation-canvas {
+    margin: 0 auto; /* Centrado horizontal */
+    position: relative; /* Cambiado de absolute a relative */
+    left: auto;
+    right: auto;
+}
+        
+        .controls-left {
+            position: fixed;
+            left: 10px;
+            top: 50px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
         }
         
-        .drawing-mode {
-            background-color: #4CAF50 !important;
+        .controls-right {
+            position: fixed;
+            right: 10px;
+            top: 80px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
         }
-
+        
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+        
+        .control-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .page-info {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
         .loading {
             color: white;
             text-align: center;
@@ -82,40 +110,35 @@
         }
 
         @media (max-width: 600px) {
-            .toolbar {
-                gap: 5px;
-                padding: 5px;
+            .control-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
             }
             
-            .toolbar button {
-                padding: 6px 8px;
-                font-size: 12px;
-                min-width: 50px;
-            }
-            
-            .toolbar span {
-                min-width: 60px;
+            .page-info {
                 font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="toolbar">
-        <button id="prev-page">Anterior</button>
-        <button id="next-page">Siguiente</button>
-        <span id="page-num">Página: 1/1</span>
-        <button id="zoom-out">-</button>
-        <span id="zoom-level">100%</span>
-        <button id="zoom-in">+</button>
-        <button id="draw-btn">Lápiz</button>
-        <button id="undo-btn">Deshacer</button>
-        <button id="redo-btn">Rehacer</button>
+    <div class="controls-left">
+        <button id="zoom-in" class="control-btn"><i class="ri-add-line"></i></button>
+        <button id="zoom-out" class="control-btn"><i class="ri-subtract-line"></i></button>
     </div>
+    
+    <div class="controls-right">
+        <button id="draw-btn" class="control-btn"><i class="ri-edit-2-line"></i></button>
+        <button id="undo-btn" class="control-btn"><i class="ri-arrow-go-back-line"></i></button>
+        <button id="redo-btn" class="control-btn"><i class="ri-arrow-go-forward-line"></i></button>
+    </div>
+    
+    <div class="page-info" id="page-num">Página: 1/1</div>
     
     <div class="canvas-container">
         <div id="loading" class="loading">Cargando PDF...</div>
-        <canvas id="pdf-canvas"></canvas>
+        <div id="pdf-container"></div>
         <canvas id="annotation-canvas"></canvas>
     </div>
 
@@ -126,12 +149,9 @@
         
         // Variables de estado
         let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
+            currentPage = 1,
             scale = 1.0,
-            canvas = document.getElementById('pdf-canvas'),
-            ctx = canvas.getContext('2d'),
+            pdfContainer = document.getElementById('pdf-container'),
             annotationCanvas = document.getElementById('annotation-canvas'),
             annotationCtx = annotationCanvas.getContext('2d'),
             isDrawing = false,
@@ -139,7 +159,8 @@
             lastX = 0,
             lastY = 0,
             drawingHistory = [],
-            historyIndex = -1;
+            historyIndex = -1,
+            pdfPages = [];
         
         // URL de tu PDF en cloud storage
         const url = 'https://dashboard.mozartacademy.mx/media/sevilla.pdf';
@@ -158,13 +179,13 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('page-num').textContent = `Página: 1/${pdfDoc.numPages}`;
                 
-                // Renderizar la primera página
-                renderPage(1);
+                // Renderizar todas las páginas
+                renderAllPages();
                 
                 // Ajustar al cambiar tamaño de ventana
                 window.addEventListener('resize', throttle(function() {
                     if (pdfDoc) {
-                        renderPage(pageNum);
+                        renderAllPages();
                     }
                 }, 200));
                 
@@ -196,90 +217,137 @@
             }
         }
         
-        // Renderizar una página específica
-        function renderPage(num) {
-            pageRendering = true;
+        // Renderizar todas las páginas en un flujo continuo
+        function renderAllPages() {
+            pdfContainer.innerHTML = '';
+            pdfPages = [];
             
             // Calcular el tamaño disponible
-            const container = document.querySelector('.canvas-container');
-            const containerWidth = container.clientWidth - 40; // 20px de margen a cada lado
+            const containerWidth = document.querySelector('.canvas-container').clientWidth - 40;
             
-            pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({ scale: 1.0 });
-                const newScale = containerWidth / viewport.width;
-                const scaledViewport = page.getViewport({ scale: newScale * scale });
+            // Crear un contenedor para todas las páginas
+            const allPagesContainer = document.createElement('div');
+            allPagesContainer.style.width = '100%';
+            
+            // Función recursiva para renderizar páginas una por una
+            function renderPage(pageNumber) {
+                if (pageNumber > pdfDoc.numPages) {
+                    pdfContainer.appendChild(allPagesContainer);
+                    updateAnnotationCanvasSize();
+                    return;
+                }
                 
-                canvas.height = scaledViewport.height;
-                canvas.width = scaledViewport.width;
-                annotationCanvas.height = scaledViewport.height;
-                annotationCanvas.width = scaledViewport.width;
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'pdf-page';
+                pageContainer.style.margin = '20px auto';
+                pageContainer.style.position = 'relative';
                 
-                // Ajustar posición del canvas de anotaciones
-                const pdfCanvasRect = canvas.getBoundingClientRect();
-                annotationCanvas.style.top = pdfCanvasRect.top + 'px';
-                annotationCanvas.style.left = pdfCanvasRect.left + 'px';
+                const canvas = document.createElement('canvas');
+                canvas.className = 'pdf-page-canvas';
                 
-                // Renderizar la página PDF
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: scaledViewport
-                };
+                pageContainer.appendChild(canvas);
+                allPagesContainer.appendChild(pageContainer);
                 
-                const renderTask = page.render(renderContext);
-                
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
+                pdfDoc.getPage(pageNumber).then(function(page) {
+                    const viewport = page.getViewport({ scale: 1.0 });
+                    const newScale = containerWidth / viewport.width;
+                    const scaledViewport = page.getViewport({ scale: newScale * scale });
+                    
+                    canvas.height = scaledViewport.height;
+                    canvas.width = scaledViewport.width;
+                    
+                    // Guardar información de la página
+                    pdfPages[pageNumber - 1] = {
+                        element: pageContainer,
+                        canvas: canvas,
+                        viewport: scaledViewport
+                    };
+                    
+                    // Renderizar la página PDF
+                    const renderContext = {
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: scaledViewport
+                    };
+                    
+                    page.render(renderContext).promise.then(function() {
+                        renderPage(pageNumber + 1);
+                    });
                 });
-            }).catch(function(error) {
-                console.error('Error al renderizar página:', error);
-            });
+            }
             
-            document.getElementById('page-num').textContent = `Página: ${num}/${pdfDoc.numPages}`;
+            renderPage(1);
         }
         
-        // Manejar cola de renderizado
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
+        // Actualizar el tamaño del canvas de anotaciones
+        function updateAnnotationCanvasSize() {
+            if (pdfPages.length === 0) return;
+            
+            // Calcular el tamaño total de todas las páginas
+            let totalHeight = 0;
+            let maxWidth = 0;
+            
+            pdfPages.forEach(page => {
+                totalHeight += page.canvas.height + 40; // 20px de margen arriba y abajo
+                maxWidth = Math.max(maxWidth, page.canvas.width);
+            });
+            
+            annotationCanvas.width = maxWidth;
+            annotationCanvas.height = totalHeight;
+            
+            // Posicionar el canvas de anotaciones
+            const firstPage = pdfPages[0];
+            if (firstPage) {
+                const firstPageRect = firstPage.element.getBoundingClientRect();
+                const containerRect = document.querySelector('.canvas-container').getBoundingClientRect();
+
+                /*annotationCanvas.style.top = (firstPageRect.top - containerRect.top) + 'px';
+                annotationCanvas.style.left = (firstPageRect.left - containerRect.left) + 'px';*/
+                
+                annotationCanvas.style.top = '0';
+                annotationCanvas.style.left = '50%';
+                annotationCanvas.style.transform = 'translateX(-50%)';
+                annotationCanvas.style.position = 'absolute';
             }
         }
         
-        // Ir a página anterior
-        function onPrevPage() {
-            if (pageNum <= 1) return;
-            pageNum--;
-            queueRenderPage(pageNum);
-            clearAnnotations();
-        }
-        
-        // Ir a página siguiente
-        function onNextPage() {
-            if (pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            queueRenderPage(pageNum);
-            clearAnnotations();
+        // Actualizar la información de página visible
+        function updateVisiblePage() {
+            if (pdfPages.length === 0) return;
+            
+            const container = document.querySelector('.canvas-container');
+            const containerRect = container.getBoundingClientRect();
+            const containerCenter = containerRect.top + (containerRect.height / 2);
+            
+            let visiblePage = 1;
+            
+            for (let i = 0; i < pdfPages.length; i++) {
+                const page = pdfPages[i];
+                const pageRect = page.element.getBoundingClientRect();
+                
+                if (pageRect.top <= containerCenter && pageRect.bottom >= containerCenter) {
+                    visiblePage = i + 1;
+                    break;
+                }
+            }
+            
+            if (currentPage !== visiblePage) {
+                currentPage = visiblePage;
+                document.getElementById('page-num').textContent = `Página: ${currentPage}/${pdfDoc.numPages}`;
+            }
         }
         
         // Aumentar zoom
         function zoomIn() {
             if (scale >= 3.0) return;
             scale += 0.1;
-            document.getElementById('zoom-level').textContent = `${Math.round(scale * 100)}%`;
-            queueRenderPage(pageNum);
+            renderAllPages();
         }
         
         // Disminuir zoom
         function zoomOut() {
             if (scale <= 0.5) return;
             scale -= 0.1;
-            document.getElementById('zoom-level').textContent = `${Math.round(scale * 100)}%`;
-            queueRenderPage(pageNum);
+            renderAllPages();
         }
         
         // Alternar modo dibujo
@@ -288,12 +356,12 @@
             const drawBtn = document.getElementById('draw-btn');
             
             if (isDrawingMode) {
-                drawBtn.classList.add('drawing-mode');
+                drawBtn.classList.add('active');
                 annotationCanvas.style.pointerEvents = 'auto';
             } else {
-                drawBtn.classList.remove('drawing-mode');
+                drawBtn.classList.remove('active');
                 annotationCanvas.style.pointerEvents = 'none';
-                isDrawing = false; // Asegurarse de que no queda en estado de dibujo
+                isDrawing = false;
             }
         }
         
@@ -356,8 +424,6 @@
         }
         
         // Event listeners para botones
-        document.getElementById('prev-page').addEventListener('click', onPrevPage);
-        document.getElementById('next-page').addEventListener('click', onNextPage);
         document.getElementById('zoom-in').addEventListener('click', zoomIn);
         document.getElementById('zoom-out').addEventListener('click', zoomOut);
         document.getElementById('draw-btn').addEventListener('click', toggleDrawing);
@@ -374,6 +440,9 @@
         annotationCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
         annotationCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
         annotationCanvas.addEventListener('touchend', stopDrawing);
+        
+        // Evento para detectar página visible
+        document.querySelector('.canvas-container').addEventListener('scroll', throttle(updateVisiblePage, 100));
         
         function handleTouchStart(e) {
             if (e.cancelable) e.preventDefault();
