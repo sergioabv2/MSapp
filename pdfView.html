@@ -749,38 +749,7 @@
 }
 
         
-        // Manejar gestos táctiles para zoom
-        function handleTouchGestures(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                
-                const touch1 = e.touches[0];
-                const touch2 = e.touches[1];
-                
-                const currentDistance = Math.hypot(
-                    touch2.clientX - touch1.clientX,
-                    touch2.clientY - touch1.clientY
-                );
-                
-                if (e.type === 'touchstart') {
-                    touchStartDistance = currentDistance;
-                    initialScale = scale;
-                } else if (e.type === 'touchmove') {
-                    if (touchStartDistance === 0) return;
-                    
-                    const scaleFactor = currentDistance / touchStartDistance;
-                    const newScale = initialScale * scaleFactor;
-                    
-                    // Limitar el zoom
-                    if (newScale >= 0.5 && newScale <= 3.0) {
-                        scale = newScale;
-                        renderAllPages();
-                    }
-                }
-            } else {
-                touchStartDistance = 0;
-            }
-        }
+      
         
         // Configurar elemento de texto
         function setupTextElement(textElement, x, y) {
@@ -927,6 +896,7 @@
     annotationWrapper.appendChild(label);
     annotationWrapper.appendChild(description);
     textAnnotationsContainer.appendChild(annotationWrapper);
+
 
     // Store reference to the added annotation
     textAnnotations.push({
@@ -1209,12 +1179,7 @@ function saveTextAnnotations() {
         annotationCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
         annotationCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
         
-        // Eventos para gestos de zoom
-        document.querySelector('.canvas-container').addEventListener('touchstart', handleTouchGestures, { passive: false });
-        document.querySelector('.canvas-container').addEventListener('touchmove', handleTouchGestures, { passive: false });
-        document.querySelector('.canvas-container').addEventListener('touchend', function() {
-            touchStartDistance = 0;
-        }, { passive: true });
+     
         
         // Evento para detectar página visible
         document.querySelector('.canvas-container').addEventListener('scroll', throttle(updateVisiblePage, 100));
