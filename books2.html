@@ -967,7 +967,7 @@ background-color: rgba(0, 0, 0, 0.5);
   
   .saved-recordings-modal .modal-content {
     background: white;
-    padding: 20px;
+    padding: 25px;
     border-radius: 10px;
     width: 80%;
     max-width: 500px;
@@ -979,15 +979,37 @@ background-color: rgba(0, 0, 0, 0.5);
     margin-top: 15px;
   }
   
-  .recording-item {
-    padding: 10px;
+   .recording-item {
+    padding: 12px 0;
     border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
   }
-  
+
   .recording-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+  }
+
+  .recording-details {
+    flex-grow: 1;
+  }
+
+  .recording-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .recording-date {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .recording-actions {
+    display: flex;
+    gap: 8px;
   }
   
   .no-recordings {
@@ -1276,13 +1298,18 @@ src="">
           <div class="recordings-list">
             <div class="recording-item" ng-repeat="recording in recordings">
               <div class="recording-info">
-                <span>{{recording.date | date:'medium'}}</span>
-                <button class="play-btn" ng-click="playSavedRecording(recording)">
-                  <i class="ri-play-line"></i>
-                </button>
-                <button class="delete-btn" ng-click="deleteRecording(recording.id)">
-                  <i class="ri-delete-bin-line"></i>
-                </button>
+              <div class="recording-details">
+            <div class="recording-name">{{recording.name}}</div>
+            <div class="recording-date">{{recording.date | date:'medium'}}</div>
+          </div>
+          <div class="recording-actions">
+            <button class="play-btn" ng-click="playSavedRecording(recording)">
+              <i class="ri-play-line"></i>
+            </button>
+            <button class="delete-btn" ng-click="deleteRecording(recording.id)">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
               </div>
             </div>
             <div class="no-recordings" ng-show="recordings.length === 0">
@@ -1873,6 +1900,7 @@ function startRecording() {
             recorder.onstop = () => {
                 $scope.isRecording = false;
                 $scope.isProcessing = true;
+
                 $scope.$apply();
                 
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -1881,6 +1909,7 @@ function startRecording() {
                     const newRecording = {
                         id: Date.now(),
                         data: noteSequence,
+                      name: $scope.currentManual.title,
                         date: new Date(),
                         midiBlob: null
                     };
@@ -1890,7 +1919,7 @@ function startRecording() {
                     newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
                     
                     $scope.recordings.unshift(newRecording);
-                 $scope.showRecordingModal = true;
+                                  $scope.showRecordingModal = true;
                     showRecording(newRecording);
                 }).catch(err => {
                     console.error('Error en la transcripción:', err);
