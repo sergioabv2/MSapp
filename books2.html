@@ -1873,7 +1873,6 @@ function startRecording() {
             recorder.onstop = () => {
                 $scope.isRecording = false;
                 $scope.isProcessing = true;
-                $scope.showRecordingModal = true;
                 $scope.$apply();
                 
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -1891,6 +1890,7 @@ function startRecording() {
                     newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
                     
                     $scope.recordings.unshift(newRecording);
+                 $scope.showRecordingModal = true;
                     showRecording(newRecording);
                 }).catch(err => {
                     console.error('Error en la transcripción:', err);
