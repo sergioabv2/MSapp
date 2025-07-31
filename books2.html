@@ -1651,7 +1651,7 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+   token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1813,10 +1813,6 @@ function clearBPMTimers() {
   clearInterval($scope.bpmInterval);
 } 
 
-$scope.playRecording = function() {
-  // Lógica para reproducir grabación
-  console.log('Reproduciendo grabación');
-};
 
 // En tu controlador AngularJS
 $scope.getProgressPercentage = function() {
@@ -1886,9 +1882,20 @@ let audioChunks = [];
 
 function startRecording() {
     $scope.isRecording = true;
-    navigator.mediaDevices.getUserMedia({ audio: true })
+    const audioConstraints = {
+        audio: {
+            sampleRate: 16000,  // 16kHz para reducir tamaño
+            channelCount: 1,    // Mono
+            echoCancellation: true
+        }
+    };
+
+    navigator.mediaDevices.getUserMedia(audioConstraints)
         .then(stream => {
-            recorder = new MediaRecorder(stream);
+            recorder = new MediaRecorder(stream, {
+                mimeType: 'audio/webm;codecs=opus',
+                audioBitsPerSecond: 64000 // 64kbps bitrate
+            });
             audioChunks = [];
 
             recorder.ondataavailable = (event) => {
@@ -1899,7 +1906,6 @@ function startRecording() {
 
             recorder.onstop = () => {
                 $scope.isRecording = false;
-                $scope.isProcessing = true;
 
                 $scope.$apply();
                 
@@ -1942,6 +1948,7 @@ function startRecording() {
 function stopRecording() {
     if (recorder && recorder.state === "recording") {
         recorder.stop();
+        $scope.isProcessing = true;
         // Detener todas las pistas del stream
         recorder.stream.getTracks().forEach(track => track.stop());
     }
