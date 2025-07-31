@@ -1651,8 +1651,7 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-      //localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1884,109 +1883,65 @@ $scope.deleteRecording = function(id) {
 };
 
 let audioChunks = [];
-let chunkSize = 5000; // 5 segundos por chunk (ajustable)
 
 function startRecording() {
     $scope.isRecording = true;
-    $scope.progress = 0;
-    
-    // Configuración optimizada para móviles
-    const audioConstraints = {
-        audio: {
-            sampleRate: 16000,  // 16kHz para reducir tamaño
-            channelCount: 1,    // Mono
-            echoCancellation: true
-        }
-    };
-
-    navigator.mediaDevices.getUserMedia(audioConstraints)
+    navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            recorder = new MediaRecorder(stream, {
-                mimeType: 'audio/webm;codecs=opus',
-                audioBitsPerSecond: 64000 // 64kbps bitrate
-            });
-
+            recorder = new MediaRecorder(stream);
             audioChunks = [];
-            let chunkIndex = 0;
-            
-            // Procesamiento en tiempo real por chunks
-            recorder.ondataavailable = async (event) => {
+
+            recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     audioChunks.push(event.data);
-                    
-                    // Procesar chunk cada [chunkSize] milisegundos
-                    if (recorder.state === 'recording' && event.timecode >= chunkIndex * chunkSize) {
-                        chunkIndex++;
-                        await processCurrentChunk();
-                    }
                 }
             };
 
-            recorder.onstop = async () => {
+            recorder.onstop = () => {
                 $scope.isRecording = false;
+                $scope.isProcessing = true;
+
+                $scope.$apply();
                 
-                // Procesar último chunk si queda algo pendiente
-                if (audioChunks.length > 0) {
-                    await processCurrentChunk(true);
-                }
-                
-                stream.getTracks().forEach(track => track.stop());
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
+                    const newRecording = {
+                        id: Date.now(),
+                        data: noteSequence,
+                      name: $scope.currentManual.title,
+                        date: new Date(),
+                        midiBlob: null
+                    };
+                    
+                    // Convertir a MIDI y guardar
+                    const midiData = mm.sequenceProtoToMidi(noteSequence);
+                    newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
+                    
+                    $scope.recordings.unshift(newRecording);
+                                  $scope.showRecordingModal = true;
+                    showRecording(newRecording);
+                }).catch(err => {
+                    console.error('Error en la transcripción:', err);
+                    alert('Error al procesar la grabación');
+                }).finally(() => {
+                    $scope.isProcessing = false;
+                    $scope.$apply();
+                });
             };
 
-            recorder.start(chunkSize); // Inicia chunking automático
+            recorder.start();
         })
-        .catch(handleError);
-}
-
-// Función optimizada para procesamiento por chunks
-async function processCurrentChunk(isFinal = false) {
-   
-    try {
-        const chunkBlob = new Blob([...audioChunks], { type: 'audio/webm' });
-        audioChunks = []; // Limpiar buffer después de procesar
-        
-        const noteSequence = await model.transcribeFromAudioFile(chunkBlob);
-        const midiData = mm.sequenceProtoToMidi(noteSequence);
-        
-        const newChunk = {
-            id: Date.now() + (isFinal ? 0 : Math.random()),
-            name: $scope.currentManual.title,
-            date: new Date(),
-            data: noteSequence,
-            midiBlob: new Blob([midiData], { type: 'audio/midi' }),
-            isPartial: !isFinal
-        };
-        
-        // Actualizar UI progresivamente
-        $scope.$apply(() => {
-            if (isFinal) {
-                $scope.recordings.unshift(newChunk);
-                $scope.showRecordingModal = true;
-                showRecording(newChunk);
-            } else {
-                $scope.progress = Math.min(90, (chunkIndex * chunkSize) / maxDuration * 100);
-            }
+        .catch(err => {
+            console.error('Error al acceder al micrófono:', err);
+            $scope.isRecording = false;
+            $scope.$apply();
         });
-        
-    } catch (err) {
-        console.error('Error procesando chunk:', err);
-    } finally {
-        $scope.isProcessing = false;
-    }
-}
-
-function handleError(err) {
-    console.error('Error:', err);
-    $scope.$apply(() => {
-        $scope.isRecording = false;
-        $scope.isProcessing = false;
-    });
 }
 
 function stopRecording() {
     if (recorder && recorder.state === "recording") {
         recorder.stop();
-         $scope.isProcessing = true;
         // Detener todas las pistas del stream
         recorder.stream.getTracks().forEach(track => track.stop());
     }
