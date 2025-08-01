@@ -1651,7 +1651,7 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-   token: localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1813,6 +1813,10 @@ function clearBPMTimers() {
   clearInterval($scope.bpmInterval);
 } 
 
+$scope.playRecording = function() {
+  // Lógica para reproducir grabación
+  console.log('Reproduciendo grabación');
+};
 
 // En tu controlador AngularJS
 $scope.getProgressPercentage = function() {
@@ -1842,6 +1846,7 @@ $scope.showRecordingModal = false;
 $scope.showSavedRecordingsModal = false;
 $scope.recordings = [];
 let recorder;
+let model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
 
 // Inicializar el modelo
 model.initialize().then(() => {
@@ -1881,20 +1886,9 @@ let audioChunks = [];
 
 function startRecording() {
     $scope.isRecording = true;
-    const audioConstraints = {
-        audio: {
-            sampleRate: 16000,  // 16kHz para reducir tamaño
-            channelCount: 1,    // Mono
-            echoCancellation: true
-        }
-    };
-
-    navigator.mediaDevices.getUserMedia(audioConstraints)
+    navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            recorder = new MediaRecorder(stream, {
-                mimeType: 'audio/webm;codecs=opus',
-                audioBitsPerSecond: 64000 // 64kbps bitrate
-            });
+            recorder = new MediaRecorder(stream);
             audioChunks = [];
 
             recorder.ondataavailable = (event) => {
@@ -1904,7 +1898,7 @@ function startRecording() {
             };
 
             recorder.onstop = () => {
-    $scope.isRecording = false;
+                $scope.isRecording = false;
     $scope.isProcessing = true;
     $scope.$apply();
 
@@ -1950,7 +1944,7 @@ function startRecording() {
         $scope.isProcessing = false;
         $scope.$apply();
     });
-};
+            };
 
             recorder.start();
         })
@@ -1964,7 +1958,6 @@ function startRecording() {
 function stopRecording() {
     if (recorder && recorder.state === "recording") {
         recorder.stop();
-        $scope.isProcessing = true;
         // Detener todas las pistas del stream
         recorder.stream.getTracks().forEach(track => track.stop());
     }
