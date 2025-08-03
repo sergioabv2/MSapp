@@ -1899,51 +1899,35 @@ function startRecording() {
 
             recorder.onstop = () => {
                 $scope.isRecording = false;
-    $scope.isProcessing = true;
-    $scope.$apply();
+                $scope.isProcessing = true;
 
-    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                $scope.$apply();
+                
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
 
-    // Preparar los datos para el envío
-    const formData = new FormData();
-    formData.append('audio_file', audioBlob, 'grabacion.webm');
-
-    // Enviar el audio a tu servicio de Cloud Run
-    fetch('https://midiconvert-145083375828.us-central1.run.app/transcribe', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('La transcripción falló en el servidor.');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const noteSequence = data.secuencia_midi;
-        const newRecording = {
-            id: Date.now(),
-            data: noteSequence,
-            name: $scope.currentManual.title,
-            date: new Date(),
-            midiBlob: null
-        };
-        
-        const midiData = mm.sequenceProtoToMidi(noteSequence);
-        newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
-        
-        $scope.recordings.unshift(newRecording);
-        $scope.showRecordingModal = true;
-        showRecording(newRecording);
-    })
-    .catch(err => {
-        console.error('Error en la transcripción:', err);
-        alert('Error al procesar la grabación: ' + err.message);
-    })
-    .finally(() => {
-        $scope.isProcessing = false;
-        $scope.$apply();
-    });
+                model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
+                    const newRecording = {
+                        id: Date.now(),
+                        data: noteSequence,
+                      name: $scope.currentManual.title,
+                        date: new Date(),
+                        midiBlob: null
+                    };
+                    
+                    // Convertir a MIDI y guardar
+                    const midiData = mm.sequenceProtoToMidi(noteSequence);
+                    newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
+                    
+                    $scope.recordings.unshift(newRecording);
+                                  $scope.showRecordingModal = true;
+                    showRecording(newRecording);
+                }).catch(err => {
+                    console.error('Error en la transcripción:', err);
+                    alert('Error al procesar la grabación');
+                }).finally(() => {
+                    $scope.isProcessing = false;
+                    $scope.$apply();
+                });
             };
 
             recorder.start();
