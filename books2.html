@@ -1982,6 +1982,9 @@ function processLocally(audioBlob) {
 
 // Procesamiento en servidor (Android)
 function processOnServer(audioBlob) {
+    $scope.isProcessing = true;
+    $scope.$apply();
+    
     convertWebmToWav(audioBlob)
         .then(wavBlob => {
             const formData = new FormData();
@@ -1992,18 +1995,18 @@ function processOnServer(audioBlob) {
                 body: formData
             });
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Error en el servidor');
-            return response.text(); // Recibimos el MIDI como base64
-        })
-        .then(base64MIDI => {
-            // Convertir base64 a Blob MIDI
-            const binaryString = atob(base64MIDI);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
+        .then(async response => {
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
             }
-            const midiBlob = new Blob([bytes], { type: 'audio/midi' });
+            
+            // Recibir directamente el blob MIDI
+            const midiBlob = await response.blob();
+            
+            // Verificar que sea un archivo MIDI válido
+            if (!midiBlob.type.includes('midi') && !midiBlob.type.includes('octet-stream')) {
+                throw new Error('El servidor no devolvió un archivo MIDI válido');
+            }
             
             const newRecording = {
                 id: Date.now(),
