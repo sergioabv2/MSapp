@@ -1840,6 +1840,32 @@ $scope.getProgressPercentage2 = function() {
 
 
 
+
+$scope.useServerProcessing = false;
+$scope.devicePerformance = 'unknown';
+
+// Add this function to detect device capabilities
+function detectDevicePerformance() {
+    // Simple performance detection - you might want to enhance this
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const ram = navigator.deviceMemory || 4; // Default to 4GB if unknown
+    
+    if (!isMobile) {
+        $scope.devicePerformance = 'high';
+        $scope.useServerProcessing = false;
+    } else if (ram >= 5) {
+        $scope.devicePerformance = 'high';
+        $scope.useServerProcessing = false;
+    } else {
+        $scope.devicePerformance = 'low';
+        $scope.useServerProcessing = true;
+    }
+}
+detectDevicePerformance();
+
+
+
+
 $scope.isRecording = false;
 $scope.isProcessing = false;
 $scope.showRecordingModal = false;
@@ -1898,37 +1924,88 @@ function startRecording() {
             };
 
             recorder.onstop = () => {
-                $scope.isRecording = false;
-                $scope.isProcessing = true;
-
-                $scope.$apply();
-                
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-
-                model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
-                    const newRecording = {
-                        id: Date.now(),
-                        data: noteSequence,
-                      name: $scope.currentManual.title,
-                        date: new Date(),
-                        midiBlob: null
-                    };
-                    
-                    // Convertir a MIDI y guardar
-                    const midiData = mm.sequenceProtoToMidi(noteSequence);
-                    newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
-                    
-                    $scope.recordings.unshift(newRecording);
-                                  $scope.showRecordingModal = true;
-                    showRecording(newRecording);
-                }).catch(err => {
-                    console.error('Error en la transcripción:', err);
-                    alert('Error al procesar la grabación');
-                }).finally(() => {
-                    $scope.isProcessing = false;
-                    $scope.$apply();
-                });
-            };
+    $scope.isRecording = false;
+    $scope.isProcessing = true;
+    $scope.$apply();
+    
+    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+    
+    const processLocally = () => {
+        model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
+            createRecording(noteSequence);
+        }).catch(err => {
+            console.error('Local processing failed, falling back to server:', err);
+            if ($scope.devicePerformance !== 'low') {
+                processOnServer(audioBlob);
+            } else {
+                handleProcessingError(err);
+            }
+        });
+    };
+    
+    const processOnServer = (blob) => {
+        const formData = new FormData();
+        // Convert webm to wav for server compatibility
+        convertWebmToWav(blob).then(wavBlob => {
+            formData.append('file', wavBlob, 'recording.wav');
+            
+            fetch('https://transcriptor-app-145083375828.us-central1.run.app', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.noteSequence) {
+                    // Convert server response to NoteSequence format
+                    const noteSequence = mm.sequenceProtoFromMidi(data.midiData);
+                    createRecording(noteSequence);
+                } else {
+                    throw new Error('Server processing failed');
+                }
+            })
+            .catch(err => {
+                handleProcessingError(err);
+            });
+        }).catch(err => {
+            handleProcessingError(err);
+        });
+    };
+    
+    const createRecording = (noteSequence) => {
+        const newRecording = {
+            id: Date.now(),
+            data: noteSequence,
+            name: $scope.currentManual.title,
+            date: new Date(),
+            midiBlob: null,
+            processedLocally: !$scope.useServerProcessing
+        };
+        
+        // Convert to MIDI and save
+        const midiData = mm.sequenceProtoToMidi(noteSequence);
+        newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
+        
+        $scope.recordings.unshift(newRecording);
+        $scope.showRecordingModal = true;
+        showRecording(newRecording);
+        $scope.isProcessing = false;
+        $scope.$apply();
+    };
+    
+    const handleProcessingError = (err) => {
+        console.error('Processing error:', err);
+        alert('Error al procesar la grabación. Por favor intente nuevamente.');
+        $scope.isProcessing = false;
+        $scope.$apply();
+    };
+    
+    // Start processing based on device capability
+    if ($scope.useServerProcessing) {
+        processOnServer(audioBlob);
+    } else {
+        processLocally();
+    }
+};
 
             recorder.start();
         })
@@ -1946,6 +2023,70 @@ function stopRecording() {
         recorder.stream.getTracks().forEach(track => track.stop());
     }
 }
+
+
+// Helper function to convert webm to wav
+function convertWebmToWav(webmBlob) {
+    return new Promise((resolve, reject) => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const fileReader = new FileReader();
+        
+        fileReader.onload = function() {
+            audioContext.decodeAudioData(this.result)
+                .then(audioBuffer => {
+                    // Create WAV from audio buffer
+                    const wavBlob = audioBufferToWav(audioBuffer);
+                    resolve(wavBlob);
+                })
+                .catch(reject);
+        };
+        
+        fileReader.onerror = reject;
+        fileReader.readAsArrayBuffer(webmBlob);
+    });
+}
+
+function audioBufferToWav(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const length = buffer.length * numChannels * 2 + 44;
+    const bufferArray = new ArrayBuffer(length);
+    const view = new DataView(bufferArray);
+    
+    // Write WAV header
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + buffer.length * numChannels * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * 2 * numChannels, true);
+    view.setUint16(32, numChannels * 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, buffer.length * numChannels * 2, true);
+    
+    // Write audio data
+    let offset = 44;
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+        const channel = buffer.getChannelData(i);
+        for (let j = 0; j < channel.length; j++) {
+            const sample = Math.max(-1, Math.min(1, channel[j]));
+            view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            offset += 2;
+        }
+    }
+    
+    return new Blob([view], { type: 'audio/wav' });
+}
+
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
 
 function showRecording(recording) {
     $timeout(() => {
