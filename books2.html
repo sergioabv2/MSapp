@@ -1847,12 +1847,7 @@ $scope.useServerProcessing = false;
 function detectDevice() {
     const userAgent = navigator.userAgent;
     const isAndroid = /Android/.test(userAgent);
-    
-    // iOS y computadoras procesan localmente, Android en servidor
     $scope.useServerProcessing = isAndroid;
-    
-    console.log(`Dispositivo: ${isAndroid ? 'Android' : 'iOS/Computadora'}, 
-                Procesamiento: ${$scope.useServerProcessing ? 'Servidor' : 'Local'}`);
 }
 detectDevice();
 
@@ -1976,8 +1971,6 @@ function processLocally(audioBlob) {
             showRecording(newRecording);
         })
         .catch(err => {
-            console.error('Error en procesamiento local:', err);
-            // Fallback a servidor para iOS/computadoras
             alert('Procesamiento local falló, intentando con servidor...');
             processOnServer(audioBlob);
         })
@@ -1994,22 +1987,31 @@ function processOnServer(audioBlob) {
             const formData = new FormData();
             formData.append('file', wavBlob, 'recording.wav');
             
-            return fetch('https://transcriptor-app-145083375828.us-central1.run.app', {
+            return fetch('https://transcriptor-app-145083375828.us-central1.run.app/transcribe', {
                 method: 'POST',
                 body: formData
             });
         })
         .then(response => {
             if (!response.ok) throw new Error('Error en el servidor');
-            return response.blob(); // Recibimos el MIDI directamente
+            return response.text(); // Recibimos el MIDI como base64
         })
-        .then(midiBlob => {
+        .then(base64MIDI => {
+            // Convertir base64 a Blob MIDI
+            const binaryString = atob(base64MIDI);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const midiBlob = new Blob([bytes], { type: 'audio/midi' });
+            
             const newRecording = {
                 id: Date.now(),
                 name: $scope.currentManual.title,
                 date: new Date(),
                 midiBlob: midiBlob,
-                processedLocally: false
+                processedLocally: false,
+                source: 'server'
             };
             
             $scope.recordings.unshift(newRecording);
@@ -2018,7 +2020,7 @@ function processOnServer(audioBlob) {
         })
         .catch(err => {
             console.error('Error en el servidor:', err);
-            alert('Error al procesar en el servidor');
+            alert('Error al procesar en el servidor: ' + err.message);
         })
         .finally(() => {
             $scope.isProcessing = false;
