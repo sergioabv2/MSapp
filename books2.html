@@ -1842,48 +1842,50 @@ $scope.getProgressPercentage2 = function() {
 
 
 $scope.useServerProcessing = false;
-$scope.devicePerformance = 'unknown';
 
-// Add this function to detect device capabilities
-function detectDevicePerformance() {
-    // Simple performance detection - you might want to enhance this
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const ram = navigator.deviceMemory || 4; // Default to 4GB if unknown
+// Función simplificada para detectar dispositivo
+function detectDevice() {
+    const userAgent = navigator.userAgent;
+    const isAndroid = /Android/.test(userAgent);
     
-    if (!isMobile) {
-        $scope.devicePerformance = 'high';
-        $scope.useServerProcessing = false;
-    } else if (ram >= 5) {
-        $scope.devicePerformance = 'high';
-        $scope.useServerProcessing = false;
-    } else {
-        $scope.devicePerformance = 'low';
-        $scope.useServerProcessing = true;
-    }
+    // iOS y computadoras procesan localmente, Android en servidor
+    $scope.useServerProcessing = isAndroid;
+    
+    console.log(`Dispositivo: ${isAndroid ? 'Android' : 'iOS/Computadora'}, 
+                Procesamiento: ${$scope.useServerProcessing ? 'Servidor' : 'Local'}`);
 }
-detectDevicePerformance();
+detectDevice();
 
-
-
-
+// Variables de estado
 $scope.isRecording = false;
 $scope.isProcessing = false;
 $scope.showRecordingModal = false;
 $scope.showSavedRecordingsModal = false;
 $scope.recordings = [];
 let recorder;
-let model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+let model;
 
-// Inicializar el modelo
-model.initialize().then(() => {
-    console.log('Modelo de transcripción cargado');
-});
+// Inicializar modelo solo para procesamiento local
+function initializeModel() {
+    if (!$scope.useServerProcessing) {
+        model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+        return model.initialize().then(() => {
+            console.log('Modelo de transcripción cargado localmente');
+        });
+    }
+    return Promise.resolve();
+}
 
+// Funciones de la interfaz
 $scope.toggleRecording = function() {
     if ($scope.isRecording) {
         stopRecording();
     } else {
-        startRecording();
+        initializeModel().then(startRecording).catch(err => {
+            console.error('Error al inicializar modelo:', err);
+            $scope.isRecording = false;
+            $scope.$apply();
+        });
     }
 };
 
@@ -1908,6 +1910,7 @@ $scope.deleteRecording = function(id) {
     $scope.recordings = $scope.recordings.filter(r => r.id !== id);
 };
 
+// Grabación de audio
 let audioChunks = [];
 
 function startRecording() {
@@ -1924,88 +1927,18 @@ function startRecording() {
             };
 
             recorder.onstop = () => {
-    $scope.isRecording = false;
-    $scope.isProcessing = true;
-    $scope.$apply();
-    
-    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-    
-    const processLocally = () => {
-        model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
-            createRecording(noteSequence);
-        }).catch(err => {
-            console.error('Local processing failed, falling back to server:', err);
-            if ($scope.devicePerformance !== 'low') {
-                processOnServer(audioBlob);
-            } else {
-                handleProcessingError(err);
-            }
-        });
-    };
-    
-    const processOnServer = (blob) => {
-        const formData = new FormData();
-        // Convert webm to wav for server compatibility
-        convertWebmToWav(blob).then(wavBlob => {
-            formData.append('file', wavBlob, 'recording.wav');
-            
-            fetch('https://transcriptor-app-145083375828.us-central1.run.app', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.noteSequence) {
-                    // Convert server response to NoteSequence format
-                    const noteSequence = mm.sequenceProtoFromMidi(data.midiData);
-                    createRecording(noteSequence);
+                $scope.isRecording = false;
+                $scope.isProcessing = true;
+                $scope.$apply();
+                
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                
+                if ($scope.useServerProcessing) {
+                    processOnServer(audioBlob);
                 } else {
-                    throw new Error('Server processing failed');
+                    processLocally(audioBlob);
                 }
-            })
-            .catch(err => {
-                handleProcessingError(err);
-            });
-        }).catch(err => {
-            handleProcessingError(err);
-        });
-    };
-    
-    const createRecording = (noteSequence) => {
-        const newRecording = {
-            id: Date.now(),
-            data: noteSequence,
-            name: $scope.currentManual.title,
-            date: new Date(),
-            midiBlob: null,
-            processedLocally: !$scope.useServerProcessing
-        };
-        
-        // Convert to MIDI and save
-        const midiData = mm.sequenceProtoToMidi(noteSequence);
-        newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
-        
-        $scope.recordings.unshift(newRecording);
-        $scope.showRecordingModal = true;
-        showRecording(newRecording);
-        $scope.isProcessing = false;
-        $scope.$apply();
-    };
-    
-    const handleProcessingError = (err) => {
-        console.error('Processing error:', err);
-        alert('Error al procesar la grabación. Por favor intente nuevamente.');
-        $scope.isProcessing = false;
-        $scope.$apply();
-    };
-    
-    // Start processing based on device capability
-    if ($scope.useServerProcessing) {
-        processOnServer(audioBlob);
-    } else {
-        processLocally();
-    }
-};
+            };
 
             recorder.start();
         })
@@ -2019,13 +1952,104 @@ function startRecording() {
 function stopRecording() {
     if (recorder && recorder.state === "recording") {
         recorder.stop();
-        // Detener todas las pistas del stream
         recorder.stream.getTracks().forEach(track => track.stop());
     }
 }
 
+// Procesamiento local (iOS y computadoras)
+function processLocally(audioBlob) {
+    model.transcribeFromAudioFile(audioBlob)
+        .then(noteSequence => {
+            const midiData = mm.sequenceProtoToMidi(noteSequence);
+            const midiBlob = new Blob([midiData], { type: 'audio/midi' });
+            
+            const newRecording = {
+                id: Date.now(),
+                name: $scope.currentManual.title,
+                date: new Date(),
+                midiBlob: midiBlob,
+                processedLocally: true
+            };
+            
+            $scope.recordings.unshift(newRecording);
+            $scope.showRecordingModal = true;
+            showRecording(newRecording);
+        })
+        .catch(err => {
+            console.error('Error en procesamiento local:', err);
+            // Fallback a servidor para iOS/computadoras
+            alert('Procesamiento local falló, intentando con servidor...');
+            processOnServer(audioBlob);
+        })
+        .finally(() => {
+            $scope.isProcessing = false;
+            $scope.$apply();
+        });
+}
 
-// Helper function to convert webm to wav
+// Procesamiento en servidor (Android)
+function processOnServer(audioBlob) {
+    convertWebmToWav(audioBlob)
+        .then(wavBlob => {
+            const formData = new FormData();
+            formData.append('file', wavBlob, 'recording.wav');
+            
+            return fetch('https://transcriptor-app-145083375828.us-central1.run.app', {
+                method: 'POST',
+                body: formData
+            });
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Error en el servidor');
+            return response.blob(); // Recibimos el MIDI directamente
+        })
+        .then(midiBlob => {
+            const newRecording = {
+                id: Date.now(),
+                name: $scope.currentManual.title,
+                date: new Date(),
+                midiBlob: midiBlob,
+                processedLocally: false
+            };
+            
+            $scope.recordings.unshift(newRecording);
+            $scope.showRecordingModal = true;
+            showRecording(newRecording);
+        })
+        .catch(err => {
+            console.error('Error en el servidor:', err);
+            alert('Error al procesar en el servidor');
+        })
+        .finally(() => {
+            $scope.isProcessing = false;
+            $scope.$apply();
+        });
+}
+
+// Mostrar grabación
+function showRecording(recording) {
+    $timeout(() => {
+        try {
+            const midiUrl = URL.createObjectURL(recording.midiBlob);
+            const visualizer = document.getElementById('recordingVisualizer');
+            const player = document.getElementById('recordingPlayer');
+            
+            if (player && visualizer) {
+                player.src = midiUrl;
+                visualizer.src = midiUrl;
+                
+                if (player.player) {
+                    player.player.stop();
+                    player.player.loadMIDI(midiUrl);
+                }
+            }
+        } catch (err) {
+            console.error('Error al mostrar grabación:', err);
+        }
+    });
+}
+
+// Conversión de WebM a WAV (para envío al servidor)
 function convertWebmToWav(webmBlob) {
     return new Promise((resolve, reject) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -2033,11 +2057,7 @@ function convertWebmToWav(webmBlob) {
         
         fileReader.onload = function() {
             audioContext.decodeAudioData(this.result)
-                .then(audioBuffer => {
-                    // Create WAV from audio buffer
-                    const wavBlob = audioBufferToWav(audioBuffer);
-                    resolve(wavBlob);
-                })
+                .then(audioBuffer => resolve(audioBufferToWav(audioBuffer)))
                 .catch(reject);
         };
         
@@ -2052,7 +2072,7 @@ function audioBufferToWav(buffer) {
     const bufferArray = new ArrayBuffer(length);
     const view = new DataView(bufferArray);
     
-    // Write WAV header
+    // Escribir encabezado WAV
     writeString(view, 0, 'RIFF');
     view.setUint32(4, 36 + buffer.length * numChannels * 2, true);
     writeString(view, 8, 'WAVE');
@@ -2067,7 +2087,7 @@ function audioBufferToWav(buffer) {
     writeString(view, 36, 'data');
     view.setUint32(40, buffer.length * numChannels * 2, true);
     
-    // Write audio data
+    // Escribir datos de audio
     let offset = 44;
     for (let i = 0; i < buffer.numberOfChannels; i++) {
         const channel = buffer.getChannelData(i);
@@ -2085,31 +2105,6 @@ function writeString(view, offset, string) {
     for (let i = 0; i < string.length; i++) {
         view.setUint8(offset + i, string.charCodeAt(i));
     }
-}
-
-
-function showRecording(recording) {
-    $timeout(() => {
-        try {
-            const url = URL.createObjectURL(recording.midiBlob);
-            
-            const visualizer = document.getElementById('recordingVisualizer');
-            const player = document.getElementById('recordingPlayer');
-            
-            if (player && visualizer) {
-                player.src = url;
-                visualizer.src = url;
-                
-                // Forzar reinicio del player
-                if (player.player) {
-                    player.player.stop();
-                    player.player.loadMIDI(url);
-                }
-            }
-        } catch (err) {
-            console.error('Error al mostrar grabación:', err);
-        }
-    });
 }
 
 $scope.closeRecordingModal = function() {
