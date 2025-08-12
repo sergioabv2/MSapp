@@ -10,13 +10,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
 </script>
-   <script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css">
-<script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js"></script>
+  
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.2"></script>
 
     <!--
 <script src="https://cdn.jsdelivr.net/npm/inertia-plugin@0.6.0/dist/runtime.iife.js"></script>
@@ -2095,13 +2099,14 @@ input[type="radio"]:checked + label.green-bg::after {
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-right: -10px;
+
 }
 
 .time-display .value {
   font-weight: bold;
   font-size: 14px;
   color: #333;
+  margin-right: 15px;
 
 }
 
@@ -2427,7 +2432,133 @@ input[type="radio"]:checked + label.green-bg::after {
   margin: 0 auto;
   position: relative;
 }
+  
+  
+   .recording-indicator {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    z-index: 100;
+  }
+  
+  .recording-dot {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .processing-indicator {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    z-index: 100;
+  }
+  
+  .spinner {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
 
+
+.saved-recordings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .saved-recordings-modal .modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .recordings-list {
+    margin-top: 35px;
+  }
+   
+   .recording-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .recording-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .recording-details {
+    flex-grow: 1;
+    text-align: left;
+  }
+
+  .recording-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .recording-date {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .recording-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .no-recordings {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
   
 </style>
 
@@ -2522,8 +2653,13 @@ input[type="radio"]:checked + label.green-bg::after {
       ng-if="activity.media === 'video'">
   <i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}
 </span>
+ <span class="text-inside"  
+      ng-click="toggle_pdf_modal(activity)" 
+      ng-if="activity.media === 'pdf'">
+  <i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}
+</span>
  <span class="text-inside"  this-lvl="{{lvl}}" quiz-icon="{{activity.icon}}" quiz-title="{{activity.type}}" quiz-subtitle="{{activity.title}}" data-package="{{activity.package}}" onclick="showQuiz(this)" ng-if="activity.media == 'quiz'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span> 
- <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" this-lvl=5 current-lvl="{{lvl}}" lsn-id="{{lesson.id}}" current-lsn="{{lsn}}" current-status="{{currentlsns[activity.index].status}}" current-index="{{activity.index}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span>
+<!-- <span class="text-inside"  onclick="showModal(this)" data-pdf-id="{{activity.url}}" this-lvl=5 current-lvl="{{lvl}}" lsn-id="{{lesson.id}}" current-lsn="{{lsn}}" current-status="{{currentlsns[activity.index].status}}" current-index="{{activity.index}}" ng-if="activity.media == 'pdf'"><i class="material-icons inside">{{activity.icon}}</i>{{activity.type}}</span> -->
             
   </li>
       </ul> 
@@ -3202,18 +3338,20 @@ input[type="radio"]:checked + label.green-bg::after {
       <i class="ri-fullscreen-fill" id="fullscreen-icon"></i>
         </button>
 
+{{currentlsns[currentActivity.index].name}}
   
       <h4 id="pdfTitle"></h4>
       <div class="player-tools">
          <button class="tool-btn recording-btn"
           ng-click="setActivePanel('recording')"
           ng-class="{'active': activePanel === 'recording'}">
-    <i class="ri-record-circle-line"></i> Grabación
+
+    Grabación
   </button>
         <button class="tool-btn metrics-btn" 
           ng-click="setActivePanel('session')"
           ng-class="{'active': activePanel === 'session'}">
-     <i class="ri-timer-line"></i> Sesión
+     Progreso
   </button>
 
   
@@ -3227,33 +3365,59 @@ input[type="radio"]:checked + label.green-bg::after {
     <div class="progress-display">
   <div class="progress-info" ng-show="activePanel === 'session'">
     <div class="progress-bar-container">
-      <div class="progress-label">Progreso: %</div>
-   <div class="progress-bar">
-  <div class="progress-fill" ng-style="{'width': getProgressPercentage() + '%', 'background': getProgressColor()}"></div>
+      <div style="text-align: left; ">Progreso: {{getProgressPercentage(2,5)}}%</div>
+   <div class="progress-bar" >
+  <div class="progress-fill" ng-style="{'width': getProgressPercentage(2,5) + '%', 'background': getProgressColor(2,5)}"></div>
 </div>
+    </div>
 
+
+    <div class="time-displays-container">
+       <div class="time-display">
+        <span class="value"> 2 / 5</span>
+         <span class="label" >Ejercicios</span>
+        <span class="label" style="margin-right: 15px" ng-if="yes">Compases</span>
+      </div>
+    </div>
+
+<!--
+    <div class="progress-bar-container">
+      <div style="text-align: left; ">Progreso: 100%</div>
+   <div class="progress-bar" >
+  <div class="progress-fill" ng-style="{'width': 100 + '%', 'background': 'green'}"></div>
+</div>
     </div>
     <div class="time-displays-container">
-      <div class="time-display">
-        <span class="value"></span>
-        <span class="label">Sesión</span>
-      </div>
-      <div class="time-display">
-        <span class="value"></span>
-        <span class="label">Total</span>
+       <div class="time-display">
+        <span class="value" style="margin-right: -3px"> Completado</span>
       </div>
     </div>
+-->
+
+
+
   </div>
       
         <div class="progress-info" ng-show="activePanel === 'recording'">
+
+          <div class="recording-indicator" ng-show="isRecording">
+    <div class="recording-dot"></div>
+    <span>Grabando...</span>
+  </div>
+  
+  <div class="processing-indicator" ng-show="isProcessing">
+    <div class="spinner"></div>
+    <span>Procesando...</span>
+  </div>
+
  <div class="recording-controls">
   <!-- Controles izquierdos -->
   <div class="left-controls">
     <button class="tool-btn record-btn" ng-click="toggleRecording()" ng-class="{'active': isRecording}">
      <i class="ri-mic-line"></i>
     </button>
-    <button class="tool-btn play-btn" ng-click="playRecording()">
-      <i class="ri-play-fill"></i>
+    <button class="tool-btn play-btn" ng-click="openRecordings()">
+     <i class="ri-folder-music-line"></i>
     </button>
   </div>
   
@@ -3283,8 +3447,56 @@ input[type="radio"]:checked + label.green-bg::after {
 </div>
 
     
-     <iframe id="drive" src="" frameborder="0" allow="microphone; midi"></iframe> 
-  
+     <iframe id="drive" ng-src="{{trustAsResourceUrl(currentlsns[currentActivity.index].pdf)}}" frameborder="0" allow="microphone; midi"></iframe> 
+  <div class="recording-modal" ng-show="showRecordingModal">
+     <button class="close-btn2" ng-click="closeRecordingModal()" style="position: absolute; right: 0; top: 0; ">
+      <i class="ri-close-large-line"></i>
+    </button>
+    <div class="modal-content2">
+ 
+      <midi-player id="recordingPlayer" sound-font visualizer="#recordingVisualizer" src=""></midi-player>
+     <div class="visualizer-container">
+  <midi-visualizer id="recordingVisualizer" 
+                   type="waterfall"
+src=""> 
+  </midi-visualizer>
+</div>
+     
+    </div>
+  </div>
+
+  <div class="saved-recordings-modal" ng-show="showSavedRecordingsModal">
+        <div class="modal-content">
+          <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;">
+    <h3 style="font-size: 20px; margin: 0;">Tus Grabaciones</h3>
+    <button class="close-btn2" ng-click="closeSavedRecordingsModal()" style="position: absolute; right: 0; top: 0; ">
+      <i class="ri-close-large-line"></i>
+    </button>
+  </div>
+          <div class="recordings-list">
+            <div class="recording-item" ng-repeat="recording in audios">
+              <div class="recording-info">
+              <div class="recording-details">
+            <div class="recording-name">{{recording.name}}</div>
+            <div class="recording-date">{{recording.date | date:'medium'}}</div>
+          </div>
+          <div class="recording-actions">
+            <button class="play-btn" ng-click="playSavedRecording(recording)">
+              <i class="ri-play-line"></i>
+            </button>
+            <button class="delete-btn" ng-click="deleteRecording(recording.id)">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+              </div>
+            </div>
+            <div class="no-recordings" ng-show="audios.length === 0">
+              No hay grabaciones guardadas
+            </div>
+          </div>
+         
+        </div>
+      </div>
 
             </div> 
         </div>
@@ -3411,7 +3623,7 @@ var currentActivity = null;
           progress: response.data.progress,
           lssons: response.data.lessons,
           status: response.data.status,
-          history: response.data.history,
+          audios: response.data.audios,
           counterLvl: response.data.counterLvl
         });
       }, function(error) {
@@ -3470,7 +3682,7 @@ getActivity: function() {
    
 }])
 
-.controller('pdfView', ["$scope", "SharedState", "$sce", function($scope, SharedState, $sce) {
+.controller('pdfView', ["$scope", "SharedState", "$sce", "$timeout", function($scope, SharedState, $sce, $timeout) {
   
    $scope.trustAsResourceUrl = function(url) {
     return $sce.trustAsResourceUrl(url);
@@ -3480,15 +3692,389 @@ getActivity: function() {
     return SharedState.getActivity().getCurrentActivity();
   }, function(newActivity) {
     $scope.currentActivity = newActivity;
-
-     
   });
+
+   SharedState.getNum().then(function(data) {
+    $scope.lsn = data.lsn;
+    $scope.audios = data.audios.container;
+      $scope.currentlsns = filterCurrent(data.lssons);
+  })
+
+   function filterCurrent(obj) {
+    return obj.filter(function(entry) {
+        return entry.index == $scope.lsn;
+    });
+   }
 
 
    $scope.activePanel = 'session'; // Panel por defecto
 $scope.setActivePanel = function(panel) {
   if ($scope.activePanel === panel) return;
   $scope.activePanel = panel;
+};
+
+$scope.getProgressPercentage = function(ready, total) {
+    return Math.round((ready / total) * 100);
+};
+
+  $scope.getProgressColor = function(ready, total) {
+  const percentage = $scope.getProgressPercentage(ready, total) || 0;
+  // HSL: 0 (rojo) to 120 (verde)
+  const hue = Math.round((percentage / 100) * 120);
+  return 'hsl(' + hue + ', 85%, 50%)';
+};
+
+
+  $scope.metronomeActive = false;
+$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
+$scope.baseBPM = 60; // BPM del audio original
+$scope.metronomeAudio = document.getElementById('metronomeAudio');
+
+// Función para convertir BPM a velocidad de reproducción
+function bpmToPlaybackRate(bpm) {
+  return bpm / $scope.baseBPM;
+}
+
+$scope.toggleMetronome = function() {
+  $scope.metronomeActive = !$scope.metronomeActive;
+  
+  if ($scope.metronomeActive) {
+    // Configurar velocidad inicial
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+    $scope.metronomeAudio.currentTime = 0;
+    $scope.metronomeAudio.play()
+      .catch(e => console.error("Error al reproducir:", e));
+  } else {
+    $scope.metronomeAudio.pause();
+    $scope.metronomeAudio.currentTime = 0;
+  }
+};
+
+$scope.adjustBPM = function(change, event) {
+  // Actualizar valor BPM
+  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+  
+  // Ajustar velocidad de reproducción si está activo
+  if ($scope.metronomeActive) {
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+  }
+  
+  // Lógica para mantener presionado
+  if (event) {
+    const button = event.target;
+    button.addEventListener('mouseup', clearBPMTimers);
+    button.addEventListener('mouseleave', clearBPMTimers);
+    button.addEventListener('touchend', clearBPMTimers);
+    
+    $scope.bpmTimeout = setTimeout(() => {
+      $scope.bpmInterval = setInterval(() => {
+        $scope.adjustBPM(change);
+        $scope.$apply();
+      }, 100);
+    }, 500);
+  } 
+};
+
+function clearBPMTimers() {
+  clearTimeout($scope.bpmTimeout);
+  clearInterval($scope.bpmInterval);
+} 
+
+$scope.openRecordings = function() {
+    $scope.showSavedRecordingsModal = true;
+};
+
+$scope.closeSavedRecordingsModal = function() {
+    $scope.showSavedRecordingsModal = false;
+};
+
+
+
+$scope.isRecording = false;
+$scope.isProcessing = false;
+$scope.showRecordingModal = false;
+$scope.showSavedRecordingsModal = false;
+$scope.recordings = [];
+let recorder;
+let model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+
+// Inicializar el modelo
+model.initialize().then(() => {
+    console.log('Modelo de transcripción cargado');
+});
+
+$scope.toggleRecording = function() {
+    if ($scope.isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
+};
+
+$scope.openRecordings = function() {
+    $scope.showSavedRecordingsModal = true;
+};
+
+$scope.closeSavedRecordingsModal = function() {
+    $scope.showSavedRecordingsModal = false;
+};
+
+$scope.playSavedRecording = function(recording) {
+    $scope.currentRecording = recording;
+    $scope.showRecordingModal = true;
+    $timeout(() => {
+        $scope.showSavedRecordingsModal = false;
+        showRecording(recording);
+    });
+};
+
+$scope.deleteRecording = function(id) {
+    $scope.recordings = $scope.recordings.filter(r => r.id !== id);
+};
+
+
+let audioChunks = [];
+function startRecording() {
+    $scope.isRecording = true;
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            recorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+
+            recorder.onstop = () => {
+                $scope.isRecording = false;
+                $scope.isProcessing = true;
+
+                $scope.$apply();
+                
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+
+
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+            convertWebmToWav(audioBlob)
+                .then(wavBlob => {
+                    const formData = new FormData();
+                    formData.append('file', wavBlob, 'recording.wav');
+                    
+                    return fetch('https://midiconverter-145083375828.us-central1.run.app/transcribe', {
+                        method: 'POST',
+                        body: formData
+                    });
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error(`Error del servidor: ${response.status}`);
+                    }
+                    
+                    const midiBlob = await response.blob();
+                    
+                    if (!midiBlob.type.includes('midi') && !midiBlob.type.includes('octet-stream')) {
+                        throw new Error('El servidor no devolvió un archivo MIDI válido');
+                    }
+                    
+                    const newRecording = {
+                        id: Date.now(),
+                        name: "recording",
+                        date: new Date(),
+                        midiBlob: midiBlob,
+                        processedLocally: false,
+                        source: 'server'
+                    };
+                    
+                    $scope.audios.unshift(newRecording);
+                    $scope.showRecordingModal = true;
+                    showRecording(newRecording);
+                })
+                .catch(err => {
+                    console.error('Error en transcripción servidor:', err);
+                    alert('Error al procesar la grabación en servidor');
+                })
+                .finally(() => {
+                    $scope.isProcessing = false;
+                    $scope.$apply();
+                });
+        }else{
+                model.transcribeFromAudioFile(audioBlob).then(noteSequence => {
+                    var newRecording = {
+                        id: Date.now(),
+                        data: noteSequence,
+                      name: "recording",
+                        date: new Date(),
+                        midiBlob: null
+                    };
+                    
+                    // Convertir a MIDI y guardar
+                    const midiData = mm.sequenceProtoToMidi(noteSequence);
+                    newRecording.midiBlob = new Blob([midiData], { type: 'audio/midi' });
+                    
+                    $scope.audios.unshift(newRecording);
+                                  $scope.showRecordingModal = true;
+                    showRecording(newRecording);
+                }).catch(err => {
+                    console.error('Error en la transcripción:', err);
+                    alert('Error al procesar la grabación');
+                }).finally(() => {
+                    $scope.isProcessing = false;
+                    $scope.$apply();
+                });
+            }
+
+
+
+            };
+
+            recorder.start();
+        })
+        .catch(err => {
+            console.error('Error al acceder al micrófono:', err);
+            $scope.isRecording = false;
+            $scope.$apply();
+        });
+}
+
+function stopRecording() {
+    if (recorder && recorder.state === "recording") {
+        recorder.stop();
+        // Detener todas las pistas del stream
+        recorder.stream.getTracks().forEach(track => track.stop());
+    }
+}
+
+function showRecording(recording) {
+    $timeout(() => {
+        try {
+            let url;
+            if (recording.midi) {
+                // Es un link directo a un archivo .mid
+                url = recording.midi;
+            } else if (recording.midiBlob) {
+                // Es un blob generado localmente
+                url = URL.createObjectURL(recording.midiBlob);
+            } else {
+                console.error("No hay MIDI válido en la grabación");
+                return;
+            }
+
+            const visualizer = document.getElementById('recordingVisualizer');
+            const player = document.getElementById('recordingPlayer');
+
+            if (player && visualizer) {
+                player.src = url;
+                visualizer.src = url;
+
+                if (player.player) {
+                    player.player.stop();
+                    player.player.loadMIDI(url);
+                }
+            }
+        } catch (err) {
+            console.error('Error al mostrar grabación:', err);
+        }
+    });
+}
+
+
+$scope.closeRecordingModal = function() {
+    $scope.showRecordingModal = false;
+    // Limpiar variables para nueva grabación
+    audioChunks = [];
+    $scope.currentRecording = null;
+};
+
+
+function convertWebmToWav(webmBlob) {
+    return new Promise((resolve, reject) => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const fileReader = new FileReader();
+        
+        fileReader.onload = function() {
+            audioContext.decodeAudioData(this.result)
+                .then(audioBuffer => resolve(audioBufferToWav(audioBuffer)))
+                .catch(reject);
+        };
+        
+        fileReader.onerror = reject;
+        fileReader.readAsArrayBuffer(webmBlob);
+    });
+}
+
+function audioBufferToWav(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const length = buffer.length * numChannels * 2 + 44;
+    const bufferArray = new ArrayBuffer(length);
+    const view = new DataView(bufferArray);
+    
+    // Escribir encabezado WAV
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + buffer.length * numChannels * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * 2 * numChannels, true);
+    view.setUint16(32, numChannels * 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, buffer.length * numChannels * 2, true);
+    
+    // Escribir datos de audio
+    let offset = 44;
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+        const channel = buffer.getChannelData(i);
+        for (let j = 0; j < channel.length; j++) {
+            const sample = Math.max(-1, Math.min(1, channel[j]));
+            view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            offset += 2;
+        }
+    }
+    
+    return new Blob([view], { type: 'audio/wav' });
+}
+
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
+
+
+
+// Modifica tu función closePlayer para guardar el progreso
+$scope.closePlayer = function() {
+    clearInterval($scope.sessionTimer.interval);
+    
+    // Guardar tiempo de sesión
+    const sessionTime = $scope.sessionTimer.seconds;
+
+        $scope.currentManual.practiceData = $scope.currentManual.practiceData || {
+            totalTime: 0,
+            completedBars: 0,
+            sessions: []
+        };
+        
+        $scope.currentManual.practiceData.totalTime += sessionTime;
+        
+        $scope.currentManual.practiceData.sessions.push({
+            date: new Date().toISOString(),
+            sessionTime: sessionTime,
+            barsCompleted: 0 // Se actualizará cuando el usuario cierre el modal de progreso
+        });
+        
+        // Mostrar modal para registrar compases avanzados
+        $scope.showProgressModal = true;
+      $scope.showPlayer = false;
+   
 };
   
    
@@ -3533,6 +4119,14 @@ $scope.setActivePanel = function(panel) {
  function isMobileDevice() {
   return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 }
+
+$scope.toggle_pdf_modal = function(act){
+  SharedState.getActivity().setCurrentActivity(act);
+          //$("#drive").attr('src', act.url);        
+        document.getElementById('modalPDF').classList.add('four');
+}
+
+
 
 $scope.toggle_video_modal = function(act) {
   var activity = act.content
@@ -3813,6 +4407,7 @@ function newSize() {
                   icon: 'piano',
                   type: 'Exercises',
                   media: 'pdf',
+                  index: 1,
                  url: 'https://app.mozartacademy.mx/pdfView'
                
                   },
@@ -6561,28 +7156,33 @@ function newSize() {
 
 document.addEventListener("DOMContentLoaded", function () {
     var isMobile = /Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (!isMobile) {
-        document.getElementById('fullscreen-btn').style.display = 'flex';
+    var fullscreenBtn = document.getElementById('fullscreen-btn');
+    var fullscreenIcon = document.getElementById("fullscreen-icon");
 
-      document.getElementById("fullscreen-btn").addEventListener("click", function () {
-  const icon = document.getElementById("fullscreen-icon");
+    if (isMobile) {
+        // Ocultar botón en móviles
+        if (fullscreenBtn) fullscreenBtn.style.display = 'none';
+    } else {
+        // Mostrar botón en escritorio
+        if (fullscreenBtn) fullscreenBtn.style.display = 'flex';
 
-  if (!document.fullscreenElement) {
-    // Entrar a pantalla completa
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen();
-    }
-    icon.className = "ri-fullscreen-exit-fill";
-  } else {
-    // Salir de pantalla completa
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-    icon.className = "ri-fullscreen-fill";
-  }
-});
-
-
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener("click", function () {
+                if (!document.fullscreenElement) {
+                    // Entrar a pantalla completa
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    }
+                    if (fullscreenIcon) fullscreenIcon.className = "ri-fullscreen-exit-fill";
+                } else {
+                    // Salir de pantalla completa
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                    if (fullscreenIcon) fullscreenIcon.className = "ri-fullscreen-fill";
+                }
+            });
+        }
     }
 });
 
@@ -6603,7 +7203,6 @@ function showModal(element) {
         setTimeout(() => {
             modal.classList.remove('four', 'out');
         }, 300);
-        $("#drive").attr('src', '');
          if (!/Android|webOS|iPhone|iPad|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
    if (document.fullscreenElement) {
     document.exitFullscreen()
@@ -7059,5 +7658,5 @@ video.onpause = () => {
 
 
 
-
-</script>
+ 
+</script> 
