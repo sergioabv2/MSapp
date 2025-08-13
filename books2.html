@@ -688,7 +688,7 @@ background-color: rgba(0, 0, 0, 0.5);
 .metric-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
   padding: 0 10px;
 }
 
@@ -1691,7 +1691,7 @@ background-color: rgba(0, 0, 0, 0.5);
       
         <div class="progress-info" ng-show="activePanel === 'recording'">
 
-          <div class="recording-indicator" ng-show="isRecording">
+          <div class="recording-indicator" ng-show="isRecording2">
     <div class="recording-dot"></div>
     <span>Grabando...</span>
   </div>
@@ -1700,7 +1700,7 @@ background-color: rgba(0, 0, 0, 0.5);
  <div class="recording-controls">
   <!-- Controles izquierdos -->
   <div class="left-controls">
-  <button class="tool-btn record-btn" id="startButton">
+  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}">
      <i class="ri-mic-line"></i>
     </button>
     <button class="tool-btn play-btn" ng-click="openWavs()">
@@ -1760,7 +1760,18 @@ background-color: rgba(0, 0, 0, 0.5);
   
 
   <div class="right-controls">
+    
+    
+      <div class="time-display" style="margin-right: 5px">
+        <div id="result" class="value" style="margin-right: 10px">--</div>
+        <span class="label">Acorde</span>
+      </div>
+     
+
      <canvas id="oscilloscopeCanvas" width="100" height="40"></canvas>
+      <button class="tool-btn play-btn" id="listenIA">
+   <i class="ri-pulse-ai-line"></i>
+    </button>
   </div>
 </div>
   </div>
@@ -2415,6 +2426,7 @@ $scope.getProgressPercentage2 = function() {
 
 
 $scope.isRecording = false;
+$scope.isRecording2 = false;
 $scope.isProcessing = false;
 $scope.showRecordingModal = false;
 $scope.showSavedRecordingsModal = false;
@@ -2614,11 +2626,11 @@ $scope.closeRecordingModal = function() {
 
 function convertWebmToWav(webmBlob) {
     return new Promise((resolve, reject) => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
         const fileReader = new FileReader();
         
         fileReader.onload = function() {
-            audioContext.decodeAudioData(this.result)
+            audioContext2.decodeAudioData(this.result)
                 .then(audioBuffer => resolve(audioBufferToWav(audioBuffer)))
                 .catch(reject);
         };
@@ -2744,48 +2756,14 @@ $scope.marcarPreferencia = function () {
     navText:['<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>','<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>']
   });
 });
-  
-}])
-  
-  .filter('secondsToTime', function() {
-    return function(seconds) {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return [h, m > 9 ? m : (h ? '0' + m : m || '0'), s > 9 ? s : '0' + s]
-            .filter(Boolean).join(':');
-    };
-});
-
-  
-
-</script>
 
 
 
- <script>
-
-  setTimeout(function() {
-         var loader = document.getElementById("loader");
-    var main = document.getElementById("container");
-           loader.style.display = "none";
-          main.style.display = "block";
-        }, 4000);
-
-
-
-   
-const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const statusElement = document.getElementById('status');
-        const canvas = document.getElementById('oscilloscopeCanvas');
-        const canvasCtx = canvas.getContext('2d');
 
 
 let mediaRecorder;
-        let audioChunks = [];
-        let audioContext;
-        let analyser;
+        let audioChunks2 = [];
+        let audioContext2;
         let animationId;
 
         // Opciones de audio con supresión de ruido y control de ganancia
@@ -2804,15 +2782,15 @@ let mediaRecorder;
                 
                 // Configura la MediaRecorder para la grabación de audio
                 mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
+                audioChunks2 = [];
 
                 mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
+                    audioChunks2.push(event.data);
                 };
 
                 mediaRecorder.onstop = () => {
                     cancelAnimationFrame(animationId);
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
                     const audioUrl = URL.createObjectURL(audioBlob);
 
                     const audioElement = document.createElement('audio');
@@ -2831,8 +2809,6 @@ let mediaRecorder;
                 source.connect(analyser);
                 analyser.fftSize = 2048;
 
-                drawOscilloscope();
-
                 mediaRecorder.start();
        
             } catch (err) {
@@ -2840,43 +2816,7 @@ let mediaRecorder;
                 console.error('Error al acceder al micrófono:', err);
             }
         }
-        
-       function drawOscilloscope() {
-    const bufferLength = analyser.fftSize;
-    const dataArray = new Uint8Array(bufferLength);
-
-    function draw() {
-        animationId = requestAnimationFrame(draw);
-        analyser.getByteTimeDomainData(dataArray);
-
-        // Fondo transparente
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Estilo de la onda: negro
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = '#000000';
-        canvasCtx.beginPath();
-
-        const sliceWidth = canvas.width / bufferLength;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = v * canvas.height / 2;
-            if (i === 0) {
-                canvasCtx.moveTo(x, y);
-            } else {
-                canvasCtx.lineTo(x, y);
-            }
-            x += sliceWidth;
-        }
-
-        canvasCtx.lineTo(canvas.width, canvas.height / 2);
-        canvasCtx.stroke();
-    }
-
-    draw();
-}
+    
 
 
     /*    startButton.addEventListener('click', startRecordingAndOscilloscope);
@@ -2888,13 +2828,15 @@ let mediaRecorder;
         });*/
 
 
-        startButton.addEventListener('click', () => {
+       $scope.recordWav = function(){ 
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
+                $scope.isRecording2 = false
             }else{
               startRecordingAndOscilloscope()
+              $scope.isRecording2 = true
             }
-        })
+        }
 
 
 
@@ -3663,4 +3605,231 @@ AP.init({
   ]
 });
 
-    </script> 
+  
+}])
+  
+  .filter('secondsToTime', function() {
+    return function(seconds) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return [h, m > 9 ? m : (h ? '0' + m : m || '0'), s > 9 ? s : '0' + s]
+            .filter(Boolean).join(':');
+    };
+});
+
+  
+
+</script>
+
+
+
+ <script>
+
+  setTimeout(function() {
+         var loader = document.getElementById("loader");
+    var main = document.getElementById("container");
+           loader.style.display = "none";
+          main.style.display = "block";
+        }, 4000);
+
+
+
+   const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+// 🎶 Base de datos de acordes actualizada
+const CHORD_PATTERNS = {
+    'mayor':     [0, 4, 7],
+    'menor':     [0, 3, 7],
+    '7':         [0, 4, 7, 10],   // Séptima dominante
+    'dim':       [0, 3, 6],      // Tríada disminuida (ej: C, Eb, Gb)
+    'dim7':      [0, 3, 6, 9]     // Acorde disminuido 7 (ej: C, Eb, Gb, Bbb)
+};
+
+// Renombrar las variables para mayor claridad y consistencia.
+// Ahora se usa 'audioContext' y 'analyser'.
+let audioContext, analyser, srcNode, rafId;
+let listening = false;
+
+// Estabilidad
+let lastChord = null;
+let candidateChord = null;
+let candidateSince = 0;
+const HOLD_MS = 300; // tiempo mínimo para aceptar cambio
+
+  const canvas = document.getElementById('oscilloscopeCanvas');
+ const canvasCtx = canvas.getContext('2d');
+
+
+// Asegurarse de que el ID del botón es 'listenIA'
+document.getElementById('listenIA').addEventListener('click', () => {
+    listening ? stopListening() : startListening();
+});
+
+async function startListening() {
+    // Se crea una nueva instancia de AudioContext
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 4096;
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    srcNode = audioContext.createMediaStreamSource(stream);
+    srcNode.connect(analyser);
+
+    listening = true;
+    loop();
+  drawOscilloscope()
+}
+
+function stopListening() {
+    listening = false;
+    cancelAnimationFrame(rafId);
+    if (srcNode) srcNode.disconnect();
+    // Usar la variable 'audioContext' correcta
+    if (audioContext) audioContext.close();
+    document.getElementById('result').textContent = '--';
+    lastChord = null;
+    candidateChord = null;
+}
+
+function loop() {
+    if (!listening) return;
+
+    // Usar la variable 'analyser' correcta
+    const N = analyser.frequencyBinCount;
+    const freqData = new Float32Array(N);
+    analyser.getFloatFrequencyData(freqData);
+
+    const chroma = new Float32Array(12);
+    // Usar la variable 'audioContext' correcta
+    const sampleRate = audioContext.sampleRate;
+    const fftSize = analyser.fftSize;
+
+    for (let i = 1; i < N; i++) {
+        const db = freqData[i];
+        if (db < -60) continue; // puerta de ruido simple
+        const mag = Math.pow(10, db / 20);
+        const freq = i * sampleRate / fftSize;
+        if (freq < 30 || freq > 5000) continue;
+        const pc = freqToPitchClass(freq);
+        chroma[pc] += mag * weighting(freq);
+    }
+
+    normalize(chroma);
+    const chord = detectChord(chroma);
+
+    applyStability(chord);
+
+    rafId = requestAnimationFrame(loop);
+}
+
+function freqToPitchClass(freq) {
+    const midi = Math.round(12 * Math.log2(freq / 440) + 69);
+    return ((midi % 12) + 12) % 12;
+}
+
+function weighting(freq) {
+    const mid = 600, spread = 800;
+    return 0.6 + 0.9 * Math.exp(-Math.pow((freq - mid) / spread, 2));
+}
+
+function normalize(vec) {
+    const sum = vec.reduce((a,b)=>a+b,0);
+    if (sum > 0) for (let i=0;i<vec.length;i++) vec[i] /= sum;
+}
+
+function detectChord(chroma) {
+    let best = { name: null, score: -1 };
+    for (let root = 0; root < 12; root++) {
+        for (const [name, intervals] of Object.entries(CHORD_PATTERNS)) {
+            const tpl = new Array(12).fill(0);
+            const weights = [1.0, 0.9, 0.85, 0.75]; 
+            intervals.forEach((int, idx) => {
+                tpl[(root + int) % 12] = weights[idx] || 0.5;
+            });
+            const sim = cosineSim(chroma, tpl);
+            if (sim > best.score) best = { name: `${NOTES[root]}${name === '7' ? '7' : name === 'dim' ? '°' : name === 'dim7' ? '°7' : ' ' + name}`, score: sim };
+        }
+    }
+    return best.score > 0.6 ? best.name : null;
+}
+
+function cosineSim(a, b) {
+    let dot=0, na=0, nb=0;
+    for (let i=0;i<a.length;i++) {
+        dot += a[i]*b[i];
+        na += a[i]*a[i];
+        nb += b[i]*b[i];
+    }
+    return (na && nb) ? dot / (Math.sqrt(na)*Math.sqrt(nb)) : 0;
+}
+
+function applyStability(newChord) {
+    const now = performance.now();
+
+    if (newChord !== candidateChord) {
+        candidateChord = newChord;
+        candidateSince = now;
+    }
+
+    if (newChord && newChord !== lastChord) {
+        if (now - candidateSince >= HOLD_MS) {
+            lastChord = newChord;
+            let displayChord = newChord || '';
+            // Cambios en esta sección para manejar los nuevos nombres
+            displayChord = displayChord
+                .replace(" mayor", "")
+                .replace(" menor", "m");
+            document.getElementById('result').textContent = displayChord;
+        }
+    }
+
+    if (!newChord && lastChord !== null) {
+        if (now - candidateSince >= HOLD_MS) {
+            lastChord = null;
+            document.getElementById('result').textContent = '--';
+        }
+    }
+}
+
+
+    
+       function drawOscilloscope() {
+    const bufferLength = analyser.fftSize;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteTimeDomainData(dataArray);
+
+        // Fondo transparente
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Estilo de la onda: negro
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = '#000000';
+        canvasCtx.beginPath();
+
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = v * canvas.height / 2;
+            if (i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+        }
+
+        canvasCtx.lineTo(canvas.width, canvas.height / 2);
+        canvasCtx.stroke();
+    }
+
+    draw();
+}
+
+
+
+    </script>   
