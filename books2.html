@@ -1018,7 +1018,7 @@ background-color: rgba(0, 0, 0, 0.5);
     color: #666;
   }
 
-	.ap {
+  .ap {
   position: fixed;
   left: 0;
   right: 0;
@@ -1706,9 +1706,7 @@ background-color: rgba(0, 0, 0, 0.5);
     <button class="tool-btn play-btn" ng-click="openWavs()">
     <i class="ri-play-line"></i>
     </button>
-  <!--   <button class="tool-btn " id="stopButton">
-     <i class="ri-stop-line"></i>
-    </button> -->
+
   </div>
   
   <!-- Controles derechos -->
@@ -2776,7 +2774,7 @@ $scope.marcarPreferencia = function () {
 
 
 
-	 
+   
 const startButton = document.getElementById('startButton');
         const stopButton = document.getElementById('stopButton');
         const statusElement = document.getElementById('status');
@@ -2836,8 +2834,6 @@ let mediaRecorder;
                 drawOscilloscope();
 
                 mediaRecorder.start();
-                startButton.disabled = true;
-                stopButton.disabled = false;
        
             } catch (err) {
 
@@ -2883,15 +2879,25 @@ let mediaRecorder;
 }
 
 
-        startButton.addEventListener('click', startRecordingAndOscilloscope);
+    /*    startButton.addEventListener('click', startRecordingAndOscilloscope);
         
         stopButton.addEventListener('click', () => {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
-                startButton.disabled = false;
-                stopButton.disabled = true;
             }
-        });
+        });*/
+
+
+        startButton.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }else{
+              startRecordingAndOscilloscope()
+            }
+        })
+
+
+
 function addToPlaylist(title, url) {
     // Crear un nuevo objeto de canción
     const newTrack = {
@@ -3657,4 +3663,4 @@ AP.init({
   ]
 });
 
-    </script>
+    </script> 
