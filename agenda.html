@@ -1735,6 +1735,25 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
       lang: "es-mx",
             eventTextColor: '#fff',
             eventBorderColor: 'white',
+   eventBackgroundColor: function(event) {
+              if(event.color){
+                return event.color; 
+              }
+                
+            },
+            eventBackgroundColor: 'LightSeaGreen',
+            eventRender: function(event, element) {
+                element.find('.fc-time').text(""); 
+              if (event.start < new Date()) { 
+                if(event.attendance === 1){
+                     element.append('<i class="ri-check-line" style="position: absolute; top: -30px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
+                }else if(event.attendance === 0){
+                  element.append('<i class="ri-close-line" style="position: absolute; top: -30px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
+               }
+                 
+                };
+             
+            },
     header: {
       left: 'title',
       center: '',
