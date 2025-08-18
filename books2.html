@@ -2594,7 +2594,12 @@ function stopRecording() {
 function showRecording(recording) {
     $timeout(() => {
         try {
-            const url = URL.createObjectURL(recording.midiBlob);
+           let url;
+            if (recording.midi) {
+                url = recording.midi;
+            } else if (recording.midiBlob) {
+                url = URL.createObjectURL(recording.midiBlob);
+            }
             
             const visualizer = document.getElementById('recordingVisualizer');
             const player = document.getElementById('recordingPlayer');
