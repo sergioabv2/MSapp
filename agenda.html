@@ -1495,6 +1495,9 @@ margin: 4px 10px !important;
             <!--             <div class="row">s
                 <h3 uib-tooltip-html="htmlTooltip" tooltip-placement="bottom">{{teste}}</h3>
             </div> -->
+
+
+
             <!--     Modal Body     -->
             <script type="text/ng-template" id="myModalContent.html">
                 <div class="modal-header">
@@ -1509,55 +1512,48 @@ margin: 4px 10px !important;
                     <p>
                         <label for="nome">{{   gfExtenso    }}</label>
                     </p>
-              <h3 class="panel-title " ng-if="items.attendance === ''"> <i class="ri-time-line"></i> Pendiente</h3>
-                 <h3 class="panel-title " ng-if="items.attendance === 1" style="color: green;  "> <i class="ri-check-fill"></i> Asistencia</h3>
-                     <h3 class="panel-title " ng-if="items.attendance === 0" style="color: red;  "> <i class="ri-close-fill"></i> Falta</h3>
+              <h3 class="panel-title " ng-if="selected.attendance === ''"> <i class="ri-time-line"></i> Pendiente</h3>
+                 <h3 class="panel-title " ng-if="selected.attendance === 1" style="color: green;  "> <i class="ri-check-fill"></i> Asistencia</h3>
+                     <h3 class="panel-title " ng-if="selected.attendance === 0" style="color: red;  "> <i class="ri-close-fill"></i> Falta</h3>
                 </div>
                 
                 </div>
                 <div class="modal-footer">
-              <button class="btn btn-default" ng-if="items.attendance === ''" type="button" ng-click="ok()">Reagendar</button>
+              <button class="btn btn-default" ng-if="selected.attendance === ''" type="button" ng-click="bookpiano(selected)">Reagendar</button>
                     <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
                 </div>
             </script>
           
           
-          
-            <script type="text/ng-template" id="bookpiano.html">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
-                    <h3 class="modal-title">Agendar servicio</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center well">
-                    
-                    <p>
-             <label for="service">Servicio</label>
-  <select id="service" class="form-control" ng-model="selectedService" ng-change="updateDayList()">
-    <option value=""></option>
-    <option value="service1">{{opc1}}</option>
-    <option value="service2" ng-if="miss > 0">{{opc2}}</option>
-    <option value="service3" ng-if="delay > 0">{{opc3}}</option>
-  </select>
-        <label for="dayList" ng-if="selectedService">Dia</label>
-  <select id="dayList" class="form-control" ng-model="selectedDay" ng-change="updateHourList()" ng-options="day for day in days" >
-  </select>
-     <label for="hourList" ng-if="selectedDay && selectedService != 'service3'">Hora</label>
-  <select id="hourList" class="form-control" ng-model="selectedHour"  ng-change="logHour(selectedHour)" ng-if="selectedDay && selectedService != 'service3'" ng-options="hour for hour in hours">
+          <script type="text/ng-template" id="bookpiano.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Reagendar Clase</h3>
+  </div>
+  <div class="modal-body">
+    <p><strong>Evento:</strong> {{ oldTitle }}</p>
+    <p><strong>Fecha de falta:</strong> {{ oldDate }}</p>
 
-  </select>
-             </p>          
-                  
-                </div>
-               <span style="font-weight: 700;">Prácticas:  </span> Ilimitadas<br>
-  <span style="font-weight: 700;">Reposiciones:  </span> {{miss}}<br>
-               <span style="font-weight: 700;">Falta sin recargo:  </span> {{delay}}
-                </div>
-                <div class="modal-footer">
-                  <button class="btn btn-default" type="button" ng-click="cancel()">Cancel</button>
-                    <button class="btn btn-primary" type="button" ng-click="submitForm()">Solicitar</button>
-                </div>
-            </script>
+    <div class="form-group">
+      <label>Selecciona nueva fecha:</label>
+      <input type="date" class="form-control" ng-model="newDate"
+             ng-change="loadHours()" 
+             min="{{ today }}" />
+      <small style="color:red;" ng-if="invalidDay">No se permiten lunes ni martes</small>
+    </div>
+
+    <div class="form-group" ng-if="availableHours.length > 0">
+      <label>Selecciona horario:</label>
+      <select class="form-control" ng-model="selectedHour"
+              ng-options="h for h in availableHours"></select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="cancel()">Cancelar</button>
+    <button class="btn btn-primary" type="button" ng-click="save()">OK</button>
+  </div>
+</script>
+
+         
           
             <!--   END  Modal Body     -->
             <div class="alert-success calAlert ng-scope" ng-show="alertMessage != undefined &amp;&amp; alertMessage != ''">
@@ -1574,8 +1570,8 @@ margin: 4px 10px !important;
    <!--  <div class="col-md-12">
            <button class="btn btn-default btnAtten" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/attendance';">Solicitar</button>
         </div>  -->
-   
-        
+  
+         
       </div>
 
       <div class="right-content">
@@ -1638,21 +1634,8 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
 
    
  
-  
- $scope.bookpiano = function() {
-    var modalInstance2 = $uibModal.open({
-      templateUrl: 'bookpiano.html',
-      controller: 'bookCtrl',
-      resolve: {
-                items: function() {
-                    return $scope.events;
-                },
-                userData: function() {
-                    return $scope.userData;
-                }
-            }
-    });
-  };
+
+
 
     /* Render Tooltip
     $scope.eventRender = function(event, element, view) {
@@ -1667,7 +1650,7 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
         $scope.selected = date;
         // Modal
 
-        $scope.animationsEnabled = true;
+        $scope.animationsEnabled = true; 
 
         var modalInstance = $uibModal.open({
             animation: $scope.animationsEnabled,
@@ -1675,9 +1658,12 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
             controller: 'ModalInstanceCtrl',
             size: size,
             resolve: {
-                items: function() {
+               selected: function() {
                     return $scope.selected;
-                }
+                },
+              items: function() {
+                    return $scope.events;
+                },
             }
         });
 
@@ -1774,30 +1760,122 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
 
 });
 
-app.controller('ModalInstanceCtrl', function($scope, $uibModalInstance, items) {
-
-    $scope.nome = items.title;
+app.controller('ModalInstanceCtrl', function($scope, $uibModal, $uibModalInstance, items, selected) {
+    $scope.selected = selected
+    $scope.nome = selected.title;
     // Mudando formato como é mostrado DateTime no input
-    $scope.ted = items.start;
+    $scope.ted = selected.start;
     $scope.date = moment($scope.ted).format("DD-MM-YYYY HH:mm");
-    $scope.gfExtenso = moment(items.start).format("dddd D MMMM YYYY, HH:mm a");
+    $scope.gfExtenso = moment(selected.start).format("dddd D MMMM YYYY, HH:mm a");
     // FIM Mudando formato como é mostrado DateTime no input
 
-    $scope.items = items;
-
-    $scope.selected = {
-        item: $scope.items[0]
-    };
+    
 
     $scope.ok = function() {
-        $uibModalInstance.close($scope.selected.item);
+        $uibModalInstance.close();
     };
 
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
+
+
+ $scope.bookpiano = function(event) {
+    var modalInstance2 = $uibModal.open({
+      templateUrl: 'bookpiano.html',
+      controller: 'bookCtrl',
+      resolve: {
+          event: function() {
+              return event; 
+          },
+        items: function() {
+              return items; 
+          },
+      }
+    });
+};
+
 });
 
+app.controller('bookCtrl', function($scope, $uibModalInstance, event, items, uiCalendarConfig) {
+  $scope.oldTitle = event.title
+  $scope.oldDate = moment(event.start).format("dddd D MMMM YYYY, HH:mm a");
+  $scope.today = moment().format("YYYY-MM-DD");
+  $scope.availableHours = [];
+  $scope.invalidDay = false;
+
+  $scope.loadHours = function() {
+    if(!$scope.newDate) return;
+    var day = moment($scope.newDate).day(); // 0=Dom ... 1=Lun ... 2=Mar ... 6=Sab
+
+    if (day === 1 || day === 2) { // Bloquear lunes y martes
+      $scope.invalidDay = true;
+      $scope.availableHours = [];
+      return;
+    }
+    $scope.invalidDay = false;
+
+    if(day === 3 || day === 4){ // Miércoles, jueves
+    $scope.availableHours = ["14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
+  } else if(day === 5){ // Viernes
+    $scope.availableHours = ["11:00","12:00","13:00","14:00","15:00","16:00"];
+  } else if(day === 6 || day === 0){ // Sábado o Domingo
+    $scope.availableHours = ["09:00","10:00","11:00","12:00","13:00","14:00"];
+  } else {
+    $scope.availableHours = [];
+  }
+
+  // Selección por defecto
+  $scope.selectedHour = $scope.availableHours[0] || null;
+  };
+
+  $scope.save = function() {
+  
+   
+    // Buscar evento dentro del array `items`
+    var idx = items.findIndex(function(it) {
+      return it.title === event.title && moment(it.start).isSame(event.start); 
+    });
+    var newDateTime = dateToISO($scope.newDate, $scope.selectedHour);
+
+    if (idx !== -1) {
+      items[idx].start = newDateTime; 
+    }
+    
+     $scope.eventSources = [items];
+   if (uiCalendarConfig.calendars['myCalendar1']) {
+     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('removeEventSources');
+     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', items);
+     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
+    }
+   
+   if (uiCalendarConfig.calendars['myCalendar2']) {
+     uiCalendarConfig.calendars['myCalendar2'].fullCalendar('addEventSource', items);
+    }
+
+    // 4. Cerrar el modal
+    $uibModalInstance.close(items);
+};
+  
+  function dateToISO(dateObj, timeString) {
+  var parts = timeString.split(':');
+    var hour = parseInt(timeString.split(':')[0]);
+
+  var date = new Date(dateObj);
+  date.setHours(hour, 0, 0, 0);
+
+  var offset = date.getTimezoneOffset();
+  date.setMinutes(date.getMinutes() - offset);
+
+  return date.toISOString();
+}
+
+
+
+  $scope.cancel = function() {
+    $uibModalInstance.dismiss('cancel');
+  };
+});
 
 
 </script>
