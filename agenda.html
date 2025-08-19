@@ -1509,10 +1509,14 @@ margin: 4px 10px !important;
                     <p>
                         <label for="nome">{{   gfExtenso    }}</label>
                     </p>
+              <h3 class="panel-title " ng-if="items.attendance === ''"> <i class="ri-time-line"></i> Pendiente</h3>
+                 <h3 class="panel-title " ng-if="items.attendance === 1" style="color: green;  "> <i class="ri-check-fill"></i> Asistencia</h3>
+                     <h3 class="panel-title " ng-if="items.attendance === 0" style="color: red;  "> <i class="ri-close-fill"></i> Falta</h3>
                 </div>
                 
                 </div>
                 <div class="modal-footer">
+              <button class="btn btn-default" ng-if="items.attendance === ''" type="button" ng-click="ok()">Reagendar</button>
                     <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
                 </div>
             </script>
