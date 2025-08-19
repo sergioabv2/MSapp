@@ -1,5 +1,5 @@
  <html lang="es">
-<head> 
+<head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
      <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
@@ -164,12 +164,6 @@
         }     
 
         @media (max-width: 600px) {
-            .control-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
-            
             .page-info {
                 font-size: 12px;
             }
@@ -369,7 +363,7 @@
             currentColor = 'red';
         
         // URL de tu PDF en cloud storage
-        const url = 'https://dashboard.mozartacademy.mx/media/sevilla.pdf';
+        const url = 'https://storage.googleapis.com/mozartacademy-files/pdf/Old%20German%20Dance.pdf';
         
         // Inicializar el visualizador de PDF
         function initPdfViewer() {
@@ -389,11 +383,31 @@
                 renderAllPages();
                 
                 // Ajustar al cambiar tamaño de ventana
-                window.addEventListener('resize', throttle(function() {
-                    if (pdfDoc) {
-                        renderAllPages();
-                    }
-                }, 200));
+               // Reemplazar el event listener existente con este:
+let resizeTimeout;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+        if (pdfDoc) {
+            // Guardar el estado actual antes de redimensionar
+            saveCanvasState();
+            
+            // Renderizar páginas
+            renderAllPages();
+            
+            // Restaurar el estado del canvas de anotaciones
+            if (drawingHistory.length > 0) {
+                const img = new Image();
+                img.onload = function() {
+                    annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+                    annotationCtx.drawImage(img, 0, 0, img.width, img.height, 
+                                          0, 0, annotationCanvas.width, annotationCanvas.height);
+                };
+                img.src = drawingHistory[historyIndex].dataURL;
+            }
+        }
+    }, 200); // Debounce de 200ms
+});
                 
             }).catch(function(error) {
                 console.error('Error al cargar el PDF:', error);
@@ -488,36 +502,54 @@
         
         // Actualizar el tamaño del canvas de anotaciones
         function updateAnnotationCanvasSize() {
-            if (pdfPages.length === 0) return;
-            
-            // Calcular el tamaño total de todas las páginas
-            let totalHeight = 0;
-            let maxWidth = 0;
-            
-            pdfPages.forEach(page => {
-                totalHeight += page.canvas.height + 40; // 20px de margen arriba y abajo
-                maxWidth = Math.max(maxWidth, page.canvas.width);
-            });
-            
-            annotationCanvas.width = maxWidth;
-            annotationCanvas.height = totalHeight;
-            
-            // Posicionar el canvas de anotaciones
-            annotationCanvas.style.top = '0';
-            annotationCanvas.style.left = '50%';
-            annotationCanvas.style.transform = 'translateX(-50%)';
-            annotationCanvas.style.position = 'absolute';
-            
-            // Actualizar contenedor de textos
-            const textContainer = document.getElementById('text-annotations-container');
-            textContainer.style.width = maxWidth + 'px';
-            textContainer.style.height = totalHeight + 'px';
-            textContainer.style.top = '0';
-            textContainer.style.left = '50%';
-            textContainer.style.transform = 'translateX(-50%)';
-            textContainer.style.position = 'absolute';
-            textContainer.style.pointerEvents = 'none';
-        }
+    if (pdfPages.length === 0) return;
+    
+    // Guardar el contenido actual como imagen antes de redimensionar
+    const currentContent = annotationCanvas.toDataURL('image/png');
+    
+    // Calcular el tamaño total de todas las páginas
+    let totalHeight = 0;
+    let maxWidth = 0;
+    
+    pdfPages.forEach(page => {
+        totalHeight += page.canvas.height + 40;
+        maxWidth = Math.max(maxWidth, page.canvas.width);
+    });
+    
+    // Solo redimensionar si hay cambios significativos
+    if (Math.abs(maxWidth - annotationCanvas.width) < 5 && 
+        Math.abs(totalHeight - annotationCanvas.height) < 5) {
+        return;
+    }
+    
+    // Redimensionar el canvas
+    annotationCanvas.width = maxWidth;
+    annotationCanvas.height = totalHeight;
+    
+    // Restaurar el contenido después de redimensionar
+    const img = new Image();
+    img.onload = function() {
+        // Limpiar completamente el canvas antes de redibujar
+        annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+        annotationCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, annotationCanvas.width, annotationCanvas.height);
+    };
+    img.src = currentContent;
+    
+    // Resto del código de posicionamiento...
+    annotationCanvas.style.top = '0';
+    annotationCanvas.style.left = '50%';
+    annotationCanvas.style.transform = 'translateX(-50%)';
+    annotationCanvas.style.position = 'absolute';
+    
+    const textContainer = document.getElementById('text-annotations-container');
+    textContainer.style.width = maxWidth + 'px';
+    textContainer.style.height = totalHeight + 'px';
+    textContainer.style.top = '0';
+    textContainer.style.left = '50%';
+    textContainer.style.transform = 'translateX(-50%)';
+    textContainer.style.position = 'absolute';
+    textContainer.style.pointerEvents = 'none';
+}
         
         // Actualizar la información de página visible
         function updateVisiblePage() {
@@ -711,23 +743,29 @@
         }
         
         // Limpiar todas las anotaciones
-        function clearAllAnnotations() {
-            if (confirm('¿Estás seguro de que quieres eliminar todas las anotaciones?')) {
-                // Limpiar canvas de dibujo
-                annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
-                drawingHistory = [];
-                historyIndex = -1;
-                
-                // Limpiar anotaciones de texto
-                const textContainer = document.getElementById('text-annotations-container');
-                textContainer.innerHTML = '';
-                textAnnotations = [];
-                
-                // Eliminar de localStorage
-                localStorage.removeItem('pdfDrawingAnnotations');
-                localStorage.removeItem('pdfTextAnnotations');
-            }
-        }
+       function clearAllAnnotations() {
+    if (confirm('¿Estás seguro de que quieres eliminar todas las anotaciones?')) {
+        // Limpiar canvas de dibujo
+        annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+        
+        // Reiniciar historial con el estado limpio
+        drawingHistory = [{
+            dataURL: annotationCanvas.toDataURL('image/png'),
+            width: annotationCanvas.width,
+            height: annotationCanvas.height
+        }];
+        historyIndex = 0;
+        
+        // Limpiar anotaciones de texto
+        const textContainer = document.getElementById('text-annotations-container');
+        textContainer.innerHTML = '';
+        textAnnotations = [];
+        
+        // Eliminar de localStorage
+        localStorage.removeItem('pdfDrawingAnnotations');
+        localStorage.removeItem('pdfTextAnnotations');
+    }
+}
         
         // Obtener posición relativa al canvas
         function getCanvasPosition(canvas, event) {
@@ -984,100 +1022,20 @@ function setupAnnotationEvents(wrapper) {
 }
 
 
-function loadTextAnnotations() {
-    const savedAnnotations = localStorage.getItem('pdfTextAnnotations');
-    if (!savedAnnotations) return;
-
-    const annotations = JSON.parse(savedAnnotations);
-    const textAnnotationsContainer = document.getElementById('text-annotations-container');
-
-    annotations.forEach(anno => {
-        const annotationWrapper = document.createElement('div');
-        annotationWrapper.className = 'pdf-annotation-wrapper';
-        annotationWrapper.style.setProperty('--point-top', anno.y + 'px');
-        annotationWrapper.style.setProperty('--point-left', anno.x + 'px');
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'annotation-point';
-        checkbox.id = anno.id;
-        checkbox.checked = anno.checked || false;
-        checkbox.style.left = `0px`;
-        checkbox.style.top = `0px`;
-
-        const label = document.createElement('label');
-        label.htmlFor = anno.id;
-        label.className = 'annotation-label';
-        label.style.left = `0px`;
-        label.style.top = `0px`;
-        label.innerHTML = `<span><span></span></span>`;
-
-        const description = document.createElement('div');
-        description.className = 'annotation-description';
-        description.style.display = anno.checked ? 'block' : 'none'; // Show if checked
-
-        const textContentDiv = document.createElement('div');
-        textContentDiv.className = 'annotation-text-content';
-        const [paragraph1, paragraph2] = anno.text.split("||").map(p => p.trim());
-        textContentDiv.innerHTML = `
-            <p class="typewriter delay-1">${paragraph1 || ""}</p>
-            ${paragraph2 ? `<p class="typewriter delay-2">${paragraph2}</p>` : ""}
-        `;
-        description.appendChild(textContentDiv);
-
-        annotationWrapper.appendChild(checkbox);
-        annotationWrapper.appendChild(label);
-        annotationWrapper.appendChild(description);
-        textAnnotationsContainer.appendChild(annotationWrapper);
-
-        textAnnotations.push({
-            id: anno.id,
-            element: annotationWrapper,
-            x: anno.x,
-            y: anno.y,
-            page: anno.page,
-            text: anno.text,
-            checked: anno.checked
-        });
-
-        setupAnnotationEvents(annotationWrapper);
-
-        // If an annotation was checked, trigger the change event to apply zoom and visibility
-        if (anno.checked) {
-            checkbox.dispatchEvent(new Event('change'));
-        }
-    });
-
-    // Add a global click listener to reset zoom when clicking outside any annotation
-    document.addEventListener('click', function(e) {
-        // Check if the click was not on an annotation point or description
-        const isClickOnAnnotation = e.target.closest('.pdf-annotation-wrapper');
-        const isClickOnPdfContainer = e.target.closest('#pdf-container'); // Check if click is within PDF area
-        const isClickOnCanvasContainer = e.target.closest('.canvas-container'); // Check if click is within canvas container
-
-
-        if (!isClickOnAnnotation && pdfContainer.style.transform !== 'scale(1)' && isClickOnCanvasContainer) {
-            pdfContainer.style.transform = 'scale(1)';
-            pdfContainer.style.transition = 'transform 0.5s ease';
-
-            textAnnotations.forEach(anno => {
-                const checkbox = anno.element.querySelector('.annotation-point');
-                const description = anno.element.querySelector('.annotation-description');
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    description.style.animation = 'fadeOut 0.3s forwards';
-                    setTimeout(() => {
-                        description.style.display = 'none';
-                    }, 300);
-                    anno.checked = false; // Update internal state
-                }
-                // Ensure all annotation points/labels are visible after reset
-                anno.element.querySelector('.annotation-point').classList.remove('hidden-annotation-element');
-                anno.element.querySelector('.annotation-label').classList.remove('hidden-annotation-element');
-            });
-            saveTextAnnotations(); // Save state after resetting all
-        }
-    });
+function loadDrawingAnnotations() {
+    const savedDrawing = localStorage.getItem('pdfDrawingAnnotations');
+    if (!savedDrawing) return;
+    
+    const img = new Image();
+    img.onload = function() {
+        // Limpiar el canvas antes de dibujar
+        annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+        annotationCtx.drawImage(img, 0, 0);
+        
+        // Guardar el estado inicial
+        saveCanvasState();
+    };
+    img.src = savedDrawing;
 }
 
 // Update `saveTextAnnotations` to store the text and checked state
@@ -1128,15 +1086,20 @@ function saveTextAnnotations() {
         
         // Guardar estado actual del canvas
         function saveCanvasState() {
-            const imageData = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
-            
-            if (historyIndex < drawingHistory.length - 1) {
-                drawingHistory = drawingHistory.slice(0, historyIndex + 1);
-            }
-            
-            drawingHistory.push(imageData);
-            historyIndex++;
-        }
+    // Guardar como URL de datos en lugar de ImageData
+    const snapshot = {
+        dataURL: annotationCanvas.toDataURL('image/png'),
+        width: annotationCanvas.width,
+        height: annotationCanvas.height
+    };
+    
+    if (historyIndex < drawingHistory.length - 1) {
+        drawingHistory = drawingHistory.slice(0, historyIndex + 1);
+    }
+    
+    drawingHistory.push(snapshot);
+    historyIndex++;
+}
         
         // Event listeners para botones
         document.getElementById('zoom-in').addEventListener('click', zoomIn);
@@ -1251,7 +1214,7 @@ function saveTextAnnotations() {
             
             // Guardar estado antes de empezar a dibujar
             saveCanvasState();
-        }
+        } 
         
         function draw(e) {
             if (!isDrawing || !isDrawingMode) return;
