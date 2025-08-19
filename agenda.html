@@ -1365,8 +1365,9 @@ be a descendant of the grid when it is being dragged.
 
 /* Puntos de evento */
 .fc-event-dot {
-  margin: 7px !important;
-  background-color: #0fb;
+margin: 4px 10px !important;
+  background-color: transparent !important;
+  color:  transparent !important;
 }
 
 
@@ -1706,11 +1707,14 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
             eventBackgroundColor: 'LightSeaGreen',
             eventRender: function(event, element) {
                 element.find('.fc-time').text(""); 
+             var titleElement = element.find('.fc-event-dot');
               if (event.start < new Date()) { 
-                if(event.attendance === 1){
-                     element.append('<i class="ri-check-line" style="position: absolute; top: -30px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
+                 if(event.attendance === 1){
+                     element.append('<i class="ri-check-line" style="position: absolute; top: -25px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
+                      titleElement.append('<i class="ri-check-line" style="color: green; font-size: 22px; font-weight: 700; margin-left: -6px;"></i>'); 
                 }else if(event.attendance === 0){
-                  element.append('<i class="ri-close-line" style="position: absolute; top: -30px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
+                  element.append('<i class="ri-close-line" style="position: absolute; top: -25px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
+                   titleElement.append('<i class="ri-close-line" style="color: red; font-size: 22px; font-weight: 700; margin-left: -6px; "></i>'); 
                }
                  
                 };
@@ -1747,9 +1751,9 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
                 element.find('.fc-time').text(""); 
               if (event.start < new Date()) { 
                 if(event.attendance === 1){
-                     element.append('<i class="ri-check-line" style="position: absolute; top: -30px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
+                     element.append('<i class="ri-check-line" style="position: absolute; top: -25px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
                 }else if(event.attendance === 0){
-                  element.append('<i class="ri-close-line" style="position: absolute; top: -30px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
+                  element.append('<i class="ri-close-line" style="position: absolute; top: -25px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
                }
                  
                 };
