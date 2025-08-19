@@ -1532,7 +1532,7 @@ background-color: rgba(0, 0, 0, 0.5);
 
   
   <div class="mhn-slide owl-carousel">
-    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual, lvl, lsn)">
+    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="openPlayer(manual)">
      <!-- <h4>{{manual.level}}</h4>
           <p>{{manual.block}}</p>  -->
       <div class="mhn-inner">
@@ -2322,6 +2322,9 @@ $scope.showPreview = function(manual, lvl, lsn) {
     $scope.currentManual = manual;
     $scope.showPlayer = true;
     $scope.sessionStartTime = new Date();
+    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    }
     $scope.sessionTimer = {
         seconds: 0,
         interval: setInterval(function() {
@@ -2691,6 +2694,8 @@ function writeString(view, offset, string) {
 // Modifica tu función closePlayer para guardar el progreso
 $scope.closePlayer = function() {
     clearInterval($scope.sessionTimer.interval);
+
+    document.exitFullscreen();
     
     // Guardar tiempo de sesión
     const sessionTime = $scope.sessionTimer.seconds;
