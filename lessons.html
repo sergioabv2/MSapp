@@ -3338,8 +3338,7 @@ input[type="radio"]:checked + label.green-bg::after {
       <i class="ri-fullscreen-fill" id="fullscreen-icon"></i>
         </button>
 
-{{currentlsns[currentActivity.index].name}}
-  
+
       <h4 id="pdfTitle"></h4>
       <div class="player-tools">
          <button class="tool-btn recording-btn"
@@ -3365,16 +3364,16 @@ input[type="radio"]:checked + label.green-bg::after {
     <div class="progress-display">
   <div class="progress-info" ng-show="activePanel === 'session'">
     <div class="progress-bar-container">
-      <div style="text-align: left; ">Progreso: {{getProgressPercentage(2,5)}}%</div>
+      <div style="text-align: left; ">Progreso: {{getProgressPercentage(0,5)}}%</div>
    <div class="progress-bar" >
-  <div class="progress-fill" ng-style="{'width': getProgressPercentage(2,5) + '%', 'background': getProgressColor(2,5)}"></div>
+  <div class="progress-fill" ng-style="{'width': getProgressPercentage(0,5) + '%', 'background': getProgressColor(2,5)}"></div>
 </div>
     </div>
 
 
     <div class="time-displays-container">
        <div class="time-display">
-        <span class="value"> 2 / 5</span>
+        <span class="value"> 0 / 5</span>
          <span class="label" >Ejercicios</span>
         <span class="label" style="margin-right: 15px" ng-if="yes">Compases</span>
       </div>
@@ -3447,7 +3446,8 @@ input[type="radio"]:checked + label.green-bg::after {
 </div>
 
     
-     <iframe id="drive" ng-src="{{trustAsResourceUrl(currentlsns[currentActivity.index].pdf)}}" frameborder="0" allow="microphone; midi"></iframe> 
+  <!--   <iframe id="drive" ng-src="{{trustAsResourceUrl(currentlsns[currentActivity.index].pdf)}}" frameborder="0" allow="microphone; midi"></iframe>  -->
+   <iframe id="drive" ng-src="{{trustAsResourceUrl(currentActivity.url)}}" frameborder="0" allow="microphone; midi"></iframe> 
   <div class="recording-modal" ng-show="showRecordingModal">
      <button class="close-btn2" ng-click="closeRecordingModal()" style="position: absolute; right: 0; top: 0; ">
       <i class="ri-close-large-line"></i>
@@ -4408,7 +4408,7 @@ function newSize() {
                   type: 'Exercises',
                   media: 'pdf',
                   index: 1,
-                 url: 'https://app.mozartacademy.mx/pdfView'
+                 url: 'https://drive.google.com/file/d/1FI1eaRN-JowdgRRFEF_peZktBd-VY3Ke/preview'
                
                   },
                           {
@@ -4585,7 +4585,7 @@ function newSize() {
                   icon: 'description',
                   type: 'Partitura',
                   media: 'pdf',
-                  url: 'https://drive.google.com/file/d/15amNYqOJwINhWNjw8I77uRWZ-6sh15-e/preview'
+                  url: 'https://app.mozartacademy.mx/pdfView3'
                   }
                 ]
               }
