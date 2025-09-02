@@ -12,8 +12,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.3.3/angular-locale_es-mx.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+ <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
  <link rel="manifest" href="/manifest.json">
 </head>
 
@@ -1384,271 +1389,920 @@ width: 200px; /* Ajusta según el tamaño deseado */
 }
 
 
+    :root {
+      --primary: #4a6fa5;
+      --primary-dark: #3a5982;
+      --primary-light: #6b8cbe;
+      --secondary: #ff9e4a;
+      --secondary-dark: #e08530;
+      --success: #4caf50;
+      --danger: #ff6b6b;
+      --warning: #ffc107;
+      --dark: #2c3e50;
+      --light: #f5f7fa;
+      --gray: #78909c;
+      --white: #ffffff;
+      --card-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      --button-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    
+   
+    
 
-   .stream-container{
-      background: linear-gradient(135deg, #e6f0ff 0%, #c9e4ff 100%);
-       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 92vh;
-      padding: 20px;
-      color: #212529;
+    
+    .piano-content {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      padding-bottom: 100px;
     }
     
-    .container2 {
-      
-      max-width: 800px;
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
       margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      padding: 20px;
     }
     
-   .stream-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
-   .stream-header h1 {
-      color: #4a6fa5;
-      font-weight: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .status {
-      padding: 10px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 15px !important;
-      margin: 15px 0;
-    }
-    
-    .status.connected {
-      background: rgba(76, 175, 80, 0.1);
-      color: #4caf50;
-    }
-    
-    .status.disconnected {
-      background: rgba(255, 107, 107, 0.1);
-      color: #ff6b6b;
-    }
-    
-    /* Botón de micrófono flotante */
-    .floating-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: #4a6fa5;
-      color: white;
-      border: none;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      transition: all 0.3s ease;
-      z-index: 998;
-    }
-    
-    .floating-btn.muted {
-      background: #6c757d;
-    }
-    
-    .floating-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
-    }
-    .floating-btn:not(.muted) {
-  background: #ff6b6b;
-  box-shadow: 0 0 15px #ff6b6b; /* Añade un efecto de brillo */
-}
-    
-    /* Modal de chat */
-    .modal2 {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal2.active {
-      display: flex;
-    }
-    
-    .modal-content2 {
-      background: white;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      animation: modalFadeIn 0.3s ease;
-    }
-    
-    @keyframes modalFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
+    @media (min-width: 800px) {
+      .dashboard {
+        grid-template-columns: 1fr 1fr;
       }
-      to {
+      
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+    
+  .card2 {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card2:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+ .card3 {
+    background: var(--white);
+    border-radius: 16px;
+    margin-top: 10px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 19px; /* 1.2rem -> 19.2px */
+    font-weight: 600;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.status-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.status-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 29px; /* 1.8rem -> 28.8px */
+    flex-shrink: 0;
+}
+
+.status-icon.connected {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--success);
+}
+
+.status-icon.disconnected {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--danger);
+}
+
+.status-icon.connecting {
+    background: rgba(255, 193, 7, 0.15);
+    color: var(--warning);
+}
+
+.status-info {
+    flex: 1;
+}
+
+.status-info h3 {
+    margin: 0 0 5px 0;
+    font-weight: 600;
+    font-size: 18px; /* 1.1rem -> 17.6px */
+}
+
+.status-info p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 14px; /* 0.9rem -> 14.4px */
+}
+
+.connection-button {
+    margin: 0;
+    border-radius: 12px;
+    box-shadow: var(--button-shadow);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 55px;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 16px; /* Tamaño base para pantallas más grandes */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 20px; /* Padding por defecto para pantallas más grandes */
+    /* Nueva: Permitir que los elementos se envuelvan si no caben */
+    flex-wrap: wrap; 
+    text-align: center; /* Centrar texto si se envuelve */
+}
+
+@media (max-width: 600px) {
+
+    .connection-button i{
+        display: none;
+    }
+}
+
+.connection-button:active {
+    transform: scale(0.98);
+}
+
+.connection-button.connected {
+    background: linear-gradient(135deg, var(--danger) 0%, #e53935 100%);
+}
+
+.connection-button.disconnected {
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+}
+
+.connection-button.connecting {
+    background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+    opacity: 0.9;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px; /* 1.2rem -> 19.2px */
+    margin-bottom: 10px;
+}
+
+.stat-icon.mic.muted {
+    background: rgba(44, 62, 80, 0.35);
+    color: var(--light);
+    box-shadow: none;
+}
+.stat-icon.mic {
+    background: rgba(255, 107, 107, 0.75);
+    box-shadow: 0 0 15px #ff6b6b;
+    color: var(--white);
+}
+
+.stat-icon.video {
+    background: rgba(66, 165, 245, 0.15);
+    color: #42a5f5;
+}
+
+.stat-icon.connection {
+    background: rgba(255, 193, 7, 0.15);
+    color: var(--warning);
+}
+
+.stat-value {
+    font-weight: 600;
+    font-size: 18px; /* 1.1rem -> 17.6px */
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 13px; /* 0.8rem -> 12.8px */
+    color: var(--gray);
+}
+
+.instruction-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.instruction-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.instruction-list li:last-child {
+    border-bottom: none;
+}
+
+.instruction-list .number {
+    background: var(--primary-light);
+    color: var(--white);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px; /* 0.8rem -> 12.8px */
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.message-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.preview-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: background 0.2s ease;
+}
+
+.preview-item:hover {
+    background: #f1f5f9;
+}
+
+.preview-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.preview-content {
+    flex: 1;
+}
+
+.preview-sender {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px; /* 0.9rem -> 14.4px */
+}
+
+.preview-text {
+    font-size: 14px; /* 0.9rem -> 14.4px */
+    color: var(--gray);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.preview-time {
+    font-size: 12px; /* 0.75rem -> 12px */
+    color: #94a3b8;
+}
+
+.view-all-btn {
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.view-all-btn:hover {
+    background: #f8fafc;
+}
+
+.floating-buttons {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.floating-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: var(--button-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 22px; /* 1.4rem -> 22.4px */
+    position: relative;
+}
+
+.floating-btn:active {
+    transform: scale(0.95);
+}
+
+.floating-btn.chat {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    color: var(--white);
+}
+
+.floating-btn.mic {
+    background: linear-gradient(135deg, var(--danger) 0%, #ff6b6b 100%);
+    box-shadow: 0 0 15px #ff6b6b;
+    color: var(--white);
+}
+
+.floating-btn.mic.muted {
+    background: linear-gradient(135deg, var(--gray) 0%, #546e7a 100%);
+    box-shadow: none; 
+}
+
+.floating-btn.video {
+    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+    color: var(--white);
+}
+
+.chat-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.video-container {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    width: 300px;
+    height: 170px;
+    background: #000;
+    border-radius: 12px;
+    border: 3px solid var(--primary);
+    z-index: 998;
+    overflow: hidden;
+    cursor: move;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.video-container:hover {
+    box-shadow: 0 15px 35px rgba(74, 111, 165, 0.3);
+    transform: scale(1.02);
+}
+
+.video-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 1000;
+    cursor: default;
+    border: none;
+}
+
+.video-container.dragging {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: scale(1.03);
+}
+
+.video-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 999;
+    background: rgba(0,0,0,0.7);
+    border-radius: 8px;
+    padding: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    gap: 5px;
+}
+
+.video-container:hover .video-controls {
+    opacity: 1;
+}
+
+.video-control-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 8px;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px; /* 1rem -> 16px */
+    transition: background 0.2s ease;
+}
+
+.video-control-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.remote-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 60px;
+    background: rgba(0,0,0,0.6);
+    z-index: 1001;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.custom-modal.show {
+    display: flex;
+}
+
+.modal-content3 {
+    margin: 2% auto;
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    height: 70%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header .button-clear {
+    color: white;
+    opacity: 0.8;
+    font-size: 24px; /* 1.5rem -> 24px */
+    transition: opacity 0.2s ease;
+}
+
+.modal-header .button-clear:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fafafa;
+}
+
+.message-item {
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    animation: messageAppear 0.3s ease;
+}
+
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
         opacity: 1;
         transform: translateY(0);
-      }
+    }
+}
+
+.message-item.own {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    margin-left: auto;
+    text-align: right;
+    border-bottom-right-radius: 5px;
+}
+
+.message-item.other {
+    background: white;
+    color: #333;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.message-sender {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    background: white;
+    align-items: center;
+}
+
+.chat-input input {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 24px;
+    padding: 12px 20px;
+    margin-right: 10px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    font-size: 16px; /* 1rem -> 16px */
+}
+
+.chat-input input:focus {
+    border-color: var(--primary);
+}
+
+.chat-input .button {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 3px 10px rgba(74, 111, 165, 0.3);
+    transition: all 0.2s ease;
+}
+
+.chat-input .button:active {
+    transform: scale(0.95);
+}
+
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Mejoras responsivas */
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .video-container {
+        width: 220px;
+        height: 130px;
+        left: 15px;
+        top: 70px;
+    }
+    
+    .floating-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 19px; /* 1.2rem -> 19.2px */
+    }
+    
+    .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .modal-content3 {
+        width: 95%;
+        height: 85%;
+        border-radius: 16px;
     }
     
     .modal-header {
-      background: #4a6fa5;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
+        padding: 15px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-      align-items: center;
+@media (max-width: 480px) {
+    .video-container {
+        width: 180px;
+        height: 110px;
     }
     
-    .modal-title {
-      font-size:15px;
-      font-weight: 500;
-      justify-content: flex-start;
+    .status-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
     }
     
-    .close-btn {
-      background: none;
-
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-       margin-left: auto; 
+    .status-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px; /* 1.5rem -> 24px */
     }
-    
-    .modal-body {
-      padding: 20px;
-      max-height: 50vh;
-      overflow-y: auto;
-    }
-    
-    .chat-log {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-    
-    .message2 {
-      padding: 10px 15px;
-      border-radius: 18px;
-      max-width: 80%;
-      word-break: break-word;
-    }
-    
-    .message2.self {
-      align-self: flex-end;
-      background: #4a6fa5;
-      color: white;
-    }
-    
-    .message2.other {
-      align-self: flex-start;
-      background: #e9ecef;
-      color: #212529;
-    }
-    
-    .message-sender {
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-    
-    .modal-footer {
-      padding: 15px 20px;
-      border-top: 1px solid #eee;
-    }
-    
-    .chat-input {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .chat-input input {
-      flex: 1;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: 24px;
-      font-size: 13px;
-    }
-    
-    .send-btn {
-      background: #4a6fa5;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .send-btn:hover {
-      background: #3a5985;
-    }
-    
-    .open-chat-btn {
-      position: fixed;
-      bottom: 110px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #6e9887;
-      color: white;
-      border: none;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      transition: all 0.3s ease;
-      z-index: 997;
-    }
-    
-    .open-chat-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-    
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ff6b6b;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+}
 
 
+
+
+     /* Estilos para Próximas Clases (1) */
+.schedule-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.schedule-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 10px;
+    color: white;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.schedule-day {
+    font-size: 11px; /* 0.7rem -> 11.2px */
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.schedule-number {
+    font-size: 19px; /* 1.2rem -> 19.2px */
+    font-weight: 700;
+    line-height: 1;
+}
+
+.schedule-info {
+    flex: 1;
+}
+
+.schedule-time {
+    font-size: 14px; /* 0.9rem -> 14.4px */
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 3px;
+}
+
+.schedule-title {
+    font-size: 15px; /* 0.95rem -> 15.2px */
+    color: var(--dark);
+}
+
+.schedule-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.schedule-btn:hover, .schedule-btn.active {
+    background: var(--primary);
+    color: white;
+}
+---
+/* Estilos para Logros/Recompensas (5) */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.achievement-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.achievement-item.unlocked {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.achievement-item.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 24px; /* 1.5rem -> 24px */
+}
+
+.achievement-item.unlocked .achievement-icon {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.achievement-item.locked .achievement-icon {
+    background: #e2e8f0;
+    color: var(--gray);
+}
+
+.achievement-title {
+    font-size: 13px; /* 0.8rem -> 12.8px */
+    font-weight: 500;
+    color: var(--dark);
+}
+---
+/* Estilos para Tareas Pendientes (3) */
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+    color: var(--gray);
+}
+
+.task-item.completed .task-date {
+    color: var(--success);
+}
+
+.task-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    cursor: pointer;
+    color: var(--gray);
+    flex-shrink: 0;
+}
+
+.task-item.completed .task-check {
+    color: var(--success);
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-title {
+    font-size: 15px; /* 0.95rem -> 15.2px */
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 3px;
+}
+
+.task-date {
+    font-size: 13px; /* 0.8rem -> 12.8px */
+    color: var(--gray);
+}
 </style>
 
 <body>
@@ -1707,9 +2361,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
          <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-shelf-line" ></i>&nbsp&nbspRepertorio</a>
  <a href="#/menu/agenda" class="item" ng-class="(activeMenuClr=='agenda')?'menuSelectedColor':''" ng-click="activeMenuClr = 'agenda'" menu-toggle="left"><i class="ri-calendar-todo-fill"></i>&nbsp&nbspAgenda</a>   
      <hr>
- <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-live-line"></i>&nbsp&nbspLive Sessions</a>  
-        <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-question-answer-line"></i>&nbsp&nbspComunidad</a>  
- <a href="#/menu/statistics" class="item" ng-class="(activeMenuClr=='statistics')?'menuSelectedColor':''" ng-click="activeMenuClr = 'statistics'" menu-toggle="left"><i class="ri-line-chart-fill"></i>&nbsp&nbspMi Progreso</a>  
+
+        <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-live-line"></i>&nbsp&nbspLive Sessions</a>  
+        <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-team-line"></i>&nbsp&nbspMozart Connect</a>  
+
         
 <!--
       <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="left"><i class="ri-aed-line"></i>&nbsp&nbspPráctica</a>  
@@ -1959,191 +2614,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <script id="statistics.html" type="text/ng-template">
     <ion-view >
       
-   <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="right">
-
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
-        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
-    </div>
-</button> 
-          
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
-
-      <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
-  <div style="display: flex; align-items: center;" >    
-   
-  <div class="user-info" style="margin-top: -2px;">
-   <div style="font-size: 13px; font-weight: 600; color: #333;">{{userData.name}}</div>
-  <div style="font-size: 12px; color: #777; margin-top: -15px;" ng-if="userData.lvl == 0">Preparatorio</div>
-          <div style="font-size: 11px; color: #777; margin-top: -15px;" ng-if="userData.lvl != 0">Nivel {{userData.lvl}}</div>
-   </div>
-
-    <div style="position: relative; " class="profilImg">
-    
-      <div style="position: relative; width: 36px; height: 36px; margin-top: 4px; margin-left: 5px;">
-  <!-- Anillo exterior -->
-  <div style="
-    width: 36px;
-    height: 36px;
-    border: 1px solid #3ac5f2; /* color del anillo */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 2px #1e2b47; /* sombra tipo segundo anillo */
-  ">
-    <!-- Imagen de perfil -->
-    <img src="{{userData.photo}}" width="30" height="30" style="border-radius: 50%; border: 0.5px solid black;" />
-  </div>
-
-  <!-- Punto de estado -->
-  <div style="
-    position: absolute;
-    bottom: -3px;
-    right: 0;
-    width: 10px;
-    height: 10px;
-    background-color: #5fff87; /* verde */
-    border: 2px solid #1e2b47; /* separador del fondo */
-    border-radius: 50%;
-  "></div>
-</div>
-
-
-   </div>
-   
- </div>
+      <ion-nav-bar class="bar-light" >     
+       <ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goBack()">
+      <i class="ri-arrow-left-s-line"></i> regresar
     </button>
-
-
-    
-  </ion-nav-buttons>
-       
-        <ion-nav-buttons side="left">
-          <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>  
-
-            
-       
-        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
-     <div id="bannerRow">
-      <div class="profile-avatar-container" style="transform: scale(0.9)">
-      <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
-    </div>
-      <p class="profileName">{{userData.name}}</p>
-      <p class="profileEmail">{{userData.mail}}</p>
-    </div>
-    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
-      <i class="ion-ios-contact-outline"></i> Perfil
-    </div>
-       
-           
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
-    </div>
-      <div class="dropdown-item" ng-click="logout()">
-      <i class="ri-logout-box-r-line"></i> Salir
-    </div>
-  </div>
-
-  
-
- <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
-  <div class="chat-header">
-      <button class="close-dropdown" ng-click="dropdownChat()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>MozAI</h4>
-    <p>Asistente Inteligente</p>
-  </div>
-  
-  <div class="chat-messages" id="chatMessages2">
-    
-    
-    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
-      <div class="message-avatar" ng-if="message.sender === 'admin'">
-        <img src="https://lh3.googleusercontent.com/d/1zFiuq3CmoKEwEnOsAfq5GkK8h_SRaWEy">
-      </div>
-      <div class="message-content">
-        <p>{{message.content}}</p>
-        <span class="message-time">{{ calculateTimeAgo(message.timestamp) }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="typing-indicator" ng-if="isTyping">
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <span>Mozart Academy está escribiendo...</span>
-</div>
-  
-  <div class="chat-input">
-    <input type="text" 
-           ng-model="newMessage" 
-           placeholder="Escribe tu mensaje..."
-           id="inputMessage2"
-           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
-    <button ng-click="sendMessage(newMessage)">
-      <i class="ri-send-plane-2-fill"></i>
-    </button>
-  </div>
-</div>
-
-
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
- 
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-     Eliminar todas las notificaciones
-    </button>
-  </div>
-</div> 
-        
+  </ion-nav-buttons>  
     </ion-nav-bar>
       
       <ion-content > 
-
         <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/statistics" frameborder="0" allowfullscreen></iframe></div>   
       </ion-content>
 
@@ -2163,7 +2642,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </ion-nav-buttons>  
     </ion-nav-bar>
-      <ion-content >
+      <ion-content style="margin-top: 10px">
        <div class="list">
         <ion-list>
       <ion-item class="item-avatar">
@@ -2190,11 +2669,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
 <i class="icon ri-presentation-fill" ></i> Formato
          <p>{{userData.format}} </p>   
                 </ion-item>
-                 <ion-item class="item-icon-left item-icon-right" >
+
+                 <ion-item class="item-icon-left item-button-right" >
 <i class="icon ri-calendar-schedule-fill" ></i> Próximo pago
-         <p ng-style="{'color': userData.status !== 'ACTIVO' ? 'red' : 'green'}">{{userData.nextpay}} </p>  
-          <i class="icon ri-arrow-left-double-fill slide-hint-left" style="margin-top: 35px;" ng-if="userData.status != 'ACTIVO'"></i>
-            <ion-option-button class="button-balanced" ng-if="userData.status != 'ACTIVO'" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment';">Pagar</ion-option-button>
+         <p >{{userData.nextpay}} </p>  
+        
+
+            <button class="button button-stable" ng-click="goToPayment()" style="transform: scale(.8); margin-right: -20px; margin-top: 10px;">
+            Pago   
+          </button>
+
                 </ion-item>
            
     </ion-list>    
@@ -2260,6 +2744,11 @@ width: 200px; /* Ajusta según el tamaño deseado */
          <i class="icon ri-mail-fill" style="font-size: 25px"></i>
        Correo
           <p style="color: brown;" > {{userData.mail}} </p> 
+          </ion-item>
+
+           <ion-item class="item-icon-left " ng-click="goToStats()">
+         <i class="icon ri-line-chart-fill" style="font-size: 25px"></i>
+       Estadísticas
           </ion-item>
 
 
@@ -2472,11 +2961,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </script>   
 
     
+    
+ 
 
 
 
 
-        <script id="livestream.html" type="text/ng-template">
+
+      <script id="livestream.html" type="text/ng-template">
     <ion-view >
  
       <ion-nav-bar class="bar-light" >      
@@ -2650,65 +3142,346 @@ width: 200px; /* Ajusta según el tamaño deseado */
 </div>
         
     </ion-nav-bar>
-    <ion-content >
-  <div class="stream-container">
-    <div class="container2">
-      <header class="stream-header">
-        <h1><i class="fas fa-user-graduate"></i> Alumno - Mozart Academy</h1>
-      </header>
-
-      <div id="connectionStatus" class="status" ng-class="service.connectionStatus">
-        <i class="fas" ng-class="{'fa-check-circle': service.connectionStatus === 'connected', 'fa-times-circle': service.connectionStatus === 'disconnected'}"></i> {{ service.statusMessage }}
-      </div>
-
-      <div style="text-align: center; margin: 20px 0;">
-        <p>Recibirás mensajes y audio del profesor a través de esta plataforma.</p>
-        <p>Usa los botones flotantes para controlar el micrófono y el chat.</p>
-      </div>
-    </div>
-
-    <button id="openChatBtn" class="open-chat-btn" ng-click="openChatModal()">
-      <i class="fas fa-comments"></i>
-      <span id="notificationBadge" class="notification-badge" ng-show="service.unreadCount > 0">{{ service.unreadCount > 9 ? '9+' : service.unreadCount }}</span>
-    </button>
-
-    <button id="toggleAudio" class="floating-btn" ng-click="service.toggleAudio()" ng-class="{'muted': !service.isAudioEnabled}">
-      <i class="fas" ng-class="{'fa-microphone': service.isAudioEnabled, 'fa-microphone-slash': !service.isAudioEnabled}"></i>
-    </button>
-
-    <div id="chatModal" class="modal2" ng-class="{'active': isChatOpen}">
-      <div class="modal-content2">
-        <div class="modal-header">
-          <h3 class="modal-title"><i class="fas fa-comment"></i> Chat con el Profesor</h3>
-          <button class="close-btn" ng-click="closeChatModal()">&times;</button>
+   <ion-content class="piano-content" >
+      <div class="dashboard">
+        <!-- Estado de Conexión -->
+        <div class="card3 full-width">
+          <div class="status-card">
+            <div class="status-icon" ng-class="getConnectionClass()">
+              <i class="fas" ng-class="{'fa-wifi': webrtc.connectionStatus === 'connected', 'fa-plug': webrtc.connectionStatus === 'disconnected', 'fa-sync-alt fa-spin': isConnecting}"></i>
+            </div>
+            <div class="status-info">
+              <h3>{{ getStatusMessage() }}</h3>
+              <p ng-if="webrtc.connectionStatus === 'connected'">Conexión estable con el profesor</p>
+              <p ng-if="webrtc.connectionStatus === 'disconnected'">No conectado a ninguna clase</p>
+              <p ng-if="isConnecting">Estableciendo conexión...</p>
+            </div>
+            <button class="button connection-button" 
+                    ng-class="getConnectionButtonClass()"
+                    ng-click="toggleConnection()"
+                    ng-disabled="isConnecting">
+              <i class="fas" ng-class="{'fa-plug': webrtc.connectionStatus === 'disconnected', 'fa-times': webrtc.connectionStatus === 'connected', 'fa-sync-alt fa-spin': isConnecting}"></i>
+              {{getConnectionButtonText()}}
+            </button>
+          </div>
         </div>
-        <div class="modal-body">
-          <div id="chatLog" class="chat-log">
-            <div ng-repeat="msg in service.chatMessages track by $index" class="message" ng-class="{'self': msg.isSelf, 'other': !msg.isSelf}">
-              <div class="message-sender">{{ msg.sender }}</div>
-              <div>{{ msg.text }}</div>
+
+
+
+             <!-- Información del profesor -->
+        <div class="card2" ng-show="webrtc.isConnectedToTeacher()">
+          <div class="card-header">
+            <h2><i class="fas fa-user-graduate"></i> Información de la Clase</h2>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div>
+                <h3 style="margin: 0 0 5px 0;">Profesor Sergio</h3>
+                <p style="margin: 0; color: var(--gray);">Clase de Piano Avanzado</p>
+              </div>
+            </div>
+            
+            <div style="background: #f8fafc; padding: 12px; border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div style="font-weight: 600;">Duración:</div>
+                <div>60 minutos</div>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div style="font-weight: 600;">Nivel:</div>
+                <div>Intermedio-Avanzado</div>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <div style="font-weight: 600;">Tema:</div>
+                <div>Improvisación Jazz</div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
+        
+        <!-- Estadísticas de conexión -->
+        <div class="card2" ng-show="webrtc.isConnectedToTeacher()">
+          <div class="card-header">
+            <h2><i class="fas fa-chart-line"></i> Estado de Conexión</h2>
+          </div>
+          <div class="card-body">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon mic" ng-class="{'muted': webrtc.isMuted}">
+                  <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+                </div>
+                <div class="stat-value">{{webrtc.isMuted ? 'Silenciado' : 'Activo'}}</div>
+                <div class="stat-label">Micrófono</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon video">
+                  <i class="fas" ng-class="{'fa-video': webrtc.isVideoVisible, 'fa-video-slash': !webrtc.isVideoVisible}"></i>
+                </div>
+                <div class="stat-value">{{webrtc.isVideoVisible ? 'Disponible' : 'No disponible'}}</div>
+                <div class="stat-label">Video</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon connection">
+                  <i class="fas fa-signal"></i>
+                </div>
+                <div class="stat-value">Estable</div>
+                <div class="stat-label">Conexión</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon" style="background: rgba(74, 111, 165, 0.15); color: #4a6fa5;">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">15:42</div>
+                <div class="stat-label">Tiempo de clase</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="card2" ng-show="webrtc.isConnectedToTeacher()">
+  <div class="card-header">
+    <h2><i class="fas fa-tasks"></i> Tareas Pendientes</h2>
+  </div>
+  <div class="card-body">
+    <div class="task-item">
+      <div class="task-check">
+        <i class="far fa-circle"></i>
+      </div>
+      <div class="task-content">
+        <div class="task-title">Practicar escala de Do mayor</div>
+        <div class="task-date">Para el 15 Oct</div>
+      </div>
+    </div>
+    <div class="task-item completed">
+      <div class="task-check">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="task-content">
+        <div class="task-title">Estudiar partitura de Mozart</div>
+        <div class="task-date">Completado</div>
+      </div>
+    </div>
+    <div class="task-item">
+      <div class="task-check">
+        <i class="far fa-circle"></i>
+      </div>
+      <div class="task-content">
+        <div class="task-title">Grabar ejercicio de arpegios</div>
+        <div class="task-date">Para el 18 Oct</div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+        <!-- Calendario -->
+     <div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
+  <div class="card-header">
+    <h2><i class="fas fa-calendar-alt"></i> Próximas Clases</h2>
+  </div>
+  <div class="card-body">
+    <div class="schedule-item">
+      <div class="schedule-date">
+        <div class="schedule-day">Lun</div>
+        <div class="schedule-number">15</div>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-time">16:00 - 17:00</div>
+        <div class="schedule-title">Improvisación Jazz</div>
+      </div>
+      <button class="schedule-btn">
+        <i class="fas fa-bell"></i>
+      </button>
+    </div>
+    <div class="schedule-item">
+      <div class="schedule-date">
+        <div class="schedule-day">Mié</div>
+        <div class="schedule-number">17</div>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-time">17:30 - 18:30</div>
+        <div class="schedule-title">Técnica de Escalas</div>
+      </div>
+      <button class="schedule-btn active">
+        <i class="fas fa-bell"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
+  <div class="card-header">
+    <h2><i class="fas fa-trophy"></i> Mis Logros</h2>
+  </div>
+  <div class="card-body">
+    <div class="achievements-grid">
+      <div class="achievement-item unlocked">
+        <div class="achievement-icon">
+          <i class="fas fa-music"></i>
+        </div>
+        <div class="achievement-title">Primera Clase</div>
+      </div>
+      <div class="achievement-item unlocked">
+        <div class="achievement-icon">
+          <i class="fas fa-forward"></i>
+        </div>
+        <div class="achievement-title">5 Clases Completadas</div>
+      </div>
+      <div class="achievement-item locked">
+        <div class="achievement-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <div class="achievement-title">10 Clases Completadas</div>
+      </div>
+      <div class="achievement-item locked">
+        <div class="achievement-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="achievement-title">Ejercicio Perfecto</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+        
+        <!-- Mensajes recientes del chat -->
+        <div class="card2" ng-show="webrtc.chatMessages.length > 0">
+          <div class="card-header">
+            <h2><i class="fas fa-comments"></i> Mensajes Recientes</h2>
+          </div>
+          <div class="card-body">
+            <div class="message-preview">
+              <div class="preview-item" ng-repeat="message in webrtc.chatMessages | limitTo:3 | orderBy:'-timestamp'">
+                <div class="preview-avatar">
+                  {{message.sender.charAt(0)}}
+                </div>
+                <div class="preview-content">
+                  <div class="preview-sender" ng-class="{'text-primary': message.isOwn, 'text-dark': !message.isOwn}">
+                    {{message.sender}}
+                  </div>
+                  <div class="preview-text">
+                    {{message.message}}
+                  </div>
+                  <div class="preview-time">
+                    {{formatTime(message.timestamp)}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="view-all-btn" ng-click="openChat()" ng-show="webrtc.chatMessages.length > 3">
+            Ver todos los mensajes <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+        
+    
+      </div>
+      
+      <!-- Espacio inferior -->
+      <div style="height: 100px;"></div>
+      
+    </ion-content>
+    
+    <!-- Contenedor de Video Draggable -->
+    <div id="videoContainer" 
+         class="video-container" 
+         ng-show="showVideo"
+         ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
+      <div class="video-controls">
+        <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
+          <i class="fas" ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+        </button>
+        <button class="video-control-btn" ng-click="toggleVideo()" title="Ocultar Video">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <video id="remoteVideo" 
+             class="remote-video" 
+             autoplay 
+             playsinline>
+      </video>
+    </div>
+    
+    <!-- Botones Flotantes -->
+    <div class="floating-buttons">
+      <!-- Botón de Chat -->
+      <button class="button floating-btn chat" 
+              ng-click="openChat()">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+      <!-- Botón de Video -->
+      <button class="button floating-btn video"
+              ng-click="toggleVideo()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+      </button>
+    </div>
+    
+    <!-- Modal de Chat Personalizado -->
+    <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
+      <div class="modal-content3">
+        <div class="modal-header">
+          <h3><i class="fas fa-comments"></i> Chat con el Profesor</h3>
+          <button class="button button-clear" ng-click="closeChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="chatContainer" class="chat-messages">
+            <div ng-repeat="message in webrtc.chatMessages track by $index" 
+                 class="message-item"
+                 ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
+              <div class="message-sender">{{message.sender}}</div>
+              <div class="message-text">{{message.message}}</div>
+              <div class="message-time">{{formatTime(message.timestamp)}}</div>
+            </div>
+          </div>
           <div class="chat-input">
-            <input id="input" type="text" placeholder="Escribe tu respuesta..." ng-model="chatInput" ng-keypress="($event.which === 13) && sendMessage()" />
-            <button id="sendBtn" class="send-btn" ng-click="sendMessage()">
+            <input type="text" 
+                   ng-model="chatMessage"
+                   placeholder="Escribe tu mensaje..."
+                   ng-keypress="($event.which === 13) && sendMessage()">
+            <button class="button button-positive" ng-click="sendMessage()">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</ion-content>
     </ion-view>
   </script>  
 
 
 
-    
- 
+
+
+
+
         
 <script id="lessons.html" type="text/ng-template">
   <ion-view>
@@ -3051,7 +3824,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
+    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" > 
       <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
         <i class="{{alert.icon}}"></i>
       </div>
@@ -3096,123 +3869,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-
-
-
-
-  <script id="solfege.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/solfege" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
-        <script id="rhythm.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses/rhythm" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-    <script id="pieces.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/pieces" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
-  
-
-       <script id="scales.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/scales" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
-      
-        <script id="sightread.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/sightread" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
     
 
-        <script id="aural.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/aural" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
-
-    <script id="theorytest.html" type="text/ng-template">
-    <ion-view>
-     <ion-nav-bar class="bar-light">
-      <ion-nav-buttons side="left">
-        <button class="button button-clear" ng-click="goBack()">
-          <i class="ri-arrow-left-s-line"></i> regresar
-        </button>
-      </ion-nav-buttons>
-    </ion-nav-bar>
-      <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/theory" frameborder="0" allowfullscreen ></iframe></div> 
-      </ion-content>
-    </ion-view>
-  </script>
-
- 
 
 
 
@@ -3611,9 +4269,87 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
      <ion-content>
   <div class="iframe-container2"><iframe src="https://app.mozartacademy.mx/books2" frameborder="0" allowfullscreen ></iframe></div> 
+
+   
       </ion-content>
       
-       
+       <div id="videoContainer" 
+         class="video-container" 
+         ng-show="showVideo"
+         ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
+      <div class="video-controls">
+        <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
+          <i class="fas" ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+        </button>
+        <button class="video-control-btn" ng-click="toggleVideo()" title="Ocultar Video">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <video id="remoteVideo" 
+             class="remote-video" 
+             autoplay 
+             playsinline>
+      </video>
+    </div>
+    
+    <!-- Botones Flotantes -->
+    <div class="floating-buttons">
+      <!-- Botón de Chat -->
+      <button class="button floating-btn chat" 
+              ng-click="openChat()">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+      <!-- Botón de Video -->
+      <button class="button floating-btn video"
+              ng-click="toggleVideo()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+      </button>
+    </div>
+    
+    <!-- Modal de Chat Personalizado -->
+    <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
+      <div class="modal-content3">
+        <div class="modal-header">
+          <h3><i class="fas fa-comments"></i> Chat con el Profesor</h3>
+          <button class="button button-clear" ng-click="closeChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="chatContainer" class="chat-messages">
+            <div ng-repeat="message in webrtc.chatMessages track by $index" 
+                 class="message-item"
+                 ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
+              <div class="message-sender">{{message.sender}}</div>
+              <div class="message-text">{{message.message}}</div>
+              <div class="message-time">{{formatTime(message.timestamp)}}</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" 
+                   ng-model="chatMessage"
+                   placeholder="Escribe tu mensaje..."
+                   ng-keypress="($event.which === 13) && sendMessage()">
+            <button class="button button-positive" ng-click="sendMessage()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
      
     </ion-view>
@@ -3675,10 +4411,18 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
   var app = angular.module('ionicApp', ['ionic']);
 app
+ .run(function($ionicPlatform) {
+      $ionicPlatform.ready(function() {
+        if (window.StatusBar) {
+          StatusBar.styleDefault();
+        }
+      });
+    })
 .factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getProfileData",
-    token: localStorage.getItem('MStoken')
+     token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    //token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -3712,6 +4456,313 @@ app
     getNum: getNum
   };
 })
+
+  .service('WebRTCService', function($q, $timeout, $rootScope) {
+      var self = this;
+      
+      // Configuración Firebase
+      var fb_config = {
+        apiKey: "AIzaSyCiYZ-_3zXQCu6DIkOd_HRGLCS3s6bIYiE",
+        authDomain: "jcubic-webrtc.firebaseapp.com",
+        databaseURL: "https://jcubic-webrtc.firebaseio.com",
+        projectId: "jcubic-webrtc",
+        storageBucket: "jcubic-webrtc.appspot.com",
+        messagingSenderId: "530153588319"
+      };
+      
+      // Configuración de servidores STUN/TURN
+      var iceServers = [
+        { urls: "stun:stun.relay.metered.ca:80" },
+        {
+          urls: "turn:a.relay.metered.ca:80",
+          username: "fad444a63bcf5c8176a3e139",
+          credential: "MQm2u8W0l1TCVMm0"
+        },
+        {
+          urls: "turn:a.relay.metered.ca:80?transport=tcp",
+          username: "fad444a63bcf5c8176a3e139",
+          credential: "MQm2u8W0l1TCVMm0"
+        },
+        {
+          urls: "turn:a.relay.metered.ca:443",
+          username: "fad444a63bcf5c8176a3e139",
+          credential: "MQm2u8W0l1TCVMm0"
+        },
+        {
+          urls: "turn:a.relay.metered.ca:443?transport=tcp",
+          username: "fad444a63bcf5c8176a3e139",
+          credential: "MQm2u8W0l1TCVMm0"
+        }
+      ];
+      
+      // Variables del servicio
+      var db, room = "piano-class", usersRef, signalsRef;
+      var localStream = null;
+      var myId = "user-" + Math.floor(Math.random() * 10000);
+      var peer = null;
+      var isConnected = false;
+      var connectionTimeoutPromise = null;
+      
+      // Estados públicos
+      self.connectionStatus = 'disconnected';
+      self.statusMessage = 'Desconectado';
+      self.isMuted = false;
+      self.isVideoVisible = false;
+      self.unreadMessages = 0;
+      self.chatMessages = [];
+      
+      
+      // Inicializar Firebase
+      self.init = function() {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(fb_config);
+        }
+        db = firebase.database();
+        usersRef = db.ref(room + '/users');
+        signalsRef = db.ref(room + '/signals');
+      };
+      
+      // Conectar con el profesor
+      // Dentro del servicio WebRTCService
+
+      self.connect = function(userName, stream) {
+          var deferred = $q.defer();
+
+          if (isConnected) {
+              deferred.resolve();
+              return deferred.promise;
+          }
+
+          localStream = stream; // Asigna el stream recibido del controlador
+          
+          if (peer) {
+              peer.destroy();
+              peer = null;
+          }
+
+          usersRef.child(myId).set({
+              id: myId,
+              role: "user",
+              name: userName
+          });
+          usersRef.child(myId).onDisconnect().remove();
+
+          self.listenForSignals();
+          self.updateStatus('isConnecting', 'Esperando conexión con el profesor');
+          self.addMessage('Sistema', 'Conectando con el profesor...');
+
+          isConnected = true;
+          
+          // Inicia el temporizador de 40 segundos
+          connectionTimeoutPromise = $timeout(function() {
+              // Si el temporizador expira y el estado sigue siendo 'isConnecting', desconecta
+              if (self.connectionStatus === 'isConnecting') {
+                  self.disconnect();
+                  self.addMessage('Sistema', 'Tiempo de espera de conexión agotado. El profesor no respondió.');
+              }
+          }, 40000); // 40 segundos
+
+          deferred.resolve();
+          $rootScope.$apply();
+
+          return deferred.promise;
+      };
+      
+      // Desconectar
+      self.disconnect = function() {
+        if (peer) {
+          peer.destroy();
+          peer = null;
+        }
+        
+        if (localStream) {
+          localStream.getTracks().forEach(function(track) {
+            track.stop();
+          });
+          localStream = null;
+        }
+        
+        if (usersRef) {
+          usersRef.child(myId).remove();
+          signalsRef.off("child_added");
+        }
+        
+        self.isVideoVisible = false;
+        self.updateStatus('disconnected', 'Desconectado');
+        self.addMessage('Sistema', 'Te has desconectado del profesor.');
+        
+        isConnected = false;
+        $rootScope.$apply();
+      };
+      
+      // Iniciar peer connection
+      self.startPeer = function(masterId, initiator) {
+        peer = new SimplePeer({ 
+          initiator: initiator, 
+          stream: localStream,
+          config: { iceServers: iceServers }
+        });
+        
+        peer.on("signal", function(data) {
+          signalsRef.push({ from: myId, to: masterId, data: data });
+        });
+        
+        peer.on("data", function(msg) {
+          var data = JSON.parse(msg.toString());
+          if (data.type === 'chat') {
+            self.addMessage("Profesor", data.text);
+            if (!self.isChatOpen) {
+              self.unreadMessages++;
+            }
+            $rootScope.$apply();
+          }
+        });
+        
+        peer.on("stream", function(stream) {
+          var hasVideo = stream.getVideoTracks().length > 0;
+          var hasAudio = stream.getAudioTracks().length > 0;
+          
+          if (hasVideo) {
+            var remoteVideo = document.getElementById('remoteVideo');
+            if (remoteVideo) {
+              remoteVideo.srcObject = stream;
+              self.isVideoVisible = true;
+            }
+          }
+          
+          if (hasAudio) {
+            var audio = new Audio();
+            audio.srcObject = stream;
+            audio.autoplay = true;
+            
+            audio.play().catch(function(e) {
+              console.log("Error reproduciendo audio:", e);
+              document.addEventListener('click', function playAudio() {
+                audio.play().catch(console.error);
+                document.removeEventListener('click', playAudio);
+              });
+            });
+          }
+          
+          self.updateStatus('connected', 'Conectado con el profesor');
+          self.addMessage('Sistema', 'Conectado con el profesor. Ya puedes comunicarte.');
+          $rootScope.$apply();
+        });
+        
+        peer.on("close", function() {
+          self.updateStatus('disconnected', 'Conexión cerrada');
+          self.addMessage('Sistema', 'El profesor ha terminado la conexión.');
+          self.isVideoVisible = false;
+          $rootScope.$apply();
+        });
+        
+        peer.on("error", function(err) {
+          console.error("Error de conexión:", err);
+          self.addMessage('Sistema', 'Error de conexión. Intentando reconectar...');
+          self.updateStatus('disconnected', 'Error de conexión');
+          $rootScope.$apply();
+        });
+      };
+      
+      // Escuchar señales
+      self.listenForSignals = function() {
+        signalsRef.on("child_added", function(snap) {
+          var signal = snap.val();
+          var from = signal.from;
+          var to = signal.to;
+          var data = signal.data;
+          
+          if (to === myId) {
+            if (!peer) {
+              self.startPeer(from, false);
+            }
+            try {
+              peer.signal(data);
+            } catch (e) {
+              console.log('Error signaling peer:', e);
+            }
+          }
+        });
+      };
+      
+      // Enviar mensaje
+      self.sendMessage = function(message) {
+        var deferred = $q.defer();
+        
+        if (!peer) {
+          deferred.reject('No estás conectado con un profesor');
+          return deferred.promise;
+        }
+        
+        var messageData = {
+          type: 'chat',
+          text: message,
+          timestamp: new Date().toISOString(),
+          sender: myId
+        };
+        
+        try {
+          peer.send(JSON.stringify(messageData));
+          self.addMessage("Tú", message);
+          deferred.resolve();
+        } catch (error) {
+          console.error('Error enviando mensaje:', error);
+          self.addMessage('Sistema', 'Error al enviar el mensaje. Intenta nuevamente.');
+          deferred.reject(error);
+        }
+        
+        return deferred.promise;
+      };
+      
+      // Toggle audio
+      self.toggleAudio = function() {
+        if (!localStream) return;
+        
+        var audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+          audioTrack.enabled = !audioTrack.enabled;
+          self.isMuted = !audioTrack.enabled;
+          $rootScope.$apply();
+        }
+      };
+      
+      // Agregar mensaje al chat
+      self.addMessage = function(sender, message) {
+        self.chatMessages.push({
+          sender: sender,
+          message: message,
+          timestamp: new Date(),
+          isOwn: sender === "Tú"
+        });
+        
+        // Scroll al final del chat
+        $timeout(function() {
+          var chatContainer = document.getElementById('chatContainer');
+          if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+        }, 100);
+      };
+      
+      // Actualizar estado de conexión
+      self.updateStatus = function(status, message) {
+        self.connectionStatus = status;
+        self.statusMessage = message;
+      };
+      
+      // Obtener estado de conexión
+      self.isConnectedToTeacher = function() {
+        return isConnected && self.connectionStatus === 'connected';
+      };
+      
+      // Limpiar mensajes no leídos
+      self.clearUnreadMessages = function() {
+        self.unreadMessages = 0;
+      };
+      
+      // Inicializar el servicio
+      self.init();
+    })
 
 .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
@@ -3798,67 +4849,11 @@ app
       views: {
         'menuContent': {
           templateUrl: "livestream.html",
+        //  controller: 'livestreamCtrl'
         }
       }
     }) 
-      .state('menu.solfege', {
-      url: "/solfege",
-      views: {
-        'menuContent': {
-          templateUrl: "solfege.html"
-        }
-      }
-    })
- 
-          .state('menu.rhythm', {
-      url: "/rhythm",
-      views: {
-        'menuContent': {
-          templateUrl: "rhythm.html"
-        }
-      }
-    })
-            .state('menu.pieces', {
-      url: "/pieces",
-      views: {
-        'menuContent': {
-          templateUrl: "pieces.html"
-        }
-      }
-    })
-        .state('menu.scales', {
-      url: "/scales",
-      views: {
-        'menuContent': {
-          templateUrl: "scales.html"
-        }
-      }
-    })
-        .state('menu.sightread', {
-      url: "/sightread",
-      views: {
-        'menuContent': {
-          templateUrl: "sightread.html"
-        }
-      }
-    })
-        .state('menu.aural', {
-      url: "/aural",
-      views: {
-        'menuContent': {
-          templateUrl: "aural.html"
-        }
-      }
-    })
-        .state('menu.theorytest', {
-      url: "/theorytest",
-      views: {
-        'menuContent': {
-          templateUrl: "theorytest.html"
-        }
-      }
-    }) 
- 
+    
   
  .state('menu.payment', {
       url: "/payment",
@@ -3907,10 +4902,381 @@ app
   $ionicConfigProvider.tabs.position('bottom'); 
 })
 
- .controller('AppCtrl', function() {
-  ionic.Platform.ready(function() {
-  });
- })       
+ .controller('AppCtrl', function($scope, $ionicViewSwitcher, $timeout, WebRTCService, SharedState) {
+      
+      // Vincular el servicio al scope
+      $scope.webrtc = WebRTCService;
+      
+      // Variables del controlador
+      $scope.isConnecting = false;
+      $scope.chatMessage = '';
+      $scope.showVideo = false;
+      $scope.isFullscreen = false;
+      $scope.showChatModal = false;
+      $scope.isDragging = false;
+      $scope.userName = "Alumno"
+      
+
+      // Variables para drag
+      var dragOffset = { x: 0, y: 0 };
+      
+      // Conectar/Desconectar
+      $scope.toggleConnection = function() {
+        if ($scope.webrtc.connectionStatus === 'disconnected' && !$scope.isConnecting) {
+          $scope.connect();
+        } else if ($scope.webrtc.connectionStatus !== 'disconnected') {
+          $scope.disconnect();
+        }
+      };
+      
+
+      $scope.connect = function() {
+          $scope.isConnecting = true;
+          
+          // Inicia ambas promesas en paralelo
+          var micPromise = navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          var dataPromise = SharedState.getNum();
+          
+          // Espera a que ambas promesas se resuelvan
+          Promise.all([micPromise, dataPromise])
+              .then(function(results) {
+                  var stream = results[0]; // Resultado de la promesa del micrófono
+                  var data = results[1];   // Resultado de la promesa de SharedState
+                  
+                  $scope.userName = data.data.name;
+                  
+                  return WebRTCService.connect($scope.userName, stream);
+              })
+              .then(function() {
+                  console.log('Conexión iniciada. Esperando respuesta del profesor.');
+              })
+              .catch(function(error) {
+                  console.error('Error durante la conexión:', error);
+                  var errorMessage = 'No se pudo iniciar la conexión.';
+                  if (error && error.name === 'NotAllowedError') {
+                      errorMessage = 'Por favor, permite el acceso al micrófono para conectarte.';
+                  } else if (error && error.name === 'NotFoundError') {
+                      errorMessage = 'No se encontró un micrófono disponible.';
+                  }
+                  alert(errorMessage);
+                  $scope.isConnecting = false;
+              });
+      };
+            
+      // Desconectar
+      $scope.disconnect = function() {
+          WebRTCService.disconnect();
+          $scope.showVideo = false;
+          $scope.isConnecting = false;
+      };
+
+      $scope.$watch('webrtc.connectionStatus', function(newStatus, oldStatus) {
+        if (newStatus === 'connected' || newStatus === 'disconnected') {
+          $scope.isConnecting = false;
+        }
+      });
+
+      $scope.getStatusMessage = function() {
+        if ($scope.isConnecting) {
+            return 'Esperando aprobación del profesor';
+        } else {
+            return $scope.webrtc.statusMessage;
+        }
+      };
+      
+      // Toggle micrófono
+      $scope.toggleMicrophone = function() {
+        WebRTCService.toggleAudio();
+      };
+      
+      // Abrir modal de chat
+      $scope.openChat = function() {
+        console.log('Opening chat modal');
+        WebRTCService.clearUnreadMessages();
+        $scope.showChatModal = true;
+      };
+      
+      // Cerrar modal de chat
+      $scope.closeChat = function() {
+        console.log('Closing chat modal');
+        $scope.showChatModal = false;
+      };
+      
+      // Cerrar modal al hacer clic fuera
+      $scope.closeModalOnOutsideClick = function(event) {
+        if (event.target.id === 'chatModal') {
+          $scope.closeChat();
+        }
+      };
+      
+      // Enviar mensaje
+      $scope.sendMessage = function() {
+        if (!$scope.chatMessage.trim()) return;
+        
+        var message = $scope.chatMessage.trim();
+        $scope.chatMessage = '';
+        
+        WebRTCService.sendMessage(message)
+          .catch(function(error) {
+            alert(error);
+          });
+      };
+      
+      // Mostrar/Ocultar video
+      $scope.toggleVideo = function() {
+        $scope.showVideo = !$scope.showVideo;
+      };
+      
+      // Pantalla completa
+      $scope.toggleFullscreen = function() {
+        var videoElement = document.getElementById('videoContainer');
+        
+        if (!$scope.isFullscreen) {
+          // Entrar en pantalla completa
+          if (videoElement.requestFullscreen) {
+            videoElement.requestFullscreen();
+          } else if (videoElement.webkitRequestFullscreen) {
+            videoElement.webkitRequestFullscreen();
+          } else if (videoElement.mozRequestFullScreen) {
+            videoElement.mozRequestFullScreen();
+          } else if (videoElement.msRequestFullscreen) {
+            videoElement.msRequestFullscreen();
+          }
+          $scope.isFullscreen = true;
+        } else {
+          // Salir de pantalla completa
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+          $scope.isFullscreen = false;
+        }
+      };
+      
+      // Funciones para drag del video
+      $scope.startDrag = function(event) {
+        if ($scope.isFullscreen) return;
+        
+        event.preventDefault();
+        $scope.isDragging = true;
+        document.body.classList.add('no-select');
+        
+        var rect = document.getElementById('videoContainer').getBoundingClientRect();
+        dragOffset.x = event.clientX - rect.left;
+        dragOffset.y = event.clientY - rect.top;
+        
+        document.addEventListener('mousemove', $scope.drag);
+        document.addEventListener('mouseup', $scope.stopDrag);
+      };
+      
+      $scope.startDragTouch = function(event) {
+        if ($scope.isFullscreen) return;
+        
+        event.preventDefault();
+        $scope.isDragging = true;
+        document.body.classList.add('no-select');
+        
+        var touch = event.touches[0];
+        var rect = document.getElementById('videoContainer').getBoundingClientRect();
+        dragOffset.x = touch.clientX - rect.left;
+        dragOffset.y = touch.clientY - rect.top;
+        
+        document.addEventListener('touchmove', $scope.dragTouch);
+        document.addEventListener('touchend', $scope.stopDrag);
+      };
+      
+   $scope.drag = function(event) {
+  if (!$scope.isDragging) return;
+
+  var container = document.getElementById('videoContainer');
+  
+  // detectar si hay sidebar expuesto
+  var sidebarWidth = (window.innerWidth > 700) ? 280 : 0;
+
+  var newX = event.clientX - dragOffset.x - sidebarWidth;
+  var newY = event.clientY - dragOffset.y;
+
+  var maxX = window.innerWidth - container.offsetWidth - sidebarWidth;
+  var maxY = window.innerHeight - container.offsetHeight;
+
+  newX = Math.max(0, Math.min(newX, maxX));
+  newY = Math.max(0, Math.min(newY, maxY));
+
+  container.style.left = newX + 'px';
+  container.style.top = newY + 'px';
+};
+
+
+$scope.dragTouch = function(event) {
+  if (!$scope.isDragging) return;
+
+  var touch = event.touches[0];
+  var container = document.getElementById('videoContainer');
+  
+  var sidebarWidth = (window.innerWidth > 700) ? 280 : 0;
+
+  var newX = touch.clientX - dragOffset.x - sidebarWidth;
+  var newY = touch.clientY - dragOffset.y;
+
+  var maxX = window.innerWidth - container.offsetWidth - sidebarWidth;
+  var maxY = window.innerHeight - container.offsetHeight;
+
+  newX = Math.max(0, Math.min(newX, maxX));
+  newY = Math.max(0, Math.min(newY, maxY));
+
+  container.style.left = newX + 'px';
+  container.style.top = newY + 'px';
+};
+
+
+      
+      $scope.stopDrag = function() {
+        $scope.isDragging = false;
+        document.body.classList.remove('no-select');
+        
+        document.removeEventListener('mousemove', $scope.drag);
+        document.removeEventListener('mouseup', $scope.stopDrag);
+        document.removeEventListener('touchmove', $scope.dragTouch);
+        document.removeEventListener('touchend', $scope.stopDrag);
+        
+        $scope.$apply();
+      };
+      
+      // Obtener clase CSS para el estado de conexión
+      $scope.getConnectionClass = function() {
+        return $scope.webrtc.connectionStatus === 'connected' ? 'connected' : 'disconnected';
+      };
+      
+      // Obtener ícono de conexión
+      $scope.getConnectionIcon = function() {
+        if ($scope.isConnecting) {
+          return 'ion-load-c';
+        }
+        return $scope.webrtc.connectionStatus === 'connected' ? 'ion-checkmark-circled' : 'ion-close-circled';
+      };
+      
+      // Obtener texto del botón de conexión
+      $scope.getConnectionButtonText = function() {
+        if ($scope.isConnecting) {
+          return 'Conectando...';
+        }
+        return $scope.webrtc.connectionStatus === 'connected' ? 'Desconectar' : 'Conectar con el profesor';
+      };
+      
+      // Obtener clase del botón de conexión
+      $scope.getConnectionButtonClass = function() {
+        if ($scope.webrtc.connectionStatus === 'connected') {
+          return 'button-assertive';
+        }
+        return 'button-positive';
+      };
+      
+      // Obtener ícono del micrófono
+      $scope.getMicrophoneIcon = function() {
+        return $scope.webrtc.isMuted ? 'ion-mic-disabled' : 'ion-mic-a';
+      };
+      
+      // Obtener clase del botón de micrófono
+      $scope.getMicrophoneClass = function() {
+        return $scope.webrtc.isMuted ? 'button-stable' : 'button-assertive';
+      };
+      
+      // Watch para cambios en la visibilidad del video
+      $scope.$watch('webrtc.isVideoVisible', function(newVal) {
+        $scope.showVideo = newVal;
+      });
+      
+      // Función para formatear timestamp
+      $scope.formatTime = function(timestamp) {
+        return new Date(timestamp).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+      
+      // Manejar eventos de pantalla completa
+      document.addEventListener('fullscreenchange', function() {
+        $scope.$apply(function() {
+          $scope.isFullscreen = !!document.fullscreenElement;
+        });
+      });
+      
+      document.addEventListener('webkitfullscreenchange', function() {
+        $scope.$apply(function() {
+          $scope.isFullscreen = !!document.webkitFullscreenElement;
+        });
+      });
+      
+      document.addEventListener('mozfullscreenchange', function() {
+        $scope.$apply(function() {
+          $scope.isFullscreen = !!document.mozFullScreenElement;
+        });
+      });
+      
+      // Inicializar event listeners para drag después de que el DOM esté listo
+      $timeout(function() {
+        var videoContainer = document.getElementById('videoContainer');
+        if (videoContainer) {
+          videoContainer.addEventListener('mousedown', $scope.startDrag);
+          videoContainer.addEventListener('touchstart', $scope.startDragTouch, { passive: false });
+        }
+        
+        // Event listener para cerrar modal al hacer clic fuera
+        var chatModal = document.getElementById('chatModal');
+        if (chatModal) {
+          chatModal.addEventListener('click', $scope.closeModalOnOutsideClick);
+        }
+      }, 100);
+
+      $scope.$on('$ionicView.enter', function(e) {
+        // This code will run every time the view becomes active
+        $timeout(function() {
+            var videoContainer = document.getElementById('videoContainer');
+            if (videoContainer) {
+                console.log("Attaching event listeners for video container.");
+                videoContainer.addEventListener('mousedown', $scope.startDrag);
+                videoContainer.addEventListener('touchstart', $scope.startDragTouch, { passive: false });
+            }
+        }, 0); // Use $timeout to ensure the DOM is fully rendered
+    });
+
+    // Add a corresponding '$ionicView.leave' to clean up listeners
+    $scope.$on('$ionicView.leave', function(e) {
+        // Clean up listeners to prevent memory leaks
+        var videoContainer = document.getElementById('videoContainer');
+        if (videoContainer) {
+            videoContainer.removeEventListener('mousedown', $scope.startDrag);
+            videoContainer.removeEventListener('touchstart', $scope.startDragTouch);
+        }
+    });
+      
+      // Limpiar event listeners al destruir el scope
+      $scope.$on('$destroy', function() {
+        WebRTCService.disconnect();
+        
+        var videoContainer = document.getElementById('videoContainer');
+        if (videoContainer) {
+          videoContainer.removeEventListener('mousedown', $scope.startDrag);
+          videoContainer.removeEventListener('touchstart', $scope.startDragTouch);
+        }
+        
+        document.removeEventListener('mousemove', $scope.drag);
+        document.removeEventListener('mouseup', $scope.stopDrag);
+        document.removeEventListener('touchmove', $scope.dragTouch);
+        document.removeEventListener('touchend', $scope.stopDrag);
+        
+        var chatModal = document.getElementById('chatModal');
+        if (chatModal) {
+          chatModal.removeEventListener('click', $scope.closeModalOnOutsideClick);
+        }
+      });
+    })
+
 
 .controller('MenuCtrl', ['$http', '$scope', '$ionicSideMenuDelegate', '$ionicModal', '$ionicHistory', '$timeout', 'SharedState', function($http, $scope, $ionicSideMenuDelegate, $ionicModal, $ionicHistory, $timeout, SharedState) {
   $scope.toggleRight = function() {
@@ -4171,9 +5537,13 @@ function cleanInput() {
       $scope.goToAgenda = function() {
   window.location.href = '#/menu/agenda';
 };
+$scope.goToPayment = function() {
+   window.location.href = '#/main/payment';
+};
     $scope.goToMain = function() {
    window.location.href = '#/main';
 };
+
 $scope.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
   .test(navigator.userAgent);
 
@@ -4291,55 +5661,38 @@ $scope.installApp = function () {
 }; 
     }])
 
-   .controller('profileImagesCtrl', ['$scope', 'SharedState', function($scope,  SharedState){
+  /* .controller('livestreamCtrl', ['$scope', 'SharedState', 'WebRTCService', function($scope,  SharedState, WebRTCService){
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
   })
+
+  $scope.service = WebRTCService;
+
+  // Functions for the view
+  $scope.openChatModal = function() {
+    $scope.isChatOpen = true;
+    WebRTCService.unreadCount = 0;
+  };
+  
+  $scope.closeChatModal = function() {
+    $scope.isChatOpen = false;
+  };
+
+  $scope.sendMessage = function() {
+    if (!$scope.chatInput) return;
+    WebRTCService.sendMessage($scope.chatInput);
+    $scope.chatInput = "";
+  };
+
+  // Initialize the service when the controller loads
+  WebRTCService.init();
+
   
 
+    }])*/
 
-    }])
 
 
 
     </script>
-
-
-<script>
-$(window).on('load', function() { 
-  var storedToken = localStorage.getItem('MStoken');
-  if (storedToken) {
-    var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
-
-    var validationData = {
-      redirect: "follow",
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        action: "validateToken",
-        token: storedToken
-      })
-    };
-
-  fetch(api, validationData)
-  .then(response => response.text())
-  .then(res => {
-    var validation = JSON.parse(res);
-    if (validation.status == "success") {
-      $('.preloader').css({'display':'none'})  
-      $('.mainSection').fadeIn('slow')  
-    } else {
-      localStorage.removeItem('MStoken');
-     window.location.href = 'https://app.mozartacademy.mx/';
-    }
-  })
-  } else {
-    window.location.href = 'https://app.mozartacademy.mx/';
-  }
-});
- 
-
-</script> 
  
