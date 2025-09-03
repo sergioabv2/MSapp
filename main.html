@@ -19,6 +19,10 @@
  <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css" rel="stylesheet" type="text/css"> 
+
  <link rel="manifest" href="/manifest.json">
 </head>
 
@@ -133,12 +137,13 @@ ion-side-menu .list .item {
   font-size: 18px;
   display: flex;
   align-items: center;
-  color:  #374151;
+  color: #374151;
   transition: background-color 0.3s ease, color 0.3s ease;
   border-radius: 2px; /* Bordes redondeados */
     border-top: 1px solid transparent !important; 
     border-bottom: 1px solid transparent !important; 
-  
+  font-weight: 400; 
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 }
 
 ion-side-menu .list .item i {
@@ -160,10 +165,10 @@ ion-side-menu .list .item:hover {
 }
 
 .menuSelectedColor {    
-
+font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-weight: 500 !important; text-shadow: 0 0 6px silver !important;
     background-color: #f0f2f5 !important; 
   color: #1F2937 !important;
-  font-weight:bold;
 }
 
 .card{
@@ -658,13 +663,14 @@ ion-side-menu .list .item:hover {
 }
 
 .main-data .planTag{
-  color: #77777a; 
-  font-size: 12px;
+  color: gray; font-weight: 500; text-shadow: 0 0 2px silver;
+  font-size: 11px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 }
 .main-data .userLvl{
   margin-top: 1px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  color: black; font-weight: 500 !important; text-shadow: 0 0 6px silver !important;
 }
 .main-data h4 {
     font-size: 17px;
@@ -1857,7 +1863,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 }
 
 .video-control-btn {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.1); 
     border: none;
     color: white;
     padding: 8px;
@@ -2303,6 +2309,42 @@ width: 200px; /* Ajusta según el tamaño deseado */
     font-size: 13px; /* 0.8rem -> 12.8px */
     color: var(--gray);
 }
+   
+   .toggle-royal {
+    margin-top: 7px !important; 
+  margin-right: 5px !important;
+     cursor: pointer;
+}
+
+.item-input-wrapper{
+  max-width: 96px ;
+  justify-content: flex-end;
+}
+
+.item-input-wrapper select {
+  /* Hide the default dropdown arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 24px;
+  
+  /* Reset button styles */
+  background-color: transparent;
+  border: none;
+ 
+  /* Text and positioning */
+  color: inherit;
+  font-size: 16px;
+  padding: 10px;
+  cursor: pointer;
+
+}
+
+
+
+
 </style>
 
 <body>
@@ -2335,14 +2377,11 @@ width: 200px; /* Ajusta según el tamaño deseado */
               <img class="profile-pic" src="{{userData.photo}}">
           </div>
           <div class="main-data" style="margin-top: 12px;" ng-if="!loadingProfile">
-            <h4 >{{userData.name}}</h4>
-        <div class="pull-left planTag" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN PREMIUM
-            <i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
-    <div class="pull-left planTag" ng-if="userPlan == 'Pro' && userData.status == 'ACTIVO'" style="color: #20a2f1; text-shadow: 0 0 1px #20a2f1;"> PLAN PRO
-            <i class="ri-verified-badge-fill" style="color: #20a2f1; text-shadow: none;"></i>  </div>
-      <div class="pull-left planTag" ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN ESTUDIANTE
-            <i class="ri-graduation-cap-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
-    <div class="pull-left planTag" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'" style="color: brown;"> PLAN STANDARD </div>
+            <h4 class="userLvl">{{userData.name}}</h4>
+
+        <div class="pull-left planTag"> <i class="ri-progress-8-line" style="color: #28a745; text-shadow: 0 0 10px #28a745; margin-right: 4px" ng-if="userData.status == 'ACTIVO'"></i> <i class="ri-lock-2-fill" style="margin-right: 4px" ng-if="userData.status != 'ACTIVO'"></i>  {{userData.status}} </div>
+
+
             <br>
         <div class="userLvl" ng-if="userData.lvl == 0"> Nivel Preparatorio </div>
           <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userData.lvl}} </div>
@@ -2612,7 +2651,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
      <script id="statistics.html" type="text/ng-template">
-    <ion-view >
+    <ion-view ng-init="showGraph()">
       
       <ion-nav-bar class="bar-light" >     
        <ion-nav-buttons side="left">
@@ -2622,8 +2661,31 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </ion-nav-buttons>  
     </ion-nav-bar>
       
-      <ion-content > 
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/statistics" frameborder="0" allowfullscreen></iframe></div>   
+      <ion-content style="margin-top: 10px;"> 
+      
+           <div class="item item-divider itemDividerforitem">List Icon</div>
+        <a class="item item-icon-left item-icon-right" href="javascript:;">
+          <i class="icon ion-chatbubble-working"></i>Contact us
+          <i class="icon ion-ios-telephone-outline" ></i>
+        </a>
+        <a class="item item-icon-left" href="javascript:;">
+          <i class="icon ion-ios-game-controller-b"></i>Games
+          <span class="item-note">NFS</span>
+        </a>
+        <a class="item item-icon-left" href="javascript:;">
+          <i class="icon ion-levels"></i>Level Completed
+          <span class="badge badge-balanced">5</span>
+        </a>
+        <div class="item item-button-right">Delete It
+          <button class="button button-assertive">
+            <i class="icon ion-ios-trash"></i>
+          </button>
+        </div>
+
+
+      <div class="item item-divider">All Chart</div>
+        <select ng-model="config.type" ng-options="typeOption for typeOption in typeOptions" ng-change="showGraph()"></select>
+      <div id="chartDisplay" data-tap-disabled="true"></div>
       </ion-content>
 
    
@@ -2644,42 +2706,68 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-nav-bar>
       <ion-content style="margin-top: 10px">
        <div class="list">
+
         <ion-list>
-      <ion-item class="item-avatar">
-        <img data-ng-src="{{userData.photo}}">    
-           <h2>{{userData.name}}</h2>       
-          <p>{{userData.mail}}</p>    
-          </ion-item>
+            <ion-item class="item-divider itemDividerforitem" >
+    Plan de pago
+        </ion-item>
+
+
+          <ion-item class="item-icon-left item-button-right" >
+<i class="icon ri-vip-crown-line" style="font-weight: 600; color: orange; text-shadow: 0 0 4px orange; " ng-if="activeUser && userPlan != 'Premium'" > </i> 
+<i class="icon ri-vip-crown-line" style="font-weight: 600;  text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan == 'Premium'" > </i> 
+<i class="icon ri-lock-fill"  ng-if="!activeUser" > </i> 
+     Mozart Plus
+       <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="!activeUser">Free</p>    
+    <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan != 'Premium'">PREMIUM</p> 
+     <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan == 'Premium'">PREMIUM BLACK</p> 
+
+         <button ng-if="!activeUser" class="button button-dark" style="margin-top: 10px; border-radius: 18px;" ng-click="goToPayment()">
+            Upgrade
+          </button>
+                </ion-item>
+
+        <ion-item class="item-icon-left " ng-if="activeUser">
+<i class="icon ri-time-line" style="font-weight: 500; text-shadow: 0 0 4px silver;"></i> Termino del plan
+        <p style="font-weight: 700; text-shadow: 0 0 4px silver;">
+         {{userData.nextpay}}
+        </p>
+      </ion-item>
+
+
      </ion-list>    
+
           <ion-list>
       <ion-item class="item-divider itemDividerforitem" >
-    Mi plan
+    Sistema
         </ion-item>
-      <ion-item class="item-icon-left">
-            <span class="item-note"  style="  margin-top: 5px; color: green" ng-if="userData.status == 'ACTIVO'">ACTIVO</span>
-           <span class="item-note"  style=" color: red" ng-if="userData.status != 'ACTIVO'">Pago pendiente</span>
-         <i class="icon ri-currency-fill" ></i>
-       Plan de pago
-         <p style="color: orange; text-shadow: 0 0 10px orange;" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'"><i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i> Premium </p>   
-        <p style="color: #20a2f1; text-shadow: 0 0 1px #20a2f1;" ng-if="userPlan == 'Pro' && userData.status == 'ACTIVO'"><i class="ri-verified-badge-fill" style="color: #20a2f1; text-shadow: none;" ></i> PRO </p>   
-         <p ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'">><i class="ri-graduation-cap-fill'" ></i> Estudiante </p>  
-          <p style="color: brown;" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'"> Standard </p> 
-          </ion-item>
-          <ion-item class="item-icon-left" ng-if="userData.status == 'ACTIVO'">
-<i class="icon ri-presentation-fill" ></i> Formato
-         <p>{{userData.format}} </p>   
-                </ion-item>
+     
 
-                 <ion-item class="item-icon-left item-button-right" >
-<i class="icon ri-calendar-schedule-fill" ></i> Próximo pago
-         <p >{{userData.nextpay}} </p>  
-        
+   <ion-toggle
+    ng-model="notificationsEnabled"
+    ng-checked="notificationsEnabled"
+    toggle-class="toggle-royal" class="item-icon-left">
+    Notificaciones
+     <i class="icon ri-notification-4-line" style="font-weight: 500; text-shadow: 0 0 4px silver;" ng-if="notificationsEnabled"> </i> 
+     <i class="icon ri-notification-off-line" style="font-weight: 500; text-shadow: 0 0 4px silver;" ng-if="!notificationsEnabled"> </i> 
+     <p ng-if="notificationsEnabled">Encendidas</p>
+<p ng-if="!notificationsEnabled">Apagadas</p>
+</ion-toggle>
 
-            <button class="button button-stable" ng-click="goToPayment()" style="transform: scale(.8); margin-right: -20px; margin-top: 10px;">
-            Pago   
-          </button>
+<ion-item class="item-icon-left " style="display: flex; flex-direction: row; justify-content: space-between;">
+  <div >
+  <i class="icon ri-translate-2" style="font-weight: 500; text-shadow: 0 0 4px silver;" > </i> 
+    Idioma
+    <p>{{ languageName[selectedLanguage] }}</p>
+  </div>
+    <div class=" item-input-wrapper" >
+        <select ng-model="selectedLanguage">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+</ion-item>
 
-                </ion-item>
            
     </ion-list>    
         
@@ -2734,14 +2822,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
       <ion-item class="item-icon-left item-icon-right">
-         <i class="icon ri-user-fill" style="font-size: 25px"></i>
+         <i class="icon ri-user-3-line" style="font-size: 25px"></i>
        Nombre
           <p style="color: brown;" > {{userData.name}} </p> 
             <ion-option-button class="button-calm" ng-click="">Editar</ion-option-button>
           </ion-item>
 
            <ion-item class="item-icon-left">
-         <i class="icon ri-mail-fill" style="font-size: 25px"></i>
+         <i class="icon ri-mail-line" style="font-size: 25px"></i>
        Correo
           <p style="color: brown;" > {{userData.mail}} </p> 
           </ion-item>
@@ -2749,14 +2837,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
            <ion-item class="item-icon-left " ng-click="goToStats()">
          <i class="icon ri-line-chart-fill" style="font-size: 25px"></i>
        Estadísticas
+          <p style="color: gray;" > Da click para acceder a tus estadísticas </p> 
           </ion-item>
 
 
-          <ion-item class="item-icon-left " >
-         <i class="icon ri-camera-fill" style="font-size: 25px"></i>
-       Foto
-   
-          </ion-item>
 
  
         
@@ -3396,7 +3480,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-content>
     
     <!-- Contenedor de Video Draggable -->
-    <div id="videoContainer" 
+<!--    <div id="videoContainer" 
          class="video-container" 
          ng-show="showVideo"
          ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
@@ -3413,13 +3497,13 @@ width: 200px; /* Ajusta según el tamaño deseado */
              autoplay 
              playsinline>
       </video>
-    </div>
+    </div>  -->
     
     <!-- Botones Flotantes -->
     <div class="floating-buttons">
       <!-- Botón de Chat -->
       <button class="button floating-btn chat" 
-              ng-click="openChat()">
+              ng-click="openChat()" ng-show="webrtc.connectionStatus !== 'disconnected'">
         <i class="fas fa-comment-dots"></i>
         <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
           {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
@@ -4273,7 +4357,86 @@ width: 200px; /* Ajusta según el tamaño deseado */
    
       </ion-content>
       
-     
+     <div id="videoContainer" 
+         class="video-container" 
+         ng-show="showVideo"
+         ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
+      <div class="video-controls">
+        <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
+          <i class="fas" ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+        </button>
+        <button class="video-control-btn" ng-click="toggleVideo()" title="Ocultar Video">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <video id="remoteVideo" 
+             class="remote-video" 
+             autoplay 
+             playsinline>
+      </video>
+    </div> 
+
+
+
+
+      <!-- Botones Flotantes -->
+    <div class="floating-buttons" style="margin-bottom: 20px !important">
+      <!-- Botón de Chat -->
+      <button class="button floating-btn chat" 
+              ng-click="openChat()" ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+      <!-- Botón de Video -->
+      <button class="button floating-btn video"
+              ng-click="toggleVideo()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+      </button>
+    </div>
+    
+    <!-- Modal de Chat Personalizado -->
+    <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
+      <div class="modal-content3">
+        <div class="modal-header">
+          <h3><i class="fas fa-comments"></i> Chat con el Profesor</h3>
+          <button class="button button-clear" ng-click="closeChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="chatContainer" class="chat-messages">
+            <div ng-repeat="message in webrtc.chatMessages track by $index" 
+                 class="message-item"
+                 ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
+              <div class="message-sender">{{message.sender}}</div>
+              <div class="message-text">{{message.message}}</div>
+              <div class="message-time">{{formatTime(message.timestamp)}}</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" 
+                   ng-model="chatMessage"
+                   placeholder="Escribe tu mensaje..."
+                   ng-keypress="($event.which === 13) && sendMessage()">
+            <button class="button button-positive" ng-click="sendMessage()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
      
     </ion-view>
@@ -4345,7 +4508,7 @@ app
 .factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getProfileData",
-     token: localStorage.getItem('MStoken')
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -4737,7 +4900,8 @@ app
       url: "/statistics",
       views: {
         'menuContent': {
-          templateUrl: "statistics.html"
+          templateUrl: "statistics.html",
+          controller: 'statisticsCtrl'
         }
       }
     })
@@ -5565,8 +5729,16 @@ $scope.installApp = function () {
       .controller('StatusCtrl', ['$scope', 'SharedState', function($scope, SharedState){
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
-      $scope.userPlan = data.data.plan.split(" ")[0]
+      $scope.userPlan = data.data.plan.split(" ")[0];
+      $scope.activeUser = data.data.status === 'ACTIVO';
   })
+
+  $scope.notificationsEnabled = true; // Set a default value
+  $scope.selectedLanguage = 'es'; // Set a default value
+$scope.languageName = {
+  'es': 'Español',
+  'en': 'English'
+};
  
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
@@ -5583,6 +5755,31 @@ $scope.installApp = function () {
   window.location.href = '#/menu/payment';
 }; 
     }])
+
+    .controller('statisticsCtrl', function($scope){
+    $scope.chart = null;
+    $scope.config={};
+    $scope.config["data1"]="30, 200, 100, 200, 150, 250";
+    $scope.config["data2"]="70, 30, 10, 240, 150, 125";
+    $scope.config["x"]="'site1', 'site2', 'site3', 'site4', 'site5', 'site6'";
+    $scope.typeOptions=["area","area-spline", "pie"]; // total-8
+    $scope.config.type=$scope.typeOptions[0];
+    $scope.showGraph = function() {
+      var config = {};
+      config.bindto = '#chartDisplay';
+      config.x = 'x',
+      config.axis = {};
+      config.axis.x = {type: 'category'};
+      config.data = {};
+      config.data.json = {};
+      config.data.json["data1"] = $scope.config["data1"].split(",");
+      config.data.json["data2"] = $scope.config["data2"].split(",");
+      config.axis = {"y":{"label":{"text":"Number of items","position":"outer-middle"}}};
+      //config.data.type= $scope.typeOptions[7];
+      config.data.type= $scope.config.type;
+      $scope.chart = c3.generate(config);     
+    }
+  })
 
   /* .controller('livestreamCtrl', ['$scope', 'SharedState', 'WebRTCService', function($scope,  SharedState, WebRTCService){
   SharedState.getNum().then(function(data) {
