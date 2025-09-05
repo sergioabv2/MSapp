@@ -13,210 +13,249 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     
     <style>
-        body {
+      /* --- FUENTES Y VARIABLES GLOBALES --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-            background-color: #f9f9f9;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
-        
-     
-        .search-container {
-            background-color: #2c3e50;
-            color: white;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-        
-        .search-box {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        /* ESTILOS PARA LISTA (MODIFICADO) */
-        .partitura-item {
-            background: white;
-            border-radius: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            display: flex;
-            padding: 15px;
-        }
-        
-        .partitura-item:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        
-        .partitura-img {
-            width: 120px;
-            height: 160px;
-            overflow: hidden;
-            border-radius: 3px;
-            flex-shrink: 0;
-            margin-right: 20px;
-        }
-        
-        .partitura-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .partitura-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .partitura-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .partitura-title {
-            font-weight: bold;
-            font-size: 18px;
-            color: #2c3e50;
-            margin: 0;
-        }
-        
-        .partitura-author {
-            color: #7f8c8d;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .partitura-description {
-            color: #555;
-            margin-bottom: 15px;
-            flex-grow: 1;
-        }
-        
-        .partitura-stats {
-            display: flex;
-            font-size: 13px;
-            color: #95a5a6;
-        }
-        
-        .partitura-stat {
-            margin-right: 20px;
-        }
-        
-        .partitura-actions {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
+:root {
+    --color-primary: #3498db;
+    --color-primary-dark: #2980b9;
+    --color-dark: #2c3e50;
+    --color-text: #34495e;
+    --color-text-light: #7f8c8d;
+    --color-background: #f8f9fa;
+    --color-white: #ffffff;
+    --color-border: #e9ecef;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.07);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+    --border-radius: 6px;
+}
 
-        }
-        
-        .partitura-price {
-            background-color: #2c3e50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .partitura-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .partitura-button:hover {
-            background-color: #2980b9;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 50px;
-            color: #7f8c8d;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 30px;
-            color: #7f8c8d;
-        }
-        
-        /* Resto de estilos se mantienen igual */
-        .filter-sidebar {
-            background: white;
-            padding: 15px;
-            border-radius: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-            margin-bottom: 20px;
-        }
-        
-        .filter-title {
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        .filter-option {
-            margin-bottom: 10px;
-        }
-        .upload-manager {
-    background: #fff;
-    padding: 15px;
+body {
+    background-color: var(--color-background);
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- SECCIÓN DE BÚSQUEDA --- */
+.search-container {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.search-box h2 {
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.search-box .form-control {
+    box-shadow: none;
+    border-color: #4a627a;
+}
+.search-box .form-control:focus {
+    border-color: var(--color-primary);
+}
+
+/* --- BARRA DE FILTROS TIPO "CHIP" --- */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.filter-chip .chip-select {
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 18px;
+    border: 1px solid var(--color-border);
+    appearance: none;
+    background-color: var(--color-white);
+    color: var(--color-text-light);
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.filter-chip .chip-select:focus,
+/* Este selector [ng-model] es inusual, pero lo mantenemos por compatibilidad.
+   Una mejor práctica sería usar ng-class para aplicar una clase 'active' */
+.chip-select[ng-model="true"] {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+    box-shadow: none;
+}
+.filter-chip .chip-select:hover:not(:focus) {
+    border-color: #bdc3c7;
+}
+
+
+/* --- TARJETA DE RESULTADO (.partitura-item) --- */
+.partitura-item {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    transition: all 0.2s ease-out;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+
+.partitura-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+    border-color: #dcdfe2;
+}
+
+.partitura-img {
+    width: 110px;
+    height: 150px;
+    flex-shrink: 0;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.partitura-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.partitura-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.partitura-title {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--color-dark);
+    margin: 0 0 2px 0;
+}
+
+.partitura-author {
+    color: var(--color-text-light);
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+.partitura-description {
+    color: #555;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.partitura-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--color-text-light);
+}
+.partitura-stats .fa{
+    margin-right: 5px;
+}
+
+.partitura-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    min-width: 110px;
+}
+
+.partitura-price {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+}
+
+.partitura-button {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+}
+
+.partitura-button:hover {
+    background-color: var(--color-primary-dark);
+    transform: scale(1.05);
+}
+.partitura-button .fa {
+    margin-right: 5px;
+}
+
+/* --- PANEL DE SUBIDA --- */
+.upload-manager {
+    background: var(--color-white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+.upload-manager h4 {
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 15px;
 }
 
 .upload-area {
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--border-radius);
     padding: 30px;
     text-align: center;
     margin: 15px 0;
     cursor: pointer;
     transition: all 0.3s;
+    color: var(--color-text-light);
 }
 .upload-area:hover {
-    border-color: #3498db;
-    background: #f8f9fa;
+    border-color: var(--color-primary);
+    background: #f1f8fe;
+    color: var(--color-primary);
+}
+.upload-area .fa {
+    margin-bottom: 10px;
 }
 
-.filters-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+/* --- ESTADOS DE CARGA Y SIN RESULTADOS --- */
+.loading-spinner, .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-text-light);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+}
+.no-results h3 {
+    color: var(--color-dark);
+    font-weight: 700;
 }
 
-.filter-chip {
-    position: relative;
-}
-
-.chip-select {
-    height: 32px;
-    padding: 0 15px;
-    border-radius: 16px;
-    border: 1px solid #ddd;
-    appearance: none;
-    background: #f8f9fa;
-    transition: all 0.2s;
-}
-
-.chip-select:focus, 
-.chip-select[ng-model="true"] {
-    background: #e3f2fd;
-    border-color: #3498db;
-    color: #3498db;
-}
-
+/* --- MEDIA QUERIES --- */
 @media(max-width: 600px){
   .nomobile{
     display: none !important;
