@@ -6,6 +6,7 @@
     <title>Piano Quest Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <style>
+      
         :root {
             --bg-color: #f0f2f5;
             --main-content-bg: #ffffff;
@@ -37,64 +38,118 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
-            flex-direction: column;
             height: 100vh;
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
 
-        .app-header {
-            display: none; /* Oculto en desktop por defecto */
+        /* Contenedor para la app de piano que se muestra/oculta */
+        #pianoApp {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        
-        .app-container { display: flex; flex: 1; overflow: hidden; }
 
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            top: 10px;
-            left: 15px; /* Movido a la izquierda */
+
+        /* ============================================= */
+        /* == ESTILOS PARA EL SELECTOR DE NIVELES ====== */
+        /* ============================================= */
+        #levelSelector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .level-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--main-content-bg);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        .level-header {
             background: var(--sidebar-bg);
             color: var(--sidebar-text);
-            border: none;
-            font-size: 1.5rem; /* Ajustado para el icono */
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .level-header h1 { font-size: 2.2rem; margin-bottom: 12px; }
+        .level-header p { font-size: 1.1rem; opacity: 0.9; }
+        .levels-grid {
+            padding: 40px 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .level-card {
+            background:  #f5f5f5;
+            color: white;
+            border: 2px solid gray;
+            border-radius: 12px;
+            padding: 28px 24px;
             cursor: pointer;
-            z-index: 1002;
-            width: 45px;
-            height: 45px;
+            transition: all 0.3s ease;
+        }
+        .level-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-accent);
+            background: #e2e6ea;
+        }
+        .level-card.selected {
+            border-color: var(--primary-accent);
+            background: #e2e6ea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.2);
+        }
+        .level-number {
+            width: 40px; height: 40px;
+            background: var(--primary-accent);
+            color: white;
             border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-weight: 600; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
         }
-        
-        #theme-toggle {
-            background: none;
-            border: 1px solid var(--medium-gray);
-            color: var(--sidebar-text);
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-top: auto;
-            padding: 5px;
-            border-radius: 8px;
-            align-self: center;
-            margin-bottom: 10px;
+        .level-title { font-size: 1.3rem; font-weight: 600; color: var(--text-color); margin-bottom: 8px; }
+        .level-description { color: var(--text-color); opacity: 0.8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px; }
+        .level-duration { color: var(--primary-accent); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .level-duration::before { content: '⏱️'; }
+        .continue-btn-container { margin: 30px; margin-top: 0; text-align: center; }
+        .continue-btn {
+            background: var(--primary-accent);
+            color: white;
+            padding: 16px 40px; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.6; pointer-events: none;
         }
-        
+        .continue-btn.active { opacity: 1; pointer-events: all; }
+        .continue-btn:hover.active { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3); }
+
+        /* ============================================= */
+        /* == ESTILOS PARA LA APP DE PIANO ============= */
+        /* ============================================= */
+        .app-header { display: none; }
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+        .menu-toggle-btn { display: none; position: fixed; top: 10px; left: 15px; background: var(--sidebar-bg); color: var(--sidebar-text); border: none; font-size: 1.5rem; cursor: pointer; z-index: 1002; width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        #theme-toggle { background: none; border: 1px solid var(--medium-gray); color: var(--sidebar-text); font-size: 1.5rem; cursor: pointer; margin-top: auto; padding: 5px; border-radius: 8px; align-self: center; margin-bottom: 10px; }
         .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; border-left: 1px solid var(--lesson-header-bg); }
         .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex; }
         #content-iframe { width: 100%; height: 100%; border: none; }
-
         .user-profile { display: flex; align-items: center; margin-bottom: 25px; }
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
         .user-info .name { font-size: 1.1rem; font-weight: 600; }
         .user-info .plan { font-size: 0.8rem; color: #adb5bd; }
         .progress-bar { width: 100%; height: 8px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
         .progress-fill { height: 100%; background-color: var(--primary-accent); width: 0%; transition: width 0.5s ease-in-out; }
-        
         .lessons-container { flex-grow: 1; overflow-y: auto; }
         .lesson-header { display: flex; align-items: center; border: 1px solid var(--medium-gray); font-weight: bold; font-size: 1rem; padding: 12px; background-color: var(--lesson-header-bg); border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s; }
         .lesson-header.unlocked { cursor: pointer; }
@@ -103,67 +158,23 @@
         .lesson-header .icon { font-size: 1.2rem; margin-right: 10px; }
         .tasks-list { list-style: none; padding-left: 15px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
         .tasks-list.expanded { max-height: 500px; }
-        
-        .task-item { display: flex; align-items: center; padding: 10px 5px; font-size: 0.95rem; opacity: 0.7; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; }
+        .task-item { display: flex; align-items: center; padding: 10px 5px; font-size: 0.95rem; opacity: 0.7; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
         .task-item:hover { background-color: var(--lesson-header-hover); }
-        /* +++ AÑADE ESTO +++ */
-
-
-.task-item.is-viewing {
-    background-color: rgba(226, 230, 234, 0.8);
-}
-
-.task-item.active {
-    opacity: 1;
-    font-weight: bold;
-    background-color: rgba(111, 66, 193, 0.2); /* Mantenemos el fondo original */
-    border-left: 3px solid var(--primary-accent); /* Añadimos un borde para máximo énfasis */
-    padding-left: 10px; /* Un poco de espacio extra por el borde */
-}
+        .task-item.is-viewing { background-color: rgba(111, 66, 193, 0.08); }
+        .task-item.active { opacity: 1; font-weight: bold; background-color: rgba(111, 66, 193, 0.2); border-left: 3px solid var(--primary-accent); padding-left: 10px; }
         .task-item.completed { opacity: 1; }
         .task-item.completed .task-title { text-decoration: line-through; }
         .task-status { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--medium-gray); margin-right: 10px; flex-shrink: 0; }
         .task-item.active .task-status { border-color: var(--primary-accent); }
         .task-item.completed .task-status { background-color: var(--success-green); border-color: var(--success-green); }
         .task-interaction-icon { cursor: pointer; margin-left: auto; font-size: 1.5rem; z-index: 2; }
-        
-        /* Estilos para el indicador de grabación */
-        #recordingIndicator {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--danger-red);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1020;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-weight: 500;
-        }
-        #recordingIndicator::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: var(--danger-red);
-            border-radius: 20px;
-            z-index: -1;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            70% { transform: scale(1.1); opacity: 0; }
-            100% { transform: scale(0.95); opacity: 0; }
-        }
-
+        #recordingIndicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--danger-red); color: white; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; z-index: 1020; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: 500; }
+        #recordingIndicator::before { content: ''; position: absolute; inset: 0; background-color: var(--danger-red); border-radius: 20px; z-index: -1; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 70% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; align-items: center; justify-content: center; z-index: 1010; }
         .modal-content { background: var(--modal-content-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 640px; text-align: center; }
         #audio-playback { width: 100%; margin: 15px 0; }
         .modal-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 15px; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .modal-button { padding: 10px 20px; border: none; border-radius: 5px; background-color: var(--primary-accent); color: white; font-size: 1rem; cursor: pointer; }
@@ -171,30 +182,17 @@
         .quiz-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
         .quiz-option { padding: 12px; border: 1px solid var(--medium-gray); color: var(--text-color); background-color: transparent; border-radius: 5px; cursor: pointer; }
         .quiz-option:hover { background-color: var(--lesson-header-hover); }
-        
         .confetti { position: fixed; width: 10px; height: 10px; opacity: 0; animation: confetti-fall 5s ease-out forwards; }
         @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
         @media (max-width: 800px) {
-            .app-header {
-                display: flex; /* Visible en móvil */
-                align-items: center;
-                justify-content: space-between; /* Alineación */
-                padding: 0 15px 0 70px; /* Espacio para botones */
-                height: 45px; /* Altura reducida */
-                position: fixed;
-                top: 0;
-                width: 100%;
-                z-index: 999;
-            }
-            #mobile-task-icon {
-                font-size: 1.8rem;
-                cursor: pointer;
-                color: var(--header-text);
-            }
-            .main-content {
-                padding-top: 45px; /* Empujar contenido hacia abajo */
-            }
+            .levels-grid { grid-template-columns: 1fr; padding: 30px 20px; }
+            .level-header { padding: 30px 20px; }
+            .level-header h1 { font-size: 1.8rem; }
+            
+            .app-header { display: flex; align-items: center; justify-content: space-between; padding: 0 15px 0 70px; height: 45px; position: fixed; top: 0; width: 100%; z-index: 999; background-color: var(--header-bg); }
+            #mobile-task-icon { font-size: 1.8rem; cursor: pointer; color: var(--header-text); }
+            .main-content { padding-top: 45px; }
             .menu-toggle-btn { display: flex; align-items: center; justify-content: center; }
             .sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 80%; z-index: 1001; transform: translateX(100%); transition: transform 0.3s ease-in-out; border-left: 1px solid var(--lesson-header-bg); border-right: none; }
             .sidebar.is-open { transform: translateX(0); }
@@ -205,45 +203,112 @@
 </head>
 <body>
     
-   <header class="app-header">
-       <h1 class="app-title">Piano Quest Pro</h1>
-       <div id="mobile-task-icon"></div>
-   </header> 
-
-    <button id="menu-toggle" class="menu-toggle-btn"><i class="ri-menu-line"></i></button>
-
-    <div class="app-container">
-        <main class="main-content">
-            <iframe id="content-iframe" src="" title="Contenido principal"></iframe>
-        </main>
-
-        <aside class="sidebar">
-            <div class="user-profile">
-                <div class="user-avatar">1</div>
-                <div class="user-info">
-                    <div class="name">Nivel 1</div>
-                    <div class="plan">Unidad 1</div>
+    <div id="levelSelector">
+        <div class="level-container">
+         
+            <div class="levels-grid">
+                <div class="level-card" data-level="1">
+                    <div class="level-number">1</div>
+                    <h3 class="level-title">Fundamentos</h3>
+                    <p class="level-description">Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.</p>
+                    <div class="level-duration">~2 horas</div>
+                </div>
+                <div class="level-card" data-level="2">
+                    <div class="level-number">2</div>
+                    <h3 class="level-title">Principiante</h3>
+                    <p class="level-description">Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.</p>
+                    <div class="level-duration">~4 horas</div>
+                </div>
+                <div class="level-card" data-level="3">
+                    <div class="level-number">3</div>
+                    <h3 class="level-title">Intermedio</h3>
+                    <p class="level-description">Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.</p>
+                    <div class="level-duration">~8 horas</div>
                 </div>
             </div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            <div class="lessons-container" id="lessonsList"></div>
-            <button id="theme-toggle" ><i class="ri-sun-line"></i></button>
-        </aside>
+            <div class="continue-btn-container">
+                <button class="continue-btn" id="continueBtn">Comenzar Aventura</button>
+            </div>
+        </div>
     </div>
 
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content" id="modalContent"></div>
-    </div>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-    <div id="recordingIndicator" style="display: none;">
-        <i class="ri-mic-fill"></i>
-        <span>Grabando...</span>
+    <div id="pianoApp" style="display: none;">
+        <header class="app-header">
+            <h1 class="app-title">Piano Quest Pro</h1>
+            <div id="mobile-task-icon"></div>
+        </header> 
+        <button id="menu-toggle" class="menu-toggle-btn"><i class="ri-menu-line"></i></button>
+        <div class="app-container">
+            <main class="main-content">
+                <iframe id="content-iframe" src="" title="Contenido principal"></iframe>
+            </main>
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <div class="user-avatar" id="user-level-avatar">1</div>
+                    <div class="user-info">
+                        <div class="name" id="user-level-name">Nivel 1</div>
+                        <div class="plan">Unidad 1</div>
+                    </div>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="lessons-container" id="lessonsList"></div>
+                <button id="theme-toggle"><i class="ri-sun-line"></i></button>
+            </aside>
+        </div>
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-content" id="modalContent"></div>
+        </div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div id="recordingIndicator" style="display: none;">
+            <i class="ri-mic-fill"></i>
+            <span>Grabando...</span>
+        </div>
     </div>
 
 <script>
+// =============================================
+// == LÓGICA DEL SELECTOR DE NIVELES
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    let selectedLevel = null;
+    const levelCards = document.querySelectorAll('.level-card');
+    const continueBtn = document.getElementById('continueBtn');
+
+    levelCards.forEach(card => {
+        card.addEventListener('click', () => {
+            levelCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedLevel = card.dataset.level;
+            continueBtn.classList.add('active');
+        });
+    });
+
+    continueBtn.addEventListener('click', () => {
+        if (selectedLevel) {
+            // 1. Ocultar el selector de niveles
+            document.getElementById('levelSelector').style.display = 'none';
+
+            // 2. Mostrar la aplicación de piano
+            const pianoAppElement = document.getElementById('pianoApp');
+            pianoAppElement.style.display = 'flex'; // Usamos flex para mantener el layout
+
+            // 3. Actualizar la UI de la app con el nivel seleccionado
+            document.getElementById('user-level-avatar').textContent = selectedLevel;
+            document.getElementById('user-level-name').textContent = `Nivel ${selectedLevel}`;
+            
+            // 4. Iniciar la clase principal de la aplicación
+            new PianoQuest();
+        }
+    });
+});
+
+
+// =============================================
+// == CLASE Y LÓGICA DE LA APP DE PIANO
+// =============================================
 class PianoQuest {
     constructor() {
+        // ... (Todo el código de la clase PianoQuest que ya tenías va aquí, sin cambios)
         this.currentLessonIndex = 0;
         this.currentTaskIndex = 0;
         this.totalTasksCompleted = 0;
@@ -291,19 +356,15 @@ class PianoQuest {
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-
         const closeMenu = () => {
             sidebar.classList.remove('is-open');
             overlay.classList.remove('is-active');
         };
-
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('is-open');
             overlay.classList.toggle('is-active');
         });
-
         overlay.addEventListener('click', closeMenu);
-        
         document.getElementById('lessonsList').addEventListener('click', (e) => {
             if (e.target.closest('.task-item')) {
                 setTimeout(closeMenu, 200);
@@ -349,7 +410,7 @@ class PianoQuest {
             }).join('');
             
             const isLocked = lessonIndex > 0 && !this.lessons[lessonIndex - 1].completed;
-            const lockIconClass = isLocked ? 'ri-lock-fill' : '';
+            const lockIconClass = isLocked ? 'ri-lock-line' : 'ri-lock-unlock-line';
 
             lessonItem.innerHTML = `<div class="lesson-header ${isLocked ? 'locked' : 'unlocked'} ${lesson.completed ? 'completed' : ''}">
                 <i class="icon ${lockIconClass}"></i>
@@ -361,24 +422,21 @@ class PianoQuest {
         this.addEventListeners();
         this.loadCurrentTask();
     }
-
+ 
     addEventListeners() {
         document.querySelectorAll('.lesson-header.unlocked').forEach(header => {
             header.addEventListener('click', () => header.nextElementSibling.classList.toggle('expanded'));
         });
-
         document.querySelectorAll('.task-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const [lessonIndex, taskIndex] = item.dataset.taskId.split('-').map(Number);
                 const lesson = this.lessons[lessonIndex];
                 const isLessonUnlocked = lessonIndex === 0 || this.lessons[lessonIndex - 1].completed;
-
                 if (isLessonUnlocked) {
                     document.querySelectorAll('.task-item.is-viewing').forEach(el => el.classList.remove('is-viewing'));
                     item.classList.add('is-viewing');
                     this.updateIframe(lesson.tasks[taskIndex].contentUrl);
                 }
-
                 if (e.target.closest('.task-interaction-icon')) {
                     e.stopPropagation();
                     if (lessonIndex === this.currentLessonIndex && taskIndex === this.currentTaskIndex) {
@@ -396,7 +454,7 @@ class PianoQuest {
         switch (task.type) {
             case 'video': this.openVideoModal(task.videoId); break;
             case 'quiz': this.openQuizModal(task); break;
-            case 'record': this.toggleRecording(); break; // <-- Cambio clave
+            case 'record': this.toggleRecording(); break;
         }
     }
 
@@ -411,23 +469,17 @@ class PianoQuest {
             this.showConfetti(200);
             return;
         }
-
         const task = this.lessons[this.currentLessonIndex].tasks[this.currentTaskIndex];
         this.updateIframe(task.contentUrl);
-
         const currentLessonEl = document.querySelector(`.lesson-item[data-lesson-index='${this.currentLessonIndex}']`);
         currentLessonEl?.querySelector('.tasks-list').classList.add('expanded');
-
         document.querySelectorAll('.task-item').forEach(item => item.classList.remove('active'));
         const activeTaskEl = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
         if (activeTaskEl) {
             activeTaskEl.classList.add('active', 'is-viewing');
             document.querySelectorAll('.task-item:not(.active)').forEach(el => el.classList.remove('is-viewing'));
         }
-        
-        // Actualizar icono del header móvil
         this.updateMobileHeaderIcon();
-
         if (task.type === 'note') this.speak(`Ahora, ${task.title}`, 'important');
         else this.speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
     }
@@ -461,11 +513,9 @@ class PianoQuest {
             taskUI.classList.remove('active');
             taskUI.classList.add('completed');
         }
-        
         this.totalTasksCompleted++;
         this.updateProgress();
         this.currentTaskIndex++;
-
         if (this.currentTaskIndex >= this.lessons[this.currentLessonIndex].tasks.length) {
             this.completeLesson();
         } else {
@@ -484,13 +534,7 @@ class PianoQuest {
     
     openVideoModal(videoId) {
         const modalContent = document.getElementById('modalContent');
-        modalContent.innerHTML = `
-            <h3>Video Lección</h3>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <button id="completeVideoButton" class="modal-button">Completar Tarea</button>
-        `;
+        modalContent.innerHTML = `<h3>Video Lección</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><button id="completeVideoButton" class="modal-button">Completar Tarea</button>`;
         document.getElementById('modalOverlay').style.display = 'flex';
         document.getElementById('completeVideoButton').onclick = () => {
             this.closeModal();
@@ -500,14 +544,8 @@ class PianoQuest {
     
     openQuizModal(task) {
         const modalContent = document.getElementById('modalContent');
-        const optionsHTML = task.options.map((option, index) => 
-            `<button class="quiz-option" data-index="${index}">${option}</button>`
-        ).join('');
-        modalContent.innerHTML = `
-            <h3>Quiz Rápido</h3>
-            <p>${task.question}</p>
-            <div class="quiz-options">${optionsHTML}</div>
-        `;
+        const optionsHTML = task.options.map((option, index) => `<button class="quiz-option" data-index="${index}">${option}</button>`).join('');
+        modalContent.innerHTML = `<h3>Quiz Rápido</h3><p>${task.question}</p><div class="quiz-options">${optionsHTML}</div>`;
         document.getElementById('modalOverlay').style.display = 'flex';
         modalContent.querySelectorAll('.quiz-option').forEach(button => {
             button.onclick = (e) => {
@@ -528,14 +566,11 @@ class PianoQuest {
         const indicator = document.getElementById('recordingIndicator');
         const taskIcon = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}'] .task-interaction-icon`);
         const mobileIcon = document.querySelector('#mobile-task-icon .task-interaction-icon');
-
         const setIcons = (iconClass) => {
             if (taskIcon) taskIcon.className = `task-interaction-icon ${iconClass}`;
             if (mobileIcon) mobileIcon.className = `task-interaction-icon ${iconClass}`;
         };
-        
         if (this.isRecording) {
-            // Detener grabación
             this.mediaRecorder.stop();
             this.isRecording = false;
             indicator.style.display = 'none';
@@ -543,55 +578,32 @@ class PianoQuest {
             this.speak("Grabación detenida.");
             return;
         }
-
-        // Iniciar grabación
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.mediaRecorder = new MediaRecorder(stream);
             this.audioChunks = [];
-            
-            this.mediaRecorder.ondataavailable = event => {
-                this.audioChunks.push(event.data);
-            };
-
+            this.mediaRecorder.ondataavailable = event => this.audioChunks.push(event.data);
             this.mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
                 this.openRecordingReviewModal(audioBlob);
-                // Detener todas las pistas para liberar el micrófono
                 stream.getTracks().forEach(track => track.stop());
             };
-
             this.mediaRecorder.start();
             this.isRecording = true;
             indicator.style.display = 'flex';
             setIcons('ri-stop-fill');
             this.speak("Grabando.");
-
         } catch (err) {
             this.speak("Error, no pude acceder a tu micrófono. Por favor, otorga los permisos.");
-            console.error("Error accessing microphone:", err);
         }
     }
 
     openRecordingReviewModal(audioBlob) {
         const modalContent = document.getElementById('modalContent');
         const audioUrl = URL.createObjectURL(audioBlob);
-
-        modalContent.innerHTML = `
-            <h3>Revisa tu Grabación</h3>
-            <p>Escucha tu melodía. Si te gusta, completa la tarea. Si no, puedes intentarlo de nuevo.</p>
-            <audio id="audio-playback" src="${audioUrl}" controls></audio>
-            <div class="modal-buttons">
-                <button id="deleteRecording" class="modal-button delete">Eliminar y Grabar de Nuevo</button>
-                <button id="completeRecording" class="modal-button">Completar Tarea</button>
-            </div>
-        `;
+        modalContent.innerHTML = `<h3>Revisa tu Grabación</h3><p>Escucha tu melodía. Si te gusta, completa la tarea. Si no, puedes intentarlo de nuevo.</p><audio id="audio-playback" src="${audioUrl}" controls></audio><div class="modal-buttons"><button id="deleteRecording" class="modal-button delete">Eliminar y Grabar de Nuevo</button><button id="completeRecording" class="modal-button">Completar Tarea</button></div>`;
         document.getElementById('modalOverlay').style.display = 'flex';
-        
-        document.getElementById('deleteRecording').onclick = () => {
-            this.closeModal();
-        };
-
+        document.getElementById('deleteRecording').onclick = () => this.closeModal();
         document.getElementById('completeRecording').onclick = () => {
             this.closeModal();
             this.completeCurrentTask();
@@ -605,24 +617,19 @@ class PianoQuest {
         this.mediaRecorder = null;
         this.audioChunks = [];
         this.isRecording = false;
-        
         document.getElementById('recordingIndicator').style.display = 'none';
         const taskIcon = document.querySelector(`.task-item.active .task-interaction-icon`);
         if (taskIcon && taskIcon.classList.contains('ri-stop-fill')) {
             taskIcon.className = 'task-interaction-icon ri-mic-line';
             this.updateMobileHeaderIcon();
         }
-        
-        const modalOverlay = document.getElementById('modalOverlay');
-        modalOverlay.style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
         document.getElementById('modalContent').innerHTML = '';
     }
     
     speak(text, priority = 'normal') {
         if ('speechSynthesis' in window) {
-            if (priority === 'important') {
-                speechSynthesis.cancel();
-            }
+            if (priority === 'important') speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-MX';
             utterance.rate = 1.1;
@@ -639,9 +646,7 @@ class PianoQuest {
                         input.onmidimessage = this.handleMIDIMessage.bind(this);
                     }
                 },
-                () => {
-                    this.speak("No pude detectar tu teclado MIDI. El curso continuará sin él.", 'important');
-                }
+                () => this.speak("No pude detectar tu teclado MIDI. El curso continuará sin él.", 'important')
             );
         }
     }
@@ -674,8 +679,6 @@ class PianoQuest {
         }
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => { new PianoQuest(); });
 </script>
 
 </body>
