@@ -62,10 +62,25 @@
         #theme-toggle { background: none; border: none; color: var(--header-text); font-size: 1.5rem; cursor: pointer; }
         
         .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
-        .main-content { flex-grow: 1; background-color: var(--main-content-bg); padding: 40px; display: flex; flex-direction: column; align-items: center; }
         
+        /* MODIFICADO: Se elimina padding y align-items para que el iframe ocupe todo el espacio */
+        .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex; }
+        
+        /* AÑADIDO: Estilos para que el iframe sea responsivo y ocupe todo el contenedor */
+        #content-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .user-profile { display: flex; align-items: center; margin-bottom: 25px; }
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
+        .user-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Hace que la imagen sea redonda */
+    object-fit: cover;    /* Evita que la imagen se deforme */
+}
         .user-info .name { font-size: 1.1rem; font-weight: 600; }
         .user-info .plan { font-size: 0.8rem; color: #adb5bd; }
         .progress-bar { width: 100%; height: 8px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
@@ -88,15 +103,8 @@
         .task-item.completed .task-status { background-color: var(--success-green); border-color: var(--success-green); }
         .task-interaction-icon { cursor: pointer; margin-left: auto; width: 20px; height: 20px; }
         
-        .main-content h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .main-content p { font-size: 1.2rem; color: var(--medium-gray); margin-bottom: 40px; }
-        .staff-container { width: 500px; position: relative; min-height: 120px; }
-        .staff-lines { position: relative; height: 80px; border-top: 2px solid var(--text-color); border-bottom: 2px solid var(--text-color); display: flex; flex-direction: column; justify-content: space-between; }
-        .staff-lines div { height: 2px; background-color: var(--text-color); }
-        .clef { position: absolute; top: -15px; left: 10px; font-size: 7rem; }
-        .note { position: absolute; width: 24px; height: 24px; background-color: var(--text-color); border-radius: 50%; left: 150px; transition: top 0.3s ease; }
-        #statusText { margin-top: 30px; font-size: 1.2rem; font-weight: 500; min-height: 25px; }
-        
+        /* Ya no son necesarios los estilos para el pentagrama, nota, etc. */
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: var(--modal-content-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 640px; text-align: center; }
         .modal-content h3, .modal-content p { color: var(--text-color); }
@@ -133,27 +141,27 @@
         <button id="theme-toggle">🌙</button>
     </header>
     <div class="app-container">
+        <main class="main-content">
+            <iframe 
+                id="content-iframe" 
+                src="https://app.mozartacademy.mx/books2" 
+                title="Contenido principal">
+            </iframe>
+        </main>
+
         <aside class="sidebar">
             <div class="user-profile">
-                <div class="user-avatar">A</div>
+                <div class="user-avatar">
+                  <img src="https://lh3.googleusercontent.com/d/1BZhdPgLilUQ5AuDGMHTgwu2TysXIKbe4" >
+              </div>
                 <div class="user-info">
-                    <div class="name">Andrea Romero</div>
-                    <div class="plan">PLAN PRO</div>
+                    <div class="name">Nivel Preparatorio</div>
+                    <div class="plan">Unidad 1</div>
                 </div>
             </div>
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="lessons-container" id="lessonsList"></div>
         </aside>
-
-        <main class="main-content">
-            <h1>Juego de Notas MIDI</h1>
-            <p>Completa las actividades en la barra lateral</p>
-            <div class="staff-container">
-                <div class="clef">𝄞</div>
-                <div class="staff-lines"><div></div><div></div><div></div></div>
-            </div>
-            <p id="statusText">Cargando...</p>
-        </main>
     </div>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -170,7 +178,7 @@ class PianoQuest {
             {
                 title: "Lección 1: Fundamentos",
                 tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "a-y28_n2-VQ" },
+                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs" },
                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1 },
                     { type: 'note', title: "Toca la nota Sol", key: 'G' },
                 ]
@@ -183,7 +191,7 @@ class PianoQuest {
                     { type: 'note', title: "Toca la nota Si", key: 'B' },
                 ]
             },
-        ];
+    ];
         this.notePositions = { 'C': 82, 'D': 72, 'E': 62, 'F': 52, 'G': 42, 'A': 32, 'B': 22 };
         this.totalTasks = this.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
         this.noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -285,6 +293,7 @@ class PianoQuest {
             // Manejo de finalización del curso
             const mainContent = document.querySelector('.main-content');
             if(mainContent) {
+                 // MODIFICADO: Cambia el src del iframe en lugar de reemplazar el contenido
                 mainContent.innerHTML = `<h1>¡Curso Completado!</h1><p>¡Felicidades, has dominado todas las lecciones!</p>`;
             }
             this.speak("¡Increíble! Has completado todo el curso. ¡Eres un gran músico!", 'important');
@@ -302,20 +311,12 @@ class PianoQuest {
         const activeTaskEl = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
         if(activeTaskEl) activeTaskEl.classList.add('active');
 
-        // Lógica para el main-content en desktop
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            const staffContainer = mainContent.querySelector('.staff-container');
-            const statusText = mainContent.querySelector('#statusText');
-            staffContainer.style.display = (task.type === 'note') ? 'block' : 'none';
-            if (task.type === 'note') {
-                statusText.textContent = `Busca la nota en tu piano...`;
-                this.speak(task.title, 'important');
-                this.displayNoteOnStaff(task.key);
-            } else {
-                statusText.textContent = `Completa la actividad: ${task.title}`;
-                this.speak(`Siguiente actividad: ${task.title}. Haz clic en el ícono.`);
-            }
+        // MODIFICADO: Se elimina la lógica que manipulaba el pentagrama y texto de estado
+        if (task.type === 'note') {
+            this.speak(task.title, 'important');
+             // Ya no se puede mostrar la nota, pero la instrucción de voz sigue siendo útil
+        } else {
+            this.speak(`Siguiente actividad: ${task.title}. Haz clic en el ícono.`);
         }
     }
     
@@ -457,16 +458,17 @@ class PianoQuest {
         }
     }
 
+    // MODIFICADO: Esta función ya no tiene elementos que manipular
     displayNoteOnStaff(noteKey) {
-        const staffContainer = document.querySelector('.staff-container');
-        if(!staffContainer) return;
-        let noteEl = staffContainer.querySelector('.note');
-        if (!noteEl) {
-            noteEl = document.createElement('div');
-            noteEl.className = 'note';
-            staffContainer.appendChild(noteEl);
-        }
-        noteEl.style.top = `${this.notePositions[noteKey]}px`;
+       // const staffContainer = document.querySelector('.staff-container');
+       // if(!staffContainer) return;
+       // let noteEl = staffContainer.querySelector('.note');
+       // if (!noteEl) {
+       //     noteEl = document.createElement('div');
+       //     noteEl.className = 'note';
+       //     staffContainer.appendChild(noteEl);
+       // }
+       // noteEl.style.top = `${this.notePositions[noteKey]}px`;
     }
 
     updateProgress() {
