@@ -23,17 +23,17 @@
         }
 
         body.dark-theme {
-            --bg-color: #121212;
-            --main-content-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --sidebar-bg: #181818;
-            --sidebar-text: #f8f9fa;
-            --header-bg: #1e1e1e;
-            --header-text: #ffffff;
-            --lesson-header-bg: #282828;
-            --lesson-header-hover: #333333;
-            --modal-bg: rgba(0,0,0,0.8);
-            --modal-content-bg: #282828;
+           --bg-color: #f0f2f5; /* Un fondo claro similar al de la imagen */
+    --main-content-bg: #ffffff; /* Contenido principal blanco */
+    --text-color: #333333; /* Texto oscuro para buena legibilidad */
+    --sidebar-bg: #e9ecef; /* Barra lateral ligeramente gris claro */
+    --sidebar-text: #212529; /* Texto oscuro para la barra lateral */
+    --header-bg: #ffffff; /* Encabezado blanco */
+    --header-text: #343a40; /* Texto oscuro para el encabezado */
+    --lesson-header-bg: #f8f9fa; /* Encabezado de lección muy claro */
+    --lesson-header-hover: #e2e6ea; /* Un gris muy claro para hover */
+    --modal-bg: rgba(0,0,0,0.5); /* Fondo de modal semitransparente oscuro */
+    --modal-content-bg: #ffffff; /* Contenido del modal blanco */
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +59,7 @@
             justify-content: space-between;
             flex-shrink: 0;
         }
-        #theme-toggle { background: none; border: none; color: var(--header-text); font-size: 1.5rem; cursor: pointer; }
+        #theme-toggle { background: none; border: none; bottom: 0; color: var(--header-text); font-size: 1.5rem; cursor: pointer; }
         
         .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
         
@@ -75,12 +75,6 @@
 
         .user-profile { display: flex; align-items: center; margin-bottom: 25px; }
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
-        .user-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%; /* Hace que la imagen sea redonda */
-    object-fit: cover;    /* Evita que la imagen se deforme */
-}
         .user-info .name { font-size: 1.1rem; font-weight: 600; }
         .user-info .plan { font-size: 0.8rem; color: #adb5bd; }
         .progress-bar { width: 100%; height: 8px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
@@ -136,10 +130,7 @@
     </style>
 </head>
 <body>
-    <header class="app-header">
-        <span>Piano Quest Pro</span>
-        <button id="theme-toggle">🌙</button>
-    </header>
+   
     <div class="app-container">
         <main class="main-content">
             <iframe 
@@ -151,16 +142,15 @@
 
         <aside class="sidebar">
             <div class="user-profile">
-                <div class="user-avatar">
-                  <img src="https://lh3.googleusercontent.com/d/1BZhdPgLilUQ5AuDGMHTgwu2TysXIKbe4" >
-              </div>
+                <div class="user-avatar">1</div>
                 <div class="user-info">
-                    <div class="name">Nivel Preparatorio</div>
+                    <div class="name">Nivel 1</div>
                     <div class="plan">Unidad 1</div>
                 </div>
             </div>
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="lessons-container" id="lessonsList"></div>
+              <button id="theme-toggle">🌙</button>
         </aside>
     </div>
 
