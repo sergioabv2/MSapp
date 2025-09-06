@@ -20,16 +20,15 @@
             --danger-red: #dc3545;
             --modal-bg: rgba(0,0,0,0.6);
             --modal-content-bg: #ffffff;
+            --medium-gray: #adb5bd;
         }
 
         body.dark-theme {
-           --bg-color: #f0f2f5; /* Un fondo claro similar al de la imagen */
+            --bg-color: #f0f2f5; /* Un fondo claro similar al de la imagen */
     --main-content-bg: #ffffff; /* Contenido principal blanco */
     --text-color: #333333; /* Texto oscuro para buena legibilidad */
-    --sidebar-bg: #e9ecef; /* Barra lateral ligeramente gris claro */
+    --sidebar-bg: #f5f5f5; /* Barra lateral ligeramente gris claro */
     --sidebar-text: #212529; /* Texto oscuro para la barra lateral */
-    --header-bg: #ffffff; /* Encabezado blanco */
-    --header-text: #343a40; /* Texto oscuro para el encabezado */
     --lesson-header-bg: #f8f9fa; /* Encabezado de lección muy claro */
     --lesson-header-hover: #e2e6ea; /* Un gris muy claro para hover */
     --modal-bg: rgba(0,0,0,0.5); /* Fondo de modal semitransparente oscuro */
@@ -59,14 +58,12 @@
             justify-content: space-between;
             flex-shrink: 0;
         }
-        #theme-toggle { background: none; border: none; bottom: 0; color: var(--header-text); font-size: 1.5rem; cursor: pointer; }
+        #theme-toggle { background: none; bottom: 0; border: none; color: var(--header-text); font-size: 1.5rem; cursor: pointer; }
         
-        .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; border-left: 1px solid var(--lesson-header-bg); }
         
-        /* MODIFICADO: Se elimina padding y align-items para que el iframe ocupe todo el espacio */
         .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex; }
         
-        /* AÑADIDO: Estilos para que el iframe sea responsivo y ocupe todo el contenedor */
         #content-iframe {
             width: 100%;
             height: 100%;
@@ -81,24 +78,24 @@
         .progress-fill { height: 100%; background-color: var(--primary-accent); width: 0%; transition: width 0.5s ease-in-out; }
         
         .lessons-container { flex-grow: 1; overflow-y: auto; }
-        .lesson-header { display: flex; align-items: center; font-weight: bold; font-size: 1rem; padding: 12px; background-color: var(--lesson-header-bg); border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s; }
+        .lesson-header { display: flex; align-items: center; border: 1px solid var(--medium-gray); font-weight: bold; font-size: 1rem; padding: 12px; background-color: var(--lesson-header-bg); border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s; }
         .lesson-header.unlocked { cursor: pointer; }
         .lesson-header.unlocked:hover { background-color: var(--lesson-header-hover); }
-        .lesson-header.completed { background-color: var(--success-green); }
+        .lesson-header.completed { background-color: var(--success-green); color: white; border-color: var(--success-green);}
         .lesson-header .icon { width: 18px; height: 18px; margin-right: 10px; }
         .tasks-list { list-style: none; padding-left: 15px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
         .tasks-list.expanded { max-height: 500px; }
         
-        .task-item { display: flex; align-items: center; padding: 10px 0; font-size: 0.95rem; opacity: 0.7; }
-        .task-item.active { opacity: 1; font-weight: bold; }
-        .task-item.completed { opacity: 1; text-decoration: line-through; }
+        .task-item { display: flex; align-items: center; padding: 10px 5px; font-size: 0.95rem; opacity: 0.7; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; }
+        .task-item:hover { background-color: var(--lesson-header-hover); }
+        .task-item.active { opacity: 1; font-weight: bold; background-color: rgba(111, 66, 193, 0.2); }
+        .task-item.completed { opacity: 1; }
+        .task-item.completed .task-title { text-decoration: line-through; }
         .task-status { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--medium-gray); margin-right: 10px; flex-shrink: 0; }
         .task-item.active .task-status { border-color: var(--primary-accent); }
         .task-item.completed .task-status { background-color: var(--success-green); border-color: var(--success-green); }
-        .task-interaction-icon { cursor: pointer; margin-left: auto; width: 20px; height: 20px; }
+        .task-interaction-icon { cursor: pointer; margin-left: auto; width: 20px; height: 20px; z-index: 2; }
         
-        /* Ya no son necesarios los estilos para el pentagrama, nota, etc. */
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: var(--modal-content-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 640px; text-align: center; }
         .modal-content h3, .modal-content p { color: var(--text-color); }
@@ -112,32 +109,20 @@
         .confetti { position: fixed; width: 10px; height: 10px; opacity: 0; animation: confetti-fall 5s ease-out forwards; }
         @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-        /* === ESTILOS PARA MÓVILES === */
         @media (max-width: 800px) {
-            .app-container {
-                flex-direction: column;
-                overflow-y: auto;
-            }
-            .sidebar {
-                width: 100%;
-                height: 100%; /* Ocupa toda la altura disponible */
-                padding: 15px;
-            }
-            .main-content {
-                display: none; /* Oculta el contenido principal */
-            }
+            body { flex-direction: column-reverse; }
+            .app-container { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; max-height: 50vh; overflow-y: auto; }
+            .main-content { display: flex; height: 50vh;}
         }
     </style>
 </head>
 <body>
-   
+    
+  
     <div class="app-container">
         <main class="main-content">
-            <iframe 
-                id="content-iframe" 
-                src="https://app.mozartacademy.mx/books2" 
-                title="Contenido principal">
-            </iframe>
+            <iframe id="content-iframe" src="" title="Contenido principal"></iframe>
         </main>
 
         <aside class="sidebar">
@@ -150,7 +135,7 @@
             </div>
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="lessons-container" id="lessonsList"></div>
-              <button id="theme-toggle">🌙</button>
+             <button id="theme-toggle">🌙</button>
         </aside>
     </div>
 
@@ -164,27 +149,30 @@ class PianoQuest {
         this.currentLessonIndex = 0;
         this.currentTaskIndex = 0;
         this.totalTasksCompleted = 0;
+        // MODIFICADO: Se añade la propiedad contentUrl a cada tarea.
         this.lessons = [
             {
                 title: "Lección 1: Fundamentos",
                 tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs" },
-                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1 },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G' },
+                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview" },
+                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" },
                 ]
             },
             {
                 title: "Lección 2: Primeras Notas",
                 tasks: [
-                    { type: 'note', title: "Toca la nota Mi", key: 'E' },
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "k3K_b6AAuC4" },
-                    { type: 'note', title: "Toca la nota Si", key: 'B' },
+                    { type: 'note', title: "Toca la nota Mi", key: 'E', contentUrl: "https://app.mozartacademy.mx/books2/page/8" },
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "k3K_b6AAuC4", contentUrl: "https://app.mozartacademy.mx/books2/page/9" },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
                 ]
             },
-    ];
-        this.notePositions = { 'C': 82, 'D': 72, 'E': 62, 'F': 52, 'G': 42, 'A': 32, 'B': 22 };
+        ];
         this.totalTasks = this.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
         this.noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        
+        // AÑADIDO: Cachear elementos del DOM
+        this.iframe = document.getElementById('content-iframe');
         
         this.init();
     }
@@ -213,7 +201,6 @@ class PianoQuest {
         });
     }
     
-    // ...el resto de los métodos de la clase (generateLessonList, addEventListeners, etc.) son idénticos al código anterior...
     generateLessonList() {
         const lessonsListEl = document.getElementById('lessonsList');
         lessonsListEl.innerHTML = '';
@@ -230,18 +217,17 @@ class PianoQuest {
             
             const tasksHTML = lesson.tasks.map((task, taskIndex) => {
                 let icon = '';
-                if (task.type === 'video') icon = videoIcon;
-                if (task.type === 'quiz') icon = quizIcon;
+                if (task.type === 'video' || task.type === 'quiz') icon = task.type === 'video' ? videoIcon : quizIcon;
                 return `
                 <li class="task-item" data-task-id="${lessonIndex}-${taskIndex}">
                     <div class="task-status"></div>
-                    <span>${task.title}</span>
+                    <span class="task-title">${task.title}</span>
                     ${icon}
                 </li>`;
             }).join('');
             
             lessonItem.innerHTML = `
-                <div class="lesson-header ${isLocked ? 'locked' : 'unlocked'}">
+                <div class="lesson-header ${isLocked ? 'locked' : 'unlocked'} ${lesson.completed ? 'completed' : ''}">
                     ${isLocked ? lockIcon : unlockedIcon}
                     <span>${lesson.title}</span>
                 </div>
@@ -257,14 +243,27 @@ class PianoQuest {
                 header.nextElementSibling.classList.toggle('expanded');
             });
         });
-        document.querySelectorAll('.task-interaction-icon').forEach(icon => {
-            icon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const [lessonIndex, taskIndex] = e.currentTarget.parentElement.dataset.taskId.split('-').map(Number);
-                if (lessonIndex === this.currentLessonIndex && taskIndex === this.currentTaskIndex) {
-                    this.handleTaskInteraction(lessonIndex, taskIndex);
-                } else {
-                    this.speak("Por favor, completa la tarea activa primero.");
+
+        // MODIFICADO: El listener se añade a toda la tarea
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const [lessonIndex, taskIndex] = item.dataset.taskId.split('-').map(Number);
+                const lesson = this.lessons[lessonIndex];
+                const isLessonUnlocked = lessonIndex === 0 || this.lessons[lessonIndex - 1].completed;
+
+                // Permite ver el contenido de cualquier tarea no bloqueada
+                if (isLessonUnlocked) {
+                    this.updateIframe(lesson.tasks[taskIndex].contentUrl);
+                }
+
+                // Si se hace clic en un icono de interacción, manejarlo por separado
+                if (e.target.closest('.task-interaction-icon')) {
+                     e.stopPropagation();
+                     if (lessonIndex === this.currentLessonIndex && taskIndex === this.currentTaskIndex) {
+                        this.handleTaskInteraction(lessonIndex, taskIndex);
+                    } else {
+                        this.speak("Por favor, completa la tarea activa primero para usar esta función.");
+                    }
                 }
             });
         });
@@ -278,14 +277,17 @@ class PianoQuest {
         }
     }
 
+    // AÑADIDO: Función para centralizar la actualización del iframe
+    updateIframe(url) {
+        if (this.iframe.src !== url) {
+            this.iframe.src = url;
+        }
+    }
+
     loadCurrentTask() {
         if (this.currentLessonIndex >= this.lessons.length) {
-            // Manejo de finalización del curso
-            const mainContent = document.querySelector('.main-content');
-            if(mainContent) {
-                 // MODIFICADO: Cambia el src del iframe en lugar de reemplazar el contenido
-                mainContent.innerHTML = `<h1>¡Curso Completado!</h1><p>¡Felicidades, has dominado todas las lecciones!</p>`;
-            }
+            this.iframe.src = 'about:blank';
+            document.body.innerHTML = `<h1>¡Curso Completado!</h1><p>¡Felicidades, has dominado todas las lecciones!</p>`;
             this.speak("¡Increíble! Has completado todo el curso. ¡Eres un gran músico!", 'important');
             this.showConfetti(200);
             return;
@@ -293,20 +295,23 @@ class PianoQuest {
 
         const lesson = this.lessons[this.currentLessonIndex];
         const task = lesson.tasks[this.currentTaskIndex];
+        
+        // MODIFICADO: Actualiza el iframe al cargar la tarea actual
+        this.updateIframe(task.contentUrl);
+
         const currentLessonEl = document.querySelector(`.lesson-item[data-lesson-index='${this.currentLessonIndex}']`);
-        if (currentLessonEl) {
+        if (currentLessonEl && !currentLessonEl.querySelector('.tasks-list').classList.contains('expanded')) {
             currentLessonEl.querySelector('.tasks-list').classList.add('expanded');
         }
+
         document.querySelectorAll('.task-item').forEach(item => item.classList.remove('active'));
         const activeTaskEl = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
         if(activeTaskEl) activeTaskEl.classList.add('active');
 
-        // MODIFICADO: Se elimina la lógica que manipulaba el pentagrama y texto de estado
         if (task.type === 'note') {
-            this.speak(task.title, 'important');
-             // Ya no se puede mostrar la nota, pero la instrucción de voz sigue siendo útil
+            this.speak(`Ahora, ${task.title}`, 'important');
         } else {
-            this.speak(`Siguiente actividad: ${task.title}. Haz clic en el ícono.`);
+            this.speak(`Siguiente actividad: ${task.title}. Haz clic en el ícono para comenzar.`);
         }
     }
     
@@ -328,7 +333,10 @@ class PianoQuest {
 
     completeCurrentTask() {
         const taskUI = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
-        if (taskUI) taskUI.classList.add('completed');
+        if (taskUI) {
+            taskUI.classList.remove('active');
+            taskUI.classList.add('completed');
+        }
         
         this.totalTasksCompleted++;
         this.updateProgress();
@@ -344,25 +352,17 @@ class PianoQuest {
     completeLesson() {
         this.speak(`¡Felicidades! Has completado la ${this.lessons[this.currentLessonIndex].title}.`, 'important');
         this.lessons[this.currentLessonIndex].completed = true;
-        const lessonUI = document.querySelector(`.lesson-item[data-lesson-index='${this.currentLessonIndex}'] .lesson-header`);
-        if (lessonUI) lessonUI.classList.add('completed');
-        
         this.showConfetti();
         
         this.currentLessonIndex++;
         this.currentTaskIndex = 0;
 
-        if (this.currentLessonIndex < this.lessons.length) {
-            this.unlockLesson(this.currentLessonIndex);
-        }
+        // Regenerar la lista para actualizar el estado de bloqueo y eventos
+        this.generateLessonList(); 
         
         setTimeout(() => this.loadCurrentTask(), 5000);
     }
     
-    unlockLesson(lessonIndex) {
-        this.generateLessonList(); // La forma más simple de actualizar el estado de bloqueo y los eventos
-    }
-
     openVideoModal(videoId) {
         const modalContent = document.getElementById('modalContent');
         modalContent.innerHTML = `
@@ -434,9 +434,12 @@ class PianoQuest {
                     setTimeout(() => this.loadCurrentTask(), 2000);
                 },
                 () => {
-                    this.speak("No pude detectar tu teclado MIDI.", 'important');
+                    this.speak("No pude detectar tu teclado MIDI. El curso continuará sin él.", 'important');
+                     setTimeout(() => this.loadCurrentTask(), 2000);
                 }
             );
+        } else {
+             setTimeout(() => this.loadCurrentTask(), 2000);
         }
     }
 
@@ -446,19 +449,6 @@ class PianoQuest {
             const noteName = this.noteMap[message.data[1] % 12];
             this.checkKey(noteName);
         }
-    }
-
-    // MODIFICADO: Esta función ya no tiene elementos que manipular
-    displayNoteOnStaff(noteKey) {
-       // const staffContainer = document.querySelector('.staff-container');
-       // if(!staffContainer) return;
-       // let noteEl = staffContainer.querySelector('.note');
-       // if (!noteEl) {
-       //     noteEl = document.createElement('div');
-       //     noteEl.className = 'note';
-       //     staffContainer.appendChild(noteEl);
-       // }
-       // noteEl.style.top = `${this.notePositions[noteKey]}px`;
     }
 
     updateProgress() {
