@@ -1,44 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" ng-app="pianoApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Piano Quest Pro</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <style>
-      
+        /* CSS Básico - Sin cambios, excepto por el nuevo botón de regreso */
         :root {
-            --bg-color: #f0f2f5;
-            --main-content-bg: #ffffff;
-            --text-color: #333;
-            --sidebar-bg: #212529;
-            --sidebar-text: #f8f9fa;
-            --header-bg: #212529;
-            --header-text: #ffffff;
-            --lesson-header-bg: #343a40;
-            --lesson-header-hover: #495057;
-            --primary-accent: #6f42c1;
-            --success-green: #28a745;
-            --danger-red: #dc3545;
-            --modal-bg: rgba(0,0,0,0.6);
-            --modal-content-bg: #ffffff;
-            --medium-gray: #adb5bd;
-        }
-
-        body.light-theme {
             --bg-color: #f0f2f5;
             --main-content-bg: #ffffff;
             --text-color: #333333;
             --sidebar-bg: #f5f5f5;
             --sidebar-text: #212529;
+            --header-bg: #212529;
+            --header-text: #ffffff;
             --lesson-header-bg: #f8f9fa;
             --lesson-header-hover: #e2e6ea;
+            --primary-accent: #6f42c1;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
             --modal-bg: rgba(0,0,0,0.5);
             --modal-content-bg: #ffffff;
+            --medium-gray: #adb5bd;
         }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
@@ -47,14 +34,9 @@
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
-
-        /* Contenedor para la app de piano que se muestra/oculta */
-        #pianoApp {
-            display: flex;
-            flex-direction: column;
+        #levelSelector, #pianoApp {
             height: 100%;
         }
-
 
         /* ============================================= */
         /* == ESTILOS PARA EL SELECTOR DE NIVELES ====== */
@@ -64,7 +46,6 @@
             align-items: center;
             justify-content: center;
             padding: 40px 20px;
-            height: 100%;
             overflow-y: auto;
         }
         .level-container {
@@ -94,7 +75,7 @@
             color: white;
             border: 2px solid gray;
             border-radius: 12px;
-            padding: 28px 24px;
+            padding: 28px 34px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -109,23 +90,25 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(111, 66, 193, 0.2);
         }
-        .level-number {
-            width: 40px; height: 40px;
-            background: var(--primary-accent);
-            color: white;
-            border-radius: 50%;
-            font-weight: 600; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
+        .level-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 16px;
         }
-        .level-title { font-size: 1.3rem; font-weight: 600; color: var(--text-color); margin-bottom: 8px; }
+        .level-number {
+            width: 40px; height: 40px; background: var(--primary-accent);
+            color: white; border-radius: 50%; font-weight: 600; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .level-title { font-size: 1.3rem; font-weight: 600; color: var(--text-color); }
         .level-description { color: var(--text-color); opacity: 0.8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px; }
         .level-duration { color: var(--primary-accent); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
         .level-duration::before { content: '⏱️'; }
         .continue-btn-container { margin: 30px; margin-top: 0; text-align: center; }
         .continue-btn {
-            background: var(--primary-accent);
-            color: white;
+            background: var(--primary-accent); color: white;
             padding: 16px 40px; border: none; border-radius: 8px;
             font-size: 1.1rem; font-weight: 600; cursor: pointer;
             transition: all 0.3s ease;
@@ -137,10 +120,10 @@
         /* ============================================= */
         /* == ESTILOS PARA LA APP DE PIANO ============= */
         /* ============================================= */
+         #pianoApp { display: flex; flex-direction: column; }
         .app-header { display: none; }
         .app-container { display: flex; flex: 1; overflow: hidden; }
         .menu-toggle-btn { display: none; position: fixed; top: 10px; left: 15px; background: var(--sidebar-bg); color: var(--sidebar-text); border: none; font-size: 1.5rem; cursor: pointer; z-index: 1002; width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        #theme-toggle { background: none; border: 1px solid var(--medium-gray); color: var(--sidebar-text); font-size: 1.5rem; cursor: pointer; margin-top: auto; padding: 5px; border-radius: 8px; align-self: center; margin-bottom: 10px; }
         .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; border-left: 1px solid var(--lesson-header-bg); }
         .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex; }
         #content-iframe { width: 100%; height: 100%; border: none; }
@@ -148,7 +131,7 @@
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
         .user-info .name { font-size: 1.1rem; font-weight: 600; }
         .user-info .plan { font-size: 0.8rem; color: #adb5bd; }
-        .progress-bar { width: 100%; height: 8px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
+        .progress-bar { width: 100%; height: 11px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
         .progress-fill { height: 100%; background-color: var(--primary-accent); width: 0%; transition: width 0.5s ease-in-out; }
         .lessons-container { flex-grow: 1; overflow-y: auto; }
         .lesson-header { display: flex; align-items: center; border: 1px solid var(--medium-gray); font-weight: bold; font-size: 1rem; padding: 12px; background-color: var(--lesson-header-bg); border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s; }
@@ -185,15 +168,29 @@
         .confetti { position: fixed; width: 10px; height: 10px; opacity: 0; animation: confetti-fall 5s ease-out forwards; }
         @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
+        /* Estilos del nuevo botón "Regresar" */
+        #back-to-levels-btn {
+            background: none; border: none; color: var(--header-text);
+            font-size: 1.5rem; cursor: pointer;
+            position: absolute; left: 20px;
+        }
+
         @media (max-width: 800px) {
             .levels-grid { grid-template-columns: 1fr; padding: 30px 20px; }
             .level-header { padding: 30px 20px; }
             .level-header h1 { font-size: 1.8rem; }
-            
-            .app-header { display: flex; align-items: center; justify-content: space-between; padding: 0 15px 0 70px; height: 45px; position: fixed; top: 0; width: 100%; z-index: 999; background-color: var(--header-bg); }
-            #mobile-task-icon { font-size: 1.8rem; cursor: pointer; color: var(--header-text); }
+            .app-header {
+                display: flex; align-items: center; justify-content: center; /* Centrado */
+                padding: 0 15px; height: 45px;
+                position: fixed; top: 0; width: 100%; z-index: 999;
+                background-color: var(--header-bg);
+            }
+             #mobile-task-icon {
+                font-size: 1.8rem; cursor: pointer; color: var(--header-text);
+                position: absolute; right: 20px; /* Posicionado a la derecha */
+            }
             .main-content { padding-top: 45px; }
-            .menu-toggle-btn { display: flex; align-items: center; justify-content: center; }
+            .menu-toggle-btn { display: flex; align-items: center; justify-content: center; top: 10px; right: 15px; left: auto; } /* Ajustado a la derecha */
             .sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 80%; z-index: 1001; transform: translateX(100%); transition: transform 0.3s ease-in-out; border-left: 1px solid var(--lesson-header-bg); border-right: none; }
             .sidebar.is-open { transform: translateX(0); }
             .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
@@ -201,64 +198,87 @@
         }
     </style>
 </head>
-<body>
+<body ng-controller="PianoController">
     
-    <div id="levelSelector">
+    <div id="levelSelector" ng-show="currentView === 'levelSelector'">
         <div class="level-container">
-         
+            <div class="level-header">
+                <h1>Bienvenido a Piano Quest Pro</h1>
+                <p>Elige tu nivel para comenzar tu viaje musical.</p>
+            </div>
             <div class="levels-grid">
-                <div class="level-card" data-level="1">
-                    <div class="level-number">1</div>
-                    <h3 class="level-title">Fundamentos</h3>
-                    <p class="level-description">Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.</p>
-                    <div class="level-duration">~2 horas</div>
-                </div>
-                <div class="level-card" data-level="2">
-                    <div class="level-number">2</div>
-                    <h3 class="level-title">Principiante</h3>
-                    <p class="level-description">Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.</p>
-                    <div class="level-duration">~4 horas</div>
-                </div>
-                <div class="level-card" data-level="3">
-                    <div class="level-number">3</div>
-                    <h3 class="level-title">Intermedio</h3>
-                    <p class="level-description">Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.</p>
-                    <div class="level-duration">~8 horas</div>
+                <div class="level-card" 
+                     ng-repeat="level in levels" 
+                     ng-click="selectLevel(level)"
+                     ng-class="{'selected': selectedLevel.id === level.id}">
+                    <div class="level-card-header">
+                        <div class="level-number">{{level.id}}</div>
+                        <h3 class="level-title">{{level.title}}</h3>
+                    </div>
+                    <p class="level-description">{{level.description}}</p>
+                    <div class="level-duration">{{level.duration}}</div>
                 </div>
             </div>
             <div class="continue-btn-container">
-                <button class="continue-btn" id="continueBtn">Comenzar Aventura</button>
+                <button class="continue-btn" ng-class="{'active': selectedLevel}" ng-click="startApp()">Comenzar Aventura</button>
             </div>
         </div>
     </div>
 
-    <div id="pianoApp" style="display: none;">
+    <div id="pianoApp" ng-show="currentView === 'app'">
         <header class="app-header">
+            <button id="back-to-levels-btn" ng-click="showLevelSelector()"><i class="ri-arrow-left-line"></i></button>
             <h1 class="app-title">Piano Quest Pro</h1>
-            <div id="mobile-task-icon"></div>
-        </header> 
-        <button id="menu-toggle" class="menu-toggle-btn"><i class="ri-menu-line"></i></button>
+            <div id="mobile-task-icon" ng-bind-html="getMobileTaskIcon()"></div>
+        </header>  
+        <button id="menu-toggle" class="menu-toggle-btn" ng-click="toggleSidebar()"><i class="ri-menu-line"></i></button>
         <div class="app-container">
             <main class="main-content">
-                <iframe id="content-iframe" src="" title="Contenido principal"></iframe>
+                <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" title="Contenido principal"></iframe>
             </main>
-            <aside class="sidebar">
+            <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
                 <div class="user-profile">
-                    <div class="user-avatar" id="user-level-avatar">1</div>
+                    <div class="user-avatar">{{selectedLevel.id}}</div>
                     <div class="user-info">
-                        <div class="name" id="user-level-name">Nivel 1</div>
-                        <div class="plan">Unidad 1</div>
+                        <div class="name">Nivel {{selectedLevel.id}}: {{selectedLevel.title}}</div>
+                        <div class="plan">Unidad {{currentLessonIndex + 1}}</div>
                     </div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                <div class="lessons-container" id="lessonsList"></div>
-                <button id="theme-toggle"><i class="ri-sun-line"></i></button>
+                <div class="progress-bar"><div class="progress-fill" style="width: {{progress}}%;"></div></div>
+                <div class="lessons-container">
+                    <div class="lesson-item" ng-repeat="lesson in lessons" data-lesson-index="{{$index}}">
+                        <div class="lesson-header" 
+                             ng-class="{
+                                'completed': lesson.completed, 
+                                'unlocked': $index === 0 || lessons[$index - 1].completed,
+                                'locked': $index > 0 && !lessons[$index - 1].completed
+                             }"
+                             ng-click="toggleLesson(lesson)">
+                            <i class="icon" ng-class="{'ri-lock-line': $index > 0 && !lessons[$index - 1].completed, 'ri-lock-unlock-line': !($index > 0 && !lessons[$index - 1].completed)}"></i>
+                            <span>{{lesson.title}}</span>
+                        </div>
+                        <ul class="tasks-list" ng-class="{'expanded': lesson.expanded}">
+                            <li class="task-item" 
+                                ng-repeat="task in lesson.tasks" 
+                                ng-click="viewTask($parent.$index, $index)"
+                                ng-class="{
+                                    'completed': task.completed,
+                                    'active': currentLessonIndex === $parent.$index && currentTaskIndex === $index,
+                                    'is-viewing': viewingLessonIndex === $parent.$index && viewingTaskIndex === $index
+                                }">
+                                <div class="task-status"></div>
+                                <span class="task-title">{{task.title}}</span>
+                                <i class="task-interaction-icon {{task.iconClass}}" ng-if="task.iconClass" ng-click="handleTaskInteraction($event, $parent.$index, $index)"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </aside>
         </div>
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal-content" id="modalContent"></div>
+        <div class="modal-overlay" id="modalOverlay" ng-style="{'display': modal.show ? 'flex' : 'none'}">
+            <div class="modal-content" id="modalContent" ng-bind-html="modal.content"></div>
         </div>
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
         <div id="recordingIndicator" style="display: none;">
             <i class="ri-mic-fill"></i>
             <span>Grabando...</span>
@@ -266,368 +286,328 @@
     </div>
 
 <script>
-// =============================================
-// == LÓGICA DEL SELECTOR DE NIVELES
-// =============================================
-document.addEventListener('DOMContentLoaded', () => {
-    let selectedLevel = null;
-    const levelCards = document.querySelectorAll('.level-card');
-    const continueBtn = document.getElementById('continueBtn');
+const app = angular.module('pianoApp', []);
 
-    levelCards.forEach(card => {
-        card.addEventListener('click', () => {
-            levelCards.forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            selectedLevel = card.dataset.level;
-            continueBtn.classList.add('active');
-        });
-    });
+// Filtro de seguridad para poder usar URLs dinámicas en ng-src
+app.filter('trustAsResourceUrl', ['$sce', function($sce) {
+    return function(val) {
+        return $sce.trustAsResourceUrl(val);
+    };
+}]);
 
-    continueBtn.addEventListener('click', () => {
-        if (selectedLevel) {
-            // 1. Ocultar el selector de niveles
-            document.getElementById('levelSelector').style.display = 'none';
+app.controller('PianoController', function($scope, $sce, $timeout) {
 
-            // 2. Mostrar la aplicación de piano
-            const pianoAppElement = document.getElementById('pianoApp');
-            pianoAppElement.style.display = 'flex'; // Usamos flex para mantener el layout
+    // =============================================
+    // == DATOS Y ESTADO DE LA APLICACIÓN
+    // =============================================
+    $scope.currentView = 'levelSelector';
+    $scope.levels = [
+        { id: 1, title: 'Fundamentos', description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', duration: '~2 horas' },
+        { id: 2, title: 'Principiante', description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '~4 horas' },
+        { id: 3, title: 'Intermedio', description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', duration: '~8 horas' }
+    ];
+    $scope.selectedLevel = null;
+    $scope.sidebarOpen = false;
 
-            // 3. Actualizar la UI de la app con el nivel seleccionado
-            document.getElementById('user-level-avatar').textContent = selectedLevel;
-            document.getElementById('user-level-name').textContent = `Nivel ${selectedLevel}`;
-            
-            // 4. Iniciar la clase principal de la aplicación
-            new PianoQuest();
-        }
-    });
-});
+    $scope.lessons = [
+        {
+            title: "Lección 1: Fundamentos",
+            tasks: [
+                { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
+                { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
+            ]
+        },
+        {
+            title: "Lección 2: Primeras Notas",
+            tasks: [
+                { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+            ]
+        },
+    ];
 
+    // Variables de estado del curso
+    $scope.currentLessonIndex = 0;
+    $scope.currentTaskIndex = 0;
+    $scope.viewingLessonIndex = 0;
+    $scope.viewingTaskIndex = 0;
+    $scope.totalTasksCompleted = 0;
+    $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+    $scope.progress = 0;
+    $scope.currentTaskUrl = '';
 
-// =============================================
-// == CLASE Y LÓGICA DE LA APP DE PIANO
-// =============================================
-class PianoQuest {
-    constructor() {
-        // ... (Todo el código de la clase PianoQuest que ya tenías va aquí, sin cambios)
-        this.currentLessonIndex = 0;
-        this.currentTaskIndex = 0;
-        this.totalTasksCompleted = 0;
-        this.lessons = [
-            {
-                title: "Lección 1: Fundamentos",
-                tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview" },
-                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2" },
-                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 2: Primeras Notas",
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview" },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-        ];
-        this.totalTasks = this.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
-        this.noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        
-        this.iframe = document.getElementById('content-iframe');
-        this.mediaRecorder = null;
-        this.audioChunks = [];
-        this.isRecording = false;
-        
-        this.init();
-    }
+    $scope.modal = { show: false, content: '' };
 
-    init() {
-        this.setupTheme();
-        this.generateLessonList();
-        this.setupMIDI();
-        this.updateProgress();
-        document.getElementById('modalOverlay').addEventListener('click', (e) => {
-            if (e.target.id === 'modalOverlay') this.closeModal();
-        });
-        this.setupMobileMenu();
-    }
+    // Variables de grabación
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
 
-    setupMobileMenu() {
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const closeMenu = () => {
-            sidebar.classList.remove('is-open');
-            overlay.classList.remove('is-active');
-        };
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('is-open');
-            overlay.classList.toggle('is-active');
-        });
-        overlay.addEventListener('click', closeMenu);
-        document.getElementById('lessonsList').addEventListener('click', (e) => {
-            if (e.target.closest('.task-item')) {
-                setTimeout(closeMenu, 200);
-            }
-        });
-    }
+    const noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-    setupTheme() {
-        const themeToggle = document.getElementById('theme-toggle');
-        const icon = themeToggle.querySelector('i');
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+    // =============================================
+    // == LÓGICA DE CAMBIO DE VISTAS Y NIVELES
+    // =============================================
+    $scope.selectLevel = (level) => {
+        $scope.selectedLevel = level;
+    };
 
-        document.body.classList.toggle('light-theme', savedTheme === 'light');
-        icon.className = savedTheme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+    $scope.startApp = () => {
+        if (!$scope.selectedLevel) return;
+        $scope.currentView = 'app';
+        // Reiniciar el estado del curso si es necesario (o cargarlo desde el storage)
+        initApp();
+    };
 
-        themeToggle.addEventListener('click', () => {
-            const isLight = document.body.classList.toggle('light-theme');
-            icon.className = isLight ? 'ri-moon-line' : 'ri-sun-line';
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        });
-    }
+    $scope.showLevelSelector = () => {
+        $scope.currentView = 'levelSelector';
+        // Aquí podrías agregar lógica para guardar el progreso antes de salir.
+    };
+
+    $scope.toggleSidebar = () => {
+        $scope.sidebarOpen = !$scope.sidebarOpen;
+    };
     
-    generateLessonList() {
-        const lessonsListEl = document.getElementById('lessonsList');
-        lessonsListEl.innerHTML = '';
+    function initApp() {
+        // Inicializa o resetea el progreso
+        $scope.lessons.forEach(lesson => {
+            lesson.completed = false;
+            lesson.expanded = false;
+            lesson.tasks.forEach(task => task.completed = false);
+        });
         
-        this.lessons.forEach((lesson, lessonIndex) => {
-            const lessonItem = document.createElement('div');
-            lessonItem.className = 'lesson-item';
-            lessonItem.dataset.lessonIndex = lessonIndex;
-            
-            const tasksHTML = lesson.tasks.map((task, taskIndex) => {
-                let iconClass = '';
-                if (task.type === 'video') iconClass = 'ri-play-circle-line';
-                else if (task.type === 'quiz') iconClass = 'ri-question-line';
-                else if (task.type === 'record') iconClass = 'ri-mic-line';
-                
-                return `<li class="task-item" data-task-id="${lessonIndex}-${taskIndex}">
-                    <div class="task-status"></div>
-                    <span class="task-title">${task.title}</span>
-                    ${iconClass ? `<i class="task-interaction-icon ${iconClass}"></i>` : ''}
-                </li>`;
-            }).join('');
-            
-            const isLocked = lessonIndex > 0 && !this.lessons[lessonIndex - 1].completed;
-            const lockIconClass = isLocked ? 'ri-lock-line' : 'ri-lock-unlock-line';
-
-            lessonItem.innerHTML = `<div class="lesson-header ${isLocked ? 'locked' : 'unlocked'} ${lesson.completed ? 'completed' : ''}">
-                <i class="icon ${lockIconClass}"></i>
-                <span>${lesson.title}</span>
-            </div>
-            <ul class="tasks-list">${tasksHTML}</ul>`;
-            lessonsListEl.appendChild(lessonItem);
-        });
-        this.addEventListeners();
-        this.loadCurrentTask();
-    }
- 
-    addEventListeners() {
-        document.querySelectorAll('.lesson-header.unlocked').forEach(header => {
-            header.addEventListener('click', () => header.nextElementSibling.classList.toggle('expanded'));
-        });
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const [lessonIndex, taskIndex] = item.dataset.taskId.split('-').map(Number);
-                const lesson = this.lessons[lessonIndex];
-                const isLessonUnlocked = lessonIndex === 0 || this.lessons[lessonIndex - 1].completed;
-                if (isLessonUnlocked) {
-                    document.querySelectorAll('.task-item.is-viewing').forEach(el => el.classList.remove('is-viewing'));
-                    item.classList.add('is-viewing');
-                    this.updateIframe(lesson.tasks[taskIndex].contentUrl);
-                }
-                if (e.target.closest('.task-interaction-icon')) {
-                    e.stopPropagation();
-                    if (lessonIndex === this.currentLessonIndex && taskIndex === this.currentTaskIndex) {
-                        this.handleTaskInteraction(lessonIndex, taskIndex);
-                    } else {
-                        this.speak("Por favor, completa la tarea activa primero para usar esta función.");
-                    }
-                }
-            });
-        });
+        $scope.currentLessonIndex = 0;
+        $scope.currentTaskIndex = 0;
+        $scope.totalTasksCompleted = 0;
+        
+        setupMIDI();
+        updateProgress();
+        loadCurrentTask();
     }
 
-    handleTaskInteraction(lessonIndex, taskIndex) {
-        const task = this.lessons[lessonIndex].tasks[taskIndex];
-        switch (task.type) {
-            case 'video': this.openVideoModal(task.videoId); break;
-            case 'quiz': this.openQuizModal(task); break;
-            case 'record': this.toggleRecording(); break;
+
+    // =============================================
+    // == LÓGICA DE LECCIONES Y TAREAS
+    // =============================================
+    $scope.toggleLesson = (lesson) => {
+        const lessonIndex = $scope.lessons.indexOf(lesson);
+        const isUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
+        if (isUnlocked) {
+            lesson.expanded = !lesson.expanded;
         }
-    }
-
-    updateIframe(url) {
-        if (this.iframe.src !== url) this.iframe.src = url;
-    }
-
-    loadCurrentTask() {
-        if (this.currentLessonIndex >= this.lessons.length) {
-            document.body.innerHTML = `<h1>¡Curso Completado!</h1>`;
-            this.speak("¡Has completado todo el curso!", 'important');
-            this.showConfetti(200);
+    };
+    
+    $scope.viewTask = (lessonIndex, taskIndex) => {
+        const lesson = $scope.lessons[lessonIndex];
+        const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
+        
+        if(isLessonUnlocked) {
+            $scope.viewingLessonIndex = lessonIndex;
+            $scope.viewingTaskIndex = taskIndex;
+            $scope.currentTaskUrl = lesson.tasks[taskIndex].contentUrl;
+            if($scope.sidebarOpen) { // Cierra el sidebar en móvil al seleccionar una tarea
+                 $timeout(() => $scope.sidebarOpen = false, 200);
+            }
+        }
+    };
+    
+    function loadCurrentTask() {
+        if ($scope.currentLessonIndex >= $scope.lessons.length) {
+            alert("¡Curso Completado!");
+            speak("¡Has completado todo el curso!", 'important');
+            showConfetti(200);
+            $scope.showLevelSelector(); // Vuelve al selector de niveles
             return;
         }
-        const task = this.lessons[this.currentLessonIndex].tasks[this.currentTaskIndex];
-        this.updateIframe(task.contentUrl);
-        const currentLessonEl = document.querySelector(`.lesson-item[data-lesson-index='${this.currentLessonIndex}']`);
-        currentLessonEl?.querySelector('.tasks-list').classList.add('expanded');
-        document.querySelectorAll('.task-item').forEach(item => item.classList.remove('active'));
-        const activeTaskEl = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
-        if (activeTaskEl) {
-            activeTaskEl.classList.add('active', 'is-viewing');
-            document.querySelectorAll('.task-item:not(.active)').forEach(el => el.classList.remove('is-viewing'));
-        }
-        this.updateMobileHeaderIcon();
-        if (task.type === 'note') this.speak(`Ahora, ${task.title}`, 'important');
-        else this.speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
+        
+        const lesson = $scope.lessons[$scope.currentLessonIndex];
+        const task = lesson.tasks[$scope.currentTaskIndex];
+        
+        lesson.expanded = true; // Expande la lección actual
+        $scope.viewTask($scope.currentLessonIndex, $scope.currentTaskIndex);
+        
+        if (task.type === 'note') speak(`Ahora, ${task.title}`, 'important');
+        else speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
     }
     
-    updateMobileHeaderIcon() {
-        const mobileIconContainer = document.getElementById('mobile-task-icon');
-        const activeTaskEl = document.querySelector('.task-item.active .task-interaction-icon');
-        if (activeTaskEl) {
-            mobileIconContainer.innerHTML = activeTaskEl.outerHTML;
-            mobileIconContainer.firstChild.onclick = () => this.handleTaskInteraction(this.currentLessonIndex, this.currentTaskIndex);
+    function completeCurrentTask() {
+        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
+        task.completed = true;
+
+        $scope.totalTasksCompleted++;
+        updateProgress();
+        
+        $scope.currentTaskIndex++;
+        if ($scope.currentTaskIndex >= $scope.lessons[$scope.currentLessonIndex].tasks.length) {
+            completeLesson();
         } else {
-            mobileIconContainer.innerHTML = '';
+            $timeout(loadCurrentTask, 1200);
         }
     }
     
-    checkKey(playedKey) {
-        if (this.currentLessonIndex >= this.lessons.length) return;
-        const task = this.lessons[this.currentLessonIndex].tasks[this.currentTaskIndex];
-        if (task.type !== 'note') return;
-        if (playedKey === task.key) {
-            this.speak("¡Correcto!");
-            this.completeCurrentTask();
-        } else {
-            this.speak("Esa no es la nota, intenta de nuevo.");
-        }
+    function completeLesson() {
+        const lesson = $scope.lessons[$scope.currentLessonIndex];
+        speak(`¡Felicidades! Has completado la ${lesson.title}.`, 'important');
+        lesson.completed = true;
+        showConfetti();
+        
+        $scope.currentLessonIndex++;
+        $scope.currentTaskIndex = 0;
+        
+        // Carga la siguiente lección o finaliza el curso
+        $timeout(loadCurrentTask, 1500);
+    }
+    
+    function updateProgress() {
+        $scope.progress = ($scope.totalTasksCompleted / $scope.totalTasks) * 100;
     }
 
-    completeCurrentTask() {
-        const taskUI = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}']`);
-        if (taskUI) {
-            taskUI.classList.remove('active');
-            taskUI.classList.add('completed');
+    // =============================================
+    // == INTERACCIÓN DE TAREAS (MODALES, GRABACIÓN)
+    // =============================================
+    $scope.handleTaskInteraction = ($event, lessonIndex, taskIndex) => {
+        $event.stopPropagation();
+        
+        if (lessonIndex !== $scope.currentLessonIndex || taskIndex !== $scope.currentTaskIndex) {
+            speak("Por favor, completa la tarea activa primero para usar esta función.");
+            return;
         }
-        this.totalTasksCompleted++;
-        this.updateProgress();
-        this.currentTaskIndex++;
-        if (this.currentTaskIndex >= this.lessons[this.currentLessonIndex].tasks.length) {
-            this.completeLesson();
-        } else {
-            setTimeout(() => this.loadCurrentTask(), 1200);
-        }
-    }
 
-    completeLesson() {
-        this.speak(`¡Felicidades! Has completado la ${this.lessons[this.currentLessonIndex].title}.`, 'important');
-        this.lessons[this.currentLessonIndex].completed = true;
-        this.showConfetti();
-        this.currentLessonIndex++;
-        this.currentTaskIndex = 0;
-        this.generateLessonList();
-    }
+        const task = $scope.lessons[lessonIndex].tasks[taskIndex];
+        switch (task.type) {
+            case 'video': openVideoModal(task); break;
+            case 'quiz': openQuizModal(task); break;
+            case 'record': toggleRecording(); break;
+        }
+    };
     
-    openVideoModal(videoId) {
-        const modalContent = document.getElementById('modalContent');
-        modalContent.innerHTML = `<h3>Video Lección</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><button id="completeVideoButton" class="modal-button">Completar Tarea</button>`;
-        document.getElementById('modalOverlay').style.display = 'flex';
-        document.getElementById('completeVideoButton').onclick = () => {
-            this.closeModal();
-            this.completeCurrentTask();
+    $scope.getMobileTaskIcon = () => {
+        if ($scope.currentView !== 'app' || $scope.currentLessonIndex >= $scope.lessons.length) return '';
+        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
+        if (!task.iconClass) return '';
+        
+        // Función para manejar el clic desde el HTML generado dinámicamente
+        window.handleMobileIconClick = () => {
+            $scope.$apply(() => {
+                $scope.handleTaskInteraction({ stopPropagation: () => {} }, $scope.currentLessonIndex, $scope.currentTaskIndex);
+            });
         };
-    }
-    
-    openQuizModal(task) {
-        const modalContent = document.getElementById('modalContent');
-        const optionsHTML = task.options.map((option, index) => `<button class="quiz-option" data-index="${index}">${option}</button>`).join('');
-        modalContent.innerHTML = `<h3>Quiz Rápido</h3><p>${task.question}</p><div class="quiz-options">${optionsHTML}</div>`;
-        document.getElementById('modalOverlay').style.display = 'flex';
-        modalContent.querySelectorAll('.quiz-option').forEach(button => {
-            button.onclick = (e) => {
-                const selectedIndex = parseInt(e.target.dataset.index);
-                if (selectedIndex === task.correctAnswer) {
-                    this.closeModal();
-                    this.completeCurrentTask();
-                } else {
-                    e.target.style.backgroundColor = 'var(--danger-red)';
-                    e.target.style.color = 'white';
-                    this.speak("Respuesta incorrecta. Intenta de nuevo.");
-                }
+        
+        return $sce.trustAsHtml(`<i class="task-interaction-icon ${task.iconClass}" onclick="handleMobileIconClick()"></i>`);
+    };
+
+    function openVideoModal(task) {
+        const content = `
+            <h3>Video Lección</h3>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/${task.videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <button id="completeVideoButton" class="modal-button">Completar Tarea</button>`;
+        $scope.modal.content = $sce.trustAsHtml(content);
+        $scope.modal.show = true;
+        $timeout(() => {
+            document.getElementById('completeVideoButton').onclick = () => {
+                $scope.$apply(() => {
+                    closeModal();
+                    completeCurrentTask();
+                });
             };
         });
     }
+
+    function openQuizModal(task) {
+        const optionsHTML = task.options.map((option, index) => `<button class="quiz-option" data-index="${index}">${option}</button>`).join('');
+        const content = `
+            <h3>Quiz Rápido</h3><p>${task.question}</p>
+            <div class="quiz-options">${optionsHTML}</div>`;
+        $scope.modal.content = $sce.trustAsHtml(content);
+        $scope.modal.show = true;
+
+        $timeout(() => {
+            document.querySelectorAll('.quiz-option').forEach(button => {
+                button.onclick = (e) => {
+                    const selectedIndex = parseInt(e.target.dataset.index);
+                    if (selectedIndex === task.correctAnswer) {
+                        $scope.$apply(() => {
+                            closeModal();
+                            completeCurrentTask();
+                        });
+                    } else {
+                        e.target.style.backgroundColor = 'var(--danger-red)';
+                        e.target.style.color = 'white';
+                        speak("Respuesta incorrecta. Intenta de nuevo.");
+                    }
+                };
+            });
+        });
+    }
     
-    async toggleRecording() {
+    async function toggleRecording() {
         const indicator = document.getElementById('recordingIndicator');
-        const taskIcon = document.querySelector(`.task-item[data-task-id='${this.currentLessonIndex}-${this.currentTaskIndex}'] .task-interaction-icon`);
-        const mobileIcon = document.querySelector('#mobile-task-icon .task-interaction-icon');
-        const setIcons = (iconClass) => {
-            if (taskIcon) taskIcon.className = `task-interaction-icon ${iconClass}`;
-            if (mobileIcon) mobileIcon.className = `task-interaction-icon ${iconClass}`;
-        };
-        if (this.isRecording) {
-            this.mediaRecorder.stop();
-            this.isRecording = false;
+        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
+
+        if (isRecording) {
+            mediaRecorder.stop();
+            isRecording = false;
             indicator.style.display = 'none';
-            setIcons('ri-mic-line');
-            this.speak("Grabación detenida.");
+            task.iconClass = 'ri-mic-line';
+            speak("Grabación detenida.");
             return;
         }
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.mediaRecorder = new MediaRecorder(stream);
-            this.audioChunks = [];
-            this.mediaRecorder.ondataavailable = event => this.audioChunks.push(event.data);
-            this.mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-                this.openRecordingReviewModal(audioBlob);
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                openRecordingReviewModal(audioBlob);
                 stream.getTracks().forEach(track => track.stop());
             };
-            this.mediaRecorder.start();
-            this.isRecording = true;
+            mediaRecorder.start();
+            isRecording = true;
             indicator.style.display = 'flex';
-            setIcons('ri-stop-fill');
-            this.speak("Grabando.");
+            task.iconClass = 'ri-stop-fill';
+            speak("Grabando.");
         } catch (err) {
-            this.speak("Error, no pude acceder a tu micrófono. Por favor, otorga los permisos.");
+            speak("Error, no pude acceder a tu micrófono. Por favor, otorga los permisos.");
         }
-    }
-
-    openRecordingReviewModal(audioBlob) {
-        const modalContent = document.getElementById('modalContent');
-        const audioUrl = URL.createObjectURL(audioBlob);
-        modalContent.innerHTML = `<h3>Revisa tu Grabación</h3><p>Escucha tu melodía. Si te gusta, completa la tarea. Si no, puedes intentarlo de nuevo.</p><audio id="audio-playback" src="${audioUrl}" controls></audio><div class="modal-buttons"><button id="deleteRecording" class="modal-button delete">Eliminar y Grabar de Nuevo</button><button id="completeRecording" class="modal-button">Completar Tarea</button></div>`;
-        document.getElementById('modalOverlay').style.display = 'flex';
-        document.getElementById('deleteRecording').onclick = () => this.closeModal();
-        document.getElementById('completeRecording').onclick = () => {
-            this.closeModal();
-            this.completeCurrentTask();
-        };
-    }
-
-    closeModal() {
-        if (this.isRecording) {
-            this.mediaRecorder.stop();
-        }
-        this.mediaRecorder = null;
-        this.audioChunks = [];
-        this.isRecording = false;
-        document.getElementById('recordingIndicator').style.display = 'none';
-        const taskIcon = document.querySelector(`.task-item.active .task-interaction-icon`);
-        if (taskIcon && taskIcon.classList.contains('ri-stop-fill')) {
-            taskIcon.className = 'task-interaction-icon ri-mic-line';
-            this.updateMobileHeaderIcon();
-        }
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modalContent').innerHTML = '';
     }
     
-    speak(text, priority = 'normal') {
+    function openRecordingReviewModal(audioBlob) {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const content = `
+            <h3>Revisa tu Grabación</h3>
+            <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
+            <audio id="audio-playback" src="${audioUrl}" controls></audio>
+            <div class="modal-buttons">
+                <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
+                <button id="completeRecording" class="modal-button">Completar Tarea</button>
+            </div>`;
+        $scope.modal.content = $sce.trustAsHtml(content);
+        $scope.modal.show = true;
+        $timeout(() => {
+            document.getElementById('deleteRecording').onclick = () => $scope.$apply(closeModal);
+            document.getElementById('completeRecording').onclick = () => {
+                $scope.$apply(() => {
+                    closeModal();
+                    completeCurrentTask();
+                });
+            };
+        });
+    }
+
+    function closeModal() {
+        $scope.modal.show = false;
+        $scope.modal.content = '';
+    }
+
+    // =============================================
+    // == MIDI, VOZ Y EFECTOS
+    // =============================================
+    function speak(text, priority = 'normal') {
         if ('speechSynthesis' in window) {
             if (priority === 'important') speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -637,34 +617,42 @@ class PianoQuest {
         }
     }
 
-    setupMIDI() {
+    function setupMIDI() {
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess().then(
                 (midiAccess) => {
-                    this.speak("Bienvenido a tu lección de piano. ¡Empecemos!", 'important');
+                    speak("Bienvenido a tu lección de piano. ¡Empecemos!", 'important');
                     for (let input of midiAccess.inputs.values()) {
-                        input.onmidimessage = this.handleMIDIMessage.bind(this);
+                        input.onmidimessage = handleMIDIMessage;
                     }
                 },
-                () => this.speak("No pude detectar tu teclado MIDI. El curso continuará sin él.", 'important')
+                () => speak("No pude detectar tu teclado MIDI.", 'important')
             );
         }
     }
-
-    handleMIDIMessage(message) {
-        const [command, , velocity] = message.data;
+    
+    function handleMIDIMessage(message) {
+        const [command, note, velocity] = message.data;
         if (command === 144 && velocity > 0) {
-            const noteName = this.noteMap[message.data[1] % 12];
-            this.checkKey(noteName);
+            const noteName = noteMap[note % 12];
+            checkKey(noteName);
         }
     }
+    
+    function checkKey(playedKey) {
+        if ($scope.currentLessonIndex >= $scope.lessons.length) return;
+        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
+        if (task.type !== 'note') return;
 
-    updateProgress() {
-        const progress = (this.totalTasksCompleted / this.totalTasks) * 100;
-        document.getElementById('progressFill').style.width = `${progress}%`;
+        if (playedKey === task.key) {
+            speak("¡Correcto!");
+            $scope.$apply(completeCurrentTask);
+        } else {
+            speak("Esa no es la nota, intenta de nuevo.");
+        }
     }
-
-    showConfetti(count = 100) {
+    
+    function showConfetti(count = 100) {
         const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
         for (let i = 0; i < count; i++) {
             const confetti = document.createElement('div');
@@ -678,8 +666,9 @@ class PianoQuest {
             setTimeout(() => confetti.remove(), 5000);
         }
     }
-}
+});
 </script>
 
 </body>
 </html>
+
