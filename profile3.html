@@ -81,27 +81,7 @@
             grid-template-columns: 1fr; padding: 10px 20px;
             gap: 20px;
         }
-        .level-card {
-          display: flex;
-         /*   background:  #f5f5f5; 
-         color: white; */
-            background: white;
-            border: 2px solid gray;
-            border-radius: 12px;
-            padding: 14px 17px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .level-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary-accent);
-          /*  background: #e2e6ea; */
-            background: #f5f5f5; 
-             box-shadow: 0 8px 25px rgba(111, 66, 193, 0.2);
-        }
-        .level-card.selected {
-           
-        }
+      
 
 
 
@@ -664,6 +644,156 @@
     }
 }
 
+
+         .level-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .level-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .level-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .level-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .level-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        .level-description {
+            color: #6e6e73;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .level-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .time-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+
+        .time-text {
+            color: #8B5CF6;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8B5CF6, #A855F7);
+            border-radius: 2px;
+            width: 0%;
+            animation: fillProgress 2s ease-out forwards;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            opacity: 0;
+            animation: shimmer 2s ease-out forwards;
+        }
+
+        @keyframes fillProgress {
+            from { width: 0%; }
+            to { width: 25%; }
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Estados interactivos */
+        .level-card:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 20px;
+            }
+            
+            .level-card {
+                padding: 20px;
+            }
+            
+            .level-number {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .level-title {
+                font-size: 20px;
+            }
+            
+            .level-description {
+                font-size: 15px;
+            }
+        }
     </style>
 </head>
 <body ng-controller="PianoController" >
@@ -699,22 +829,32 @@
             <div class="levels-grid">
                
 
-                <div class="level-card" 
-                   ng-repeat="level in levels" 
+             
+
+
+                <div class="level-card" ng-repeat="level in levels" 
                    ng-click="selectLevel(level); startApp()"
                    ng-class="{'selected': selectedLevel.id === level.id}" >
-                  
-                  <div class="level-card-left level-card-header">
-                       <div class="level-number">{{level.id}}</div>
-                      <h3 class="level-title">{{level.title}}</h3>
-                  </div>
-
-                  <div class="level-card-right">
-                      <p class="level-description">{{level.description}}</p>
-                      <div class="level-duration">{{level.duration}}</div>
-               <!-- <button class="continue-btn2" ng-class="{'active': selectedLevel}" ng-click="startApp()">Iniciar</button> -->
-                  </div>
-              </div>
+        <div class="card-content">
+            <div class="level-number">{{level.id}}</div>
+            <div class="level-info">
+                <h2 class="level-title">{{level.title}}</h2>
+                <p class="level-description">
+                  {{level.description}}
+                </p>
+                <div class="level-meta">
+                    <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                    </svg>
+                    <span class="time-text">~{{level.duration}}</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
             </div>
 
