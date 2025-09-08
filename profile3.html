@@ -37,23 +37,35 @@
             height: 100%;
         }
 
-        /* ============================================= */
-        /* == ESTILOS PARA EL SELECTOR DE NIVELES ====== */
-        /* ============================================= */
-        #levelSelector {
+      /*  #levelSelector {
             display: flex;
             align-items: flex-start;
             justify-content: center;
             padding: 40px 20px;
             overflow-y: auto;
-        }
+        }*/
+
+       #levelSelector {
+    flex: 1; /* CLAVE: Hace que ocupe el espacio sobrante */
+    overflow-y: auto; /* CLAVE: Le da su propio scroll vertical */
+    min-height: 0; /* TRUCO CLAVE: Un fix de flexbox que previene problemas de encogimiento */
+    
+    /* Propiedades que ya tenías */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0; 
+    margin-bottom: 100px;
+}
+
         .level-container {
     display: grid;
     grid-template-columns: 230px 1fr; /* Columna principal flexible y columna derecha fija */
-    gap: 30px; /* Espacio entre las columnas */
+    gap: 15px; /* Espacio entre las columnas */
     max-width: 1200px; /* Aumentamos el ancho máximo para que quepan bien */
     width: 100%;
     padding: 20px; /* Añadimos padding para que el contenido no pegue a los bordes */
+
   
 }
         .level-header {
