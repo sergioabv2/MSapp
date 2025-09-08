@@ -45,17 +45,17 @@
             overflow-y: auto;
         }*/
 
-       #levelSelector {
-    flex: 1; /* CLAVE: Hace que ocupe el espacio sobrante */
-    overflow-y: auto; /* CLAVE: Le da su propio scroll vertical */
-    min-height: 0; /* TRUCO CLAVE: Un fix de flexbox que previene problemas de encogimiento */
-    
-    /* Propiedades que ya tenías */
+      #levelSelector {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0; 
     margin-bottom: 100px;
+    
+    /* --- AÑADE ESTA LÍNEA --- */
+    padding: 120px 0 0 0; /* 120px arriba, 0 en los demás lados */
 }
 
         .level-container {
@@ -83,24 +83,24 @@
         }
         .level-card {
           display: flex;
-            background:  #f5f5f5;
-            color: white;
+         /*   background:  #f5f5f5; 
+         color: white; */
+            background: white;
             border: 2px solid gray;
             border-radius: 12px;
-            padding: 28px 34px;
+            padding: 14px 17px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         .level-card:hover {
             transform: translateY(-4px);
             border-color: var(--primary-accent);
-            background: #e2e6ea;
+          /*  background: #e2e6ea; */
+            background: #f5f5f5; 
+             box-shadow: 0 8px 25px rgba(111, 66, 193, 0.2);
         }
         .level-card.selected {
-            border-color: var(--primary-accent);
-            background: #e2e6ea;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.2);
+           
         }
 
 
@@ -110,8 +110,10 @@
     flex-shrink: 0; /* Evita que se encoja */
     width: 30%; /* Ancho del panel izquierdo */
     display: flex;
+    background-color: ;
     flex-direction: column;
     justify-content: center; /* Centra el contenido verticalmente */
+  /*  background-color: rgba(111, 66, 193, 0.3); */
 }
 
 
@@ -549,11 +551,31 @@
   animation: pulse 1.5s infinite;
 }
 
-.banner-header {
-    width: 100%;          /* Ancho del 95% del viewport */
-    height: 120px;        /* Una altura fija */
 
-    overflow: hidden;     /* Oculta las partes de la imagen que se salgan */
+/*
+.banner-header {
+    width: 98vw;          
+    max-width: 1200px;   
+    height: 150px;       
+    margin: 0 auto;      
+    margin-top: 5px;
+    border-radius: 16px;
+    overflow: hidden;     
+}
+*/
+
+.banner-header {
+    /* --- PROPIEDADES MODIFICADAS Y NUEVAS --- */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    
+    /* --- PROPIEDADES QUE SE MANTIENEN --- */
+    width: 100%;  /* Asegúrate que sea 100% y no 98vw */
+    height: 110px;
+    overflow: hidden;
+    will-change: transform, opacity;
 }
 
 .banner-image {
@@ -695,6 +717,8 @@
               </div>
 
             </div>
+
+
          <!--     <div class="continue-btn-container">
                 <button class="continue-btn" ng-class="{'active': selectedLevel}" ng-click="startApp()">Iniciar</button>
             </div>  -->
@@ -857,6 +881,36 @@ $scope.levels = [
     { 
         id: 3, 
         title: 'Nivel 3', 
+        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
+        duration: '~8 horas',
+        lessons: [
+            // Aquí irían las lecciones del Nivel 3
+            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
+        ]
+    },
+     { 
+        id: 4, 
+        title: 'Nivel 4', 
+        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
+        duration: '~8 horas',
+        lessons: [
+            // Aquí irían las lecciones del Nivel 3
+            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
+        ]
+    },
+     { 
+        id: 5, 
+        title: 'Nivel 5', 
+        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
+        duration: '~8 horas',
+        lessons: [
+            // Aquí irían las lecciones del Nivel 3
+            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
+        ]
+    },
+     { 
+        id: 6, 
+        title: 'Nivel 6', 
         description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
         duration: '~8 horas',
         lessons: [
@@ -1278,6 +1332,35 @@ function clearBPMTimers() {
 } 
 
 
+
+
+
+
+  $timeout(function() {
+        // Obtenemos los dos elementos que necesitamos
+        const levelSelector = document.getElementById('levelSelector');
+        const banner = document.querySelector('.banner-header');
+
+        // Nos aseguramos de que ambos existan antes de continuar
+        if (levelSelector && banner) {
+            
+            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
+            levelSelector.addEventListener('scroll', function() {
+                // 'scrollTop' nos dice cuántos píxeles hemos bajado
+                let scrollTop = this.scrollTop;
+                let bannerHeight = banner.offsetHeight;
+
+                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
+                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
+                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+
+                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
+                // avance la altura total del banner.
+                let opacity = 1 - (scrollTop / bannerHeight);
+                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
+            });
+        }
+    });
 
 
 });
