@@ -538,9 +538,10 @@
 
 .banner-header {
     width: 100%; /* Ocupa todo el ancho */
-    padding: 20px 20px;
+    height: 100px;
     background-color: var(--sidebar-bg); /* O el color que prefieras */
     text-align: center;
+    margin-bottom: -20px;
     color: var(--sidebar-text);
 }
 
@@ -548,13 +549,20 @@
 .banner-header p { font-size: 1.1rem; opacity: 0.9; }
 
 
+        .banner-image {
+    width: 100%;       /* Asegura que la imagen ocupe todo el ancho disponible */
+    height: 100%;      /* Asegura que la imagen ocupe toda la altura del banner-header */
+    object-fit: cover; /* Recorta la imagen para que cubra el área sin distorsionar */
+    display: block;    /* Elimina el espacio extra debajo de las imágenes */
+}
+
+
     </style>
 </head>
 <body ng-controller="PianoController" >
 
      <div class="banner-header">
-        <h1>Bienvenido a Mozart Academy</h1>
-        <p>Elige tu nivel para comenzar tu formación musical.</p>
+        <img src="https://lh3.googleusercontent.com/d/1kh9ISl_yCeyj1LEbRdXVPMml6gNEofSc"  class="banner-image">
     </div>
     
     <div id="levelSelector" ng-show="currentView === 'levelSelector'" >
