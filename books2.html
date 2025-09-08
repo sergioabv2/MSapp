@@ -24,93 +24,11 @@
             --text-color: #333;
         }
         
-       .loader {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+    
         
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 30px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-      .loader    h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        
-      .loader    p {
-            color: var(--secondary-color);
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
-        
-        .loading-container {
-            width: 300px;
-            height: 8px;
-            background-color: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--accent-color);
-            border-radius: 4px;
-            animation: loading 2.5s ease-in-out infinite;
-        }
-        
-        .book-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .book-icon {
-            font-size: 2rem;
-            color: var(--primary-color);
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes loading {
-            0% { width: 0%; }
-            50% { width: 100%; }
-            100% { width: 0%; }
-        }
-        
-        @keyframes fadeIn {
-            to { opacity: 0.7; }
-        }
-        
-        /* Asignamos diferentes delays a los iconos de libros */
-        .book-icon:nth-child(1) { animation-delay: 0.3s; }
-        .book-icon:nth-child(2) { animation-delay: 0.6s; }
-        .book-icon:nth-child(3) { animation-delay: 0.9s; }
-        .book-icon:nth-child(4) { animation-delay: 1.2s; }
-        .book-icon:nth-child(5) { animation-delay: 1.5s; }
-
+     
  
-  body{font-family:Roboto,'Open Sans',sans-serif}
+  body{font-family:Roboto,'Open Sans',sans-serif;  overflow: hidden;}
 
 .mhn-slide .mhn-item{width:100%;padding:10px}
 .mhn-slide .mhn-inner{width:100%;box-shadow:0 2px 10px 0 rgba(0,0,0,.16),0 2px 5px 0 rgba(0,0,0,.26);border-radius:3px;transition: transform 0.4s ease;}
@@ -1481,62 +1399,41 @@ background-color: rgba(0, 0, 0, 0.5);
 
 
 
- .banner-header {
-    /* --- PROPIEDADES MODIFICADAS Y NUEVAS --- */
+#container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.banner-header {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 10;
-    
-    /* --- PROPIEDADES QUE SE MANTIENEN --- */
-    width: 100%;  /* Asegúrate que sea 100% y no 98vw */
+    width: 100%;
     height: 110px;
+    z-index: 10;
     overflow: hidden;
     will-change: transform, opacity;
 }
 
-.banner-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+#booksContent {
+    padding-top: 120px;
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
 }
 
 
-
-  #booksContent {
-
-    padding-top: 120px; 
-}
 </style>
 
 <div  ng-app="books" ng-controller="main">
   
 
 
-  <div class="loader" id="loader" >
-  <svg class="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h6v7l2.5-1.5L16 9V2h2a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2z" fill="#4a6fa5"/>
-    </svg> 
-    
-    <h1>Biblioteca</h1>
-    <p>Organizando tu biblioteca digital...</p>
-    
-    <div class="loading-container">
-        <div class="loading-bar"></div>
-    </div>
-    
-    <div class="book-icons">
-        <div class="book-icon">📕</div>
-        <div class="book-icon">📗</div>
-        <div class="book-icon">📘</div>
-        <div class="book-icon">📙</div>
-        <div class="book-icon">📖</div>
-    </div> 
-  </div >
   
   
-  <div id="container" style="display: none">
+  <div id="container" >
 
      <div class="banner-header" ng-show="!showPlayer">
         <img src="https://lh3.googleusercontent.com/d/1IBxAj270P8JN4MorTI0HqpDyZHXuapEs"  class="banner-image">
@@ -2273,8 +2170,8 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-   // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-     token: localStorage.getItem('MStoken')
+  //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -3696,13 +3593,6 @@ AP.init({
 
 
  <script>
-
-  setTimeout(function() {
-         var loader = document.getElementById("loader");
-    var main = document.getElementById("container");
-           loader.style.display = "none";
-          main.style.display = "block";
-        }, 4000);
 
 
 
