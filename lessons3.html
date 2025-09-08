@@ -45,17 +45,17 @@
             overflow-y: auto;
         }*/
 
-       #levelSelector {
-    flex: 1; /* CLAVE: Hace que ocupe el espacio sobrante */
-    overflow-y: auto; /* CLAVE: Le da su propio scroll vertical */
-    min-height: 0; /* TRUCO CLAVE: Un fix de flexbox que previene problemas de encogimiento */
-    
-    /* Propiedades que ya tenías */
+      #levelSelector {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0; 
     margin-bottom: 100px;
+    
+    /* --- AÑADE ESTA LÍNEA --- */
+    padding: 120px 0 0 0; /* 120px arriba, 0 en los demás lados */
 }
 
         .level-container {
@@ -563,10 +563,17 @@
 */
 
 .banner-header {
-    width: 100%;          /* Ancho del 95% del viewport */
-    height: 120px;        /* Una altura fija */
-
-    overflow: hidden;     /* Oculta las partes de la imagen que se salgan */
+    /* --- PROPIEDADES MODIFICADAS Y NUEVAS --- */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    
+    /* --- PROPIEDADES QUE SE MANTIENEN --- */
+    width: 100%;  /* Asegúrate que sea 100% y no 98vw */
+    height: 120px;
+    overflow: hidden;
+    will-change: transform, opacity;
 }
 
 .banner-image {
@@ -709,7 +716,7 @@
 
             </div>
 
-            <br><br><br><br><br>
+
          <!--     <div class="continue-btn-container">
                 <button class="continue-btn" ng-class="{'active': selectedLevel}" ng-click="startApp()">Iniciar</button>
             </div>  -->
@@ -1293,6 +1300,35 @@ function clearBPMTimers() {
 } 
 
 
+
+
+
+
+  $timeout(function() {
+        // Obtenemos los dos elementos que necesitamos
+        const levelSelector = document.getElementById('levelSelector');
+        const banner = document.querySelector('.banner-header');
+
+        // Nos aseguramos de que ambos existan antes de continuar
+        if (levelSelector && banner) {
+            
+            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
+            levelSelector.addEventListener('scroll', function() {
+                // 'scrollTop' nos dice cuántos píxeles hemos bajado
+                let scrollTop = this.scrollTop;
+                let bannerHeight = banner.offsetHeight;
+
+                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
+                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
+                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+
+                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
+                // avance la altura total del banner.
+                let opacity = 1 - (scrollTop / bannerHeight);
+                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
+            });
+        }
+    });
 
 
 });
