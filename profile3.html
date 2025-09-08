@@ -48,13 +48,14 @@
             overflow-y: auto;
         }
         .level-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
- 
-            overflow: hidden;
-        }
+    display: grid;
+    grid-template-columns: 230px 1fr; /* Columna principal flexible y columna derecha fija */
+    gap: 30px; /* Espacio entre las columnas */
+    max-width: 1200px; /* Aumentamos el ancho máximo para que quepan bien */
+    width: 100%;
+    padding: 20px; /* Añadimos padding para que el contenido no pegue a los bordes */
+  
+}
         .level-header {
             background: var(--sidebar-bg);
             color: var(--sidebar-text);
@@ -65,7 +66,7 @@
         .level-header p { font-size: 1.1rem; opacity: 0.9; }
         .levels-grid {
             display: grid;
-            grid-template-columns: 1fr; padding: 30px 20px;
+            grid-template-columns: 1fr; padding: 10px 20px;
             gap: 20px;
         }
         .level-card {
@@ -537,36 +538,131 @@
 }
 
 .banner-header {
-    width: 100%; /* Ocupa todo el ancho */
-    height: 100px;
-    background-color: var(--sidebar-bg); /* O el color que prefieras */
-    text-align: center;
-    margin-bottom: -20px;
-    color: var(--sidebar-text);
+    width: 98vw;          /* Ancho del 95% del viewport */
+    max-width: 1200px;    /* Un ancho máximo consistente con el contenido */
+    height: 150px;        /* Una altura fija */
+    margin: 0 auto;       /* ¡LA CLAVE PARA CENTRARLO! */
+    margin-top: 5px;
+    border-radius: 16px;
+    overflow: hidden;     /* Oculta las partes de la imagen que se salgan */
 }
 
-.banner-header h1 { font-size: 2.2rem; margin-bottom: 12px; }
-.banner-header p { font-size: 1.1rem; opacity: 0.9; }
-
-
-        .banner-image {
-    width: 100%;       /* Asegura que la imagen ocupe todo el ancho disponible */
-    height: 100%;      /* Asegura que la imagen ocupe toda la altura del banner-header */
-    object-fit: cover; /* Recorta la imagen para que cubra el área sin distorsionar */
-    display: block;    /* Elimina el espacio extra debajo de las imágenes */
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
+
+.pending-tasks {
+    background-color: var(--main-content-bg);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content; /* Se ajusta a la altura de su contenido */
+}
+.pending-tasks h4 {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+.pending-tasks ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.pending-tasks li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.task-icon {
+    font-size: 1.5rem;
+    color: var(--primary-accent);
+    margin-right: 15px;
+}
+.task-info span {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+.task-info a {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+}
+.task-info a:hover {
+    text-decoration: underline;
+}
+.view-all-tasks {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--primary-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Importante: Hacerlo responsivo en pantallas pequeñas */
+@media (max-width: 900px) {
+    .level-container {
+        grid-template-columns: 1fr; /* Apila las columnas una sobre otra */
+    }
+    .pending-tasks {
+        order: -1; /* Mueve las tareas pendientes arriba de los niveles en móvil */
+    }
+}
+
+
+/* Dentro de tu etiqueta <style> */
+
+@media (max-width: 900px) {
+    /* 1. Ocultamos el panel de tareas pendientes en móvil */
+    .pending-tasks {
+        display: none; 
+    }
+
+    /* 2. Ajustamos el contenedor para que muestre una única columna */
+    .level-container {
+        grid-template-columns: 1fr; /* Forzamos una sola columna */
+        gap: 0; /* Eliminamos el espacio, ya que solo hay una columna visible */
+        padding: 10px; /* Reducimos el padding en pantallas pequeñas */
+    }
+}
 
     </style>
 </head>
 <body ng-controller="PianoController" >
 
-     <div class="banner-header">
+     <div class="banner-header" ng-show="currentView === 'levelSelector'">
         <img src="https://lh3.googleusercontent.com/d/1vn_w1YjLx9qaEkuQ6bfRNoYvLCvK_l-Z"  class="banner-image">
     </div>
     
     <div id="levelSelector" ng-show="currentView === 'levelSelector'" >
         <div class="level-container" >
+
+              <div class="pending-tasks">
+        <h4>Tareas Pendientes</h4>
+        <ul>
+            <li>
+                <div class="task-icon"><i class="ri-quill-pen-line"></i></div>
+                <div class="task-info">
+                    <span>Lección 2</span>
+                    <a href="#">Quiz de Postura</a>
+                </div>
+            </li>
+            <li>
+                <div class="task-icon"><i class="ri-mic-line"></i></div>
+                <div class="task-info">
+                    <span>Lección 3</span>
+                    <a href="#">Graba tu melodía</a>
+                </div>
+            </li>
+        </ul>
+    </div>
            
 
             <div class="levels-grid">
