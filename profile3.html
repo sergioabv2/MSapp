@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="es" ng-app="pianoApp">
 <head>
     <meta charset="UTF-8">
@@ -125,7 +125,7 @@
         .app-container { display: flex; flex: 1; overflow: hidden; }
         .menu-toggle-btn { display: none; position: fixed; top: 10px; left: 15px; background: var(--sidebar-bg); color: var(--sidebar-text); border: none; font-size: 1.5rem; cursor: pointer; z-index: 1002; width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; border-left: 1px solid var(--lesson-header-bg); }
-        .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex; }
+        .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex;   flex-direction: column;}
         #content-iframe { width: 100%; height: 100%; border: none; }
         .user-profile { display: flex; align-items: center; margin-bottom: 25px; }
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
@@ -152,7 +152,7 @@
         .task-item.completed .task-status { background-color: var(--success-green); border-color: var(--success-green); }
         .task-interaction-icon { cursor: pointer; margin-left: auto; font-size: 1.5rem; z-index: 2; }
         #recordingIndicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--danger-red); color: white; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; z-index: 1020; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: 500; }
-        #recordingIndicator::before { content: ''; position: absolute; inset: 0; background-color: var(--danger-red); border-radius: 20px; z-index: -1; animation: pulse 1.5s infinite; }
+       #recordingIndicator::before { content: ''; position: absolute; inset: 0; background-color: var(--danger-red); border-radius: 20px; z-index: -1; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 70% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; align-items: center; justify-content: center; z-index: 1010; }
         .modal-content { background: var(--modal-content-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 640px; text-align: center; }
@@ -169,11 +169,7 @@
         @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
         /* Estilos del nuevo botón "Regresar" */
-        #back-to-levels-btn {
-            background: none; border: none; color: var(--header-text);
-            font-size: 1.5rem; cursor: pointer;
-            position: absolute; left: 20px;
-        }
+      
 
         @media (max-width: 800px) {
             .levels-grid { grid-template-columns: 1fr; padding: 30px 20px; }
@@ -185,12 +181,9 @@
                 position: fixed; top: 0; width: 100%; z-index: 999;
                 background-color: var(--header-bg);
             }
-             #mobile-task-icon {
-                font-size: 1.8rem; cursor: pointer; color: var(--header-text);
-                position: absolute; right: 20px; /* Posicionado a la derecha */
-            }
-            .main-content { padding-top: 45px; }
-            .menu-toggle-btn { display: flex; align-items: center; justify-content: center; top: 10px; right: 15px; left: auto; } /* Ajustado a la derecha */
+            
+
+            .menu-toggle-btn { display: flex; align-items: center; justify-content: center; top: 50px; left: 15px; right: auto; } /* Ajustado a la derecha */
             .sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 80%; z-index: 1001; transform: translateX(100%); transition: transform 0.3s ease-in-out; border-left: 1px solid var(--lesson-header-bg); border-right: none; }
             .sidebar.is-open { transform: translateX(0); }
             .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
@@ -226,16 +219,57 @@
     </div>
 
     <div id="pianoApp" ng-show="currentView === 'app'">
-        <header class="app-header">
-            <button id="back-to-levels-btn" ng-click="showLevelSelector()"><i class="ri-arrow-left-line"></i></button>
-            <h1 class="app-title">Piano Quest Pro</h1>
-            <div id="mobile-task-icon" ng-bind-html="getMobileTaskIcon()"></div>
-        </header>  
+    
         <button id="menu-toggle" class="menu-toggle-btn" ng-click="toggleSidebar()"><i class="ri-menu-line"></i></button>
         <div class="app-container">
+
+
             <main class="main-content">
+                  <div class="player-header">
+      <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()"><i class="ri-arrow-left-line"></i></button>
+      
+        <div class="progress-info">
+
+          <div class="recording-indicator" ng-show="isRecording2">
+    <div class="recording-dot"></div>
+    <span>Grabando...</span>
+  </div>
+
+ <div class="recording-controls">
+
+  <!-- Controles izquierdos -->
+  <div class="left-controls">
+  
+   
+  </div>
+  <!-- Controles derechos -->
+  <div class="right-controls">
+    <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
+     <button class="tool-btn" id="mobile-task-icon" ng-bind-html="getMobileTaskIcon()">
+    </button>
+   <div class="metronome-control">
+  <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
+    <i class="ri-timer-flash-line"></i>
+  </button>
+  <div class="bpm-control">
+    <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
+      <i class="ri-subtract-line"></i>
+    </button>
+    <span class="bpm-label">{{metronomeBPM}} BPM</span>
+    <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
+      <i class="ri-add-line"></i>
+    </button>
+  </div>
+</div>
+  </div>
+</div>
+  </div>   
+</div>
                 <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" title="Contenido principal"></iframe>
             </main>
+
+
+
             <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
                 <div class="user-profile">
                     <div class="user-avatar">{{selectedLevel.id}}</div>
@@ -279,9 +313,9 @@
             <div class="modal-content" id="modalContent" ng-bind-html="modal.content"></div>
         </div>
         <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
-        <div id="recordingIndicator" style="display: none;">
+        <div id="recordingIndicator" style="display: none;"> 
             <i class="ri-mic-fill"></i>
-            <span>Grabando...</span>
+             <span>Grabando...</span>
         </div>
     </div>
 
@@ -301,32 +335,60 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     // == DATOS Y ESTADO DE LA APLICACIÓN
     // =============================================
     $scope.currentView = 'levelSelector';
-    $scope.levels = [
-        { id: 1, title: 'Fundamentos', description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', duration: '~2 horas' },
-        { id: 2, title: 'Principiante', description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '~4 horas' },
-        { id: 3, title: 'Intermedio', description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', duration: '~8 horas' }
-    ];
+$scope.levels = [
+    { 
+        id: 1, 
+        title: 'Fundamentos', 
+        description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
+        duration: '~2 horas',
+        // Aquí anidamos las lecciones correspondientes a este nivel
+        lessons: [
+            {
+                title: "Lección 1: Fundamentos",
+                tasks: [
+                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
+                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
+                ]
+            },
+            {
+                title: "Lección 2: Primeras Notas",
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+        ]
+    },
+    { 
+        id: 2, 
+        title: 'Principiante', 
+        description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
+        duration: '~4 horas',
+        lessons: [
+            // Aquí irían las lecciones del Nivel 2
+            { title: "Lección 3: Escalas Mayores", tasks: [ /* ... */ ] }
+        ]
+    },
+    { 
+        id: 3, 
+        title: 'Intermedio', 
+        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
+        duration: '~8 horas',
+        lessons: [
+            // Aquí irían las lecciones del Nivel 3
+            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
+        ]
+    }
+];
+
+
+$scope.lessons = [];
     $scope.selectedLevel = null;
     $scope.sidebarOpen = false;
 
-    $scope.lessons = [
-        {
-            title: "Lección 1: Fundamentos",
-            tasks: [
-                { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
-                { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
-            ]
-        },
-        {
-            title: "Lección 2: Primeras Notas",
-            tasks: [
-                { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-            ]
-        },
-    ];
+
 
     // Variables de estado del curso
     $scope.currentLessonIndex = 0;
@@ -357,7 +419,6 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     $scope.startApp = () => {
         if (!$scope.selectedLevel) return;
         $scope.currentView = 'app';
-        // Reiniciar el estado del curso si es necesario (o cargarlo desde el storage)
         initApp();
     };
 
@@ -371,21 +432,23 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     };
     
     function initApp() {
-        // Inicializa o resetea el progreso
-        $scope.lessons.forEach(lesson => {
-            lesson.completed = false;
-            lesson.expanded = false;
-            lesson.tasks.forEach(task => task.completed = false);
-        });
-        
-        $scope.currentLessonIndex = 0;
-        $scope.currentTaskIndex = 0;
-        $scope.totalTasksCompleted = 0;
-        
-        setupMIDI();
-        updateProgress();
-        loadCurrentTask();
-    }
+    $scope.lessons = angular.copy($scope.selectedLevel.lessons);
+    $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+
+    $scope.lessons.forEach(lesson => {
+        lesson.completed = false;
+        lesson.expanded = false;
+        lesson.tasks.forEach(task => task.completed = false);
+    });
+    
+    $scope.currentLessonIndex = 0;
+    $scope.currentTaskIndex = 0;
+    $scope.totalTasksCompleted = 0;
+    
+    setupMIDI();
+    updateProgress();
+    loadCurrentTask();
+}
 
 
     // =============================================
@@ -666,7 +729,77 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
             setTimeout(() => confetti.remove(), 5000);
         }
     }
+
+
+
+
+
+
+
+
+
+  
+  $scope.metronomeActive = false;
+$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
+$scope.baseBPM = 60; // BPM del audio original
+$scope.metronomeAudio = document.getElementById('metronomeAudio');
+
+// Función para convertir BPM a velocidad de reproducción
+function bpmToPlaybackRate(bpm) {
+  return bpm / $scope.baseBPM;
+}
+
+$scope.toggleMetronome = function() {
+  $scope.metronomeActive = !$scope.metronomeActive;
+  
+  if ($scope.metronomeActive) {
+    // Configurar velocidad inicial
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+    $scope.metronomeAudio.currentTime = 0;
+    $scope.metronomeAudio.play()
+      .catch(e => console.error("Error al reproducir:", e));
+  } else {
+    $scope.metronomeAudio.pause();
+    $scope.metronomeAudio.currentTime = 0;
+  }
+};
+
+$scope.adjustBPM = function(change, event) {
+  // Actualizar valor BPM
+  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+  
+  // Ajustar velocidad de reproducción si está activo
+  if ($scope.metronomeActive) {
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+  }
+  
+  // Lógica para mantener presionado
+  if (event) {
+    const button = event.target;
+    button.addEventListener('mouseup', clearBPMTimers);
+    button.addEventListener('mouseleave', clearBPMTimers);
+    button.addEventListener('touchend', clearBPMTimers);
+    
+    $scope.bpmTimeout = setTimeout(() => {
+      $scope.bpmInterval = setInterval(() => {
+        $scope.adjustBPM(change);
+        $scope.$apply();
+      }, 100);
+    }, 500);
+  } 
+};
+
+function clearBPMTimers() {
+  clearTimeout($scope.bpmTimeout);
+  clearInterval($scope.bpmInterval);
+} 
+
+
+
+
 });
+
+
 </script>
 
 </body>
