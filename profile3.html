@@ -94,9 +94,9 @@
 
 
 .level-card-left {
-    padding: 24px 30px;
+    padding: 12px 15px;
     flex-shrink: 0; /* Evita que se encoja */
-    width: 35%; /* Ancho del panel izquierdo */
+    width: 30%; /* Ancho del panel izquierdo */
     display: flex;
     flex-direction: column;
     justify-content: center; /* Centra el contenido verticalmente */
@@ -106,7 +106,7 @@
 
 /* 4. Panel derecho (claro) */
 .level-card-right {
-    padding: 24px 30px;
+    padding: 12px 15px;
     flex-grow: 1; /* Ocupa el espacio restante */
     display: flex;
     flex-direction: column;
@@ -552,8 +552,8 @@
 
                 <div class="level-card" 
                    ng-repeat="level in levels" 
-                   ng-click="selectLevel(level)"
-                   ng-class="{'selected': selectedLevel.id === level.id}">
+                   ng-click="selectLevel(level); startApp()"
+                   ng-class="{'selected': selectedLevel.id === level.id}" >
                   
                   <div class="level-card-left level-card-header">
                        <div class="level-number">{{level.id}}</div>
@@ -568,9 +568,9 @@
               </div>
 
             </div>
-            <div class="continue-btn-container">
+         <!--     <div class="continue-btn-container">
                 <button class="continue-btn" ng-class="{'active': selectedLevel}" ng-click="startApp()">Iniciar</button>
-            </div>
+            </div>  -->
         </div>
     </div>
 
