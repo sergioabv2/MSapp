@@ -1478,6 +1478,36 @@ background-color: rgba(0, 0, 0, 0.5);
 .h-show {
   display: block;
 }
+
+
+
+ .banner-header {
+    /* --- PROPIEDADES MODIFICADAS Y NUEVAS --- */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    
+    /* --- PROPIEDADES QUE SE MANTIENEN --- */
+    width: 100%;  /* Asegúrate que sea 100% y no 98vw */
+    height: 110px;
+    overflow: hidden;
+    will-change: transform, opacity;
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+
+  #booksContent {
+
+    padding-top: 120px; 
+}
 </style>
 
 <div  ng-app="books" ng-controller="main">
@@ -1506,7 +1536,15 @@ background-color: rgba(0, 0, 0, 0.5);
   </div >
   
   
-  <div class="container" id="container" style="display: none">
+  <div id="container" style="display: none">
+
+     <div class="banner-header" ng-show="!showPlayer">
+        <img src="https://lh3.googleusercontent.com/d/1IBxAj270P8JN4MorTI0HqpDyZHXuapEs"  class="banner-image">
+    </div> 
+
+
+   <div class="container" id="booksContent">
+
     <div class="carousel-header">
   <h2>Piezas  </h2>
 </div>
@@ -1923,7 +1961,8 @@ src="">
     </div>
   </div>
 
-  
+
+</div>  
 </div>
 </div>
 
@@ -2234,6 +2273,7 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
+   // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
      token: localStorage.getItem('MStoken')
   };
 
@@ -3608,6 +3648,33 @@ AP.init({
   playList: [
   ]
 });
+
+
+  $timeout(function() {
+        // Obtenemos los dos elementos que necesitamos
+        const levelSelector = document.getElementById('booksContent');
+        const banner = document.querySelector('.banner-header');
+
+        // Nos aseguramos de que ambos existan antes de continuar
+        if (levelSelector && banner) {
+            
+            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
+            levelSelector.addEventListener('scroll', function() {
+                // 'scrollTop' nos dice cuántos píxeles hemos bajado
+                let scrollTop = this.scrollTop;
+                let bannerHeight = banner.offsetHeight;
+
+                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
+                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
+                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+
+                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
+                // avance la altura total del banner.
+                let opacity = 1 - (scrollTop / bannerHeight);
+                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
+            });
+        }
+    });
 
   
 }])
