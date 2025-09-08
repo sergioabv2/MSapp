@@ -14,18 +14,6 @@
 
 
 <style>
-    body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
-}
-  
-
-
-
-
-
-
-
-
 
 
 
@@ -64,6 +52,7 @@ body {
   position: relative;
   background: var(--bg-body);
   overflow: hidden;
+   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
 }
 
 /* MAIN MENU */
@@ -71,21 +60,17 @@ body {
 
 
 .content {
-
   min-height: 100vh;
   display: grid;
   grid-template-columns: auto 360px;
 }
 
 
- /*
+ 
 .left-content {
-  color: var(--primary-color);
-  height: 100vh;
-  width: 100% !important;
-  overflow: auto;
+   padding-top: 20px;
 }
-*/
+
 
 
 /* RIGHT CONTENT */
@@ -96,11 +81,11 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
-
   height: 100vh;
  width: 360px; 
  right: 0;
  padding: 10px;
+ padding-top: 20px;
   overflow: auto;
 }
 
@@ -1346,7 +1331,7 @@ be a descendant of the grid when it is being dragged.
 }
 
 .fc-listYear-view .fc-scroller {
-    height: 800px !important; 
+    height: 450px !important; 
 }
 
 /* 
@@ -1467,7 +1452,7 @@ margin: 4px 10px !important;
 
    @media (max-width: 500px ){
     body{
-        margin-top: 30px;
+        margin-top: 20px;
     }
   }
   
@@ -1600,7 +1585,8 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   
    var requestData = {
     action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+  //  token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1713,7 +1699,6 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
             
             header: {
                 left: 'title',
-              center: 'month,listYear',
                 right: 'prev,next'
             },
             eventClick: $scope.alertOnEventClick
