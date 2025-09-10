@@ -15,7 +15,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa; /* Un fondo ligeramente más claro */
+            background: #f8f9fa;
             min-height: 100vh;
             padding: 20px;
         }
@@ -25,7 +25,7 @@
             margin: 0 auto;
         }
 
-        /* --- Header (Adaptado del Gestor de Grabaciones) --- */
+        /* --- Header --- */
         .header {
             background: white;
             border-radius: 16px;
@@ -49,7 +49,7 @@
         .header-icon {
             width: 56px;
             height: 56px;
-            background: linear-gradient(135deg, #5668E2, #7343D9); /* Tono azul/violeta */
+            background: linear-gradient(135deg, #5668E2, #7343D9);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -71,7 +71,7 @@
             font-size: 16px;
         }
 
-        /* --- Search Box (Simplificado) --- */
+        /* --- Search Box --- */
         .search-box {
             position: relative;
             min-width: 280px;
@@ -125,17 +125,17 @@
             overflow-x: auto;
             padding: 10px 5px;
             scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling en iOS */
-            scrollbar-width: none; /* Ocultar scrollbar en Firefox */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
 
         .carousel::-webkit-scrollbar {
-            display: none; /* Ocultar scrollbar en Chrome/Safari */
+            display: none;
         }
 
         /* --- Book Card --- */
         .book-card {
-            flex: 0 0 auto; /* No encoger, no crecer, base automática */
+            flex: 0 0 auto;
             width: 180px;
             scroll-snap-align: start;
             cursor: pointer;
@@ -178,7 +178,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 240px; /* Misma altura que la imagen */
+            height: 240px;
             background: rgba(30, 30, 30, 0.5);
             border-radius: 8px;
             display: flex;
@@ -189,12 +189,13 @@
             backdrop-filter: blur(2px);
             opacity: 0;
             transition: opacity 0.2s ease;
-        }
-
-        .book-card:hover .locked-overlay {
-            opacity: 1;
+            pointer-events: none; /* Allows clicks to go through if needed, but here it's for visual effect */
         }
         
+        .book-card.is-locked .book-cover {
+            filter: grayscale(80%);
+        }
+
         .book-card.is-locked .locked-overlay {
              opacity: 1;
         }
@@ -203,7 +204,7 @@
         .scroll-btn {
             position: absolute;
             top: 50%;
-            transform: translateY(-70%); /* Ajuste vertical para centrar con la imagen */
+            transform: translateY(-70%);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -243,8 +244,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Fondo más oscuro */
-            backdrop-filter: blur(8px); /* Efecto de desenfoque */
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -260,13 +261,13 @@
         }
 
         .modal-content {
-            background: #2a2a2e; /* Fondo oscuro casi negro */
+            background: #2a2a2e;
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
             max-width: 800px;
             width: 90%;
             display: flex;
-            color: #e0e0e0; /* Texto claro */
+            color: #e0e0e0;
             overflow: hidden;
             animation: fadeInScale 0.3s ease-out;
             border: 1px solid rgba(255,255,255,0.1);
@@ -283,19 +284,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #1c1c1e; /* Un tono un poco más claro para el panel izquierdo */
+            background: #1c1c1e;
         }
 
         .modal-preview-img {
             max-width: 100%;
-            max-height: 500px;
+            max-height: 400px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255,255,255,0.15);
         }
 
         .modal-right {
-            width: 350px; /* Ancho fijo para el panel de detalles */
+            width: 350px;
             padding: 30px;
             display: flex;
             flex-direction: column;
@@ -310,7 +311,7 @@
             background: none;
             border: none;
             font-size: 24px;
-            color: #8e8e93; /* Un gris sutil */
+            color: #8e8e93;
             cursor: pointer;
             transition: color 0.2s ease;
         }
@@ -363,7 +364,7 @@
             height: 100%;
             background: linear-gradient(90deg, #5668E2, #7343D9);
             border-radius: 4px;
-            width: 30%; /* Ejemplo */
+            transition: width 0.5s ease-out;
         }
 
         .modal-stats {
@@ -372,7 +373,7 @@
             font-size: 14px;
             color: #a0a0a0;
         }
-
+        
         .modal-stat-value {
             font-size: 20px;
             font-weight: 600;
@@ -384,7 +385,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-top: auto; /* Empuja los botones hacia abajo */
+            margin-top: auto;
         }
 
         .modal-button {
@@ -396,6 +397,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: center;
+            text-decoration: none; /* Para el tag <a> */
         }
 
         .modal-button.primary {
@@ -417,28 +419,82 @@
         .modal-button.secondary:hover {
             background: #5e5e62;
         }
+        
+        /* --- PDF Viewer Styles --- */
+        .pdf-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #212121;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
 
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .pdf-viewer-header {
+            height: 60px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+        
+        .pdf-viewer-header h3 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .pdf-viewer-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .pdf-viewer-close:hover {
+            color: #d1d1d1;
+        }
+
+        .pdf-viewer-overlay iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
         /* Responsive */
-        @media (max-width: 900px) {
+        @media (max-width: 800px) {
             .modal-content {
                 flex-direction: column;
                 max-width: 400px;
-                height: 90vh; /* Para ocupar más espacio vertical */
+                height: 90vh;
                 overflow-y: auto;
             }
             .modal-left {
                 padding: 15px;
+                max-height: 200px;
                 border-bottom: 1px solid rgba(255,255,255,0.1);
             }
             .modal-right {
                 width: 100%;
                 padding: 25px;
             }
-            .modal-preview-img {
-                max-height: 300px;
-            }
-            .scroll-btn { display: none; } /* Ocultar botones en móvil, se usa swipe */
+           .modal-preview-img {
+                max-height: 180px;
+           }
+           .scroll-btn { display: none; }
         }
 
         @media (max-width: 768px) {
@@ -450,7 +506,7 @@
     </style>
 </head>
 <body ng-controller="libraryCtrl">
-    <div class="container">
+    <div class="container" ng-hide="showPdfViewer">
         <div class="header">
             <div class="header-left">
                 <div class="header-icon">
@@ -472,11 +528,13 @@
                 <h2 class="section-title">{{ section.title }}</h2>
                 <div class="carousel-wrapper">
                     <div class="carousel" id="carousel-{{$index}}">
-                        <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }" ng-class="{'is-locked': book.isLocked}" ng-click="showPreview(book, section.title)">
+                        <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }" 
+                             ng-class="{'is-locked': book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)}" 
+                             ng-click="showPreview(book, section.title)">
                             <img ng-src="{{ book.coverUrl }}" alt="{{ book.title }}" class="book-cover">
                             <div class="book-title">{{ book.title }}</div>
                             <div class="book-level">{{ book.level }}</div>
-                            <div class="locked-overlay" ng-if="book.isLocked">
+                            <div class="locked-overlay" ng-if="book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)">
                                 <i class="fas fa-lock"></i>
                             </div>
                         </div>
@@ -501,87 +559,155 @@
                     <p class="modal-author">{{ selectedBook.author }}</p>
                 </div>
                 
-                <div class="modal-progress-section">
+                <div class="modal-progress-section" ng-if="selectedBook.type === 'piece'">
                     <div class="modal-progress-bar">
-                        <div class="modal-progress-fill" style="width: 30%;"></div>
+                        <div class="modal-progress-fill" ng-style="{width: (selectedBook.practiceData.completedBars / selectedBook.totalBars * 100) + '%'}"></div>
                     </div>
                     <div class="modal-stats">
                         <div>
                             <span>Compases avanzados</span>
-                            <div class="modal-stat-value">15/50</div>
+                            <div class="modal-stat-value">{{ selectedBook.practiceData.completedBars }}/{{ selectedBook.totalBars }}</div>
                         </div>
                         <div>
                             <span>Tiempo total</span>
-                            <div class="modal-stat-value">0:00</div>
+                            <div class="modal-stat-value">{{ formatTime(selectedBook.practiceData.totalTime) }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-actions">
-                    <button class="modal-button primary">Abrir</button>
-                    <button class="modal-button secondary">Descargar</button>
+                    <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
+                    <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary">Descargar</a>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="pdf-viewer-overlay" ng-show="showPdfViewer">
+        <div class="pdf-viewer-header">
+            <h3>{{ selectedBook.title }}</h3>
+            <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
+        </div>
+        <iframe ng-src="{{pdfUrl}}" frameborder="0"></iframe>
     </div>
 
     <script>
         const app = angular.module('libraryApp', []);
 
-        app.controller('libraryCtrl', function($scope) {
+ 
+             app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
+
+           
+
+            // --- ESTADO DE LA UI ---
             $scope.searchQuery = '';
             $scope.showPreviewModal = false;
             $scope.selectedBook = null;
             $scope.selectedCategory = '';
-            
-            $scope.library = [
-    {
-        title: 'Manuales',
-        books: [
-            { id: 1, title: 'Nivel Preparatorio - Unidad 1', level: 'Nivel Preparatorio', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', isLocked: false },
-            { id: 2, title: 'Nivel Preparatorio - Unidad 2', level: 'Nivel Preparatorio', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', isLocked: false },
-            { id: 3, title: 'Nivel Preparatorio - Unidad 3', level: 'Nivel Preparatorio', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', isLocked: false },
-            { id: 4, title: 'Nivel 1 - Unidad 1', level: 'Nivel 1', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', isLocked: false },
-            { id: 5, title: 'Nivel 1 - Unidad 2', level: 'Nivel 1', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', isLocked: false },
-            { id: 6, title: 'Nivel 1 - Unidad 3', level: 'Nivel 1', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', isLocked: false },
-            { id: 7, title: 'Nivel 2 - Unidad 1', level: 'Nivel 2', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', isLocked: false },
-            { id: 8, title: 'Nivel 2 - Unidad 2', level: 'Nivel 2', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', isLocked: false },
-            { id: 9, title: 'Nivel 2 - Unidad 3', level: 'Nivel 2', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', isLocked: false },
-            { id: 10, title: 'Nivel 3 - Unidad 1', level: 'Nivel 3', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', isLocked: false },
-            { id: 11, title: 'Nivel 3 - Unidad 2', level: 'Nivel 3', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', isLocked: false },
-            { id: 12, title: 'Nivel 3 - Unidad 3', level: 'Nivel 3', author: 'Mozart Academy', coverUrl: 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', isLocked: true }
-        ]
-    },
-    {
-        title: 'Piezas',
-        books: [
-            { id: 13, title: 'Ode to Joy - var3', level: 'Preparatory', author: 'L.V. Beethoven', coverUrl: 'https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej', isLocked: false },
-            { id: 14, title: 'Trumpet Voluntary', level: 'Preparatory', author: 'Jeremiah Clarke', coverUrl: 'https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd', isLocked: false },
-            { id: 15, title: 'Old German Dance', level: 'Preparatory', author: 'Michael Praetorius', coverUrl: 'https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4', isLocked: false },
-            { id: 16, title: 'Waltz', level: 'Preparatory', author: 'Carl Czerny', coverUrl: 'https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh', isLocked: false },
-            { id: 17, title: 'Bagpipe', level: 'Preparatory', author: 'Anonymous', coverUrl: 'https://lh3.googleusercontent.com/d/1iaC23Nv4CSXuQ5YPCLEIR_EUxqhs6pKj', isLocked: false },
-            { id: 18, title: 'Sonatina', level: 'Preparatory', author: 'C.H. Wilton', coverUrl: 'https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P', isLocked: false },
-            { id: 19, title: 'March I', level: 'Preparatory', author: 'D. Gottlob Türk', coverUrl: 'https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi', isLocked: false },
-            { id: 20, title: 'March II', level: 'Preparatory', author: 'D. Gottlob Türk', coverUrl: 'https://lh3.googleusercontent.com/d/1Z_uQb4Vu5nI4nj4jjR6oNL-Xfsx27Bys', isLocked: false },
-            { id: 21, title: 'Minuet', level: 'Preparatory', author: 'A. Reinagle', coverUrl: 'https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf', isLocked: false },
-            { id: 22, title: 'Promenade', level: 'Preparatory', author: 'A. Reinagle', coverUrl: 'https://lh3.googleusercontent.com/d/1S1IwsNd6pzbUUpLONCjHC39GssguknES', isLocked: false },
-            { id: 23, title: 'Sonatina in C', level: 'Grade 1', author: 'Cornelius Gurlitt', coverUrl: 'https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM', isLocked: false },
-            { id: 24, title: 'March in F', level: 'Grade 1', author: 'D. Gottlob Türk', coverUrl: 'https://lh3.googleusercontent.com/d/1xoG80Ob1e2-d2_Vun_v_UrKJPJkrbFdM', isLocked: false },
-            { id: 25, title: 'The Old Windmill', level: 'Grade 1', author: 'Dunhill', coverUrl: 'https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt', isLocked: false },
-            { id: 26, title: 'Allemande', level: 'Grade 1', author: 'J.H. Schein', coverUrl: 'https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn', isLocked: false },
-            { id: 27, title: 'Andante', level: 'Grade 1', author: 'F. Beyer', coverUrl: 'https://lh3.googleusercontent.com/d/1LSa0lIkuOzU4fhgZr2r4kpgOyRlA2zgj', isLocked: false },
-            { id: 28, title: 'Aria in F', level: 'Grade 1', author: 'J.S. Bach', coverUrl: 'https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU', isLocked: false },
-            { id: 29, title: 'Sonatina in C', level: 'Grade 2', author: 'Frank Lynes', coverUrl: 'https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12', isLocked: false },
-            { id: 30, title: 'Gigue in G', level: 'Grade 2', author: 'G. P. Telemann', coverUrl: 'https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ', isLocked: false }
-        ]
-    }
-];
+            $scope.showPdfViewer = false;
+            $scope.pdfUrl = '';
 
-            // Función para controlar el desplazamiento de los carruseles
+            // --- DATOS DE LA BIBLIOTECA ---
+            var manualsData = [
+                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0},
+                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5},
+                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9},
+                {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0},
+                {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4},
+                {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7},
+                {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0},
+                {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4},
+                {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7},
+                {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0},
+                {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4},
+                {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7},
+            ];
+
+            var piecesData = [
+                { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://drive.google.com/file/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej/preview", "lvl": 0, "lsn": 0, "grade": "Preparatory", "totalBars": 50, "practiceData": { "totalTime": 125, "completedBars": 15, "sessions": [] }},
+                { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory", "totalBars": 40, "practiceData": { "totalTime": 320, "completedBars": 35, "sessions": [] }},
+                { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory", "totalBars": 30, "practiceData": { "totalTime": 80, "completedBars": 10, "sessions": [] }},
+                { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory", "totalBars": 50, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory", "totalBars": 60, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory", "totalBars": 32, "practiceData": { "totalTime": 450, "completedBars": 32, "sessions": [] }},
+                { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory", "totalBars": 24, "practiceData": { "totalTime": 150, "completedBars": 12, "sessions": [] }},
+                { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1", "totalBars": 50, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1", "totalBars": 48, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1", "totalBars": 40, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1", "totalBars": 28, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2", "totalBars": 70, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
+                { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2", "totalBars": 55, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }}
+            ];
+            
+            // --- TRANSFORMACIÓN DE DATOS ---
+            var manuals = manualsData.map(function(manual) {
+                return {
+                    title: manual.title + ' - ' + manual.subtitle,
+                    level: manual.title,
+                    author: 'Mozart Academy',
+                    coverUrl: manual.background,
+                    pdf: manual.pdf,
+                    lvl: manual.lvl,
+                    lsn: manual.lsn,
+                    type: 'manual' // Tipo para renderizado condicional
+                };
+            });
+
+            var pieces = piecesData.map(function(piece) {
+                return {
+                    title: piece.title,
+                    level: piece.grade,
+                    author: piece.subtitle,
+                    coverUrl: piece.background,
+                    pdf: piece.pdf,
+                    lvl: piece.lvl,
+                    lsn: piece.lsn,
+                    totalBars: piece.totalBars,
+                    practiceData: piece.practiceData,
+                    type: 'piece' // Tipo para renderizado condicional
+                };
+            });
+
+            $scope.library = [
+                { title: 'Manuales', books: manuals },
+                { title: 'Piezas', books: pieces }
+            ];
+
+                var requestData = {
+          action: "getBasicData",
+        //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+           token: localStorage.getItem('MStoken')
+        };
+
+        var config = {
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          } 
+        };
+                 
+        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+          .then(function(response) { 
+              var repertoire = JSON.parse(response.data.repertoire);
+                 $scope.library.push(repertoire)
+                $scope.lvl = response.data.lvl;
+                 $scope.lsn = response.data.lsn;
+          })  
+
+         
+
+            // Formatear segundos a M:SS
+            $scope.formatTime = function(seconds) {
+                if (isNaN(seconds) || seconds < 0) return "0:00";
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                return minutes + ":" + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
+            };
+
+            // Desplazamiento del carrusel
             $scope.scrollCarousel = function(elementId, direction) {
                 const carousel = document.getElementById(elementId);
                 if (carousel) {
-                    const scrollAmount = 200 * direction; // Desplazar 200px a la vez
+                    const scrollAmount = 200 * direction;
                     carousel.scrollBy({
                         left: scrollAmount,
                         behavior: 'smooth'
@@ -589,10 +715,11 @@
                 }
             };
 
-            // Función para mostrar el modal de vista previa
+            // Mostrar el modal de vista previa
             $scope.showPreview = function(book, categoryTitle) {
-                if (book.isLocked) {
-                    alert('Esta pieza está bloqueada. ¡Desbloquéala para acceder!');
+                var isLocked = book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
+                if (isLocked) {
+                    alert('Este material está bloqueado. ¡Sigue avanzando para desbloquearlo!');
                     return;
                 }
                 $scope.selectedBook = book;
@@ -600,15 +727,32 @@
                 $scope.showPreviewModal = true;
             };
 
-            // Función para cerrar el modal
+            // Cerrar el modal
             $scope.closePreviewModal = function(event) {
-                // Evitar que el clic en el contenido del modal lo cierre
-                if (event && event.target.classList.contains('modal-content')) {
+                if (event && event.target !== event.currentTarget) {
                     return;
                 }
                 $scope.showPreviewModal = false;
             };
-        });
+            
+            // Abrir el visor de PDF
+            $scope.openPdfViewer = function(book) {
+                if (!book || !book.pdf) {
+                    alert('No hay un PDF disponible para este libro.');
+                    return;
+                }
+                // $sce.trustAsResourceUrl es necesario para que AngularJS permita URLs dinámicas en iframes
+                $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
+                $scope.showPreviewModal = false; // Ocultar modal pequeño
+                $scope.showPdfViewer = true;     // Mostrar visor grande
+            };
+
+            // Cerrar el visor de PDF
+            $scope.closePdfViewer = function() {
+                $scope.showPdfViewer = false;
+                $scope.pdfUrl = ''; // Limpiar la URL para detener la carga
+            };
+        }]);
     </script>
 </body>
 </html>
