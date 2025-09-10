@@ -24,93 +24,11 @@
             --text-color: #333;
         }
         
-       .loader {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+    
         
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 30px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-      .loader    h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        
-      .loader    p {
-            color: var(--secondary-color);
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
-        
-        .loading-container {
-            width: 300px;
-            height: 8px;
-            background-color: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--accent-color);
-            border-radius: 4px;
-            animation: loading 2.5s ease-in-out infinite;
-        }
-        
-        .book-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .book-icon {
-            font-size: 2rem;
-            color: var(--primary-color);
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes loading {
-            0% { width: 0%; }
-            50% { width: 100%; }
-            100% { width: 0%; }
-        }
-        
-        @keyframes fadeIn {
-            to { opacity: 0.7; }
-        }
-        
-        /* Asignamos diferentes delays a los iconos de libros */
-        .book-icon:nth-child(1) { animation-delay: 0.3s; }
-        .book-icon:nth-child(2) { animation-delay: 0.6s; }
-        .book-icon:nth-child(3) { animation-delay: 0.9s; }
-        .book-icon:nth-child(4) { animation-delay: 1.2s; }
-        .book-icon:nth-child(5) { animation-delay: 1.5s; }
-
+     
  
-  body{font-family:Roboto,'Open Sans',sans-serif}
+  body{font-family:Roboto,'Open Sans',sans-serif;  overflow: hidden;}
 
 .mhn-slide .mhn-item{width:100%;padding:10px}
 .mhn-slide .mhn-inner{width:100%;box-shadow:0 2px 10px 0 rgba(0,0,0,.16),0 2px 5px 0 rgba(0,0,0,.26);border-radius:3px;transition: transform 0.4s ease;}
@@ -1478,41 +1396,58 @@ background-color: rgba(0, 0, 0, 0.5);
 .h-show {
   display: block;
 }
+
+
+
+#container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.banner-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    z-index: 10;
+    overflow: hidden;
+    will-change: transform, opacity;
+}
+
+#booksContent {
+    padding-top: 120px;
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+
 </style>
 
 <div  ng-app="books" ng-controller="main">
   
 
 
-  <div class="loader" id="loader" >
-  <svg class="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h6v7l2.5-1.5L16 9V2h2a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2z" fill="#4a6fa5"/>
-    </svg> 
-    
-    <h1>Biblioteca</h1>
-    <p>Organizando tu biblioteca digital...</p>
-    
-    <div class="loading-container">
-        <div class="loading-bar"></div>
-    </div>
-    
-    <div class="book-icons">
-        <div class="book-icon">📕</div>
-        <div class="book-icon">📗</div>
-        <div class="book-icon">📘</div>
-        <div class="book-icon">📙</div>
-        <div class="book-icon">📖</div>
+  
+  
+  <div id="container" >
+
+     <div class="banner-header" ng-show="!showPlayer">
+        <img src="https://lh3.googleusercontent.com/d/183Sz7F_Dvn_JXvdm1tHESUtnMRXPN-l3"  class="banner-image">
     </div> 
-  </div >
-  
-  
-  <div class="container" id="container" style="display: none">
+
+
+   <div class="container" id="booksContent">
+
     <div class="carousel-header">
   <h2>Piezas  </h2>
 </div>
   
   <div class="mhn-slide owl-carousel">
-    <div class="mhn-item" ng-repeat="manual in pieces" ng-click="openPlayer(manual)">
+    <div class="mhn-item" ng-repeat="manual in pieces" ng-click="showPreview(manual, lvl, lsn)">
       <div class="mhn-inner">
        <div class="lock-icon" ng-if="!datosCargados || manual.lvl > lvl || (manual.lvl == lvl && manual.lsn >= lsn)">
   <i class="ri-lock-fill"></i>
@@ -1532,7 +1467,7 @@ background-color: rgba(0, 0, 0, 0.5);
 
   
   <div class="mhn-slide owl-carousel">
-    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="openPlayer(manual)">
+    <div class="mhn-item" ng-repeat="manual in manuals" ng-click="showPreview(manual, lvl, lsn)">
      <!-- <h4>{{manual.level}}</h4>
           <p>{{manual.block}}</p>  -->
       <div class="mhn-inner">
@@ -1555,7 +1490,7 @@ background-color: rgba(0, 0, 0, 0.5);
 </div>
   
    <div class="mhn-slide2 owl-carousel">
-    <div class="mhn-item" ng-repeat="manual in repertoire" ng-click="openPlayer(manual)">
+    <div class="mhn-item" ng-repeat="manual in repertoire" ng-click="showPreview2(manual)">
       <div class="mhn-inner">
        
 <div class="grade-badge">
@@ -1642,11 +1577,11 @@ background-color: rgba(0, 0, 0, 0.5);
       <h4 class="mobile">{{currentManual.title}}</h4>
     
       <div class="player-tools">
-        <button class="tool-btn recording-btn mobile"
+     <!--   <button class="tool-btn recording-btn mobile"
           ng-click="setActivePanel('IArecording')"
           ng-class="{'active': activePanel === 'IArecording'}">
     <i class="ri-shining-line"></i> MozartIA
-  </button>
+  </button> -->
          <button class="tool-btn recording-btn"
           ng-click="setActivePanel('recording')"
           ng-class="{'active': activePanel === 'recording'}">
@@ -1923,7 +1858,8 @@ src="">
     </div>
   </div>
 
-  
+
+</div>  
 </div>
 </div>
 
@@ -1944,9 +1880,9 @@ angular.module('books', [])
        {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0},
       {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4},
       {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7},
-       {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 2, lsn: 0},
-      {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 2, lsn: 4},
-      {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 2, lsn: 7},
+       {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0},
+      {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4},
+      {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7},
      
     ];
 
@@ -2234,7 +2170,8 @@ angular.module('books', [])
 
     var requestData = {
     action: "getBasicData",
-     token: "U2FsdGVkX1+O3QNKxr7i65+rZS88LOrcquA8lGK28gvecieY+EsOVZ9mREDrZlaX"
+  //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -2322,9 +2259,6 @@ $scope.showPreview = function(manual, lvl, lsn) {
     $scope.currentManual = manual;
     $scope.showPlayer = true;
     $scope.sessionStartTime = new Date();
-    if (document.documentElement.requestFullscreen) {
-                        document.documentElement.requestFullscreen();
-                    }
     $scope.sessionTimer = {
         seconds: 0,
         interval: setInterval(function() {
@@ -2694,8 +2628,6 @@ function writeString(view, offset, string) {
 // Modifica tu función closePlayer para guardar el progreso
 $scope.closePlayer = function() {
     clearInterval($scope.sessionTimer.interval);
-
-    document.exitFullscreen();
     
     // Guardar tiempo de sesión
     const sessionTime = $scope.sessionTimer.seconds;
@@ -3614,6 +3546,33 @@ AP.init({
   ]
 });
 
+
+  $timeout(function() {
+        // Obtenemos los dos elementos que necesitamos
+        const levelSelector = document.getElementById('booksContent');
+        const banner = document.querySelector('.banner-header');
+
+        // Nos aseguramos de que ambos existan antes de continuar
+        if (levelSelector && banner) {
+            
+            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
+            levelSelector.addEventListener('scroll', function() {
+                // 'scrollTop' nos dice cuántos píxeles hemos bajado
+                let scrollTop = this.scrollTop;
+                let bannerHeight = banner.offsetHeight;
+
+                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
+                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
+                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+
+                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
+                // avance la altura total del banner.
+                let opacity = 1 - (scrollTop / bannerHeight);
+                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
+            });
+        }
+    });
+
   
 }])
   
@@ -3634,13 +3593,6 @@ AP.init({
 
 
  <script>
-
-  setTimeout(function() {
-         var loader = document.getElementById("loader");
-    var main = document.getElementById("container");
-           loader.style.display = "none";
-          main.style.display = "block";
-        }, 4000);
 
 
 
