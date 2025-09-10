@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Grabaciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .header-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+
+        .header-info p {
+            color: #6e6e73;
+            font-size: 16px;
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .record-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b6b, #e53935);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .record-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+        }
+
+        .record-btn.recording {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6); }
+            100% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+        }
+
+        .upload-btn {
+            padding: 12px 20px;
+            border: 2px dashed #8B5CF6;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.05);
+            color: #8B5CF6;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #A855F7;
+        }
+
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #1d1d1f;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .recordings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .recording-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .recording-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .recording-header {
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .recording-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .recording-icon.midi {
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            color: white;
+        }
+
+        .recording-icon.audio {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+
+        .recording-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recording-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .recording-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .recording-date {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        .recording-duration {
+            font-size: 13px;
+            color: #8B5CF6;
+            font-weight: 500;
+        }
+
+        .recording-actions {
+            padding: 0 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .play-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .play-btn.playing {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .waveform-btn {
+            padding: 8px 12px;
+            border: 1px solid #8B5CF6;
+            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.05);
+            color: #8B5CF6;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .waveform-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .menu-actions {
+            position: relative;
+        }
+
+        .menu-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 16px 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8B5CF6, #A855F7);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6e6e73;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            color: #9ca3af;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .recording-timer {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 12px;
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .recording-timer.active {
+            display: flex;
+        }
+
+        .timer-dot {
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1d1d1f;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+            margin-top: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .recording-controls {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .recordings-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stat-item {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <div class="header-info">
+                    <h1>Mis Grabaciones</h1>
+                    <p>Gestiona y reproduce tus grabaciones de piano</p>
+                </div>
+            </div>
+            <div class="recording-controls">
+                <div class="recording-timer" id="recordingTimer">
+                    <div class="timer-dot"></div>
+                    <span id="timerDisplay">00:00</span>
+                </div>
+                <button class="record-btn" id="recordBtn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <label class="upload-btn">
+                    <i class="fas fa-upload"></i>
+                    Subir archivo
+                    <input type="file" accept="audio/*,.mid,.midi" style="display: none;">
+                </label>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">24</span>
+                <div class="stat-label">Total grabaciones</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">2h 34m</span>
+                <div class="stat-label">Tiempo total</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">18</span>
+                <div class="stat-label">Audio</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">6</span>
+                <div class="stat-label">MIDI</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Tipo:</span>
+                <select class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="audio">Audio</option>
+                    <option value="midi">MIDI</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Ordenar por:</span>
+                <select class="filter-select">
+                    <option value="date">Fecha</option>
+                    <option value="name">Nombre</option>
+                    <option value="duration">Duración</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar grabaciones...">
+            </div>
+        </div>
+
+        <!-- Recordings Grid -->
+        <div class="recordings-grid" id="recordingsGrid">
+            <!-- Recording Card - MIDI -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon midi">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Escalas Do Mayor - Práctica</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">Hoy, 14:30</div>
+                            <div class="recording-duration">2:45 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="waveform-btn">Ver notas</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Card - Audio -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon audio">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Nocturno en Mi bemol - Ensayo</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">Ayer, 16:20</div>
+                            <div class="recording-duration">4:12 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 35%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn playing">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <button class="waveform-btn">Waveform</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Card - MIDI -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon midi">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Improvisación Jazz - Sesión 1</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">3 Oct, 10:15</div>
+                            <div class="recording-duration">6:30 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="waveform-btn">Ver notas</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Card - Audio -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon audio">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Escalas menores - Ejercicio</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">2 Oct, 18:45</div>
+                            <div class="recording-duration">3:28 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="waveform-btn">Waveform</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Card - MIDI -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon midi">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Canon en Re - Bach</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">1 Oct, 20:10</div>
+                            <div class="recording-duration">5:15 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="waveform-btn">Ver notas</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Card - Audio -->
+            <div class="recording-card">
+                <div class="recording-header">
+                    <div class="recording-icon audio">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="recording-info">
+                        <div class="recording-title">Sonata K331 - Mozart (fragmento)</div>
+                        <div class="recording-meta">
+                            <div class="recording-date">28 Sep, 15:30</div>
+                            <div class="recording-duration">7:22 min</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="recording-actions">
+                    <div class="play-controls">
+                        <button class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="waveform-btn">Waveform</button>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let recordingTime = 0;
+        let timerInterval;
+
+        const recordBtn = document.getElementById('recordBtn');
+        const recordingTimer = document.getElementById('recordingTimer');
+        const timerDisplay = document.getElementById('timerDisplay');
+
+        recordBtn.addEventListener('click', toggleRecording);
+
+        function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        function startRecording() {
+            isRecording = true;
+            recordingTime = 0;
+            recordBtn.classList.add('recording');
+            recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            recordingTimer.classList.add('active');
+            
+            timerInterval = setInterval(() => {
+                recordingTime++;
+                updateTimer();
+            }, 1000);
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            recordingTimer.classList.remove('active');
+            clearInterval(timerInterval);
+            
+            // Aquí agregarías la lógica para guardar la grabación
+            console.log('Grabación guardada:', recordingTime + ' segundos');
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(recordingTime / 60);
+            const seconds = recordingTime % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Event listeners para los botones de play
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Toggle play/pause state
+                const isPlaying = this.classList.contains('playing');
+                
+                // Reset all other buttons
+                document.querySelectorAll('.play-btn').forEach(otherBtn => {
+                    otherBtn.classList.remove('playing');
+                    otherBtn.innerHTML = '<i class="fas fa-play"></i>';
+                });
+                
+                if (!isPlaying) {
+                    this.classList.add('playing');
+                    this.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    this.classList.remove('playing');
+                    this.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+        });
+
+        // Event listeners para filtros
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('Filter changed:', this.value);
+                // Aquí implementarías la lógica de filtrado
+            });
+        });
+
+        // Event listener para búsqueda
+        document.querySelector('.search-input').addEventListener('input', function() {
+            console.log('Searching:', this.value);
+            // Aquí implementarías la lógica de búsqueda
+        });
+
+        // Event listener para upload
+        document.querySelector('input[type="file"]').addEventListener('change', function() {
+            if (this.files.length > 0) {
+                console.log('File selected:', this.files[0].name);
+                // Aquí implementarías la lógica de subida de archivos
+            }
+        });
+    </script>
+</body>
+</html>
