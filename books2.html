@@ -559,21 +559,21 @@
                     <p class="modal-author">{{ selectedBook.author }}</p>
                 </div>
                 
-                <div class="modal-progress-section" ng-if="selectedBook.type === 'piece'">
-                    <div class="modal-progress-bar">
-                        <div class="modal-progress-fill" ng-style="{width: (selectedBook.practiceData.completedBars / selectedBook.totalBars * 100) + '%'}"></div>
-                    </div>
-                    <div class="modal-stats">
-                        <div>
-                            <span>Compases avanzados</span>
-                            <div class="modal-stat-value">{{ selectedBook.practiceData.completedBars }}/{{ selectedBook.totalBars }}</div>
-                        </div>
-                        <div>
-                            <span>Tiempo total</span>
-                            <div class="modal-stat-value">{{ formatTime(selectedBook.practiceData.totalTime) }}</div>
-                        </div>
-                    </div>
-                </div>
+                <div class="modal-progress-section" ng-if="selectedBook.type === 'manual'">
+                  <div class="modal-progress-bar">
+                      <div class="modal-progress-fill" ng-style="{width: (selectedBook.practiceData.completedExercises / selectedBook.totalExercises * 100) + '%'}"></div>
+                  </div>
+                  <div class="modal-stats">
+                      <div>
+                          <span>Ejercicios completados</span>
+                          <div class="modal-stat-value">{{ selectedBook.practiceData.completedExercises }}/{{ selectedBook.totalExercises }}</div>
+                      </div>
+                      <div>
+                          <span>Tiempo total</span>
+                          <div class="modal-stat-value">{{ formatTime(selectedBook.practiceData.totalTime) }}</div>
+                      </div>
+                  </div>
+              </div>
 
                 <div class="modal-actions">
                     <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
@@ -608,65 +608,66 @@
             $scope.pdfUrl = '';
 
             // --- DATOS DE LA BIBLIOTECA ---
-            var manualsData = [
-                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0},
-                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5},
-                {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9},
-                {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0},
-                {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4},
-                {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7},
-                {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0},
-                {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4},
-                {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7},
-                {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0},
-                {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4},
-                {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7},
-            ];
+           var manualsData = [
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 25, 'practiceData': { 'totalTime': 1520, 'completedExercises': 20, 'sessions': [] }},
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 30, 'practiceData': { 'totalTime': 980, 'completedExercises': 15, 'sessions': [] }},
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 28, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 35, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 32, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 40, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 28, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 33, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+    {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7, 'totalExercises': 30, 'practiceData': { 'totalTime': 0, 'completedExercises': 0, 'sessions': [] }},
+];
 
-            var piecesData = [
-                { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://drive.google.com/file/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej/preview", "lvl": 0, "lsn": 0, "grade": "Preparatory", "totalBars": 50, "practiceData": { "totalTime": 125, "completedBars": 15, "sessions": [] }},
-                { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory", "totalBars": 40, "practiceData": { "totalTime": 320, "completedBars": 35, "sessions": [] }},
-                { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory", "totalBars": 30, "practiceData": { "totalTime": 80, "completedBars": 10, "sessions": [] }},
-                { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory", "totalBars": 50, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory", "totalBars": 60, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory", "totalBars": 32, "practiceData": { "totalTime": 450, "completedBars": 32, "sessions": [] }},
-                { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory", "totalBars": 24, "practiceData": { "totalTime": 150, "completedBars": 12, "sessions": [] }},
-                { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1", "totalBars": 50, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1", "totalBars": 48, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1", "totalBars": 40, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1", "totalBars": 28, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2", "totalBars": 70, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }},
-                { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2", "totalBars": 55, "practiceData": { "totalTime": 0, "completedBars": 0, "sessions": [] }}
-            ];
+           var piecesData = [
+    { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://drive.google.com/file/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej/preview", "lvl": 0, "lsn": 0, "grade": "Preparatory"},
+    { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory"},
+    { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory"},
+    { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory"},
+    { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory"},
+    { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory"},
+    { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory"},
+    { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1"},
+    { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1"},
+    { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1"},
+    { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1"},
+    { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2"},
+    { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2"}
+];
             
             // --- TRANSFORMACIÓN DE DATOS ---
-            var manuals = manualsData.map(function(manual) {
-                return {
-                    title: manual.title + ' - ' + manual.subtitle,
-                    level: manual.title,
-                    author: 'Mozart Academy',
-                    coverUrl: manual.background,
-                    pdf: manual.pdf,
-                    lvl: manual.lvl,
-                    lsn: manual.lsn,
-                    type: 'manual' // Tipo para renderizado condicional
-                };
-            });
+           var manuals = manualsData.map(function(manual) {
+    return {
+        title: manual.title + ' - ' + manual.subtitle,
+        level: manual.title,
+        author: 'Mozart Academy',
+        coverUrl: manual.background,
+        pdf: manual.pdf,
+        lvl: manual.lvl,
+        lsn: manual.lsn,
+        totalExercises: manual.totalExercises, // <- AÑADIR ESTA LÍNEA
+        practiceData: manual.practiceData,     // <- AÑADIR ESTA LÍNEA
+        type: 'manual' 
+    };
+});
 
-            var pieces = piecesData.map(function(piece) {
-                return {
-                    title: piece.title,
-                    level: piece.grade,
-                    author: piece.subtitle,
-                    coverUrl: piece.background,
-                    pdf: piece.pdf,
-                    lvl: piece.lvl,
-                    lsn: piece.lsn,
-                    totalBars: piece.totalBars,
-                    practiceData: piece.practiceData,
-                    type: 'piece' // Tipo para renderizado condicional
-                };
-            });
+         var pieces = piecesData.map(function(piece) {
+    return {
+        title: piece.title,
+        level: piece.grade,
+        author: piece.subtitle,
+        coverUrl: piece.background,
+        pdf: piece.pdf,
+        lvl: piece.lvl,
+        lsn: piece.lsn,
+        // Las propiedades 'totalBars' y 'practiceData' se han eliminado
+        type: 'piece' 
+    };
+});
 
             $scope.library = [
                 { title: 'Manuales', books: manuals },
