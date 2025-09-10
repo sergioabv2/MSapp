@@ -6,8 +6,15 @@
     <title>Gestor de Grabaciones</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+    
     <style>
-        /* TU CSS ORIGINAL VA AQUÍ - NO SE HA MODIFICADO NADA */
+        /* TU CSS ORIGINAL CON MODIFICACIONES */
         * {
             margin: 0;
             padding: 0;
@@ -129,12 +136,7 @@
         }
 
         .filters {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e5e5e7;
+            
             display: flex;
             gap: 16px;
             align-items: center;
@@ -212,7 +214,7 @@
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             border: 1px solid #e5e5e7;
-            overflow: hidden;
+            /* overflow: hidden; */ /* <<< [FIX 2] ELIMINADO PARA PERMITIR QUE EL DROPDOWN SEA VISIBLE */
             transition: all 0.2s ease;
             cursor: pointer;
         }
@@ -247,6 +249,16 @@
         }
 
         .recording-icon.audio {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+
+        .play-btn.midi {
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            color: white;
+        }
+
+         .play-btn.audio {
             background: linear-gradient(135deg, #06b6d4, #0891b2);
             color: white;
         }
@@ -334,6 +346,16 @@
         .waveform-btn:hover {
             background: rgba(139, 92, 246, 0.1);
         }
+        
+        .waveform-btn-audio {
+             padding: 8px 12px;
+            border: 1px solid #06b6d4;
+            border-radius: 8px;
+            background: rgba(6, 182, 212, 0.05);
+            color: #0891b2;
+            font-size: 12px;
+            font-weight: 500;
+        }
 
         .menu-actions {
             position: relative;
@@ -359,18 +381,18 @@
         }
 
         .progress-bar {
-            width: 100%;
-            height: 4px;
+            width: calc(100% - 40px);
+            margin: 0 20px 16px;
+            height: 6px; /* <<< [AJUSTE 1] BARRA MÁS GRUESA */
             background: #f0f0f0;
-            border-radius: 2px;
+            border-radius: 3px;
             overflow: hidden;
-            margin: 16px 20px 0;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #8B5CF6, #A855F7);
-            border-radius: 2px;
+            border-radius: 3px;
             width: 0%;
             transition: width 0.1s linear;
         }
@@ -447,6 +469,7 @@
             z-index: 10;
             overflow: hidden;
             display: none;
+            z-index: 1000;
         }
         .dropdown-menu.show {
             display: block;
@@ -465,14 +488,103 @@
             color: #dc2626;
         }
 
+        /* --- [NUEVO] ESTILOS PARA EL MODAL MIDI --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #1e1e2e; /* Dark theme for visualizer */
+            color: #cdd6f4;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 900px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid #313244;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #313244;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #cba6f7; /* Magenta color */
+        }
+        .modal-title .title-text {
+            color: #cdd6f4;
+            font-weight: 400;
+            margin-left: 8px;
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: #a6adc8;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close-btn:hover {
+            color: #f38ba8; /* Reddish color for close */
+        }
+        .visualizer-container {
+            flex-grow: 1;
+            padding: 0;
+            overflow: hidden;
+            border-radius: 0 0 16px 16px;
+        }
+        midi-visualizer {
+            width: 100%;
+            height: 100%;
+        }
+        .player-container {
+            padding: 10px 24px;
+            background: #181825;
+        }
+        midi-player {
+            width: 100%;
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 0; }
             .header { flex-direction: column; align-items: flex-start; }
             .recording-controls { width: 100%; justify-content: center; }
-            .filters { flex-direction: column; align-items: stretch; gap: 12px; }
-            .filter-group { flex-direction: column; align-items: flex-start; width: 100%; }
+            .filter-date{display: none}
             .search-box { max-width: none; }
             .recordings-grid { grid-template-columns: 1fr; gap: 16px; padding: 0 10px; }
         }
@@ -483,37 +595,19 @@
         <div class="header">
             <div class="header-left">
                 <div class="header-icon">
-                    <i class="fas fa-microphone"></i>
+                    <i class="fas ri-record-circle-line"></i>
                 </div>
                 <div class="header-info">
                     <h1>Mis Grabaciones</h1>
                     <p>Gestiona y reproduce tus grabaciones de piano</p>
                 </div>
             </div>
-     <!--       <div class="recording-controls">
-                <div class="recording-timer" ng-class="{active: isRecording}">
-                    <div class="timer-dot"></div>
-                    <span id="timerDisplay">{{ recordingTime | formatDuration }}</span>
-                </div>
-                <button class="record-btn" ng-click="toggleRecording()" ng-class="{recording: isRecording}">
-                    <i class="fas" ng-class="{'fa-microphone': !isRecording, 'fa-stop': isRecording}"></i>
-                </button>
-                <label class="upload-btn">
-                    <i class="fas fa-upload"></i>
-                    Subir archivo
-                    <input type="file" accept="audio/*,.mid,.midi" style="display: none;" onchange="angular.element(this).scope().uploadFile(this.files)">
-                </label>
-            </div>  -->
-
+       
              <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Buscar grabaciones..." ng-model="filters.title">
             </div>
-
-
-        </div>
-
-        <div class="filters">
+  <div class="filters">
             <div class="filter-group">
                 <span class="filter-label">Tipo:</span>
                 <select class="filter-select" ng-model="filters.type">
@@ -527,12 +621,13 @@
                 <select class="filter-select" ng-model="filters.genre">
                     <option value="">Todos</option>
                     <option value="Práctica">Práctica</option>
+                    <option value="Románticismo">Románticismo</option>
                     <option value="Clásico">Clásico</option>
                     <option value="Jazz">Jazz</option>
                     <option value="Composición">Composición</option>
                 </select>
             </div>
-            <div class="filter-group" >
+            <div class="filter-group filter-date" >
                 <span class="filter-label">Ordenar por:</span>
                 <select class="filter-select" ng-model="sortOrder">
                     <option value="-date">Fecha (recientes)</option>
@@ -541,8 +636,12 @@
                     <option value="duration">Duración</option>
                 </select>
             </div>
-         
+        
         </div>
+
+        </div>
+
+        
 
         <div class="recordings-grid">
             <div class="recording-card" ng-repeat="rec in recordings | filter:filters | orderBy:sortOrder">
@@ -564,10 +663,11 @@
                 </div>
                 <div class="recording-actions">
                     <div class="play-controls">
-                        <button class="play-btn" ng-click="playPause(rec, $event)" ng-class="{playing: rec.isPlaying}">
+                        <button class="play-btn" ng-click="playPause(rec, $event)" ng-class="{playing: rec.isPlaying, 'midi': rec.type === 'midi', 'audio': rec.type === 'audio'}">
                             <i class="fas" ng-class="{'fa-play': !rec.isPlaying, 'fa-pause': rec.isPlaying}"></i>
                         </button>
-                        <button class="waveform-btn">{{ rec.type === 'midi' ? 'Ver notas' : 'Waveform' }}</button>
+                        <button class="waveform-btn" ng-if="rec.type === 'midi'" ng-click="showMidiVisualizer(rec, $event)">Visualizar</button>
+                        <span class="waveform-btn-audio" ng-if="rec.type === 'audio'">Audio</span>
                     </div>
                     <div class="menu-actions">
                         <button class="menu-btn" ng-click="toggleMenu(rec, $event)">
@@ -591,13 +691,33 @@
     
     <audio id="audioPlayer" style="display: none;"></audio>
 
+    <div class="modal-overlay" ng-class="{show: isMidiModalVisible}" ng-click="hideMidiModal()">
+        <div class="modal-content" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-music"></i> Visualizador MIDI
+                    <span class="title-text" title="{{ currentMidi.title }}">{{ currentMidi.title }}</span>
+                </div>
+                <button class="modal-close-btn" ng-click="hideMidiModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="visualizer-container">
+                 <midi-visualizer id="recordingVisualizer" type="waterfall"></midi-visualizer>
+            </div>
+            <div class="player-container">
+                 <midi-player id="recordingPlayer" sound-font visualizer="#recordingVisualizer"></midi-player>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         const app = angular.module('recordingApp', []);
         
         app.filter('formatDuration', function() {
             return function(seconds) {
+                if (isNaN(seconds) || seconds < 0) return '00:00';
                 const min = Math.floor(seconds / 60);
-                const sec = seconds % 60;
+                const sec = Math.floor(seconds % 60);
                 return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
             };
         });
@@ -605,88 +725,13 @@
         app.controller('recordingCtrl', function($scope, $interval, $filter) {
             // --- DATA MODEL ---
             $scope.recordings = [
-                { id: 1, title: 'Nocturno en Mi bemol - Ensayo', date: new Date(2025, 8, 8, 16, 20), duration: 252, type: 'audio', genre: 'Clásico', progress: 0, isPlaying: false, url: null },
-                { id: 2, title: 'Escalas Do Mayor - Práctica', date: new Date(2025, 8, 9, 14, 30), duration: 165, type: 'midi', genre: 'Práctica', progress: 0, isPlaying: false, url: null },
-                { id: 3, title: 'Improvisación Jazz - Sesión 1', date: new Date(2025, 9, 3, 10, 15), duration: 390, type: 'midi', genre: 'Jazz', progress: 0, isPlaying: false, url: null },
-                { id: 4, title: 'Sonata K331 - Mozart (fragmento)', date: new Date(2025, 8, 28, 15, 30), duration: 442, type: 'audio', genre: 'Clásico', progress: 0, isPlaying: false, url: null }
+                { id: 1, title: 'Prelude Op.28 N.4 - F. Chopin', date: new Date(2025, 8, 9, 14, 30), duration: 165, type: 'midi', genre: 'Románticismo', progress: 0, isPlaying: false, url: "https://assets.codepen.io/81395/chopin.mid" },
+                { id: 2, title: 'Nocturne Op.9 N.2 - F. Chopin', date: new Date(2025, 9, 3, 10, 15), duration: 390, type: 'audio', genre: 'Románticismo', progress: 0, isPlaying: false, url: "https://dashboard.mozartacademy.mx/media/chopinop9n2.mp3" },
+                { id: 3, title: 'Sonata K.545 - W. A. Mozart ', date: new Date(2025, 8, 28, 15, 30), duration: 442, type: 'audio', genre: 'Clásico', progress: 0, isPlaying: false, url: "https://dashboard.mozartacademy.mx/media/mozartk545.mp3" }
             ];
             
             $scope.filters = { type: '', genre: '', title: '' };
             $scope.sortOrder = '-date';
-            
-            // --- RECORDING LOGIC ---
-            $scope.isRecording = false;
-            $scope.recordingTime = 0;
-            let timerInterval;
-            let mediaRecorder;
-            let audioChunks = [];
-
-            $scope.toggleRecording = function() {
-                if (!$scope.isRecording) {
-                    startRecording();
-                } else {
-                    stopRecording();
-                }
-            };
-            
-            function startRecording() {
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        mediaRecorder = new MediaRecorder(stream);
-                        mediaRecorder.start();
-                        
-                        $scope.isRecording = true;
-                        $scope.recordingTime = 0;
-                        audioChunks = [];
-
-                        timerInterval = $interval(() => {
-                            $scope.recordingTime++;
-                        }, 1000);
-
-                        mediaRecorder.addEventListener("dataavailable", event => {
-                            audioChunks.push(event.data);
-                        });
-                        
-                         mediaRecorder.addEventListener("stop", () => {
-                            const audioBlob = new Blob(audioChunks);
-                            const audioUrl = URL.createObjectURL(audioBlob);
-                            
-                            const title = prompt("Introduce un título para tu grabación:", "Nueva Grabación");
-                            const genre = prompt("Introduce un género (Práctica, Clásico, Jazz, Composición):", "Práctica");
-                            
-                            if (title) {
-                                const newRecording = {
-                                    id: Date.now(),
-                                    title: title,
-                                    date: new Date(),
-                                    duration: $scope.recordingTime,
-                                    type: 'audio',
-                                    genre: genre || 'Práctica',
-                                    progress: 0,
-                                    isPlaying: false,
-                                    url: audioUrl
-                                };
-                                $scope.recordings.push(newRecording);
-                                $scope.$apply(); // Needed as this is outside angular digest cycle
-                            }
-                            
-                             // Clean up
-                            stream.getTracks().forEach(track => track.stop());
-                        });
-
-                        $scope.$apply();
-                    }).catch(err => {
-                        alert("Error al acceder al micrófono: " + err);
-                    });
-            }
-            
-            function stopRecording() {
-                if (mediaRecorder) {
-                    mediaRecorder.stop();
-                }
-                $scope.isRecording = false;
-                $interval.cancel(timerInterval);
-            }
             
             // --- PLAYBACK LOGIC ---
             const audioPlayer = document.getElementById('audioPlayer');
@@ -694,6 +739,13 @@
 
             $scope.playPause = function(rec, event) {
                 event.stopPropagation();
+                
+                // Si es MIDI, no hacer nada aquí. Se maneja en el modal.
+                if (rec.type === 'midi') {
+                    $scope.showMidiVisualizer(rec, event);
+                    return;
+                }
+
                 if (currentlyPlaying === rec) {
                     if (rec.isPlaying) {
                         audioPlayer.pause();
@@ -706,6 +758,7 @@
                     if (currentlyPlaying) {
                         currentlyPlaying.isPlaying = false;
                         currentlyPlaying.progress = 0;
+                        audioPlayer.pause();
                     }
                     currentlyPlaying = rec;
                     if (!rec.url) {
@@ -719,7 +772,7 @@
             };
 
             audioPlayer.addEventListener('timeupdate', () => {
-                if (currentlyPlaying) {
+                if (currentlyPlaying && currentlyPlaying.type === 'audio') {
                     $scope.$apply(() => {
                         currentlyPlaying.progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
                     });
@@ -747,44 +800,64 @@
                 }
             };
             
-            $scope.uploadFile = function(files) {
-                 if (files.length > 0) {
-                     const file = files[0];
-                     const url = URL.createObjectURL(file);
-                     const isMidi = file.name.endsWith('.mid') || file.name.endsWith('.midi');
-                     
-                      const newRecording = {
-                        id: Date.now(),
-                        title: file.name.replace(/\.[^/.]+$/, ""),
-                        date: new Date(),
-                        duration: 0, // We would need a library to get duration, default to 0
-                        type: isMidi ? 'midi' : 'audio',
-                        genre: 'Subido',
-                        progress: 0,
-                        isPlaying: false,
-                        url: url
-                    };
-                    $scope.recordings.push(newRecording);
-                    $scope.$apply();
-                    alert(`"${file.name}" añadido a la lista. La duración no se puede determinar para archivos subidos.`);
-                 }
-            };
-            
             // --- UI ACTIONS ---
             $scope.toggleMenu = function(rec, event) {
                 event.stopPropagation();
-                rec.showMenu = !rec.showMenu;
-                // Close other menus
-                $scope.recordings.forEach(r => {
-                    if (r.id !== rec.id) r.showMenu = false;
-                });
+                const currentMenuState = rec.showMenu;
+                // Close all other menus first
+                $scope.recordings.forEach(r => r.showMenu = false);
+                // Then toggle the current one
+                rec.showMenu = !currentMenuState;
             };
             
-            // Close menu when clicking anywhere else
+            // --- [NUEVO] MIDI MODAL LOGIC ---
+            $scope.isMidiModalVisible = false;
+            $scope.currentMidi = null;
+            const midiPlayer = document.querySelector('#recordingPlayer');
+            const midiVisualizer = document.querySelector('#recordingVisualizer');
+
+            $scope.showMidiVisualizer = function(rec, event) {
+                event.stopPropagation();
+                if (rec.type !== 'midi') return;
+
+                $scope.currentMidi = rec;
+                midiPlayer.src = rec.url;
+                midiVisualizer.src = rec.url;
+                $scope.isMidiModalVisible = true;
+                
+                // Detener cualquier audio que se esté reproduciendo
+                if (currentlyPlaying) {
+                    currentlyPlaying.isPlaying = false;
+                    currentlyPlaying.progress = 0;
+                    audioPlayer.pause();
+                    currentlyPlaying = null;
+                }
+            };
+
+            $scope.hideMidiModal = function() {
+                if ($scope.isMidiModalVisible) {
+                    midiPlayer.stop();
+                    midiPlayer.src = "";
+                    midiVisualizer.src = "";
+                    $scope.isMidiModalVisible = false;
+                    $scope.currentMidi = null;
+                }
+            };
+
+            // --- GLOBAL CLICK LISTENER ---
             document.addEventListener('click', function() {
                 $scope.$apply(() => {
                     $scope.recordings.forEach(r => r.showMenu = false);
                 });
+            });
+            
+            // Escuchar la tecla 'Escape' para cerrar el modal
+            document.addEventListener('keydown', function(event) {
+                if (event.key === "Escape") {
+                    $scope.$apply(() => {
+                        $scope.hideMidiModal();
+                    });
+                }
             });
         });
     </script>
