@@ -490,7 +490,7 @@
                     <p>Gestiona y reproduce tus grabaciones de piano</p>
                 </div>
             </div>
-            <div class="recording-controls">
+     <!--       <div class="recording-controls">
                 <div class="recording-timer" ng-class="{active: isRecording}">
                     <div class="timer-dot"></div>
                     <span id="timerDisplay">{{ recordingTime | formatDuration }}</span>
@@ -503,7 +503,14 @@
                     Subir archivo
                     <input type="file" accept="audio/*,.mid,.midi" style="display: none;" onchange="angular.element(this).scope().uploadFile(this.files)">
                 </label>
+            </div>  -->
+
+             <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar grabaciones..." ng-model="filters.title">
             </div>
+
+
         </div>
 
         <div class="filters">
@@ -525,7 +532,7 @@
                     <option value="Composición">Composición</option>
                 </select>
             </div>
-            <div class="filter-group">
+            <div class="filter-group" >
                 <span class="filter-label">Ordenar por:</span>
                 <select class="filter-select" ng-model="sortOrder">
                     <option value="-date">Fecha (recientes)</option>
@@ -534,10 +541,7 @@
                     <option value="duration">Duración</option>
                 </select>
             </div>
-            <div class="search-box">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Buscar grabaciones..." ng-model="filters.title">
-            </div>
+         
         </div>
 
         <div class="recordings-grid">
