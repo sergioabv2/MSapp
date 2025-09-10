@@ -345,7 +345,7 @@
                     <div class="form-group">
                         <i class="ri-mail-line form-icon"></i>
                         <input type="email" id="email-login" class="form-control" placeholder="Ingresa tu email">
-                    </div>
+                     </div>
                     <div class="form-group">
                         <i class="ri-lock-password-line form-icon"></i>
                         <input type="password" id="password-login" class="form-control" placeholder="Ingresa tu password">
@@ -597,22 +597,24 @@
     });
 
 
-     $(function() {
-        // 1. Define la lista de URLs de tus imágenes de fondo.
-        // Puedes cambiar o agregar las que quieras.
-        var images = [
+    $(function() {
+        // 1. Define tu lista de imágenes de fondo.
+         var images = [
             'https://lh3.googleusercontent.com/d/1ddzBB0_dKU4RiL6C1qwtOhx42Osv7kAv',
             'https://lh3.googleusercontent.com/d/191aQbU-GcDMwiagJNILJB7ZiElo6Do_s',
             'https://lh3.googleusercontent.com/d/1OGH73fXAvPHs_J7e2UQrHH6tvEGI_4EW',
             'https://lh3.googleusercontent.com/d/1XUHZMWjkiD1dBveaoEYSTY_Zd7lOi63t'
         ];
 
-        // 2. Elige un índice aleatorio del array de imágenes.
+        // 2. Elige una imagen aleatoria.
         var randomIndex = Math.floor(Math.random() * images.length);
         var randomImage = images[randomIndex];
 
-        // 3. Aplica la imagen elegida como fondo al elemento .intro-section.
-        $('.intro-section').css('background-image', 'url(' + randomImage + ')');
+        // 3. Aplica tanto el degradado como la imagen aleatoria.
+        //    Esta es la línea que debes actualizar.
+        $('.intro-section').css('background-image', 
+            'linear-gradient(to top, rgba(10, 10, 20, 0.6), rgba(50, 30, 70, 0.4)), url(' + randomImage + ')'
+        );
     });
 
 </script>
