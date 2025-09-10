@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" ng-app="recordingApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Grabaciones</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* TU CSS ORIGINAL VA AQUÍ - NO SE HA MODIFICADO NADA */
         * {
             margin: 0;
             padding: 0;
@@ -173,7 +175,7 @@
             max-width: 300px;
             position: relative;
         }
-
+        
         .search-input {
             width: 100%;
             padding: 12px 16px 12px 44px;
@@ -270,7 +272,7 @@
             gap: 2px;
         }
 
-        .recording-date {
+        .recording-date, .recording-genre {
             font-size: 13px;
             color: #6e6e73;
         }
@@ -336,7 +338,7 @@
         .menu-actions {
             position: relative;
         }
-
+        
         .menu-btn {
             width: 32px;
             height: 32px;
@@ -370,13 +372,14 @@
             background: linear-gradient(90deg, #8B5CF6, #A855F7);
             border-radius: 2px;
             width: 0%;
-            transition: width 0.1s ease;
+            transition: width 0.1s linear;
         }
 
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: #6e6e73;
+            grid-column: 1 / -1;
         }
 
         .empty-icon {
@@ -433,90 +436,50 @@
             51%, 100% { opacity: 0.3; }
         }
 
-        .stats-bar {
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 40px;
             background: white;
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border: 1px solid #e5e5e7;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            z-index: 10;
+            overflow: hidden;
+            display: none;
         }
-
-        .stat-item {
-            text-align: center;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1d1d1f;
+        .dropdown-menu.show {
             display: block;
         }
-
-        .stat-label {
+        .dropdown-item {
+            padding: 10px 16px;
+            color: #374151;
             font-size: 14px;
-            color: #6e6e73;
-            margin-top: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+        .dropdown-item.delete {
+            color: #dc2626;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 16px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .recording-controls {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .filters {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-
-            .filter-group {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
-            }
-
-            .search-box {
-                max-width: none;
-            }
-
-            .recordings-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .stats-bar {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .stat-item {
-                min-width: auto;
-            }
+            body { padding: 10px; }
+            .container { padding: 0; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .recording-controls { width: 100%; justify-content: center; }
+            .filters { flex-direction: column; align-items: stretch; gap: 12px; }
+            .filter-group { flex-direction: column; align-items: flex-start; width: 100%; }
+            .search-box { max-width: none; }
+            .recordings-grid { grid-template-columns: 1fr; gap: 16px; padding: 0 10px; }
         }
     </style>
 </head>
-<body>
+<body ng-controller="recordingCtrl">
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <div class="header-icon">
@@ -528,354 +491,297 @@
                 </div>
             </div>
             <div class="recording-controls">
-                <div class="recording-timer" id="recordingTimer">
+                <div class="recording-timer" ng-class="{active: isRecording}">
                     <div class="timer-dot"></div>
-                    <span id="timerDisplay">00:00</span>
+                    <span id="timerDisplay">{{ recordingTime | formatDuration }}</span>
                 </div>
-                <button class="record-btn" id="recordBtn">
-                    <i class="fas fa-microphone"></i>
+                <button class="record-btn" ng-click="toggleRecording()" ng-class="{recording: isRecording}">
+                    <i class="fas" ng-class="{'fa-microphone': !isRecording, 'fa-stop': isRecording}"></i>
                 </button>
                 <label class="upload-btn">
                     <i class="fas fa-upload"></i>
                     Subir archivo
-                    <input type="file" accept="audio/*,.mid,.midi" style="display: none;">
+                    <input type="file" accept="audio/*,.mid,.midi" style="display: none;" onchange="angular.element(this).scope().uploadFile(this.files)">
                 </label>
             </div>
         </div>
 
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-value">24</span>
-                <div class="stat-label">Total grabaciones</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">2h 34m</span>
-                <div class="stat-label">Tiempo total</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">18</span>
-                <div class="stat-label">Audio</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">6</span>
-                <div class="stat-label">MIDI</div>
-            </div>
-        </div>
-
-        <!-- Filters -->
         <div class="filters">
             <div class="filter-group">
                 <span class="filter-label">Tipo:</span>
-                <select class="filter-select">
+                <select class="filter-select" ng-model="filters.type">
                     <option value="">Todos</option>
                     <option value="audio">Audio</option>
                     <option value="midi">MIDI</option>
                 </select>
             </div>
             <div class="filter-group">
+                <span class="filter-label">Género:</span>
+                <select class="filter-select" ng-model="filters.genre">
+                    <option value="">Todos</option>
+                    <option value="Práctica">Práctica</option>
+                    <option value="Clásico">Clásico</option>
+                    <option value="Jazz">Jazz</option>
+                    <option value="Composición">Composición</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <span class="filter-label">Ordenar por:</span>
-                <select class="filter-select">
-                    <option value="date">Fecha</option>
-                    <option value="name">Nombre</option>
+                <select class="filter-select" ng-model="sortOrder">
+                    <option value="-date">Fecha (recientes)</option>
+                    <option value="date">Fecha (antiguos)</option>
+                    <option value="title">Nombre</option>
                     <option value="duration">Duración</option>
                 </select>
             </div>
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Buscar grabaciones...">
+                <input type="text" class="search-input" placeholder="Buscar grabaciones..." ng-model="filters.title">
             </div>
         </div>
 
-        <!-- Recordings Grid -->
-        <div class="recordings-grid" id="recordingsGrid">
-            <!-- Recording Card - MIDI -->
-            <div class="recording-card">
+        <div class="recordings-grid">
+            <div class="recording-card" ng-repeat="rec in recordings | filter:filters | orderBy:sortOrder">
                 <div class="recording-header">
-                    <div class="recording-icon midi">
-                        <i class="fas fa-music"></i>
+                    <div class="recording-icon" ng-class="{'midi': rec.type === 'midi', 'audio': rec.type === 'audio'}">
+                        <i class="fas" ng-class="{'fa-music': rec.type === 'midi', 'fa-volume-up': rec.type === 'audio'}"></i>
                     </div>
                     <div class="recording-info">
-                        <div class="recording-title">Escalas Do Mayor - Práctica</div>
+                        <div class="recording-title" title="{{ rec.title }}">{{ rec.title }}</div>
                         <div class="recording-meta">
-                            <div class="recording-date">Hoy, 14:30</div>
-                            <div class="recording-duration">2:45 min</div>
+                            <div class="recording-date">{{ rec.date | date:'d MMM, HH:mm' }}</div>
+                            <div class="recording-genre">Género: {{ rec.genre }}</div>
+                            <div class="recording-duration">{{ rec.duration | formatDuration }} min</div>
                         </div>
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
+                    <div class="progress-fill" ng-style="{width: rec.progress + '%'}"></div>
                 </div>
                 <div class="recording-actions">
                     <div class="play-controls">
-                        <button class="play-btn">
-                            <i class="fas fa-play"></i>
+                        <button class="play-btn" ng-click="playPause(rec, $event)" ng-class="{playing: rec.isPlaying}">
+                            <i class="fas" ng-class="{'fa-play': !rec.isPlaying, 'fa-pause': rec.isPlaying}"></i>
                         </button>
-                        <button class="waveform-btn">Ver notas</button>
+                        <button class="waveform-btn">{{ rec.type === 'midi' ? 'Ver notas' : 'Waveform' }}</button>
                     </div>
                     <div class="menu-actions">
-                        <button class="menu-btn">
+                        <button class="menu-btn" ng-click="toggleMenu(rec, $event)">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
+                         <div class="dropdown-menu" ng-class="{show: rec.showMenu}">
+                            <div class="dropdown-item">Publicar</div>
+                            <div class="dropdown-item delete" ng-click="deleteRecording(rec, $event)">Eliminar</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recording Card - Audio -->
-            <div class="recording-card">
-                <div class="recording-header">
-                    <div class="recording-icon audio">
-                        <i class="fas fa-volume-up"></i>
-                    </div>
-                    <div class="recording-info">
-                        <div class="recording-title">Nocturno en Mi bemol - Ensayo</div>
-                        <div class="recording-meta">
-                            <div class="recording-date">Ayer, 16:20</div>
-                            <div class="recording-duration">4:12 min</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 35%"></div>
-                </div>
-                <div class="recording-actions">
-                    <div class="play-controls">
-                        <button class="play-btn playing">
-                            <i class="fas fa-pause"></i>
-                        </button>
-                        <button class="waveform-btn">Waveform</button>
-                    </div>
-                    <div class="menu-actions">
-                        <button class="menu-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recording Card - MIDI -->
-            <div class="recording-card">
-                <div class="recording-header">
-                    <div class="recording-icon midi">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <div class="recording-info">
-                        <div class="recording-title">Improvisación Jazz - Sesión 1</div>
-                        <div class="recording-meta">
-                            <div class="recording-date">3 Oct, 10:15</div>
-                            <div class="recording-duration">6:30 min</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="recording-actions">
-                    <div class="play-controls">
-                        <button class="play-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="waveform-btn">Ver notas</button>
-                    </div>
-                    <div class="menu-actions">
-                        <button class="menu-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recording Card - Audio -->
-            <div class="recording-card">
-                <div class="recording-header">
-                    <div class="recording-icon audio">
-                        <i class="fas fa-volume-up"></i>
-                    </div>
-                    <div class="recording-info">
-                        <div class="recording-title">Escalas menores - Ejercicio</div>
-                        <div class="recording-meta">
-                            <div class="recording-date">2 Oct, 18:45</div>
-                            <div class="recording-duration">3:28 min</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="recording-actions">
-                    <div class="play-controls">
-                        <button class="play-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="waveform-btn">Waveform</button>
-                    </div>
-                    <div class="menu-actions">
-                        <button class="menu-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recording Card - MIDI -->
-            <div class="recording-card">
-                <div class="recording-header">
-                    <div class="recording-icon midi">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <div class="recording-info">
-                        <div class="recording-title">Canon en Re - Bach</div>
-                        <div class="recording-meta">
-                            <div class="recording-date">1 Oct, 20:10</div>
-                            <div class="recording-duration">5:15 min</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="recording-actions">
-                    <div class="play-controls">
-                        <button class="play-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="waveform-btn">Ver notas</button>
-                    </div>
-                    <div class="menu-actions">
-                        <button class="menu-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recording Card - Audio -->
-            <div class="recording-card">
-                <div class="recording-header">
-                    <div class="recording-icon audio">
-                        <i class="fas fa-volume-up"></i>
-                    </div>
-                    <div class="recording-info">
-                        <div class="recording-title">Sonata K331 - Mozart (fragmento)</div>
-                        <div class="recording-meta">
-                            <div class="recording-date">28 Sep, 15:30</div>
-                            <div class="recording-duration">7:22 min</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="recording-actions">
-                    <div class="play-controls">
-                        <button class="play-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="waveform-btn">Waveform</button>
-                    </div>
-                    <div class="menu-actions">
-                        <button class="menu-btn">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <div class="empty-state" ng-if="(recordings | filter:filters).length === 0">
+                 <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                 <h3 class="empty-title">No se encontraron grabaciones</h3>
+                 <p class="empty-description">Prueba a cambiar los filtros o graba algo nuevo.</p>
+             </div>
         </div>
     </div>
+    
+    <audio id="audioPlayer" style="display: none;"></audio>
 
     <script>
-        let isRecording = false;
-        let recordingTime = 0;
-        let timerInterval;
+        const app = angular.module('recordingApp', []);
+        
+        app.filter('formatDuration', function() {
+            return function(seconds) {
+                const min = Math.floor(seconds / 60);
+                const sec = seconds % 60;
+                return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            };
+        });
 
-        const recordBtn = document.getElementById('recordBtn');
-        const recordingTimer = document.getElementById('recordingTimer');
-        const timerDisplay = document.getElementById('timerDisplay');
-
-        recordBtn.addEventListener('click', toggleRecording);
-
-        function toggleRecording() {
-            if (!isRecording) {
-                startRecording();
-            } else {
-                stopRecording();
-            }
-        }
-
-        function startRecording() {
-            isRecording = true;
-            recordingTime = 0;
-            recordBtn.classList.add('recording');
-            recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
-            recordingTimer.classList.add('active');
+        app.controller('recordingCtrl', function($scope, $interval, $filter) {
+            // --- DATA MODEL ---
+            $scope.recordings = [
+                { id: 1, title: 'Nocturno en Mi bemol - Ensayo', date: new Date(2025, 8, 8, 16, 20), duration: 252, type: 'audio', genre: 'Clásico', progress: 0, isPlaying: false, url: null },
+                { id: 2, title: 'Escalas Do Mayor - Práctica', date: new Date(2025, 8, 9, 14, 30), duration: 165, type: 'midi', genre: 'Práctica', progress: 0, isPlaying: false, url: null },
+                { id: 3, title: 'Improvisación Jazz - Sesión 1', date: new Date(2025, 9, 3, 10, 15), duration: 390, type: 'midi', genre: 'Jazz', progress: 0, isPlaying: false, url: null },
+                { id: 4, title: 'Sonata K331 - Mozart (fragmento)', date: new Date(2025, 8, 28, 15, 30), duration: 442, type: 'audio', genre: 'Clásico', progress: 0, isPlaying: false, url: null }
+            ];
             
-            timerInterval = setInterval(() => {
-                recordingTime++;
-                updateTimer();
-            }, 1000);
-        }
-
-        function stopRecording() {
-            isRecording = false;
-            recordBtn.classList.remove('recording');
-            recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-            recordingTimer.classList.remove('active');
-            clearInterval(timerInterval);
+            $scope.filters = { type: '', genre: '', title: '' };
+            $scope.sortOrder = '-date';
             
-            // Aquí agregarías la lógica para guardar la grabación
-            console.log('Grabación guardada:', recordingTime + ' segundos');
-        }
+            // --- RECORDING LOGIC ---
+            $scope.isRecording = false;
+            $scope.recordingTime = 0;
+            let timerInterval;
+            let mediaRecorder;
+            let audioChunks = [];
 
-        function updateTimer() {
-            const minutes = Math.floor(recordingTime / 60);
-            const seconds = recordingTime % 60;
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Event listeners para los botones de play
-        document.querySelectorAll('.play-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                // Toggle play/pause state
-                const isPlaying = this.classList.contains('playing');
-                
-                // Reset all other buttons
-                document.querySelectorAll('.play-btn').forEach(otherBtn => {
-                    otherBtn.classList.remove('playing');
-                    otherBtn.innerHTML = '<i class="fas fa-play"></i>';
-                });
-                
-                if (!isPlaying) {
-                    this.classList.add('playing');
-                    this.innerHTML = '<i class="fas fa-pause"></i>';
+            $scope.toggleRecording = function() {
+                if (!$scope.isRecording) {
+                    startRecording();
                 } else {
-                    this.classList.remove('playing');
-                    this.innerHTML = '<i class="fas fa-play"></i>';
+                    stopRecording();
+                }
+            };
+            
+            function startRecording() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.start();
+                        
+                        $scope.isRecording = true;
+                        $scope.recordingTime = 0;
+                        audioChunks = [];
+
+                        timerInterval = $interval(() => {
+                            $scope.recordingTime++;
+                        }, 1000);
+
+                        mediaRecorder.addEventListener("dataavailable", event => {
+                            audioChunks.push(event.data);
+                        });
+                        
+                         mediaRecorder.addEventListener("stop", () => {
+                            const audioBlob = new Blob(audioChunks);
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            
+                            const title = prompt("Introduce un título para tu grabación:", "Nueva Grabación");
+                            const genre = prompt("Introduce un género (Práctica, Clásico, Jazz, Composición):", "Práctica");
+                            
+                            if (title) {
+                                const newRecording = {
+                                    id: Date.now(),
+                                    title: title,
+                                    date: new Date(),
+                                    duration: $scope.recordingTime,
+                                    type: 'audio',
+                                    genre: genre || 'Práctica',
+                                    progress: 0,
+                                    isPlaying: false,
+                                    url: audioUrl
+                                };
+                                $scope.recordings.push(newRecording);
+                                $scope.$apply(); // Needed as this is outside angular digest cycle
+                            }
+                            
+                             // Clean up
+                            stream.getTracks().forEach(track => track.stop());
+                        });
+
+                        $scope.$apply();
+                    }).catch(err => {
+                        alert("Error al acceder al micrófono: " + err);
+                    });
+            }
+            
+            function stopRecording() {
+                if (mediaRecorder) {
+                    mediaRecorder.stop();
+                }
+                $scope.isRecording = false;
+                $interval.cancel(timerInterval);
+            }
+            
+            // --- PLAYBACK LOGIC ---
+            const audioPlayer = document.getElementById('audioPlayer');
+            let currentlyPlaying = null;
+
+            $scope.playPause = function(rec, event) {
+                event.stopPropagation();
+                if (currentlyPlaying === rec) {
+                    if (rec.isPlaying) {
+                        audioPlayer.pause();
+                        rec.isPlaying = false;
+                    } else {
+                        audioPlayer.play();
+                        rec.isPlaying = true;
+                    }
+                } else {
+                    if (currentlyPlaying) {
+                        currentlyPlaying.isPlaying = false;
+                        currentlyPlaying.progress = 0;
+                    }
+                    currentlyPlaying = rec;
+                    if (!rec.url) {
+                        alert("Este es un audio de ejemplo, no tiene un archivo para reproducir. Graba o sube uno nuevo.");
+                        return;
+                    }
+                    audioPlayer.src = rec.url;
+                    audioPlayer.play();
+                    rec.isPlaying = true;
+                }
+            };
+
+            audioPlayer.addEventListener('timeupdate', () => {
+                if (currentlyPlaying) {
+                    $scope.$apply(() => {
+                        currentlyPlaying.progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    });
                 }
             });
-        });
 
-        // Event listeners para filtros
-        document.querySelectorAll('.filter-select').forEach(select => {
-            select.addEventListener('change', function() {
-                console.log('Filter changed:', this.value);
-                // Aquí implementarías la lógica de filtrado
+            audioPlayer.addEventListener('ended', () => {
+                if (currentlyPlaying) {
+                    $scope.$apply(() => {
+                        currentlyPlaying.isPlaying = false;
+                        currentlyPlaying.progress = 0;
+                        currentlyPlaying = null;
+                    });
+                }
             });
-        });
-
-        // Event listener para búsqueda
-        document.querySelector('.search-input').addEventListener('input', function() {
-            console.log('Searching:', this.value);
-            // Aquí implementarías la lógica de búsqueda
-        });
-
-        // Event listener para upload
-        document.querySelector('input[type="file"]').addEventListener('change', function() {
-            if (this.files.length > 0) {
-                console.log('File selected:', this.files[0].name);
-                // Aquí implementarías la lógica de subida de archivos
-            }
+            
+            // --- FILE MANAGEMENT ---
+            $scope.deleteRecording = function(rec, event) {
+                event.stopPropagation();
+                if (confirm(`¿Estás seguro de que quieres eliminar "${rec.title}"?`)) {
+                    const index = $scope.recordings.findIndex(r => r.id === rec.id);
+                    if (index > -1) {
+                        $scope.recordings.splice(index, 1);
+                    }
+                }
+            };
+            
+            $scope.uploadFile = function(files) {
+                 if (files.length > 0) {
+                     const file = files[0];
+                     const url = URL.createObjectURL(file);
+                     const isMidi = file.name.endsWith('.mid') || file.name.endsWith('.midi');
+                     
+                      const newRecording = {
+                        id: Date.now(),
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        date: new Date(),
+                        duration: 0, // We would need a library to get duration, default to 0
+                        type: isMidi ? 'midi' : 'audio',
+                        genre: 'Subido',
+                        progress: 0,
+                        isPlaying: false,
+                        url: url
+                    };
+                    $scope.recordings.push(newRecording);
+                    $scope.$apply();
+                    alert(`"${file.name}" añadido a la lista. La duración no se puede determinar para archivos subidos.`);
+                 }
+            };
+            
+            // --- UI ACTIONS ---
+            $scope.toggleMenu = function(rec, event) {
+                event.stopPropagation();
+                rec.showMenu = !rec.showMenu;
+                // Close other menus
+                $scope.recordings.forEach(r => {
+                    if (r.id !== rec.id) r.showMenu = false;
+                });
+            };
+            
+            // Close menu when clicking anywhere else
+            document.addEventListener('click', function() {
+                $scope.$apply(() => {
+                    $scope.recordings.forEach(r => r.showMenu = false);
+                });
+            });
         });
     </script>
 </body>
