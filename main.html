@@ -1486,7 +1486,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     .piano-content {
        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
       min-height: 100vh;
-      padding-bottom: 100px;
+      padding-bottom: 20px;
       padding-top: 13px !important; 
     }
     
@@ -1548,6 +1548,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
         .card-body {
             padding: 24px;
         }
+
+     
 
  .status-card {
             display: flex;
@@ -1794,20 +1796,79 @@ width: 200px; /* Ajusta según el tamaño deseado */
             border-bottom: none;
         }
 
-        .schedule-date {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 54px;
-            height: 54px;
-            background: linear-gradient(135deg, #4a6fa5, #3a5982);
-            border-radius: 12px;
-            color: white;
-            margin-right: 16px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(74, 111, 165, 0.2);
-        }
+       /* Estilos por defecto para .schedule-date (activos) */
+.schedule-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #4a6fa5, #3a5982); /* Fondo original azul */
+    border-radius: 12px;
+    color: white; /* Texto blanco original */
+    margin-right: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(74, 111, 165, 0.2);
+    position: relative; /* Necesario para la franja roja */
+    overflow: hidden;   /* Asegura que la franja roja no se salga de los bordes redondeados */
+}
+
+/* CSS MODIFICADO PARA FECHAS PASADAS */
+
+/* 1. Estilos del contenedor principal con un gris más claro */
+.schedule-date.schedule-date-past {
+    background: linear-gradient(135deg, #e9ecef, #dee2e6); /* Degradado de gris más claro */
+    color: #6c757d; /* Texto gris oscuro para mejor contraste */
+    box-shadow: none; /* Quitamos la sombra para un look más plano */
+    border: 1px solid #ced4da; /* Borde sutil */
+}
+
+/* 2. Pseudo-elemento para crear la línea diagonal (la "tache") */
+.schedule-date.schedule-date-past::after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Centra la línea verticalmente */
+    left: -10%; /* Inicia un poco a la izquierda para cubrir las esquinas */
+    width: 120%; /* Ancho extendido para que la línea cruce todo el elemento */
+    height: 2px; /* Grosor de la línea */
+    background-color: rgba(108, 117, 125, 0.55); /* Color de la línea (gris semi-transparente) */
+    transform: rotate(-20deg); /* Rota la línea para crear el efecto diagonal */
+}
+
+/* 3. Asegura que el texto sea legible y no sea afectado por la línea */
+.schedule-date.schedule-date-past .schedule-day,
+.schedule-date.schedule-date-past .schedule-number {
+    color: #6c757d; /* Mismo color de texto gris oscuro */
+    z-index: 1; /* Pone el texto por encima de la línea */
+}
+
+/* Estilos para .schedule-date cuando NO es la próxima clase (inactivos) */
+.schedule-date.schedule-date-inactive {
+    background: white; /* Fondo blanco */
+    color: black;      /* Texto negro */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    border: 1px solid #e0e0e0; /* Borde sutil */
+}
+
+/* Franja superior roja para .schedule-date-inactive */
+.schedule-date.schedule-date-inactive::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px; /* Altura de la franja */
+    background-color: #dc3545; /* Color rojo */
+    border-top-left-radius: 11px; /* Ajusta a los bordes redondeados del padre */
+    border-top-right-radius: 11px; /* Ajusta a los bordes redondeados del padre */
+}
+
+/* Ajustes para el texto dentro de .schedule-date-inactive */
+.schedule-date.schedule-date-inactive .schedule-day,
+.schedule-date.schedule-date-inactive .schedule-number {
+    color: black; /* Asegura que el texto sea negro */
+}
 
         .schedule-day {
             font-size: 11px;
@@ -1825,16 +1886,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
             flex: 1;
         }
 
-        .schedule-time {
-            font-size: 14px;
-            font-weight: 600;
-            color: #4a6fa5;
-            margin-bottom: 4px;
-        }
+       
 
         .schedule-title {
-            font-size: 15px;
-            color: #2c3e50;
+             font-size: 16px;
+            font-weight: 600;
+   
         }
 
         .schedule-btn {
@@ -1877,6 +1934,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid #e5e5e7;
+            cursor: pointer;
         }
 
         .achievement-item.locked {
@@ -1884,8 +1942,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
             filter: grayscale(0.8);
         }
 
-        .achievement-item:hover {
-            transform: translateY(-2px);
+        .achievement-item.unlocked:hover {
+            transform: scale(1.03);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
@@ -2655,6 +2713,215 @@ width: 200px; /* Ajusta según el tamaño deseado */
     text-shadow: 0 1px 2px rgba(255,255,255,0.6) !important; /* Sombra de texto clara para resaltar */
     letter-spacing: -0.5px !important;
 }
+
+
+     /* Estilos para el nuevo formato de fecha y hora */
+.schedule-info-detailed {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.schedule-full-date {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.schedule-time-range {
+  font-size: 14px;
+   font-weight: 500;
+  color: gray;
+}
+
+
+
+/* Estilo para tachar el texto de clases pasadas */
+.text-strikethrough {
+    text-decoration: line-through;
+    color: silver !important; /* Color de texto más opaco */
+}
+
+/* Estilo de sombra para resaltar la próxima clase */
+.shadow-text {
+    font-weight: bold;
+    color: #333; /* Un color de texto más oscuro si es necesario */
+   text-shadow: 0 0 4px silver
+}
+
+/* Estilo base para el texto de estado (opcional, para consistencia) */
+.schedule-time-range {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* Insignia de texto */
+.schedule-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  transform: scale(0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.schedule-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.schedule-action-wrapper:hover .schedule-badge::before {
+  left: 100%;
+}
+
+
+
+.schedule-action-wrapper:has(.schedule-btn.active) .schedule-badge {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(0.8);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    transform: scale(0.85);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Botón circular */
+.schedule-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.8));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.schedule-btn:hover::before {
+  opacity: 1;
+}
+
+
+ 
+.schedule-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  animation: pulse-button 2s infinite;
+}
+
+.schedule-btn.active:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+@keyframes pulse-button {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), 0 0 0 8px rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Iconos */
+.schedule-btn i {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+
+
+.schedule-btn.active i {
+  animation: ring 2s infinite;
+}
+
+@keyframes ring {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30% {
+    transform: rotate(-10deg);
+  }
+  20%, 40% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .schedule-action-wrapper {
+    gap: 8px;
+    padding: 6px;
+  }
+  
+  .schedule-badge {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .schedule-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+}
+
+/* Mejoras adicionales para accesibilidad */
+.schedule-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.schedule-action-wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 
 </style>
 
@@ -3706,7 +3973,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </div>
 
 
-      <div class="dashboard" id="dashboard">
+      <div class="dashboard" >
         <!-- Estado de Conexión -->
         <div class="card3 full-width">
           <div class="status-card">
@@ -3808,75 +4075,65 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-        <div class="card2" ng-show="webrtc.isConnectedToTeacher()">
-  <div class="card-header">
-    <h2><i class="fas fa-tasks"></i> Tareas Pendientes</h2>
-  </div>
-  <div class="card-body">
-    <div class="task-item">
-      <div class="task-check">
-        <i class="far fa-circle"></i>
-      </div>
-      <div class="task-content">
-        <div class="task-title">Practicar escala de Do mayor</div>
-        <div class="task-date">Para el 15 Oct</div>
-      </div>
-    </div>
-    <div class="task-item completed">
-      <div class="task-check">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <div class="task-content">
-        <div class="task-title">Estudiar partitura de Mozart</div>
-        <div class="task-date">Completado</div>
-      </div>
-    </div>
-    <div class="task-item">
-      <div class="task-check">
-        <i class="far fa-circle"></i>
-      </div>
-      <div class="task-content">
-        <div class="task-title">Grabar ejercicio de arpegios</div>
-        <div class="task-date">Para el 18 Oct</div>
-      </div>
-    </div>
-  </div>
-</div>
         
         <!-- Calendario -->
-     <div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
+   <div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
   <div class="card-header">
     <h2><i class="fas fa-calendar-alt"></i> Próximas Clases</h2>
   </div>
-  <div class="card-body">
+  <div class="card-body" style=" padding-top: 5px; max-height: 360px; overflow-y: auto; position: relative;" id="card-schedule">
+    <div class="schedule-item" ng-repeat="item in userAgenda"  ng-if="item.title !== 'Próximo pago'" id="{{ item.isNextClass ? 'next-class-item' : '' }}">
+      <div class="schedule-date" ng-class="{
+       'schedule-date-past': item.isPast,
+       'schedule-date-inactive': !item.isNextClass && !item.isPast
+     }">
+        <div class="schedule-day">{{ item.start | date:'EEE' }}</div>
+        <div class="schedule-number">{{ item.start | date:'d' }}</div>
+      </div>
 
-    <div class="schedule-item">
-      <div class="schedule-date">
-        <div class="schedule-day">Lun</div>
-        <div class="schedule-number">15</div>
-      </div>
-      <div class="schedule-info">
-        <div class="schedule-time">16:00 - 17:00</div>
-        <div class="schedule-title">Improvisación Jazz</div>
-      </div>
-      <button class="schedule-btn">
-        <i class="fas fa-bell"></i>
-      </button>
+
+      <!-- <div class="schedule-info-detailed">
+        <div class="schedule-title">{{ item.title }}</div>
+        <div class="schedule-full-date">{{ item.start | date:'EEEE, d \'de\' MMMM' }}</div>
+        
+        <div class="schedule-time-range">
+        <i class="ri-time-line"></i>  {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+        </div>
+      </div>  -->
+
+
+      <div class="schedule-info-detailed">
+    <div class="schedule-title" 
+         ng-class="{
+           'text-strikethrough': item.isPast,
+           'shadow-text': item.isNextClass
+         }">
+        {{ item.start | date:'EEEE, d \'de\' MMMM' }}
     </div>
 
-    <div class="schedule-item">
-      <div class="schedule-date">
-        <div class="schedule-day">Mié</div>
-        <div class="schedule-number">17</div>
-      </div>
-      <div class="schedule-info">
-        <div class="schedule-time">17:30 - 18:30</div>
-        <div class="schedule-title">Técnica de Escalas</div>
-      </div>
-      <button class="schedule-btn active">
-        <i class="fas fa-bell"></i>
-      </button>
+    <div class="schedule-full-date" ng-if="!item.isPast">
+        <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
     </div>
+
+    <div class="schedule-time-range">
+        <span ng-if="item.isPast">Finalizada</span>
+        <span ng-if="item.isNextClass" style="color: black; text-shadow: 0 0 3px silver;  font-weight: 500;">Próxima clase</span>
+        <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+    </div>
+</div>
+
+
+        <div class="schedule-action-wrapper" >
+        <button class="schedule-btn" ng-if="item.isNextClass" ng-class="{'active': item.isNextClass}">
+          <span >
+            <i  ng-if="item.isNextClass" class="fas fa-bell"></i>
+          </span>
+        </button>
+      </div>
+
+
+    </div>
+
   </div>
 </div>
 
@@ -3890,27 +4147,27 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <div class="achievements-grid">
       <div class="achievement-item unlocked">
         <div class="achievement-icon">
-          <i class="fas fa-music"></i>
+          <i class="fas ri-calendar-check-line"></i>
         </div>
-        <div class="achievement-title">Primera Clase</div>
+        <div class="achievement-title">Asistencia</div>
       </div>
       <div class="achievement-item unlocked">
         <div class="achievement-icon">
-          <i class="fas fa-forward"></i>
+          <i class="fas ri-flashlight-line"></i>
         </div>
-        <div class="achievement-title">5 Clases Completadas</div>
+        <div class="achievement-title">Puntualidad</div>
       </div>
       <div class="achievement-item locked">
         <div class="achievement-icon">
-          <i class="fas fa-fire"></i>
+          <i class="fas ri-file-check-line"></i>
         </div>
-        <div class="achievement-title">10 Clases Completadas</div>
+        <div class="achievement-title">Trabajo en casa</div>
       </div>
       <div class="achievement-item locked">
         <div class="achievement-icon">
-          <i class="fas fa-star"></i>
+          <i class="fas ri-file-marked-line"></i>
         </div>
-        <div class="achievement-title">Ejercicio Perfecto</div>
+        <div class="achievement-title">Trabajo en clase</div>
       </div>
     </div>
   </div>
@@ -4916,10 +5173,12 @@ app
         }
       });
     })
+
 .factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getProfileData",
     token: localStorage.getItem('MStoken')
+  //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
 
   var config = {
@@ -5347,7 +5606,7 @@ app
       views: {
         'menuContent': {
           templateUrl: "livestream.html",
-        //  controller: 'livestreamCtrl'
+          controller: 'livestreamCtrl'
         }
       }
     }) 
@@ -5413,6 +5672,8 @@ app
       $scope.showChatModal = false;
       $scope.isDragging = false;
       $scope.userName = "Alumno"
+
+      
       
 
       // Variables para drag
@@ -5775,31 +6036,6 @@ $scope.dragTouch = function(event) {
       });
 
 
-       $timeout(function() {
-        // Obtenemos los dos elementos que necesitamos
-        const levelSelector = document.getElementById('.dashboard');
-        const banner = document.querySelector('.banner-header');
-
-        // Nos aseguramos de que ambos existan antes de continuar
-        if (levelSelector && banner) {
-            
-            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
-            levelSelector.addEventListener('scroll', function() {
-                // 'scrollTop' nos dice cuántos píxeles hemos bajado
-                let scrollTop = this.scrollTop;
-                let bannerHeight = banner.offsetHeight;
-
-                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
-                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
-                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
-
-                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
-                // avance la altura total del banner.
-                let opacity = 1 - (scrollTop / bannerHeight);
-                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
-            });
-        }
-    });
 
 
     })
@@ -6196,6 +6432,63 @@ $scope.languageName = {
   window.location.href = '#/menu/payment';
 }; 
     }])
+
+
+       .controller('livestreamCtrl', function($scope, SharedState, $timeout){
+       var ahora = new Date();
+    var proximaClaseEncontrada = false;
+
+
+  SharedState.getNum().then(function(data) {
+     $scope.userAgenda = JSON.parse(data.data.agenda);
+      // Procesamos cada item de la agenda
+    $scope.userAgenda.forEach(function(item) {
+        var fechaInicio = new Date(item.start);
+
+        // 1. Calculamos y añadimos la hora de fin (inicio + 1 hora)
+        var fechaFin = new Date(fechaInicio);
+        fechaFin.setHours(fechaFin.getHours() + 1);
+        item.end = fechaFin; // Añadimos la propiedad 'end' al objeto
+
+        item.isPast = fechaInicio < ahora;
+
+        // 2. Buscamos la primera clase futura para marcarla como la "próxima"
+         if (!proximaClaseEncontrada && !item.isPast && item.title !== 'Próximo pago') {
+            item.isNextClass = true;
+            proximaClaseEncontrada = true;
+        } else {
+            item.isNextClass = false;
+        }
+    });
+
+        scrollToNextClass();
+  })
+
+  function scrollToNextClass() {
+    $timeout(function() {
+        var container = document.getElementById('card-schedule'); // o 'agenda-container'
+        var targetElement = document.getElementById('next-class-item');
+  
+        if (container && targetElement) {
+            
+            // --- CÁLCULO MODIFICADO ---
+            var containerHeight = container.clientHeight;
+            var elementHeight = targetElement.clientHeight;
+
+            // Usamos el cálculo robusto de la respuesta anterior
+            var relativeOffsetTop = targetElement.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+
+            // NUEVO CÁLCULO: Alinea la parte inferior del elemento con la parte inferior del contenedor.
+            var newScrollTop = relativeOffsetTop + elementHeight - containerHeight;
+
+            container.scrollTop = newScrollTop;
+        }
+    }, 0);
+}
+
+
+
+})
 
     .controller('statisticsCtrl', function($scope, $timeout){
    
