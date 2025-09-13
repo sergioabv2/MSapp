@@ -535,9 +535,290 @@
 
           @media (max-width: 558px) {
             .add-file-btn{display: none}
+            .bookTitle{display: none}
           }
 
- 
+ .right-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: auto; /* Empuja todo a la derecha */
+  margin-right: 15px;
+}
+
+.metronome-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bpm-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: silver;
+  border-radius: 12px;
+  padding: 4px 8px;
+}
+
+.bpm-buttons {
+  display: flex;
+}
+
+.bpm-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.bpm-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.bpm-label {
+  font-family: 'Roboto Mono', monospace;
+  color: black;
+  font-size: 14px;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Estilos para estados activos */
+.record-btn.active {
+  color: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+.tool-btn {
+    background: silver;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.tool-btn:hover {
+    background: #f0f0f0;
+}
+
+.tool-btn i {
+    font-size: 16px;
+}
+
+.metronome-btn.active {
+  color: #FF9800;
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to { opacity: 0.7; }
+}
+  
+  
+  .record-btn.active {
+  color: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+
+
+.online-badge-container {
+  position: absolute;
+ margin-top: 75px !important;
+  margin-left: 10px !important;
+}
+
+.online-badge {
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+  width: 130px;
+}
+
+.status-indicator {
+    position: relative;
+    width: 12px;
+    height: 12px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    /* Color rojo principal */
+    background-color: #ef4444; 
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.status-pulse {
+    width: 12px;
+    height: 12px;
+    /* Color rojo para la pulsación */
+    background-color: #f87171; 
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.status-ring {
+    width: 12px;
+    height: 12px;
+    /* Color rojo claro para el anillo */
+    background-color: #fca5a5;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.status-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* === ESTILOS DEL MODAL DE GUARDAR GRABACIÓN === */
+.save-recording-modal {
+    max-width: 500px;
+}
+
+.audio-preview-container {
+    margin: 24px 0;
+}
+
+.audio-preview-container audio {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.save-recording-modal .upload-modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+  margin-top: 7px;
+    border-bottom: 1px solid #f1f3f5;
+    padding-bottom: 16px;
+}
+.save-recording-modal .upload-modal-header h2 {
+    font-size: 1.5rem;
+    color: #212529;
+    margin: 0;
+}
+.save-recording-modal .upload-modal-header p {
+    color: #6c757d;
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+/* Previsualización del audio */
+.audio-preview-container {
+    margin: 20px 0;
+}
+.audio-preview-container audio {
+    width: 100%;
+    border-radius: 8px;
+}
+
+
+
+/* Formulario */
+.recording-form {
+    margin-top: 24px;
+  padding: 17px;
+}
+.recording-form .form-group {
+    margin-bottom: 18px;
+}
+.recording-form .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+}
+.recording-form .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background: #f8f9fa;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+.recording-form .form-group input:focus {
+    outline: none;
+    border-color: #5668E2;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(86, 104, 226, 0.15);
+}
+
+/* Caja de metadatos (Fecha, Duración) */
+.recording-metadata {
+    display: flex;
+    justify-content: center; /* Centrado si solo hay un elemento */
+    gap: 24px;
+    padding: 14px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #e9ecef;
+    color: #495057;
+    font-size: 0.9rem;
+}
+.recording-metadata span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.recording-metadata i {
+    color: #868e96;
+}
+
+/* Botones de acción (Eliminar, Guardar) */
+.modal-actions-upload {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f3f5;
+}
         
     </style>
 </head>
@@ -680,6 +961,10 @@
         </div>
     </div>
 
+
+  
+
+
     <div class="modal-overlay" ng-class="{show: showLockedModal}">
         <div class="locked-modal-content">
             <i class="fas fa-lock"></i>
@@ -687,11 +972,82 @@
         </div>
     </div>
     
-    <div class="pdf-viewer-overlay" ng-show="showPdfViewer">
+   <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
         <div class="pdf-viewer-header">
-            <h3>{{ selectedBook.title }}</h3>
+            <h3 class="bookTitle">{{ selectedBook.title }}</h3>
+
+<div class="right-controls">
+  <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
+  <div class="metronome-control">
+    <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}">
+   <i class="fa-solid fa-microphone"></i>
+    </button>
+    <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
+      <i class="fa-solid fa-stopwatch"></i>
+    </button>
+    <div class="bpm-control">
+      <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
+        <i class="fa-solid fa-minus"></i>
+      </button>
+      <span class="bpm-label">{{metronomeBPM}} BPM</span>
+      <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
             <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
         </div>
+
+     <div class="online-badge-container">
+        <div class="online-badge" ng-if="isRecording2">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Grabando...</span>
+        </div>
+      </div>
+
+          <div class="modal-overlay" ng-class="{show: showSaveRecordingModal}">
+    <div class="modal-content2 save-recording-modal" ng-click="$event.stopPropagation()">
+        <div class="upload-modal-header">
+            <h2>Previsualizar y Guardar Grabación</h2>
+            <p>Escucha tu grabación y asigna un nombre antes de guardarla.</p>
+        </div>
+
+        <div class="audio-preview-container">
+            <audio ng-src="{{recording.url}}" controls controlsList="nodownload"></audio>
+        </div>
+
+        <div class="recording-form">
+            <div class="form-group">
+                <label for="rec-name">Nombre del archivo</label>
+                <input type="text" id="rec-name" ng-model="recording.name">
+            </div>
+            <div class="form-group">
+                <label for="rec-author">Autor (Opcional)</label>
+                <input type="text" id="rec-author" ng-model="recording.author" placeholder="Ej: Mi Práctica Diaria">
+            </div>
+            <div class="recording-metadata">
+                <span><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> {{ recording.date | date:'dd/MM/yyyy h:mm a' }}</span>
+              
+            </div>
+        </div>
+
+        <div class="modal-actions-upload">
+            <button class="modal-button secondary danger" ng-click="deleteRecording()">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+            <button class="modal-button primary" ng-click="saveRecording()">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+    </div>
+</div>
+
         <iframe ng-src="{{pdfUrl}}" frameborder="0"></iframe>
     </div>
 
@@ -789,7 +1145,7 @@
                 var requestData = {
           action: "getBasicData",
        //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-           token: localStorage.getItem('MStoken')
+          token: localStorage.getItem('MStoken')
         };
 
         var config = {
@@ -950,6 +1306,181 @@
                 $scope.showPdfViewer = false;
                 $scope.pdfUrl = ''; // Limpiar la URL para detener la carga
             };
+               
+               
+               
+  $scope.metronomeActive = false;
+$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
+$scope.baseBPM = 60; // BPM del audio original
+$scope.metronomeAudio = document.getElementById('metronomeAudio');
+
+// Función para convertir BPM a velocidad de reproducción
+function bpmToPlaybackRate(bpm) {
+  return bpm / $scope.baseBPM;
+}
+
+$scope.toggleMetronome = function() {
+  $scope.metronomeActive = !$scope.metronomeActive;
+  
+  if ($scope.metronomeActive) {
+    // Configurar velocidad inicial
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+    $scope.metronomeAudio.currentTime = 0;
+    $scope.metronomeAudio.play()
+      .catch(e => console.error("Error al reproducir:", e));
+  } else {
+    $scope.metronomeAudio.pause();
+    $scope.metronomeAudio.currentTime = 0;
+  }
+};
+
+$scope.adjustBPM = function(change, event) {
+  // Actualizar valor BPM
+  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+  
+  // Ajustar velocidad de reproducción si está activo
+  if ($scope.metronomeActive) {
+    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+  }
+  
+  // Lógica para mantener presionado
+  if (event) {
+    const button = event.target;
+    button.addEventListener('mouseup', clearBPMTimers);
+    button.addEventListener('mouseleave', clearBPMTimers);
+    button.addEventListener('touchend', clearBPMTimers);
+    
+    $scope.bpmTimeout = setTimeout(() => {
+      $scope.bpmInterval = setInterval(() => {
+        $scope.adjustBPM(change);
+        $scope.$apply();
+      }, 100);
+    }, 500);
+  } 
+};
+
+function clearBPMTimers() {
+  clearTimeout($scope.bpmTimeout);
+  clearInterval($scope.bpmInterval);
+} 
+
+
+ 
+let mediaRecorder;
+        let audioChunks2 = [];
+        let audioContext2;
+        let animationId;
+
+        $scope.showSaveRecordingModal = false;
+$scope.recording = {};
+
+        // Opciones de audio con supresión de ruido y control de ganancia
+        const constraints = {
+            audio: {
+                noiseSuppression: true,
+                autoGainControl: true,
+                echoCancellation: true
+            }
+        };
+
+    async function startRecordingAndOscilloscope() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks2 = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks2.push(event.data);
+        };
+
+        // **** ESTA ES LA SECCIÓN MODIFICADA ****
+        mediaRecorder.onstop = () => {
+            cancelAnimationFrame(animationId);
+            if (audioChunks2.length === 0) return;
+
+            const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            // Usamos un elemento de audio temporal para leer la duración
+            const tempAudio = document.createElement('audio');
+            tempAudio.src = audioUrl;
+            tempAudio.onloadedmetadata = () => {
+                // Una vez que tenemos la duración, poblamos el scope y mostramos el modal
+                $scope.$apply(() => {
+                    const duration = tempAudio.duration;
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60);
+
+                    $scope.recording = {
+                        url: $sce.trustAsResourceUrl(audioUrl), // URL segura para ng-src
+                        blob: audioBlob,
+                        name: "Grabación " + new Date().toLocaleTimeString(),
+                        author: "", // El usuario puede llenarlo
+                        date: new Date(),
+                        duration: `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                    };
+
+                    $scope.showSaveRecordingModal = true;
+                });
+            };
+        };
+
+        // ... El resto de la función (analyser, mediaRecorder.start) sigue igual
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        analyser.fftSize = 2048;
+        mediaRecorder.start();
+
+    } catch (err) {
+        console.error('Error al acceder al micrófono:', err);
+    }
+}
+
+// La función recordWav no necesita cambios
+$scope.recordWav = function() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        $scope.isRecording2 = false;
+    } else {
+        startRecordingAndOscilloscope();
+        $scope.isRecording2 = true;
+    }
+};
+
+// --- AGREGA ESTAS NUEVAS FUNCIONES AL FINAL DE TU CONTROLADOR ---
+
+// Cierra el modal y limpia los datos
+$scope.closeSaveModal = function() {
+    // Revoca el Object URL para liberar memoria
+    if ($scope.recording && $scope.recording.url) {
+        URL.revokeObjectURL($scope.recording.url.toString());
+    }
+    $scope.showSaveRecordingModal = false;
+    $scope.recording = {};
+};
+
+// Se ejecuta al hacer clic en "Guardar"
+$scope.saveRecording = function() {
+    if (!$scope.recording.name) {
+        alert("Por favor, asigna un nombre a la grabación.");
+        return;
+    }
+    // Lógica de guardado (como pediste, un alert temporal)
+    alert(`Guardando archivo: \nNombre: ${$scope.recording.name}\nAutor: ${$scope.recording.author || 'N/A'}`);
+    
+    // Aquí iría tu lógica para subir el $scope.recording.blob a tu servidor o base de datos
+    
+    $scope.closeSaveModal();
+};
+
+// Se ejecuta al hacer clic en "Eliminar"
+$scope.deleteRecording = function() {
+    // No se hace nada, solo se cierra el modal y se liberan los recursos
+    $scope.closeSaveModal();
+};
+
         }]);
     </script>
 </body>
