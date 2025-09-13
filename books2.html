@@ -503,6 +503,41 @@
             .search-box { min-width: 100%; }
             .carousel-wrapper { margin-left: 0; margin-right: 0; }
         }
+
+        .header-right-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinea los elementos internos a la derecha */
+    gap: 12px; /* Espacio entre la búsqueda y el botón */
+}
+        .add-file-btn { background-color: #8a2be2; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .add-file-btn:hover { background-color: #7b24c6; }
+
+.modal-content2 {
+            background: #e0e0e0;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            color:#2a2a2e;
+            overflow: hidden;
+            animation: fadeInScale 0.3s ease-out;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .upload-modal-content { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .drop-zone { border: 2px dashed #ccc; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; background-color: #f9f9f9; }
+        .drop-zone p { margin: 0; color: #888; }
+        .drop-zone:hover { border-color: #8a2be2; background-color: #f5efff; }
+        .modal-actions-upload { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .locked-modal-content { background-color: #fff; padding: 30px; border-radius: 10px; text-align: center; max-width: 350px; }
+        .locked-modal-content i { font-size: 40px; color: #ffc107; margin-bottom: 15px; }
+        .locked-modal-content p { font-size: 1.1rem; color: #333; margin: 0; }
+        .book-card { position: relative; }
+        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+        .book-card:hover .delete-btn { opacity: 1; }
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -515,12 +550,36 @@
                 <div class="header-info">
                     <h1>Mi Biblioteca</h1>
                     <p>Encuentra tus libros y piezas de piano</p>
+                   </div>
+
+            </div>
+
+            <div class="header-right-column">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Buscar en la biblioteca..." ng-model="searchQuery">
+                </div>
+
+                <div class="header-actions">
+                    <button class="add-file-btn" ng-click="openUploadModal()">
+                        <i class="fas fa-plus"></i> Agregar Archivo
+                    </button>
                 </div>
             </div>
-            <div class="search-box">
+            
+       <!--     <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Buscar en la biblioteca..." ng-model="searchQuery">
+                <input type="text" class="search-input" placeholder="Buscar en la biblioteca..." ng-model="searchQuery">   
+
+                  <div class="header-actions">
+                            <button class="add-file-btn" ng-click="openUploadModal()">
+                              <i class="fas fa-plus"></i> Agregar Archivo
+                           </button>
+                       </div>
+                   </div> -->
             </div>
+
+          
         </div>
 
         <div class="library-content">
@@ -529,12 +588,12 @@
                 <div class="carousel-wrapper">
                     <div class="carousel" id="carousel-{{$index}}">
                         <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }" 
-                             ng-class="{'is-locked': book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)}" 
+                             ng-class="{'is-locked': !isLoaded || book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)}" 
                              ng-click="showPreview(book, section.title)">
                             <img ng-src="{{ book.coverUrl }}" alt="{{ book.title }}" class="book-cover">
                             <div class="book-title">{{ book.title }}</div>
                             <div class="book-level">{{ book.author }}</div>
-                            <div class="locked-overlay" ng-if="book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)">
+                            <div class="locked-overlay" ng-if="!isLoaded || book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)" >
                                 <i class="fas fa-lock"></i>
                             </div>
                         </div>
@@ -599,6 +658,44 @@
             </div>
         </div>
     </div>
+
+     <div class="modal-overlay" ng-class="{show: showUploadModal}" ng-click="closeUploadModal($event)">
+        <div class="modal-content2 upload-modal-content" ng-click="$event.stopPropagation()">
+            <button class="modal-close" ng-click="closeUploadModal()"><i class="fas fa-times"></i></button>
+            <h2>Agregar nuevo PDF</h2>
+            <div class="form-group">
+                <label for="title">Título</label>
+                <input type="text" id="title" ng-model="newPdf.title" placeholder="Ej: Sonata Claro de Luna">
+            </div>
+            <div class="form-group">
+                <label for="author">Autor</label>
+                <input type="text" id="author" ng-model="newPdf.author" placeholder="Ej: L.V. Beethoven">
+            </div>
+            <div class="form-group">
+                <label for="grade">Grado / Nivel</label>
+                <input type="text" id="grade" ng-model="newPdf.grade" placeholder="Ej: Grado 3">
+            </div>
+            <div class="form-group">
+                <label>Archivo PDF</label>
+                <div class="drop-zone" ng-click="triggerFileInput()">
+                    <p ng-if="!newPdf.fileName">Haz clic o arrastra un archivo PDF aquí</p>
+                    <p ng-if="newPdf.fileName"><i class="fas fa-check-circle"></i> {{ newPdf.fileName }}</p>
+                </div>
+                <input type="file" id="fileInput" onchange="angular.element(this).scope().onFileSelect(event)" style="display: none;" accept=".pdf">
+            </div>
+            <div class="modal-actions-upload">
+                <button class="modal-button secondary" ng-click="closeUploadModal()">Cancelar</button>
+                <button class="modal-button primary" ng-click="saveNewPdf()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" ng-class="{show: showLockedModal}">
+        <div class="locked-modal-content">
+            <i class="fas fa-lock"></i>
+            <p>Este material está bloqueado. <br>¡Sigue avanzando para desbloquearlo!</p>
+        </div>
+    </div>
     
     <div class="pdf-viewer-overlay" ng-show="showPdfViewer">
         <div class="pdf-viewer-header">
@@ -623,7 +720,13 @@
             $scope.selectedCategory = '';
             $scope.showPdfViewer = false;
             $scope.pdfUrl = '';
+            $scope.isLoaded = false;
           //  $scope.exe = 4; 
+
+             $scope.showUploadModal = false;
+              $scope.showLockedModal = false;
+              $scope.newPdf = {}; 
+               $scope.userPDFs = []; 
 
             // --- DATOS DE LA BIBLIOTECA ---
        var manualsData = [
@@ -685,17 +788,18 @@
         // Las propiedades 'totalBars' y 'practiceData' se han eliminado
         type: 'piece' 
     };
-});
+}); 
 
             $scope.library = [
                 { title: 'Manuales', books: manuals },
-                { title: 'Piezas', books: pieces }
+                { title: 'Piezas', books: pieces },
+                { title: 'Mis Archivos', books: $scope.userPDFs }
             ];
 
                 var requestData = {
           action: "getBasicData",
-        //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-           token: localStorage.getItem('MStoken')
+          token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+         //  token: localStorage.getItem('MStoken')
         };
 
         var config = {
@@ -713,6 +817,7 @@
                 $scope.lvl = stage.lvl;
                  $scope.lsn = stage.lsn;
                  $scope.exe = stage.exes;
+                 $scope.isLoaded = true;
           })  
 
          
@@ -737,9 +842,90 @@
                 }
             };
 
+
+             $scope.openUploadModal = function() {
+        $scope.newPdf = {}; // Resetea el formulario
+        $scope.showUploadModal = true;
+    };
+
+    $scope.closeUploadModal = function() {
+        $scope.showUploadModal = false;
+    };
+    
+    $scope.triggerFileInput = function() {
+        document.getElementById('fileInput').click();
+    };
+
+    $scope.onFileSelect = function(event) {
+        var file = event.target.files[0];
+        if (!file || file.type !== 'application/pdf') {
+            alert("Por favor, selecciona un archivo PDF.");
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(loadEvent) {
+            $scope.$apply(function() {
+                $scope.newPdf.fileData = loadEvent.target.result; // Esto es el Base64
+                $scope.newPdf.fileName = file.name;
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+
+    $scope.saveNewPdf = function() {
+        if (!$scope.newPdf.title || !$scope.newPdf.author || !$scope.newPdf.fileData) {
+            alert("Por favor, completa todos los campos y selecciona un archivo.");
+            return;
+        }
+
+        const newBook = {
+            "title": $scope.newPdf.title,
+            "author": $scope.newPdf.author,
+            "level": $scope.newPdf.grade || "N/A",
+            "coverUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png", // Icono genérico de PDF
+            "pdf": $scope.newPdf.fileData,
+            "isUserUploaded": true // Bandera para identificar estos archivos
+        };
+
+        $scope.userPDFs.push(newBook);
+        $scope.closeUploadModal();
+    };
+    
+    // === LÓGICA PARA ELIMINAR ARCHIVOS (NUEVA) ===
+    $scope.deleteUserPdf = function(index, event) {
+        event.stopPropagation(); // Evita que se abra el modal de vista previa
+        if (confirm("¿Estás seguro de que quieres eliminar este archivo?")) {
+            $scope.userPDFs.splice(index, 1);
+        }
+    };
+
+
+             $scope.showPreview = function(book, categoryTitle) {
+        // Los archivos del usuario nunca están bloqueados
+        if (book.isUserUploaded) {
+            $scope.selectedBook = book;
+            $scope.selectedCategory = categoryTitle;
+            $scope.showPreviewModal = true;
+            return;
+        }
+
+        var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
+        if (isLocked) {
+            $scope.showLockedModal = true;
+            $timeout(function() {
+                $scope.showLockedModal = false;
+            }, 3000); // Se cierra después de 4 segundos
+            return;
+        }
+
+        $scope.selectedBook = book;
+        $scope.selectedCategory = categoryTitle;
+        $scope.showPreviewModal = true;
+    };
+
             // Mostrar el modal de vista previa
-            $scope.showPreview = function(book, categoryTitle) {
-                var isLocked = book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
+         /*   $scope.showPreview = function(book, categoryTitle) {
+                var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
                 if (isLocked) {
                     alert('Este material está bloqueado. ¡Sigue avanzando para desbloquearlo!');
                     return;
@@ -747,7 +933,7 @@
                 $scope.selectedBook = book;
                 $scope.selectedCategory = categoryTitle;
                 $scope.showPreviewModal = true;
-            };
+            }; */
 
             // Cerrar el modal
             $scope.closePreviewModal = function(event) {
@@ -777,4 +963,4 @@
         }]);
     </script>
 </body>
-</html> 
+</html>  
