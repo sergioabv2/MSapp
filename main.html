@@ -3374,7 +3374,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <div class="profile-content">
             <div class="profile-avatar-container">
                 <img src="{{userData.photo}}" class="profile-avatar">
-                <div class="profile-level">{{paymentData.planName}}</div>
+                <div class="profile-level">{{userPlan}}</div>
             </div>
             
             <h1 class="profile-name" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 500; text-shadow: 0 0 6px silver;">{{userData.name}}</h1>
@@ -3404,7 +3404,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-item class="item-icon-left">
             <i class="icon ri-shield-check-line" style="font-size: 25px; color: #33cd5f;"></i>
             Estado del plan
-            <p style="color: #33cd5f; font-weight: bold;">{{paymentData.status}}</p>
+            <p style="color: #33cd5f; font-weight: bold;">{{userData.status}}</p>
         </ion-item>
 
         <ion-item class="item-icon-left">
@@ -6134,12 +6134,7 @@ $scope.installApp = function () {
       $scope.activeUser = data.data.status === 'ACTIVO';
   })
 
-  $scope.notificationsEnabled = true; // Set a default value
-  $scope.selectedLanguage = 'es'; // Set a default value
-$scope.languageName = {
-  'es': 'Español',
-  'en': 'English'
-};
+
  
       $scope.goToPayment = function() {
   window.location.href = '#/menu/payment';
