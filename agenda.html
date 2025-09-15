@@ -1497,46 +1497,33 @@ margin: 4px 10px !important;
                     <p>
                         <label for="nome">{{   gfExtenso    }}</label>
                     </p>
-              <h3 class="panel-title " ng-if="selected.attendance === ''"> <i class="ri-time-line"></i> Pendiente</h3>
-                 <h3 class="panel-title " ng-if="selected.attendance === 1" style="color: green;  "> <i class="ri-check-fill"></i> Asistencia</h3>
-                     <h3 class="panel-title " ng-if="selected.attendance === 0" style="color: red;  "> <i class="ri-close-fill"></i> Falta</h3>
+               <h3 class="panel-title" ng-if="status === 'finalizada'" style="color: grey;">
+                <i class="ri-check-line"></i> Finalizada
+            </h3>
+            
+            <h3 class="panel-title" ng-if="status === 'hoy'" style="color: #007bff;">
+                <i class="ri-time-line"></i> Hoy
+            </h3>
+
+            <h3 class="panel-title" ng-if="status === 'pendiente'" >
+                <i class="ri-time-line"></i> Pendiente
+                <span style="font-weight: normal; font-size: 0.9em;">
+                    (faltan {{ diasFaltantes }} 
+                    <span ng-if="diasFaltantes > 1">días</span>
+                    <span ng-if="diasFaltantes === 1">día</span>)
+                </span>
+            </h3>
                 </div>
                 
                 </div>
                 <div class="modal-footer">
-           <!--   <button class="btn btn-default" ng-if="selected.attendance === ''" type="button" ng-click="bookpiano(selected)">Reagendar</button> -->
+   
+
                     <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
                 </div>
             </script>
           
-          
-          <script type="text/ng-template" id="bookpiano.html">
-  <div class="modal-header">
-    <h3 class="modal-title">Reagendar Clase</h3>
-  </div>
-  <div class="modal-body">
-    <p><strong>Evento:</strong> {{ oldTitle }}</p>
-    <p><strong>Fecha de falta:</strong> {{ oldDate }}</p>
-
-    <div class="form-group">
-      <label>Selecciona nueva fecha:</label>
-      <input type="date" class="form-control" ng-model="newDate"
-             ng-change="loadHours()" 
-             min="{{ today }}" />
-      <small style="color:red;" ng-if="invalidDay">No se permiten lunes ni martes</small>
-    </div>
-
-    <div class="form-group" ng-if="availableHours.length > 0">
-      <label>Selecciona horario:</label>
-      <select class="form-control" ng-model="selectedHour"
-              ng-options="h for h in availableHours"></select>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-default" type="button" ng-click="cancel()">Cancelar</button>
-    <button class="btn btn-primary" type="button" ng-click="save()">OK</button>
-  </div>
-</script>
+      
 
          
           
@@ -1585,7 +1572,7 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   
    var requestData = {
     action: "getBasicData",
-   // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+ //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
     token: localStorage.getItem('MStoken')
   };
 
@@ -1673,29 +1660,49 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
       lang: "es-mx",
             eventTextColor: '#fff',
             eventBorderColor: 'white',
-          
-            eventBackgroundColor: function(event) {
-              if(event.color){
-                return event.color; 
-              }
-                
-            },
             eventBackgroundColor: 'LightSeaGreen',
+
             eventRender: function(event, element) {
-                element.find('.fc-time').text(""); 
-             var titleElement = element.find('.fc-event-dot');
-              if (event.start < new Date()) { 
-                 if(event.attendance === 1){
-                     element.append('<i class="ri-check-line" style="position: absolute; top: -25px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
-                      titleElement.append('<i class="ri-check-line" style="color: green; font-size: 22px; font-weight: 700; margin-left: -6px;"></i>'); 
-                }else if(event.attendance === 0){
-                  element.append('<i class="ri-close-line" style="position: absolute; top: -25px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
-                   titleElement.append('<i class="ri-close-line" style="color: red; font-size: 22px; font-weight: 700; margin-left: -6px; "></i>'); 
-               }
-                 
-                };
-             
-            },
+            // No mostrar la hora en la vista de lista
+            element.find('.fc-time').text(""); 
+            
+            // Obtener el elemento del título para modificarlo
+            var titleElement = element.find('.fc-list-item-title'); 
+            
+            // Comprobar si la fecha del evento ya pasó
+            if (event.start < new Date()) { 
+                // 1. Aplicar estilos de finalizado al título
+                titleElement.css({
+                    'color': 'silver',
+                    'text-decoration': 'line-through'
+                });
+
+                // 2. Anexar el texto "Finalizado"
+                titleElement.find('a').append(' - Finalizada');
+
+                // 3. Agregar un ícono de check
+                var dotElement = element.find('.fc-list-item-marker');
+                dotElement.empty().append('<i class="ri-check-line" style="color: grey; font-size: 22px; font-weight: 700; margin-left: 4px; margin-top: 7px"></i>');
+            }else {
+                // --- NUEVO: Lógica para eventos FUTUROS ---
+                var now = moment().startOf('day');
+                var eventDate = moment(event.start).startOf('day');
+                var diasFaltantes = eventDate.diff(now, 'days');
+
+                var textoFaltante = '';
+                if (diasFaltantes === 0) {
+                    textoFaltante = ' (Hoy)';
+                } else if (diasFaltantes === 1) {
+                    textoFaltante = ' (Falta 1 día)';
+                } else {
+                    textoFaltante = ` (Faltan ${diasFaltantes} días)`;
+                }
+                
+                  var dotElement = element.find('.fc-list-item-marker');
+                dotElement.empty().append('<i class="ri-time-line" style="color: grey; font-size: 21px; font-weight: 500; margin-left: 4px; margin-top: 7px"></i>');
+                titleElement.find('a').append(textoFaltante);
+            }
+        },
             
             header: {
                 left: 'title',
@@ -1715,25 +1722,23 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
       lang: "es-mx",
             eventTextColor: '#fff',
             eventBorderColor: 'white',
-   eventBackgroundColor: function(event) {
-              if(event.color){
-                return event.color; 
-              }
-                
-            },
+  
             eventBackgroundColor: 'LightSeaGreen',
-            eventRender: function(event, element) {
-                element.find('.fc-time').text(""); 
-              if (event.start < new Date()) { 
-                if(event.attendance === 1){
-                     element.append('<i class="ri-check-line" style="position: absolute; top: -25px;  color: green; font-size: 20px; font-weight: 700;"></i>'); 
-                }else if(event.attendance === 0){
-                  element.append('<i class="ri-close-line" style="position: absolute; top: -25px;  color: red; font-size: 20px; font-weight: 700;"></i>'); 
-               }
-                 
-                };
-             
-            },
+
+             eventRender: function(event, element) {
+            // Elimina la hora del evento en la vista de mes
+            element.find('.fc-time').text(""); 
+
+            // 2. Si el evento ya pasó, cambia el color directamente aquí.
+            // Esto es compatible con FullCalendar v3.
+            if (event.start < new Date()) {
+                element.css('background-color', 'silver');
+                element.css('border-color', 'silver'); // Cambia también el borde para que coincida
+                
+       
+            }
+        },
+          
     header: {
       left: 'title',
       center: '',
@@ -1746,15 +1751,28 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
 });
 
 app.controller('ModalInstanceCtrl', function($scope, $uibModal, $uibModalInstance, items, selected) {
-    $scope.selected = selected
+    $scope.selected = selected;
     $scope.nome = selected.title;
-    // Mudando formato como é mostrado DateTime no input
-    $scope.ted = selected.start;
-    $scope.date = moment($scope.ted).format("DD-MM-YYYY HH:mm");
-    $scope.gfExtenso = moment(selected.start).format("dddd D MMMM YYYY, HH:mm a");
-    // FIM Mudando formato como é mostrado DateTime no input
-
     
+    // Formateo de fechas con Moment.js
+    $scope.gfExtenso = moment(selected.start).format("dddd D MMMM YYYY, HH:mm a");
+
+    // --- LÓGICA PARA DETERMINAR EL ESTADO DE LA CLASE ---
+    var now = moment().startOf('day'); // Fecha actual al inicio del día
+    var eventDate = moment(selected.start).startOf('day'); // Fecha del evento al inicio del día
+
+    if (eventDate.isBefore(now)) {
+        // La fecha ya aconteció
+        $scope.status = 'finalizada';
+    } else if (eventDate.isSame(now)) {
+        // La fecha es hoy
+        $scope.status = 'hoy';
+    } else {
+        // La fecha es en el futuro
+        $scope.status = 'pendiente';
+        $scope.diasFaltantes = eventDate.diff(now, 'days');
+    }
+    // --- FIN DE LA LÓGICA DE ESTADO ---
 
     $scope.ok = function() {
         $uibModalInstance.close();
@@ -1763,106 +1781,6 @@ app.controller('ModalInstanceCtrl', function($scope, $uibModal, $uibModalInstanc
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
-
-
- $scope.bookpiano = function(event) {
-    var modalInstance2 = $uibModal.open({
-      templateUrl: 'bookpiano.html',
-      controller: 'bookCtrl',
-      resolve: {
-          event: function() {
-              return event; 
-          },
-        items: function() {
-              return items; 
-          },
-      }
-    });
-};
-
 });
-
-app.controller('bookCtrl', function($scope, $uibModalInstance, event, items, uiCalendarConfig) {
-  $scope.oldTitle = event.title
-  $scope.oldDate = moment(event.start).format("dddd D MMMM YYYY, HH:mm a");
-  $scope.today = moment().format("YYYY-MM-DD");
-  $scope.availableHours = [];
-  $scope.invalidDay = false;
-
-  $scope.loadHours = function() {
-    if(!$scope.newDate) return;
-    var day = moment($scope.newDate).day(); // 0=Dom ... 1=Lun ... 2=Mar ... 6=Sab
-
-    if (day === 1 || day === 2) { // Bloquear lunes y martes
-      $scope.invalidDay = true;
-      $scope.availableHours = [];
-      return;
-    }
-    $scope.invalidDay = false;
-
-    if(day === 3 || day === 4){ // Miércoles, jueves
-    $scope.availableHours = ["14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
-  } else if(day === 5){ // Viernes
-    $scope.availableHours = ["11:00","12:00","13:00","14:00","15:00","16:00"];
-  } else if(day === 6 || day === 0){ // Sábado o Domingo
-    $scope.availableHours = ["09:00","10:00","11:00","12:00","13:00","14:00"];
-  } else {
-    $scope.availableHours = [];
-  }
-
-  // Selección por defecto
-  $scope.selectedHour = $scope.availableHours[0] || null;
-  };
-
-  $scope.save = function() {
-  
-   
-    // Buscar evento dentro del array `items`
-    var idx = items.findIndex(function(it) {
-      return it.title === event.title && moment(it.start).isSame(event.start); 
-    });
-    var newDateTime = dateToISO($scope.newDate, $scope.selectedHour);
-
-    if (idx !== -1) {
-      items[idx].start = newDateTime; 
-    }
-    
-     $scope.eventSources = [items];
-   if (uiCalendarConfig.calendars['myCalendar1']) {
-     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('removeEventSources');
-     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('addEventSource', items);
-     uiCalendarConfig.calendars['myCalendar1'].fullCalendar('rerenderEvents');
-    }
-   
-   if (uiCalendarConfig.calendars['myCalendar2']) {
-     uiCalendarConfig.calendars['myCalendar2'].fullCalendar('removeEventSources');
-     uiCalendarConfig.calendars['myCalendar2'].fullCalendar('addEventSource', items);
-     uiCalendarConfig.calendars['myCalendar2'].fullCalendar('rerenderEvents');
-    }
-
-    // 4. Cerrar el modal
-    $uibModalInstance.close(items);
-};
-  
-  function dateToISO(dateObj, timeString) {
-  var parts = timeString.split(':');
-    var hour = parseInt(timeString.split(':')[0]);
-
-  var date = new Date(dateObj);
-  date.setHours(hour, 0, 0, 0);
-
-  var offset = date.getTimezoneOffset();
-  date.setMinutes(date.getMinutes() - offset);
-
-  return date.toISOString();
-}
-
-
-
-  $scope.cancel = function() {
-    $uibModalInstance.dismiss('cancel');
-  };
-});
-
 
 </script>
