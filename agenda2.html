@@ -14,18 +14,6 @@
 
 
 <style>
-    body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
-}
-  
-
-
-
-
-
-
-
-
 
 
 
@@ -63,6 +51,8 @@
 body {
   position: relative;
   background: var(--bg-body);
+  overflow: hidden;
+   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
 }
 
 /* MAIN MENU */
@@ -70,21 +60,17 @@ body {
 
 
 .content {
-
   min-height: 100vh;
   display: grid;
-  grid-template-columns: auto 380px;
+  grid-template-columns: auto 360px;
 }
 
 
- /*
+ 
 .left-content {
-  color: var(--primary-color);
-  height: 100vh;
-  width: 100% !important;
-  overflow: auto;
+   padding-top: 20px;
 }
-*/
+
 
 
 /* RIGHT CONTENT */
@@ -95,11 +81,11 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
-
   height: 100vh;
- width: 380px; 
+ width: 360px; 
  right: 0;
  padding: 10px;
+ padding-top: 20px;
   overflow: auto;
 }
 
@@ -1345,7 +1331,7 @@ be a descendant of the grid when it is being dragged.
 }
 
 .fc-listYear-view .fc-scroller {
-    height: 800px !important; 
+    height: 450px !important; 
 }
 
 /* 
@@ -1466,7 +1452,7 @@ margin: 4px 10px !important;
 
    @media (max-width: 500px ){
     body{
-        margin-top: 30px;
+        margin-top: 20px;
     }
   }
   
@@ -1518,7 +1504,7 @@ margin: 4px 10px !important;
                 
                 </div>
                 <div class="modal-footer">
-              <button class="btn btn-default" ng-if="selected.attendance === ''" type="button" ng-click="bookpiano(selected)">Reagendar</button>
+           <!--   <button class="btn btn-default" ng-if="selected.attendance === ''" type="button" ng-click="bookpiano(selected)">Reagendar</button> -->
                     <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
                 </div>
             </script>
@@ -1599,8 +1585,8 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
   
    var requestData = {
     action: "getBasicData",
-    token: "U2FsdGVkX1+O3QNKxr7i65+rZS88LOrcquA8lGK28gvecieY+EsOVZ9mREDrZlaX"
-		//localStorage.getItem('MStoken')
+   // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -1713,7 +1699,6 @@ app.controller('Ctrl', function($scope, $http, $uibModal, $log, $compile, uiCale
             
             header: {
                 left: 'title',
-              center: 'month,listYear',
                 right: 'prev,next'
             },
             eventClick: $scope.alertOnEventClick
