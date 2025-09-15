@@ -3173,8 +3173,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
       <i class="ri-shut-down-line"></i> Cerrar sesión
@@ -3280,183 +3280,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-      
-    
-    <script id="profile.html" type="text/ng-template">
-    <ion-view >
-      
-   <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="right">
-
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
-        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
-    </div>
-</button> 
-          
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
-
- <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
-            Upgrade
-          </button>
-
-
-  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
-  <div style="display: flex; align-items: center;" >    
-      <div style="position: relative; " class="profilImg">
-       <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
-      </div>
-   </div>
-  </button>
-
-
-    
-  </ion-nav-buttons>
-
-
-        <ion-nav-buttons side="left">
-          <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>  
-
-       
-        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
-     <div id="bannerRow">
-      <div class="profile-avatar-container" style="transform: scale(0.9)">
-      <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
-    </div>
-      <p class="profileName">{{userData.name}}</p>
-      <p class="profileEmail">{{userData.mail}}</p>
-    </div>
-    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
-      <i class="ri-user-3-line"></i> Perfil
-    </div>
-     <div class="dropdown-item" ng-click="goToPayment(); toggleDropdown()">
-      <i class="ri-bank-card-line"></i> Suscripción
-       <div class="pro-badge" ng-if="userData.status == 'ACTIVO'">
-        <i class="ri-vip-crown-fill"></i>
-       <span class="pro-text">        
-      Pro
-      </span>
-     </div>
-
-      <div class="free-badge" ng-if="userData.status != 'ACTIVO'">
-       <span class="free-text">        
-      Free
-      </span>
-      </div>
-
-
-    </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
-    </div>
-      <div class="dropdown-item" ng-click="logout()">
-      <i class="ri-shut-down-line"></i> Cerrar sesión
-    </div>
-  </div>
-
-   <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
-  <div class="chat-header">
-      <button class="close-dropdown" ng-click="dropdownChat()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Amadeus 2.1</h4>
-    <p>Asistente Inteligente</p>
-  </div>
-  
-  <div class="chat-messages" id="chatMessages1">
-    
-    
-    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
-      <div class="message-avatar" ng-if="message.sender === 'admin'">
-        <img src="https://lh3.googleusercontent.com/d/1Muzocba--A_soQyO7BXemMbx6GOU2-AK=s96-c">
-      </div>
-      <div class="message-content">
-        <p>{{message.content}}</p>
-        <span class="message-time">{{calculateTimeAgo(message.timestamp) }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="typing-indicator" ng-if="isTyping">
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <span>Mozart Academy está escribiendo...</span>
-</div>
-  
-  <div class="chat-input">
-    <input type="text" 
-           ng-model="newMessage" 
-           placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
-           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
-    <button ng-click="sendMessage(newMessage)">
-      <i class="ri-send-plane-2-fill"></i>
-    </button>
-  </div>
-</div>
-
-
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
-        
-    </ion-nav-bar>
-      
-      <ion-content > 
-
-
-        <div class="iframe-container"><iframe id="profileFrame" src="https://app.mozartacademy.mx/profile3" frameborder="0" allowfullscreen></iframe></div>   
-      </ion-content>
-    </ion-view>
-  </script>
-
-
      <script id="statistics.html" type="text/ng-template">
     <ion-view ng-init="init()">
       
@@ -3544,76 +3367,60 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </ion-nav-buttons>  
     </ion-nav-bar>
-      <ion-content style="padding-top: 10px">
-       <div class="list">
+     <ion-content style="padding-top: 10px">
 
-        <ion-list>
-            <ion-item class="item-divider itemDividerforitem" >
-    Plan de pago
-        </ion-item>
-
-
-          <ion-item class="item-icon-left item-button-right" >
-<i class="icon ri-vip-crown-line" style="font-weight: 500; color: orange; text-shadow: 0 0 4px orange; " ng-if="activeUser && userPlan != 'Premium'" > </i> 
-<i class="icon ri-vip-crown-line" style="font-weight: 600;  text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan == 'Premium'" > </i> 
-<i class="icon ri-lock-fill"  ng-if="!activeUser" > </i> 
-     Mozart Plus
-       <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="!activeUser">Free</p>    
-    <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan != 'Premium'">PREMIUM</p> 
-     <p style="font-weight: 700; text-shadow: 0 0 4px silver;" ng-if="activeUser && userPlan == 'Premium'">PREMIUM BLACK</p> 
-
-         <button ng-if="!activeUser" class="button button-dark" style="margin-top: 10px; border-radius: 18px;" ng-click="goToPayment()">
-            Upgrade
-          </button>
-                </ion-item>
-
-        <ion-item class="item-icon-left " ng-if="activeUser">
-<i class="icon ri-time-line" style="font-weight: 500; text-shadow: 0 0 4px silver;"></i> Termino del plan
-        <p style="font-weight: 700; text-shadow: 0 0 4px silver;">
-         {{userData.nextpay}}
-        </p>
-      </ion-item>
-
-
-     </ion-list>    
-
-          <ion-list>
-      <ion-item class="item-divider itemDividerforitem" >
-    Sistema
-        </ion-item>
-     
-
-   <ion-toggle
-    ng-model="notificationsEnabled"
-    ng-checked="notificationsEnabled"
-    toggle-class="toggle-royal" class="item-icon-left">
-    Notificaciones
-     <i class="icon ri-notification-4-line" style="font-weight: 500; text-shadow: 0 0 4px silver;" ng-if="notificationsEnabled"> </i> 
-     <i class="icon ri-notification-off-line" style="font-weight: 500; text-shadow: 0 0 4px silver;" ng-if="!notificationsEnabled"> </i> 
-     <p ng-if="notificationsEnabled">Encendidas</p>
-<p ng-if="!notificationsEnabled">Apagadas</p>
-</ion-toggle>
-
-<ion-item class="item-icon-left " style="display: flex; flex-direction: row; justify-content: space-between;">
-  <div >
-  <i class="icon ri-translate-2" style="font-weight: 500; text-shadow: 0 0 4px silver;" > </i> 
-    Idioma
-    <p>{{ languageName[selectedLanguage] }}</p>
-  </div>
-    <div class=" item-input-wrapper" >
-        <select ng-model="selectedLanguage">
-            <option value="es">Español</option>
-            <option value="en">English</option>
-        </select>
+    <div class="profile-header">
+        <div class="profile-background"></div>
+        <div class="profile-content">
+            <div class="profile-avatar-container">
+                <img src="{{userData.photo}}" class="profile-avatar">
+                <div class="profile-level">{{paymentData.planName}}</div>
+            </div>
+            
+            <h1 class="profile-name" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 500; text-shadow: 0 0 6px silver;">{{userData.name}}</h1>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{paymentData.sessionsCompleted}}</div>
+                    <div class="stat-label">Sesiones Cursadas</div>
+                </div>
+                <div class="stat-item highlight">
+                    <div class="stat-value">{{paymentData.sessionsRemaining}}</div>
+                    <div class="stat-label">Sesiones Pendientes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{paymentData.sessionsTotal}}</div>
+                    <div class="stat-label">Sesiones Totales</div>
+                </div>
+            </div>
+        </div>
     </div>
-</ion-item>
 
-           
-    </ion-list>    
-        
-          
-         </div>
-      </ion-content>
+    <ion-list>
+        <ion-item class="item-divider">
+            Detalles de tu Suscripción
+        </ion-item>
+
+        <ion-item class="item-icon-left">
+            <i class="icon ri-shield-check-line" style="font-size: 25px; color: #33cd5f;"></i>
+            Estado del plan
+            <p style="color: #33cd5f; font-weight: bold;">{{paymentData.status}}</p>
+        </ion-item>
+
+        <ion-item class="item-icon-left">
+            <i class="icon ri-calendar-check-line" style="font-size: 25px"></i>
+            Fecha de finalización
+            <p style="color: brown;">{{paymentData.endDate | date:'fullDate'}}</p>
+        </ion-item>
+
+        <ion-item class="item-icon-left" ng-click="manageSubscription()">
+            <i class="icon ri-wallet-3-line" style="font-size: 25px"></i>
+            Gestionar Plan
+            <p style="color: gray;">Ver historial o cambiar de plan</p>
+        </ion-item>
+    </ion-list>
+
+</ion-content>
     </ion-view>
   </script>
 
@@ -3692,185 +3499,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
       
-
-        <script id="courses.html" type="text/ng-template">
-    <ion-view >
- 
-   <ion-nav-bar class="bar-light" >      
-        <ion-nav-buttons side="right">
-
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
-        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
-    </div>
-</button> 
-          
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
-
- <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
-            Upgrade
-          </button>
-
-
-  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
-  <div style="display: flex; align-items: center;" >    
-      <div style="position: relative; " class="profilImg">
-       <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
-      </div>
-   </div>
-  </button>
-
-
-    
-  </ion-nav-buttons>
-
-
-        <ion-nav-buttons side="left">
-          <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        </ion-nav-buttons>  
-
-       
-        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
-     <div id="bannerRow">
-      <div class="profile-avatar-container" style="transform: scale(0.9)">
-      <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
-    </div>
-      <p class="profileName">{{userData.name}}</p>
-      <p class="profileEmail">{{userData.mail}}</p>
-    </div>
-    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
-      <i class="ri-user-3-line"></i> Perfil
-    </div>
-     <div class="dropdown-item" ng-click="goToPayment(); toggleDropdown()">
-      <i class="ri-bank-card-line"></i> Suscripción
-       <div class="pro-badge" ng-if="userData.status == 'ACTIVO'">
-        <i class="ri-vip-crown-fill"></i>
-       <span class="pro-text">        
-      Pro
-      </span>
-     </div>
-
-      <div class="free-badge" ng-if="userData.status != 'ACTIVO'">
-       <span class="free-text">        
-      Free
-      </span>
-      </div>
-
-
-    </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
-    </div>
-      <div class="dropdown-item" ng-click="logout()">
-      <i class="ri-shut-down-line"></i> Cerrar sesión
-    </div>
-  </div>
-
-   <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
-  <div class="chat-header">
-      <button class="close-dropdown" ng-click="dropdownChat()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Amadeus 2.1</h4>
-    <p>Asistente Inteligente</p>
-  </div>
-  
-  <div class="chat-messages" id="chatMessages1">
-    
-    
-    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
-      <div class="message-avatar" ng-if="message.sender === 'admin'">
-        <img src="https://lh3.googleusercontent.com/d/1Muzocba--A_soQyO7BXemMbx6GOU2-AK=s96-c">
-      </div>
-      <div class="message-content">
-        <p>{{message.content}}</p>
-        <span class="message-time">{{calculateTimeAgo(message.timestamp) }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="typing-indicator" ng-if="isTyping">
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <span>Mozart Academy está escribiendo...</span>
-</div>
-  
-  <div class="chat-input">
-    <input type="text" 
-           ng-model="newMessage" 
-           placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
-           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
-    <button ng-click="sendMessage(newMessage)">
-      <i class="ri-send-plane-2-fill"></i>
-    </button>
-  </div>
-</div>
-
-
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
-        
-    </ion-nav-bar>
-
-     <ion-content>
-   <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/courses" frameborder="0" allowfullscreen></iframe></div>
-      </ion-content>
- 
-         
-
-    </ion-view>
-  </script>   
-
-    
-    
- 
 
 
 
@@ -3956,8 +3584,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+       <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
       <i class="ri-shut-down-line"></i> Cerrar sesión
@@ -4432,8 +4060,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
       <i class="ri-shut-down-line"></i> Cerrar sesión
@@ -4614,8 +4242,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+     <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
       <i class="ri-shut-down-line"></i> Cerrar sesión
@@ -4746,79 +4374,70 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
+      <script id="agenda.html" type="text/ng-template">
+    <ion-view >
+
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBack()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+    
+      <ion-content>
+        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/agenda" frameborder="0" allowfullscreen ></iframe></div> 
+      </ion-content>
+    </ion-view>
+  </script>
+
+
+
+
+
 
    <script id="finder.html" type="text/ng-template">
     <ion-view >
 
-      <ion-nav-bar class="bar-light" >      
+     <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
 <i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
   <i class="ri-notification-3-line" ></i>
             <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
 
-     <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
+ <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
+            Upgrade
+          </button>
+
+
+  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
   <div style="display: flex; align-items: center;" >    
-   
-  <div class="user-info" style="margin-top: -2px;">
-   <div style="font-size: 13px; font-weight: 600; color: #333;">{{userData.name}}</div>
-  <div style="font-size: 12px; color: #777; margin-top: -15px;" ng-if="userData.lvl == 0">Preparatorio</div>
-          <div style="font-size: 11px; color: #777; margin-top: -15px;" ng-if="userData.lvl != 0">Nivel {{userData.lvl}}</div> 
+      <div style="position: relative; " class="profilImg">
+       <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
+      </div>
    </div>
+  </button>
 
-    <div style="position: relative; " class="profilImg">
+
     
-      <div style="position: relative; width: 36px; height: 36px; margin-top: 4px; margin-left: 5px;">
-  <!-- Anillo exterior -->
-  <div style="
-    width: 36px;
-    height: 36px;
-    border: 1px solid #3ac5f2; /* color del anillo */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 2px #1e2b47; /* sombra tipo segundo anillo */
-  ">
-    <!-- Imagen de perfil -->
-    <img src="{{userData.photo}}" width="30" height="30" style="border-radius: 50%; border: 0.5px solid black;" />
-  </div>
-
-  <!-- Punto de estado -->
-  <div style="
-    position: absolute;
-    bottom: -3px;
-    right: 0;
-    width: 10px;
-    height: 10px;
-    background-color: #5fff87; /* verde */
-    border: 2px solid #1e2b47; /* separador del fondo */
-    border-radius: 50%;
-  "></div>
-</div>
- 
-
-   </div>
-   
- </div>
-    </button>
   </ion-nav-buttons>
-       
+
+
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
         </ion-nav-buttons>  
 
-            
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
@@ -4830,13 +4449,30 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <p class="profileEmail">{{userData.mail}}</p>
     </div>
     <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
-      <i class="ion-ios-contact-outline"></i> Perfil
-    </div>  
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+      <i class="ri-user-3-line"></i> Perfil
+    </div>
+     <div class="dropdown-item" ng-click="goToPayment(); toggleDropdown()">
+      <i class="ri-bank-card-line"></i> Suscripción
+       <div class="pro-badge" ng-if="userData.status == 'ACTIVO'">
+        <i class="ri-vip-crown-fill"></i>
+       <span class="pro-text">        
+      Pro
+      </span>
+     </div>
+
+      <div class="free-badge" ng-if="userData.status != 'ACTIVO'">
+       <span class="free-text">        
+      Free
+      </span>
+      </div>
+
+
+    </div>
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
-      <i class="ri-logout-box-r-line"></i> Salir
+      <i class="ri-shut-down-line"></i> Cerrar sesión
     </div>
   </div>
 
@@ -4845,20 +4481,20 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <button class="close-dropdown" ng-click="dropdownChat()">
       <i class="ri-close-line"></i>
     </button>
-    <h4>MozAI</h4>
+    <h4>Amadeus 2.1</h4>
     <p>Asistente Inteligente</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages6">
+  <div class="chat-messages" id="chatMessages1">
     
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
       <div class="message-avatar" ng-if="message.sender === 'admin'">
-        <img src="https://lh3.googleusercontent.com/d/1zFiuq3CmoKEwEnOsAfq5GkK8h_SRaWEy">
+        <img src="https://lh3.googleusercontent.com/d/1Muzocba--A_soQyO7BXemMbx6GOU2-AK=s96-c">
       </div>
       <div class="message-content">
         <p>{{message.content}}</p>
-        <span class="message-time">{{ calculateTimeAgo(message.timestamp) }}</span>
+        <span class="message-time">{{calculateTimeAgo(message.timestamp) }}</span>
       </div>
     </div>
   </div>
@@ -4874,7 +4510,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage6"
+           id="inputMessage1"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -4889,7 +4525,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <i class="ri-close-line"></i>
     </button>
     <h4>Notificaciones</h4>
-
+  
   </div>
   
   <div class="notif-list" ng-if="alerts.length > 0">
@@ -4901,12 +4537,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <div class="notif-title">{{alert.subject}}</div>
         <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
         <div class="notif-time">
-          <i class="ri-time-line"></i>{{calculateTimeAgo(alert.date)}}
+          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
         </div>
       </div>
       <div class="notif-actions">
         <button class="notif-action-btn" ng-click="deleteNotif(alert)">
- <i class="ri-delete-bin-line"></i>
+<i class="ri-delete-bin-line"></i>
         </button>
       </div>
     </div>
@@ -5019,8 +4655,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-      <div class="dropdown-item" ng-click="goToStatus(); toggleDropdown()">
-      <i class="ri-settings-3-line"></i> Configuración
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
       <i class="ri-shut-down-line"></i> Cerrar sesión
@@ -5653,14 +5289,7 @@ app
       }
     })
      
-  .state('menu.profile', {
-      url: "/profile",
-      views: {
-        'menuContent': {
-          templateUrl: "profile.html"
-        }
-      }
-    })
+  
   .state('menu.statistics', {
       url: "/statistics",
       views: {
@@ -5688,11 +5317,11 @@ app
       }
     })
 
-      .state('menu.courses', {
-      url: "/courses",
+      .state('menu.agenda', {
+      url: "/agenda",
       views: {
         'menuContent': {
-          templateUrl: "courses.html"
+          templateUrl: "agenda.html"
         }
       }
     }) 
