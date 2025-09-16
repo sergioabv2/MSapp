@@ -681,11 +681,7 @@ background: rgba(0, 0, 0, 0.3);
                                         <label>{{calculateTimeAgo(post.date)}}</label>
                                     </div>
                                 </div>
-                                <div class="infoProf " ng-if="showProfileInfo[post.header]">
-                                    <i class="ri-user-line"></i> {{post.user}}<br>
-                                    <small>Nivel: {{post.lvl}}</small><br>
-                                    <small>Plan: {{post.progress}}</small>
-                                </div>
+                               
                             </div>
                             <div class="medium-space"></div>
                             <div ng-if="post.type == 'text'" class="textContent">{{post.url}}</div>
@@ -800,11 +796,7 @@ background: rgba(0, 0, 0, 0.3);
                                             <label>{{calculateTimeAgo(selectedPostForComments.date)}}</label>
                                         </div>
                                     </div>
-                                    <div class="infoProf " ng-if="showProfileInfo[selectedPostForComments.header]">
-                                        <i class="ri-user-line"></i> {{selectedPostForComments.user}}<br>
-                                        <small>Nivel: {{selectedPostForComments.lvl}}</small><br>
-                                        <small>Plan: {{selectedPostForComments.progress}}</small>
-                                    </div>
+                                  
                                 </div>
                                 <div class="medium-space"></div>
                                 <div ng-if="selectedPostForComments.type == 'text'" class="textContent" style="margin-bottom: 30px !important">{{selectedPostForComments.url}}</div>
@@ -920,6 +912,22 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         });
     });
 
+
+      $scope.user = "Anonimo"
+      $scope.userImg = "https://lh3.googleusercontent.com/d/1CWImzia2Z8LdK-VxeMKK22oa7387Ktwj=s96-c"
+    var requestData2 = {
+    action: "getUserData",
+   // token: localStorage.getItem('MStoken')
+      token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+  };
+  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData2, config)
+        .then(function (response) {
+         $scope.user = response.data.name.split(' ').slice(0, 2).join(' ');
+         $scope.userImg = response.data.photo;
+    });
+
+
+
     $scope.loadMorePosts = function () {
         $scope.itemsPerPage += 5;
     };
@@ -962,45 +970,11 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         // Add the comment to the selected post's comment array
         $scope.selectedPostForComments.comments.push(newComment);
 
-        // Optionally, send the comment to the server
-        // $scope.sendComment(selectedPostForComments.id, newComment.comment);
-
-        // Clear the input field
         $scope.newCommentText = '';
     };
 
 
-    $scope.lvlColor = function (lvl) {
-        if (lvl == 0) {
-            return "#F44336"
-        } else if (lvl == 1) {
-            return "#9024dc"
-        } else if (lvl == 2) {
-            return "#1894cc"
-        } else if (lvl == 3) {
-            return "#489454"
-        } else if (lvl == 4) {
-            return "#f0ac14"
-        } else if (lvl == 5) {
-            return "#485cb4"
-        } else if (lvl == 6) {
-            return "#08949c"
-        }
-    }
-    $scope.getEvent = function (task) {
-        if (task.split(" ")[0] == "Nivel") {
-            return " ha subido de nivel"
-        } else {
-            return " ha entregado"
-        }
-    }
-    $scope.getLevel = function (lvl) {
-        if (lvl == 0) {
-            return "Nivel Preparatorio"
-        } else {
-            return "Nivel " + lvl.toString()
-        }
-    }
+
     // In your controller
     $scope.userVoted = false;
     $scope.currentUser = "user10"; // Replace with actual current user
@@ -1052,53 +1026,8 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         $scope.midiModalOpen = false;
         $scope.currentMidi = null;
     };
-    $scope.showProfileInfo = {};
-    $scope.toggleProfileInfo = function (postId) {
-        $scope.showProfileInfo[postId] = !$scope.showProfileInfo[postId];
-    };
-    $scope.user = "@anonimo"
-    var requestData = {
-        action: "getUserName",
-        token: localStorage.getItem('MStoken')
-    };
-    var config = {
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        }
-    };
-    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-        .then(function (response) {
-            $scope.user = response.data
-        });
-    $scope.sendLike = function (postid) {
-        var requestData = {
-            action: "newLike",
-            token: localStorage.getItem('MStoken'),
-            postid: postid
-        };
-        var config = {
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            }
-        };
-        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-            .then(function (response) { });
-    }
-    $scope.sendComment = function (postid, comment) {
-        var requestData = {
-            action: "newComment",
-            token: localStorage.getItem('MStoken'),
-            comment: comment,
-            postid: postid
-        };
-        var config = {
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            }
-        };
-        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-            .then(function (response) { });
-    }
+
+
     $scope.updatePagination = function () {
         $scope.totalPages = Math.ceil($scope.filteredData.length / $scope.itemsPerPage);
         $scope.currentPage = 1;
@@ -1142,10 +1071,9 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
     };
     $scope.newPost = function (data) {
         var post = {
-            "user": "User",
+            "user": $scope.user,
             "type": "text",
-            "height": 0,
-            "photo": "https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V",
+            "photo": $scope.userImg,
             "url": data,
             "date": new Date(),
             "likes": [],
@@ -1182,23 +1110,7 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
             return `${minutes} minuto(s)`;
         }
     };
-    $scope.currentSection = '#about';
-    $scope.handleButtonClick = function (section) {
-        $scope.currentSection = section;
-    };
-    $scope.handleUserProfile = function (username) {
-        $scope.currentMain = username;
-        if (username != "Mozart Appcademy") {
-            $('#profileModal').modal('show');
-        }
-    };
-    $scope.youtubeModal = function () {
-        $('#youtubeModal').modal('show');
-    };
-    $scope.filterByLevel = function (lsn) {
-        return function (entry) {
-            return entry.index <= lsn;
-        };
-    };
+  
+ 
 }]);
 </script> 
