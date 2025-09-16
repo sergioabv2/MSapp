@@ -633,6 +633,16 @@ background: rgba(0, 0, 0, 0.3);
       display: none !important;
     }
   }
+
+  .chip.active {
+    background-color: #e0e0e0; /* Or any color you prefer */
+    color: #000;
+}
+
+/* This targets Material Icons to make them appear filled */
+.chip.active i {
+    font-variation-settings: 'FILL' 1;
+}
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
@@ -648,19 +658,22 @@ background: rgba(0, 0, 0, 0.3);
                                 <input placeholder="Create Post" ng-model="newText2" />
                             </div>
                         </div>
-                        <button class="transparent circle" onclick="ui('#dialog-post')">
+                        <button class="transparent circle" ng-click="openImagePostDialog()">
                             <i>image</i>
                             <div class="tooltip bottom">Create Media Post</div>
                         </button>
                         <button ng-click="newPost(newText2)">Post</button>
                     </div>
                 </article>
-                <nav style="justify-content: center; flex-wrap: wrap;">
-                    <button class="chip" ng-click="filterPosts('all')"><i>explore</i><span>Explore</span></button>
-                    <button class="chip" ng-click="filterPosts('midi')"><i>piano</i><span>Piano</span></button>
-                    <button class="chip" ng-click="filterPosts('user')"><i>article</i><span>My Posts</span></button>
-                    <button class="chip" ng-click="filterPosts('saved')"><i>bookmark</i><span>Saved</span></button>
-                </nav>
+         <nav style="justify-content: center; flex-wrap: wrap;">
+            <button class="chip" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')"><i>explore</i><span>Explore</span></button>
+
+            <button class="chip" ng-class="{'active': filter === 'midi'}" ng-click="filterPosts('midi')"><i>piano</i><span>Piano</span></button>
+            
+            <button class="chip" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')"><i>article</i><span>My Posts</span></button>
+            
+            <button class="chip" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')"><i>bookmark</i><span>Saved</span></button>
+        </nav>
                 <div class="showbox" ng-if="userDataLoaded">
                     <div class="loader">
                         <svg class="circular" viewbox="25 25 50 50">
@@ -706,41 +719,42 @@ background: rgba(0, 0, 0, 0.3);
                                 </div>
                             </div>
 
-                            <div class="poll-container" ng-if="post.type == 'poll'" ng-class="{'poll-voted': userVoted}">
-                                <div class="poll-voter">
-                                    <h4 class="textContent">{{post.url}}</h4>
-                                    <div class="poll-list">
-                                        <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'selected-option': opt.votedByCurrentUser}">
-                                            <div class="poll-option">
-                                                <div class="poll-option-bg" ng-class="{ 'voted': userVoted, 'selected-option': userVoted && opt.votedByCurrentUser }"></div>
-                                                <div class="poll-option-bar" ng-if="userVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
-                                                <div class="poll-option-text">
-                                                    <span class="option-name">{{opt.name}} <i ng-if="opt.votedByCurrentUser" class="ri-checkbox-circle-line" style="margin-top: -2px; font-size: 20px"></i></span>
-                                                    <span class="option-percent" ng-show="userVoted">{{calculatePercentage(post, opt)}}%</span>
-                                                </div>
-                                            </div>
-                                            <div class="poll-vote-button" ng-show="!userVoted">
-                                                <div class="vote-circle"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="poll-footer" ng-show="userVoted">
-                                        {{getTotalVotes(post)}} votes
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="poll-container" ng-if="post.type == 'poll'" ng-class="{'poll-voted': post.userHasVoted}">
+                              <div class="poll-voter">
+                                  <h4 class="textContent">{{post.url}}</h4>
+                                  <div class="poll-list">
+                                      <div class="vote-row" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'selected-option': opt.votedByCurrentUser}">
+                                          <div class="poll-option">
+                                              <div class="poll-option-bg" ng-class="{ 'voted': post.userHasVoted, 'selected-option': post.userHasVoted && opt.votedByCurrentUser }"></div>
+                                              <div class="poll-option-bar" ng-if="post.userHasVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
+                                              <div class="poll-option-text">
+                                                  <span class="option-name">{{opt.name}} <i ng-if="opt.votedByCurrentUser" class="ri-checkbox-circle-line" style="margin-top: -2px; font-size: 20px"></i></span>
+                                                  <span class="option-percent" ng-show="post.userHasVoted">{{calculatePercentage(post, opt)}}%</span>
+                                              </div>
+                                          </div>
+                                          <div class="poll-vote-button" ng-show="!post.userHasVoted">
+                                              <div class="vote-circle"></div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="poll-footer" ng-show="post.userHasVoted">
+                                      {{getTotalVotes(post)}} votes
+                                  </div>
+                              </div>
+                          </div>
 
                             <div class="row" style="display: flex; justify-content: space-between;" ng-if="post.type != 'poll'">
                                 <div>
-                                    <button class="transparent circle" ng-click="newLike($index, post)">
-                                        <i ng-if="post.likes.includes(user)" class="ri-heart-fill liked"></i>
-                                        <i ng-if="!post.likes.includes(user)" class="ri-heart-line"></i>
-                                        {{post.likes.length}}
-                                    </button>
+                                  <button class="transparent circle" ng-click="newLike($index, post)">
+                                    <i ng-if="isPostLiked(post)" class="ri-heart-fill liked"></i>
+                                    <i ng-if="!isPostLiked(post)" class="ri-heart-line"></i>
+                                    {{post.likes.length}}
+                                      </button>
                                     <button class="transparent circle" ng-click="openComments(post);"><i>chat_bubble</i>{{post.comments.length}}</button>
                                 </div>
-                                <button class="chip">
-                                    <i class="ri-bookmark-line"></i><span>Save</span>
+                                <button class="chip" ng-click="toggleSave(post)">
+                                    <i ng-class="{'ri-bookmark-fill': isPostSaved(post), 'ri-bookmark-line': !isPostSaved(post)}"></i>
+                                    <span>{{ isPostSaved(post) ? 'Saved' : 'Save' }}</span>
                                 </button>
                             </div>
                         </div>
@@ -826,7 +840,7 @@ background: rgba(0, 0, 0, 0.3);
                     <div class="input-group">
                         <img src="https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V" style="width: 40px; height: 40px; border-radius: 50%;">
                         <input type="text" class="form-control" placeholder="Escribe tu respuesta" id="form-control" ng-model="newCommentText">
-                        <button class="responsive" style="width: 60px !important;" ng-click="addComment()">Responder</button>
+                        <button class="responsive" style="width: 60px !important;" ng-click="addComment(newCommentText)">Responder</button>
                     </div>
                     <br>
                     <div ng-if="selectedPostForComments.comments.length > 0" ng-repeat="comment in selectedPostForComments.comments">
@@ -871,6 +885,23 @@ background: rgba(0, 0, 0, 0.3);
         </div>
         
         <dialog id="dialog-post">
+                <div class="modal-content" style="padding: 20px; text-align: center;">
+                    <h5>Crear Post con Imagen</h5>
+                    <div class="field textarea label border extra">
+                        <textarea ng-model="newImagePost.header" placeholder="Escribe algo sobre la imagen..."></textarea>
+       
+                    </div>
+                    <img ng-if="imagePreview" ng-src="{{imagePreview}}" class="responsive" style="max-height: 300px; border-radius: 8px; margin-top: 10px;" />
+                    <br><br>
+                    <input type="file" id="imageUpload" accept="image/*" onchange="angular.element(this).scope().handleFileSelect(this.files)" style="display: none;">
+                    <button onclick="document.getElementById('imageUpload').click()">
+                        <i class="ri-upload-2-line"></i> Seleccionar Imagen
+                    </button>
+                    <div class="row" style="justify-content: flex-end; margin-top: 20px;">
+                        <button class="red" onclick="ui('#dialog-post')">Cancelar</button>
+                        <button ng-click="createImagePost()" ng-disabled="!imagePreview || !newImagePost.header">Publicar</button>
+                    </div>
+                </div>
             </dialog>
     </main>
 </body>
@@ -906,8 +937,8 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         $scope.userDataLoaded = false
         $scope.data.forEach(post => {
             if (post.type === 'poll') {
-              var poll = JSON.parse(posts.likes)
-                processPollData(poll);
+                // Check if the current user's name is in any option's user list
+                post.userHasVoted = post.likes.some(opt => opt.users.includes($scope.user));
             }
         });
     });
@@ -918,7 +949,7 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
     var requestData2 = {
     action: "getUserData",
     token: localStorage.getItem('MStoken')
-   //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData2, config)
         .then(function (response) {
@@ -953,26 +984,27 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         $scope.selectedPostForComments = null;
     };
 
-    // MODIFICATION 4: New function to add a comment
-    $scope.newCommentText = ''; // Model for the new comment input
-    $scope.addComment = function () {
-        // Check if there is a selected post and the comment text is not empty
-        if (!$scope.selectedPostForComments || !$scope.newCommentText.trim()) {
-            return;
-        }
+  
+  
+    $scope.addComment = function (commentText) {
+   
+    if (!$scope.selectedPostForComments || !commentText) {
+        return;
+    }
 
-        // Create the new comment object
-        var newComment = {
-            user: $scope.user, // Assumes $scope.user is the current user's name
-            comment: $scope.newCommentText.trim()
-        };
-
-        // Add the comment to the selected post's comment array
-        $scope.selectedPostForComments.comments.push(newComment);
-
-        $scope.newCommentText = '';
+    var newComment = {
+        user: $scope.user,
+        photo: $scope.userImg, // Agrega la foto del usuario
+        comment: commentText
     };
 
+    // Añade el comentario localmente para actualización instantánea
+    if (!$scope.selectedPostForComments.comments) {
+        $scope.selectedPostForComments.comments = [];
+    }
+    $scope.selectedPostForComments.comments.push(newComment);
+    document.getElementById('form-control').value = '';
+   };
 
 
     // In your controller
@@ -987,9 +1019,8 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         return post.likes.reduce((sum, opt) => sum + opt.users.length, 0);
     };
     $scope.addVote = function (post, option, index) {
-        if ($scope.userVoted) return;
-        const hasVoted = post.likes.some(opt => opt.users.includes($scope.currentUser));
-        if (hasVoted) return;
+        if (post.userHasVoted) return;
+
         option.users.push($scope.currentUser);
         option.votedByCurrentUser = true;
         $scope.userVoted = true;
@@ -1040,10 +1071,8 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
             $scope.filteredData = $scope.data.filter(function (post) {
                 return post.user === $scope.user;
             });
-        } else if (type === 'saved') {
-            $scope.filteredData = $scope.data.filter(function (post) {
-                return post.saved === $scope.user;
-            });
+        }  else if (type === 'saved') {
+            $scope.filteredData = $scope.data.filter(post => $scope.isPostSaved(post));
         } else {
             $scope.filteredData = $scope.data.filter(function (post) {
                 return post.type === type;
@@ -1077,24 +1106,36 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
             "url": data,
             "date": new Date(),
             "likes": [],
-            "comments": []
+            "comments": [],
+            "saved": []
         }
         $scope.data.unshift(post)
         $scope.newText2 = "";
     }
     $scope.dangerButtonActive = [];
     $scope.newLike = function (index, post) {
-        $scope.selectedPost = post;
-        var selectedDataItem = $scope.data.find(item => item.header === post.header);
-        if (selectedDataItem) {
-            const userIndex = selectedDataItem.likes.indexOf($scope.user);
-            if (userIndex === -1) {
-                selectedDataItem.likes.push($scope.user);
-            } else {
-                selectedDataItem.likes.splice(userIndex, 1);
-            }
-        }
+        if (!post.likes) {
+        post.likes = []; // Ensure likes array exists
+    }
+
+    // Find the index of the like from the current user
+    const userLikeIndex = post.likes.findIndex(like => like.user === $scope.user);
+
+    if (userLikeIndex === -1) {
+        // If not found, add the like
+        post.likes.push({ user: $scope.user });
+    } else {
+        // If found, remove it
+        post.likes.splice(userLikeIndex, 1);
+    }
     };
+    $scope.isPostLiked = function(post) {
+    if (!post || !post.likes) {
+        return false;
+    }
+    // Check if any object in the likes array has a user property matching the current user
+    return post.likes.some(like => like.user === $scope.user);
+};
     $scope.calculateTimeAgo = function (alertDate) {
         const alertDateObj = new Date(alertDate);
         const today = new Date();
@@ -1109,6 +1150,82 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         } else {
             return `${minutes} minuto(s)`;
         }
+    };
+
+
+
+    $scope.isPostSaved = function(post) {
+        if (!post.saved) return false;
+        return post.saved.some(s => s.user === $scope.user);
+    };
+
+    $scope.toggleSave = function(post) {
+        if (!post.saved) {
+            post.saved = []; // Inicializa el array si no existe
+        }
+        
+        const userIndex = post.saved.findIndex(s => s.user === $scope.user);
+
+        if (userIndex === -1) {
+            post.saved.push({ user: $scope.user });
+        } else {
+            post.saved.splice(userIndex, 1);
+        }
+
+        // Aquí harías una llamada HTTP para persistir el cambio en el backend
+    };
+
+    // MODIFICACIÓN 5.3: Funciones para crear un post con imagen
+    $scope.newImagePost = { header: '' };
+    $scope.imagePreview = null;
+
+    $scope.openImagePostDialog = function() {
+        // Resetea el formulario al abrir
+        $scope.newImagePost = { header: '' };
+        $scope.imagePreview = null;
+        document.getElementById('imageUpload').value = null; // Limpia el input file
+        ui('#dialog-post'); // Abre el diálogo
+    };
+
+    $scope.handleFileSelect = function(files) {
+        if (files && files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $scope.$apply(function() {
+                    $scope.imagePreview = e.target.result; // Muestra la previsualización
+                });
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    };
+
+    $scope.createImagePost = function() {
+        if (!$scope.imagePreview || !$scope.newImagePost.header) {
+            alert("Por favor, selecciona una imagen y añade una descripción.");
+            return;
+        }
+
+        var post = {
+            "user": $scope.user,
+            "type": "img",
+            "photo": $scope.userImg,
+            "header": $scope.newImagePost.header,
+            "url": $scope.imagePreview, // URL en Base64 de la imagen
+            "date": new Date().toISOString(),
+            "likes": [],
+            "comments": [{
+            user: $scope.user,
+            photo: $scope.userImg,
+            comment: $scope.newImagePost.header
+            }],
+            "saved": []
+        };
+
+        $scope.data.unshift(post); // Añade el nuevo post al inicio del feed
+        $scope.filterPosts($scope.filter || 'all'); // Refresca el filtro actual
+
+        
+        ui('#dialog-post'); // Cierra el diálogo
     };
   
  
