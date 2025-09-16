@@ -152,11 +152,7 @@ dialog{
   }
 }
   
-  @media (max-width: 700px){
-    .hidemobile{
-      display: none !important;
-    }
-  }
+
 
   .input-group {
   display: flex;
@@ -631,6 +627,12 @@ background: rgba(0, 0, 0, 0.3);
   font-size: 1.1rem; /* Aproximadamente 16px, similar a la imagen */
   font-weight: 450; 
 }
+
+  @media (max-width: 978px){
+    .hidemobile{
+      display: none !important;
+    }
+  }
 </style>
 
 <body style="background-color: white;" ng-app="postApp" ng-controller="postController">
@@ -850,10 +852,10 @@ background: rgba(0, 0, 0, 0.3);
                 </section>
             </div>
 
-            <section class="s12 m4 l4 hide-on-medium-and-down hidemobile">
+            <section class="s12 m4 l4 hide-on-medium-and-down">
               
 
-                <article class="no-elevate round">
+                <article class="no-elevate round hidemobile">
                     <h6>Recent Posts</h6>
                     <nav class="drawer max no-padding" ng-repeat="post in data | orderBy:'-date':true | limitTo:4">
                         <a class="small-round" style="margin-top: -10px; cursor: pointer;" ng-click="openComments(post)">
@@ -861,17 +863,14 @@ background: rgba(0, 0, 0, 0.3);
                                 <img class="circle small" ng-src="{{post.photo}}" />
                                 <div class="user-info">
                                     <div class="user-name">
-                                        <a href="#">{{post.user}}</a>
+                                        <div>{{post.user}}</div>
                                     </div>
                                     <div class="post-time" style="margin-top: -6px;">
                                         <label style="font-size: 11px;">hace {{calculateTimeAgo(post.date)}}</label>
                                     </div>
                                 </div>
                             </div>
-                            <div style="font-size: 15px; font-weight: 400; margin-bottom: 15px; word-wrap: break-word;">
-                                <span ng-if="post.type === 'text'">{{ post.url | limitTo: 80 }}{{ post.url.length > 80 ? '...' : '' }}</span>
-                                <span ng-if="post.type !== 'text'">[{{post.type | uppercase}}] Post</span>
-                            </div>
+                          
                         </a>
                         <hr>
                     </nav>
