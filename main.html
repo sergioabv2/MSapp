@@ -3444,7 +3444,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   <div class="profile-content">
     <div class="profile-avatar-container">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">  Nivel {{userData.lvl}}</div>
+      <div class="profile-level">  Nivel {{userLvl}}</div>
     </div>
     
     <h1 class="profile-name" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;  font-weight: 500; text-shadow: 0 0 6px silver;">{{userData.name}}</h1>
@@ -4908,7 +4908,7 @@ app
 
 .factory('SharedState', function($http, $q) {
   var requestData = {
-    action: "getProfileData",
+    action: "getUserData",
     token: localStorage.getItem('MStoken')
   //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
@@ -4925,10 +4925,11 @@ app
 
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
+             var stage = JSON.parse(response.data.stage);
         deferred.resolve({
-          lvl: response.data.lvl,
-          blq: response.data.blq,
-    lsn: response.data.lsn, 
+          lvl: stage.lvl,
+          blq: 1,
+          lsn: stage.lsn, 
           data: response.data,
         });
       }, function(error) {
@@ -6144,7 +6145,9 @@ $scope.installApp = function () {
   
   .controller('accountCtrl', ['$scope', 'SharedState', function($scope, SharedState){
   SharedState.getNum().then(function(data) {
+
        $scope.userData = data.data;
+       $scope.userLvl = data.lvl;
       $scope.userPlan = data.data.plan.split(" ")[0]
   })
  
