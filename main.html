@@ -3042,7 +3042,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
             <br>
         <div class="userLvl" ng-if="userData.lvl == 0"> Nivel Preparatorio </div>
-          <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userData.lvl}} </div>
+          <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userLvl}} </div>
         <div class="progress">
           <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
         </div>
@@ -3104,22 +3104,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <ion-view >
       
  
-<ion-nav-bar class="bar-light" >      
+  <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-gemini-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+   
 
  <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
             Upgrade
@@ -3141,6 +3136,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -3148,7 +3151,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -3222,49 +3225,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </div>
 </div>
-
-
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
-        
     </ion-nav-bar>
 
      <ion-content > 
@@ -3507,22 +3467,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
       <script id="livestream.html" type="text/ng-template">
     <ion-view >
  
-    <ion-nav-bar class="bar-light" >      
+      <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-gemini-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+   
 
  <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
             Upgrade
@@ -3544,7 +3499,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-           <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
             <div class="status-indicator">
                 <div class="status-dot"></div>
                 <div class="status-pulse"></div>
@@ -3559,7 +3514,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -3584,7 +3539,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-       <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
       <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -3635,46 +3590,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 </div>
 
 
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
+
         
     </ion-nav-bar>
 
@@ -3992,22 +3908,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
 <script id="lessons.html" type="text/ng-template">
   <ion-view>
-       <ion-nav-bar class="bar-light" >      
+      <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-gemini-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+   
 
  <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
             Upgrade
@@ -4029,6 +3940,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -4036,7 +3955,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -4112,46 +4031,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 </div>
 
 
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
+
         
     </ion-nav-bar>
 
@@ -4174,22 +4054,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
 <script id="reel.html" type="text/ng-template">
   <ion-view>
       
-      <ion-nav-bar class="bar-light" >      
+       <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-gemini-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+   
 
  <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
             Upgrade
@@ -4211,6 +4086,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -4218,7 +4101,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -4243,7 +4126,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
     </div>
-     <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
       <i class="ri-calendar-view"></i> Calendario
     </div>
       <div class="dropdown-item" ng-click="logout()">
@@ -4294,46 +4177,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 </div>
 
 
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
+
         
     </ion-nav-bar>
 
@@ -4444,7 +4288,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -4582,19 +4426,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;" ng-if="userData.status == 'ACTIVO'">
-<i class="ri-chat-ai-line"></i>
-            <div style="position: absolute; top: -3px; left: 8px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-gemini-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
 </button> 
           
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+   
 
  <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
             Upgrade
@@ -4631,7 +4470,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
      <div id="bannerRow">
       <div class="profile-avatar-container" style="transform: scale(0.9)">
       <img src="{{userData.photo}}" class="profile-avatar">
-      <div class="profile-level">Nivel {{userData.lvl}}</div>
+      <div class="profile-level">Nivel {{userLvl}}</div>
     </div>
       <p class="profileName">{{userData.name}}</p>
       <p class="profileEmail">{{userData.mail}}</p>
@@ -4707,46 +4546,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 </div>
 
 
-<div class="dropdownContent notif-dropdown" ng-show="dropdownNotifVisible" ng-click="$event.stopPropagation()">
-  <div class="notif-header">
-           <button class="close-dropdown" ng-click="dropdownNotif()">
-      <i class="ri-close-line"></i>
-    </button>
-    <h4>Notificaciones</h4>
-  
-  </div>
-  
-  <div class="notif-list" ng-if="alerts.length > 0">
-    <div class="notif-item" ng-repeat="alert in alerts | orderBy:'-date'" >
-      <div class="notif-icon" style="background: {{alert.color}}20; color: {{alert.color}}">
-        <i class="{{alert.icon}}"></i>
-      </div>
-      <div class="notif-content">
-        <div class="notif-title">{{alert.subject}}</div>
-        <div class="notif-desc">{{alert.message || 'Mensaje de notificación'}}</div>
-        <div class="notif-time">
-          <i class="ri-time-line"></i> {{calculateTimeAgo(alert.date)}}
-        </div>
-      </div>
-      <div class="notif-actions">
-        <button class="notif-action-btn" ng-click="deleteNotif(alert)">
-<i class="ri-delete-bin-line"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="empty-notifs" ng-if="alerts.length === 0">
-    <i class="ri-notification-off-line"></i>
-    <p>No hay notificaciones</p>
-  </div>
-  
-  <div class="notif-footer" ng-if="alerts.length > 0">
-    <button class="view-all" ng-click="deleteAllNotif()">
-      Eliminar todas las notificaciones
-    </button>
-  </div>
-</div>
+
         
     </ion-nav-bar>
 
@@ -4925,11 +4725,7 @@ app
 
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
-             var stage = JSON.parse(response.data.stage);
         deferred.resolve({
-          lvl: stage.lvl,
-          blq: 1,
-          lsn: stage.lsn, 
           data: response.data,
         });
       }, function(error) {
@@ -5779,7 +5575,6 @@ $scope.dragTouch = function(event) {
  
       
     $ionicSideMenuDelegate.toggleLeft();
-      $scope.dropdownNotifVisible = false;
       $scope.isDropdownVisible = false;
       $scope.dropdownChatVisible = false;
 };
@@ -5787,10 +5582,11 @@ $scope.dragTouch = function(event) {
     $scope.loadingProfile = true;
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
+      var userLvl = JSON.parse($scope.userData.stage)
+       $scope.userLvl = userLvl.lvl;
        $scope.userPlan = data.data.plan.split(" ")[0];
       $scope.userNameShort = data.data.name.split(" ")[0];
       $scope.chats = JSON.parse(data.data.messages);
-    $scope.alerts = JSON.parse(data.data.alerts);
       $scope.loadingProfile = false;
   }) 
 
@@ -5799,18 +5595,16 @@ $scope.dragTouch = function(event) {
     $scope.toggleDropdown = function() {
       $scope.isDropdownVisible = !$scope.isDropdownVisible;
       $scope.dropdownChatVisible = false;
-      $scope.dropdownNotifVisible = false;
         $scope.btnBar = false;
     };
     
  $scope.chatCounter = true;
- $scope.alertCounter = true;
+
     
     $scope.dropdownChatVisible = false;
     $scope.dropdownChat = function() {
       $scope.dropdownChatVisible = !$scope.dropdownChatVisible;
       $scope.isDropdownVisible = false;
-      $scope.dropdownNotifVisible = false;
       $scope.chatCounter = false;  
 
       $timeout(function() {
@@ -5819,15 +5613,7 @@ $scope.dragTouch = function(event) {
       
     };
 
-    $scope.dropdownNotifVisible = false;
-    $scope.dropdownNotif = function() {
-      $scope.dropdownNotifVisible = !$scope.dropdownNotifVisible;
-      $scope.isDropdownVisible = false;
-      $scope.dropdownChatVisible = false;
-      $scope.alertCounter = false;  
-    };
 
- 
 
 
 $scope.calculateTimeAgo = function(alertDate) {
@@ -5857,19 +5643,6 @@ $scope.calculateTimeAgo = function(alertDate) {
 };
 
 
-// Eliminar notificación individual por posición
-$scope.deleteNotif = function(alertToDelete) {
-  const index = $scope.alerts.indexOf(alertToDelete);
-  if (index !== -1) {
-    $scope.alerts.splice(index, 1);
-  }
-};
-
-// Eliminar todas las notificaciones
-$scope.deleteAllNotif = function() {
-  if (!$scope.alerts.length) return;
-    $scope.alerts = [];
-};
 
 
   $scope.sendMessage = function(newMessage) {
@@ -6147,7 +5920,8 @@ $scope.installApp = function () {
   SharedState.getNum().then(function(data) {
 
        $scope.userData = data.data;
-       $scope.userLvl = data.lvl;
+       var userLvl = JSON.parse($scope.userData.stage)
+       $scope.userLvl = userLvl.lvl;
       $scope.userPlan = data.data.plan.split(" ")[0]
   })
  
