@@ -671,7 +671,7 @@ background: rgba(0, 0, 0, 0.3);
                 <article class="no-elevate round" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
                     <div class="row top-align">
                         <div class="max">
-                            <div class="row" ng-click="toggleProfileInfo(post.id); $event.preventDefault()">
+                            <div class="row" ng-click="toggleProfileInfo(post.header); $event.preventDefault()">
                                 <img class="circle small imgHead" ng-src="{{post.photo}}" />
                                 <div class="user-info">
                                     <div class="user-name">
@@ -681,7 +681,7 @@ background: rgba(0, 0, 0, 0.3);
                                         <label>{{calculateTimeAgo(post.date)}}</label>
                                     </div>
                                 </div>
-                                <div class="infoProf " ng-if="showProfileInfo[post.id]">
+                                <div class="infoProf " ng-if="showProfileInfo[post.header]">
                                     <i class="ri-user-line"></i> {{post.user}}<br>
                                     <small>Nivel: {{post.lvl}}</small><br>
                                     <small>Plan: {{post.progress}}</small>
@@ -703,7 +703,7 @@ background: rgba(0, 0, 0, 0.3);
                                             <i class="ri-play-fill"></i>
                                         </div>
                                         <div class="midi-info">
-                                            <h5>{{post.id || 'Composición MIDI'}}</h5>
+                                            <h5>{{post.header || 'Composición MIDI'}}</h5>
                                             <p>Haz clic para reproducir</p>
                                         </div>
                                     </div>
@@ -761,7 +761,7 @@ background: rgba(0, 0, 0, 0.3);
             <div class="midi-modal-overlay" ng-class="{'active': midiModalOpen}">
                 <div class="midi-modal-container">
                     <div class="midi-modal-header">
-                        <h4 class="midi-modal-title">{{currentMidi.id || 'Reproductor MIDI'}}
+                        <h4 class="midi-modal-title">{{currentMidi.header || 'Reproductor MIDI'}}
                             <p class="midi-modal-user">{{currentMidi.user}}</p><br>
                         </h4>
                         <button class="midi-modal-close" ng-click="closeMidiModal()">
@@ -790,7 +790,7 @@ background: rgba(0, 0, 0, 0.3);
                     <div class="row top-align">
                         <div class="max">
                             <div>
-                                <div class="row" ng-click="toggleProfileInfo(selectedPostForComments.id); $event.preventDefault()">
+                                <div class="row" ng-click="toggleProfileInfo(selectedPostForComments.header); $event.preventDefault()">
                                     <img class="circle small imgHead" ng-src="{{selectedPostForComments.photo}}" />
                                     <div class="user-info">
                                         <div class="user-name">
@@ -800,7 +800,7 @@ background: rgba(0, 0, 0, 0.3);
                                             <label>{{calculateTimeAgo(selectedPostForComments.date)}}</label>
                                         </div>
                                     </div>
-                                    <div class="infoProf " ng-if="showProfileInfo[selectedPostForComments.id]">
+                                    <div class="infoProf " ng-if="showProfileInfo[selectedPostForComments.header]">
                                         <i class="ri-user-line"></i> {{selectedPostForComments.user}}<br>
                                         <small>Nivel: {{selectedPostForComments.lvl}}</small><br>
                                         <small>Plan: {{selectedPostForComments.progress}}</small>
@@ -820,7 +820,7 @@ background: rgba(0, 0, 0, 0.3);
                                                 <i class="ri-play-fill"></i>
                                             </div>
                                             <div class="midi-info">
-                                                <h5>{{selectedPostForComments.id || 'Composición MIDI'}}</h5>
+                                                <h5>{{selectedPostForComments.header || 'Composición MIDI'}}</h5>
                                                 <p>Haz clic para reproducir</p>
                                             </div>
                                         </div>
@@ -897,32 +897,25 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
     $scope.itemsPerPage = 6;
     $scope.totalPages = 1;
 
-    $http({
-        method: 'GET',
-        url: 'https://script.google.com/macros/s/AKfycbxN34IjjTFdUaPKeyLFI5-VCzDcBznvBB96B1IbWLAlSbqjISYOTK08Z07XrC2xDuwV/exec',
+    var requestData = {
+        action: "getPosts",
+    };
+    var config = {
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            "Content-Type": "text/plain;charset=utf-8"
         }
-    }).then(function (response) {
-        let posts = response.data.posts;
-        posts.forEach(post => {
-            if (post.type === 'midi') {
-                post.midi_url = post.url;
-                post.url = 'about:blank';
-            }
-        });
-
-        $scope.data = shuffleArray(response.data.posts);
-        $scope.profileData = response.data.profiles
+    };
+    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+        .then(function (response) {
+           let posts = response.data;
+        $scope.data = shuffleArray(posts);
         $scope.filterPosts('all');
         $scope.updatePagination();
         $scope.userDataLoaded = false
-        $scope.feed = response.data.feed;
-
         $scope.data.forEach(post => {
             if (post.type === 'poll') {
-                processPollData(post);
+              var poll = JSON.parse(posts.likes)
+                processPollData(poll);
             }
         });
     });
@@ -1031,7 +1024,7 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
                 opt.animate = true;
             }
         });
-        $scope.sendVote(post.id, option.name);
+        $scope.sendVote(post.header, option.name);
     };
     $scope.currentMidi = null;
     $scope.midiModalOpen = false;
@@ -1042,8 +1035,8 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
             const player = document.getElementById('mainMidiPlayer');
             const visualizer = document.getElementById('mainMidiVisualizer');
             if (player && visualizer) {
-                player.setAttribute('src', post.midi_url);
-                visualizer.setAttribute('src', post.midi_url);
+                player.setAttribute('src', post.url);
+                visualizer.setAttribute('src', post.url);
                 if (player.player) {
                     player.player.stop();
                     player.player.loadMIDI(post.url);
@@ -1140,10 +1133,10 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
                 user: $scope.user,
                 comment: userInput
             };
-            var selectedDataItem = $scope.data.find(item => item.id === $scope.selectedPost.id);
+            var selectedDataItem = $scope.data.find(item => item.header === $scope.selectedPost.header);
             if (selectedDataItem) {
                 selectedDataItem.comments.push(newComment);
-                $scope.sendComment(post.id, userInput)
+                $scope.sendComment(post.header, userInput)
             }
         }
     };
@@ -1164,7 +1157,7 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
     $scope.dangerButtonActive = [];
     $scope.newLike = function (index, post) {
         $scope.selectedPost = post;
-        var selectedDataItem = $scope.data.find(item => item.id === post.id);
+        var selectedDataItem = $scope.data.find(item => item.header === post.header);
         if (selectedDataItem) {
             const userIndex = selectedDataItem.likes.indexOf($scope.user);
             if (userIndex === -1) {
@@ -1208,4 +1201,4 @@ app.controller('postController', ['$scope', '$http', '$interval', '$sce', '$time
         };
     };
 }]);
-</script>
+</script> 
