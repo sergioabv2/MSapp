@@ -312,7 +312,7 @@
 .progress-bar {
 
   overflow: hidden;
-  height: 12px;
+  height: 24px;
   width: 130px;
   background: #e0e0e0;
   border-radius: 4px;
@@ -320,8 +320,8 @@
 
 
 .progress-fill {
-    height: 12px;
-    background: gray; /* Green for the filled part */
+    height: 24px;
+    background: #AA336A; /* Green for the filled part */
     border-radius: 2px;
     transition: width 0.3s ease;
     display: block;
@@ -795,6 +795,32 @@
             gap: 2px;
         }
       }
+      
+      .lockLvlIco{
+  position: absolute;
+  font-size: 20px;
+  right: 15px;
+  top: 15px;
+}
+
+
+.unit-separator {
+    font-weight: bold;
+    color: #a0a0a0;
+    padding: 15px 20px 5px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    background-color: #f0f2f5; /* Un color de fondo sutil */
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-top: 10px;
+}
+
+.unit-separator:first-child {
+    margin-top: 0;
+    border-top: none;
+}
     </style>
 </head>
 <body ng-controller="PianoController" >
@@ -837,7 +863,9 @@
                    ng-click="selectLevel(level); startApp()"
                    ng-class="{'selected': selectedLevel.id === level.id}" >
         <div class="card-content">
-            <div class="level-number">{{level.id}}</div>
+          <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i> </div>
+           <div class="level-number" ng-if="level.id === 0">P</div>
+            <div class="level-number" ng-if="level.id !== 0">{{level.id}}</div>
             <div class="level-info">
                 <h2 class="level-title">{{level.title}}</h2>
                 <p class="level-description">
@@ -920,15 +948,24 @@
 
             <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
                 <div class="user-profile">
-                    <div class="user-avatar">{{selectedLevel.id}}</div>
+                   <div class="user-avatar" ng-if="selectedLevel.id === 0">P</div>
+                    <div class="user-avatar" ng-if="selectedLevel.id !== 0">{{selectedLevel.id}}</div>
+                    
                     <div class="user-info">
-                        <div class="name">Nivel {{selectedLevel.id}}: {{selectedLevel.title}}</div>
-                        <div class="plan">Unidad {{currentLessonIndex + 1}}</div>
+                        <div class="name">{{selectedLevel.title}}</div>
+                        <div class="plan">Unidad  {{lessons[currentLessonIndex].unit || ''}}</div>
                     </div>
                 </div>
                 <div class="progress-bar"><div class="progress-fill" style="width: {{progress}}%;"></div></div>
                 <div class="lessons-container">
-                    <div class="lesson-item" ng-repeat="lesson in lessons" data-lesson-index="{{$index}}">
+
+                    <div class="unit-separator" 
+                         ng-repeat-start="lesson in lessons" 
+                         ng-if="$index === 0 || lessons[$index - 1].unit !== lesson.unit">
+                        Unidad {{lesson.unit}}
+                    </div>
+                                 
+                      <div class="lesson-item" ng-repeat-end data-lesson-index="{{$index}}">
                         <div class="lesson-header" 
                              ng-class="{
                                 'completed': lesson.completed, 
@@ -936,7 +973,7 @@
                                 'locked': $index > 0 && !lessons[$index - 1].completed
                              }"
                              ng-click="toggleLesson(lesson)">
-                            <i class="icon" ng-class="{'ri-lock-line': $index > 0 && !lessons[$index - 1].completed, 'ri-lock-unlock-line': !($index > 0 && !lessons[$index - 1].completed)}"></i>
+                            <i class="icon" ng-class="{'ri-lock-fill': $index > 0 && !lessons[$index - 1].completed}"></i>
                             <span>{{lesson.title}}</span>
                         </div>
                         <ul class="tasks-list" ng-class="{'expanded': lesson.expanded}">
@@ -985,22 +1022,194 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     $scope.currentView = 'levelSelector';
 $scope.levels = [
     { 
-        id: 1, 
-        title: 'Nivel 1', 
+        id: 0, 
+        title: 'Nivel Preparatorio', 
         description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
         duration: '~2 horas',
         // Aquí anidamos las lecciones correspondientes a este nivel
         lessons: [
             {
                 title: "Lección 1: Fundamentos",
+                unit: 1,
                 tasks: [
                     { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
                     { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
                 ]
             },
+             {
+                title: "Lección 2: GrandStaff",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
             {
-                title: "Lección 2: Primeras Notas",
+                title: "Lección 3: Dirección",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 4: Intervalos",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 5: Frases",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 6: Acordes",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+             {
+                title: "Lección 7: Corcheas",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+             {
+                title: "Lección 8: C Position",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 9: G Position",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 10: Tie",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+        ]
+    },
+    { 
+        id: 1, 
+        title: 'Nivel 1', 
+        description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
+        duration: '~4 horas',
+        lessons: [
+             {
+                title: "Lección 1: Escalas Mayores",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
+                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
+                ]
+            },
+             {
+                title: "Lección 2: Tonalidad de G",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 3: Pentaescalas",
+                unit: 1,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 4: Cambio de Posición",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 5: Intervalos de 6ta",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 6: Tonalidad de F",
+                unit: 2,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+             {
+                title: "Lección 7: Grupo 1",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+             {
+                title: "Lección 8: Más Notación",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 9: Síncopas",
+                unit: 3,
+                tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                ]
+            },
+            {
+                title: "Lección 10: Pieza Final",
+                unit: "Final",
                 tasks: [
                     { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
                     { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
@@ -1048,16 +1257,6 @@ $scope.levels = [
             // Aquí irían las lecciones del Nivel 3
             { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
         ]
-    },
-     { 
-        id: 6, 
-        title: 'Nivel 6', 
-        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
-        duration: '~8 horas',
-        lessons: [
-            // Aquí irían las lecciones del Nivel 3
-            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
-        ]
     }
 ];
 
@@ -1069,6 +1268,7 @@ $scope.lessons = [];
 
 
     // Variables de estado del curso
+    $scope.currentLevelIndex = 0;
     $scope.currentLessonIndex = 0;
     $scope.currentTaskIndex = 0;
     $scope.viewingLessonIndex = 0;
@@ -1317,29 +1517,44 @@ $scope.lessons = [];
         }
     }
     
-    function openRecordingReviewModal(audioBlob) {
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const content = `
-            <h3>Revisa tu Grabación</h3>
-            <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
-            <audio id="audio-playback" src="${audioUrl}" controls></audio>
-            <div class="modal-buttons">
-                <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
-                <button id="completeRecording" class="modal-button">Completar Tarea</button>
-            </div>`;
-        $scope.modal.content = $sce.trustAsHtml(content);
-        $scope.modal.show = true;
-        $timeout(() => {
-            document.getElementById('deleteRecording').onclick = () => $scope.$apply(closeModal);
-            document.getElementById('completeRecording').onclick = () => {
-                $scope.$apply(() => {
-                    closeModal();
-                    completeCurrentTask();
-                });
-            };
-        });
-    }
+  // VERSIÓN CORREGIDA Y ROBUSTA
+function openRecordingReviewModal(audioBlob) {
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const content = `
+        <h3>Revisa tu Grabación</h3>
+        <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
+        <audio id="audio-playback" src="${audioUrl}" controls></audio>
+        <div class="modal-buttons">
+            <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
+            <button id="completeRecording" class="modal-button">Completar Tarea</button>
+        </div>`;
+    
+    $scope.modal.content = $sce.trustAsHtml(content);
+    $scope.modal.show = true;
 
+    // Apenas se muestre el modal, asignamos el listener al CONTENEDOR.
+    $timeout(() => {
+        const modalContent = document.getElementById('modalContent');
+        
+        if (modalContent) {
+            modalContent.onclick = function(event) {
+                // Verificamos el ID del elemento que recibió el clic
+                const targetId = event.target.id;
+
+                if (targetId === 'deleteRecording') {
+                    $scope.$apply(closeModal);
+                } 
+                
+                else if (targetId === 'completeRecording') {
+                    $scope.$apply(() => {
+                        closeModal();
+                        completeCurrentTask();
+                    });
+                }
+            };
+        }
+    }, 0); // Un timeout de 0 es suficiente para esperar a que el DOM se actualice.
+}
     function closeModal() {
         $scope.modal.show = false;
         $scope.modal.content = '';
