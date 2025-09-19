@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actualizar a Premium</title>
+    <title>Elige tu Plan de Piano</title>
     <style>
         * {
             margin: 0;
@@ -120,20 +120,6 @@
             color: #000;
         }
 
-        .best-offer {
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #00ba7c;
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
         .pricing-cards {
             display: flex;
             gap: 16px;
@@ -153,6 +139,8 @@
             border: 2px solid transparent;
             transition: all 0.2s;
             cursor: pointer; /* Added pointer cursor */
+            display: flex;
+            flex-direction: column;
         }
 
         .card.premium {
@@ -180,28 +168,15 @@
             color: #5b7083;
             font-size: 15px;
         }
-
-        .savings {
-            color: #00ba7c;
-            font-size: 13px;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-
-        .annual-price {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #eee;
-        }
-
-        .annual-price .price {
-            font-size: 24px;
-        }
-
-        .annual-label {
+        
+        /* NUEVO: Estilo para el desglose de precios */
+        .price-breakdown {
+            font-size: 14px;
             color: #5b7083;
-            font-size: 13px;
+            margin-top: -4px; /* Ajusta el espacio */
+            min-height: 20px; /* Asegura que el espacio se mantenga */
         }
+
 
         .features {
             list-style: none;
@@ -282,7 +257,6 @@
             position: relative; /* Añadido para posicionar el botón de cierre */
         }
 
-        /* NUEVO: Estilo para el botón de cierre del CTA */
         .close-cta-btn {
             position: absolute;
             top: -10px;
@@ -425,7 +399,6 @@
                 margin: 0;
             }
             
-            /* NUEVO: Ajuste del botón de cierre para móviles */
             .close-cta-btn {
                 top: -8px;
                 right: 0px;
@@ -439,77 +412,72 @@
             <button class="close-btn" onclick="closeModal()">×</button>
             
             <div class="header">
-                <h1 class="title">Actualizar a Premium</h1>
+                <h1 class="title">Elige tu Plan de Piano</h1>
                 <p class="subtitle">
-                    Disfruta de una experiencia mejorada, herramientas exclusivas para creadores, verificación y seguridad de primer nivel.<br>
-                    (Las organizaciones deben <a href="#">registrarse aquí</a>)
+                    Comienza tu viaje musical. Elige el plan que mejor se adapte a tu ritmo y al de tu familia para desbloquear todo tu potencial.
                 </p>
             </div>
 
             <div class="billing-toggle">
-                <button class="toggle-btn" onclick="switchBilling('annual')">Anual</button>
-                <button class="toggle-btn active" onclick="switchBilling('monthly')">
-                    Mensual
-                    <span class="best-offer">Mejor oferta</span>
-                </button>
+                <button class="toggle-btn active" onclick="switchBilling('individual')">Individual</button>
+                <button class="toggle-btn" onclick="switchBilling('pareja')">Pareja</button>
+                <button class="toggle-btn" onclick="switchBilling('familia')">Familia (4)</button>
             </div>
 
             <div class="pricing-cards">
-                <div class="card" onclick="selectPlan('basic')">
+                <div class="card premium" onclick="selectPlan('plan1')">
                     <div class="radio-container">
-                        <h3 class="plan-name">Básico</h3>
-                        <div class="radio-input"></div>
-                    </div>
-                    <div class="card-header">
-                        <div class="price monthly-price">33,50 MXN <span class="price-period">/ mes</span></div>
-                        <div class="price annual-price-display" style="display: none;">350,00 MXN <span class="price-period">/ año</span></div>
-                        <div class="savings">AHORRA UN 16%</div>
-                    </div>
-                   <ul class="features">
-                        <li class="feature">Aplicación de boost a respuesta corta</li>
-                        <li class="feature">Carpetas de Elementos guardados</li>
-                        <li class="feature">Pestañas Destacadas</li>
-                    </ul>
-                </div>
-
-                <div class="card premium" onclick="selectPlan('premium')">
-                    <div class="radio-container">
-                        <h3 class="plan-name">Premium</h3>
+                        <h3 class="plan-name">Plan 1</h3>
                         <div class="radio-input checked"></div>
                     </div>
                     <div class="card-header">
-                        <div class="price monthly-price">89,00 MXN <span class="price-period">/ mes</span></div>
-                        <div class="price annual-price-display" style="display: none;">1.068,00 MXN <span class="price-period">/ año</span></div>
-                        <div class="savings">AHORRA UN 16%</div>
+                        <div class="price price-individual">650,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price price-pareja" style="display: none;">1.170,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price price-familia" style="display: none;">2.080,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price-breakdown breakdown-pareja" style="display: none;">$585 por persona</div>
+                        <div class="price-breakdown breakdown-familia" style="display: none;">$520 por persona</div>
                     </div>
-                    <div style="margin-bottom: 16px;">
-                        <div style="font-size: 15px; margin-bottom: 12px;">Todas las funciones del plan Básico y</div>
-                    </div>
-                    <ul class="features">
-                        <li class="feature">Mitad de anuncios en Para ti y Siguiendo</li>
-                        <li class="feature">Respuestas prioritarias</li>
-                        <li class="feature">Bookmarks organizados</li>
-                        <li class="feature">Editar posts</li>
+                   <ul class="features">
+                        <li class="feature">4 clases al mes</li>
+                        <li class="feature">1 clase por semana</li>
                     </ul>
                 </div>
 
-                <div class="card" onclick="selectPlan('premium-plus')">
+                <div class="card" onclick="selectPlan('plan2')">
                     <div class="radio-container">
-                        <h3 class="plan-name">Premium+</h3>
+                        <h3 class="plan-name">Plan 2</h3>
                         <div class="radio-input"></div>
                     </div>
                     <div class="card-header">
-                        <div class="price monthly-price">665,83 MXN <span class="price-period">/ mes</span></div>
-                        <div class="price annual-price-display" style="display: none;">7.990,00 MXN <span class="price-period">/ año</span></div>
-                        <div class="savings">AHORRA UN 17%</div>
-                    </div>
-                    <div style="margin-bottom: 16px;">
-                        <div style="font-size: 15px; margin-bottom: 12px;">Todas las funciones del plan Premium y</div>
+                        <div class="price price-individual">1.200,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price price-pareja" style="display: none;">2.160,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price price-familia" style="display: none;">3.840,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price-breakdown breakdown-individual">$150 por clase</div>
+                        <div class="price-breakdown breakdown-pareja" style="display: none;">$1080 por persona</div>
+                        <div class="price-breakdown breakdown-familia" style="display: none;">$960 por persona</div>
                     </div>
                     <ul class="features">
-                        <li class="feature">Totalmente sin anuncios</li>
-                        <li class="feature">Aplicación de boost a respuesta larga</li>
-                        <li class="feature">Análisis de contenido avanzados</li>
+                        <li class="feature">8 clases al mes</li>
+                        <li class="feature">Material didáctico incluido</li>
+                        <li class="feature">Acceso a recitales</li>
+                    </ul>
+                </div>
+
+                <div class="card" id="intensivo-card" onclick="selectPlan('intensivo')">
+                    <div class="radio-container">
+                        <h3 class="plan-name">Intensivo</h3>
+                        <div class="radio-input"></div>
+                    </div>
+                    <div class="card-header">
+                        <div class="price price-individual">2.200,00 MXN <span class="price-period">/ mes</span></div>
+                        <div class="price price-pareja" style="display: none;"></div>
+                        <div class="price price-familia" style="display: none;"></div>
+                        <div class="price-breakdown breakdown-individual">$137.5 por clase</div>
+                    </div>
+                    <ul class="features">
+                        <li class="feature">16 clases al mes</li>
+                        <li class="feature">Horarios flexibles</li>
+                        <li class="feature">Clase magistral trimestral</li>
                     </ul>
                 </div>
             </div>
@@ -518,15 +486,15 @@
                 <div class="cta-content">
                     <button class="close-cta-btn" onclick="closeCta()">×</button>
                     <div class="selected-price-container">
-                        <div class="selected-plan-name">Premium</div>
-                        <div class="selected-price" id="selected-price-amount">89,00 MXN</div>
+                        <div class="selected-plan-name">Plan 1</div>
+                        <div class="selected-price" id="selected-price-amount">650,00 MXN</div>
                         <div class="selected-price-period" id="selected-price-period">/ mes</div>
                     </div>
                     <div class="cta-right-box">
                         <button class="subscribe-btn" onclick="subscribe()">Suscribirse y pagar</button>
                         <div class="terms">
-                            Si te suscribes, aceptas los <a href="#">Términos de servicio del comprador</a>. Las suscripciones se renuevan automáticamente hasta que se cancelan. 
-                            <a href="#">Cancelar en cualquier momento</a>, al menos 24 horas antes de la renovación para evitar cargos adicionales. Administra tu suscripción a través de la plataforma en la que te suscribiste.
+                            Si te suscribes, aceptas los <a href="#">Términos de servicio</a>. Las suscripciones se renuevan automáticamente hasta que se cancelan. 
+                            <a href="#">Cancela en cualquier momento</a>.
                         </div>
                     </div>
                 </div>
@@ -540,30 +508,30 @@
 
     <script>
         const pricingData = {
-            'basic': {
-                name: 'Básico',
-                monthly: { amount: '33,50 MXN', period: '/ mes' },
-                annual: { amount: '350,00 MXN', period: '/ año' }
+            'plan1': {
+                name: 'Plan 1',
+                individual: { amount: '650,00 MXN', period: '/ mes' },
+                pareja: { amount: '1.170,00 MXN', period: '/ mes' },
+                familia: { amount: '2.080,00 MXN', period: '/ mes' }
             },
-            'premium': {
-                name: 'Premium',
-                monthly: { amount: '89,00 MXN', period: '/ mes' },
-                annual: { amount: '1.068,00 MXN', period: '/ año' }
+            'plan2': {
+                name: 'Plan 2',
+                individual: { amount: '1.200,00 MXN', period: '/ mes' },
+                pareja: { amount: '2.160,00 MXN', period: '/ mes' },
+                familia: { amount: '3.840,00 MXN', period: '/ mes' }
             },
-            'premium-plus': {
-                name: 'Premium+',
-                monthly: { amount: '665,83 MXN', period: '/ mes' },
-                annual: { amount: '7.990,00 MXN', period: '/ año' }
+            'intensivo': {
+                name: 'Intensivo',
+                individual: { amount: '2.200,00 MXN', period: '/ mes' }
             }
         };
 
-        let selectedPlan = 'premium';
-        let billingType = 'monthly';
+        let selectedPlan = 'plan1';
+        let billingType = 'individual';
 
         document.addEventListener('DOMContentLoaded', () => {
-            selectPlan('premium');
-            switchBilling('monthly');
-            // MODIFICACIÓN: Asegurarse de que el CTA esté oculto al inicio
+            selectPlan('plan1');
+            switchBilling('individual');
             document.querySelector('.cta-section').style.display = 'none';
         });
 
@@ -577,7 +545,6 @@
             document.querySelector('.reopen-button-container').style.display = 'block';
         }
 
-        // NUEVA FUNCIÓN para cerrar el CTA
         function closeCta() {
             document.querySelector('.cta-section').style.display = 'none';
         }
@@ -596,20 +563,19 @@
             const cards = document.querySelectorAll('.card');
             const radioInputs = document.querySelectorAll('.radio-input');
             
-            if (plan === 'basic') {
+            if (plan === 'plan1') {
                 radioInputs[0].classList.add('checked');
                 cards[0].classList.add('premium');
-            } else if (plan === 'premium') {
+            } else if (plan === 'plan2') {
                 radioInputs[1].classList.add('checked');
                 cards[1].classList.add('premium');
-            } else if (plan === 'premium-plus') {
+            } else if (plan === 'intensivo') {
                 radioInputs[2].classList.add('checked');
                 cards[2].classList.add('premium');
             }
             
             updateCtaPrice();
             
-            // MODIFICACIÓN: Mostrar el CTA cuando se selecciona un plan
             document.querySelector('.cta-section').style.display = 'flex';
         }
 
@@ -619,39 +585,66 @@
             document.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
+
+            const pricesIndividual = document.querySelectorAll('.price-individual');
+            const pricesPareja = document.querySelectorAll('.price-pareja');
+            const pricesFamilia = document.querySelectorAll('.price-familia');
             
-            const monthlyPrices = document.querySelectorAll('.monthly-price');
-            const annualPrices = document.querySelectorAll('.annual-price-display');
+            const breakdownIndividual = document.querySelectorAll('.breakdown-individual');
+            const breakdownPareja = document.querySelectorAll('.breakdown-pareja');
+            const breakdownFamilia = document.querySelectorAll('.breakdown-familia');
+            
+            const intensivoCard = document.getElementById('intensivo-card');
 
-            const bestOfferSpan = document.querySelector('.best-offer');
-
-            if (type === 'annual') {
+            // Ocultar todos los desgloses primero
+            [...breakdownIndividual, ...breakdownPareja, ...breakdownFamilia].forEach(el => el.style.display = 'none');
+            
+            if (type === 'individual') {
                 document.querySelectorAll('.toggle-btn')[0].classList.add('active');
-                bestOfferSpan.style.display = 'none';
+                pricesIndividual.forEach(price => price.style.display = 'block');
+                pricesPareja.forEach(price => price.style.display = 'none');
+                pricesFamilia.forEach(price => price.style.display = 'none');
+                breakdownIndividual.forEach(el => el.style.display = 'block');
+                intensivoCard.style.display = 'flex';
+            } else { // pareja o familia
+                intensivoCard.style.display = 'none';
+                if (selectedPlan === 'intensivo') {
+                    selectPlan('plan2'); // Selecciona un plan válido por defecto
+                }
                 
-                monthlyPrices.forEach(price => price.style.display = 'none');
-                annualPrices.forEach(price => price.style.display = 'inline');
-
-            } else { // monthly
-                document.querySelectorAll('.toggle-btn')[1].classList.add('active');
-                bestOfferSpan.style.display = 'inline-block';
-                
-                monthlyPrices.forEach(price => price.style.display = 'inline');
-                annualPrices.forEach(price => price.style.display = 'none');
+                if (type === 'pareja') {
+                    document.querySelectorAll('.toggle-btn')[1].classList.add('active');
+                    pricesIndividual.forEach(price => price.style.display = 'none');
+                    pricesPareja.forEach(price => price.style.display = 'block');
+                    pricesFamilia.forEach(price => price.style.display = 'none');
+                    breakdownPareja.forEach(el => el.style.display = 'block');
+                } else { // familia
+                    document.querySelectorAll('.toggle-btn')[2].classList.add('active');
+                    pricesIndividual.forEach(price => price.style.display = 'none');
+                    pricesPareja.forEach(price => price.style.display = 'none');
+                    pricesFamilia.forEach(price => price.style.display = 'block');
+                    breakdownFamilia.forEach(el => el.style.display = 'block');
+                }
             }
 
             updateCtaPrice();
         }
 
         function updateCtaPrice() {
-            const priceData = pricingData[selectedPlan][billingType];
+            if (!pricingData[selectedPlan] || !pricingData[selectedPlan][billingType]) {
+                console.error('Combinación de plan y facturación no válida.');
+                return;
+            }
+            const planInfo = pricingData[selectedPlan];
+            const priceData = planInfo[billingType];
             document.getElementById('selected-price-amount').textContent = priceData.amount;
             document.getElementById('selected-price-period').textContent = priceData.period;
-            document.querySelector('.selected-plan-name').textContent = pricingData[selectedPlan].name;
+            document.querySelector('.selected-plan-name').textContent = planInfo.name;
         }
 
         function subscribe() {
-            alert(`¡Gracias por suscribirte al plan ${selectedPlan} con facturación ${billingType}!`);
+            const planName = pricingData[selectedPlan].name;
+            alert(`¡Gracias por suscribirte al ${planName} en la modalidad ${billingType}!`);
         }
     </script>
 </body>
