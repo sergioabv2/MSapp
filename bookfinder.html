@@ -1,659 +1,630 @@
-
-
-<html lang="es" ng-app="partiturasApp">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicScore - Buscador de Partituras (Lista)</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    
+    <title>Piano Sheets Finder</title>
     <style>
-      /* --- FUENTES Y VARIABLES GLOBALES --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-:root {
-    --color-primary: #3498db;
-    --color-primary-dark: #2980b9;
-    --color-dark: #2c3e50;
-    --color-text: #34495e;
-    --color-text-light: #7f8c8d;
-    --color-background: #f8f9fa;
-    --color-white: #ffffff;
-    --color-border: #e9ecef;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.07);
-    --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
-    --border-radius: 6px;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
 
-body {
-    background-color: var(--color-background);
-    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: var(--color-text);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+        .search-section {
+            padding: 2rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
 
-/* --- SECCIÓN DE BÚSQUEDA --- */
-.search-container {
-    background-color: var(--color-dark);
-    color: var(--color-white);
-    padding: 40px 0;
-    margin-bottom: 40px;
-}
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
 
-.search-box h2 {
-    font-weight: 700;
-    margin-bottom: 20px;
-}
+        .search-title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #2c2c2c;
+            margin-bottom: 0.5rem;
+        }
 
-.search-box .form-control {
-    box-shadow: none;
-    border-color: #4a627a;
-}
-.search-box .form-control:focus {
-    border-color: var(--color-primary);
-}
+        .search-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
 
-/* --- BARRA DE FILTROS TIPO "CHIP" --- */
-.filters-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-bottom: 25px;
-    margin-bottom: 25px;
-    border-bottom: 1px solid var(--color-border);
-}
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
 
-.filter-chip .chip-select {
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 18px;
-    border: 1px solid var(--color-border);
-    appearance: none;
-    background-color: var(--color-white);
-    color: var(--color-text-light);
-    font-weight: 500;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-}
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            font-size: 0.95rem;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
 
-.filter-chip .chip-select:focus,
-/* Este selector [ng-model] es inusual, pero lo mantenemos por compatibilidad.
-   Una mejor práctica sería usar ng-class para aplicar una clase 'active' */
-.chip-select[ng-model="true"] {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-white);
-    box-shadow: none;
-}
-.filter-chip .chip-select:hover:not(:focus) {
-    border-color: #bdc3c7;
-}
+        .search-input:focus {
+            border-color: #6c757d;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
 
+        .search-btn {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            background-color: #2c2c2c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.625rem 1.25rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+        }
 
-/* --- TARJETA DE RESULTADO (.partitura-item) --- */
-.partitura-item {
-    background: var(--color-white);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 20px;
-    transition: all 0.2s ease-out;
-    display: flex;
-    padding: 20px;
-    gap: 20px;
-}
+        .search-btn:hover {
+            background-color: #495057;
+        }
 
-.partitura-item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-4px);
-    border-color: #dcdfe2;
-}
+        .filters-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
 
-.partitura-img {
-    width: 110px;
-    height: 150px;
-    flex-shrink: 0;
-    border-radius: 4px;
-    overflow: hidden;
-}
+        .filter-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
 
-.partitura-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        .filter-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+            min-width: 70px;
+        }
 
-.partitura-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
+        .filter-chip {
+            padding: 0.4rem 0.875rem;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
 
-.partitura-title {
-    font-weight: 700;
-    font-size: 20px;
-    color: var(--color-dark);
-    margin: 0 0 2px 0;
-}
+        .filter-chip:hover, .filter-chip.active {
+            background-color: #2c2c2c;
+            color: white;
+            border-color: #2c2c2c;
+        }
 
-.partitura-author {
-    color: var(--color-text-light);
-    font-size: 15px;
-    margin-bottom: 15px;
-}
+        .main-content {
+            padding: 2rem 0;
+        }
 
-.partitura-description {
-    color: #555;
-    margin-bottom: 15px;
-    flex-grow: 1;
-    font-size: 14px;
-    line-height: 1.5;
-}
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
 
-.partitura-stats {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 13px;
-    color: var(--color-text-light);
-}
-.partitura-stats .fa{
-    margin-right: 5px;
-}
+        .results-count {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
 
-.partitura-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
-    min-width: 110px;
-}
+        .sort-select {
+            padding: 0.5rem 0.875rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
 
-.partitura-price {
-    background-color: var(--color-dark);
-    color: var(--color-white);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 16px;
-    text-align: center;
-}
+        .sheet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-.partitura-button {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease-out;
-    font-weight: 500;
-    width: 100%;
-    text-align: center;
-}
+        .sheet-item {
+            display: flex;
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-.partitura-button:hover {
-    background-color: var(--color-primary-dark);
-    transform: scale(1.05);
-}
-.partitura-button .fa {
-    margin-right: 5px;
-}
+        .sheet-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
 
-/* --- PANEL DE SUBIDA --- */
-.upload-manager {
-    background: var(--color-white);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-sm);
-}
-.upload-manager h4 {
-    font-weight: 700;
-    color: var(--color-dark);
-    margin-bottom: 15px;
-}
+        .sheet-thumbnail {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-right: 1px solid #f1f3f4;
+        }
 
-.upload-area {
-    border: 2px dashed var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 30px;
-    text-align: center;
-    margin: 15px 0;
-    cursor: pointer;
-    transition: all 0.3s;
-    color: var(--color-text-light);
-}
-.upload-area:hover {
-    border-color: var(--color-primary);
-    background: #f1f8fe;
-    color: var(--color-primary);
-}
-.upload-area .fa {
-    margin-bottom: 10px;
-}
+        .sheet-icon {
+            font-size: 2.5rem;
+            color: #adb5bd;
+        }
 
-/* --- ESTADOS DE CARGA Y SIN RESULTADOS --- */
-.loading-spinner, .no-results {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--color-text-light);
-    background: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    margin-top: 20px;
-}
-.no-results h3 {
-    color: var(--color-dark);
-    font-weight: 700;
-}
+        .sheet-content {
+            flex: 1;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-/* --- MEDIA QUERIES --- */
-@media(max-width: 600px){
-  .nomobile{
-    display: none !important;
-  }
-}
-      
+        .sheet-main-info {
+            margin-bottom: 0.75rem;
+        }
+
+        .sheet-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #2c2c2c;
+        }
+
+        .sheet-composer {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sheet-description {
+            color: #6c757d;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .sheet-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        .sheet-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sheet-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .sheet-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #ffc107;
+        }
+
+        .sheet-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1.25rem;
+            border-left: 1px solid #f1f3f4;
+            min-width: 120px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .price-tag {
+            background-color: #495057;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-tag.free {
+            background-color: #28a745;
+        }
+
+        .download-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.625rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .download-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .page-btn {
+            padding: 0.625rem 0.875rem;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background-color: #2c2c2c;
+            color: white;
+            border-color: #2c2c2c;
+        }
+
+        @media (max-width: 768px) {
+            .sheet-item {
+                flex-direction: column;
+            }
+
+            .sheet-thumbnail {
+                width: 100%;
+                height: 100px;
+            }
+
+            .sheet-actions {
+                flex-direction: row;
+                border-left: none;
+                border-top: 1px solid #f1f3f4;
+                min-width: auto;
+                padding: 1rem 1.25rem;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-label {
+                min-width: auto;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
-  
-    
-    <!-- Search Section (se mantiene igual) -->
-    <div class="search-container">
+    <section class="search-section">
         <div class="container">
-            <div class="search-box">
-                <h2>Encuentra las partituras que necesitas</h2>
-                <div class="input-group">
-                    <input type="text" class="form-control input-lg" placeholder="Buscar partituras..." ng-model="searchQuery" ng-keyup="$event.keyCode === 13 && search()">
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary btn-lg" type="button" ng-click="search()">
-                            <i class="fa fa-search"></i> Buscar
-                        </button>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="container" ng-controller="PartiturasController">
-
-
-      <div class="filters-bar">
-    <div class="filter-chip" ng-repeat="instrument in instruments">
-        <select class="form-control chip-select" ng-model="selectedInstruments[instrument]">
-            <option value="">{{instrument}}</option>
-            <option value="true">✓ {{instrument}}</option>
-        </select>
-    </div>
-    
-    <div class="filter-chip" ng-repeat="level in difficultyLevels">
-        <select class="form-control chip-select" ng-model="selectedLevels[level]">
-            <option value="">{{level}}</option>
-            <option value="true">✓ {{level}}</option>
-        </select>
-    </div>
-</div>
-
-
-        <div class="row">
-
-          <div class="col-md-3 upload-manager">
-    <div class="upload-box">
-        <h4><i class="fa fa-upload"></i> Subir nueva partitura</h4>
-        <div class="upload-area" ngf-drop ngf-select ng-model="files">
-            <i class="fa fa-cloud-upload fa-3x"></i>
-            <p>Arrastra archivos aquí o haz clic</p>
-        </div>
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Título" ng-model="newScore.title">
-        </div>
-        <button class="btn btn-primary btn-block" ng-click="upload()">
-            <i class="fa fa-upload"></i> Subir
-        </button>
-    </div>
-</div>
+            <h1 class="search-title">Partituras de Piano</h1>
+            <p class="search-subtitle">Descubre obras clásicas y contemporáneas para piano</p>
             
-            <!-- Results - AHORA EN FORMATO DE LISTA -->
-            <div class="col-md-9">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="pull-left">
-                            <strong>{{filteredPartituras.length}}</strong> resultados encontrados
-                        </div>
-                        <div class="pull-right">
-                            Ordenar por: 
-                            <select class="form-control input-sm" ng-model="sortOption" ng-change="applyFilters()">
-                                <option value="-views">Más populares</option>
-                                <option value="-date">Más recientes</option>
-                                <option value="title">A-Z</option>
-                            </select>
-                        </div>
-                    </div>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Buscar por título o compositor..." id="searchInput">
+                <button class="search-btn" onclick="performSearch()">Buscar</button>
+            </div>
+            
+            <div class="filters-section">
+                <div class="filter-group">
+                    <span class="filter-label">Dificultad:</span>
+                    <button class="filter-chip active" data-filter="all">Todas</button>
+                    <button class="filter-chip" data-filter="principiante">Principiante</button>
+                    <button class="filter-chip" data-filter="intermedio">Intermedio</button>
+                    <button class="filter-chip" data-filter="avanzado">Avanzado</button>
                 </div>
                 
-                <hr>
-                
-                <!-- Loading Spinner -->
-                <div class="loading-spinner" ng-show="loading">
-                    <i class="fa fa-spinner fa-spin fa-3x"></i>
-                    <p>Cargando partituras...</p>
-                </div>
-                
-                <!-- No Results -->
-                <div class="no-results" ng-show="!loading && filteredPartituras.length === 0">
-                    <i class="fa fa-search fa-4x" style="margin-bottom: 20px;"></i>
-                    <h3>No se encontraron partituras</h3>
-                    <p>Intenta con otros términos de búsqueda o ajusta los filtros</p>
-                </div>
-                
-                <!-- LISTA DE PARTITURAS (MODIFICADO) -->
-                <div ng-show="!loading && filteredPartituras.length > 0">
-                    <div class="partitura-item" ng-repeat="partitura in filteredPartituras | limitTo: itemsPerPage : (currentPage - 1) * itemsPerPage">
-                        <div class="partitura-img">
-                            <img ng-src="{{partitura.image}}" alt="{{partitura.title}}">
-                        </div>
-                        <div class="partitura-content">
-                            <div class="partitura-header">
-                                <div>
-                                    <h3 class="partitura-title">{{partitura.title}}</h3>
-                                    <div class="partitura-author">{{partitura.author}}</div>
-                                </div>
-                            
-                            </div>
-                            <div class="partitura-description">
-                                Partitura para {{partitura.instrument}} - Nivel {{partitura.level}}. {{partitura.type}}.
-                            </div>
-                            <div class="partitura-stats">
-                                <span class="partitura-stat"><i class="fa fa-file-text"></i> {{partitura.pages || '12'}} páginas</span>
-                                <span class="partitura-stat"><i class="fa fa-calendar"></i> {{partitura.date | date:'mediumDate'}}</span>
-                                 <span class="partitura-stat"><i class="fa fa-star"></i> {{partitura.rating}}</span>
-                            </div>
-                        </div>
-                        <div class="partitura-actions">
-                            <div class="partitura-price" ng-if="partitura.price">
-                                {{partitura.price | currency}}
-                            </div>
-                            <div class="partitura-price" ng-if="!partitura.price">
-                                GRATIS
-                            </div>
-                            <button class="partitura-button">
-                                <i class="fa fa-download nomobile"></i> Descargar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Pagination (se mantiene igual) -->
-                <div class="row" ng-show="filteredPartituras.length > itemsPerPage">
-                    <div class="col-xs-12 pagination-container">
-                        <ul class="pagination">
-                            <li ng-class="{disabled: currentPage == 1}">
-                                <a href="#" ng-click="setPage(currentPage - 1)">&laquo;</a>
-                            </li>
-                            <li ng-repeat="n in range(1, totalPages)" ng-class="{active: n == currentPage}">
-                                <a href="#" ng-click="setPage(n)">{{n}}</a>
-                            </li>
-                            <li ng-class="{disabled: currentPage == totalPages}">
-                                <a href="#" ng-click="setPage(currentPage + 1)">&raquo;</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="filter-group">
+                    <span class="filter-label">Estilo:</span>
+                    <button class="filter-chip active" data-style="all">Todos</button>
+                    <button class="filter-chip" data-style="clasico">Clásico</button>
+                    <button class="filter-chip" data-style="barroco">Barroco</button>
+                    <button class="filter-chip" data-style="romantico">Romántico</button>
+                    <button class="filter-chip" data-style="jazz">Jazz</button>
+                    <button class="filter-chip" data-style="moderno">Moderno</button>
                 </div>
             </div>
         </div>
-    </div>
-    
-  
-    
-    <!-- jQuery, Bootstrap JS and AngularJS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    
+    </section>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="results-header">
+                <span class="results-count">Mostrando 1-8 de 1,247 partituras</span>
+                <select class="sort-select">
+                    <option>Más relevantes</option>
+                    <option>Más recientes</option>
+                    <option>Mejor valoradas</option>
+                    <option>Dificultad ascendente</option>
+                    <option>A-Z</option>
+                </select>
+            </div>
+
+            <div class="sheet-list" id="sheetList">
+                <!-- Las partituras se generarán dinámicamente -->
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn">‹ Anterior</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">Siguiente ›</button>
+            </div>
+        </div>
+    </main>
+
     <script>
-        var app = angular.module('partiturasApp', []);
-        
-        app.controller('PartiturasController', function($scope, $timeout) {
-            // Datos de ejemplo (ampliados)
-            $scope.partituras = [
-                {
-                    id: 1,
-                    title: "Moonlight Sonata - Beethoven",
-                    author: "Ludwig van Beethoven",
-                    instrument: "Piano",
-                    level: "Avanzado",
-                    type: "Partitura completa",
-                    views: 12543,
-                    downloads: 4321,
-                    rating: 4.8,
-                    date: new Date(2023, 0, 15),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 4.99,
-                    pages: 15
-                },
-                {
-                    id: 2,
-                    title: "Canon in D - Pachelbel",
-                    author: "Johann Pachelbel",
-                    instrument: "Violín",
-                    level: "Intermedio",
-                    type: "Partitura completa",
-                    views: 9876,
-                    downloads: 3210,
-                    rating: 4.5,
-                    date: new Date(2023, 1, 20),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 3.50,
-                    pages: 8
-                },
-                {
-                    id: 3,
-                    title: "Für Elise - Beethoven",
-                    author: "Ludwig van Beethoven",
-                    instrument: "Piano",
-                    level: "Principiante",
-                    type: "Partitura simplificada",
-                    views: 18765,
-                    downloads: 7654,
-                    rating: 4.7,
-                    date: new Date(2023, 2, 5),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 0,
-                    pages: 4
-                },
-                {
-                    id: 4,
-                    title: "The Four Seasons - Vivaldi",
-                    author: "Antonio Vivaldi",
-                    instrument: "Violín",
-                    level: "Avanzado",
-                    type: "Partitura completa",
-                    views: 8765,
-                    downloads: 2345,
-                    rating: 4.9,
-                    date: new Date(2023, 1, 15),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 7.99,
-                    pages: 32
-                },
-                {
-                    id: 5,
-                    title: "Clair de Lune - Debussy",
-                    author: "Claude Debussy",
-                    instrument: "Piano",
-                    level: "Intermedio",
-                    type: "Partitura completa",
-                    views: 11234,
-                    downloads: 4567,
-                    rating: 4.6,
-                    date: new Date(2023, 0, 30),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 5.50,
-                    pages: 12
-                },
-                {
-                    id: 6,
-                    title: "Symphony No. 5 - Beethoven",
-                    author: "Ludwig van Beethoven",
-                    instrument: "Orquesta",
-                    level: "Avanzado",
-                    type: "Partitura completa",
-                    views: 7654,
-                    downloads: 1987,
-                    rating: 4.7,
-                    date: new Date(2022, 11, 10),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 12.99,
-                    pages: 45
-                },
-                {
-                    id: 7,
-                    title: "Gymnopédie No. 1 - Satie",
-                    author: "Erik Satie",
-                    instrument: "Piano",
-                    level: "Principiante",
-                    type: "Partitura simplificada",
-                    views: 14321,
-                    downloads: 5432,
-                    rating: 4.4,
-                    date: new Date(2022, 10, 25),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 0,
-                    pages: 3
-                },
-                {
-                    id: 8,
-                    title: "Nocturne Op. 9 No. 2 - Chopin",
-                    author: "Frédéric Chopin",
-                    instrument: "Piano",
-                    level: "Intermedio",
-                    type: "Partitura completa",
-                    views: 15678,
-                    downloads: 6543,
-                    rating: 4.8,
-                    date: new Date(2022, 9, 15),
-                    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    price: 6.25,
-                    pages: 9
-                }
-            ];
+        const pianoSheetsData = [
+            {
+                title: "Für Elise",
+                composer: "Ludwig van Beethoven",
+                description: "Partitura para Piano - Nivel Principiante. Partitura simplificada.",
+                difficulty: "Principiante",
+                style: "Clásico",
+                pages: 4,
+                date: "Mar 5, 2023",
+                rating: 4.7,
+                price: "GRATIS",
+                isFree: true
+            },
+            {
+                title: "Nocturne Op. 9 No. 2",
+                composer: "Frédéric Chopin",
+                description: "Partitura para Piano - Nivel Intermedio. Partitura completa.",
+                difficulty: "Intermedio",
+                style: "Romántico",
+                pages: 9,
+                date: "Oct 15, 2022",
+                rating: 4.8,
+                price: "$6.25",
+                isFree: false
+            },
+            {
+                title: "Preludio en Do Mayor BWV 846",
+                composer: "Johann Sebastian Bach",
+                description: "Partitura para Piano - Nivel Intermedio. Del Clave Bien Temperado.",
+                difficulty: "Intermedio",
+                style: "Barroco",
+                pages: 3,
+                date: "Jan 12, 2023",
+                rating: 4.9,
+                price: "$4.50",
+                isFree: false
+            },
+            {
+                title: "Claro de Luna (1er Movimiento)",
+                composer: "Ludwig van Beethoven",
+                description: "Partitura para Piano - Nivel Avanzado. Sonata No. 14 completa.",
+                difficulty: "Avanzado",
+                style: "Clásico",
+                pages: 7,
+                date: "Feb 28, 2023",
+                rating: 4.8,
+                price: "$8.00",
+                isFree: false
+            },
+            {
+                title: "Take Five",
+                composer: "Dave Brubeck",
+                description: "Partitura para Piano - Nivel Intermedio. Arreglo para piano solo.",
+                difficulty: "Intermedio",
+                style: "Jazz",
+                pages: 5,
+                date: "Dec 8, 2022",
+                rating: 4.6,
+                price: "$7.25",
+                isFree: false
+            },
+            {
+                title: "Gymnopédie No. 1",
+                composer: "Erik Satie",
+                description: "Partitura para Piano - Nivel Principiante. Obra completa original.",
+                difficulty: "Principiante",
+                style: "Moderno",
+                pages: 3,
+                date: "Nov 20, 2022",
+                rating: 4.7,
+                price: "GRATIS",
+                isFree: true
+            },
+            {
+                title: "Invención No. 1 en Do Mayor",
+                composer: "Johann Sebastian Bach",
+                description: "Partitura para Piano - Nivel Intermedio. Invención a dos voces.",
+                difficulty: "Intermedio",
+                style: "Barroco",
+                pages: 2,
+                date: "Sep 15, 2022",
+                rating: 4.5,
+                price: "$3.75",
+                isFree: false
+            },
+            {
+                title: "Liebestraum No. 3",
+                composer: "Franz Liszt",
+                description: "Partitura para Piano - Nivel Avanzado. Sueño de Amor en La bemol Mayor.",
+                difficulty: "Avanzado",
+                style: "Romántico",
+                pages: 8,
+                date: "Aug 3, 2022",
+                rating: 4.9,
+                price: "$9.50",
+                isFree: false
+            }
+        ];
+
+        function renderSheets(sheets = pianoSheetsData) {
+            const list = document.getElementById('sheetList');
+            list.innerHTML = '';
+
+            sheets.forEach(sheet => {
+                const item = document.createElement('div');
+                item.className = 'sheet-item';
+                item.innerHTML = `
+                    <div class="sheet-thumbnail">
+                        <div class="sheet-icon">🎹</div>
+                    </div>
+                    <div class="sheet-content">
+                        <div class="sheet-main-info">
+                            <h3 class="sheet-title">${sheet.title}</h3>
+                            <p class="sheet-composer">${sheet.composer}</p>
+                            <p class="sheet-description">${sheet.description}</p>
+                        </div>
+                        <div class="sheet-meta">
+                            <div class="sheet-meta-left">
+                                <div class="sheet-meta-item">
+                                    <span>📄</span>
+                                    <span>${sheet.pages} páginas</span>
+                                </div>
+                                <div class="sheet-meta-item">
+                                    <span>📅</span>
+                                    <span>${sheet.date}</span>
+                                </div>
+                                <div class="sheet-rating">
+                                    <span>⭐</span>
+                                    <span>${sheet.rating}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sheet-actions">
+                        <div class="price-tag ${sheet.isFree ? 'free' : ''}">${sheet.price}</div>
+                        <button class="download-btn">
+                            <span>⬇</span>
+                            Descargar
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            // Actualizar contador de resultados
+            document.querySelector('.results-count').textContent = 
+                `Mostrando 1-${sheets.length} de ${sheets.length} partituras`;
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (searchTerm.trim()) {
+                console.log('Buscando:', searchTerm);
+                // Aquí iría la lógica de búsqueda real
+            }
+        }
+
+        function filterSheets() {
+            const activeDifficulty = document.querySelector('.filter-chip[data-filter].active')?.dataset.filter || 'all';
+            const activeStyle = document.querySelector('.filter-chip[data-style].active')?.dataset.style || 'all';
             
-            // Filtros y opciones
-            $scope.instruments = ["Piano"];
-            $scope.difficultyLevels = ["Principiante", "Intermedio", "Avanzado"];
-            $scope.documentTypes = ["Partitura completa", "Partitura simplificada", "Tablatura", "Lead sheet"];
+            let filtered = pianoSheetsData;
             
-            $scope.selectedInstruments = {};
-            $scope.selectedLevels = {};
-            $scope.selectedTypes = {};
+            if (activeDifficulty !== 'all') {
+                filtered = filtered.filter(sheet => 
+                    sheet.difficulty.toLowerCase() === activeDifficulty.toLowerCase()
+                );
+            }
             
-            $scope.sortOption = "-views";
-            $scope.searchQuery = "";
-            $scope.filteredPartituras = [];
-            $scope.loading = false;
+            if (activeStyle !== 'all') {
+                filtered = filtered.filter(sheet => 
+                    sheet.style.toLowerCase() === activeStyle.toLowerCase()
+                );
+            }
             
-            // Paginación
-            $scope.currentPage = 1;
-            $scope.itemsPerPage = 5;  // Reducido para mejor visualización en lista
-            
-            // Función para generar un rango de números para la paginación
-            $scope.range = function(start, end) {
-                var result = [];
-                for (var i = start; i <= end; i++) {
-                    result.push(i);
-                }
-                return result;
-            };
-            
-            // Calcular total de páginas
-            $scope.$watch('filteredPartituras', function() {
-                $scope.totalPages = Math.ceil($scope.filteredPartituras.length / $scope.itemsPerPage);
-            }, true);
-            
-            // Cambiar página
-            $scope.setPage = function(page) {
-                if (page >= 1 && page <= $scope.totalPages) {
-                    $scope.currentPage = page;
-                }
-            };
-            
-            // Función de búsqueda
-            $scope.search = function() {
-                $scope.loading = true;
-                $scope.currentPage = 1;
-                
-                // Simular carga asíncrona
-                $timeout(function() {
-                    $scope.applyFilters();
-                    $scope.loading = false;
-                }, 800);
-            };
-            
-            // Aplicar filtros
-            $scope.applyFilters = function() {
-                $scope.filteredPartituras = $scope.partituras.filter(function(partitura) {
-                    // Filtrar por texto de búsqueda
-                    var matchesSearch = true;
-                    if ($scope.searchQuery) {
-                        var query = $scope.searchQuery.toLowerCase();
-                        matchesSearch = partitura.title.toLowerCase().includes(query) || 
-                                         partitura.author.toLowerCase().includes(query);
-                    }
-                    
-                    // Filtrar por instrumentos seleccionados
-                    var matchesInstruments = true;
-                    var selectedInstruments = Object.keys($scope.selectedInstruments).filter(function(key) {
-                        return $scope.selectedInstruments[key];
-                    });
-                    if (selectedInstruments.length > 0) {
-                        matchesInstruments = selectedInstruments.includes(partitura.instrument);
-                    }
-                    
-                    // Filtrar por niveles de dificultad seleccionados
-                    var matchesLevels = true;
-                    var selectedLevels = Object.keys($scope.selectedLevels).filter(function(key) {
-                        return $scope.selectedLevels[key];
-                    });
-                    if (selectedLevels.length > 0) {
-                        matchesLevels = selectedLevels.includes(partitura.level);
-                    }
-                    
-                    // Filtrar por tipos de documento seleccionados
-                    var matchesTypes = true;
-                    var selectedTypes = Object.keys($scope.selectedTypes).filter(function(key) {
-                        return $scope.selectedTypes[key];
-                    });
-                    if (selectedTypes.length > 0) {
-                        matchesTypes = selectedTypes.includes(partitura.type);
-                    }
-                    
-                    return matchesSearch && matchesInstruments && matchesLevels && matchesTypes;
-                });
-                
-                // Ordenar resultados
-                $scope.filteredPartituras.sort(function(a, b) {
-                    if ($scope.sortOption.startsWith('-')) {
-                        var field = $scope.sortOption.substring(1);
-                        return b[field] - a[field];
-                    } else {
-                        return a[$scope.sortOption] > b[$scope.sortOption] ? 1 : -1;
-                    }
-                });
-            };
-            
-            // Inicializar con todos los resultados
-            $scope.search();
+            renderSheets(filtered);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
         });
+
+        // Filtros de dificultad
+        document.querySelectorAll('.filter-chip[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterSheets();
+            });
+        });
+
+        // Filtros de estilo
+        document.querySelectorAll('.filter-chip[data-style]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip[data-style]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterSheets();
+            });
+        });
+
+        // Paginación
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.textContent.includes('‹') && !this.textContent.includes('›')) {
+                    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Inicializar la página
+        renderSheets();
     </script>
 </body>
 </html>
