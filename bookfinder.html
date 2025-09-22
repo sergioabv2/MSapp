@@ -71,8 +71,30 @@
         .sheet-meta span { display: flex; align-items: center; gap: 4px; }
         .sheet-meta .fa-star { color: #f59e0b; }
         .sheet-actions { flex-shrink: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: 120px; }
-        .price-tag { background-color: #374151; color: white; padding: 6px 10px; border-radius: 6px; font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 4px; }
-        .price-tag.free { background-color: #16a34a; }
+  .sheet-actions-container {
+    display: flex;
+    align-items: flex-end; /* Vertically aligns the price with the button group */
+    gap: 16px;           /* Adds space between the price and the buttons */
+    flex-shrink: 0;      /* Prevents this container from shrinking */
+}
+
+/* MODIFIED: Remove absolute positioning from the price tag */
+.price-tag {
+    /* No more 'position: absolute', 'top', 'left', etc. */
+    background-color: #374151;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    /* The height will be determined by its content and padding */
+}
+
+/* This rule for the free tag remains the same */
+.price-tag.free {
+    background-color: #16a34a;
+}
         .action-btn { border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
         .action-btn:hover { opacity: 0.85; }
         .preview-btn { background-color: var(--preview-color); color: white; }
@@ -140,28 +162,28 @@
             <main class="results-content">
                 <div class="sheets-grid">
                     <div class="sheet-card" ng-repeat="sheet in sheets | filter:customFilter | orderBy:'title'">
-                        <div class="sheet-icon-container">
-                            <img ng-src="{{ sheet.img }}">
-                        </div>
-                        <div class="sheet-info">
-                            <h3 class="sheet-title">{{ sheet.title }}</h3>
-                            <p class="sheet-composer">{{ sheet.composer }}</p>
-                            <div class="sheet-meta">
-                                <span><i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
-                                <span><i class="fas fa-calendar-alt"></i>{{ sheet.date | date:'d MMM yyyy' }}</span>
-                                <span><i class="fas fa-star"></i>{{ sheet.rating }}</span>
-                            </div>
-                        </div>
-                        <div class="sheet-actions">
-                            <div class="price-tag" ng-class="{free: sheet.isFree}">{{ sheet.price }}</div>
-                            <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
-                            <button class="action-btn add-btn" ng-click="addToLibrary(sheet)">Agregar</button>
-                        </div>
-                    </div>
-                    <div class="empty-state" ng-if="(sheets | filter:customFilter).length === 0">
-                        <h3>No se encontraron partituras</h3>
-                        <p>Intenta ajustar los filtros de búsqueda.</p>
-                    </div>
+                      <div class="sheet-icon-container">
+                          <img ng-src="{{ sheet.img }}">
+                      </div>
+                      <div class="sheet-info">
+                       
+                          <h3 class="sheet-title">{{ sheet.title }}</h3>
+                          <p class="sheet-composer">{{ sheet.composer }}</p>
+                          <div class="sheet-meta">
+                              <span><i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
+                              <span><i class="fas fa-signal"></i>{{ sheet.difficulty }}</span>
+                              <span><i class="fas fa-music"></i>{{ sheet.style }}</span>
+                              <span><i class="fas fa-star"></i>{{ sheet.rating }}</span>
+                          </div>
+                      </div>
+                         <div class="sheet-actions-container">
+                          <div class="price-tag" ng-class="{free: sheet.isFree}">{{ sheet.price }}</div>
+                          <div class="sheet-actions">
+                              <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
+                              <button class="action-btn add-btn" ng-click="addToLibrary(sheet)">Agregar</button>
+                          </div>
+                      </div>
+                  </div>
                 </div>
             </main>
         </div>
@@ -173,7 +195,7 @@
                 <h3 class="modal-title">Preview: {{ currentSheet.title }}</h3>
                 <button class="modal-close-btn" ng-click="hidePreview()"><i class="fas fa-times"></i></button>
             </div>
-            <div class="visualizer-container"><midi-visualizer id="sheetVisualizer" type="piano-roll"></midi-visualizer></div>
+            <div class="visualizer-container"><midi-visualizer id="sheetVisualizer" type="waterfall"></midi-visualizer></div>
             <div class="player-container"><midi-player id="sheetPlayer" sound-font visualizer="#sheetVisualizer"></midi-player></div>
         </div>
     </div>
