@@ -71,30 +71,35 @@
         .sheet-meta span { display: flex; align-items: center; gap: 4px; }
         .sheet-meta .fa-star { color: #f59e0b; }
         .sheet-actions { flex-shrink: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: 120px; }
-  .sheet-actions-container {
-    display: flex;
-    align-items: flex-end; /* Vertically aligns the price with the button group */
-    gap: 16px;           /* Adds space between the price and the buttons */
-    flex-shrink: 0;      /* Prevents this container from shrinking */
-}
+        .sheet-actions-container {
+            display: flex;
+            align-items: flex-end; 
+            gap: 16px;           
+            flex-shrink: 0;      
+        }
 
-/* MODIFIED: Remove absolute positioning from the price tag */
-.price-tag {
-    /* No more 'position: absolute', 'top', 'left', etc. */
-    background-color: #374151;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    /* The height will be determined by its content and padding */
-}
+        /* --- NUEVO: Estilos para la etiqueta de grado --- */
+        /* --- CORREGIDO: Estilos para la etiqueta de grado --- */
+        .grade-tag {
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+        }
+        
+        .grade-preparatorio { background-color: #ef4444; } /* Rojo */
+        .grade-grado-1 { background-color: #8b5cf6; } /* Morado Royal */
+        .grade-grado-2 { background-color: #3b82f6; } /* Azul Facebook */
+        .grade-grado-3 { background-color: #22c55e; } /* Verde */
+        .grade-grado-4 { background-color: #f97316; } /* Naranja */
+        .grade-grado-5 { background-color: #1e3a8a; } /* Azul Oscuro */
+        .grade-grado-6 { background-color: #14b8a6; } /* Turquesa */
+        .grade-grado-7 { background-color: #9ca3af; } /* Plata */
+        .grade-grado-8 { background-color: #111827; } /* Negro */
 
-/* This rule for the free tag remains the same */
-.price-tag.free {
-    background-color: #16a34a;
-}
         .action-btn { border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
         .action-btn:hover { opacity: 0.85; }
         .preview-btn { background-color: var(--preview-color); color: white; }
@@ -114,6 +119,9 @@
         .player-container { padding: 10px 24px; border-top: 1px solid #e5e7eb; }
 
         @media (max-width: 768px) {
+          .grade-tag{
+            display: none
+          }
             .main-layout { grid-template-columns: 1fr; /* Apila las columnas en móvil */ }
             .filters-panel { position: static; /* Desactiva el sticky en móvil */ }
         }
@@ -141,11 +149,17 @@
                 <h3>Filtros</h3>
                 <div class="filter-group">
                     <label class="filter-label" for="difficulty-select">Dificultad</label>
-                    <select id="difficulty-select" class="filter-select" ng-model="filters.difficulty">
+                    <select id="difficulty-select" class="filter-select" ng-model="filters.grade">
                         <option value="">Todas</option>
-                        <option value="Principiante">Principiante</option>
-                        <option value="Intermedio">Intermedio</option>
-                        <option value="Avanzado">Avanzado</option>
+                        <option value="Preparatorio">Preparatorio</option>
+                        <option value="Grado 1">Grado 1</option>
+                        <option value="Grado 2">Grado 2</option>
+                        <option value="Grado 3">Grado 3</option>
+                        <option value="Grado 4">Grado 4</option>
+                        <option value="Grado 5">Grado 5</option>
+                        <option value="Grado 6">Grado 6</option>
+                        <option value="Grado 7">Grado 7</option>
+                        <option value="Grado 8">Grado 8</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -162,28 +176,27 @@
             <main class="results-content">
                 <div class="sheets-grid">
                     <div class="sheet-card" ng-repeat="sheet in sheets | filter:customFilter | orderBy:'title'">
-                      <div class="sheet-icon-container">
-                          <img ng-src="{{ sheet.img }}">
-                      </div>
-                      <div class="sheet-info">
-                       
-                          <h3 class="sheet-title">{{ sheet.title }}</h3>
-                          <p class="sheet-composer">{{ sheet.composer }}</p>
-                          <div class="sheet-meta">
-                              <span><i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
-                              <span><i class="fas fa-signal"></i>{{ sheet.difficulty }}</span>
-                              <span><i class="fas fa-music"></i>{{ sheet.style }}</span>
-                              <span><i class="fas fa-star"></i>{{ sheet.rating }}</span>
-                          </div>
-                      </div>
-                         <div class="sheet-actions-container">
-                          <div class="price-tag" ng-class="{free: sheet.isFree}">{{ sheet.price }}</div>
-                          <div class="sheet-actions">
-                              <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
-                              <button class="action-btn add-btn" ng-click="addToLibrary(sheet)">Agregar</button>
-                          </div>
-                      </div>
-                  </div>
+                        <div class="sheet-icon-container">
+                            <img ng-src="{{ sheet.img }}">
+                        </div>
+                        <div class="sheet-info">
+                          
+                            <h3 class="sheet-title">{{ sheet.title }}</h3>
+                            <p class="sheet-composer">{{ sheet.composer }}</p>
+                            <div class="sheet-meta">
+                                <span><i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
+                                <span><i class="fas fa-music"></i>{{ sheet.style }}</span>
+                                <span><i class="fas fa-star"></i>{{ sheet.rating }}</span>
+                            </div>
+                        </div>
+                        <div class="sheet-actions-container">
+                            <div class="grade-tag" ng-class="getGradeClass(sheet.grade)">{{ sheet.grade }}</div>
+                            <div class="sheet-actions">
+                                <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
+                                <button class="action-btn add-btn" ng-click="addToLibrary(sheet)">Agregar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -204,39 +217,49 @@
         const app = angular.module('sheetMusicApp', []);
 
         app.controller('sheetMusicCtrl', function($scope) {
+            // CAMBIO: Se reemplaza 'price', 'isFree' y 'difficulty' por 'grade'
             $scope.sheets = [
-                { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'W.A. Mozart', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Intermedio', style: 'Clásico' },
-                { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/88447.mid", difficulty: 'Principiante', style: 'Clásico' },
-                { id: 2, img:'https://lh3.googleusercontent.com/d/1GdXII41ODxYXU9fkeA71fTYwycUkAJlh', title: 'Prelude in C, BWV 846', composer: 'Franz Liszt', pages: 2, date: new Date('2025-01-12'), rating: 4.9, price: '$4.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/401.mid", difficulty: 'Intermedio', style: 'Barroco' },
-                { id: 3, img:'https://lh3.googleusercontent.com/d/1S57ZR582Gi9T8ahbsFdIFtqbSt8WK038', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, price: '$6.25', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Intermedio', style: 'Romántico' },
-                { id: 5, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Moonlight Sonata', composer: 'L.V. Beethoven', pages: 6, date: new Date('2024-11-20'), rating: 4.9, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/1995.mid", difficulty: 'Avanzado', style: 'Romántico' },
-                { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Intermedio', style: 'Clásico' }
+                { id: 10, img:'http://googleusercontent.com/profile/picture/9', title: 'Twinkle Twinkle', composer: 'Tradicional', pages: 1, date: new Date('2025-03-10'), rating: 4.5, grade: 'Preparatorio', type: 'midi', url: "https://bitmidi.com/uploads/88447.mid", style: 'Clásico' },
+                { id: 8, img:'http://googleusercontent.com/profile/picture/8', title: 'Minuet in G', composer: 'C. Petzold', pages: 2, date: new Date('2025-02-20'), rating: 4.6, grade: 'Grado 1', type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", style: 'Barroco' },
+                { id: 9, img:'http://googleusercontent.com/profile/picture/7', title: 'Ode to Joy (Easy)', composer: 'L.V. Beethoven', pages: 1, date: new Date('2025-01-15'), rating: 4.7, grade: 'Grado 2', type: 'midi', url: "https://bitmidi.com/uploads/1995.mid", style: 'Clásico' },
+                { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, grade: 'Grado 3', type: 'midi', url: "https://bitmidi.com/uploads/88447.mid", style: 'Clásico' },
+                { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, date: new Date('2025-02-28'), rating: 4.8, grade: 'Grado 4', type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", style: 'Clásico' },
+                { id: 2, img:'https://lh3.googleusercontent.com/d/1GdXII41ODxYXU9fkeA71fTYwycUkAJlh', title: 'Prelude in C, BWV 846', composer: 'J.S. Bach', pages: 2, date: new Date('2025-01-12'), rating: 4.9, grade: 'Grado 5', type: 'midi', url: "https://bitmidi.com/uploads/401.mid", style: 'Barroco' },
+                { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, grade: 'Grado 6', type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", style: 'Clásico' },
+                { id: 3, img:'https://lh3.googleusercontent.com/d/1S57ZR582Gi9T8ahbsFdIFtqbSt8WK038', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, grade: 'Grado 7', type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", style: 'Romántico' },
+                { id: 5, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Moonlight Sonata (3er Mov.)', composer: 'L.V. Beethoven', pages: 6, date: new Date('2024-11-20'), rating: 4.9, grade: 'Grado 8', type: 'midi', url: "https://bitmidi.com/uploads/1995.mid", style: 'Romántico' }
             ];
 
-            // Objeto para los modelos de los filtros
+            // Objeto para los modelos de los filtros (CAMBIO: difficulty -> grade)
             $scope.filters = {
                 text: '',
-                difficulty: '',
+                grade: '',
                 style: ''
             };
 
-            // Filtro personalizado que combina todos los criterios
+            // Filtro personalizado que combina todos los criterios (CAMBIO: difficultyMatch -> gradeMatch)
             $scope.customFilter = function(sheet) {
                 const textSearch = !$scope.filters.text ||
                     sheet.title.toLowerCase().includes($scope.filters.text.toLowerCase()) ||
                     sheet.composer.toLowerCase().includes($scope.filters.text.toLowerCase());
 
-                const difficultyMatch = !$scope.filters.difficulty || sheet.difficulty === $scope.filters.difficulty;
+                const gradeMatch = !$scope.filters.grade || sheet.grade === $scope.filters.grade;
                 const styleMatch = !$scope.filters.style || sheet.style === $scope.filters.style;
 
-                return textSearch && difficultyMatch && styleMatch;
+                return textSearch && gradeMatch && styleMatch;
+            };
+
+            // NUEVO: Función para generar la clase CSS del grado
+            $scope.getGradeClass = function(grade) {
+                if (!grade) return '';
+                return 'grade-' + grade.toLowerCase().replace(' ', '-');
             };
             
             $scope.addToLibrary = function(sheet) {
                 alert('"' + sheet.title + '" ha sido agregada a tu biblioteca.');
             };
 
-            // Lógica del Modal de Preview
+            // Lógica del Modal de Preview (sin cambios)
             $scope.isPreviewVisible = false;
             $scope.currentSheet = null;
             const sheetPlayer = document.getElementById('sheetPlayer');
