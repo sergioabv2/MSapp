@@ -95,17 +95,141 @@
         .add-btn { background-color: var(--primary-color); color: white; }
         .empty-state { text-align: center; padding: 60px 20px; color: #6e6e73; background: white; border-radius: 12px; }
         
-        /* Modal (sin cambios) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-content { background: white; border-radius: 16px; width: 90%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.95); transition: transform 0.3s ease; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #e5e7eb; }
-        .modal-title { font-size: 18px; font-weight: 600; color: #1d1d1f; }
-        .modal-close-btn { background: none; border: none; font-size: 24px; cursor: pointer; }
-        .visualizer-container { flex-grow: 1; overflow: hidden; }
-        midi-visualizer { width: 100%; height: 100%; }
-        .player-container { padding: 10px 24px; border-top: 1px solid #e5e7eb; }
+        /* --- ESTILOS DEL MODAL MIDI --- */
+        .midi-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4.5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .midi-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .midi-modal-container {
+            width: 90%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .midi-modal-overlay.active .midi-modal-container {
+            transform: translateY(0);
+        }
+
+        .midi-modal-header {
+            padding: 20px 20px 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .midi-modal-title {
+            margin: 0;
+            color: #111827;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .midi-modal-user {
+            margin: 0;
+            color: #4b5563;
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        .midi-modal-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .midi-modal-close:hover {
+            color: #111827;
+        }
+
+        .midi-modal-body {
+            padding: 25px;
+        }
+
+        .midi-player-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .midi-visualizer-wrapper {
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            position: relative;
+            background-color: #f3f4f6;
+        }
+
+       .wave-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(74, 111, 165, 0.6), 
+    transparent);
+  animation: wave 2s linear infinite;
+  opacity: 0.6;
+}
+
+        @keyframes wave {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+
+ #sheetVisualizer {
+          display: flex;
+  justify-content: center;
+  transform: scale(0.5);
+}
+
+@media (max-width: 600px){
+    #sheetVisualizer {
+  transform: scale(0.4);
+}
+}
+
+@media (max-width: 470px){
+    #sheetVisualizer {
+  transform: scale(0.3);
+}
+}
+
+        #sheetVisualizer {
+            width: 100%;
+            height: 100%;
+        }
 
         @media (max-width: 768px) {
             .main-layout { grid-template-columns: 1fr; /* Apila las columnas en móvil */ }
@@ -113,9 +237,10 @@
         }
 
         @media (max-width: 578px) {
-            .nomobile{
-                display: none !important;
-            }
+            .nomobile { display: none !important; }
+            .midi-modal-body { padding: 15px; }
+            .midi-modal-header { padding: 15px 15px 10px 15px; }
+            .midi-modal-title { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -193,14 +318,24 @@
         </div>
     </div>
     
-    <div class="modal-overlay" ng-class="{show: isPreviewVisible}" ng-click="hidePreview()">
-        <div class="modal-content" ng-click="$event.stopPropagation()">
-            <div class="modal-header">
-                <h3 class="modal-title">Preview: {{ currentSheet.title }}</h3>
-                <button class="modal-close-btn" ng-click="hidePreview()"><i class="fas fa-times"></i></button>
+    <div class="midi-modal-overlay" ng-class="{'active': isPreviewVisible}" ng-click="hidePreview()">
+        <div class="midi-modal-container" ng-click="$event.stopPropagation()">
+            <div class="midi-modal-header">
+                <div>
+                    <h4 class="midi-modal-title">{{ currentSheet.title }}</h4>
+                    <p class="midi-modal-user">{{ currentSheet.composer }}</p>
+                </div>
+                <button class="midi-modal-close" ng-click="hidePreview()"><i class="fas fa-times"></i></button>
             </div>
-            <div class="visualizer-container"><midi-visualizer id="sheetVisualizer" type="waterfall"></midi-visualizer></div>
-            <div class="player-container"><midi-player id="sheetPlayer" sound-font visualizer="#sheetVisualizer"></midi-player></div>
+            <div class="midi-modal-body">
+                <div class="midi-player-wrapper">
+                    <midi-player id="sheetPlayer" sound-font visualizer="#sheetVisualizer"></midi-player>
+                </div>
+                <div class="midi-visualizer-wrapper">
+                    <div class="wave-effect"></div>
+                    <midi-visualizer id="sheetVisualizer" type="waterfall"></midi-visualizer>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -208,7 +343,6 @@
         const app = angular.module('sheetMusicApp', []);
 
         app.controller('sheetMusicCtrl', function($scope) {
-            // CAMBIO 2: Actualizar la propiedad "difficulty" en los datos
             $scope.sheets = [
                 { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid", difficulty: 'Grado 4', style: 'Clásico' },
                 { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/bluebossa.mid", difficulty: 'Grado 5', style: 'Clásico' },
@@ -218,22 +352,14 @@
                 { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Grado 6', style: 'Clásico' }
             ];
 
-            // Objeto para los modelos de los filtros
-            $scope.filters = {
-                text: '',
-                difficulty: '',
-                style: ''
-            };
+            $scope.filters = { text: '', difficulty: '', style: '' };
 
-            // Filtro personalizado que combina todos los criterios
             $scope.customFilter = function(sheet) {
                 const textSearch = !$scope.filters.text ||
                     sheet.title.toLowerCase().includes($scope.filters.text.toLowerCase()) ||
                     sheet.composer.toLowerCase().includes($scope.filters.text.toLowerCase());
-
                 const difficultyMatch = !$scope.filters.difficulty || sheet.difficulty === $scope.filters.difficulty;
                 const styleMatch = !$scope.filters.style || sheet.style === $scope.filters.style;
-
                 return textSearch && difficultyMatch && styleMatch;
             };
             
