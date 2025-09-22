@@ -902,15 +902,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
           <div class="circle">
               <img class="profile-pic" src="{{userData.photo}}">
           </div>
-          <div class="main-data" style="margin-top: 12px;" ng-if="!loadingProfile">
+          <div class="main-data" style="margin-top: 12px;" >
             <h4 >{{userData.name}}</h4>
-        <div class="pull-left planTag" ng-if="userPlan == 'Premium' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN PREMIUM
+        <div class="pull-left planTag"  style="color: orange; text-shadow: 0 0 10px orange;"> PLAN PREMIUM
             <i class="ri-vip-crown-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
-    <div class="pull-left planTag" ng-if="userPlan == 'Pro' && userData.status == 'ACTIVO'" style="color: #20a2f1; text-shadow: 0 0 1px #20a2f1;"> PLAN PRO
-            <i class="ri-verified-badge-fill" style="color: #20a2f1; text-shadow: none;"></i>  </div>
-      <div class="pull-left planTag" ng-if="userPlan == 'Estudiante' && userData.status == 'ACTIVO'" style="color: orange; text-shadow: 0 0 10px orange;"> PLAN ESTUDIANTE
-            <i class="ri-graduation-cap-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
-    <div class="pull-left planTag" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'" style="color: brown;"> PLAN STANDARD </div>
+
+
             <br>
         <div class="userLvl" > Nivel Preparatorio </div>
     
@@ -2714,9 +2711,7 @@ app
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
         deferred.resolve({
-          lvl: response.data.lvl,
-          blq: response.data.blq,
-    lsn: response.data.lsn, 
+       
           data: response.data
         });
       }, function(error) {
@@ -2990,8 +2985,7 @@ app
        $scope.userData = data.data;
        $scope.userPlan = data.data.plan.split(" ")[0];
       $scope.chats = JSON.parse(data.data.messages);
-    $scope.alerts = JSON.parse(data.data.alerts);
-      $scope.loadingProfile = false;
+
   }) 
 
      $scope.isDropdownVisible = false;
