@@ -63,7 +63,7 @@
         .sheet-card { background: white; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid #e5e5e7; transition: all 0.2s ease; display: flex; align-items: center; padding: 16px; gap: 16px; }
         .sheet-card:hover { transform: translateY(-3px); box-shadow: var(--card-hover-shadow); }
         .sheet-icon-container { flex-shrink: 0; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 8px; }
-        .sheet-icon-container img { width: 40px; height: auto; }
+        .sheet-icon-container img { width: 50px; height: 55px; border-radius: 12px;}
         .sheet-info { flex-grow: 1; min-width: 0; }
         .sheet-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 2px; }
         .sheet-composer { font-size: 14px; color: var(--secondary-text); margin-bottom: 8px; }
@@ -141,7 +141,7 @@
                 <div class="sheets-grid">
                     <div class="sheet-card" ng-repeat="sheet in sheets | filter:customFilter | orderBy:'title'">
                         <div class="sheet-icon-container">
-                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIgMTlWNUMyIDMuODk1NDMgMi44OTU0MyAzIDQgM0gxNkMxNy4xMDQ2IDMgMTggMy44OTU0MyAxOCA1VjE5QzE4IDIwLjEwNDYgMTcuMTA0NiAyMSAxNiAyMUgyQzIgMjEgMiAyMC4xMDQ2IDIgMTlaTTQgNS41VjEzLjVNNiA1LjVWMTMuNU04IDUuNVYxMy41TTEwIDUuNVYxMy41TTEyIDUuNVYxMy41TTE0IDUuNVYxMy41TTE2IDUuNVYxMy41TTQgMTUuNVYxNy41TTYuNSAxNS41VjE3LjVNOSAxNS41VjE3LjVNMTEuNSAxNS41VjE3LjVNMTQgMTUuNVYxNy41TTIgMTlIMThNMjAgMTdWN0MyMCA2LjQ0NzcyIDIwLjQ0NzcgNiAyMSA2QzIxLjU1MjMgNiAyMiA2LjQ0NzcyIDIyIDdWMTdDMjIgMTcuNTUyMyAyMS41NTIzIDE4IDIxIDE4QzIwLjQ0NzcgMTggMjAgMTcuNTUyMyAyMCAxN1oiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==" alt="Partitura">
+                            <img ng-src="{{ sheet.img }}">
                         </div>
                         <div class="sheet-info">
                             <h3 class="sheet-title">{{ sheet.title }}</h3>
@@ -173,7 +173,7 @@
                 <h3 class="modal-title">Preview: {{ currentSheet.title }}</h3>
                 <button class="modal-close-btn" ng-click="hidePreview()"><i class="fas fa-times"></i></button>
             </div>
-            <div class="visualizer-container"><midi-visualizer id="sheetVisualizer" type="waterfall"></midi-visualizer></div>
+            <div class="visualizer-container"><midi-visualizer id="sheetVisualizer" type="piano-roll"></midi-visualizer></div>
             <div class="player-container"><midi-player id="sheetPlayer" sound-font visualizer="#sheetVisualizer"></midi-player></div>
         </div>
     </div>
@@ -183,12 +183,12 @@
 
         app.controller('sheetMusicCtrl', function($scope) {
             $scope.sheets = [
-                { id: 4, title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Intermedio', style: 'Clásico' },
-                { id: 1, title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/88447.mid", difficulty: 'Principiante', style: 'Clásico' },
-                { id: 2, title: 'Prelude in C, BWV 846', composer: 'J.S. Bach', pages: 2, date: new Date('2025-01-12'), rating: 4.9, price: '$4.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/401.mid", difficulty: 'Intermedio', style: 'Barroco' },
-                { id: 3, title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, price: '$6.25', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Intermedio', style: 'Romántico' },
-                { id: 5, title: 'Clair de Lune', composer: 'C. Debussy', pages: 6, date: new Date('2024-11-20'), rating: 4.9, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/1995.mid", difficulty: 'Avanzado', style: 'Romántico' },
-                { id: 7, title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Intermedio', style: 'Clásico' }
+                { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'W.A. Mozart', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Intermedio', style: 'Clásico' },
+                { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/88447.mid", difficulty: 'Principiante', style: 'Clásico' },
+                { id: 2, img:'https://lh3.googleusercontent.com/d/1GdXII41ODxYXU9fkeA71fTYwycUkAJlh', title: 'Prelude in C, BWV 846', composer: 'Franz Liszt', pages: 2, date: new Date('2025-01-12'), rating: 4.9, price: '$4.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/401.mid", difficulty: 'Intermedio', style: 'Barroco' },
+                { id: 3, img:'https://lh3.googleusercontent.com/d/1S57ZR582Gi9T8ahbsFdIFtqbSt8WK038', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, price: '$6.25', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Intermedio', style: 'Romántico' },
+                { id: 5, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Moonlight Sonata', composer: 'L.V. Beethoven', pages: 6, date: new Date('2024-11-20'), rating: 4.9, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/1995.mid", difficulty: 'Avanzado', style: 'Romántico' },
+                { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Intermedio', style: 'Clásico' }
             ];
 
             // Objeto para los modelos de los filtros
