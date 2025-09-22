@@ -898,7 +898,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-content scroll="false">
 
       <div class="profile-user-data clearfix">
-        <div id="loadingProfile" ng-if="loadingProfile" style="margin-top: 20px !important;"></div>
+
           <div class="circle">
               <img class="profile-pic" src="{{userData.photo}}">
           </div>
@@ -912,10 +912,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
             <i class="ri-graduation-cap-fill" style="color: orange; text-shadow: 0 0 10px orange;"></i>  </div>
     <div class="pull-left planTag" ng-if="userPlan == 'Standard' && userData.status == 'ACTIVO'" style="color: brown;"> PLAN STANDARD </div>
             <br>
-        <div class="userLvl" ng-if="userData.lvl == 0"> Nivel Preparatorio </div>
-          <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userData.lvl}} </div>
+        <div class="userLvl" > Nivel Preparatorio </div>
+    
         <div class="progress">
-          <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userData.progress + '%'}" ng-init="startAnimation()"></div>
+          <div class="progress-bar" style="background-color: red;" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: 40 + '%'}" ng-init="startAnimation()"></div>
         </div>
           </div>  
         </div>
@@ -1618,19 +1618,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
-<i class="ri-chat-4-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
-        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
-    </div>
-</button> 
-          
-     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
-        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
-    </div> 
-</button>
+  
 
     <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
   <div style="display: flex; align-items: center;" >    
@@ -1677,6 +1665,21 @@ width: 200px; /* Ajusta según el tamaño deseado */
    
  </div>
     </button>
+
+       <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 18px;">
+<i class="ri-chat-4-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
+    </div>
+</button> 
+          
+     <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;">
+  <i class="ri-notification-3-line" ></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+        <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
+    </div> 
+</button>
+
   </ion-nav-buttons>
        
         <ion-nav-buttons side="left">
