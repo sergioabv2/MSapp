@@ -4656,7 +4656,228 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
+    
+   <script id="books.html" type="text/ng-template">
+    <ion-view >
 
+     <ion-nav-bar class="bar-light" >      
+        <ion-nav-buttons side="right">
+
+     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
+<i class="ri-chat-1-line"></i>
+            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+        <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
+    </div>
+</button> 
+          
+   
+
+ <button  class="upgrade-btn-modern" ng-click="goToPayment()" ng-if="userData.status != 'ACTIVO'">
+            Upgrade
+          </button>
+
+
+  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
+  <div style="display: flex; align-items: center;" >    
+      <div style="position: relative; " class="profilImg">
+       <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
+      </div>
+   </div>
+  </button>
+
+
+    
+  </ion-nav-buttons>
+
+
+        <ion-nav-buttons side="left">
+          <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
+        </ion-nav-buttons>  
+
+       
+        <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
+     <div id="bannerRow">
+      <div class="profile-avatar-container" style="transform: scale(0.9)">
+      <img src="{{userData.photo}}" class="profile-avatar">
+      <div class="profile-level">Nivel {{userLvl}}</div>
+    </div>
+      <p class="profileName">{{userData.name}}</p>
+      <p class="profileEmail">{{userData.mail}}</p>
+    </div>
+    <div class="dropdown-item" ng-click="goToAccount(); toggleDropdown()">
+      <i class="ri-user-3-line"></i> Perfil
+    </div>
+     <div class="dropdown-item" ng-click="goToPayment(); toggleDropdown()">
+      <i class="ri-bank-card-line"></i> Suscripción
+       <div class="pro-badge" ng-if="userData.status == 'ACTIVO'">
+        <i class="ri-vip-crown-fill"></i>
+       <span class="pro-text">        
+      Pro
+      </span>
+     </div>
+
+      <div class="free-badge" ng-if="userData.status != 'ACTIVO'">
+       <span class="free-text">        
+      Free
+      </span>
+      </div>
+
+
+    </div>
+      <div class="dropdown-item" ng-click="goToAgenda(); toggleDropdown()">
+      <i class="ri-calendar-view"></i> Calendario
+    </div>
+      <div class="dropdown-item" ng-click="logout()">
+      <i class="ri-shut-down-line"></i> Cerrar sesión
+    </div>
+  </div>
+
+   <div class="dropdownContent chat-dropdown" ng-show="dropdownChatVisible" ng-click="$event.stopPropagation()">
+  <div class="chat-header">
+      <button class="close-dropdown" ng-click="dropdownChat()">
+      <i class="ri-close-line"></i>
+    </button>
+    <h4>Amadeus 2.1</h4>
+    <p>Asistente Inteligente</p>
+  </div>
+  
+  <div class="chat-messages" id="chatMessages1">
+    
+    
+    <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
+      <div class="message-avatar" ng-if="message.sender === 'admin'">
+        <img src="https://lh3.googleusercontent.com/d/1Muzocba--A_soQyO7BXemMbx6GOU2-AK=s96-c">
+      </div>
+      <div class="message-content">
+        <p>{{message.content}}</p>
+        <span class="message-time">{{calculateTimeAgo(message.timestamp) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="typing-indicator" ng-if="isTyping">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <span>Mozart Academy está escribiendo...</span>
+</div>
+  
+  <div class="chat-input">
+    <input type="text" 
+           ng-model="newMessage" 
+           placeholder="Escribe tu mensaje..." 
+           id="inputMessage1"
+           ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
+    <button ng-click="sendMessage(newMessage)">
+      <i class="ri-send-plane-2-fill"></i>
+    </button>
+  </div>
+</div>
+
+
+
+        
+    </ion-nav-bar>
+
+
+     <ion-content >
+  <div class="iframe-container2"><iframe src="https://app.mozartacademy.mx/lessons" frameborder="0" allowfullscreen ></iframe></div> 
+
+   
+      </ion-content>
+      
+     <div id="videoContainer" 
+         class="video-container" 
+         ng-show="showVideo"
+         ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
+      <div class="video-controls">
+        <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
+          <i class="fas" ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+        </button>
+        <button class="video-control-btn" ng-click="toggleVideo()" title="Ocultar Video">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <video id="remoteVideo" 
+             class="remote-video" 
+             autoplay 
+             playsinline>
+      </video>
+    </div> 
+
+
+
+
+      <!-- Botones Flotantes -->
+    <div class="floating-buttons" style="margin-bottom: 20px !important">
+      <!-- Botón de Chat -->
+      <button class="button floating-btn chat" 
+              ng-click="openChat()" ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+      <!-- Botón de Video -->
+      <button class="button floating-btn video"
+              ng-click="toggleVideo()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+      </button>
+    </div>
+    
+    <!-- Modal de Chat Personalizado -->
+    <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
+      <div class="modal-content3">
+        <div class="modal-header">
+          <h3><i class="fas fa-comments"></i> Chat con el Profesor</h3>
+          <button class="button button-clear" ng-click="closeChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="chatContainer" class="chat-messages">
+            <div ng-repeat="message in webrtc.chatMessages track by $index" 
+                 class="message-item"
+                 ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
+              <div class="message-sender">{{message.sender}}</div>
+              <div class="message-text">{{message.message}}</div>
+              <div class="message-time">{{formatTime(message.timestamp)}}</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" 
+                   ng-model="chatMessage"
+                   placeholder="Escribe tu mensaje..."
+                   ng-keypress="($event.which === 13) && sendMessage()">
+            <button class="button button-positive" ng-click="sendMessage()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     
+    </ion-view>
+  </script>   
 
 
 
