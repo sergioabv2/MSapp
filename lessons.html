@@ -3477,7 +3477,7 @@ src="">
             <div class="recording-item" ng-repeat="recording in audios">
               <div class="recording-info">
               <div class="recording-details">
-            <div class="recording-name">{{recording.name}}</div>
+            <div class="recording-name">{{recording.title}}</div>
             <div class="recording-date">{{recording.date | date:'medium'}}</div>
           </div>
           <div class="recording-actions">
@@ -3585,8 +3585,9 @@ src="">
 var app = angular.module('materializeApp', ['ui.materialize']);
 app.factory('SharedState', function($http, $q) {
   var requestData = {
-    action: "getBasicData",
-    token: localStorage.getItem('MStoken')
+    action: "getUserData",
+  //  token: localStorage.getItem('MStoken')
+    token: "U2FsdGVkX1/pI1bZ0ubPnMIbtexAViX2jWJbRcC96D2QsP6GULGhs1YxuPWTKn4L"
   };
 
   var config = {
@@ -3618,13 +3619,10 @@ var currentActivity = null;
       .then(function(response) {
         deferred.resolve({
           name: response.data.name,
-          lvl: response.data.lvl,
-          lsn: response.data.lsn,
-          progress: response.data.progress,
-          lssons: response.data.lessons,
+          stage: JSON.parse(response.data.stage),
+          audios: JSON.parse(response.data.audios),
           status: response.data.status,
-          audios: response.data.audios,
-          counterLvl: response.data.counterLvl
+
         });
       }, function(error) {
         deferred.reject(error);
@@ -3645,10 +3643,8 @@ getActivity: function() {
 
   .controller('lvlMenu', ["$scope", "SharedState", function($scope, SharedState){ 
       SharedState.getNum().then(function(data) {
-        $scope.lvl = data.lvl;
-      $scope.progress = data.progress;
+        $scope.lvl = data.stage.lvl;
      $scope.status = data.status;
-      $scope.counter = data.counterLvl[0]
         
         if(data.lvl == 1){
           $('ul.tabs').tabs('select_tab', 'test2');
@@ -3695,7 +3691,7 @@ getActivity: function() {
   });
 
    SharedState.getNum().then(function(data) {
-    $scope.lsn = data.lsn;
+    $scope.lsn = data.stage.lsn;
     $scope.audios = data.audios;
       $scope.currentlsns = filterCurrent(data.lssons);
   })
@@ -3952,9 +3948,9 @@ function showRecording(recording) {
     $timeout(() => {
         try {
             let url;
-            if (recording.midi) {
+            if (recording.url) {
                 // Es un link directo a un archivo .mid
-                url = recording.midi;
+                url = recording.url;
             } else if (recording.midiBlob) {
                 // Es un blob generado localmente
                 url = URL.createObjectURL(recording.midiBlob);
@@ -4086,13 +4082,9 @@ $scope.closePlayer = function() {
   
     SharedState.getNum().then(function(data) {
       $scope.name = data.name.split(" ")[0];
-    $scope.lsn = data.lsn;
-      $scope.lvl = data.lvl;
-      $scope.progress = data.progress;
-      $scope.counter = data.counterLvl[0]
+    $scope.lsn = data.stage.lsn;
+      $scope.lvl = data.stage.lvl;
       $scope.status = data.status;
-      $scope.currentlsns = filterCurrent(data.lssons);
-       $scope.history = data.history;
       $scope.loading = false;
   })
 
@@ -5257,13 +5249,9 @@ function newSize() {
 
 .controller('level1', ["$scope", "SharedState", function($scope, SharedState) {
      SharedState.getNum().then(function(data) {
-    $scope.lsn = data.lsn;
-      $scope.lvl = data.lvl;
-      $scope.progress = data.progress;
-      $scope.counter = data.counterLvl[1]
+    $scope.lsn = data.stage.lsn;
+      $scope.lvl = data.stage.lvl;
       $scope.status = data.status;
-      $scope.currentlsns = filterCurrent(data.lssons);
-       $scope.history = data.history;
   })
 
 
@@ -6403,13 +6391,9 @@ function newSize() {
 
 .controller('level3', ["$scope", "SharedState", function($scope, SharedState) {
       SharedState.getNum().then(function(data) {
-    $scope.lsn = data.lsn;
-      $scope.lvl = data.lvl;
-      $scope.progress = data.progress;
-      $scope.counter = data.counterLvl[3]
+    $scope.lsn = data.stage.lsn;
+      $scope.lvl = data.stage.lvl;
       $scope.status = data.status;
-      $scope.currentlsns = filterCurrent(data.lssons);
-       $scope.history = data.history;
   })
 
 
