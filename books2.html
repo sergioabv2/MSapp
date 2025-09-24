@@ -383,14 +383,15 @@
 
         .modal-actions {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: auto;
+            flex-direction: row;
+             justify-content: space-around;
+   
         }
 
         .modal-button {
             padding: 15px 25px;
             border-radius: 12px;
+            width: 130px;
             border: none;
             font-size: 16px;
             font-weight: 600;
@@ -504,7 +505,7 @@
         .book-card:hover .delete-btn { opacity: 1; }
 
         /* Responsive */
-        @media (max-width: 800px) {
+        @media (max-width: 770px) {
             .modal-content {
                 flex-direction: column;
                 max-width: 400px;
@@ -512,17 +513,25 @@
                 overflow-y: auto;
             }
             .modal-left {
-                padding: 15px;
-                max-height: 200px;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
+        padding: 0; /* Para que la imagen ocupe todo el espacio */
+        max-height: 120px; /* Puedes ajustar esta altura */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0; /* Evita que se encoja más de la cuenta */
+    }
+    
+    /* Cambio 2: Aplica object-fit */
+    .modal-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* La propiedad clave */
+        max-height: none; /* Anula el max-height anterior */
+        border-radius: 0; /* Opcional: quita el borde redondeado para que encaje perfecto */
+    }
             .modal-right {
                 width: 100%;
                 padding: 25px;
             }
-           .modal-preview-img {
-                max-height: 180px;
-           }
+        
            .scroll-btn { display: none; }
         }
 
@@ -536,7 +545,86 @@
           @media (max-width: 558px) {
             .add-file-btn{display: none}
             .bookTitle{display: none}
+            .modal-left{display: none}
+            .exercise-list-container{max-height: 240px !important;}
           }
+
+
+/* --- Nuevos estilos para la sección de progreso --- */
+.progress-display {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.progress-display .modal-progress-bar {
+    flex-grow: 1; /* Hace que la barra ocupe el espacio disponible */
+}
+
+.progress-percentage {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    min-width: 50px; /* Ancho mínimo para alinear */
+    text-align: right;
+}
+
+.exercise-list-header {
+    font-size: 14px;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.exercise-list-container {
+    max-height: 160px; /* Altura máxima antes de mostrar scroll */
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Estilo para el scrollbar */
+.exercise-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+.exercise-list-container::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+.exercise-list-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.exercise-item {
+    padding: 10px 12px;
+    color: #e0e0e0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: background-color 0.2s ease;
+}
+
+.exercise-item:last-child {
+    border-bottom: none;
+}
+
+.exercise-item.completed {
+    color: #888;
+    text-decoration: line-through;
+}
+
+/* Ícono de check para ejercicios completados */
+.exercise-item.completed::before {
+    content: '\f00c'; /* Código de Font Awesome para check */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #28a745; /* Verde */
+    margin-right: 12px;
+    text-decoration: none; /* Evita que el ícono se tache */
+    display: inline-block;
+}
 
  .right-controls {
   display: flex;
@@ -877,58 +965,61 @@
     </div>
 
     <div class="modal-overlay" ng-class="{show: showPreviewModal}" ng-click="closePreviewModal($event)">
-        <div class="modal-content" ng-click="$event.stopPropagation()">
-            <div class="modal-left">
-                <img ng-src="{{ selectedBook.coverUrl }}" alt="{{ selectedBook.title }}" class="modal-preview-img">
-            </div>
-            <div class="modal-right">
-                <button class="modal-close" ng-click="closePreviewModal()"><i class="fas fa-times"></i></button>
-                <div class="modal-header-info">
-                    <div class="modal-category">{{ selectedCategory }}</div>
-                    <h2 class="modal-title">{{ selectedBook.title }}</h2>
-                    <p class="modal-author">{{ selectedBook.author }}</p>
-                </div>
-                
-         <div class="modal-progress-section" ng-if="selectedBook.type === 'manual'">
-            <div ng-if="selectedBook.lvl === lvl && selectedBook.lsn === lsn">
-                <div class="modal-progress-bar">
-                    <div class="modal-progress-fill" ng-style="{width: (exe / selectedBook.totalExercises * 100) + '%'}"></div>
-                </div>
-                <div class="modal-stats">
-                    <div>
-                        <span>Ejercicios completados</span>
-                        <div class="modal-stat-value">{{ exe }}/{{ selectedBook.totalExercises }}</div>
-                    </div>
-                    <div>
-                        <span>Progreso</span>
-                         <div class="modal-stat-value">{{ exe / selectedBook.totalExercises * 100 }}%</div>
-                    </div>
-                </div>
-            </div>
-            <div ng-if="selectedBook.lvl < lvl || (selectedBook.lvl === lvl && selectedBook.lsn < lsn)">
-                <div class="modal-progress-bar">
-                    <div class="modal-progress-fill" ng-style="{width: '100%'}"></div>
-                </div>
-                <div class="modal-stats">
-                    <div>
-                        <span>Ejercicios completados</span>
-                        <div class="modal-stat-value">{{ selectedBook.totalExercises }}/{{ selectedBook.totalExercises }}</div>
-                    </div>
-                    <div>
-                        <span>Progreso</span>
-                        <div class="modal-stat-value">100%</div>
-                    </div>
-                </div>
-            </div>
+    <div class="modal-content" ng-click="$event.stopPropagation()">
+        
+        <div class="modal-left">
+            <img ng-src="{{ selectedBook.coverUrl }}" alt="{{ selectedBook.title }}" class="modal-preview-img">
         </div>
 
-                <div class="modal-actions">
-                    <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
-                    <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary">Descargar</a>
+        <div class="modal-right">
+            <button class="modal-close" ng-click="closePreviewModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-header-info">
+                <div class="modal-category">{{ selectedCategory }}</div>
+                <h2 class="modal-title">{{ selectedBook.title }}</h2>
+                <p class="modal-author">{{ selectedBook.author }}</p>
+            </div>
+            
+            <div class="modal-progress-section" ng-if="selectedBook.type === 'manual'">
+
+                <div ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn < selectedBook.lsn)">
+                    <div class="progress-display">
+                        <div class="modal-progress-bar">
+                            <div class="modal-progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <span class="progress-percentage">100%</span>
+                    </div>
+                    <div class="exercise-list-header">Ejercicios Completados</div>
+                    <div class="exercise-list-container">
+                       <div class="exercise-item completed" ng-repeat="lesson in selectedBook.lessons track by $index">
+                            {{ lesson }}
+                        </div>
+                    </div>
                 </div>
+
+                <div ng-if="lvl === selectedBook.lvl && lsn >= selectedBook.lsn">
+                    <div class="progress-display">
+                        <div class="modal-progress-bar">
+                            <div class="modal-progress-fill" ng-style="{width: (exe / selectedBook.totalExercises * 100) + '%'}"></div>
+                        </div>
+                        <span class="progress-percentage">{{ (exe / selectedBook.totalExercises * 100) | number:0 }}%</span>
+                    </div>
+                    <div class="exercise-list-header">Lista de Ejercicios ({{exe}}/{{selectedBook.totalExercises}})</div>
+                    <div class="exercise-list-container">
+                       <div class="exercise-item" ng-repeat="lesson in selectedBook.lessons track by $index" ng-class="{'completed': $index < exe}">
+                            {{ lesson }}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="modal-actions" >
+                <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
+                <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary" >Descargar</a>
             </div>
         </div>
     </div>
+</div>
 
      <div class="modal-overlay" ng-class="{show: showUploadModal}" ng-click="closeUploadModal($event)">
         <div class="modal-content2 upload-modal-content" ng-click="$event.stopPropagation()">
@@ -1076,14 +1167,46 @@
 
             // --- DATOS DE LA BIBLIOTECA ---
        var manualsData = [
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 25 },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 30 },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 28},
-    {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 35},
-    {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 32},
-    {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 40},
-    {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 28},
-    {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 33 },
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ] },
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ] },
+    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ]},
+    {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ]},
+    {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ]},
+    {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ]},
+    {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ]},
+    {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
+            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
+            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+        ] },
     {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
     {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
     {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
@@ -1116,8 +1239,9 @@
         pdf: manual.pdf,
         lvl: manual.lvl,
         lsn: manual.lsn,
+        lessons: manual.lessons,
         totalExercises: manual.totalExercises,
-        totalTime: manual.totalTime, // <- AÑADIR ESTA LÍNEA
+        totalTime: manual.totalTime, 
         type: 'manual' 
     };
 });
