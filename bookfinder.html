@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="es" ng-app="sheetMusicApp">
 <head>
     <meta charset="UTF-8">
@@ -235,13 +235,72 @@
             .main-layout { grid-template-columns: 1fr; /* Apila las columnas en móvil */ }
             .filters-panel { position: static; /* Desactiva el sticky en móvil */ }
         }
-
+      
+       .mobile{
+        display: none !important;
+      }
         @media (max-width: 578px) {
             .nomobile { display: none !important; }
+          .mobile{display: flex !important;}
             .midi-modal-body { padding: 15px; }
             .midi-modal-header { padding: 15px 15px 10px 15px; }
             .midi-modal-title { font-size: 1.2rem; }
         }
+
+        /* --- Estilos para el Score del Usuario en el Header --- */
+.user-score {
+    display: flex;
+    align-items: center;
+    background-color: #f3f4f6;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #374151;
+    margin-left: 24px; /* Ajusta según necesites */
+}
+.user-score .fa-star {
+    color: #f59e0b; /* Amarillo/Dorado */
+    margin-right: 8px;
+}
+
+/* --- Estilos para el nuevo Score en la tarjeta --- */
+.score-tag {
+    background-color: #374151;
+    min-width: 80px; /* Ancho mínimo para consistencia */
+}
+.score-tag .fa-star {
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+/* --- Estilos para el indicador "Agregada" --- */
+.added-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px; /* Misma altura que el botón */
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.added-indicator .fa-check-circle {
+    color: #16a34a;
+    margin-right: 6px;
+}
+
+/* --- Estilos para el botón deshabilitado --- */
+.action-btn:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- Ajuste para el modal de confirmación --- */
+.confirm-modal {
+    max-width: 400px; /* Más pequeño que el modal de MIDI */
+}
     </style>
 </head>
 <body ng-controller="sheetMusicCtrl">
@@ -254,6 +313,10 @@
                     <h1>Buscador de Partituras</h1>
                     <p>Encuentra y previsualiza partituras MIDI</p>
                 </div>
+                <div class="user-score">
+                <i class="fas fa-star"></i>
+                <span>{{ score }} Puntos</span>
+              </div>
             </div>
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
@@ -302,21 +365,53 @@
                             <div class="sheet-meta">
                                 <span class="nomobile"> <i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
                                 <span><i class="fas fa-signal"></i>{{ sheet.difficulty }}</span>
+         <span class="mobile"><i class="fas fa-star"></i>{{ sheet.score }}</span>
                                 <span class="nomobile"><i class="fas fa-music"></i>{{ sheet.style }}</span>
                             </div>
                         </div>
                         <div class="sheet-actions-container">
-                            <div class="price-tag nomobile" ng-class="{free: sheet.isFree}">{{ sheet.price }}</div>
+                            <div class="price-tag score-tag nomobile" ng-class="{free: sheet.score === 0}">
+                                <i class="fas fa-star"></i> {{ sheet.score === 0 ? 'GRATIS' : sheet.score }}
+                            </div>
+
                             <div class="sheet-actions">
                                 <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
-                                <button class="action-btn add-btn" ng-click="addToLibrary(sheet)">Agregar</button>
+
+                                <div ng-if="!isSheetAdded(sheet)">
+                                    <button class="action-btn add-btn" 
+                                            ng-click="addToLibrary(sheet)"
+                                            ng-disabled="sheet.lvl > lvl || sheet.score > score">
+                                        Agregar
+                                    </button>
+                                </div>
+                                <div ng-if="isSheetAdded(sheet)" class="added-indicator">
+                                    <i class="fas fa-check-circle"></i> Agregada
+                                </div>
                             </div>
-                        </div>
+                          </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+
+    <div class="midi-modal-overlay" ng-class="{'active': showAddedModal}" ng-click="closeAddedModal()">
+    <div class="midi-modal-container confirm-modal" ng-click="$event.stopPropagation()">
+        <div class="midi-modal-header" style="border-bottom: none;">
+            <button class="midi-modal-close" ng-click="closeAddedModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="midi-modal-body" style="text-align: center; padding-top: 0;">
+            <i class="fas fa-check-circle" style="font-size: 50px; color: #16a34a; margin-bottom: 15px;"></i>
+            <h4 class="midi-modal-title">¡Pieza Agregada!</h4>
+            <p class="midi-modal-user" style="margin-top: 8px;">
+                "{{ addedSheet.title }}" ya está en tu repertorio.
+            </p>
+            <button class="action-btn add-btn" style="margin-top: 20px; width: 120px;" ng-click="closeAddedModal()">
+                Entendido
+            </button>
+        </div>
+    </div>
+</div>
     
     <div class="midi-modal-overlay" ng-class="{'active': isPreviewVisible}" ng-click="hidePreview()">
         <div class="midi-modal-container" ng-click="$event.stopPropagation()">
@@ -342,15 +437,50 @@
     <script>
         const app = angular.module('sheetMusicApp', []);
 
-        app.controller('sheetMusicCtrl', function($scope) {
+        app.controller('sheetMusicCtrl', function($http, $scope) {
             $scope.sheets = [
-                { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid", difficulty: 'Grado 4', style: 'Clásico' },
-                { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/bluebossa.mid", difficulty: 'Grado 5', style: 'Clásico' },
-                { id: 2, img:'https://lh3.googleusercontent.com/d/1GdXII41ODxYXU9fkeA71fTYwycUkAJlh', title: 'Prelude in C, BWV 846', composer: 'J.S. Bach', pages: 2, date: new Date('2025-01-12'), rating: 4.9, price: '$4.50', isFree: false, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/mariah.mid", difficulty: 'Grado 2', style: 'Barroco' },
-                { id: 3, img:'https://lh3.googleusercontent.com/d/1S57ZR582Gi9T8ahbsFdIFtqbSt8WK038', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, price: '$6.25', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Grado 7', style: 'Romántico' },
-                { id: 5, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Minuet in G', composer: 'Christian Petzold', pages: 2, date: new Date('2024-11-20'), rating: 4.9, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Grado 1', style: 'Barroco' },
-                { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Grado 6', style: 'Clásico' }
+                { id: 4, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, date: new Date('2025-02-28'), rating: 4.8, price: '$8.00', isFree: false, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid", difficulty: 'Grado 4', style: 'Clásico', score: 80, lvl: 4 },
+                { id: 1, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, date: new Date('2025-03-05'), rating: 4.7, price: 'GRATIS', isFree: true, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/bluebossa.mid", difficulty: 'Grado 5', style: 'Clásico', score: 40, lvl: 5 },
+                { id: 2, img:'https://lh3.googleusercontent.com/d/1GdXII41ODxYXU9fkeA71fTYwycUkAJlh', title: 'Prelude in C, BWV 846', composer: 'J.S. Bach', pages: 2, date: new Date('2025-01-12'), rating: 4.9, price: '$4.50', isFree: false, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/mariah.mid", difficulty: 'Grado 2', style: 'Barroco', score: 10, lvl: 2 },
+                { id: 3, img:'https://lh3.googleusercontent.com/d/1S57ZR582Gi9T8ahbsFdIFtqbSt8WK038', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, date: new Date('2024-10-15'), rating: 4.8, price: '$6.25', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Grado 7', style: 'Romántico', score: 30, lvl: 7 },
+                { id: 5, img:'https://lh3.googleusercontent.com/d/1fepDVSq640Ey3M_LsvdS7B4AY4jYGCon', title: 'Minuet in G', composer: 'Christian Petzold', pages: 2, date: new Date('2024-11-20'), rating: 4.9, price: 'GRATIS', isFree: true, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Grado 1', style: 'Barroco', score: 20, lvl: 1 },
+                { id: 7, img:'https://lh3.googleusercontent.com/d/1X7cZEisg9ZNPhu2KbowJYytdCwwQWgut', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, date: new Date('2024-09-01'), rating: 4.7, price: '$7.50', isFree: false, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Grado 6', style: 'Clásico', score: 40, lvl: 6 }
             ];
+
+
+          $scope.score = 0;
+          $scope.lvl = 0;
+          $scope.savedBooks = { books: [] }; // Inicializa para evitar errores
+          $scope.showAddedModal = false;
+          $scope.addedSheet = null;
+
+             var requestData = {
+          action: "getUserData",
+         token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+       //   token: localStorage.getItem('MStoken')
+        };
+
+        var config = {
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          } 
+        };
+                 
+        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+          .then(function(response) { 
+              var repertoire = JSON.parse(response.data.repertoire);
+              var stage = JSON.parse(response.data.stage);
+               $scope.score = stage.score;
+                $scope.lvl = stage.lvl;
+                $scope.savedBooks = repertoire.find(item => item.title === "Repertorio") || { books: [] };
+          })  
+
+           $scope.isSheetAdded = function(sheet) {
+                if (!$scope.savedBooks || !$scope.savedBooks.books) return false;
+                return $scope.savedBooks.books.some(book => book.id === sheet.id);
+            };
+
+
 
             $scope.filters = { text: '', difficulty: '', style: '' };
 
@@ -364,8 +494,32 @@
             };
             
             $scope.addToLibrary = function(sheet) {
-                alert('"' + sheet.title + '" ha sido agregada a tu biblioteca.');
+                // Validación de nivel y score
+                if (sheet.lvl > $scope.lvl) {
+                    alert("Necesitas un nivel más alto para agregar esta pieza.");
+                    return;
+                }
+                if (sheet.score > $scope.score) {
+                    alert("No tienes suficientes puntos para canjear esta pieza.");
+                    return;
+                }
+
+                // Lógica para agregar
+                $scope.score -= sheet.score; // Resta el costo
+                $scope.savedBooks.books.push(sheet); // Agrega a la librería
+                
+                // Muestra el modal de confirmación
+                $scope.addedSheet = sheet;
+                $scope.showAddedModal = true;
             };
+
+
+             $scope.closeAddedModal = function() {
+                  $scope.showAddedModal = false;
+                  $scope.addedSheet = null;
+              };
+              
+            
 
             // Lógica del Modal de Preview
             $scope.isPreviewVisible = false;
@@ -393,4 +547,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
