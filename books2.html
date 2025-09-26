@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="es" ng-app="libraryApp">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,10 @@
     <title>Biblioteca de Piano</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
     <style>
         * {
             margin: 0;
@@ -132,6 +136,51 @@
         .carousel::-webkit-scrollbar {
             display: none;
         }
+
+        /* Estilos para la nueva tarjeta de "Agregar Archivo" */
+.add-new-file-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0; /* Fondo más claro o distintivo */
+    border: 2px dashed #ccc; /* Borde punteado */
+    color: #6e6e73;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.add-new-file-card:hover {
+    border-color: #5668E2; /* Color de hover similar al primario */
+    background-color: #e8f0fe; /* Fondo al pasar el ratón */
+    color: #5668E2;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(86, 104, 226, 0.2);
+}
+
+.add-new-file-card i {
+    font-size: 48px; /* Tamaño grande para el icono de más */
+    margin-bottom: 10px;
+    color: #a0a0a0; /* Color del icono */
+    transition: color 0.2s ease;
+}
+
+.add-new-file-card:hover i {
+    color: #5668E2; /* Color del icono al pasar el ratón */
+}
+
+.add-new-file-card .book-title {
+    font-weight: 600;
+    color: #343a40;
+    text-align: center;
+}
+
+.add-new-file-card .book-level {
+    font-size: 13px;
+    color: #6c757d;
+    text-align: center;
+}
+
 
         /* --- Book Card --- */
         .book-card {
@@ -908,7 +957,312 @@
     padding-top: 20px;
     border-top: 1px solid #f1f3f5;
 }
-        
+ 
+      /* --- Estilos para el Modal de Tareas --- */
+.task-modal-content {
+    padding: 0;
+    max-width: 450px;
+}
+
+.task-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.task-modal-header h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0;
+}
+
+.task-list-container {
+    padding: 10px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-info .task-category {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.task-info .task-title {
+    font-size: 1rem;
+    color: #222;
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-btn {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.task-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.task-btn.video { color: #c4302b; }
+.task-btn.midi { color: #5668E2; }
+
+.modal-close2 {
+  
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #8e8e93;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close2:hover {
+            color: gray;
+        }
+
+
+
+
+/* --- Estilos para el Modal de Video --- */
+.video-modal-content {
+    background: black;
+    padding: 0;
+    width: 90%;
+    max-width: 800px; /* Ancho máximo del video */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    border: 1px solid #333;
+    border-radius: 12px;
+    overflow: hidden; /* Para que el iframe respete los bordes redondeados */
+}
+
+/* Contenedor responsivo para el video (aspecto 16:9) */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* Proporción 16:9 (9 / 16 = 0.5625) */
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-close-btn {
+
+    top: -40px; /* Posiciona el botón fuera del video */
+    right: 0;
+    color: white;
+    font-size: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+  
+    z-index: 10;
+}
+
+.task-status-container {
+    flex-grow: 1; /* Ocupa el espacio central */
+    text-align: right;
+    padding: 0 15px;
+}
+.task-status {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+.task-status.completed {
+    background-color: #e4f8e9;
+    color: #28a745;
+}
+.task-status.sent {
+    background-color: #fff0e1;
+    color: #fd9843;
+}
+.task-status i {
+    margin-right: 4px;
+}
+
+.task-title.completed-task {
+    text-decoration: line-through;
+    color: #999; /* Color más claro para indicar que está finalizado */
+}
+
+/* Añade este estilo a tu CSS existente para los estados */
+
+.task-status.failed {
+    background-color: #fdeeee;
+    color: #e74c3c;
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background: #f8f9fa;
+    font-size: 1rem;
+    -webkit-appearance: none; /* Quita el estilo nativo */
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+.form-select:focus {
+    outline: none;
+    border-color: #5668E2;
+    box-shadow: 0 0 0 3px rgba(86, 104, 226, 0.15);
+}
+
+
+
+.midi-modal-container {
+    width: 90%;
+    max-width: 700px;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+.modal-overlay.show .midi-modal-container {
+    transform: translateY(0);
+}
+.midi-modal-header {
+    padding: 20px 20px 15px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.midi-modal-title {
+    margin: 0;
+    color: #111827;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+.midi-modal-user {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin-top: 4px;
+}
+.midi-modal-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+.midi-modal-close:hover {
+    color: #111827;
+}
+.midi-modal-body {
+    padding: 25px;
+}
+.midi-player-wrapper {
+    margin-bottom: 20px;
+}
+.midi-visualizer-wrapper {
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 15px;
+    position: relative;
+    background-color: #f3f4f6;
+}
+.wave-effect {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(74, 111, 165, 0.6), transparent);
+    animation: wave 2s linear infinite;
+    opacity: 0.6;
+}
+@keyframes wave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+ #libraryMidiVisualizer {
+          display: flex;
+  justify-content: center;
+  transform: scale(0.5);
+}
+
+@media (max-width: 600px){
+    #libraryMidiVisualizer {
+  transform: scale(0.4);
+}
+}
+
+@media (max-width: 470px){
+    #libraryMidiVisualizer {
+  transform: scale(0.3);
+}
+}
+
+#libraryMidiVisualizer {
+    width: 100%;
+    height: 100%;
+}
+
+        /* Estilo para el texto que reemplaza al select */
+.form-display-text {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f1f3f5; /* Un gris claro para indicar que no es editable */
+    font-size: 1rem;
+    color: #555;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+}
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -935,11 +1289,11 @@
    
             </div>
 
-           <div style="position: absolute; margin-top: -5px; right: 15px">
+       <!--    <div style="position: absolute; margin-top: -5px; right: 15px">
                          <button class="add-file-btn" ng-click="openUploadModal()">
                              <i class="fas fa-plus"></i> Agregar Archivo
                          </button>
-                     </div>
+                     </div>  -->
         </div>
 
         <div class="library-content">
@@ -956,6 +1310,11 @@
                             <div class="locked-overlay" ng-if="!isLoaded || book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)" >
                                 <i class="fas fa-lock"></i>
                             </div>
+                        </div>
+                        <div class="book-card add-new-file-card" ng-if="section.title === 'Mis Archivos'" ng-click="openUploadModal()">
+                          <i class="fas fa-plus-circle"></i>
+                          <div class="book-title">Nuevo Archivo</div>
+                          <div class="book-level">Sube tu PDF</div>
                         </div>
                     </div>
                     <button class="scroll-btn prev" ng-click="scrollCarousel('carousel-' + $index, -1)"><i class="fas fa-chevron-left"></i></button>
@@ -982,7 +1341,8 @@
             
             <div class="modal-progress-section" ng-if="selectedBook.type === 'manual'">
 
-                <div ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn < selectedBook.lsn)">
+               <div ng-if="lvl > selectedBook.lvl || 
+                             (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))"> 
                     <div class="progress-display">
                         <div class="modal-progress-bar">
                             <div class="modal-progress-fill" style="width: 100%;"></div>
@@ -991,27 +1351,26 @@
                     </div>
                     <div class="exercise-list-header">Ejercicios Completados</div>
                     <div class="exercise-list-container">
-                       <div class="exercise-item completed" ng-repeat="lesson in selectedBook.lessons track by $index">
-                            {{ lesson }}
+                        <div class="exercise-item completed" ng-repeat="lesson in selectedBook.lessons track by $index">
+                            {{ lesson.task }}
                         </div>
                     </div>
-                </div>
+               </div>
 
-                <div ng-if="lvl === selectedBook.lvl && lsn >= selectedBook.lsn">
-                    <div class="progress-display">
-                        <div class="modal-progress-bar">
-                            <div class="modal-progress-fill" ng-style="{width: (exe / selectedBook.totalExercises * 100) + '%'}"></div>
-                        </div>
-                        <span class="progress-percentage">{{ (exe / selectedBook.totalExercises * 100) | number:0 }}%</span>
-                    </div>
-                    <div class="exercise-list-header">Lista de Ejercicios ({{exe}}/{{selectedBook.totalExercises}})</div>
-                    <div class="exercise-list-container">
-                       <div class="exercise-item" ng-repeat="lesson in selectedBook.lessons track by $index" ng-class="{'completed': $index < exe}">
-                            {{ lesson }}
-                        </div>
-                    </div>
-                </div>
-                
+               <div ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))"> 
+                  <div class="progress-display">
+                      <div class="modal-progress-bar">
+                          <div class="modal-progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%'}"></div>
+                      </div>
+                      <span class="progress-percentage">{{ (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) | number:0 }}%</span>
+                  </div>
+                  <div class="exercise-list-header">Lista de Ejercicios ({{getCompletedTaskCountForManual(selectedBook)}}/{{selectedBook.totalExercises}})</div>
+                  <div class="exercise-list-container">
+                      <div class="exercise-item" ng-repeat="lesson in selectedBook.lessons track by $index" ng-class="{'completed': isTaskCompleted(lesson)}">
+                          {{ lesson.task }}
+                      </div>
+                  </div>
+              </div>
             </div>
 
             <div class="modal-actions" >
@@ -1054,9 +1413,6 @@
     </div>
 
 
-  
-
-
     <div class="modal-overlay" ng-class="{show: showLockedModal}">
         <div class="locked-modal-content">
             <i class="fas fa-lock"></i>
@@ -1071,7 +1427,14 @@
 <div class="right-controls">
   <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
   <div class="metronome-control">
-    <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}">
+  <!--  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> -->
+    <button class="tool-btn record-btn" ng-click="openTaskModal()" ng-if="selectedBook.type === 'manual'"> 
+   <i class="fa-solid fa-clipboard-list"></i>
+    </button>
+    <button class="tool-btn record-btn" ng-click="openMidiModal(selectedBook)" ng-if="selectedBook.type !== 'manual' && selectedBook.midi"> 
+   <i class="fa-solid fa-music"></i>
+    </button>
+      <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
    <i class="fa-solid fa-microphone"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
@@ -1103,11 +1466,80 @@
         </div>
       </div>
 
+
+      <div class="modal-overlay" ng-class="{show: showTaskModal}" >
+    <div class="modal-content2 task-modal-content" ng-click="$event.stopPropagation()">
+        <div class="task-modal-header">
+            <h2>Tareas por entregar de esta unidad</h2>
+            <button class="modal-close2" ng-click="closeTaskModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="task-list-container">
+            <div class="task-item" ng-repeat="task in selectedBook.lessons | filter:filterTasksForCurrentManual track by $index">
+              <div class="task-info">
+                  <span class="task-category">Pág. {{task.pag}} - {{task.title}}</span>
+                  <p class="task-title" ng-class="{'completed-task': isTaskCompleted(task)}">{{task.task}}</p>
+              </div>
+              <div class="task-status-container">
+                <span class="task-status completed" ng-if="getTaskOverallStatus(task) === 'completed'">
+                    <i class="fas fa-check-circle"></i> Completado
+                </span>
+                <span class="task-status sent" ng-if="getTaskOverallStatus(task) === 'sent'">
+                    <i class="fas fa-paper-plane"></i> Enviado
+                </span>
+                <span class="task-status failed" ng-if="getTaskOverallStatus(task) === 'fail'">
+                    <i class="fas fa-times-circle"></i> Reintentar
+                </span>
+               </div>
+               <div class="task-actions" ng-if="task.lsn === lsn">
+                    <button class="task-btn video" ng-click="openVideoModal(task.video)" ng-if="task.video">
+                        <i class="fab fa-youtube"></i>
+                    </button>
+                    <button class="task-btn midi" ng-click="openMidiModal(task)" ng-if="task.midi">
+                        <i class="fas fa-music"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" ng-class="{show: showVideoModal}" ng-click="closeVideoModal()">
+    <div class="video-modal-content" ng-click="$event.stopPropagation()">
+        <button class="modal-close2 video-close-btn" ng-click="closeVideoModal()"><i class="fas fa-times"></i></button>
+        <div class="video-container">
+            <iframe ng-src="{{currentVideoUrl}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" ng-class="{show: isMidiModalVisible}" ng-click="closeMidiModal()">
+    <div class="midi-modal-container" ng-click="$event.stopPropagation()">
+        <div class="midi-modal-header">
+            <div>
+                <h4 class="midi-modal-title">{{ currentMidi.title }}</h4>
+                <p class="midi-modal-user">{{ currentMidi.author }}</p>
+            </div>
+            <button class="midi-modal-close" ng-click="closeMidiModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="midi-modal-body">
+            <div class="midi-player-wrapper">
+                <midi-player id="libraryMidiPlayer" sound-font visualizer="#libraryMidiVisualizer"></midi-player>
+            </div>
+            <div class="midi-visualizer-wrapper">
+                <div class="wave-effect"></div>
+                <midi-visualizer id="libraryMidiVisualizer" type="waterfall"></midi-visualizer>
+            </div>
+        </div>
+    </div>
+</div>
+
           <div class="modal-overlay" ng-class="{show: showSaveRecordingModal}">
     <div class="modal-content2 save-recording-modal" ng-click="$event.stopPropagation()">
         <div class="upload-modal-header">
             <h2>Previsualizar y Guardar Grabación</h2>
-            <p>Escucha tu grabación y asigna un nombre antes de guardarla.</p>
+            <p>Escucha tu grabación y asigna a que ejercicio corresponde antes de enviarla a revisión.</p>
         </div>
 
         <div class="audio-preview-container">
@@ -1115,13 +1547,25 @@
         </div>
 
         <div class="recording-form">
-            <div class="form-group">
-                <label for="rec-name">Nombre del archivo</label>
-                <input type="text" id="rec-name" ng-model="recording.name">
+           <div class="form-group">
+                <label for="rec-exercise">
+                    {{ selectedBook.type === 'manual' ? 'Selecciona el ejercicio a entregar' : 'Ejercicio a entregar' }}
+                </label>
+
+                <select id="rec-exercise" class="form-select"
+                        ng-if="selectedBook.type === 'manual'"
+                        ng-model="recording.selectedTask"
+                        ng-options="lesson as lesson.task + ' (Pág. ' + lesson.pag + ')' for lesson in selectedBook.lessons | filter:uncompletedFilter">
+                    <option value="">-- Elige una tarea pendiente --</option>
+                </select>
+
+                <div class="form-display-text" ng-if="selectedBook.type !== 'manual'">
+                    {{ selectedBook.title }}
+                </div>
             </div>
             <div class="form-group">
-                <label for="rec-author">Autor (Opcional)</label>
-                <input type="text" id="rec-author" ng-model="recording.author" placeholder="Ej: Mi Práctica Diaria">
+                <label for="rec-author">Notas (Opcional)</label>
+                <input type="text" id="rec-author" ng-model="recording.notes" placeholder="Agrega algún comentario adicional">
             </div>
             <div class="recording-metadata">
                 <span><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> {{ recording.date | date:'dd/MM/yyyy h:mm a' }}</span>
@@ -1131,10 +1575,10 @@
 
         <div class="modal-actions-upload">
             <button class="modal-button secondary danger" ng-click="deleteRecording()">
-                <i class="fas fa-trash"></i> Eliminar
+                 Eliminar
             </button>
             <button class="modal-button primary" ng-click="saveRecording()">
-                <i class="fas fa-save"></i> Guardar
+                 Enviar
             </button>
         </div>
     </div>
@@ -1159,7 +1603,8 @@
             $scope.showPdfViewer = false;
             $scope.pdfUrl = '';
             $scope.isLoaded = false;
-          //  $scope.exe = 4; 
+            $scope.userSubmittedRecordings = []
+       
 
              $scope.showUploadModal = false;
               $scope.showLockedModal = false;
@@ -1169,14 +1614,24 @@
             // --- DATOS DE LA BIBLIOTECA ---
        var manualsData = [
     {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+            { 'lsn': 1, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
+            { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://site.com/midi1.mid' },
+            { 'lsn': 2, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://site.com/midi2.mid' },
+            { 'lsn': 2, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
+            { 'lsn': 3, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
+            { 'lsn': 4, 'id': 1, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
+            { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
+            { 'lsn': 4, 'id': 3, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
         ] },
     {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
+            { 'lsn': 5, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
+            { 'lsn': 5, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
+            { 'lsn': 6, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
+            { 'lsn': 6, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
+            { 'lsn': 7, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
+            { 'lsn': 7, 'id': 2, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
+            { 'lsn': 7, 'id': 3, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
+            { 'lsn': 8, 'id': 1, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
         ] },
     {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
@@ -1215,7 +1670,7 @@
 ];
 
            var piecesData = [
-    { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://admin.mozartacademy.mx/editNew2?fileId=Ode%20to%20Joy%20-%20Var%203.pdf", "lvl": 0, "lsn": 0, "grade": "Preparatory"},
+    { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://admin.mozartacademy.mx/editNew2?fileId=Ode%20to%20Joy%20-%20Var%203.pdf", "lvl": 0, "lsn": 0, "grade": "Preparatory", "midi": "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid"},
     { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory"},
     { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory"},
     { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory"},
@@ -1256,6 +1711,7 @@
         pdf: piece.pdf,
         lvl: piece.lvl,
         lsn: piece.lsn,
+        midi: piece.midi,
         // Las propiedades 'totalBars' y 'practiceData' se han eliminado
         type: 'piece' 
     };
@@ -1263,7 +1719,7 @@
 
             $scope.library = [
                 { title: 'Fundamentos del Piano', books: manuals },
-                { title: 'Piezas', books: pieces },
+                { title: 'Repertorio Formativo', books: pieces },
                 { title: 'Mis Archivos', books: $scope.userPDFs }
             ];
 
@@ -1284,10 +1740,11 @@
               var repertoire = JSON.parse(response.data.repertoire);
               var stage = JSON.parse(response.data.stage);
 
-                 $scope.library.push(repertoire)
+                // $scope.library.push(repertoire)
+               $scope.library = $scope.library.concat(repertoire);
                 $scope.lvl = stage.lvl;
                  $scope.lsn = stage.lsn;
-                 $scope.exe = stage.exes;
+                 $scope.userSubmittedRecordings = stage.exes || [];
                  $scope.isLoaded = true;
           })  
 
@@ -1312,6 +1769,47 @@
                     });
                 }
             };
+
+
+          $scope.showTaskModal = false;
+
+          $scope.openTaskModal = function() {
+              $scope.showTaskModal = true;
+          };
+
+          $scope.closeTaskModal = function() {
+              $scope.showTaskModal = false;
+          };
+
+
+
+          // ... dentro de app.controller('libraryCtrl', ...)
+
+// --- ESTADO Y VARIABLES PARA EL MODAL DE VIDEO ---
+$scope.showVideoModal = false;
+$scope.currentVideoUrl = ''; // Guardará la URL del video a reproducir
+
+// --- FUNCIONES PARA EL MODAL DE VIDEO ---
+
+$scope.openVideoModal = function(videoUrl) {
+    if (!videoUrl) return;
+
+    // Transforma la URL de YouTube a un formato "embed" para el iframe
+    const embedUrl = videoUrl.replace("watch?v=", "embed/");
+    
+    // Confía en la URL para poder usarla en ng-src de forma segura
+    $scope.currentVideoUrl = $sce.trustAsResourceUrl(embedUrl);
+    
+    $scope.showVideoModal = true;
+};
+
+$scope.closeVideoModal = function() {
+    $scope.showVideoModal = false;
+    // Es importante limpiar la URL para detener la reproducción del video en segundo plano
+    $scope.currentVideoUrl = '';
+};
+
+
 
 
              $scope.openUploadModal = function() {
@@ -1586,17 +2084,161 @@ $scope.closeSaveModal = function() {
     $scope.recording = {};
 };
 
-// Se ejecuta al hacer clic en "Guardar"
+
+
+
+
+// En tu libraryCtrl...
+
+// --- ESTADO Y VARIABLES PARA EL MODAL MIDI ---
+$scope.isMidiModalVisible = false;
+$scope.currentMidi = {}; // Guardará la info del MIDI actual
+
+// Referencias a los elementos del reproductor (se inicializarán al abrir el modal)
+let midiPlayer = null;
+let midiVisualizer = null;
+
+// --- FUNCIONES PARA EL MODAL MIDI ---
+$scope.openMidiModal = function(sourceObject) {
+    if (!sourceObject || !sourceObject.midi) return;
+
+    // Asigna la información del título y autor
+    $scope.currentMidi = {
+        title: sourceObject.task || sourceObject.title, // Usa 'task' si existe, si no, 'title'
+        author: sourceObject.author || '' // El autor puede no estar en el objeto 'task'
+    };
+    
+    // Muestra el modal
+    $scope.isMidiModalVisible = true;
+    
+    // $timeout asegura que el DOM esté actualizado y los elementos sean visibles
+    $timeout(function() {
+        // Inicializa las referencias a los elementos si aún no existen
+        if (!midiPlayer) {
+            midiPlayer = document.getElementById('libraryMidiPlayer');
+            midiVisualizer = document.getElementById('libraryMidiVisualizer');
+        }
+        
+        // Asigna la URL del MIDI al reproductor y visualizador
+        midiPlayer.src = sourceObject.midi;
+        midiVisualizer.src = sourceObject.midi;
+    });
+};
+
+$scope.closeMidiModal = function() {
+    if ($scope.isMidiModalVisible && midiPlayer) {
+        // Detiene la reproducción y limpia las fuentes para liberar memoria
+        midiPlayer.stop();
+        midiPlayer.src = "";
+        if (midiVisualizer) {
+            midiVisualizer.src = "";
+        }
+    }
+    // Oculta el modal y limpia la información
+    $scope.isMidiModalVisible = false;
+    $scope.currentMidi = {};
+};
+
+
+
+
+
+$scope.getCompletedTaskCountForManual = function(manual) {
+    if (!manual || !manual.lessons) return 0;
+    return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
+};
+
+$scope.getMaxLsnInBook = function(book) {
+    if (!book || !book.lessons || book.lessons.length === 0) return 0;
+    return Math.max(...book.lessons.map(l => l.lsn));
+};
+
+$scope.filterTasksForCurrentManual = function(task) {
+    if ($scope.selectedBook.lvl < $scope.lvl) {
+        return true;
+    }
+    if ($scope.selectedBook.lvl === $scope.lvl) {
+        return task.lsn <= $scope.lsn;
+    }
+
+    return false;
+};
+
+
+$scope.sentTasks = []; 
+
+$scope.isTaskCompleted = function(task) {
+    // 1. Si la tarea es de una lección global anterior a la actual del usuario, está completada.
+    if (task.lsn < $scope.lsn) {
+        return true;
+    }
+
+    // 2. Si la tarea es de la lección global actual, busca en las grabaciones del usuario.
+    if (task.lsn === $scope.lsn) {
+        // La búsqueda DEBE incluir tanto 'id' como 'lsn' para ser precisa.
+        const userRecording = $scope.userSubmittedRecordings.find(rec => 
+            rec.id === task.id 
+        );
+        // Solo se considera completada si la grabación existe y su estado es 'completed'.
+        return userRecording && userRecording.status === 'completed';
+    }
+
+    // 3. Si es una lección futura, no está completada.
+    return false;
+};
+
+$scope.getTaskOverallStatus = function(task) {
+    // Primero, usa la función anterior para ver si la tarea ya está completada.
+    if ($scope.isTaskCompleted(task)) {
+        return 'completed';
+    }
+
+    // Si no está completada y pertenece a la lección actual, busca su estado específico.
+    if (task.lsn === $scope.lsn) {
+        // La búsqueda DEBE incluir tanto 'id' como 'lsn'.
+        const userRecording = $scope.userSubmittedRecordings.find(rec => 
+            rec.id === task.id 
+        );
+
+        // Si se encuentra una grabación, ese es su estado actual ('sent' o 'fail').
+        if (userRecording) {
+            return userRecording.status; 
+        }
+    }
+
+    // Si no cumple ninguna de las anteriores, es una tarea pendiente.
+    return null;
+};
+
+$scope.uncompletedFilter = function(lesson) {
+    // Solo se pueden entregar tareas de la lección global actual del usuario.
+    if (lesson.lsn !== $scope.lsn) {
+        return false;
+    }
+    const overallStatus = $scope.getTaskOverallStatus(lesson);
+    // Y que no estén ya completadas o enviadas.
+    return overallStatus !== 'completed' && overallStatus !== 'sent';
+};
+
+
+
 $scope.saveRecording = function() {
-    if (!$scope.recording.name) {
-        alert("Por favor, asigna un nombre a la grabación.");
+    if (!$scope.recording.selectedTask) {
+        alert("Por favor, selecciona el ejercicio que estás entregando.");
         return;
     }
-    // Lógica de guardado (como pediste, un alert temporal)
-    alert(`Guardando archivo: \nNombre: ${$scope.recording.name}\nAutor: ${$scope.recording.author || 'N/A'}`);
-    
-    // Aquí iría tu lógica para subir el $scope.recording.blob a tu servidor o base de datos
-    
+    const submittedTask = $scope.recording.selectedTask;
+
+    const userRecordingEntry = {
+        lsn: submittedTask.lsn,
+        id: submittedTask.id,
+        audio: $scope.recording.url.toString(),
+        status: 'sent', 
+        notes: $scope.recording.notes,
+        date: $scope.recording.date.toISOString(),
+    };
+
+    $scope.userSubmittedRecordings.push(userRecordingEntry);
     $scope.closeSaveModal();
 };
 
@@ -1609,4 +2251,4 @@ $scope.deleteRecording = function() {
         }]);
     </script>
 </body>
-</html>  
+</html>    
