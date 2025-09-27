@@ -440,7 +440,7 @@
         .modal-button {
             padding: 15px 25px;
             border-radius: 12px;
-            width: 130px;
+           
             border: none;
             font-size: 16px;
             font-weight: 600;
@@ -449,6 +449,8 @@
             text-align: center;
             text-decoration: none; /* Para el tag <a> */
         }
+
+        .modal-actions .modal-button{ width: 130px; }
 
         .modal-button.primary {
             background: linear-gradient(135deg, #5668E2, #7343D9);
@@ -553,51 +555,7 @@
         .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
         .book-card:hover .delete-btn { opacity: 1; }
 
-        /* Responsive */
-        @media (max-width: 770px) {
-            .modal-content {
-                flex-direction: column;
-                max-width: 400px;
-                height: 90vh;
-                overflow-y: auto;
-            }
-            .modal-left {
-        padding: 0; /* Para que la imagen ocupe todo el espacio */
-        max-height: 120px; /* Puedes ajustar esta altura */
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        flex-shrink: 0; /* Evita que se encoja más de la cuenta */
-    }
-    
-    /* Cambio 2: Aplica object-fit */
-    .modal-preview-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* La propiedad clave */
-        max-height: none; /* Anula el max-height anterior */
-        border-radius: 0; /* Opcional: quita el borde redondeado para que encaje perfecto */
-    }
-            .modal-right {
-                width: 100%;
-                padding: 25px;
-            }
-        
-           .scroll-btn { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .search-box { min-width: 100%; }
-            .carousel-wrapper { margin-left: 0; margin-right: 0; }
-               .exercise-list-container{max-height: 320px !important;}
-        }
-
-          @media (max-width: 558px) {
-            .add-file-btn{display: none}
-            .bookTitle{display: none}
-            .modal-left{display: none}
-            .exercise-list-container{max-height: 260px !important;}
-          }
+     
 
 
 /* --- Nuevos estilos para la sección de progreso --- */
@@ -1033,6 +991,7 @@
     background-color: #e0e0e0;
 }
 
+
 .task-btn.video { color: #c4302b; }
 .task-btn.midi { color: #5668E2; }
 
@@ -1099,11 +1058,12 @@
 .task-status-container {
     flex-grow: 1; /* Ocupa el espacio central */
     text-align: right;
-    padding: 0 15px;
+
 }
 .task-status {
     font-size: 0.8rem;
     font-weight: 500;
+    margin-right: 5px;
     padding: 4px 8px;
     border-radius: 12px;
 }
@@ -1263,6 +1223,132 @@
     color: #555;
     box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
 }
+
+.progress-display2 {
+  padding: 5px 10px;
+color: white;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.progress-bar-container {
+  flex: 1;
+  min-width: 0;
+  padding-right: 15px;
+}
+
+.time-displays-container {
+  display: flex;
+  gap: 5px;
+  margin-right: 7px;
+}
+
+.time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 60px;
+}
+
+.time-display .label {
+  font-size: 11px;
+  color: #f5f5f5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: -10px;
+}
+
+.time-display .value {
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+
+}
+
+
+.progress-bar {
+
+  overflow: hidden;
+  height: 12px;
+  width: 130px;
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+
+.progress-fill {
+    height: 12px;
+    background: gray; /* Green for the filled part */
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    display: block;
+}
+
+
+.modal-actions2 {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+
+
+
+
+   /* Responsive */
+        @media (max-width: 770px) {
+            .modal-content {
+                flex-direction: column;
+                max-width: 400px;
+                height: 90vh;
+                overflow-y: auto;
+            }
+            .modal-left {
+        padding: 0; /* Para que la imagen ocupe todo el espacio */
+        max-height: 120px; /* Puedes ajustar esta altura */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0; /* Evita que se encoja más de la cuenta */
+    }
+    
+    /* Cambio 2: Aplica object-fit */
+    .modal-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* La propiedad clave */
+        max-height: none; /* Anula el max-height anterior */
+        border-radius: 0; /* Opcional: quita el borde redondeado para que encaje perfecto */
+    }
+            .modal-right {
+                width: 100%;
+                padding: 25px;
+            }
+        
+           .scroll-btn { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .search-box { min-width: 100%; }
+            .carousel-wrapper { margin-left: 0; margin-right: 0; }
+               .exercise-list-container{max-height: 320px !important;}
+        }
+
+          @media (max-width: 558px) {
+            .add-file-btn{display: none}
+            .bookTitle{display: none}
+            .modal-left{display: none}
+             .task-status {display: none !important;}
+            .exercise-list-container{max-height: 240px !important;}
+          }
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -1349,12 +1435,13 @@
                         </div>
                         <span class="progress-percentage">100%</span>
                     </div>
-                    <div class="exercise-list-header">Ejercicios Completados</div>
+                    <div class="exercise-list-header">Unidad Completada</div>
                     <div class="exercise-list-container">
                         <div class="exercise-item completed" ng-repeat="lesson in selectedBook.lessons track by $index">
                             {{ lesson.task }}
                         </div>
-                    </div>
+                    </div> 
+               
                </div>
 
                <div ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))"> 
@@ -1373,10 +1460,17 @@
               </div>
             </div>
 
-            <div class="modal-actions" >
+            <div  class="modal-actions" ng-if="selectedBook.type == 'manual' ">
                 <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
                 <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary" >Descargar</a>
             </div>
+
+              <div  class="modal-actions2" ng-if="selectedBook.type != 'manual'">
+                <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
+                <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary" >Descargar</a>
+            </div>
+
+
         </div>
     </div>
 </div>
@@ -1428,13 +1522,11 @@
   <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
   <div class="metronome-control">
   <!--  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> -->
-    <button class="tool-btn record-btn" ng-click="openTaskModal()" ng-if="selectedBook.type === 'manual'"> 
-   <i class="fa-solid fa-clipboard-list"></i>
-    </button>
+   
     <button class="tool-btn record-btn" ng-click="openMidiModal(selectedBook)" ng-if="selectedBook.type !== 'manual' && selectedBook.midi"> 
    <i class="fa-solid fa-music"></i>
     </button>
-      <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
+    <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
    <i class="fa-solid fa-microphone"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
@@ -1454,6 +1546,45 @@
 
             <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
         </div>
+
+
+
+     <div class="progress-display2" ng-if="selectedBook.type === 'manual'">
+     
+
+  <div class="progress-info" >
+
+    <div class="progress-bar-container" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
+      <div class="progress-label">Progreso: 100%</div>
+   <div class="progress-bar">
+  <div class="progress-fill" ng-style="{'width': 100 + '%', 'background': getManualColor(selectedBook)}"></div>
+</div>
+    </div>
+
+
+     <div class="progress-bar-container" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
+      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}} %</div>
+   <div class="progress-bar">
+  <div class="progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%', 'background': getManualColor(selectedBook)}"></div>
+</div>
+    </div>
+
+
+    <div class="time-displays-container">
+        
+     <button class="tool-btn record-btn" style="margin-right: 5px;" ng-click="openTaskModal()" > 
+   <i class="fa-solid fa-clipboard-list"></i>
+    </button>
+
+    <div class="time-display">
+        <span class="value">{{getCompletedTaskCountForManual(selectedBook)}}  /  {{selectedBook.totalExercises}}</span>
+        <span class="label">Ejercicios</span>
+      </div>
+    </div>  
+  </div>
+   </div>
+
+
 
      <div class="online-badge-container">
         <div class="online-badge" ng-if="isRecording2">
@@ -1725,7 +1856,7 @@
 
                 var requestData = {
           action: "getUserData",
-       //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+      //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
           token: localStorage.getItem('MStoken')
         };
 
@@ -2147,6 +2278,16 @@ $scope.getCompletedTaskCountForManual = function(manual) {
     if (!manual || !manual.lessons) return 0;
     return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
 };
+
+$scope.getManualColor = function(manual) {
+    if (manual.lvl == 0){return '#F44336'}
+    else if(manual.lvl == 1){return '#9024dc'}
+    else if(manual.lvl == 2){return '#1894cc'}
+    else if(manual.lvl == 3){return '#489454'}
+    else if(manual.lvl == 4){return '#fa9223'}
+    else if(manual.lvl == 5){return '#485cb4'}
+};
+
 
 $scope.getMaxLsnInBook = function(book) {
     if (!book || !book.lessons || book.lessons.length === 0) return 0;
