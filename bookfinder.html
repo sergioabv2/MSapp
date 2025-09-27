@@ -256,7 +256,6 @@
     border-radius: 20px;
     font-weight: 600;
     color: #374151;
-    margin-left: 24px; /* Ajusta según necesites */
 }
 .user-score .fa-star {
     color: #f59e0b; /* Amarillo/Dorado */
@@ -301,6 +300,10 @@
 .confirm-modal {
     max-width: 400px; /* Más pequeño que el modal de MIDI */
 }
+
+.sheet-actions .action-btn {
+    width: 100%;
+}
     </style>
 </head>
 <body ng-controller="sheetMusicCtrl">
@@ -313,15 +316,16 @@
                     <h1>Buscador de Partituras</h1>
                     <p>Encuentra y previsualiza partituras MIDI</p>
                 </div>
-                <div class="user-score">
-                <i class="fas fa-star"></i>
-                <span>{{ score }} Puntos</span>
-              </div>
+              
             </div>
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Buscar por título o compositor..." ng-model="filters.text">
             </div>
+              <div class="user-score">
+                <i class="fas fa-star"></i>
+                <span>{{ score }} Puntos</span>
+              </div>
         </div>
 
         <div class="main-layout">
@@ -363,16 +367,17 @@
                             <h3 class="sheet-title">{{ sheet.title }}</h3>
                             <p class="sheet-composer">{{ sheet.composer }}</p>
                             <div class="sheet-meta">
+                                    <span ><i class="fas fa-star"></i>{{ sheet.score }}</span>
                                 <span class="nomobile"> <i class="fas fa-file-alt"></i>{{ sheet.pages }} pág.</span>
                                 <span><i class="fas fa-signal"></i>{{ sheet.difficulty }}</span>
-         <span class="mobile"><i class="fas fa-star"></i>{{ sheet.score }}</span>
+     
                                 <span class="nomobile"><i class="fas fa-music"></i>{{ sheet.style }}</span>
                             </div>
                         </div>
                         <div class="sheet-actions-container">
-                            <div class="price-tag score-tag nomobile" ng-class="{free: sheet.score === 0}">
+                          <!--  <div class="price-tag score-tag nomobile" ng-class="{free: sheet.score === 0}">
                                 <i class="fas fa-star"></i> {{ sheet.score === 0 ? 'GRATIS' : sheet.score }}
-                            </div>
+                            </div>  -->
 
                             <div class="sheet-actions">
                                 <button class="action-btn preview-btn" ng-click="showPreview(sheet)">Preview</button>
