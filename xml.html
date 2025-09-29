@@ -1,288 +1,125 @@
-   
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" /> 
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visualizador MusicXML + Piano (Sampler)</title>
-  <style> 
+  <title>Visualizador MusicXML + Piano</title>
+  <style>
     * { box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
-      background: #fafafa; 
-      color: #1a1a1a; 
-      margin: 0; 
-      padding: 0; 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      margin: 0;
+      padding: 0;
+      padding-bottom: 160px; /* Espacio para el piano */
     }
     
-    /* Top Bar Minimalista */
     #top-bar {
       background: #fff;
       border-bottom: 1px solid #e5e5e5;
-      padding: 16px 24px;
+      padding: 12px 24px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     
-    h1 { 
-      margin: 0 0 16px 0; 
-      font-size: 20px; 
-      font-weight: 600; 
-      letter-spacing: -0.3px;
-      color: #1a1a1a;
+    .controls-left, .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
     
-    #controls { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      gap: 24px; 
-      flex-wrap: wrap; 
+    .icon-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 8px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center;
+      transition: background-color 0.2s;
     }
+    .icon-btn:hover:not(:disabled) { background-color: #f0f0f0; }
+    .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .icon-btn svg { width: 24px; height: 24px; fill: #1a1a1a; }
     
-    .controls-left, .controls-right { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      flex-wrap: wrap; 
-    }
-    
-    .control-group { 
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
-      padding: 6px 12px;
-      background: #f8f8f8;
-      border-radius: 8px;
-      border: 1px solid #e5e5e5;
-    }
-    
-    .control-group label { 
-      font-size: 13px; 
-      font-weight: 500; 
-      color: #666; 
-      white-space: nowrap;
-    }
-    
-    button { 
-      font-size: 14px; 
-      padding: 8px 16px; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      border: 1px solid #e5e5e5;
-      background: #fff;
-      color: #1a1a1a;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    
-    button:hover:not(:disabled) { 
-      background: #f8f8f8; 
-      border-color: #d0d0d0;
-    }
-    
-    button:active:not(:disabled) { 
-      transform: scale(0.98); 
-    }
-    
-    button:disabled { 
-      opacity: 0.4; 
-      cursor: not-allowed; 
-    }
-    
-    button.primary {
-      background: #1a1a1a;
-      color: #fff;
-      border-color: #1a1a1a;
-    }
-    
-    button.primary:hover:not(:disabled) {
-      background: #333;
-      border-color: #333;
-    }
-    
-    select { 
-      font-size: 14px; 
-      padding: 6px 10px; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      border: 1px solid #e5e5e5;
-      background: #fff;
-      color: #1a1a1a;
-      font-weight: 500;
-    }
-    
-    select:disabled { 
-      opacity: 0.4; 
-      cursor: not-allowed; 
-    }
-    
-    input[type="file"] {
-      font-size: 13px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid #e5e5e5;
-      background: #f8f8f8;
-      cursor: pointer;
+    .control-group {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px; background: #f8f8f8;
+      border-radius: 8px; border: 1px solid #e5e5e5;
     }
     
     input[type="range"] {
-      width: 100px;
-      height: 4px;
-      border-radius: 2px;
-      outline: none;
-      -webkit-appearance: none;
-      background: #e5e5e5;
+      width: 120px; height: 4px; border-radius: 2px;
+      outline: none; -webkit-appearance: none; background: #e5e5e5;
     }
-    
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #1a1a1a;
-      cursor: pointer;
-      transition: transform 0.2s;
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: #1a1a1a; cursor: pointer;
     }
     
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
-    }
+    .speed-display { text-align: center; width: 70px; }
+    .speed-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+    .speed-bpm { font-size: 11px; color: #999; font-weight: 500; }
     
-    input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #1a1a1a;
-      cursor: pointer;
-      border: none;
-    }
-    
-    .speed-display {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-    }
-    
-    .speed-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1a1a1a;
-    }
-    
-    .speed-bpm {
-      font-size: 11px;
-      color: #999;
-      font-weight: 500;
-    }
-    
-    #status { 
-      font-size: 12px; 
-      color: #999; 
-      margin-top: 12px; 
-      font-weight: 500;
+    #status {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); font-size: 14px;
+      color: #999; font-weight: 500;
     }
     
     /* Contenedor de partitura */
-    #osmd-container { 
-      max-width: 1200px; 
-      margin: 32px auto; 
-      background: #fff; 
-      padding: 32px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04); 
-      min-height: 300px; 
-      border-radius: 12px;
-      border: 1px solid #e5e5e5;
+    #osmd-container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 20px; /* Añadido para mejor espaciado */
+      min-height: 300px;
+      cursor: pointer;
+      /* SOLUCIÓN DE DISEÑO: Borde para visualizar el contenedor */
+      border: 1px solid #e0e0e0;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
     /* Piano */
-    #piano-container { 
-      position: fixed; 
-      left: 0; 
-      bottom: 0; 
-      width: 100%; 
-      background: #fff; 
-      padding: 16px 0; 
-      display: flex; 
-      justify-content: center; 
-      align-items: flex-start; 
-      box-shadow: 0 -1px 3px rgba(0,0,0,0.08); 
+    #piano-container {
+      position: fixed; left: 0; bottom: 0; width: 100%;
+      background: #fff; padding: 16px 0;
+      display: flex; justify-content: center;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
       border-top: 1px solid #e5e5e5;
       transition: transform 0.3s ease;
     }
-    
-    #piano-container.hidden {
-      transform: translateY(100%);
-    }
-    
-    .key { 
-      box-sizing: border-box; 
-      border: 1px solid #e5e5e5; 
-      position: relative; 
-      transition: all 0.08s;
-    }
-    
-    .key.white { 
-      width: 40px; 
-      height: 120px; 
-      background: #fff; 
-      margin: 0; 
-      display: inline-block; 
-    }
-    
-    .key.white:hover {
-      background: #f8f8f8;
-    }
-    
-    .key.black { 
-      width: 26px; 
-      height: 80px; 
-      background: #1a1a1a; 
-      margin-left: -13px; 
-      margin-right: -12px; 
-      z-index: 2; 
-      display: inline-block; 
-    }
-    
-    .key.black:hover {
-      background: #333;
-    }
-    
-    .key.active { 
-      background: #3498db !important; 
-      box-shadow: 0 0 12px rgba(52, 152, 219, 0.5); 
-      transform: translateY(2px);
-    }
+    #piano-container.hidden { transform: translateY(100%); }
+    .key { box-sizing: border-box; border: 1px solid #e5e5e5; position: relative; }
+    .key.white { width: 40px; height: 120px; background: #fff; }
+    .key.black { width: 26px; height: 80px; background: #1a1a1a; margin-left: -13px; margin-right: -12px; z-index: 2; }
+    .key.active { background: #3498db !important; }
   </style>
 </head>
 <body>
+
   <div id="top-bar">
-    <h1>Visualizador MusicXML</h1>
-    <div id="controls">
-      <div class="controls-left">
-        <input id="file-input" type="file" accept=".xml,.musicxml" />
-        <button id="play-btn" class="primary" disabled>▶️ Reproducir</button>
-        <button id="stop-btn" disabled>⏹️ Detener</button>
-        <button id="toggle-piano-btn">🎹 Ocultar Piano</button>
-      </div>
-      <div class="controls-right">
-        <div class="control-group">
-          <label for="measure-selector">Compás:</label>
-          <select id="measure-selector" disabled></select>
-        </div>
-        <div class="control-group">
-          <label for="speed-slider">Velocidad:</label>
-          <input type="range" id="speed-slider" min="0.1" max="2.0" value="1.0" step="0.05">
-          <div class="speed-display">
-            <span id="speed-label" class="speed-value">1.00x</span>
-            <span id="speed-bpm" class="speed-bpm">120 BPM</span>
-          </div>
+    <div class="controls-left">
+      <button id="play-btn" class="icon-btn" disabled title="Reproducir/Pausar">
+        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+      </button>
+      <button id="toggle-piano-btn" class="icon-btn" title="Mostrar/Ocultar Piano">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H9v-4h2v4zm0-6H9V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4z"></path></svg>
+      </button>
+    </div>
+    <div id="status">Cargando...</div>
+    <div class="controls-right">
+      <div class="control-group">
+        <input type="range" id="speed-slider" min="0.25" max="2.0" value="1.0" step="0.05">
+        <div class="speed-display">
+          <span id="speed-label" class="speed-value">1.00x</span>
+          <span id="speed-bpm" class="speed-bpm">120 BPM</span>
         </div>
       </div>
     </div>
-    <div id="status">Esperando archivo...</div>
   </div>
 
   <div id="osmd-container"></div>
@@ -291,102 +128,118 @@
   <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.3/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
-  <script>
-  // ----- Elementos -----
-  const fileInput = document.getElementById('file-input');
-  const playBtn = document.getElementById('play-btn');
-  const stopBtn = document.getElementById('stop-btn');
-  const osmdContainer = document.getElementById('osmd-container');
-  const statusDiv = document.getElementById('status');
-  const pianoContainer = document.getElementById('piano-container');
-  const speedSlider = document.getElementById('speed-slider');
-  const speedLabel = document.getElementById('speed-label');
-  const speedBpmLabel = document.getElementById('speed-bpm');
-  const measureSelector = document.getElementById('measure-selector');
-  const togglePianoBtn = document.getElementById('toggle-piano-btn');
+ <script>
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const osmdContainer = document.getElementById('osmd-container');
+    const statusDiv = document.getElementById('status');
+    const pianoContainer = document.getElementById('piano-container');
+    const speedSlider = document.getElementById('speed-slider');
+    const speedLabel = document.getElementById('speed-label');
+    const speedBpmLabel = document.getElementById('speed-bpm');
 
-  // ----- Variables -----
-  let osmd = null;
-  let sampler = null;
-  let scheduledTimeouts = [];
-  let parsedNotes = [];
-  let measureStartTimes = []; 
-  let isPlaying = false;
-  let globalTempo = 120;
-  let playbackRate = 1.0;
-  let isPianoVisible = true;
-
-  // ----- Init OSMD -----
-  try {
-    osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
-      backend: 'svg', drawTitle: true, followCursor: true,
-      cursorsOptions: [{ type: 1, color: "rgba(52,152,219,0.8)", alpha: 0.8, follow: true }]
-    });
-    setStatus('Listo — carga un archivo MusicXML');
-  } catch (e) { setStatus('Error al inicializar OSMD: ' + e.message); }
-
-  // ----- Sampler -----
-  sampler = new Tone.Sampler({
-    urls: { "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", "A4": "A4.mp3" },
-    release: 1, baseUrl: "https://tonejs.github.io/audio/salamander/"
-  }).toDestination();
-  
-  // ----- Piano visual -----
-  function createPiano() {
-    pianoContainer.innerHTML = '';
-    const pattern = [
-      { note: 'C', hasBlack: true }, { note: 'D', hasBlack: true }, { note: 'E', hasBlack: false },
-      { note: 'F', hasBlack: true }, { note: 'G', hasBlack: true }, { note: 'A', hasBlack: true }, { note: 'B', hasBlack: false }
-    ];
-    for (let octave = 2; octave <= 5; octave++) {
-      pattern.forEach(({note, hasBlack}) => {
-        const white = document.createElement('div'); 
-        white.className = 'key white'; 
-        white.id = `${note}${octave}`; 
-        pianoContainer.appendChild(white);
-        if (hasBlack) { 
-          const black = document.createElement('div'); 
-          black.className = 'key black'; 
-          black.id = `${note}#${octave}`; 
-          pianoContainer.appendChild(black); 
-        }
-      });
-    }
-  }
-  createPiano();
-  
-  function highlightKey(noteName, durSec) {
-    const el = document.getElementById(noteName);
-    if (!el) return;
-    el.classList.add('active');
-    setTimeout(() => el.classList.remove('active'), Math.max(80, durSec * 1000));
-  }
-  
-  function setStatus(text){ statusDiv.textContent = text; }
-
-  // ----- Parse MusicXML -----
-  async function parseMusicXML(xmlText) {
-    parsedNotes = [];
-    measureStartTimes = [];
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, 'application/xml');
+    let osmd = null;
+    let sampler = null;
+    let parsedNotes = [];
+    let measureStartTimes = [];
+    let globalTempo = 120;
     
-    const divisions = parseInt(xml.querySelector('divisions')?.textContent.trim() || '24', 10);
-    const soundTempo = xml.querySelector('direction sound[tempo], sound[tempo]');
-    globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute('tempo')) : 120;
+    // SOLUCIÓN: Variables para almacenar las "partes" de Tone.js
+    let audioPart = null;
+    let visualPart = null;
     
-    // Actualizar BPM display inicial
-    speedBpmLabel.textContent = `${Math.round(globalTempo * playbackRate)} BPM`;
+    const MUSICXML_URL = 'https://storage.googleapis.com/mozartacademy-files/midi/clowns-dmitri-kabalevsky.musicxml';
 
-    const parts = xml.querySelectorAll('part');
-    parts.forEach((part, partIndex) => {
-      let currentBeat = 0;
-      const measures = part.querySelectorAll('measure');
+    document.addEventListener('DOMContentLoaded', async () => {
+      setStatus('Inicializando...');
+      initOSMD();
+      createPiano();
+      addEventListeners();
+      initSampler();
       
-      measures.forEach(measure => {
-        if (partIndex === 0) {
-            measureStartTimes.push(currentBeat * (60.0 / globalTempo));
+      setStatus('Cargando sonidos de piano...');
+      await Tone.loaded();
+      setStatus('Sonidos listos. Cargando partitura...');
+      await loadMusicXMLFromUrl(MUSICXML_URL);
+    });
+
+    function initOSMD() {
+      try {
+        osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
+          backend: 'svg',
+          drawTitle: false,
+          followCursor: true,
+          autoResize: false, 
+          cursorsOptions: [{ type: 1, color: "rgba(52,152,219,0.8)", alpha: 0.8, follow: true }]
+        });
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+      } catch (e) { setStatus('Error al inicializar OSMD'); }
+    }
+
+    function initSampler() {
+      sampler = new Tone.Sampler({
+        urls: { "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", "A4": "A4.mp3" },
+        release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/"
+      }).toDestination();
+    }
+
+    function createPiano() {
+        pianoContainer.innerHTML = '';
+        const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        const blackKeys = { 'C': 'C#', 'D': 'D#', 'F': 'F#', 'G': 'G#', 'A': 'A#' };
+        for (let octave = 2; octave <= 5; octave++) {
+            for (const note of pattern) {
+                const whiteKey = document.createElement('div');
+                whiteKey.className = 'key white';
+                whiteKey.id = `${note}${octave}`;
+                pianoContainer.appendChild(whiteKey);
+                if (blackKeys[note]) {
+                    const blackKey = document.createElement('div');
+                    blackKey.className = 'key black';
+                    blackKey.id = `${blackKeys[note]}${octave}`;
+                    pianoContainer.appendChild(blackKey);
+                }
+            }
         }
+    }
+
+    async function loadMusicXMLFromUrl(url) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`La red no respondió correctamente`);
+        const text = await response.text();
+        await osmd.load(text);
+        osmdContainer.innerHTML = ''; 
+        await osmd.render();
+        
+        parseMusicXML(text);
+        scheduleNotesOnTransport();
+
+        playBtn.disabled = false;
+        setStatus('Listo para reproducir');
+      } catch (err) {
+        setStatus(`Error al cargar: ${err.message}`);
+      }
+    }
+    
+    function parseMusicXML(xmlText) {
+      parsedNotes = [];
+      measureStartTimes = [0];
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, 'application/xml');
+      
+      const divisions = parseInt(xml.querySelector('divisions')?.textContent.trim() || '24', 10);
+      const soundTempo = xml.querySelector('direction sound[tempo], sound[tempo]');
+      globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute('tempo')) : 120;
+      updateBpmDisplay();
+      Tone.Transport.bpm.value = globalTempo;
+
+      let currentBeat = 0;
+      const measures = xml.querySelectorAll('part:first-of-type measure');
+      measures.forEach((measure, measureIndex) => {
+        if (measureIndex > 0) measureStartTimes.push(currentBeat * (60.0 / globalTempo));
 
         const nodes = measure.querySelectorAll('note, backup, forward');
         nodes.forEach(node => {
@@ -394,7 +247,6 @@
           if (node.tagName === 'note') {
             const isChord = !!node.querySelector('chord');
             if (!node.querySelector('rest') && node.querySelector('pitch')) {
-              const startBeat = currentBeat;
               const step = node.querySelector('step')?.textContent?.trim();
               const octave = node.querySelector('octave')?.textContent?.trim();
               const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
@@ -402,7 +254,7 @@
               
               parsedNotes.push({
                 pitch: `${step}${accidental}${octave}`,
-                startSec: startBeat * (60.0 / globalTempo),
+                startSec: currentBeat * (60.0 / globalTempo),
                 durSec: (durationVal / divisions) * (60.0 / globalTempo)
               });
             }
@@ -414,166 +266,148 @@
           }
         });
       });
-    });
-    parsedNotes.sort((a, b) => a.startSec - b.startSec);
-    setStatus(`Parseado: ${parsedNotes.length} notas — Tempo ${Math.round(globalTempo)} BPM`);
-  }
+    }
 
-  // ----- Lógica de Reproducción -----
-  function schedulePlayback(startTime = 0) {
-    clearScheduled();
-    const notesToPlay = parsedNotes.filter(n => n.startSec >= startTime);
-    if (notesToPlay.length === 0) {
-        setStatus('No hay notas para reproducir desde este punto.');
-        return;
+    // --- LÓGICA DE REPRODUCCIÓN REFACTORIZADA CON TONE.PART ---
+    function scheduleNotesOnTransport() {
+      // Limpia cualquier evento o parte anterior
+      if (audioPart) audioPart.dispose();
+      if (visualPart) visualPart.dispose();
+      Tone.Transport.cancel();
+      osmd.cursor.reset();
+      osmd.cursor.hide();
+
+      // Crea los eventos para la parte de audio
+      const audioEvents = parsedNotes.map(note => ({
+        time: note.startSec,
+        pitch: note.pitch,
+        duration: note.durSec
+      }));
+
+      // Crea los eventos para la parte visual (cursor y resaltado)
+      const visualEvents = [];
+      const notesByTime = new Map();
+      parsedNotes.forEach(note => {
+        if(!notesByTime.has(note.startSec)) notesByTime.set(note.startSec, []);
+        notesByTime.get(note.startSec).push(note);
+      });
+
+      notesByTime.forEach((notes, time) => {
+        visualEvents.push({ time: time, notes: notes });
+      });
+
+      // Crea la parte de AUDIO
+      audioPart = new Tone.Part((time, value) => {
+        sampler.triggerAttackRelease(value.pitch, value.duration, time);
+      }, audioEvents).start(0);
+
+      // Crea la parte VISUAL
+      visualPart = new Tone.Part((time, value) => {
+        Tone.Draw.schedule(() => {
+          osmd.cursor.next();
+          value.notes.forEach(note => highlightKey(note.pitch, note.durSec));
+        }, time);
+      }, visualEvents).start(0);
+      
+      const lastNote = parsedNotes[parsedNotes.length - 1];
+      const totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
+      Tone.Transport.scheduleOnce(() => stopPlayback(), totalDuration + 0.5);
     }
     
-    osmd.cursor.reset();
-    const firstNoteIndex = parsedNotes.findIndex(n => n.startSec >= startTime);
-    if (firstNoteIndex > 0) {
-        for (let i = 0; i < firstNoteIndex; i++) { osmd.cursor.next(); }
-    }
-    osmd.cursor.show();
-    
-    const notesByTime = new Map();
-    notesToPlay.forEach(note => {
-      if (!notesByTime.has(note.startSec)) notesByTime.set(note.startSec, []);
-      notesByTime.get(note.startSec).push(note);
-    });
+    function playFromMeasure(measureIndex) {
+        if (Tone.Transport.state === 'started') stopPlayback();
+        const startTime = measureStartTimes[measureIndex] || 0;
+        
+        osmd.cursor.reset();
+        const notesBeforeStart = parsedNotes.filter(n => n.startSec < startTime);
+        const uniqueTimestamps = new Set(notesBeforeStart.map(n => n.startSec));
+        uniqueTimestamps.forEach(ts => {
+            notesBeforeStart.filter(n => n.startSec === ts).forEach(() => osmd.cursor.next());
+        });
 
-    const now = Tone.now() + 0.1; 
-    notesByTime.forEach((notesAtSameTime, noteStartSec) => {
-      const scheduledTime = now + ((noteStartSec - startTime) / playbackRate);
-      const timeoutId = setTimeout(() => {
-        notesAtSameTime.forEach(note => {
-          try {
-            sampler.triggerAttackRelease(note.pitch, note.durSec / playbackRate, Tone.now());
-            highlightKey(note.pitch, note.durSec / playbackRate);
-          } catch (e) { console.warn('Error al reproducir nota', note.pitch, e); }
+        Tone.Transport.start(Tone.now() + 0.1, startTime);
+        updatePlayButton(true);
+        setStatus(`Reproduciendo compás ${measureIndex + 1}...`);
+        osmd.cursor.show();
+    }
+
+    function stopPlayback() {
+      Tone.Transport.stop();
+      osmd.cursor.reset();
+      osmd.cursor.hide();
+      updatePlayButton(false);
+      setStatus('Listo para reproducir');
+    }
+
+    function addEventListeners() {
+      playBtn.addEventListener('click', async () => {
+        await Tone.start();
+        if (Tone.Transport.state === 'started') {
+            Tone.Transport.pause();
+            updatePlayButton(false);
+            setStatus('Pausado');
+        } else {
+            Tone.Transport.start(Tone.now() + 0.1);
+            updatePlayButton(true);
+            setStatus('Reproduciendo...');
+            osmd.cursor.show();
+        }
+      });
+      
+      // SOLUCIÓN: El listener de velocidad ahora funciona en tiempo real sin detenerse
+      speedSlider.addEventListener('input', (e) => {
+        Tone.Transport.playbackRate = parseFloat(e.target.value);
+        updateBpmDisplay();
+      });
+
+      document.getElementById('toggle-piano-btn').addEventListener('click', () => {
+        pianoContainer.classList.toggle('hidden');
+      });
+      
+      osmdContainer.addEventListener('mousedown', (event) => {
+        if (!osmd?.graphic?.measureList) return;
+        const BBox = osmdContainer.getBoundingClientRect();
+        const clickX = event.clientX - BBox.left;
+        const clickY = event.clientY - BBox.top;
+        
+        let closestMeasureIndex = -1;
+        osmd.graphic.measureList.forEach((measure, measureIndex) => {
+            measure.forEach(staffEntry => {
+                if (!staffEntry.staves[0]) return;
+                const boundingBox = staffEntry.staves[0].boundingBox;
+                if(boundingBox.x <= clickX && clickX <= boundingBox.x + boundingBox.width &&
+                   boundingBox.y <= clickY && clickY <= boundingBox.y + boundingBox.height) {
+                    closestMeasureIndex = measureIndex;
+                }
+            });
         });
         
-        notesAtSameTime.forEach(() => {
-          osmd.cursor.next();
-        });
-
-      }, (scheduledTime - Tone.now()) * 1000);
-      scheduledTimeouts.push(timeoutId);
-    });
-    
-    const lastNote = notesToPlay[notesToPlay.length - 1];
-    const endTime = now + ((lastNote.startSec + lastNote.durSec - startTime) / playbackRate);
-    const endTimeout = setTimeout(() => {
-      isPlaying = false;
-      playBtn.textContent = '▶️ Reproducir';
-      playBtn.classList.add('primary');
-      setStatus('Reproducción finalizada');
-    }, (endTime - Tone.now()) * 1000);
-    scheduledTimeouts.push(endTimeout);
-    
-    isPlaying = true;
-    playBtn.textContent = '⏸️ Pausar';
-    playBtn.classList.remove('primary');
-    setStatus('Reproduciendo...');
-  }
-
-  function clearScheduled() { 
-    scheduledTimeouts.forEach(id => clearTimeout(id)); 
-    scheduledTimeouts = []; 
-    Tone.Transport.cancel(); 
-  }
-  
-  function stopPlayback() { 
-    clearScheduled(); 
-    isPlaying = false; 
-    playBtn.textContent = '▶️ Reproducir'; 
-    playBtn.classList.add('primary');
-    setStatus('Detenido'); 
-    osmd.cursor.reset(); 
-  }
-
-  // ----- UI & Events -----
-  function populateMeasureSelector() {
-    measureSelector.innerHTML = '';
-    measureStartTimes.forEach((_, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = `Compás ${index + 1}`;
-        measureSelector.appendChild(option);
-    });
-    measureSelector.disabled = false;
-  }
-
-  fileInput.addEventListener('change', async (e) => {
-    const f = e.target.files[0]; if (!f) return;
-    setStatus('Cargando archivo...');
-    try {
-      const text = await f.text();
-      await osmd.load(text);
-      await osmd.render();
-      await parseMusicXML(text);
-      populateMeasureSelector();
-      
-      playBtn.disabled = false; stopBtn.disabled = false;
-      setStatus(`Archivo cargado: ${f.name} — ${parsedNotes.length} notas`);
-    } catch (err) { 
-      console.error('Error al cargar archivo:', err); 
-      setStatus('Error al cargar archivo: ' + err.message); 
+        if (closestMeasureIndex !== -1) playFromMeasure(closestMeasureIndex);
+      });
     }
-  });
 
-  playBtn.addEventListener('click', async () => {
-    try {
-      await Tone.start();
-      if (!isPlaying) {
-        const startMeasureIndex = parseInt(measureSelector.value || '0', 10);
-        const startTime = measureStartTimes[startMeasureIndex] || 0;
-        schedulePlayback(startTime);
-      } else {
-        stopPlayback();
-      }
-    } catch (err) { 
-      console.error('Error al iniciar audio:', err); 
-      setStatus('Error al iniciar audio: ' + err.message); 
+    function updatePlayButton(isPlaying) {
+      playIcon.style.display = isPlaying ? 'none' : 'block';
+      pauseIcon.style.display = isPlaying ? 'block' : 'none';
     }
-  });
 
-  stopBtn.addEventListener('click', () => { stopPlayback(); });
-
-  speedSlider.addEventListener('input', (e) => {
-    playbackRate = parseFloat(e.target.value);
-    const currentBPM = Math.round(globalTempo * playbackRate);
-    speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
-    speedBpmLabel.textContent = `${currentBPM} BPM`;
-    if (isPlaying) {
-        stopPlayback();
+    function updateBpmDisplay() {
+      const playbackRate = Tone.Transport?.playbackRate ?? 1.0;
+      const currentBPM = Math.round(Tone.Transport.bpm.value * playbackRate);
+      speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
+      speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
-  });
 
-  togglePianoBtn.addEventListener('click', () => {
-    isPianoVisible = !isPianoVisible;
-    if (isPianoVisible) {
-      pianoContainer.classList.remove('hidden');
-      togglePianoBtn.textContent = '🎹 Ocultar Piano';
-    } else {
-      pianoContainer.classList.add('hidden');
-      togglePianoBtn.textContent = '🎹 Mostrar Piano';
+    function highlightKey(noteName, durSec) {
+        const noteId = noteName.replace('b', '#');
+        const el = document.getElementById(noteId);
+        if (!el) return;
+        el.classList.add('active');
+        const highlightDuration = Math.max(80, durSec * 1000 / (Tone.Transport?.playbackRate ?? 1.0));
+        setTimeout(() => el.classList.remove('active'), highlightDuration);
     }
-  });
 
-  measureSelector.addEventListener('change', () => { 
-    if (isPlaying) { 
-      stopPlayback(); 
-    } 
-  });
-  
-  window.addEventListener('keydown', (ev) => { 
-    if (ev.code === 'Space' && !playBtn.disabled) { 
-      ev.preventDefault(); 
-      playBtn.click(); 
-    } 
-  });
-  
-  sampler.on('load', () => { console.log('Sampler cargado'); });
+    function setStatus(text) { statusDiv.textContent = text; }
   </script>
 </body>
 </html>
