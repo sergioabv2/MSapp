@@ -158,6 +158,9 @@ ion-side-menu .item:hover i {
   transform: scale(1.1); /* Agrandar ligeramente el ícono */
 }
 
+ion-side-menu .item:hover img {
+  transform: scale(1.1); /* Agrandar ligeramente el ícono */
+}
 
 ion-side-menu .list .item:hover {
   background-color: #f5f6f6; /* Fondo hover */
@@ -559,6 +562,9 @@ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 @media (min-width: 850px) {
 .menubtn{
     display: none;
+  }
+  .online-badge{
+    display: flex !important;
   }
  .hintMsg{
         display: none;
@@ -1780,7 +1786,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         .schedule-item {
             display: flex;
             align-items: center;
-            padding: 16px 0;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(0,0,0,0.05);
             transition: all 0.2s ease;
         }
@@ -1788,7 +1794,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         .schedule-item:hover {
             background: rgba(248, 250, 252, 0.5);
             margin: 0 -16px;
-            padding: 16px;
+            padding: 10px;
             border-radius: 8px;
         }
 
@@ -2931,8 +2937,27 @@ width: 200px; /* Ajusta según el tamaño deseado */
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+
+.headIcon {
+ width: 38px;
+  height: 38px;
+  border-radius: 50% !important; /* Esto lo hace circular */
+  background-color: #e4e6eb !important;
+
+  color: #050505 !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+
+
+.headIcon:hover {
+  background-color: #d8dbdf !important;
+}
+
+
+
  .online-badge {
-            display: flex;
+            display: none;
             align-items: center;
             gap: 8px;
             background: white;
@@ -3067,11 +3092,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
    
        
     <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="left"><i class="ri-presentation-line" ></i>&nbsp&nbspLecciones</a>       
- <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-live-line"></i>&nbsp&nbspLive Sessions</a>      
+ <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-live-line"></i>&nbsp&nbspLive Sessions</a>   
+   <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-shelf-line" ></i>&nbsp&nbspRepertorio</a>    
      <hr>
-        <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-shelf-line" ></i>&nbsp&nbspMi Biblioteca</a> 
-      <a href="#/menu/finder" class="item" ng-class="(activeMenuClr=='finder')?'menuSelectedColor':''" ng-click="activeMenuClr = 'finder'" menu-toggle="left"><i class="ri-book-marked-line"></i>&nbsp&nbspSongbook</a>
-          <a href="#/menu/recordings" class="item" ng-class="(activeMenuClr=='recordings')?'menuSelectedColor':''" ng-click="activeMenuClr = 'recordings'" menu-toggle="left"><i class="ri-radio-button-line"></i>&nbsp&nbspMis Grabaciones</a>         
+      
+      <a href="#/menu/finder" class="item" ng-class="(activeMenuClr=='finder')?'menuSelectedColor':''" ng-click="activeMenuClr = 'finder'" menu-toggle="left"><i class="ri-book-marked-line"></i>&nbsp&nbspLibreria</a>
+          <a href="#/menu/recordings" class="item" ng-class="(activeMenuClr=='recordings')?'menuSelectedColor':''" ng-click="activeMenuClr = 'recordings'" menu-toggle="left"><img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 21px; width: 21px; margin-left: 1px; margin-right: 9px">&nbsp&nbspScores</a>         
          <hr>
      <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-award-fill"></i>&nbsp&nbspMozart Gallery</a>  
 
@@ -3087,7 +3113,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         </ion-content>
  <ion-footer-bar style="z-index: 999 !important;">
          <button class="button button-royal pull-left" ng-if="isMobile" ng-click="installApp()" ><i class="ri-download-cloud-2-line" ></i> Descargar</button>
-  <button class="button pull-right" ng-click=""><i class="icon ri-question-line"></i>Ayuda</button>
+  <button class="button pull-right" ng-click="dropdownChat()"><i class="icon ri-question-line"></i>Ayuda</button>
 </ion-footer-bar>
 
       </ion-side-menu>
@@ -3110,16 +3136,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
    <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -3131,16 +3157,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
             <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
@@ -3149,14 +3175,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <div class="status-pulse"></div>
-                <div class="status-ring"></div>
-            </div>
-            <span class="status-text">Online</span>
-        </div>
+           
         </ion-nav-buttons>  
 
        
@@ -3527,16 +3546,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -3546,19 +3565,18 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </button>
 
 
- <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="!loadingProfile">
+ <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
-          <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" ng-if="userData.status == 'ACTIVO'"/>
-              <img class="profile-avatar2" src="lh3.googleusercontent.com/d/1CHGXJ18BuHLclo_XrGyqq-SnV1j6sZXL" width="30" height="30" ng-if="userData.status != 'ACTIVO'"/>
+            <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
@@ -3821,7 +3839,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   <div class="card-header">
     <h2><i class="fas fa-calendar-alt"></i> Próximas Clases</h2>
   </div>
-  <div class="card-body" style=" padding-top: 5px; max-height: 320px; overflow-y: auto; position: relative;" id="card-schedule">
+  <div class="card-body" style=" padding-top: 5px; max-height: 250px; overflow-y: auto; position: relative;" id="card-schedule">
     <div class="schedule-item" ng-repeat="item in userAgenda"  ng-if="item.title !== 'Próximo pago'" id="{{ item.isNextClass ? 'next-class-item' : '' }}">
       <div class="schedule-date" ng-class="{
        'schedule-date-past': item.isPast,
@@ -3948,9 +3966,10 @@ width: 200px; /* Ajusta según el tamaño deseado */
     
     <!-- Botones Flotantes -->
     <div class="floating-buttons">
-      <!-- Botón de Chat -->
+
       <button class="button floating-btn chat" 
-              ng-click="openChat()" ng-show="webrtc.connectionStatus !== 'disconnected'">
+              ng-click="openChat()" 
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
         <i class="fas fa-comment-dots"></i>
         <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
           {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
@@ -3965,12 +3984,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
       </button>
       
-      <!-- Botón de Video -->
-      <button class="button floating-btn video"
-              ng-click="toggleVideo()"
-              ng-show="webrtc.connectionStatus !== 'disconnected'">
-        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
-      </button>
     </div>
     
     <!-- Modal de Chat Personalizado -->
@@ -4019,16 +4032,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -4038,18 +4051,18 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </button>
 
 
- <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="!loadingProfile">
+ <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
-          <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
+            <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
@@ -4215,16 +4228,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -4236,16 +4249,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
             <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
@@ -4254,14 +4267,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <div class="status-pulse"></div>
-                <div class="status-ring"></div>
-            </div>
-            <span class="status-text">Online</span>
-        </div>
+           
         </ion-nav-buttons>  
 
        
@@ -4453,16 +4459,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -4471,19 +4477,18 @@ width: 200px; /* Ajusta según el tamaño deseado */
             Upgrade
           </button>
 
-
  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
             <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
@@ -4492,14 +4497,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <div class="status-pulse"></div>
-                <div class="status-ring"></div>
-            </div>
-            <span class="status-text">Online</span>
-        </div>
+            
         </ion-nav-buttons>  
 
        
@@ -4650,16 +4648,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 20px;" ng-if="userData.status == 'ACTIVO'">
-    <i class="ri-customer-service-2-line"></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
+      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+    <i class="ri-chat-3-fill"></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
-</button> 
+</button>  
       
-    <button class="button button-clear" ng-click="dropdownNotif()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 25px;" ng-if="userData.status == 'ACTIVO'">
-  <i class="ri-notification-3-line" ></i>
-            <div style="position: absolute; top: -3px; left: 18px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
+    <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-notification-3-fill" ></i>
+            <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(alerts | filter:{seen: false}).length && alertCounter">
         <div style="font-size: 13px; color: white;" > {{(alerts | filter:{seen: false}).length}}</div>
     </div> 
 </button>
@@ -4671,16 +4669,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
  <button class="button button-clear" ng-class="{ 'barImage': btnBar}" ng-click="toggleDropdown()" style="font-size: 18px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <div style="display: flex; align-items: center;">
-        <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
+     <!--   <div class="user-info" style="text-align: right; margin-right: 5px; margin-left: -7px" ng-if="userData.status == 'ACTIVO'">
                     <div style="font-size: 13px; font-weight: 600; color: #333; line-height: 1.2;">{{userData.name}}</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl == 0">Preparatorio</div>
                     <div style="font-size: 11px; color: #777; line-height: 1.1;" ng-if="userLvl != 0">Nivel {{userLvl}}</div>
-        </div>
+        </div> -->
  <div style="position: relative;" class="profilImg">
             <img class="profile-avatar2" src="{{userData.photo}}" width="30" height="30" />
         </div>
     </div>
-</button>
+</button>  
 
 
     
