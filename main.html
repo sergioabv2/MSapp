@@ -4178,7 +4178,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       
     </div>
     
-    <!-- 
+
     <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
       <div class="modal-content3">
         <div class="modal-header3">
@@ -4210,7 +4210,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         </div>
       </div>
     </div>
-    -->
+
 
     </ion-view>
   </script>  
@@ -6013,6 +6013,11 @@ app
         if (!msg.trim()) return;
         var message = msg.trim();
 
+        WebRTCService.sendMessage(message)
+          .catch(function(error) {
+            alert(error);
+          });
+
         var input1 = document.getElementById('chatMsg1');
         var input2 = document.getElementById('chatMsg2');
         input1.value = '';         
@@ -6020,10 +6025,6 @@ app
         input2.value = '';         
         input2.placeholder = '';
         
-        WebRTCService.sendMessage(message)
-          .catch(function(error) {
-            alert(error);
-          });
       };
       
       // Mostrar/Ocultar video
