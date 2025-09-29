@@ -4188,7 +4188,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </button>
         </div>
         <div class="modal-body">
-          <div id="chatContainer" class="chat-messages2">
+          <div  class="chat-messages2">
             <div ng-repeat="message in webrtc.chatMessages track by $index" 
                  class="message-item"
                  ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
@@ -5508,20 +5508,7 @@ app
       self.unreadMessages = 0;
      // self.chatMessages = [];
 
-      self.chatMessages = [
-  {
-    sender: 'Profesor',
-    message: 'Hola, bienvenido a la clase. ¿Estás listo para empezar?',
-    timestamp: new Date(),
-    isOwn: false // Mensaje del otro (se alinea a la izquierda)
-  },
-  {
-    sender: 'Tú',
-    message: '¡Hola! Sí, estoy listo cuando quieras.',
-    timestamp: new Date(),
-    isOwn: true // Mensaje propio (se alinea a la derecha)
-  }
-];
+      self.chatMessages = [];
       
       
       // Inicializar Firebase
@@ -5657,7 +5644,6 @@ app
           }
           
           self.updateStatus('connected', 'Conectado con el profesor');
-          self.addMessage('Sistema', 'Conectado con el profesor. Ya puedes comunicarte.');
           $rootScope.$apply();
         });
         
@@ -6024,7 +6010,7 @@ app
         input1.placeholder = '';
         input2.value = '';         
         input2.placeholder = '';
-        
+
       };
       
       // Mostrar/Ocultar video
