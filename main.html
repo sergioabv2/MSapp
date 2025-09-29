@@ -2266,7 +2266,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     top: 80px;
     left: 20px;
     width: 300px;
-    height: 170px;
+    height: 180px;
     background: #000;
     border-radius: 12px;
     border: 3px solid var(--primary);
@@ -2301,8 +2301,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 .video-controls {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 2px;
+    right: 2px;
     z-index: 999;
     background: rgba(0,0,0,0.7);
     border-radius: 8px;
@@ -2325,7 +2325,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     margin: 0;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 16px; /* 1rem -> 16px */
+    font-size: 13px; /* 1rem -> 16px */
     transition: background 0.2s ease;
 }
 
@@ -2526,8 +2526,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
 /* Mejoras responsivas */
 @media (max-width: 768px) {
     .video-container {
-        width: 220px;
-        height: 130px;
         left: 15px;
         top: 70px;
     }
@@ -2539,6 +2537,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         object-position: center;
         background-color: #000; 
       }
+
     
     .floating-btn {
         width: 55px;
@@ -2567,10 +2566,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
 }
 
 @media (max-width: 480px) {
-   /* .video-container {
-        width: 180px;
-        height: 110px;
-    }*/
+    .video-container {
+        width: 250px;
+        height: 150px;
+    }
+
+    .video-control-btn{
+        font-size: 10px;
+      }
+    
 
     .status-card {
         flex-direction: column;
@@ -5278,10 +5282,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
    
       </ion-content>
-      
      <div id="videoContainer" 
          class="video-container" 
-         ng-show="showVideo"
+        ng-show="showVideo"
          ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
       <div class="video-controls">
         <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
