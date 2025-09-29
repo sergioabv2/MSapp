@@ -1,0 +1,579 @@
+   
+<html lang="es">
+<head>
+  <meta charset="utf-8" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visualizador MusicXML + Piano (Sampler)</title>
+  <style> 
+    * { box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+      background: #fafafa; 
+      color: #1a1a1a; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    /* Top Bar Minimalista */
+    #top-bar {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    h1 { 
+      margin: 0 0 16px 0; 
+      font-size: 20px; 
+      font-weight: 600; 
+      letter-spacing: -0.3px;
+      color: #1a1a1a;
+    }
+    
+    #controls { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 24px; 
+      flex-wrap: wrap; 
+    }
+    
+    .controls-left, .controls-right { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      flex-wrap: wrap; 
+    }
+    
+    .control-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      padding: 6px 12px;
+      background: #f8f8f8;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+    }
+    
+    .control-group label { 
+      font-size: 13px; 
+      font-weight: 500; 
+      color: #666; 
+      white-space: nowrap;
+    }
+    
+    button { 
+      font-size: 14px; 
+      padding: 8px 16px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      color: #1a1a1a;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover:not(:disabled) { 
+      background: #f8f8f8; 
+      border-color: #d0d0d0;
+    }
+    
+    button:active:not(:disabled) { 
+      transform: scale(0.98); 
+    }
+    
+    button:disabled { 
+      opacity: 0.4; 
+      cursor: not-allowed; 
+    }
+    
+    button.primary {
+      background: #1a1a1a;
+      color: #fff;
+      border-color: #1a1a1a;
+    }
+    
+    button.primary:hover:not(:disabled) {
+      background: #333;
+      border-color: #333;
+    }
+    
+    select { 
+      font-size: 14px; 
+      padding: 6px 10px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+    
+    select:disabled { 
+      opacity: 0.4; 
+      cursor: not-allowed; 
+    }
+    
+    input[type="file"] {
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      background: #f8f8f8;
+      cursor: pointer;
+    }
+    
+    input[type="range"] {
+      width: 100px;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      background: #e5e5e5;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .speed-display {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    
+    .speed-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .speed-bpm {
+      font-size: 11px;
+      color: #999;
+      font-weight: 500;
+    }
+    
+    #status { 
+      font-size: 12px; 
+      color: #999; 
+      margin-top: 12px; 
+      font-weight: 500;
+    }
+    
+    /* Contenedor de partitura */
+    #osmd-container { 
+      max-width: 1200px; 
+      margin: 32px auto; 
+      background: #fff; 
+      padding: 32px; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); 
+      min-height: 300px; 
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+    }
+    
+    /* Piano */
+    #piano-container { 
+      position: fixed; 
+      left: 0; 
+      bottom: 0; 
+      width: 100%; 
+      background: #fff; 
+      padding: 16px 0; 
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start; 
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.08); 
+      border-top: 1px solid #e5e5e5;
+      transition: transform 0.3s ease;
+    }
+    
+    #piano-container.hidden {
+      transform: translateY(100%);
+    }
+    
+    .key { 
+      box-sizing: border-box; 
+      border: 1px solid #e5e5e5; 
+      position: relative; 
+      transition: all 0.08s;
+    }
+    
+    .key.white { 
+      width: 40px; 
+      height: 120px; 
+      background: #fff; 
+      margin: 0; 
+      display: inline-block; 
+    }
+    
+    .key.white:hover {
+      background: #f8f8f8;
+    }
+    
+    .key.black { 
+      width: 26px; 
+      height: 80px; 
+      background: #1a1a1a; 
+      margin-left: -13px; 
+      margin-right: -12px; 
+      z-index: 2; 
+      display: inline-block; 
+    }
+    
+    .key.black:hover {
+      background: #333;
+    }
+    
+    .key.active { 
+      background: #3498db !important; 
+      box-shadow: 0 0 12px rgba(52, 152, 219, 0.5); 
+      transform: translateY(2px);
+    }
+  </style>
+</head>
+<body>
+  <div id="top-bar">
+    <h1>Visualizador MusicXML</h1>
+    <div id="controls">
+      <div class="controls-left">
+        <input id="file-input" type="file" accept=".xml,.musicxml" />
+        <button id="play-btn" class="primary" disabled>▶️ Reproducir</button>
+        <button id="stop-btn" disabled>⏹️ Detener</button>
+        <button id="toggle-piano-btn">🎹 Ocultar Piano</button>
+      </div>
+      <div class="controls-right">
+        <div class="control-group">
+          <label for="measure-selector">Compás:</label>
+          <select id="measure-selector" disabled></select>
+        </div>
+        <div class="control-group">
+          <label for="speed-slider">Velocidad:</label>
+          <input type="range" id="speed-slider" min="0.1" max="2.0" value="1.0" step="0.05">
+          <div class="speed-display">
+            <span id="speed-label" class="speed-value">1.00x</span>
+            <span id="speed-bpm" class="speed-bpm">120 BPM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="status">Esperando archivo...</div>
+  </div>
+
+  <div id="osmd-container"></div>
+  <div id="piano-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.3/build/opensheetmusicdisplay.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
+  <script>
+  // ----- Elementos -----
+  const fileInput = document.getElementById('file-input');
+  const playBtn = document.getElementById('play-btn');
+  const stopBtn = document.getElementById('stop-btn');
+  const osmdContainer = document.getElementById('osmd-container');
+  const statusDiv = document.getElementById('status');
+  const pianoContainer = document.getElementById('piano-container');
+  const speedSlider = document.getElementById('speed-slider');
+  const speedLabel = document.getElementById('speed-label');
+  const speedBpmLabel = document.getElementById('speed-bpm');
+  const measureSelector = document.getElementById('measure-selector');
+  const togglePianoBtn = document.getElementById('toggle-piano-btn');
+
+  // ----- Variables -----
+  let osmd = null;
+  let sampler = null;
+  let scheduledTimeouts = [];
+  let parsedNotes = [];
+  let measureStartTimes = []; 
+  let isPlaying = false;
+  let globalTempo = 120;
+  let playbackRate = 1.0;
+  let isPianoVisible = true;
+
+  // ----- Init OSMD -----
+  try {
+    osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
+      backend: 'svg', drawTitle: true, followCursor: true,
+      cursorsOptions: [{ type: 1, color: "rgba(52,152,219,0.8)", alpha: 0.8, follow: true }]
+    });
+    setStatus('Listo — carga un archivo MusicXML');
+  } catch (e) { setStatus('Error al inicializar OSMD: ' + e.message); }
+
+  // ----- Sampler -----
+  sampler = new Tone.Sampler({
+    urls: { "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", "A4": "A4.mp3" },
+    release: 1, baseUrl: "https://tonejs.github.io/audio/salamander/"
+  }).toDestination();
+  
+  // ----- Piano visual -----
+  function createPiano() {
+    pianoContainer.innerHTML = '';
+    const pattern = [
+      { note: 'C', hasBlack: true }, { note: 'D', hasBlack: true }, { note: 'E', hasBlack: false },
+      { note: 'F', hasBlack: true }, { note: 'G', hasBlack: true }, { note: 'A', hasBlack: true }, { note: 'B', hasBlack: false }
+    ];
+    for (let octave = 2; octave <= 5; octave++) {
+      pattern.forEach(({note, hasBlack}) => {
+        const white = document.createElement('div'); 
+        white.className = 'key white'; 
+        white.id = `${note}${octave}`; 
+        pianoContainer.appendChild(white);
+        if (hasBlack) { 
+          const black = document.createElement('div'); 
+          black.className = 'key black'; 
+          black.id = `${note}#${octave}`; 
+          pianoContainer.appendChild(black); 
+        }
+      });
+    }
+  }
+  createPiano();
+  
+  function highlightKey(noteName, durSec) {
+    const el = document.getElementById(noteName);
+    if (!el) return;
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), Math.max(80, durSec * 1000));
+  }
+  
+  function setStatus(text){ statusDiv.textContent = text; }
+
+  // ----- Parse MusicXML -----
+  async function parseMusicXML(xmlText) {
+    parsedNotes = [];
+    measureStartTimes = [];
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, 'application/xml');
+    
+    const divisions = parseInt(xml.querySelector('divisions')?.textContent.trim() || '24', 10);
+    const soundTempo = xml.querySelector('direction sound[tempo], sound[tempo]');
+    globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute('tempo')) : 120;
+    
+    // Actualizar BPM display inicial
+    speedBpmLabel.textContent = `${Math.round(globalTempo * playbackRate)} BPM`;
+
+    const parts = xml.querySelectorAll('part');
+    parts.forEach((part, partIndex) => {
+      let currentBeat = 0;
+      const measures = part.querySelectorAll('measure');
+      
+      measures.forEach(measure => {
+        if (partIndex === 0) {
+            measureStartTimes.push(currentBeat * (60.0 / globalTempo));
+        }
+
+        const nodes = measure.querySelectorAll('note, backup, forward');
+        nodes.forEach(node => {
+          const durationVal = parseFloat(node.querySelector('duration')?.textContent.trim() || '0');
+          if (node.tagName === 'note') {
+            const isChord = !!node.querySelector('chord');
+            if (!node.querySelector('rest') && node.querySelector('pitch')) {
+              const startBeat = currentBeat;
+              const step = node.querySelector('step')?.textContent?.trim();
+              const octave = node.querySelector('octave')?.textContent?.trim();
+              const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
+              const accidental = alt === 1 ? '#' : alt === -1 ? 'b' : '';
+              
+              parsedNotes.push({
+                pitch: `${step}${accidental}${octave}`,
+                startSec: startBeat * (60.0 / globalTempo),
+                durSec: (durationVal / divisions) * (60.0 / globalTempo)
+              });
+            }
+            if (!isChord) currentBeat += (durationVal / divisions);
+          } else if (node.tagName === 'backup') {
+            currentBeat -= (durationVal / divisions);
+          } else if (node.tagName === 'forward') {
+            currentBeat += (durationVal / divisions);
+          }
+        });
+      });
+    });
+    parsedNotes.sort((a, b) => a.startSec - b.startSec);
+    setStatus(`Parseado: ${parsedNotes.length} notas — Tempo ${Math.round(globalTempo)} BPM`);
+  }
+
+  // ----- Lógica de Reproducción -----
+  function schedulePlayback(startTime = 0) {
+    clearScheduled();
+    const notesToPlay = parsedNotes.filter(n => n.startSec >= startTime);
+    if (notesToPlay.length === 0) {
+        setStatus('No hay notas para reproducir desde este punto.');
+        return;
+    }
+    
+    osmd.cursor.reset();
+    const firstNoteIndex = parsedNotes.findIndex(n => n.startSec >= startTime);
+    if (firstNoteIndex > 0) {
+        for (let i = 0; i < firstNoteIndex; i++) { osmd.cursor.next(); }
+    }
+    osmd.cursor.show();
+    
+    const notesByTime = new Map();
+    notesToPlay.forEach(note => {
+      if (!notesByTime.has(note.startSec)) notesByTime.set(note.startSec, []);
+      notesByTime.get(note.startSec).push(note);
+    });
+
+    const now = Tone.now() + 0.1; 
+    notesByTime.forEach((notesAtSameTime, noteStartSec) => {
+      const scheduledTime = now + ((noteStartSec - startTime) / playbackRate);
+      const timeoutId = setTimeout(() => {
+        notesAtSameTime.forEach(note => {
+          try {
+            sampler.triggerAttackRelease(note.pitch, note.durSec / playbackRate, Tone.now());
+            highlightKey(note.pitch, note.durSec / playbackRate);
+          } catch (e) { console.warn('Error al reproducir nota', note.pitch, e); }
+        });
+        
+        notesAtSameTime.forEach(() => {
+          osmd.cursor.next();
+        });
+
+      }, (scheduledTime - Tone.now()) * 1000);
+      scheduledTimeouts.push(timeoutId);
+    });
+    
+    const lastNote = notesToPlay[notesToPlay.length - 1];
+    const endTime = now + ((lastNote.startSec + lastNote.durSec - startTime) / playbackRate);
+    const endTimeout = setTimeout(() => {
+      isPlaying = false;
+      playBtn.textContent = '▶️ Reproducir';
+      playBtn.classList.add('primary');
+      setStatus('Reproducción finalizada');
+    }, (endTime - Tone.now()) * 1000);
+    scheduledTimeouts.push(endTimeout);
+    
+    isPlaying = true;
+    playBtn.textContent = '⏸️ Pausar';
+    playBtn.classList.remove('primary');
+    setStatus('Reproduciendo...');
+  }
+
+  function clearScheduled() { 
+    scheduledTimeouts.forEach(id => clearTimeout(id)); 
+    scheduledTimeouts = []; 
+    Tone.Transport.cancel(); 
+  }
+  
+  function stopPlayback() { 
+    clearScheduled(); 
+    isPlaying = false; 
+    playBtn.textContent = '▶️ Reproducir'; 
+    playBtn.classList.add('primary');
+    setStatus('Detenido'); 
+    osmd.cursor.reset(); 
+  }
+
+  // ----- UI & Events -----
+  function populateMeasureSelector() {
+    measureSelector.innerHTML = '';
+    measureStartTimes.forEach((_, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `Compás ${index + 1}`;
+        measureSelector.appendChild(option);
+    });
+    measureSelector.disabled = false;
+  }
+
+  fileInput.addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    setStatus('Cargando archivo...');
+    try {
+      const text = await f.text();
+      await osmd.load(text);
+      await osmd.render();
+      await parseMusicXML(text);
+      populateMeasureSelector();
+      
+      playBtn.disabled = false; stopBtn.disabled = false;
+      setStatus(`Archivo cargado: ${f.name} — ${parsedNotes.length} notas`);
+    } catch (err) { 
+      console.error('Error al cargar archivo:', err); 
+      setStatus('Error al cargar archivo: ' + err.message); 
+    }
+  });
+
+  playBtn.addEventListener('click', async () => {
+    try {
+      await Tone.start();
+      if (!isPlaying) {
+        const startMeasureIndex = parseInt(measureSelector.value || '0', 10);
+        const startTime = measureStartTimes[startMeasureIndex] || 0;
+        schedulePlayback(startTime);
+      } else {
+        stopPlayback();
+      }
+    } catch (err) { 
+      console.error('Error al iniciar audio:', err); 
+      setStatus('Error al iniciar audio: ' + err.message); 
+    }
+  });
+
+  stopBtn.addEventListener('click', () => { stopPlayback(); });
+
+  speedSlider.addEventListener('input', (e) => {
+    playbackRate = parseFloat(e.target.value);
+    const currentBPM = Math.round(globalTempo * playbackRate);
+    speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
+    speedBpmLabel.textContent = `${currentBPM} BPM`;
+    if (isPlaying) {
+        stopPlayback();
+    }
+  });
+
+  togglePianoBtn.addEventListener('click', () => {
+    isPianoVisible = !isPianoVisible;
+    if (isPianoVisible) {
+      pianoContainer.classList.remove('hidden');
+      togglePianoBtn.textContent = '🎹 Ocultar Piano';
+    } else {
+      pianoContainer.classList.add('hidden');
+      togglePianoBtn.textContent = '🎹 Mostrar Piano';
+    }
+  });
+
+  measureSelector.addEventListener('change', () => { 
+    if (isPlaying) { 
+      stopPlayback(); 
+    } 
+  });
+  
+  window.addEventListener('keydown', (ev) => { 
+    if (ev.code === 'Space' && !playBtn.disabled) { 
+      ev.preventDefault(); 
+      playBtn.click(); 
+    } 
+  });
+  
+  sampler.on('load', () => { console.log('Sampler cargado'); });
+  </script>
+</body>
+</html>
