@@ -1067,6 +1067,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
   position: relative;
 }
 
+.notif-item:hover {
+    background: whitesmoke;
+}
 
 
 .notif-icon {
@@ -1793,7 +1796,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         .schedule-item:hover {
             background: rgba(248, 250, 252, 0.5);
-            margin: 0 -16px;
+            margin: 0 -12px;
             padding: 10px;
             border-radius: 8px;
         }
@@ -1808,8 +1811,8 @@ width: 200px; /* Ajusta según el tamaño deseado */
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 54px;
-    height: 54px;
+    width: 47px;
+    height: 47px;
     background: linear-gradient(135deg, #4a6fa5, #3a5982); /* Fondo original azul */
     border-radius: 12px;
     color: white; /* Texto blanco original */
@@ -2901,6 +2904,9 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 /* Responsivo */
 @media (max-width: 480px) {
+    .chatIco{
+        display: none;
+    }
   .schedule-action-wrapper {
     gap: 8px;
     padding: 6px;
@@ -2939,6 +2945,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 .headIcon {
+    margin-top: 4px;
  width: 38px;
   height: 38px;
   border-radius: 50% !important; /* Esto lo hace circular */
@@ -2952,6 +2959,27 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 .headIcon:hover {
   background-color: #d8dbdf !important;
+}
+
+/* Estilo para resaltar toda la fila del recordatorio de pago */
+.notif-item.pay-day-highlight {
+    background-color: #f6ffed; /* Un verde muy claro */
+    border-left: 3px solid #52c41a; /* Borde izquierdo verde */
+}
+
+/* Estilo para el contenedor del ícono de pago a la izquierda */
+.schedule-date.schedule-date-payday {
+    background: linear-gradient(135deg, #73d13d, #52c41a);
+    color: white;
+}
+
+/* Centra el ícono de dólar dentro de su contenedor */
+.payday-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 24px;
 }
 
 
@@ -3136,11 +3164,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
    <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+ <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -3298,6 +3330,71 @@ width: 200px; /* Ajusta según el tamaño deseado */
       Eliminar todas las notificaciones
     </button>
   </div>
+</div>
+
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
 </div>
         
     </ion-nav-bar>
@@ -3546,11 +3643,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+ <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -3642,7 +3743,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Chat de Soporte</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages1">
+  <div class="chat-messages" id="chatMessages2">
 
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
@@ -3667,7 +3768,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
+           id="inputMessage2"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -3715,6 +3816,71 @@ width: 200px; /* Ajusta según el tamaño deseado */
       Eliminar todas las notificaciones
     </button>
   </div>
+</div>
+
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
 </div>
         
     </ion-nav-bar>
@@ -3839,7 +4005,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
   <div class="card-header">
     <h2><i class="fas fa-calendar-alt"></i> Próximas Clases</h2>
   </div>
-  <div class="card-body" style=" padding-top: 5px; max-height: 250px; overflow-y: auto; position: relative;" id="card-schedule">
+  <div class="card-body" style=" padding-top: 5px; max-height: 240px; overflow-y: auto; position: relative;" id="card-schedule">
     <div class="schedule-item" ng-repeat="item in userAgenda"  ng-if="item.title !== 'Próximo pago'" id="{{ item.isNextClass ? 'next-class-item' : '' }}">
       <div class="schedule-date" ng-class="{
        'schedule-date-past': item.isPast,
@@ -4032,11 +4198,16 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+
+  <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -4128,7 +4299,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Chat de Soporte</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages1">
+  <div class="chat-messages" id="chatMessages3">
 
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
@@ -4153,7 +4324,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
+           id="inputMessage3"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -4202,6 +4373,74 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </div>
 </div>
+
+
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
+</div>
+  
+
         
     </ion-nav-bar>
 
@@ -4228,11 +4467,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+ <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -4317,7 +4560,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Chat de Soporte</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages1">
+  <div class="chat-messages" id="chatMessages4">
 
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
@@ -4342,7 +4585,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
+           id="inputMessage4"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -4390,6 +4633,71 @@ width: 200px; /* Ajusta según el tamaño deseado */
       Eliminar todas las notificaciones
     </button>
   </div>
+</div>
+
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
 </div>
         
     </ion-nav-bar>
@@ -4459,11 +4767,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+ <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -4547,7 +4859,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Chat de Soporte</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages1">
+  <div class="chat-messages" id="chatMessages5">
 
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
@@ -4572,7 +4884,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
+           id="inputMessage5"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -4621,6 +4933,70 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </div>
 </div>
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
+</div>
         
     </ion-nav-bar>
 
@@ -4648,11 +5024,15 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-      <button class="button button-clear headIcon" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
     </div>
+</button>  
+
+ <button class="button button-clear headIcon" ng-click="dropdownCalendar()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+  <i class="ri-booklet-fill"></i>
 </button>  
       
     <button class="button button-clear headIcon" ng-click="dropdownNotif()" style="font-size: 19px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
@@ -4744,7 +5124,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <p>Chat de Soporte</p>
   </div>
   
-  <div class="chat-messages" id="chatMessages1">
+  <div class="chat-messages" id="chatMessages6">
 
     
     <div class="message" ng-repeat="message in chats" ng-class="{'bot-message': message.sender === 'admin', 'user-message': message.sender === 'client'}">
@@ -4769,7 +5149,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <input type="text" 
            ng-model="newMessage" 
            placeholder="Escribe tu mensaje..." 
-           id="inputMessage1"
+           id="inputMessage6"
            ng-keyup="$event.keyCode === 13 && sendMessage(newMessage)">
     <button ng-click="sendMessage(newMessage)">
       <i class="ri-send-plane-2-fill"></i>
@@ -4817,6 +5197,70 @@ width: 200px; /* Ajusta según el tamaño deseado */
       Eliminar todas las notificaciones
     </button>
   </div>
+</div>
+
+<div class="dropdownContent notif-dropdown" ng-show="dropdownCalendarVisible" ng-click="$event.stopPropagation()">
+    
+    <div class="notif-header">
+        <button class="close-dropdown" ng-click="dropdownCalendar()">
+            <i class="ri-close-line"></i>
+        </button>
+        <h4>Agenda</h4>
+    </div>
+
+   <div class="notif-list" ng-if="agenda.length > 0">
+    <div class="notif-item" 
+         ng-repeat="item in agenda"
+         ng-class="{
+             'next-class-highlight': item.isNextClass, 
+             'past-item-dimmed': item.isPast,
+             'pay-day-highlight': item.isPayDay
+         }">
+        
+        <div class="schedule-date" ng-class="{
+            'schedule-date-past': item.isPast && !item.isPayDay,
+            'schedule-date-inactive': !item.isNextClass && !item.isPast && !item.isPayDay,
+            'schedule-date-payday': item.isPayDay
+        }">
+            <div ng-if="item.isPayDay" class="payday-icon-wrapper">
+               <i class="ri-refund-line"></i>
+            </div>
+       
+                <div class="schedule-day" ng-if="!item.isPayDay">{{ item.start | date:'EEE' }}</div>
+                <div class="schedule-number" ng-if="!item.isPayDay">{{ item.start | date:'d' }}</div>
+    
+        </div>
+
+        <div class="notif-content">
+            <div ng-if="!item.isPayDay">
+                <div class="notif-title" ng-class="{'text-strikethrough': item.isPast}">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+                <div class="notif-desc" ng-if="!item.isPast">
+                    <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+                </div>
+                <div class="notif-time">
+                    <span ng-if="item.isPast">Finalizada</span>
+                    <span ng-if="item.isNextClass" class="next-class-label">Próxima clase</span>
+                    <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+                </div>
+            </div>
+            
+            <div ng-if="item.isPayDay" ng-click="goToPayment()">
+                <div class="notif-title">Próximo pago</div>
+                <div class="notif-desc">
+                    {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="empty-notifs" ng-if="agenda.length === 0">
+        <i class="ri-calendar-close-line"></i>
+        <p>No hay clases programadas</p>
+    </div>
 </div>
         
     </ion-nav-bar>
@@ -4948,7 +5392,7 @@ app
   var requestData = {
     action: "getUserData",
     token: localStorage.getItem('MStoken')
-  //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+   // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
 
   var config = {
@@ -5806,19 +6250,61 @@ $scope.dragTouch = function(event) {
       $scope.isDropdownVisible = false;
       $scope.dropdownChatVisible = false;
       $scope.dropdownNotifVisible = false;
+      $scope.dropdownCalendarVisible = false;
 };
 
     $scope.loadingProfile = true;
+    var ahora = new Date();
+    var proximaClaseEncontrada = false;
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
       var userLvl = JSON.parse($scope.userData.stage)
        $scope.userLvl = userLvl.lvl;
-       $scope.userProgress = userLvl.lsn *10
+    /*   $scope.userProgress = userLvl.lsn *10
        $scope.userPlan = data.data.plan.split(" ")[0];
-      $scope.userNameShort = data.data.name.split(" ")[0];
-      $scope.chats = JSON.parse(data.data.messages);
-      $scope.alerts = JSON.parse(data.data.alerts);
+      $scope.userNameShort = data.data.name.split(" ")[0];*/
+      $scope.chats = JSON.parse($scope.userData.messages);
+      $scope.alerts = JSON.parse($scope.userData.alerts);
+      $scope.agenda = JSON.parse($scope.userData.agenda);
       $scope.loadingProfile = false;
+
+     // Asegúrate de que tu agenda esté ordenada por fecha antes de procesarla
+$scope.agenda.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+var ahora = new Date();
+var proximaClaseEncontrada = false;
+
+$scope.agenda.forEach(function(item) {
+    var fechaInicio = new Date(item.start);
+
+    // ---- INICIO DE LA LÓGICA MODIFICADA ----
+
+    // 1. Verifica si el item es un recordatorio de pago
+    if (item.title === 'Próximo pago') {
+        item.isPayDay = true;
+        item.isNextClass = false; // Un pago no es una "próxima clase"
+        item.isPast = fechaInicio < ahora; // Para saber si la fecha de pago ya pasó
+    } 
+    // 2. Si no es un pago, es una clase. Aplica la lógica que ya tenías.
+    else {
+        item.isPayDay = false;
+        
+        // Calcula la fecha de fin de la clase
+        var fechaFin = new Date(fechaInicio);
+        fechaFin.setHours(fechaFin.getHours() + 1);
+        item.end = fechaFin;
+        
+        item.isPast = fechaInicio < ahora;
+
+        // Determina si es la siguiente clase en el futuro
+        if (!proximaClaseEncontrada && !item.isPast) {
+            item.isNextClass = true;
+            proximaClaseEncontrada = true; // Marca que ya encontramos la próxima
+        } else {
+            item.isNextClass = false;
+        }
+    }
+});
   }) 
 
      $scope.isDropdownVisible = false;
@@ -5827,6 +6313,7 @@ $scope.dragTouch = function(event) {
       $scope.isDropdownVisible = !$scope.isDropdownVisible;
       $scope.dropdownChatVisible = false;
       $scope.dropdownNotifVisible = false;
+      $scope.dropdownCalendarVisible = false;
         $scope.btnBar = false;
     };
     
@@ -5838,6 +6325,7 @@ $scope.dragTouch = function(event) {
       $scope.dropdownChatVisible = !$scope.dropdownChatVisible;
       $scope.isDropdownVisible = false;
       $scope.dropdownNotifVisible = false;
+      $scope.dropdownCalendarVisible = false;
       $scope.chatCounter = false;  
 
       $timeout(function() {
@@ -5851,8 +6339,22 @@ $scope.dragTouch = function(event) {
       $scope.dropdownNotifVisible = !$scope.dropdownNotifVisible;
       $scope.isDropdownVisible = false;
       $scope.dropdownChatVisible = false;
+      $scope.dropdownCalendarVisible = false;
       $scope.alertCounter = false;  
     };
+
+
+     $scope.dropdownCalendarVisible = false;
+    $scope.dropdownCalendar = function() {
+      $scope.dropdownCalendarVisible = !$scope.dropdownCalendarVisible;
+      $scope.isDropdownVisible = false;
+      $scope.dropdownChatVisible = false;
+       $scope.dropdownNotifVisible = false;
+      $scope.alertCounter = false;  
+
+
+    };
+
 
 
 
@@ -5977,6 +6479,7 @@ $timeout(function() {
 
 
   };
+
 
 
 function scrollAllChatsToBottom() {
