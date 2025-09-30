@@ -3,74 +3,150 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visualizador MusicXML + Piano</title>
+  <title>Reproductor MusicXML</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #fafafa;
       color: #1a1a1a;
-      margin: 0;
-      padding: 0;
-      padding-bottom: 160px; /* Espacio para el piano */
+      padding-bottom: 140px;
     }
     
+    /* Top Bar - Minimalista */
     #top-bar {
       background: #fff;
-      border-bottom: 1px solid #e5e5e5;
-      padding: 12px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 10px 20px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
     
-    .controls-left, .controls-right {
+    #title-section {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
     }
     
-    .icon-btn {
-      background: none; border: none; cursor: pointer;
-      padding: 8px; border-radius: 50%; display: flex;
-      align-items: center; justify-content: center;
-      transition: background-color 0.2s;
-    }
-    .icon-btn:hover:not(:disabled) { background-color: #f0f0f0; }
-    .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .icon-btn svg { width: 24px; height: 24px; fill: #1a1a1a; }
-    
-    .control-group {
-      display: flex; align-items: center; gap: 10px;
-      padding: 6px 12px; background: #f8f8f8;
-      border-radius: 8px; border: 1px solid #e5e5e5;
+    #song-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
     }
     
-    input[type="range"] {
-      width: 120px; height: 4px; border-radius: 2px;
-      outline: none; -webkit-appearance: none; background: #e5e5e5;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px;
-      border-radius: 50%; background: #1a1a1a; cursor: pointer;
+    #song-composer {
+      font-size: 12px;
+      color: #999;
     }
     
-    .speed-display { text-align: center; width: 70px; }
-    .speed-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-    .speed-bpm { font-size: 11px; color: #999; font-weight: 500; }
-    
-    #status {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); font-size: 14px;
-      color: #999; font-weight: 500;
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
     
-    /* Contenedor de partitura */
-    #osmd-container {
+    .btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn:hover:not(:disabled) {
+      background: #f5f5f5;
+    }
+    
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #1a1a1a;
+    }
+    
+    /* Progress Bar */
+    #progress-bar-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+    
+    #progress-bar {
+      height: 100%;
+      background: #3498db;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    
+    /* Speed Controls */
+    .speed-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .speed-btn {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1a1a1a;
+      transition: all 0.2s;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .speed-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .speed-display {
+      min-width: 70px;
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    .speed-value {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .speed-bpm {
+      font-size: 10px;
+      color: #999;
+      display: block;
+      margin-top: 2px;
+    }
+  
+    
+   #osmd-container {
       max-width: 1200px;
       margin: 32px auto;
       padding: 20px; /* Añadido para mejor espaciado */
@@ -82,85 +158,170 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
-    /* Piano */
+   
+    
+    /* Piano - 88 Keys Minimalista */
     #piano-container {
-      position: fixed; left: 0; bottom: 0; width: 100%;
-      background: #fff; padding: 16px 0;
-      display: flex; justify-content: center;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      padding: 12px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
       box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
-      border-top: 1px solid #e5e5e5;
+      border-top: 1px solid #e0e0e0;
       transition: transform 0.3s ease;
     }
-    #piano-container.hidden { transform: translateY(100%); }
-    .key { box-sizing: border-box; border: 1px solid #e5e5e5; position: relative; }
-    .key.white { width: 40px; height: 120px; background: #fff; }
-    .key.black { width: 26px; height: 80px; background: #1a1a1a; margin-left: -13px; margin-right: -12px; z-index: 2; }
-    .key.active { background: #3498db !important; }
+    
+    #piano-container.hidden {
+      transform: translateY(100%);
+    }
+    
+    #piano-keys {
+      display: flex;
+      justify-content: center;
+      min-width: 100%;
+      padding: 0 10px;
+    }
+    
+    .key {
+      border: 1px solid #ddd;
+      position: relative;
+      transition: all 0.05s;
+    }
+    
+    .key.white {
+      width: 16px;
+      height: 90px;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+    }
+    
+    .key.black {
+      width: 10px;
+      height: 58px;
+      background: #1a1a1a;
+      margin-left: -5px;
+      margin-right: -5px;
+      z-index: 2;
+    }
+    
+    .key.active {
+      background: #3498db !important;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
+    }
+    
+    #status {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 13px;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+
+      
+      .key.white {
+        width: 13px;
+        height: 75px;
+      }
+      
+      .key.black {
+        width: 8px;
+        height: 48px;
+        margin-left: -4px;
+        margin-right: -4px;
+      }
+    }
   </style>
 </head>
 <body>
 
   <div id="top-bar">
-    <div class="controls-left">
-      <button id="play-btn" class="icon-btn" disabled title="Reproducir/Pausar">
-        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-        <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
-      </button>
-      <button id="toggle-piano-btn" class="icon-btn" title="Mostrar/Ocultar Piano">
-        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H9v-4h2v4zm0-6H9V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4z"></path></svg>
-      </button>
+    <div id="title-section">
+      <span id="song-title">Clowns</span>
+      <span id="song-composer">— Dmitri Kabalevsky</span>
     </div>
-    <div id="status">Cargando...</div>
-    <div class="controls-right">
-      <div class="control-group">
-        <input type="range" id="speed-slider" min="0.25" max="2.0" value="1.0" step="0.05">
+    
+    <div class="controls">
+      <button id="piano-btn" class="btn" title="Mostrar/Ocultar Piano">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H9v-4h2v4zm0-6H9V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4zm4 6h-2v-4h2v4zm0-6h-2V9h2v4z"/></svg>
+      </button>
+      
+      <button id="play-btn" class="btn" disabled>
+        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      
+      <div class="speed-group">
+        <button class="speed-btn" id="speed-down">−</button>
         <div class="speed-display">
-          <span id="speed-label" class="speed-value">1.00x</span>
-          <span id="speed-bpm" class="speed-bpm">120 BPM</span>
+          <span class="speed-value" id="speed-label">1.0x</span>
+          <span class="speed-bpm" id="speed-bpm">120 BPM</span>
         </div>
+        <button class="speed-btn" id="speed-up">+</button>
       </div>
+    </div>
+    
+    <div id="progress-bar-container">
+      <div id="progress-bar"></div>
     </div>
   </div>
 
-  <div id="osmd-container"></div>
-  <div id="piano-container"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.3/build/opensheetmusicdisplay.min.js"></script>
+    <div id="osmd-container"></div>
+  </div>
+  <div id="status">Cargando...</div>
+  
+  <div id="piano-container">
+    <div id="piano-keys"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
- <script>
+  <script>
     const playBtn = document.getElementById('play-btn');
     const playIcon = document.getElementById('play-icon');
     const pauseIcon = document.getElementById('pause-icon');
+    const pianoBtn = document.getElementById('piano-btn');
     const osmdContainer = document.getElementById('osmd-container');
     const statusDiv = document.getElementById('status');
     const pianoContainer = document.getElementById('piano-container');
-    const speedSlider = document.getElementById('speed-slider');
+    const pianoKeys = document.getElementById('piano-keys');
+    const progressBar = document.getElementById('progress-bar');
+    const progressBarContainer = document.getElementById('progress-bar-container');
     const speedLabel = document.getElementById('speed-label');
     const speedBpmLabel = document.getElementById('speed-bpm');
+    const speedUpBtn = document.getElementById('speed-up');
+    const speedDownBtn = document.getElementById('speed-down');
 
     let osmd = null;
     let sampler = null;
     let parsedNotes = [];
     let measureStartTimes = [];
     let globalTempo = 120;
-    
-    // SOLUCIÓN: Variables para almacenar las "partes" de Tone.js
+    let currentSpeed = 1.0;
+    let totalDuration = 0;
     let audioPart = null;
     let visualPart = null;
+    let progressInterval = null;
     
     const MUSICXML_URL = 'https://storage.googleapis.com/mozartacademy-files/midi/clowns-dmitri-kabalevsky.musicxml';
 
     document.addEventListener('DOMContentLoaded', async () => {
       setStatus('Inicializando...');
       initOSMD();
-      createPiano();
+      createPiano88Keys();
       addEventListeners();
       initSampler();
       
       setStatus('Cargando sonidos de piano...');
       await Tone.loaded();
-      setStatus('Sonidos listos. Cargando partitura...');
+      setStatus('Cargando partitura...');
       await loadMusicXMLFromUrl(MUSICXML_URL);
     });
 
@@ -168,47 +329,82 @@
       try {
         osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
           backend: 'svg',
-          drawTitle: false,
+          drawTitle: true,
           followCursor: true,
-          autoResize: false, 
-          cursorsOptions: [{ type: 1, color: "rgba(52,152,219,0.8)", alpha: 0.8, follow: true }]
+          autoResize: true,
+           drawingParameters: "compact",
+          cursorsOptions: [{ 
+            type: 1, 
+            color: "rgba(52,152,219,0.7)", 
+            alpha: 0.7, 
+            follow: true 
+          }]
         });
-        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
-      } catch (e) { setStatus('Error al inicializar OSMD'); }
+       osmd.zoom = 0.8;
+
+    // 2. Usamos el modo compacto para optimizar el espacio.
+    osmd.setDrawingParameters("compact");
+
+    // 3. AHORA SÍ, la regla de 4 compases tendrá espacio para aplicarse.
+    osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+    osmd.EngravingRules.FillLastSystemWithMeasures = true;
+
+    // 4. (Opcional) Si aún no funciona, puedes ser más agresivo
+    // reduciendo el espaciado mínimo entre notas.
+    osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.5;
+        
+      } catch (e) { 
+        setStatus('Error al inicializar'); 
+      }
     }
 
     function initSampler() {
       sampler = new Tone.Sampler({
-        urls: { "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", "A4": "A4.mp3" },
+        urls: { 
+          "C4": "C4.mp3", 
+          "D#4": "Ds4.mp3", 
+          "F#4": "Fs4.mp3", 
+          "A4": "A4.mp3" 
+        },
         release: 1,
         baseUrl: "https://tonejs.github.io/audio/salamander/"
       }).toDestination();
     }
 
-    function createPiano() {
-        pianoContainer.innerHTML = '';
-        const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-        const blackKeys = { 'C': 'C#', 'D': 'D#', 'F': 'F#', 'G': 'G#', 'A': 'A#' };
-        for (let octave = 2; octave <= 5; octave++) {
-            for (const note of pattern) {
-                const whiteKey = document.createElement('div');
-                whiteKey.className = 'key white';
-                whiteKey.id = `${note}${octave}`;
-                pianoContainer.appendChild(whiteKey);
-                if (blackKeys[note]) {
-                    const blackKey = document.createElement('div');
-                    blackKey.className = 'key black';
-                    blackKey.id = `${blackKeys[note]}${octave}`;
-                    pianoContainer.appendChild(blackKey);
-                }
-            }
+    function createPiano88Keys() {
+      pianoKeys.innerHTML = '';
+      const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+      const blackKeys = { 'C': 'C#', 'D': 'D#', 'F': 'F#', 'G': 'G#', 'A': 'A#' };
+      
+      // Piano de 88 teclas: A0 a C8
+      for (let octave = 0; octave <= 8; octave++) {
+        const startNote = octave === 0 ? 9 : 0; // A0 comienza en índice 9 (después de C,D,E,F,G,A,B,C,D = A)
+        
+        for (let i = startNote; i <= 6; i++) {
+          if (octave === 0 && i < 9) continue; // Saltar hasta A0
+          if (octave === 8 && i > 0) break; // Solo C8
+          
+          const note = pattern[i % 7];
+          const whiteKey = document.createElement('div');
+          whiteKey.className = 'key white';
+          whiteKey.id = `${note}${octave}`;
+          pianoKeys.appendChild(whiteKey);
+          
+          // No hay tecla negra después de E, B, ni después de C8
+          if (blackKeys[note] && !(octave === 8 && note === 'C')) {
+            const blackKey = document.createElement('div');
+            blackKey.className = 'key black';
+            blackKey.id = `${blackKeys[note]}${octave}`;
+            pianoKeys.appendChild(blackKey);
+          }
         }
+      }
     }
 
     async function loadMusicXMLFromUrl(url) {
       try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`La red no respondió correctamente`);
+        if (!response.ok) throw new Error('Error de red');
         const text = await response.text();
         await osmd.load(text);
         osmdContainer.innerHTML = ''; 
@@ -218,9 +414,9 @@
         scheduleNotesOnTransport();
 
         playBtn.disabled = false;
-        setStatus('Listo para reproducir');
+        setStatus('');
       } catch (err) {
-        setStatus(`Error al cargar: ${err.message}`);
+        setStatus(`Error: ${err.message}`);
       }
     }
     
@@ -266,25 +462,24 @@
           }
         });
       });
+      
+      const lastNote = parsedNotes[parsedNotes.length - 1];
+      totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
     }
 
-    // --- LÓGICA DE REPRODUCCIÓN REFACTORIZADA CON TONE.PART ---
     function scheduleNotesOnTransport() {
-      // Limpia cualquier evento o parte anterior
       if (audioPart) audioPart.dispose();
       if (visualPart) visualPart.dispose();
       Tone.Transport.cancel();
       osmd.cursor.reset();
       osmd.cursor.hide();
 
-      // Crea los eventos para la parte de audio
       const audioEvents = parsedNotes.map(note => ({
         time: note.startSec,
         pitch: note.pitch,
         duration: note.durSec
       }));
 
-      // Crea los eventos para la parte visual (cursor y resaltado)
       const visualEvents = [];
       const notesByTime = new Map();
       parsedNotes.forEach(note => {
@@ -296,12 +491,10 @@
         visualEvents.push({ time: time, notes: notes });
       });
 
-      // Crea la parte de AUDIO
       audioPart = new Tone.Part((time, value) => {
         sampler.triggerAttackRelease(value.pitch, value.duration, time);
       }, audioEvents).start(0);
 
-      // Crea la parte VISUAL
       visualPart = new Tone.Part((time, value) => {
         Tone.Draw.schedule(() => {
           osmd.cursor.next();
@@ -309,26 +502,24 @@
         }, time);
       }, visualEvents).start(0);
       
-      const lastNote = parsedNotes[parsedNotes.length - 1];
-      const totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
       Tone.Transport.scheduleOnce(() => stopPlayback(), totalDuration + 0.5);
     }
     
     function playFromMeasure(measureIndex) {
-        if (Tone.Transport.state === 'started') stopPlayback();
-        const startTime = measureStartTimes[measureIndex] || 0;
-        
-        osmd.cursor.reset();
-        const notesBeforeStart = parsedNotes.filter(n => n.startSec < startTime);
-        const uniqueTimestamps = new Set(notesBeforeStart.map(n => n.startSec));
-        uniqueTimestamps.forEach(ts => {
-            notesBeforeStart.filter(n => n.startSec === ts).forEach(() => osmd.cursor.next());
-        });
+      if (Tone.Transport.state === 'started') stopPlayback();
+      const startTime = measureStartTimes[measureIndex] || 0;
+      
+      osmd.cursor.reset();
+      const notesBeforeStart = parsedNotes.filter(n => n.startSec < startTime);
+      const uniqueTimestamps = new Set(notesBeforeStart.map(n => n.startSec));
+      uniqueTimestamps.forEach(() => {
+        osmd.cursor.next();
+      });
 
-        Tone.Transport.start(Tone.now() + 0.1, startTime);
-        updatePlayButton(true);
-        setStatus(`Reproduciendo compás ${measureIndex + 1}...`);
-        osmd.cursor.show();
+      Tone.Transport.start(Tone.now() + 0.1, startTime);
+      updatePlayButton(true);
+      osmd.cursor.show();
+      startProgressUpdate();
     }
 
     function stopPlayback() {
@@ -336,53 +527,103 @@
       osmd.cursor.reset();
       osmd.cursor.hide();
       updatePlayButton(false);
-      setStatus('Listo para reproducir');
+      stopProgressUpdate();
+      progressBar.style.width = '0%';
+    }
+
+    function startProgressUpdate() {
+      stopProgressUpdate();
+      progressInterval = setInterval(() => {
+        const progress = (Tone.Transport.seconds / totalDuration) * 100;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+      }, 100);
+    }
+
+    function stopProgressUpdate() {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
     }
 
     function addEventListeners() {
       playBtn.addEventListener('click', async () => {
         await Tone.start();
         if (Tone.Transport.state === 'started') {
-            Tone.Transport.pause();
-            updatePlayButton(false);
-            setStatus('Pausado');
+          Tone.Transport.pause();
+          updatePlayButton(false);
+          stopProgressUpdate();
         } else {
-            Tone.Transport.start(Tone.now() + 0.1);
-            updatePlayButton(true);
-            setStatus('Reproduciendo...');
-            osmd.cursor.show();
+          Tone.Transport.start(Tone.now() + 0.1);
+          updatePlayButton(true);
+          osmd.cursor.show();
+          startProgressUpdate();
         }
       });
-      
-      // SOLUCIÓN: El listener de velocidad ahora funciona en tiempo real sin detenerse
-      speedSlider.addEventListener('input', (e) => {
-        Tone.Transport.playbackRate = parseFloat(e.target.value);
+
+      speedUpBtn.addEventListener('click', () => {
+        currentSpeed = Math.min(2.0, currentSpeed + 0.1);
+        Tone.Transport.playbackRate = currentSpeed;
         updateBpmDisplay();
       });
 
-      document.getElementById('toggle-piano-btn').addEventListener('click', () => {
+      speedDownBtn.addEventListener('click', () => {
+        currentSpeed = Math.max(0.25, currentSpeed - 0.1);
+        Tone.Transport.playbackRate = currentSpeed;
+        updateBpmDisplay();
+      });
+
+      pianoBtn.addEventListener('click', () => {
         pianoContainer.classList.toggle('hidden');
       });
       
-      osmdContainer.addEventListener('mousedown', (event) => {
+      progressBarContainer.addEventListener('click', (e) => {
+        const rect = progressBarContainer.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        const newTime = percent * totalDuration;
+        Tone.Transport.seconds = newTime;
+        
+        osmd.cursor.reset();
+        const notesBeforeNewTime = parsedNotes.filter(n => n.startSec < newTime);
+        const uniqueTimestamps = new Set(notesBeforeNewTime.map(n => n.startSec));
+        uniqueTimestamps.forEach(() => {
+          osmd.cursor.next();
+        });
+      });
+      
+      osmdContainer.addEventListener('click', (event) => {
         if (!osmd?.graphic?.measureList) return;
-        const BBox = osmdContainer.getBoundingClientRect();
-        const clickX = event.clientX - BBox.left;
-        const clickY = event.clientY - BBox.top;
+        
+        const rect = osmdContainer.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const clickY = event.clientY - rect.top;
         
         let closestMeasureIndex = -1;
-        osmd.graphic.measureList.forEach((measure, measureIndex) => {
-            measure.forEach(staffEntry => {
-                if (!staffEntry.staves[0]) return;
-                const boundingBox = staffEntry.staves[0].boundingBox;
-                if(boundingBox.x <= clickX && clickX <= boundingBox.x + boundingBox.width &&
-                   boundingBox.y <= clickY && clickY <= boundingBox.y + boundingBox.height) {
-                    closestMeasureIndex = measureIndex;
-                }
-            });
+        let minDistance = Infinity;
+        
+        osmd.graphic.measureList.forEach((measureStaffArray, measureIndex) => {
+          if (!measureStaffArray || measureStaffArray.length === 0) return;
+          
+          measureStaffArray.forEach(staffEntry => {
+            if (!staffEntry || !staffEntry.staves || !staffEntry.staves[0]) return;
+            
+            const bbox = staffEntry.staves[0].boundingBox;
+            if (!bbox) return;
+            
+            const centerX = bbox.x + bbox.width / 2;
+            const centerY = bbox.y + bbox.height / 2;
+            const distance = Math.sqrt(Math.pow(clickX - centerX, 2) + Math.pow(clickY - centerY, 2));
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestMeasureIndex = measureIndex;
+            }
+          });
         });
         
-        if (closestMeasureIndex !== -1) playFromMeasure(closestMeasureIndex);
+        if (closestMeasureIndex !== -1 && closestMeasureIndex < measureStartTimes.length) {
+          playFromMeasure(closestMeasureIndex);
+        }
       });
     }
 
@@ -392,22 +633,24 @@
     }
 
     function updateBpmDisplay() {
-      const playbackRate = Tone.Transport?.playbackRate ?? 1.0;
-      const currentBPM = Math.round(Tone.Transport.bpm.value * playbackRate);
-      speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
+      const currentBPM = Math.round(globalTempo * currentSpeed);
+      speedLabel.textContent = `${currentSpeed.toFixed(1)}x`;
       speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
 
     function highlightKey(noteName, durSec) {
-        const noteId = noteName.replace('b', '#');
-        const el = document.getElementById(noteId);
-        if (!el) return;
-        el.classList.add('active');
-        const highlightDuration = Math.max(80, durSec * 1000 / (Tone.Transport?.playbackRate ?? 1.0));
-        setTimeout(() => el.classList.remove('active'), highlightDuration);
+      const noteId = noteName.replace('b', '#');
+      const el = document.getElementById(noteId);
+      if (!el) return;
+      el.classList.add('active');
+      const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
+      setTimeout(() => el.classList.remove('active'), highlightDuration);
     }
 
-    function setStatus(text) { statusDiv.textContent = text; }
+    function setStatus(text) { 
+      statusDiv.textContent = text;
+      statusDiv.style.display = text ? 'block' : 'none';
+    }
   </script>
 </body>
 </html>
