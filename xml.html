@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+
+<html lang="es"> 
+<head> 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Reproductor MusicXML</title>
@@ -27,11 +27,7 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
     
-    #title-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+
     
     #song-title {
       font-size: 14px;
@@ -43,12 +39,7 @@
       font-size: 12px;
       color: #999;
     }
-    
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+ 
     
     .btn {
       background: none;
@@ -96,54 +87,13 @@
     }
     
     /* Speed Controls - MEJORADO */
-
+ 
     
  
     
-   #osmd-container {
-      max-width: 1200px;
-      margin: 32px auto;
-      padding: 20px;
-      min-height: 300px;
-      cursor: pointer;
-      border: 1px solid #e0e0e0;
-      background-color: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      overflow-x: auto;
-      /* MÁRGENES HORIZONTALES MEJORADOS */
-      margin-left: 16px;
-      margin-right: 16px;
-    }
+  
     
-    /* Controles de zoom para móviles */
-    #zoom-controls {
-      display: none;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px auto;
-      padding: 0 20px;
-      max-width: 1200px;
-    }
-    
-    .zoom-btn {
-      background: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 6px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .zoom-btn:hover {
-      background: #f5f5f5;
-    }
-    
-    .zoom-display {
-      font-size: 14px;
-      padding: 6px 12px;
-      color: #666;
-    }
+   
     
     /* Piano - 88 Keys Minimalista */
     #piano-container {
@@ -207,14 +157,7 @@
     
     /* Mobile adjustments - ESCALADO PARA MÓVILES */
     @media (max-width: 768px) {
-      #zoom-controls {
-        display: flex;
-      }
-      
-      #osmd-container {
-        margin: 16px 12px; /* Márgenes reducidos pero consistentes */
-        padding: 10px;
-      }
+   
       
       /* Aplicamos zoom automático en móviles */
       .mobile-zoom {
@@ -242,25 +185,42 @@
         padding: 8px 12px;
       }
       
-      .controls {
-        gap: 12px;
-      }
-      
-    
-
-      
-      /* Zoom más agresivo en pantallas muy pequeñas */
+ 
       .mobile-zoom {
         transform: scale(0.75);
         transform-origin: top center;
       }
-      
-      #osmd-container {
-        margin: 12px 8px; /* Márgenes aún más reducidos */
-      }
-    }
+  }
 
-    /* AGREGA ESTOS ESTILOS PARA EL NUEVO CONTROL DE VELOCIDAD */
+
+#osmd-container {
+  width: 95%; 
+  max-width: 900px; 
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  box-sizing: border-box;
+  overflow: hidden; /* Asegura que el contenido SVG respete los bordes redondeados */
+}
+
+/* Ajustes para Tablets */
+@media (min-width: 768px) {
+  #osmd-container {
+    width: 90%;
+    margin: 40px auto;
+  }
+}
+
+/* Ajustes para Desktop */
+@media (min-width: 1024px) {
+  #osmd-container {
+    width: 100%;
+    margin: 50px auto; /* Aumentamos aún más el margen vertical */
+  }
+}
+  
+
 .speed-group {
     display: flex;
     align-items: center;
@@ -303,51 +263,157 @@
     display: block;
     margin-top: 2px;
 }
+#annotation-canvas {
+height: 100%;
+width: 100vw;
+}
+
+/* === Reestructuración Top Bar === */
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espacio entre elementos dentro de un grupo */
+}
+
+/* === NUEVO: Contador de Tiempo === */
+#time-display {
+  font-size: 13px;
+  color: #555;
+  font-family: 'SF Mono', 'Menlo', 'monospace'; /* Letra monoespaciada para números */
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* === NUEVO: Controles de Zoom Rediseñados (estilo de la imagen) === */
+#zoom-controls {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+#zoom-controls .zoom-display {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+#zoom-controls .zoom-buttons {
+  display: flex;
+}
+
+#zoom-controls .zoom-btn {
+  background-color: #fff;
+  border: none;
+  border-left: 1px solid #e0e0e0; /* Línea divisora */
+  padding: 6px 12px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#zoom-controls .zoom-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* === NUEVO: Espacio para botón Cerrar === */
+#close-btn-placeholder {
+  width: 40px; /* Ancho para el espacio reservado */
+  height: 40px;
+}
+
+/* === NUEVO: Botones Flotantes de Dibujo === */
+#floating-draw-controls {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column; /* Apila los botones verticalmente */
+  gap: 10px;
+  background-color: rgba(255, 255, 255, 0.85); /* Fondo semitransparente */
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px); /* Efecto "glassmorphism" para navegadores compatibles */
+}
+
+/* Ajustes a los botones flotantes */
+#floating-draw-controls .btn:hover {
+  background-color: #e9e9e9;
+}
   </style>
 </head>
 <body>
 
+  
   <div id="top-bar">
-    <div id="title-section">
-      <span id="song-title"></span>
-      <span id="song-composer"></span>
-    </div>
-    
-    <div class="controls">
-      <button id="piano-btn" class="btn" title="Mostrar/Ocultar Piano">
-       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 16.5px; width: 15.5px">
-      </button>
-      
+    <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
         <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       </button>
-      
-      <!-- CONTROL DE VELOCIDAD MEJORADO -->
-     <div class="speed-group">
-  <button id="speed-down-btn" class="btn speed-ctrl-btn">−</button>
-  <div class="speed-display">
-    <span class="speed-bpm" id="speed-bpm">120 BPM</span>
-    <span class="speed-value" id="speed-label">1.00x</span>
-  </div>
-  <button id="speed-up-btn" class="btn speed-ctrl-btn">+</button>
-</div>
 
-    </div>
+      <div id="time-display">
+        <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+      </div>
+
     
-    <div id="progress-bar-container">
+      
+      <div class="speed-group">
+        <button id="speed-down-btn" class="btn speed-ctrl-btn">−</button>
+        <div class="speed-display">
+          <span class="speed-bpm" id="speed-bpm">120 BPM</span>
+          <span class="speed-value" id="speed-label">1.00x</span>
+        </div>
+        <button id="speed-up-btn" class="btn speed-ctrl-btn">+</button>
+      </div>
+    </div>
+
+    <div class="controls-group">
+          <button id="piano-btn" class="btn" title="Mostrar/Ocultar Piano">
+       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 16.5px; width: 15.5px">
+      </button>
+
+      <div id="zoom-controls">
+        <span class="zoom-display" id="zoom-label">Zoom: 100%</span>
+        <div class="zoom-buttons">
+            <button class="zoom-btn" id="zoom-out">−</button>
+            <button class="zoom-btn" id="zoom-in">+</button>
+        </div>
+      </div>
+      <div id="close-btn-placeholder"></div>
+    </div>
+
+     <div id="progress-bar-container">
       <div id="progress-bar"></div>
     </div>
   </div>
 
   <!-- Controles de zoom para móviles -->
-  <div id="zoom-controls">
-    <button class="zoom-btn" id="zoom-out">−</button>
-    <span class="zoom-display" id="zoom-label">100%</span>
-    <button class="zoom-btn" id="zoom-in">+</button>
-  </div>
+ 
 
-  <div id="osmd-container"></div>
+  <div id="sheet-music-wrapper" style="position: relative;">
+    <div id="osmd-container"></div>
+    <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+     <div id="floating-draw-controls">
+        <button id="draw-btn" class="btn" title="Activar Lápiz">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </button>
+        <button id="clear-btn" class="btn" title="Borrar Anotaciones">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+    </div>
+</div>
   <div id="status">Cargando...</div>
   
   <div id="piano-container">
@@ -375,6 +441,8 @@ const speedDownBtn = document.getElementById('speed-down-btn');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomLabel = document.getElementById('zoom-label');
+    const currentTimeSpan = document.getElementById('current-time');
+const totalTimeSpan = document.getElementById('total-time');
 
     let osmd = null;
     let sampler = null;
@@ -390,6 +458,17 @@ const speedDownBtn = document.getElementById('speed-down-btn');
     let progressInterval = null;
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
+
+    // ... al principio del script
+const annotationCanvas = document.getElementById('annotation-canvas');
+const annotationCtx = annotationCanvas.getContext('2d');
+const drawBtn = document.getElementById('draw-btn');
+const clearBtn = document.getElementById('clear-btn'); 
+
+let isDrawingMode = false;
+let isDrawing = false;
+let annotations = []; // Aquí guardaremos los trazos
+
     
     const MUSICXML_URL = 'https://storage.googleapis.com/mozartacademy-files/midi/clowns-dmitri-kabalevsky.musicxml';
 
@@ -411,9 +490,12 @@ const speedDownBtn = document.getElementById('speed-down-btn');
         osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
           backend: 'svg',
           drawTitle: true,
+          drawSubtitle: true,   // MUESTRA EL SUBTÍTULO
+          drawComposer: true, 
           followCursor: true,
+          drawPartNames: false,
           autoResize: true,
-          drawingParameters: "compacttight",
+          drawingParameters: "width",
           cursorsOptions: [{ 
             type: 1, 
             color: "rgba(52,152,219,0.7)", 
@@ -444,8 +526,8 @@ const speedDownBtn = document.getElementById('speed-down-btn');
         osmd.EngravingRules.StaffDistance = 2.8;
         osmd.EngravingRules.StaffLineWidth = 0.06;
         osmd.EngravingRules.NoteHeadWidth = 0.8;
-        osmd.zoom = 0.7;
-        currentZoom = 0.7;
+        osmd.zoom = 0.5;
+        currentZoom = 0.5;
       } else if (width <= 768) {
         // Tablets y móviles grandes
         osmd.EngravingRules.SystemMaxMeasuresCount = 4;
@@ -454,8 +536,8 @@ const speedDownBtn = document.getElementById('speed-down-btn');
         osmd.EngravingRules.StaffDistance = 3.0;
         osmd.EngravingRules.StaffLineWidth = 0.07;
         osmd.EngravingRules.NoteHeadWidth = 0.9;
-        osmd.zoom = 0.8;
-        currentZoom = 0.8;
+        osmd.zoom = 0.75;
+        currentZoom = 0.75;
       } else {
         // Pantallas de escritorio
         osmd.EngravingRules.SystemMaxMeasuresCount = 4;
@@ -470,6 +552,14 @@ const speedDownBtn = document.getElementById('speed-down-btn');
       
       updateZoomDisplay();
     }
+
+    function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    // Añade un cero a la izquierda si los segundos son menores a 10
+    const formattedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+    return `${minutes}:${formattedSeconds}`;
+}
 
     function initSampler() {
       sampler = new Tone.Sampler({
@@ -520,11 +610,11 @@ const speedDownBtn = document.getElementById('speed-down-btn');
         const text = await response.text();
         await osmd.load(text);
         osmdContainer.innerHTML = ''; 
-        
-        // Aplicar reglas de tamaño antes de renderizar
+
         setupEngravingRulesForScreenSize();
         
         await osmd.render();
+         setTimeout(syncAndRedrawAnnotations, 100); 
         
         parseMusicXML(text);
         scheduleNotesOnTransport();
@@ -581,6 +671,7 @@ const speedDownBtn = document.getElementById('speed-down-btn');
       
       const lastNote = parsedNotes[parsedNotes.length - 1];
       totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
+      totalTimeSpan.textContent = formatTime(totalDuration); 
     }
 
     function scheduleNotesOnTransport() {
@@ -664,15 +755,27 @@ const speedDownBtn = document.getElementById('speed-down-btn');
       updatePlayButton(false);
       stopProgressUpdate();
       progressBar.style.width = '0%';
+      currentTimeSpan.textContent = '0:00'; 
     }
 
-    function startProgressUpdate() {
-      stopProgressUpdate();
-      progressInterval = setInterval(() => {
-        const progress = (Tone.Transport.seconds / totalDuration) * 100;
+function startProgressUpdate() {
+    stopProgressUpdate();
+    progressInterval = setInterval(() => {
+        // Obtenemos el tiempo actual de Tone.js
+        const currentTime = Tone.Transport.seconds;
+      
+        // Corregimos la duración total para que coincida con la velocidad de reproducción
+        const effectiveTotalDuration = totalDuration / playbackRate;
+        const progress = (currentTime / effectiveTotalDuration) * 100;
+
         progressBar.style.width = `${Math.min(progress, 100)}%`;
-      }, 100);
-    }
+
+        // --- LÍNEA NUEVA ---
+        // Actualiza el texto con el tiempo actual formateado
+        currentTimeSpan.textContent = formatTime(currentTime);
+
+    }, 100); // Se actualiza 10 veces por segundo
+}
 
     function stopProgressUpdate() {
       if (progressInterval) {
@@ -703,7 +806,7 @@ function updateSpeed(newRate) {
     // Detener la reproducción si está activa
     if (Tone.Transport.state === 'started') {
         stopPlayback();
-    }
+    } 
     
     // Limitar la velocidad entre 0.25x y 2.0x
     playbackRate = Math.max(0.25, Math.min(2.0, newRate));
@@ -724,7 +827,7 @@ speedUpBtn.addEventListener('click', () => {
 speedDownBtn.addEventListener('click', () => {
     updateSpeed(playbackRate - speedStep);
 });
-
+ 
       pianoBtn.addEventListener('click', () => {
         pianoContainer.classList.toggle('hidden');
       });
@@ -748,6 +851,7 @@ speedDownBtn.addEventListener('click', () => {
           if (osmd) {
             setupEngravingRulesForScreenSize();
             osmd.render();
+            setTimeout(syncAndRedrawAnnotations, 300);
           }
         }
       });
@@ -765,56 +869,39 @@ speedDownBtn.addEventListener('click', () => {
           osmd.cursor.next();
         });
       });
-      
-osmdContainer.addEventListener('click', (event) => {
-    if (!osmd?.graphic?.measureList) return;
-    
-    const rect = osmdContainer.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickY = event.clientY - rect.top;
-    
-    let closestMeasureIndex = -1;
-    let minDistance = Infinity;
-    
-    osmd.graphic.measureList.forEach((measureStaffEntries, measureIndex) => {
-        if (!measureStaffEntries || measureStaffEntries.length === 0) return;
-        
-        // Iterar sobre todas las staffEntries del compás
-        measureStaffEntries.forEach(staffEntries => {
-            if (!staffEntries || staffEntries.length === 0) return;
-            
-            // Tomar la primera GraphicalStaffEntry válida
-            const graphicalStaffEntry = staffEntries[0];
-            if (!graphicalStaffEntry || !graphicalStaffEntry.boundingBox) return;
-            
-            const bbox = graphicalStaffEntry.boundingBox;
-            const centerX = bbox.x + bbox.width / 2;
-            const centerY = bbox.y + bbox.height / 2;
-            
-            const distance = Math.sqrt(
-                Math.pow(clickX - centerX, 2) + 
-                Math.pow(clickY - centerY, 2)
-            );
-            
-            if (distance < minDistance && distance < 100) { // Límite de distancia
-                minDistance = distance;
-                closestMeasureIndex = measureIndex;
-            }
-        });
-    });
-    
-    if (closestMeasureIndex !== -1 && closestMeasureIndex < measureStartTimes.length) {
-        alert(`Reproduciendo desde compás ${closestMeasureIndex + 1}`);
-        playFromMeasure(closestMeasureIndex);
-    }
+     
+
+     drawBtn.addEventListener('click', () => {
+    isDrawingMode = !isDrawingMode;
+    drawBtn.style.background = isDrawingMode ? '#e0e0e0' : 'none';
+    // Habilita/deshabilita los eventos en el canvas de dibujo
+    annotationCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
 });
+
+     clearBtn.addEventListener('click', clearAnnotations);
+
+// Eventos para el dibujo
+annotationCanvas.addEventListener('mousedown', startDrawing);
+annotationCanvas.addEventListener('mousemove', draw);
+annotationCanvas.addEventListener('mouseup', stopDrawing);
+annotationCanvas.addEventListener('mouseout', stopDrawing); 
+
+
     }
 
+
+
+
+
+
+ 
     function applyZoom() {
       if (osmd) {
         osmd.zoom = currentZoom;
         osmd.render();
         updateZoomDisplay();
+
+        setTimeout(syncAndRedrawAnnotations, 300);
       }
     }
 
@@ -846,6 +933,108 @@ osmdContainer.addEventListener('click', (event) => {
       statusDiv.textContent = text;
       statusDiv.style.display = text ? 'block' : 'none';
     }
+
+function syncAndRedrawAnnotations() {
+    if (!osmd.graphic.sheet) return;
+
+    const svg = osmdContainer.querySelector('svg');
+    if (!svg) return;
+
+    const rect = svg.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    annotationCanvas.width = rect.width * dpr;
+    annotationCanvas.height = rect.height * dpr;
+
+    annotationCanvas.style.width = `${rect.width}px`;
+    annotationCanvas.style.height = `${rect.height}px`;
+
+    annotationCtx.scale(dpr, dpr);
+    annotationCtx.clearRect(0, 0, rect.width, rect.height);
+
+    // Redibuja cada trazo guardado
+    annotations.forEach(stroke => {
+        annotationCtx.beginPath();
+        annotationCtx.strokeStyle = stroke.color;
+        // El grosor de la línea se respeta automáticamente por el escalado.
+        annotationCtx.lineWidth = stroke.width;
+        annotationCtx.lineCap = 'round';
+        annotationCtx.lineJoin = 'round';
+
+        stroke.points.forEach((point, index) => {
+            const x = point.x * rect.width;
+            const y = point.y * rect.height;
+
+            if (index === 0) {
+                annotationCtx.moveTo(x, y);
+            } else {
+                annotationCtx.lineTo(x, y);
+            }
+        });
+        annotationCtx.stroke();
+    });
+}
+
+function startDrawing(e) {
+    if (!isDrawingMode) return;
+    isDrawing = true;
+
+    const rect = annotationCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+
+    // 1. Añadimos un campo 'isWidthSet' para controlar cuándo se decide el grosor.
+    const newStroke = {
+        color: '#E74C3C',
+        width: 1.1, // Grosor por defecto
+        points: [{ x, y }],
+        isWidthSet: false // Aún no hemos decidido el grosor final
+    };
+    annotations.push(newStroke);
+
+    // Preparamos el lienzo para el nuevo trazo
+    annotationCtx.beginPath();
+    annotationCtx.strokeStyle = newStroke.color;
+    annotationCtx.lineCap = 'round';
+    annotationCtx.lineJoin = 'round';
+    
+    // Movemos el "lápiz", pero todavía NO establecemos el lineWidth
+    annotationCtx.moveTo(x * rect.width, y * rect.height);
+}
+
+function draw(e) {
+    if (!isDrawing || !isDrawingMode) return;
+    
+    const rect = annotationCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width; 
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    const currentStroke = annotations[annotations.length - 1];
+    currentStroke.points.push({ x, y });
+    
+    // Dibujar en tiempo real sin redibujar todo
+    const points = currentStroke.points;
+    if (points.length >= 2) {
+        const lastPoint = points[points.length - 2];
+        const currentPoint = points[points.length - 1];
+        
+        annotationCtx.beginPath();
+        annotationCtx.strokeStyle = currentStroke.color;
+        annotationCtx.lineWidth = currentStroke.width-0.1;
+        annotationCtx.lineCap = 'round';
+        annotationCtx.moveTo(lastPoint.x * annotationCanvas.width, lastPoint.y * annotationCanvas.height);
+        annotationCtx.lineTo(currentPoint.x * annotationCanvas.width, currentPoint.y * annotationCanvas.height);
+        annotationCtx.stroke();
+    }
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function clearAnnotations() {
+  annotations = [];
+  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+}
   </script>
 </body>
 </html>
