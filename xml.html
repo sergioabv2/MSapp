@@ -184,14 +184,18 @@
       #top-bar {
         padding: 8px 12px;
       }
-      
- 
+
       .mobile-zoom {
         transform: scale(0.75);
         transform-origin: top center;
       }
   }
 
+   @media (max-width: 440px) {
+       #time-display{
+        display: none;
+      }
+   }
 
 #osmd-container {
   width: 95%; 
@@ -233,7 +237,7 @@
 .speed-ctrl-btn {
     font-size: 20px;
     font-weight: 500;
-    padding: 2px 14px;
+    padding: 4px 12px;
     line-height: 1;
     border-radius: 0; /* Quitamos bordes individuales */
     background-color: transparent;
@@ -245,7 +249,7 @@
 .speed-display {
 
     text-align: center;
-    min-width: 80px;
+    min-width: 50px;
     border-left: 1px solid #e0e0e0;
     border-right: 1px solid #e0e0e0;
 }
@@ -332,19 +336,38 @@ width: 100vw;
 
 /* === NUEVO: Botones Flotantes de Dibujo === */
 #floating-draw-controls {
-  position: absolute;
-  bottom: 25px;
-  right: 25px;
+  position: sticky;
+  bottom: 105px;
+  float: right;
+  margin-right: 10px;
   z-index: 50;
+  width: 90px;
   display: flex;
-  flex-direction: column; /* Apila los botones verticalmente */
-  gap: 10px;
+  flex-direction: row; /* Apila los botones verticalmente */
+  gap: 5px;
   background-color: rgba(255, 255, 255, 0.85); /* Fondo semitransparente */
   padding: 8px;
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   backdrop-filter: blur(8px); /* Efecto "glassmorphism" para navegadores compatibles */
+}
+
+    /* === NUEVO: Controles de Velocidad Flotantes === */
+#floating-speed-controls {
+  position: sticky;
+  width: 145px;
+  bottom: 105px;
+  left: 10px; /* Lo posicionamos a la izquierda para balancear la UI */
+  z-index: 50;
+  
+  /* Aplicamos el mismo estilo "glassmorphism" de los otros controles flotantes */
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
 }
 
 /* Ajustes a los botones flotantes */
@@ -369,26 +392,22 @@ width: 100vw;
 
     
       
-      <div class="speed-group">
-        <button id="speed-down-btn" class="btn speed-ctrl-btn">−</button>
-        <div class="speed-display">
-          <span class="speed-bpm" id="speed-bpm">120 BPM</span>
-          <span class="speed-value" id="speed-label">1.00x</span>
-        </div>
-        <button id="speed-up-btn" class="btn speed-ctrl-btn">+</button>
-      </div>
+  
     </div>
 
     <div class="controls-group">
-          <button id="piano-btn" class="btn" title="Mostrar/Ocultar Piano">
-       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 16.5px; width: 15.5px">
+          <button id="piano-btn" class="btn" >
+       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
       </button>
 
       <div id="zoom-controls">
-        <span class="zoom-display" id="zoom-label">Zoom: 100%</span>
+         <div class="speed-display">
+        <span class="zoom-display" id="speed-bpm">120 BPM</span>
+  <span class="speed-value" id="speed-label">1.00x</span>
+   </div>
         <div class="zoom-buttons">
-            <button class="zoom-btn" id="zoom-out">−</button>
-            <button class="zoom-btn" id="zoom-in">+</button>
+            <button class="zoom-btn" id="speed-down-btn">−</button>
+            <button class="zoom-btn" id="speed-up-btn">+</button>
         </div>
       </div>
       <div id="close-btn-placeholder"></div>
@@ -405,7 +424,21 @@ width: 100vw;
   <div id="sheet-music-wrapper" style="position: relative;">
     <div id="osmd-container"></div>
     <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
-     <div id="floating-draw-controls">
+    
+</div>
+  <div id="status">Cargando...</div>
+
+   <div id="floating-speed-controls">
+    <div class="speed-group">
+        <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
+        <div class="speed-display">
+          <span class="speed-bpm" id="zoom-label">Zoom: 100%</span>
+        </div>
+        <button id="zoom-in" class="btn speed-ctrl-btn">+</button>
+    </div>
+  </div>
+  
+    <div id="floating-draw-controls">
         <button id="draw-btn" class="btn" title="Activar Lápiz">
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
         </button>
@@ -413,10 +446,9 @@ width: 100vw;
             <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
         </button>
     </div>
-</div>
-  <div id="status">Cargando...</div>
-  
+
   <div id="piano-container">
+   
     <div id="piano-keys"></div>
   </div>
 
