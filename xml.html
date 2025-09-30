@@ -95,7 +95,7 @@
       transition: width 0.1s linear;
     }
     
-    /* Speed Controls */
+    /* Speed Controls - MEJORADO */
     .speed-group {
       display: flex;
       align-items: center;
@@ -106,25 +106,36 @@
       border: 1px solid #e0e0e0;
     }
     
-    .speed-btn {
-      background: #fff;
-      border: 1px solid #e0e0e0;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1a1a1a;
-      transition: all 0.2s;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .speed-slider {
+      width: 80px;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      background: #e0e0e0;
     }
     
-    .speed-btn:hover {
-      background: #f5f5f5;
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .speed-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    
+    .speed-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: none;
     }
     
     .speed-display {
@@ -149,16 +160,47 @@
    #osmd-container {
       max-width: 1200px;
       margin: 32px auto;
-      padding: 20px; /* Añadido para mejor espaciado */
+      padding: 20px;
       min-height: 300px;
       cursor: pointer;
-      /* SOLUCIÓN DE DISEÑO: Borde para visualizar el contenedor */
       border: 1px solid #e0e0e0;
       background-color: white;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow-x: auto;
+      /* MÁRGENES HORIZONTALES MEJORADOS */
+      margin-left: 16px;
+      margin-right: 16px;
     }
     
-   
+    /* Controles de zoom para móviles */
+    #zoom-controls {
+      display: none;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px auto;
+      padding: 0 20px;
+      max-width: 1200px;
+    }
+    
+    .zoom-btn {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .zoom-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .zoom-display {
+      font-size: 14px;
+      padding: 6px 12px;
+      color: #666;
+    }
     
     /* Piano - 88 Keys Minimalista */
     #piano-container {
@@ -220,9 +262,22 @@
       font-size: 13px;
     }
     
-    /* Mobile adjustments */
+    /* Mobile adjustments - ESCALADO PARA MÓVILES */
     @media (max-width: 768px) {
-
+      #zoom-controls {
+        display: flex;
+      }
+      
+      #osmd-container {
+        margin: 16px 12px; /* Márgenes reducidos pero consistentes */
+        padding: 10px;
+      }
+      
+      /* Aplicamos zoom automático en móviles */
+      .mobile-zoom {
+        transform: scale(0.85);
+        transform-origin: top center;
+      }
       
       .key.white {
         width: 13px;
@@ -234,6 +289,45 @@
         height: 48px;
         margin-left: -4px;
         margin-right: -4px;
+      }
+      
+      /* Ajustes para el control de velocidad en móviles */
+      .speed-group {
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px 8px;
+      }
+      
+      .speed-slider {
+        width: 60px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #top-bar {
+        padding: 8px 12px;
+      }
+      
+      .controls {
+        gap: 12px;
+      }
+      
+      .speed-group {
+        padding: 3px 6px;
+      }
+      
+      .speed-display {
+        min-width: 60px;
+      }
+      
+      /* Zoom más agresivo en pantallas muy pequeñas */
+      .mobile-zoom {
+        transform: scale(0.75);
+        transform-origin: top center;
+      }
+      
+      #osmd-container {
+        margin: 12px 8px; /* Márgenes aún más reducidos */
       }
     }
   </style>
@@ -256,13 +350,13 @@
         <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       </button>
       
+      <!-- CONTROL DE VELOCIDAD MEJORADO -->
       <div class="speed-group">
-        <button class="speed-btn" id="speed-down">−</button>
+        <input type="range" class="speed-slider" id="speed-slider" min="0.25" max="2.0" value="1.0" step="0.05">
         <div class="speed-display">
           <span class="speed-value" id="speed-label">1.0x</span>
           <span class="speed-bpm" id="speed-bpm">120 BPM</span>
         </div>
-        <button class="speed-btn" id="speed-up">+</button>
       </div>
     </div>
     
@@ -271,9 +365,14 @@
     </div>
   </div>
 
-
-    <div id="osmd-container"></div>
+  <!-- Controles de zoom para móviles -->
+  <div id="zoom-controls">
+    <button class="zoom-btn" id="zoom-out">−</button>
+    <span class="zoom-display" id="zoom-label">100%</span>
+    <button class="zoom-btn" id="zoom-in">+</button>
   </div>
+
+  <div id="osmd-container"></div>
   <div id="status">Cargando...</div>
   
   <div id="piano-container">
@@ -296,8 +395,10 @@
     const progressBarContainer = document.getElementById('progress-bar-container');
     const speedLabel = document.getElementById('speed-label');
     const speedBpmLabel = document.getElementById('speed-bpm');
-    const speedUpBtn = document.getElementById('speed-up');
-    const speedDownBtn = document.getElementById('speed-down');
+    const speedSlider = document.getElementById('speed-slider');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomLabel = document.getElementById('zoom-label');
 
     let osmd = null;
     let sampler = null;
@@ -309,6 +410,8 @@
     let audioPart = null;
     let visualPart = null;
     let progressInterval = null;
+    let currentZoom = 1.0;
+    let isMobile = window.innerWidth <= 768;
     
     const MUSICXML_URL = 'https://storage.googleapis.com/mozartacademy-files/midi/clowns-dmitri-kabalevsky.musicxml';
 
@@ -332,7 +435,7 @@
           drawTitle: true,
           followCursor: true,
           autoResize: true,
-           drawingParameters: "compact",
+          drawingParameters: "compacttight",
           cursorsOptions: [{ 
             type: 1, 
             color: "rgba(52,152,219,0.7)", 
@@ -340,22 +443,54 @@
             follow: true 
           }]
         });
-       osmd.zoom = 0.8;
-
-    // 2. Usamos el modo compacto para optimizar el espacio.
-    osmd.setDrawingParameters("compact");
-
-    // 3. AHORA SÍ, la regla de 4 compases tendrá espacio para aplicarse.
-    osmd.EngravingRules.SystemMaxMeasuresCount = 4;
-    osmd.EngravingRules.FillLastSystemWithMeasures = true;
-
-    // 4. (Opcional) Si aún no funciona, puedes ser más agresivo
-    // reduciendo el espaciado mínimo entre notas.
-    osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.5;
+        
+        // Configuración para pantallas grandes (hasta 4 compases por línea)
+        setupEngravingRulesForScreenSize();
         
       } catch (e) { 
         setStatus('Error al inicializar'); 
       }
+    }
+
+    // Función para configurar reglas según el tamaño de pantalla
+    function setupEngravingRulesForScreenSize() {
+      if (!osmd || !osmd.EngravingRules) return;
+      
+      const width = window.innerWidth;
+      
+      if (width <= 480) {
+        // Pantallas muy pequeñas - máxima compresión
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 0.8;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.0;
+        osmd.EngravingRules.StaffDistance = 2.8;
+        osmd.EngravingRules.StaffLineWidth = 0.06;
+        osmd.EngravingRules.NoteHeadWidth = 0.8;
+        osmd.zoom = 0.7;
+        currentZoom = 0.7;
+      } else if (width <= 768) {
+        // Tablets y móviles grandes
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.0;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.2;
+        osmd.EngravingRules.StaffDistance = 3.0;
+        osmd.EngravingRules.StaffLineWidth = 0.07;
+        osmd.EngravingRules.NoteHeadWidth = 0.9;
+        osmd.zoom = 0.8;
+        currentZoom = 0.8;
+      } else {
+        // Pantallas de escritorio
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.2;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.5;
+        osmd.EngravingRules.StaffDistance = 3.5;
+        osmd.EngravingRules.StaffLineWidth = 0.08;
+        osmd.EngravingRules.NoteHeadWidth = 1.0;
+        osmd.zoom = 1.0;
+        currentZoom = 1.0;
+      }
+      
+      updateZoomDisplay();
     }
 
     function initSampler() {
@@ -378,11 +513,11 @@
       
       // Piano de 88 teclas: A0 a C8
       for (let octave = 0; octave <= 8; octave++) {
-        const startNote = octave === 0 ? 9 : 0; // A0 comienza en índice 9 (después de C,D,E,F,G,A,B,C,D = A)
+        const startNote = octave === 0 ? 9 : 0;
         
         for (let i = startNote; i <= 6; i++) {
-          if (octave === 0 && i < 9) continue; // Saltar hasta A0
-          if (octave === 8 && i > 0) break; // Solo C8
+          if (octave === 0 && i < 9) continue;
+          if (octave === 8 && i > 0) break;
           
           const note = pattern[i % 7];
           const whiteKey = document.createElement('div');
@@ -390,7 +525,6 @@
           whiteKey.id = `${note}${octave}`;
           pianoKeys.appendChild(whiteKey);
           
-          // No hay tecla negra después de E, B, ni después de C8
           if (blackKeys[note] && !(octave === 8 && note === 'C')) {
             const blackKey = document.createElement('div');
             blackKey.className = 'key black';
@@ -408,6 +542,10 @@
         const text = await response.text();
         await osmd.load(text);
         osmdContainer.innerHTML = ''; 
+        
+        // Aplicar reglas de tamaño antes de renderizar
+        setupEngravingRulesForScreenSize();
+        
         await osmd.render();
         
         parseMusicXML(text);
@@ -491,6 +629,7 @@
         visualEvents.push({ time: time, notes: notes });
       });
 
+      // CORRECCIÓN: Usar playbackRate en lugar de recrear las partes
       audioPart = new Tone.Part((time, value) => {
         sampler.triggerAttackRelease(value.pitch, value.duration, time);
       }, audioEvents).start(0);
@@ -561,20 +700,47 @@
         }
       });
 
-      speedUpBtn.addEventListener('click', () => {
-        currentSpeed = Math.min(2.0, currentSpeed + 0.1);
+      // CONTROL DE VELOCIDAD CORREGIDO
+      speedSlider.addEventListener('input', (e) => {
+        currentSpeed = parseFloat(e.target.value);
         Tone.Transport.playbackRate = currentSpeed;
         updateBpmDisplay();
-      });
-
-      speedDownBtn.addEventListener('click', () => {
-        currentSpeed = Math.max(0.25, currentSpeed - 0.1);
-        Tone.Transport.playbackRate = currentSpeed;
-        updateBpmDisplay();
+        
+        // Si está reproduciendo, actualizar en tiempo real
+        if (Tone.Transport.state === 'started') {
+          // Re-schedule las partes visuales con la nueva velocidad
+          if (visualPart) {
+            visualPart.dispose();
+            scheduleNotesOnTransport();
+          }
+        }
       });
 
       pianoBtn.addEventListener('click', () => {
         pianoContainer.classList.toggle('hidden');
+      });
+      
+      // Controles de zoom
+      zoomInBtn.addEventListener('click', () => {
+        currentZoom = Math.min(2.0, currentZoom + 0.1);
+        applyZoom();
+      });
+      
+      zoomOutBtn.addEventListener('click', () => {
+        currentZoom = Math.max(0.5, currentZoom - 0.1);
+        applyZoom();
+      });
+      
+      // Redimensionar ventana
+      window.addEventListener('resize', () => {
+        const newIsMobile = window.innerWidth <= 768;
+        if (newIsMobile !== isMobile) {
+          isMobile = newIsMobile;
+          if (osmd) {
+            setupEngravingRulesForScreenSize();
+            osmd.render();
+          }
+        }
       });
       
       progressBarContainer.addEventListener('click', (e) => {
@@ -627,6 +793,18 @@
       });
     }
 
+    function applyZoom() {
+      if (osmd) {
+        osmd.zoom = currentZoom;
+        osmd.render();
+        updateZoomDisplay();
+      }
+    }
+
+    function updateZoomDisplay() {
+      zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
     function updatePlayButton(isPlaying) {
       playIcon.style.display = isPlaying ? 'none' : 'block';
       pauseIcon.style.display = isPlaying ? 'block' : 'none';
@@ -634,7 +812,7 @@
 
     function updateBpmDisplay() {
       const currentBPM = Math.round(globalTempo * currentSpeed);
-      speedLabel.textContent = `${currentSpeed.toFixed(1)}x`;
+      speedLabel.textContent = `${currentSpeed.toFixed(2)}x`;
       speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
 
@@ -645,7 +823,7 @@
       el.classList.add('active');
       const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
       setTimeout(() => el.classList.remove('active'), highlightDuration);
-    }
+    } 
 
     function setStatus(text) { 
       statusDiv.textContent = text;
