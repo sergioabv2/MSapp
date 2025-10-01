@@ -515,6 +515,17 @@
             cursor: pointer;
             transition: color 0.2s ease;
         }
+           .xml-viewer-close {
+            background: none;
+            border: none;
+     position: absolute; 
+     top: 15px;
+     right: 25px;
+            color: black;
+            font-size: 26px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
         
         .pdf-viewer-close:hover {
             color: #d1d1d1;
@@ -1517,7 +1528,7 @@ color: white;
     </div>
     
    <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
-        <div class="pdf-viewer-header">
+        <div class="pdf-viewer-header" ng-if="selectedBook.type !== 'xml'">
             <h3 class="bookTitle">{{ selectedBook.title }}</h3>
 
 <div class="right-controls">
@@ -1546,9 +1557,12 @@ color: white;
     </div>
   </div>
 </div>
-
             <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
         </div>
+
+         <div  ng-if="selectedBook.type === 'xml'">
+           <button class="xml-viewer-close" style="color: black !important" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
+            </div>
 
 
 
