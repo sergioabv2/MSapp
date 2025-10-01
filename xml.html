@@ -493,6 +493,9 @@ display: flex;
     <button id="draw-btn" class="btn" title="Activar Lápiz">
       <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
     </button>
+    <button id="text-btn" class="btn" title="Añadir Texto">
+        <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
+    </button>
     <button id="clear-btn" class="btn" title="Borrar Anotaciones">
       <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
     </button>
@@ -589,12 +592,15 @@ const secondaryTopBar = document.getElementById('secondary-top-bar');
 const annotationCanvas = document.getElementById('annotation-canvas');
 const annotationCtx = annotationCanvas.getContext('2d');
 const drawBtn = document.getElementById('draw-btn');
+const textBtn = document.getElementById('text-btn');
 const clearBtn = document.getElementById('clear-btn'); 
 
 
 let isDrawingMode = false;
 let isDrawing = false;
 let annotations = []; 
+let isTextMode = false;
+let textAnnotations = [];
 let startX, startY;
 
 
@@ -1026,17 +1032,20 @@ speedDownBtn.addEventListener('click', () => {
      
 
 
+// Dentro de addEventListeners(), busca el listener de drawBtn
 drawBtn.addEventListener('click', () => {
-    isDrawingMode = !isDrawingMode; // Alterna el modo
+    isDrawingMode = !isDrawingMode;
+    isTextMode = false; // <<-- AÑADE ESTA LÍNEA
 
     if (isDrawingMode) {
-        drawBtn.style.background = '#e0e0e0'; // Resalta el botón
-        annotationCanvas.style.pointerEvents = 'auto'; // El canvas puede recibir clics
-        annotationCanvas.style.cursor = 'crosshair'; // Cambia el cursor a una cruz
+        drawBtn.style.background = '#e0e0e0';
+        textBtn.style.background = 'none'; // <<-- AÑADE ESTA LÍNEA
+        annotationCanvas.style.pointerEvents = 'auto';
+        annotationCanvas.style.cursor = 'crosshair';
     } else {
-        drawBtn.style.background = 'none'; // Quita el resaltado
-        annotationCanvas.style.pointerEvents = 'none'; // El canvas ignora los clics
-        annotationCanvas.style.cursor = 'default'; // Restaura el cursor por defecto
+        drawBtn.style.background = 'none';
+        annotationCanvas.style.pointerEvents = 'none';
+        annotationCanvas.style.cursor = 'default';
     }
 });
 
@@ -1046,11 +1055,29 @@ annotationCanvas.addEventListener('mousemove', draw);
 annotationCanvas.addEventListener('mouseup', stopDrawing);
 annotationCanvas.addEventListener('mouseout', stopDrawing); 
 
-
+textBtn.addEventListener('click', toggleTextMode);
+annotationCanvas.addEventListener('click', handleCanvasClickForText);
 
     }
 
+// Puedes agregar esta función justo antes de addEventListeners()
+function toggleTextMode() {
+    isTextMode = !isTextMode;
+    isDrawingMode = false; // Desactiva el modo dibujo al activar el de texto
 
+    // Actualiza la apariencia de los botones y el cursor
+    if (isTextMode) {
+        textBtn.style.background = '#e0e0e0';
+        drawBtn.style.background = 'none';
+        annotationCanvas.style.pointerEvents = 'auto';
+        annotationCanvas.style.cursor = 'text';
+    } else {
+        textBtn.style.background = 'none';
+        // Si ningún modo está activo, el canvas no debe capturar eventos
+        annotationCanvas.style.pointerEvents = 'none';
+        annotationCanvas.style.cursor = 'default';
+    }
+}
 
 
 function populateMeasureSelector() {
@@ -1120,34 +1147,21 @@ function startDrawing(e) {
 }
 
 // Se activa mientras se mueve el ratón con el clic presionado
+// Reemplaza el contenido de la función draw(e) con esto:
 function draw(e) {
     if (!isDrawing) return;
 
-    // 1. Limpia todo el lienzo para empezar de cero en cada fotograma
-    annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+    // Redibuja todo lo que ya está guardado
+    redrawAllAnnotations();
 
-    // 2. Redibuja TODAS las anotaciones anteriores que ya están guardadas
-    // Esta es la lógica clave que faltaba: recorre el arreglo y dibuja cada rectángulo.
-    annotations.forEach(rect => {
-        annotationCtx.fillStyle = rect.color;
-        // Multiplicamos las coordenadas normalizadas (0-1) por las dimensiones actuales del canvas
-        annotationCtx.fillRect(
-            rect.x * annotationCanvas.width, 
-            rect.y * annotationCanvas.height, 
-            rect.width * annotationCanvas.width, 
-            rect.height * annotationCanvas.height
-        );
-    });
-
-    // 3. Calcula y dibuja el NUEVO rectángulo que se está creando ahora mismo
+    // Dibuja el rectángulo de previsualización que se está creando
     const canvasRect = annotationCanvas.getBoundingClientRect();
     const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
     const currentY = (e.clientY - canvasRect.top) / canvasRect.height;
 
     const width = (currentX - startX) * annotationCanvas.width;
     const height = (currentY - startY) * annotationCanvas.height;
-    
-    // Dibuja el rectángulo de previsualización
+
     annotationCtx.fillStyle = 'rgba(255, 223, 89, 0.4)'; // Amarillo semitransparente
     annotationCtx.fillRect(startX * annotationCanvas.width, startY * annotationCanvas.height, width, height);
 }
@@ -1179,14 +1193,113 @@ function stopDrawing(e) {
         });
     }
 
-
+    redrawAllAnnotations();
 
 }
 
-function clearAnnotations() {
-    annotations = []; // Vaciamos el arreglo
-    // Limpiamos visualmente el canvas
+
+function redrawAllAnnotations() {
+    // Asegura que el canvas tenga el tamaño correcto del contenedor de la partitura
+    const rect = osmdContainer.getBoundingClientRect();
+    if (annotationCanvas.width !== rect.width || annotationCanvas.height !== rect.height) {
+        annotationCanvas.width = rect.width;
+        annotationCanvas.height = rect.height;
+    }
+    
+    // Limpia todo
     annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+
+    // Dibuja los rectángulos guardados
+    annotations.forEach(rect => {
+        annotationCtx.fillStyle = rect.color;
+        annotationCtx.fillRect(
+            rect.x * annotationCanvas.width, 
+            rect.y * annotationCanvas.height, 
+            rect.width * annotationCanvas.width, 
+            rect.height * annotationCanvas.height
+        );
+    });
+
+    // Dibuja los textos guardados
+    textAnnotations.forEach(text => {
+        annotationCtx.fillStyle = text.color;
+        annotationCtx.font = text.font;
+        annotationCtx.textBaseline = 'top'; // Asegura que el texto se dibuje desde la esquina superior
+        annotationCtx.fillText(
+            text.text,
+            text.x * annotationCanvas.width,
+            text.y * annotationCanvas.height
+        );
+    });
+}
+
+// Se llama al hacer clic en el canvas cuando el modo texto está activo
+function handleCanvasClickForText(e) {
+    if (!isTextMode) return;
+    
+    // Evita que se active el dibujo si ambos modos estuvieran activos por error
+    isDrawing = false; 
+    
+    // Crea el campo de input en la posición del clic
+    createTextInput(e);
+}
+
+// Crea y posiciona un <input> temporal sobre el canvas
+function createTextInput(e) {
+    const rect = annotationCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Crea el elemento de input
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.style.position = 'absolute';
+    input.style.left = `${e.clientX}px`; // Usa coordenadas de la ventana para posicionar
+    input.style.top = `${e.clientY}px`;
+    input.style.background = 'white';
+    input.style.border = '1px solid #ccc';
+    input.style.font = 'bold 16px sans-serif';
+    input.style.padding = '2px';
+    input.setAttribute('maxlength', '50'); // Límite de caracteres
+
+    // Función para guardar el texto y eliminar el input
+    const finalizeText = () => {
+        if (input.value.trim()) {
+            // Guardamos las coordenadas normalizadas (0 a 1)
+            const normalizedX = x / rect.width;
+            const normalizedY = y / rect.height;
+
+            textAnnotations.push({
+                text: input.value,
+                x: normalizedX,
+                y: normalizedY,
+                color: 'rgba(231, 76, 60, 1.0)', // Color rojo para el texto
+                font: 'bold 16px sans-serif'
+            });
+            redrawAllAnnotations();
+        }
+        document.body.removeChild(input);
+    };
+
+    // Agrega listeners para guardar al presionar Enter o al hacer clic fuera
+    input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            input.blur(); // El evento 'blur' llamará a finalizeText
+        }
+    });
+    input.addEventListener('blur', finalizeText);
+
+    // Agrega el input al body y lo enfoca para escribir
+    document.body.appendChild(input);
+    input.focus();
+}
+
+// Reemplaza la función clearAnnotations() con esto:
+function clearAnnotations() {
+    annotations = []; // Vaciamos el arreglo de rectángulos
+    textAnnotations = []; // Vaciamos el arreglo de textos
+    redrawAllAnnotations(); // Limpiamos y redibujamos el canvas vacío
 }
 
   </script>
