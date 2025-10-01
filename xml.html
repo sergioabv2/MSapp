@@ -168,19 +168,12 @@
   overflow: hidden; /* Asegura que el contenido SVG respete los bordes redondeados */
 }
 
-/* Ajustes para Tablets */
-@media (min-width: 768px) {
-  #osmd-container {
-    width: 90%;
-    margin: 40px auto;
-  }
-}
+
 
 /* Ajustes para Desktop */
-@media (min-width: 1024px) {
+@media (min-width: 980px) {
   #osmd-container {
-    width: 100%;
-    margin: 50px auto; /* Aumentamos aún más el margen vertical */
+    width: 70%;
   }
 }
   
@@ -672,8 +665,8 @@ let startX, startY;
         osmd.EngravingRules.StaffDistance = 3.0;
         osmd.EngravingRules.StaffLineWidth = 0.07;
         osmd.EngravingRules.NoteHeadWidth = 0.9;
-        osmd.zoom = 0.75;
-        currentZoom = 0.75;
+        osmd.zoom = 0.7;
+        currentZoom = 0.7;
       } else {
         // Pantallas de escritorio
         osmd.EngravingRules.SystemMaxMeasuresCount = 4;
@@ -682,8 +675,8 @@ let startX, startY;
         osmd.EngravingRules.StaffDistance = 3.5;
         osmd.EngravingRules.StaffLineWidth = 0.08;
         osmd.EngravingRules.NoteHeadWidth = 1.0;
-        osmd.zoom = 1.0;
-        currentZoom = 1.0;
+        osmd.zoom = 0.85;
+        currentZoom = 0.85;
       }
       
       updateZoomDisplay();
@@ -1153,7 +1146,7 @@ function draw(e) {
 
     // Redibuja todo lo que ya está guardado
     redrawAllAnnotations();
-
+ 
     // Dibuja el rectángulo de previsualización que se está creando
     const canvasRect = annotationCanvas.getBoundingClientRect();
     const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
@@ -1236,17 +1229,27 @@ function redrawAllAnnotations() {
 // Se llama al hacer clic en el canvas cuando el modo texto está activo
 function handleCanvasClickForText(e) {
     if (!isTextMode) return;
+
+    // Busca si ya existe un cuadro de texto en la pantalla.
+    const existingInput = document.body.querySelector('input[type="text"][style*="position: absolute"]');
+
+    if (existingInput) {
+        // Si existe, el clic solo lo finalizará (lo "desenfoca").
+        existingInput.blur(); 
+        return; // Detiene la función aquí para no crear uno nuevo.
+    }
     
-    // Evita que se active el dibujo si ambos modos estuvieran activos por error
+    // Si no existe ningún cuadro de texto, crea uno nuevo.
     isDrawing = false; 
-    
-    // Crea el campo de input en la posición del clic
     createTextInput(e);
 }
 
 // Crea y posiciona un <input> temporal sobre el canvas
 function createTextInput(e) {
+    const wrapper = document.getElementById('sheet-music-wrapper');
     const rect = annotationCanvas.getBoundingClientRect();
+    
+    // Calcula la posición del clic relativa al contenedor de la partitura
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -1254,13 +1257,13 @@ function createTextInput(e) {
     const input = document.createElement('input');
     input.type = 'text';
     input.style.position = 'absolute';
-    input.style.left = `${e.clientX}px`; // Usa coordenadas de la ventana para posicionar
-    input.style.top = `${e.clientY}px`;
+    input.style.left = `${x}px`; // Usa las coordenadas relativas al canvas
+    input.style.top = `${y}px`;
     input.style.background = 'white';
     input.style.border = '1px solid #ccc';
-    input.style.font = 'bold 16px sans-serif';
+    input.style.font = 'bold 18px sans-serif';
     input.style.padding = '2px';
-    input.setAttribute('maxlength', '50'); // Límite de caracteres
+    input.setAttribute('maxlength', '50');
 
     // Función para guardar el texto y eliminar el input
     const finalizeText = () => {
@@ -1274,24 +1277,26 @@ function createTextInput(e) {
                 x: normalizedX,
                 y: normalizedY,
                 color: 'rgba(231, 76, 60, 1.0)', // Color rojo para el texto
-                font: 'bold 16px sans-serif'
+                font: 'bold 18px sans-serif'
             });
             redrawAllAnnotations();
         }
-        document.body.removeChild(input);
+        // Asegúrate de que el input exista antes de intentar eliminarlo
+        if (wrapper.contains(input)) {
+            wrapper.removeChild(input);
+        }
     };
 
-    // Agrega listeners para guardar al presionar Enter o al hacer clic fuera
     input.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter') {
             ev.preventDefault();
-            input.blur(); // El evento 'blur' llamará a finalizeText
+            input.blur();
         }
     });
     input.addEventListener('blur', finalizeText);
 
-    // Agrega el input al body y lo enfoca para escribir
-    document.body.appendChild(input);
+    // Agrega el input al contenedor de la partitura y lo enfoca
+    wrapper.appendChild(input);
     input.focus();
 }
 
