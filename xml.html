@@ -155,47 +155,7 @@
       font-size: 13px;
     }
     
-    /* Mobile adjustments - ESCALADO PARA MÓVILES */
-    @media (max-width: 768px) {
    
-      
-      /* Aplicamos zoom automático en móviles */
-      .mobile-zoom {
-        transform: scale(0.85);
-        transform-origin: top center;
-      }
-      
-      .key.white {
-        width: 13px;
-        height: 75px;
-      }
-      
-      .key.black {
-        width: 8px;
-        height: 48px;
-        margin-left: -4px;
-        margin-right: -4px;
-      }
-      
-   
-    }
-    
-    @media (max-width: 480px) {
-      #top-bar {
-        padding: 8px 12px;
-      }
-
-      .mobile-zoom {
-        transform: scale(0.75);
-        transform-origin: top center;
-      }
-  }
-
-   @media (max-width: 440px) {
-       #time-display{
-        display: none;
-      }
-   }
 
 #osmd-container {
   width: 95%; 
@@ -358,10 +318,9 @@ width: 100vw;
   position: sticky;
   width: 145px;
   bottom: 105px;
+  display: none;
   left: 10px; /* Lo posicionamos a la izquierda para balancear la UI */
   z-index: 50;
-  
-  /* Aplicamos el mismo estilo "glassmorphism" de los otros controles flotantes */
   background-color: rgba(255, 255, 255, 0.85);
   padding: 8px;
   border-radius: 10px;
@@ -374,6 +333,113 @@ width: 100vw;
 #floating-draw-controls .btn:hover {
   background-color: #e9e9e9;
 }
+
+
+
+#measure-select {
+  -webkit-appearance: none; /* Quita el estilo por defecto en Safari/Chrome */
+  -moz-appearance: none; 
+  appearance: none;
+  background-color: white;
+ border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  height: 30px;
+  color: #1a1a1a;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+#measure-select:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+
+
+
+/* === NUEVO: Barra de Herramientas Secundaria === */
+#secondary-top-bar {
+
+display: flex;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+ padding: 0px 15px;
+ top: 60px;
+   position: sticky ;
+   z-index: 999;
+     align-items: center; 
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden; /* Clave para la animación de despliegue */
+  max-height: 0; /* Estado inicial: colapsada */
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animación suave */
+}
+
+/* Estado visible de la barra secundaria */
+#secondary-top-bar.is-visible {
+
+  max-height: 35px; /* Altura suficiente para los botones */
+  padding: 4px 15px; /* Restaura el padding vertical */
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espacio entre los elementos de cada grupo */
+}
+
+
+ /* Mobile adjustments - ESCALADO PARA MÓVILES */
+    @media (max-width: 768px) {
+   
+      
+      /* Aplicamos zoom automático en móviles */
+      .mobile-zoom {
+        transform: scale(0.85);
+        transform-origin: top center;
+      }
+      
+      .key.white {
+        width: 13px;
+        height: 75px;
+      }
+      
+      .key.black {
+        width: 8px;
+        height: 48px;
+        margin-left: -4px;
+        margin-right: -4px;
+      }
+      
+   
+    }
+    
+    @media (max-width: 500px) {
+      #top-bar {
+        padding: 8px 12px;
+      }
+
+      #floating-speed-controls{
+        display: flex !important;
+      }
+
+      .mobile-zoom {
+        transform: scale(0.75);
+        transform-origin: top center;
+      }
+
+      #tools-toggle-btn,
+  #secondary-top-bar {
+    display: none; 
+  }
+  }
+
+   @media (max-width: 440px) {
+       #time-display{
+        display: none;
+      }
+   }
   </style>
 </head>
 <body>
@@ -396,6 +462,10 @@ width: 100vw;
     </div>
 
     <div class="controls-group">
+        <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
+        <svg viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+      </button>
+
           <button id="piano-btn" class="btn" >
        <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
       </button>
@@ -418,6 +488,29 @@ width: 100vw;
     </div>
   </div>
 
+   <div id="secondary-top-bar">
+    <div class="tool-group">
+    <button id="draw-btn" class="btn" title="Activar Lápiz">
+      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    </button>
+    <button id="clear-btn" class="btn" title="Borrar Anotaciones">
+      <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+    </button>
+    </div>
+     <div class="tool-group">
+     <select id="measure-select" class="btn" title="Iniciar desde el compás...">
+    </select>
+         <div class="speed-group">
+            <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
+            <div class="speed-display">
+              <span class="speed-bpm" id="zoom-label">Zoom: 100%</span>
+            </div>
+            <button id="zoom-in" class="btn speed-ctrl-btn">+</button>
+        </div>
+    </div>
+     
+  </div>
+
   <!-- Controles de zoom para móviles -->
  
 
@@ -428,24 +521,19 @@ width: 100vw;
 </div>
   <div id="status">Cargando...</div>
 
-   <div id="floating-speed-controls">
+
+  <div id="floating-speed-controls">
     <div class="speed-group">
-        <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
+        <button id="zoom-out2" class="btn speed-ctrl-btn">−</button>
         <div class="speed-display">
-          <span class="speed-bpm" id="zoom-label">Zoom: 100%</span>
+          <span class="speed-bpm" id="zoom-label2">Zoom: 100%</span>
         </div>
-        <button id="zoom-in" class="btn speed-ctrl-btn">+</button>
+        <button id="zoom-in2" class="btn speed-ctrl-btn">+</button>
     </div>
-  </div>
-  
-    <div id="floating-draw-controls">
-        <button id="draw-btn" class="btn" title="Activar Lápiz">
-            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button id="clear-btn" class="btn" title="Borrar Anotaciones">
-            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        </button>
-    </div>
+  </div> 
+
+
+
 
   <div id="piano-container">
    
@@ -473,8 +561,14 @@ const speedDownBtn = document.getElementById('speed-down-btn');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomLabel = document.getElementById('zoom-label');
+     const zoomInBtn2 = document.getElementById('zoom-in2');
+    const zoomOutBtn2 = document.getElementById('zoom-out2');
+    const zoomLabel2 = document.getElementById('zoom-label2');
     const currentTimeSpan = document.getElementById('current-time');
 const totalTimeSpan = document.getElementById('total-time');
+const measureSelect = document.getElementById('measure-select');
+const toolsToggleBtn = document.getElementById('tools-toggle-btn');
+const secondaryTopBar = document.getElementById('secondary-top-bar');
 
     let osmd = null;
     let sampler = null;
@@ -491,15 +585,18 @@ const totalTimeSpan = document.getElementById('total-time');
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
 
-    // ... al principio del script
+
 const annotationCanvas = document.getElementById('annotation-canvas');
 const annotationCtx = annotationCanvas.getContext('2d');
 const drawBtn = document.getElementById('draw-btn');
 const clearBtn = document.getElementById('clear-btn'); 
 
+
 let isDrawingMode = false;
 let isDrawing = false;
-let annotations = []; // Aquí guardaremos los trazos
+let annotations = []; 
+let startX, startY;
+
 
     
     const MUSICXML_URL = 'https://storage.googleapis.com/mozartacademy-files/midi/clowns-dmitri-kabalevsky.musicxml';
@@ -528,6 +625,7 @@ let annotations = []; // Aquí guardaremos los trazos
           drawPartNames: false,
           autoResize: true,
           drawingParameters: "width",
+          drawMeasureNumbers: false,
           cursorsOptions: [{ 
             type: 1, 
             color: "rgba(52,152,219,0.7)", 
@@ -646,7 +744,7 @@ let annotations = []; // Aquí guardaremos los trazos
         setupEngravingRulesForScreenSize();
         
         await osmd.render();
-         setTimeout(syncAndRedrawAnnotations, 100); 
+        populateMeasureSelector();
         
         parseMusicXML(text);
         scheduleNotesOnTransport();
@@ -874,6 +972,17 @@ speedDownBtn.addEventListener('click', () => {
         currentZoom = Math.max(0.5, currentZoom - 0.1);
         applyZoom();
       });
+
+        // Controles de zoom
+      zoomInBtn2.addEventListener('click', () => {
+        currentZoom = Math.min(2.0, currentZoom + 0.1);
+        applyZoom();
+      });
+      
+      zoomOutBtn2.addEventListener('click', () => {
+        currentZoom = Math.max(0.5, currentZoom - 0.1);
+        applyZoom();
+      });
       
       // Redimensionar ventana
       window.addEventListener('resize', () => {
@@ -883,7 +992,6 @@ speedDownBtn.addEventListener('click', () => {
           if (osmd) {
             setupEngravingRulesForScreenSize();
             osmd.render();
-            setTimeout(syncAndRedrawAnnotations, 300);
           }
         }
       });
@@ -901,22 +1009,43 @@ speedDownBtn.addEventListener('click', () => {
           osmd.cursor.next();
         });
       });
+
+
+    measureSelect.addEventListener('change', () => {
+        // Obtenemos el índice del compás seleccionado (convertido a número)
+        const selectedMeasureIndex = parseInt(measureSelect.value, 10);
+        
+        // Llamamos a la función que ya tenías para reproducir desde un compás
+        playFromMeasure(selectedMeasureIndex);
+    });
+
+      toolsToggleBtn.addEventListener('click', () => {
+        secondaryTopBar.classList.toggle('is-visible');
+    });
+
      
 
-     drawBtn.addEventListener('click', () => {
-    isDrawingMode = !isDrawingMode;
-    drawBtn.style.background = isDrawingMode ? '#e0e0e0' : 'none';
-    // Habilita/deshabilita los eventos en el canvas de dibujo
-    annotationCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+
+drawBtn.addEventListener('click', () => {
+    isDrawingMode = !isDrawingMode; // Alterna el modo
+
+    if (isDrawingMode) {
+        drawBtn.style.background = '#e0e0e0'; // Resalta el botón
+        annotationCanvas.style.pointerEvents = 'auto'; // El canvas puede recibir clics
+        annotationCanvas.style.cursor = 'crosshair'; // Cambia el cursor a una cruz
+    } else {
+        drawBtn.style.background = 'none'; // Quita el resaltado
+        annotationCanvas.style.pointerEvents = 'none'; // El canvas ignora los clics
+        annotationCanvas.style.cursor = 'default'; // Restaura el cursor por defecto
+    }
 });
 
-     clearBtn.addEventListener('click', clearAnnotations);
-
-// Eventos para el dibujo
+clearBtn.addEventListener('click', clearAnnotations);
 annotationCanvas.addEventListener('mousedown', startDrawing);
 annotationCanvas.addEventListener('mousemove', draw);
 annotationCanvas.addEventListener('mouseup', stopDrawing);
 annotationCanvas.addEventListener('mouseout', stopDrawing); 
+
 
 
     }
@@ -924,7 +1053,17 @@ annotationCanvas.addEventListener('mouseout', stopDrawing);
 
 
 
+function populateMeasureSelector() {
+    const measureCount = osmd.sheet.SourceMeasures.length;
+    measureSelect.innerHTML = ''; // Limpiamos opciones previas
 
+    for (let i = 0; i < measureCount; i++) {
+        const option = document.createElement('option');
+        option.value = i; // El valor será el índice del compás (0, 1, 2...)
+        option.textContent = `Compás ${i + 1}`; // El texto para el usuario (1, 2, 3...)
+        measureSelect.appendChild(option);
+    }
+}
 
  
     function applyZoom() {
@@ -933,12 +1072,12 @@ annotationCanvas.addEventListener('mouseout', stopDrawing);
         osmd.render();
         updateZoomDisplay();
 
-        setTimeout(syncAndRedrawAnnotations, 300);
       }
     }
 
     function updateZoomDisplay() {
       zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+      zoomLabel2.textContent = `${Math.round(currentZoom * 100)}%`;
     }
 
     function updatePlayButton(isPlaying) {
@@ -966,107 +1105,90 @@ annotationCanvas.addEventListener('mouseout', stopDrawing);
       statusDiv.style.display = text ? 'block' : 'none';
     }
 
-function syncAndRedrawAnnotations() {
-    if (!osmd.graphic.sheet) return;
 
-    const svg = osmdContainer.querySelector('svg');
-    if (!svg) return;
 
-    const rect = svg.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    annotationCanvas.width = rect.width * dpr;
-    annotationCanvas.height = rect.height * dpr;
 
-    annotationCanvas.style.width = `${rect.width}px`;
-    annotationCanvas.style.height = `${rect.height}px`;
-
-    annotationCtx.scale(dpr, dpr);
-    annotationCtx.clearRect(0, 0, rect.width, rect.height);
-
-    // Redibuja cada trazo guardado
-    annotations.forEach(stroke => {
-        annotationCtx.beginPath();
-        annotationCtx.strokeStyle = stroke.color;
-        // El grosor de la línea se respeta automáticamente por el escalado.
-        annotationCtx.lineWidth = stroke.width;
-        annotationCtx.lineCap = 'round';
-        annotationCtx.lineJoin = 'round';
-
-        stroke.points.forEach((point, index) => {
-            const x = point.x * rect.width;
-            const y = point.y * rect.height;
-
-            if (index === 0) {
-                annotationCtx.moveTo(x, y);
-            } else {
-                annotationCtx.lineTo(x, y);
-            }
-        });
-        annotationCtx.stroke();
-    });
-}
-
+// Se activa al presionar el clic
 function startDrawing(e) {
     if (!isDrawingMode) return;
     isDrawing = true;
-
-    const rect = annotationCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-
-    // 1. Añadimos un campo 'isWidthSet' para controlar cuándo se decide el grosor.
-    const newStroke = {
-        color: '#E74C3C',
-        width: 1.1, // Grosor por defecto
-        points: [{ x, y }],
-        isWidthSet: false // Aún no hemos decidido el grosor final
-    };
-    annotations.push(newStroke);
-
-    // Preparamos el lienzo para el nuevo trazo
-    annotationCtx.beginPath();
-    annotationCtx.strokeStyle = newStroke.color;
-    annotationCtx.lineCap = 'round';
-    annotationCtx.lineJoin = 'round';
     
-    // Movemos el "lápiz", pero todavía NO establecemos el lineWidth
-    annotationCtx.moveTo(x * rect.width, y * rect.height);
+    // Guardamos las coordenadas de inicio NORMALIZADAS (0 a 1)
+    const rect = annotationCanvas.getBoundingClientRect();
+    startX = (e.clientX - rect.left) / rect.width;
+    startY = (e.clientY - rect.top) / rect.height;
 }
 
+// Se activa mientras se mueve el ratón con el clic presionado
 function draw(e) {
-    if (!isDrawing || !isDrawingMode) return;
+    if (!isDrawing) return;
+
+    // 1. Limpia todo el lienzo para empezar de cero en cada fotograma
+    annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+
+    // 2. Redibuja TODAS las anotaciones anteriores que ya están guardadas
+    // Esta es la lógica clave que faltaba: recorre el arreglo y dibuja cada rectángulo.
+    annotations.forEach(rect => {
+        annotationCtx.fillStyle = rect.color;
+        // Multiplicamos las coordenadas normalizadas (0-1) por las dimensiones actuales del canvas
+        annotationCtx.fillRect(
+            rect.x * annotationCanvas.width, 
+            rect.y * annotationCanvas.height, 
+            rect.width * annotationCanvas.width, 
+            rect.height * annotationCanvas.height
+        );
+    });
+
+    // 3. Calcula y dibuja el NUEVO rectángulo que se está creando ahora mismo
+    const canvasRect = annotationCanvas.getBoundingClientRect();
+    const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
+    const currentY = (e.clientY - canvasRect.top) / canvasRect.height;
+
+    const width = (currentX - startX) * annotationCanvas.width;
+    const height = (currentY - startY) * annotationCanvas.height;
     
-    const rect = annotationCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width; 
-    const y = (e.clientY - rect.top) / rect.height;
-    
-    const currentStroke = annotations[annotations.length - 1];
-    currentStroke.points.push({ x, y });
-    
-    // Dibujar en tiempo real sin redibujar todo
-    const points = currentStroke.points;
-    if (points.length >= 2) {
-        const lastPoint = points[points.length - 2];
-        const currentPoint = points[points.length - 1];
-        
-        annotationCtx.beginPath();
-        annotationCtx.strokeStyle = currentStroke.color;
-        annotationCtx.lineWidth = currentStroke.width-0.1;
-        annotationCtx.lineCap = 'round';
-        annotationCtx.moveTo(lastPoint.x * annotationCanvas.width, lastPoint.y * annotationCanvas.height);
-        annotationCtx.lineTo(currentPoint.x * annotationCanvas.width, currentPoint.y * annotationCanvas.height);
-        annotationCtx.stroke();
-    }
+    // Dibuja el rectángulo de previsualización
+    annotationCtx.fillStyle = 'rgba(255, 223, 89, 0.4)'; // Amarillo semitransparente
+    annotationCtx.fillRect(startX * annotationCanvas.width, startY * annotationCanvas.height, width, height);
 }
 
-function stopDrawing() {
+// Se activa al soltar el clic
+function stopDrawing(e) {
+    if (!isDrawing) return;
     isDrawing = false;
+
+    const rect = annotationCanvas.getBoundingClientRect();
+    const endX = (e.clientX - rect.left) / rect.width;
+    const endY = (e.clientY - rect.top) / rect.height;
+
+    // Normalizamos para que el origen (x, y) siempre sea la esquina superior izquierda
+    const finalX = Math.min(startX, endX);
+    const finalY = Math.min(startY, endY);
+    const finalWidth = Math.abs(startX - endX);
+    const finalHeight = Math.abs(startY - endY);
+
+    // Guardamos el rectángulo final en nuestro arreglo de anotaciones
+    // Solo si el rectángulo tiene un tamaño mínimo para evitar puntos accidentales
+    if (finalWidth > 0.01 && finalHeight > 0.01) {
+        annotations.push({
+            x: finalX,
+            y: finalY,
+            width: finalWidth,
+            height: finalHeight,
+            color: 'rgba(255, 223, 89, 0.4)'
+        });
+    }
+
+
+
 }
 
 function clearAnnotations() {
-  annotations = [];
-  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+    annotations = []; // Vaciamos el arreglo
+    // Limpiamos visualmente el canvas
+    annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
 }
+
   </script>
 </body>
 </html>
