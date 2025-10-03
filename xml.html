@@ -433,11 +433,84 @@ display: flex;
         display: none;
       }
    }
+
+
+/* --- CSS CORRECTO PARA EL COLOR PICKER HORIZONTAL --- */
+
+/* Contenedor del selector de color completo (círculo + opciones) */
+#color-picker-container {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 18px; /* Bordes redondeados para el contenedor */
+  padding: 4px;
+  transition: all 0.3s ease-in-out;
+  /* Importante: quitamos position: relative que ya no es necesario */
+}
+
+/* El círculo que muestra el color actual */
+#color-preview-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  background-color: rgba(255, 223, 89, 0.4);
+  cursor: pointer;
+  flex-shrink: 0; /* Evita que el círculo se encoja */
+}
+
+/* Contenedor de las opciones de color (el que modificamos) */
+#color-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* ESTADO OCULTO INICIAL (sin display:none) */
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 0.3s ease-in-out, opacity 0.2s linear, margin-left 0.3s ease-in-out;
+  margin-left: 0;
+  /* Eliminamos position: absolute y todo lo relacionado a eso */
+}
+
+/* ESTADO ABIERTO: Cuando el contenedor tiene la clase 'is-open' */
+#color-picker-container.is-open #color-options {
+  max-width: 200px; /* Ancho suficiente para mostrar todo */
+  opacity: 1;
+  margin-left: 8px; /* Espacio entre el círculo y las opciones */
+}
+
+/* Muestras de color y el input (sin cambios, pero se incluyen por completitud) */
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+  border: 2px solid #3498db;
+}
+
+#custom-color-input {
+  width: 28px;
+  height: 28px;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
   </style>
 </head>
 <body>
 
-  
   <div id="top-bar">
     <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
@@ -448,10 +521,6 @@ display: flex;
       <div id="time-display">
         <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
       </div>
-
-    
-      
-  
     </div>
 
     <div class="controls-group">
@@ -483,6 +552,16 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
+     <div id="color-picker-container" class="btn" title="Seleccionar Color">
+  <div id="color-preview-circle"></div>
+  
+  <div id="color-options">
+    <div class="color-swatch" style="background-color: rgba(255, 223, 89, 0.4);" data-color="rgba(255, 223, 89, 0.4)"></div>
+    <div class="color-swatch" style="background-color: rgba(255, 0, 255, 0.4);" data-color="rgba(255, 0, 255, 0.4)"></div>
+    <div class="color-swatch" style="background-color: rgba(46, 204, 113, 0.4);" data-color="rgba(46, 204, 113, 0.4)"></div>
+    <input type="color" id="custom-color-input" value="#ffdf59" title="Color personalizado">
+  </div>
+</div>
     <button id="draw-btn" class="btn" title="Activar Lápiz">
       <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
     </button>
@@ -492,6 +571,9 @@ display: flex;
     <button id="clear-btn" class="btn" title="Borrar Anotaciones">
       <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
     </button>
+     <button id="eraser-btn" class="btn" title="Borrador">
+        <svg viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M16.24,3.56L20.44,7.76L7.76,20.44L3.56,16.24L16.24,3.56M22.56,6.65L19.45,3.54C19,3.09 18.3,2.9 17.7,3L17,3.69L20.31,7L21,6.29C21.45,5.85 21.65,5.14 21.35,4.54L22.47,3.42C23.06,2.83 23.06,1.88 22.47,1.29L21.06,-0.12C20.47,-0.71 19.52,-0.71 18.93,-0.12L17.81,1C17.2,0.69 16.5,0.89 16.06,1.34L12.95,4.45L16.24,7.76L17.35,6.65L15.5,4.79L16.21,4.08L18.27,6.14L19.86,4.55L17.15,1.84L17.86,1.13C18.16,0.83 18.67,0.83 18.97,1.13L20.38,2.54C20.68,2.84 20.68,3.35 20.38,3.65L19.26,4.77L20.5,6C20.8,6.3 20.8,6.81 20.5,7.11L19.09,8.53L15.18,4.62L11.88,7.92L14.63,10.67L10.67,14.63L7.92,11.88L4.62,15.18L8.53,19.09L7.11,20.5C6.81,20.8 6.3,20.8 6,20.5L4.77,19.26L3.65,20.38C3.35,20.68 2.84,20.68 2.54,20.38L1.13,18.97C0.83,18.67 0.83,18.16 1.13,17.86L1.84,17.15L4.55,19.86L6.14,18.27L4.08,16.21L4.79,15.5L6.65,17.35L7.76,16.24L4.45,12.95L1.34,16.06C0.89,16.5 0.69,17.2 1,17.81L-0.12,18.93C-0.71,19.52 -0.71,20.47 -0.12,21.06L1.29,22.47C1.88,23.06 2.83,23.06 3.42,22.47L4.54,21.35C5.14,21.65 5.85,21.45 6.29,21L7,20.31L3.69,17C3,17.7 2.9,18.3 3.54,19.45L6.65,22.56L20.44,8.78L22.56,6.65Z"/></svg>
+      </button>
     </div>
      <div class="tool-group">
      <select id="measure-select" class="btn" title="Iniciar desde el compás...">
@@ -517,7 +599,6 @@ display: flex;
 </div>
   <div id="status">Cargando...</div>
 
-
   <div id="floating-speed-controls">
     <div class="speed-group">
         <button id="zoom-out2" class="btn speed-ctrl-btn">−</button>
@@ -527,9 +608,6 @@ display: flex;
         <button id="zoom-in2" class="btn speed-ctrl-btn">+</button>
     </div>
   </div> 
-
-
-
 
   <div id="piano-container">
    
@@ -565,6 +643,11 @@ const totalTimeSpan = document.getElementById('total-time');
 const measureSelect = document.getElementById('measure-select');
 const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
+const colorPickerContainer = document.getElementById('color-picker-container');
+const colorPreviewCircle = document.getElementById('color-preview-circle');
+const colorOptions = document.getElementById('color-options');
+const customColorInput = document.getElementById('custom-color-input');
+const eraserBtn = document.getElementById('eraser-btn');
 
     let osmd = null;
     let sampler = null;
@@ -587,7 +670,11 @@ const annotationCtx = annotationCanvas.getContext('2d');
 const drawBtn = document.getElementById('draw-btn');
 const textBtn = document.getElementById('text-btn');
 const clearBtn = document.getElementById('clear-btn'); 
-
+let currentDrawingColor = 'rgba(255, 223, 89, 0.4)'; // Color inicial
+let isErasingMode = false;
+const closeColorPicker = () => {
+  colorPickerContainer.classList.remove('is-open');
+};
 
 let isDrawingMode = false;
 let isDrawing = false;
@@ -1025,18 +1112,66 @@ speedDownBtn.addEventListener('click', () => {
      
 
 
-// Dentro de addEventListeners(), busca el listener de drawBtn
 drawBtn.addEventListener('click', () => {
-    isDrawingMode = !isDrawingMode;
-    isTextMode = false; // <<-- AÑADE ESTA LÍNEA
+  isDrawingMode = !isDrawingMode;
+  isTextMode = false;
+  isErasingMode = false; // <-- AÑADE ESTO
 
-    if (isDrawingMode) {
-        drawBtn.style.background = '#e0e0e0';
-        textBtn.style.background = 'none'; // <<-- AÑADE ESTA LÍNEA
-        annotationCanvas.style.pointerEvents = 'auto';
-        annotationCanvas.style.cursor = 'crosshair';
-    } else {
+  if (isDrawingMode) {
+    drawBtn.style.background = '#e0e0e0';
+    textBtn.style.background = 'none';
+    eraserBtn.style.background = 'none'; // <-- AÑADE ESTO
+    annotationCanvas.style.pointerEvents = 'auto';
+    annotationCanvas.style.cursor = 'crosshair';
+  } else {
+    drawBtn.style.background = 'none';
+    annotationCanvas.style.pointerEvents = 'none';
+    annotationCanvas.style.cursor = 'default';
+  }
+});
+
+colorPickerContainer.addEventListener('click', (e) => {
+  // Detiene la propagación para que el clic no sea capturado por el listener del 'document'
+  e.stopPropagation(); 
+  colorPickerContainer.classList.toggle('is-open');
+});
+
+document.querySelectorAll('.color-swatch').forEach(swatch => {
+  swatch.addEventListener('click', (e) => {
+    e.stopPropagation(); // Detiene la propagación
+    currentDrawingColor = swatch.dataset.color;
+    colorPreviewCircle.style.backgroundColor = currentDrawingColor;
+    closeColorPicker(); // Cierra el selector
+  });
+});
+
+customColorInput.addEventListener('input', (e) => {
+  const hex = e.target.value;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  currentDrawingColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+  colorPreviewCircle.style.backgroundColor = currentDrawingColor;
+  // No cerramos al instante para que el usuario vea el color que eligió
+});
+customColorInput.addEventListener('change', () => {
+    // Cerramos cuando el usuario finaliza la selección de color personalizado
+    closeColorPicker();
+});
+// Lógica del Borrador
+eraserBtn.addEventListener('click', () => {
+    isErasingMode = !isErasingMode;
+    isDrawingMode = false;
+    isTextMode = false;
+
+    if (isErasingMode) {
+        eraserBtn.style.background = '#e0e0e0';
         drawBtn.style.background = 'none';
+        textBtn.style.background = 'none';
+        annotationCanvas.style.pointerEvents = 'auto';
+        annotationCanvas.style.cursor = 'pointer'; // O un cursor de borrador
+    } else {
+        eraserBtn.style.background = 'none';
         annotationCanvas.style.pointerEvents = 'none';
         annotationCanvas.style.cursor = 'default';
     }
@@ -1049,29 +1184,82 @@ annotationCanvas.addEventListener('mouseup', stopDrawing);
 annotationCanvas.addEventListener('mouseout', stopDrawing); 
 
 textBtn.addEventListener('click', toggleTextMode);
-annotationCanvas.addEventListener('click', handleCanvasClickForText);
+annotationCanvas.addEventListener('click', (e) => {
+    if (isTextMode) {
+        handleCanvasClickForText(e);
+    } else if (isErasingMode) {
+        handleCanvasClickForEraser(e);
+    }
+});
 
     }
 
 // Puedes agregar esta función justo antes de addEventListeners()
 function toggleTextMode() {
-    isTextMode = !isTextMode;
-    isDrawingMode = false; // Desactiva el modo dibujo al activar el de texto
+  isTextMode = !isTextMode;
+  isDrawingMode = false;
+  isErasingMode = false; // <-- AÑADE ESTO
 
-    // Actualiza la apariencia de los botones y el cursor
-    if (isTextMode) {
-        textBtn.style.background = '#e0e0e0';
-        drawBtn.style.background = 'none';
-        annotationCanvas.style.pointerEvents = 'auto';
-        annotationCanvas.style.cursor = 'text';
-    } else {
-        textBtn.style.background = 'none';
-        // Si ningún modo está activo, el canvas no debe capturar eventos
-        annotationCanvas.style.pointerEvents = 'none';
-        annotationCanvas.style.cursor = 'default';
-    }
+  if (isTextMode) {
+    textBtn.style.background = '#e0e0e0';
+    drawBtn.style.background = 'none';
+    eraserBtn.style.background = 'none'; // <-- AÑADE ESTO
+    annotationCanvas.style.pointerEvents = 'auto';
+    annotationCanvas.style.cursor = 'text';
+  } else {
+    textBtn.style.background = 'none';
+    annotationCanvas.style.pointerEvents = 'none';
+    annotationCanvas.style.cursor = 'default';
+  }
 }
 
+
+function handleCanvasClickForEraser(e) {
+    const rect = annotationCanvas.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) / rect.width;
+    const clickY = (e.clientY - rect.top) / rect.height;
+    let somethingWasDeleted = false;
+
+    // Itera en reversa para evitar problemas de índice al borrar
+    for (let i = annotations.length - 1; i >= 0; i--) {
+        const annotation = annotations[i];
+        if (
+            clickX >= annotation.x &&
+            clickX <= annotation.x + annotation.width &&
+            clickY >= annotation.y &&
+            clickY <= annotation.y + annotation.height
+        ) {
+            annotations.splice(i, 1); // Borra el elemento
+            somethingWasDeleted = true;
+            break; // Borra solo un elemento por clic
+        }
+    }
+
+    if (!somethingWasDeleted) {
+        // Si no se borró un dibujo, busca un texto
+        for (let i = textAnnotations.length - 1; i >= 0; i--) {
+            const text = textAnnotations[i];
+            // Aproxima un área de clic para el texto
+            const textWidthApprox = (text.text.length * 8) / rect.width; // Estimación simple
+            const textHeightApprox = 20 / rect.height;
+
+            if (
+                clickX >= text.x &&
+                clickX <= text.x + textWidthApprox &&
+                clickY >= text.y &&
+                clickY <= text.y + textHeightApprox
+            ) {
+                textAnnotations.splice(i, 1);
+                somethingWasDeleted = true;
+                break;
+            }
+        }
+    }
+
+    if (somethingWasDeleted) {
+        redrawAllAnnotations();
+    }
+}
 
 function populateMeasureSelector() {
     const measureCount = osmd.sheet.SourceMeasures.length;
@@ -1142,52 +1330,49 @@ function startDrawing(e) {
 // Se activa mientras se mueve el ratón con el clic presionado
 // Reemplaza el contenido de la función draw(e) con esto:
 function draw(e) {
-    if (!isDrawing) return;
+  if (!isDrawing) return;
 
-    // Redibuja todo lo que ya está guardado
-    redrawAllAnnotations();
+  redrawAllAnnotations();
  
-    // Dibuja el rectángulo de previsualización que se está creando
-    const canvasRect = annotationCanvas.getBoundingClientRect();
-    const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
-    const currentY = (e.clientY - canvasRect.top) / canvasRect.height;
+  const canvasRect = annotationCanvas.getBoundingClientRect();
+  const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
+  const currentY = (e.clientY - canvasRect.top) / canvasRect.height;
 
-    const width = (currentX - startX) * annotationCanvas.width;
-    const height = (currentY - startY) * annotationCanvas.height;
+  const width = (currentX - startX) * annotationCanvas.width;
+  const height = (currentY - startY) * annotationCanvas.height;
 
-    annotationCtx.fillStyle = 'rgba(255, 223, 89, 0.4)'; // Amarillo semitransparente
-    annotationCtx.fillRect(startX * annotationCanvas.width, startY * annotationCanvas.height, width, height);
+  // ✨ LÍNEA CORREGIDA ✨
+  annotationCtx.fillStyle = currentDrawingColor; 
+  annotationCtx.fillRect(startX * annotationCanvas.width, startY * annotationCanvas.height, width, height);
 }
 
 // Se activa al soltar el clic
+// ENCUENTRA LA FUNCIÓN stopDrawing(e) Y MODIFÍCALA ASÍ:
 function stopDrawing(e) {
-    if (!isDrawing) return;
-    isDrawing = false;
+  if (!isDrawing) return;
+  isDrawing = false;
 
-    const rect = annotationCanvas.getBoundingClientRect();
-    const endX = (e.clientX - rect.left) / rect.width;
-    const endY = (e.clientY - rect.top) / rect.height;
+  const rect = annotationCanvas.getBoundingClientRect();
+  const endX = (e.clientX - rect.left) / rect.width;
+  const endY = (e.clientY - rect.top) / rect.height;
 
-    // Normalizamos para que el origen (x, y) siempre sea la esquina superior izquierda
-    const finalX = Math.min(startX, endX);
-    const finalY = Math.min(startY, endY);
-    const finalWidth = Math.abs(startX - endX);
-    const finalHeight = Math.abs(startY - endY);
+  const finalX = Math.min(startX, endX);
+  const finalY = Math.min(startY, endY);
+  const finalWidth = Math.abs(startX - endX);
+  const finalHeight = Math.abs(startY - endY);
 
-    // Guardamos el rectángulo final en nuestro arreglo de anotaciones
-    // Solo si el rectángulo tiene un tamaño mínimo para evitar puntos accidentales
-    if (finalWidth > 0.01 && finalHeight > 0.01) {
-        annotations.push({
-            x: finalX,
-            y: finalY,
-            width: finalWidth,
-            height: finalHeight,
-            color: 'rgba(255, 223, 89, 0.4)'
-        });
-    }
+  if (finalWidth > 0.01 && finalHeight > 0.01) {
+    annotations.push({
+      x: finalX,
+      y: finalY,
+      width: finalWidth,
+      height: finalHeight,
+      // ---- LÍNEA MODIFICADA ----
+      color: currentDrawingColor 
+    });
+  }
 
-    redrawAllAnnotations();
-
+  redrawAllAnnotations();
 }
 
 
