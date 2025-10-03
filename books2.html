@@ -1542,8 +1542,8 @@ color: white;
    <i class="fa-solid fa-microphone"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
-    <!--  <i class="fa-solid fa-stopwatch"></i> -->
-      <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 16.5px; width: 15.5px"> 
+ <!--    <i class="fa-solid fa-stopwatch"></i>  -->
+       <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 16.5px; width: 15.5px">  
     </button>
     <div class="bpm-control">
       <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
@@ -2067,7 +2067,11 @@ $scope.closeVideoModal = function() {
                     alert('No hay un PDF disponible para este libro.');
                     return;
                 }
-                // $sce.trustAsResourceUrl es necesario para que AngularJS permita URLs dinámicas en iframes
+
+                if (!$scope.metronomeAudio) {
+                    $scope.metronomeAudio = document.getElementById('metronomeAudio');
+                }
+                 
                 $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
                 $scope.showPreviewModal = false; // Ocultar modal pequeño
                 $scope.showPdfViewer = true;     // Mostrar visor grande
@@ -2084,7 +2088,7 @@ $scope.closeVideoModal = function() {
   $scope.metronomeActive = false;
 $scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
 $scope.baseBPM = 60; // BPM del audio original
-$scope.metronomeAudio = document.getElementById('metronomeAudio');
+//$scope.metronomeAudio = document.getElementById('metronomeAudio');
 
 // Función para convertir BPM a velocidad de reproducción
 function bpmToPlaybackRate(bpm) {
