@@ -515,7 +515,8 @@
             cursor: pointer;
             transition: color 0.2s ease;
         }
-           .xml-viewer-close {
+
+            .xml-viewer-close {
             background: none;
             border: none;
      position: absolute; 
@@ -692,7 +693,11 @@
   text-align: center;
 }
 
-
+/* Estilos para estados activos */
+.record-btn.active {
+  color: #f44336;
+  animation: pulse 1.5s infinite;
+}
 
 .tool-btn {
     background: silver;
@@ -1356,12 +1361,6 @@ color: white;
              .task-status {display: none !important;}
             .exercise-list-container{max-height: 240px !important;}
           }
-
-          .metronome-icon {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.125em; /* Ajuste para alinear con el texto/otros íconos */
-}
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -1537,15 +1536,15 @@ color: white;
   <!--  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> -->
    
     <button class="tool-btn record-btn" ng-click="openMidiModal(selectedBook)" ng-if="selectedBook.type !== 'manual' && selectedBook.midi"> 
-<img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 16.5px; width: 15.5px">
+   <i class="fa-solid fa-music"></i>
     </button>
     <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
    <i class="fa-solid fa-microphone"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
-  <!-- Reemplaza: <i class="fa-solid fa-stopwatch"></i> -->
- <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 16.5px; width: 15.5px">
-</button>
+    <!--  <i class="fa-solid fa-stopwatch"></i> -->
+      <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 16.5px; width: 15.5px"> 
+    </button>
     <div class="bpm-control">
       <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
         <i class="fa-solid fa-minus"></i>
@@ -1557,8 +1556,10 @@ color: white;
     </div>
   </div>
 </div>
+
             <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
         </div>
+
 
          <div  ng-if="selectedBook.type === 'xml'">
            <button class="xml-viewer-close" style="color: black !important" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
