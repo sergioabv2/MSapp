@@ -69,28 +69,73 @@
     }
     
     /* Progress Bar */
-    #progress-bar-container {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: #e0e0e0;
-      cursor: pointer;
-    }
-    
-    #progress-bar {
-      height: 100%;
-      background: #3498db;
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    /* Speed Controls - MEJORADO */
- 
-    
- 
-    
+   /* AÑADE ESTE NUEVO BLOQUE DE CSS */
+
+
+
+
+/* Posiciona el slider en la parte inferior de la barra superior */
+#progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px; /* Grosor de la barra */
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  /* Variable CSS personalizada para el progreso */
+  --progress: 0%; /* Valor inicial */
+}
+
+/* Estilo para el "thumb" (el círculo que se arrastra) */
+#progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px; /* Tamaño del thumb */
+  height: 15px;
+  background: #3498db; /* Color del thumb */
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  margin-top: -6px; /* Centra el thumb verticalmente en la barra */
+}
+
+#progress-bar::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: #3498db;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+/* Estilo para el "track" (la barra completa) */
+/* Para navegadores WebKit: usa un gradiente para simular el progreso */
+#progress-bar::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, #3498db 0%, #3498db var(--progress), #e0e0e0 var(--progress), #e0e0e0 100%);
+  border-radius: 5px; /* Opcional: para que los bordes del track sean suaves */
+}
+
+/* Para Firefox: usa la pseudo-clase estándar */
+#progress-bar::-moz-range-track {
+  width: 100%;
+  height: 3px;
+  background: #e0e0e0; /* Color de la barra no reproducida (fondo blanco) */
+  border-radius: 5px; /* Opcional */
+}
+
+#progress-bar::-moz-range-progress {
+  background: #3498db; /* Color azul para la parte reproducida */
+  height: 3px;
+  border-radius: 5px; /* Opcional */
+}
   
     
    
@@ -545,9 +590,7 @@ display: flex;
       <div id="close-btn-placeholder"></div>
     </div>
 
-     <div id="progress-bar-container">
-      <div id="progress-bar"></div>
-    </div>
+    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
   </div>
 
    <div id="secondary-top-bar">
@@ -970,7 +1013,8 @@ let startX, startY;
       osmd.cursor.hide();
       updatePlayButton(false);
       stopProgressUpdate();
-      progressBar.style.width = '0%';
+      progressBar.value = 0;
+      progressBar.style.setProperty('--progress', '0%');
       currentTimeSpan.textContent = '0:00'; 
     }
 
@@ -984,7 +1028,8 @@ function startProgressUpdate() {
         const effectiveTotalDuration = totalDuration / playbackRate;
         const progress = (currentTime / effectiveTotalDuration) * 100;
 
-        progressBar.style.width = `${Math.min(progress, 100)}%`;
+        progressBar.value = Math.min(progress, 100);
+        progressBar.style.setProperty('--progress', `${progress}%`);
 
         // --- LÍNEA NUEVA ---
         // Actualiza el texto con el tiempo actual formateado
@@ -1082,20 +1127,29 @@ speedDownBtn.addEventListener('click', () => {
         }
       });
       
-      progressBarContainer.addEventListener('click', (e) => {
-        const rect = progressBarContainer.getBoundingClientRect();
-        const percent = (e.clientX - rect.left) / rect.width;
-        const newTime = percent * totalDuration;
-        Tone.Transport.seconds = newTime;
-        
-        osmd.cursor.reset();
-        const notesBeforeNewTime = parsedNotes.filter(n => n.startSec < newTime);
-        const uniqueTimestamps = new Set(notesBeforeNewTime.map(n => n.startSec));
-        uniqueTimestamps.forEach(() => {
-          osmd.cursor.next();
-        });
-      });
 
+
+progressBar.addEventListener('input', () => {
+  // 1. Calcula a qué tiempo quiere saltar el usuario (en segundos)
+  const seekTime = (progressBar.value / 100) * totalDuration;
+
+  const progressValue = (progressBar.value / 100) * 100; // El valor ya es 0-100
+progressBar.style.setProperty('--progress', `${progressValue}%`);
+
+  // 2. Encuentra a qué compás corresponde ese tiempo
+  let targetMeasureIndex = 0;
+  for (let i = 0; i < measureStartTimes.length; i++) {
+    if (measureStartTimes[i] <= seekTime) {
+      targetMeasureIndex = i;
+    } else {
+      break;
+    }
+  }
+
+  // 3. Llama a tu función para reproducir desde ese compás
+  // Esto mantiene el cursor visual y el audio perfectamente sincronizados.
+  playFromMeasure(targetMeasureIndex);
+});
 
     measureSelect.addEventListener('change', () => {
         // Obtenemos el índice del compás seleccionado (convertido a número)
