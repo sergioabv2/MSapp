@@ -194,10 +194,15 @@
       z-index: 2;
     }
     
-    .key.active {
-      background: #3498db !important;
-      box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
-    }
+    .key.active-treble {
+  background: #3498db !important; /* Azul para la mano derecha (treble) */
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
+}
+
+.key.active-bass {
+  background: #de9e37 !important; /* Verde para la mano izquierda (bass) */
+  box-shadow: 0 0 8px rgba(222, 158, 55, 0.6) !important;
+}
     
     #status {
       text-align: center;
@@ -719,6 +724,7 @@ const fullscreenBtn = document.getElementById('fullscreen-btn');
     let audioPart = null;
     let visualPart = null;
     let progressInterval = null;
+    let activeHighlightTimeouts = [];
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
 
@@ -772,8 +778,8 @@ let startX, startY;
           drawMeasureNumbers: false,
           cursorsOptions: [{ 
             type: 3, 
-            color: "rgba(52,152,219,0.4)", 
-            alpha: 0.7, 
+            color: "rgba(52,152,219,0.5)", 
+            alpha: 0.5, 
             follow: true 
           }]
         });
@@ -900,53 +906,70 @@ let startX, startY;
       }
     }
     
-    function parseMusicXML(xmlText) {
-      parsedNotes = [];
-      measureStartTimes = [0];
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, 'application/xml');
-      
-      const divisions = parseInt(xml.querySelector('divisions')?.textContent.trim() || '24', 10);
-      const soundTempo = xml.querySelector('direction sound[tempo], sound[tempo]');
-      globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute('tempo')) : 120;
-      updateBpmDisplay();
-      Tone.Transport.bpm.value = globalTempo;
+function parseMusicXML(xmlText) {
+  parsedNotes = [];
+  measureStartTimes = [0];
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlText, 'application/xml');
+  
+  const divisions = parseInt(xml.querySelector('divisions')?.textContent.trim() || '24', 10);
+  const soundTempo = xml.querySelector('direction sound[tempo], sound[tempo]');
+  globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute('tempo')) : 120;
+  updateBpmDisplay();
+  Tone.Transport.bpm.value = globalTempo;
 
-      let currentBeat = 0;
-      const measures = xml.querySelectorAll('part:first-of-type measure');
-      measures.forEach((measure, measureIndex) => {
-        if (measureIndex > 0) measureStartTimes.push(currentBeat * (60.0 / globalTempo));
+  // Usamos solo la primera parte, ya que ambas manos están contenidas en ella.
+  const part = xml.querySelector('part');
+  if (!part) return; // Salir si no se encuentra ninguna parte
 
-        const nodes = measure.querySelectorAll('note, backup, forward');
-        nodes.forEach(node => {
-          const durationVal = parseFloat(node.querySelector('duration')?.textContent.trim() || '0');
-          if (node.tagName === 'note') {
-            const isChord = !!node.querySelector('chord');
-            if (!node.querySelector('rest') && node.querySelector('pitch')) {
-              const step = node.querySelector('step')?.textContent?.trim();
-              const octave = node.querySelector('octave')?.textContent?.trim();
-              const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
-              const accidental = alt === 1 ? '#' : alt === -1 ? 'b' : '';
-              
-              parsedNotes.push({
-                pitch: `${step}${accidental}${octave}`,
-                startSec: currentBeat * (60.0 / globalTempo),
-                durSec: (durationVal / divisions) * (60.0 / globalTempo)
-              });
-            }
-            if (!isChord) currentBeat += (durationVal / divisions);
-          } else if (node.tagName === 'backup') {
-            currentBeat -= (durationVal / divisions);
-          } else if (node.tagName === 'forward') {
-            currentBeat += (durationVal / divisions);
-          }
-        });
-      });
-      
-      const lastNote = parsedNotes[parsedNotes.length - 1];
-      totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
-      totalTimeSpan.textContent = formatTime(totalDuration); 
+  let currentBeat = 0;
+  const measures = part.querySelectorAll('measure');
+  
+  measures.forEach((measure, measureIndex) => {
+    if (measureIndex > 0) {
+      measureStartTimes.push(currentBeat * (60.0 / globalTempo));
     }
+
+    const nodes = measure.querySelectorAll('note, backup, forward');
+    nodes.forEach(node => {
+      const durationVal = parseFloat(node.querySelector('duration')?.textContent.trim() || '0');
+      if (node.tagName === 'note') {
+        const isChord = !!node.querySelector('chord');
+        if (!node.querySelector('rest') && node.querySelector('pitch')) {
+          
+          // --- LÓGICA NUEVA Y DEFINITIVA ---
+          // Leemos el número de pentagrama (staff) directamente de la nota.
+          // Staff 1 = mano derecha (treble), Staff 2 = mano izquierda (bass).
+          const staffNumber = parseInt(node.querySelector('staff')?.textContent || '1', 10);
+          const hand = (staffNumber === 1) ? 'treble' : 'bass';
+
+          const step = node.querySelector('step')?.textContent?.trim();
+          const octave = node.querySelector('octave')?.textContent?.trim();
+          const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
+          const accidental = alt === 1 ? '#' : alt === -1 ? 'b' : '';
+          
+          parsedNotes.push({
+            pitch: `${step}${accidental}${octave}`,
+            startSec: currentBeat * (60.0 / globalTempo),
+            durSec: (durationVal / divisions) * (60.0 / globalTempo),
+            hand: hand // <-- Asignamos la mano correcta basada en el staff
+          });
+        }
+        if (!isChord) currentBeat += (durationVal / divisions);
+      } else if (node.tagName === 'backup') {
+        currentBeat -= (durationVal / divisions);
+      } else if (node.tagName === 'forward') {
+        currentBeat += (durationVal / divisions);
+      }
+    });
+  });
+  
+  parsedNotes.sort((a, b) => a.startSec - b.startSec);
+  
+  const lastNote = parsedNotes[parsedNotes.length - 1];
+  totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
+  totalTimeSpan.textContent = formatTime(totalDuration); 
+}
 
     function scheduleNotesOnTransport() {
     if (audioPart) audioPart.dispose();
@@ -983,55 +1006,60 @@ let startX, startY;
         sampler.triggerAttackRelease(value.pitch, value.duration, time);
     }, audioEvents).start(0);
 
-    visualPart = new Tone.Part((time, value) => {
-        Tone.Draw.schedule(() => {
-            osmd.cursor.next();
-            value.notes.forEach(note => highlightKey(note.pitch, note.duration));
-        }, time);
-    }, visualEvents).start(0);
+visualPart = new Tone.Part((time, value) => {
+    Tone.Draw.schedule(() => {
+        osmd.cursor.next();
+        // MODIFICACIÓN: Pasamos note.hand en lugar de note.partIndex
+        value.notes.forEach(note => highlightKey(note.pitch, note.duration, note.hand));
+    }, time);
+}, visualEvents).start(0);
 
     // Ajusta la duración total
     const newTotalDuration = totalDuration / playbackRate;
     Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
 }
     
-    function playFromMeasure(measureIndex) {
-    if (Tone.Transport.state === 'started') stopPlayback();
-    
-    const startTime = measureStartTimes[measureIndex] || 0;
-    
-    // Resetear cursor visual
-    osmd.cursor.reset();
-    
-    // Encontrar todas las notas antes del tiempo de inicio
-    const notesBeforeStart = parsedNotes.filter(n => n.startSec < startTime);
-    
-    // Avanzar el cursor hasta la posición correcta
-    let currentTime = -1;
-    parsedNotes.forEach(note => {
-        if (note.startSec < startTime && note.startSec !== currentTime) {
-            osmd.cursor.next();
-            currentTime = note.startSec;
-        }
-    });
-    
-    // Iniciar reproducción
-    Tone.Transport.start(Tone.now() + 0.1, startTime / playbackRate);
-    updatePlayButton(true);
-    osmd.cursor.show();
-    startProgressUpdate();
+function playFromMeasure(measureIndex) {
+  // ¡NUEVO! Limpia los highlights antes de empezar desde un nuevo punto.
+  clearAllHighlights();
+
+  if (Tone.Transport.state === 'started') stopPlayback();
+  
+  const startTime = measureStartTimes[measureIndex] || 0;
+  
+  // Resetear cursor visual
+  osmd.cursor.reset();
+  
+  // Avanzar el cursor hasta la posición correcta
+  let currentTime = -1;
+  parsedNotes.forEach(note => {
+      if (note.startSec < startTime && note.startSec !== currentTime) {
+          osmd.cursor.next();
+          currentTime = note.startSec;
+      }
+  });
+  
+  // Iniciar reproducción
+  Tone.Transport.start(Tone.now() + 0.1, startTime / playbackRate);
+  updatePlayButton(true);
+  osmd.cursor.show();
+  startProgressUpdate();
 }
 
-    function stopPlayback() {
-      Tone.Transport.stop();
-      osmd.cursor.reset();
-      osmd.cursor.hide();
-      updatePlayButton(false);
-      stopProgressUpdate();
-      progressBar.value = 0;
-      progressBar.style.setProperty('--progress', '0%');
-      currentTimeSpan.textContent = '0:00'; 
-    }
+   function stopPlayback() {
+  Tone.Transport.stop();
+  osmd.cursor.reset();
+  osmd.cursor.hide();
+  updatePlayButton(false);
+  stopProgressUpdate();
+  
+  // ¡NUEVO! Usa la función de limpieza total para apagar todas las teclas.
+  clearAllHighlights();
+
+  progressBar.value = 0;
+  progressBar.style.setProperty('--progress', '0%');
+  currentTimeSpan.textContent = '0:00'; 
+}
 
 function startProgressUpdate() {
     stopProgressUpdate();
@@ -1061,19 +1089,30 @@ function startProgressUpdate() {
     }
 
     function addEventListeners() {
-      playBtn.addEventListener('click', async () => {
-        await Tone.start();
-        if (Tone.Transport.state === 'started') {
-          Tone.Transport.pause();
-          updatePlayButton(false);
-          stopProgressUpdate();
-        } else {
-          Tone.Transport.start(Tone.now() + 0.1);
-          updatePlayButton(true);
-          osmd.cursor.show();
-          startProgressUpdate();
-        }
-      });
+     playBtn.addEventListener('click', async () => {
+  await Tone.start();
+  if (Tone.Transport.state === 'started') {
+    // --- LÓGICA DE PAUSA ---
+    Tone.Transport.pause();
+    updatePlayButton(false);
+    stopProgressUpdate();
+    
+    // ¡NUEVO! Cancela los timeouts pero NO borra los colores.
+    // Esto hace que las teclas se queden encendidas.
+    activeHighlightTimeouts.forEach(clearTimeout);
+    activeHighlightTimeouts = [];
+
+  } else {
+    // --- LÓGICA DE REANUDAR/PLAY ---
+    // ¡NUEVO! Limpia cualquier tecla que haya quedado encendida de la pausa.
+    clearAllHighlights(); 
+    
+    Tone.Transport.start(Tone.now() + 0.1);
+    updatePlayButton(true);
+    osmd.cursor.show();
+    startProgressUpdate();
+  }
+});
 
       // CONTROL DE VELOCIDAD CORREGIDO
   const speedStep = 0.05; // Cuánto cambiará la velocidad con cada clic
@@ -1360,12 +1399,26 @@ function toggleCursorType() {
 
   // Cambia el color del botón para dar feedback visual
   if (newType === 1) {
-    cursorBtn.style.color = '#3498db'; // Azul para indicar "activo"
+    cursorBtn.style.color = '#3498db'; 
+    osmd.cursor.cursorOptions.alpha =0.8;
+    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
   } else {
-    cursorBtn.style.color = '#1a1a1a'; // Color normal
+    cursorBtn.style.color = '#1a1a1a'; 
+     osmd.cursor.cursorOptions.alpha = 0.45;
+    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
   }
 }
 
+function clearAllHighlights() {
+  // 1. Cancela todos los timeouts pendientes para que no se ejecuten más tarde
+  activeHighlightTimeouts.forEach(clearTimeout);
+  activeHighlightTimeouts = [];
+
+  // 2. Busca todas las teclas activas en el DOM y les quita la clase de color
+  document.querySelectorAll('.active-treble, .active-bass').forEach(key => {
+    key.classList.remove('active-treble', 'active-bass');
+  });
+}
 
 function toggleFullScreen() {
   const icon = fullscreenBtn.querySelector('i');
@@ -1407,14 +1460,25 @@ function toggleFullScreen() {
       speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
 
-    function highlightKey(noteName, durSec) {
-      const noteId = noteName.replace('b', '#');
-      const el = document.getElementById(noteId);
-      if (!el) return;
-      el.classList.add('active');
-      const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
-      setTimeout(() => el.classList.remove('active'), highlightDuration);
-    } 
+// Reemplaza tu función highlightKey con esta:
+function highlightKey(noteName, durSec, hand) {
+  const noteId = noteName.replace('b', '#');
+  const el = document.getElementById(noteId);
+  if (!el) return;
+  
+  // Ahora la decisión es más clara: si la mano es 'treble', usa esa clase.
+  const highlightClass = hand === 'treble' ? 'active-treble' : 'active-bass';
+
+  el.classList.add(highlightClass);
+  const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
+  
+  // Aquí usamos la implementación que mantiene las notas en pausa
+  const timeoutId = setTimeout(() => {
+    el.classList.remove(highlightClass);
+    activeHighlightTimeouts = activeHighlightTimeouts.filter(id => id !== timeoutId);
+  }, highlightDuration);
+  activeHighlightTimeouts.push(timeoutId);
+}
 
     function setStatus(text) { 
       statusDiv.textContent = text;
