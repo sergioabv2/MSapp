@@ -649,7 +649,7 @@
                         </div>
                     </div>
                     <div class="grid-lines"></div>
-                    <div class="progress-indicator"></div>
+                     <div class="progress-indicator"></div>
                     <div class="canvas-container">
                         <canvas id="waterfallCanvas"></canvas>
                     </div>
@@ -689,6 +689,7 @@
             let currentNoteIndex = 0;
             let expectedNotes = new Set();
             let canvas, ctx;
+            let pianoHeight = 100;
             let animationFrameId;
             let scrollOffset = 0;
             let isPlaying = false;
@@ -700,7 +701,7 @@
             const whiteKeyWidth = 20; // Ancho que ya usas para las teclas blancas
             const blackKeyWidth = 13; // Ancho que ya usas para las teclas negras
             const totalWhiteKeys = 52; 
-            const VISUAL_OFFSET_SECONDS = 0.25;
+            const VISUAL_OFFSET_SECONDS = 0.05;
 
             $scope.customFilter = function(sheet) {
                 const textSearch = !$scope.filters.text ||
@@ -931,19 +932,28 @@
                 return notes;
             }
 
-            function initCanvas() {
-                canvas = document.getElementById('waterfallCanvas');
-                ctx = canvas.getContext('2d');
-                
-                function resizeCanvas() {
-                    const container = canvas.parentElement;
-                    canvas.width = container.clientWidth;
-                    canvas.height = container.clientHeight;
-                }
-                
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-            }
+
+function initCanvas() {
+    canvas = document.getElementById('waterfallCanvas');
+    ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        
+        // ✅ AQUÍ ESTÁ LA MAGIA: Leemos la altura real del elemento del piano.
+        const pianoEl = document.getElementById('pianoKeysVisual');
+        if (pianoEl) {
+            pianoHeight = pianoEl.offsetHeight;
+        }
+    }
+    
+    // Llamamos a la función una vez para establecer los valores iniciales.
+    resizeCanvas(); 
+    window.addEventListener('resize', resizeCanvas);
+}
+
 
   function isBlackKey(midiNote) {
     const note = midiNote % 12;
@@ -983,7 +993,7 @@ function drawWaterfall() {
         // ✅ Lógica condicional: aplicamos el desfase SÓLO si NO estamos en modo aprendizaje.
         const visualTime = $scope.isLearningMode ? scrollOffset : scrollOffset - VISUAL_OFFSET_SECONDS;
 
-        const noteStartY = canvas.height - 80 - ((note.startSec - visualTime) * pixelsPerSecond);
+        const noteStartY = canvas.height - pianoHeight - ((note.startSec - visualTime) * pixelsPerSecond);
         const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
 
         if (noteEndY < canvas.height && noteStartY > 0) {
@@ -1193,7 +1203,7 @@ function advanceLearningStep() {
                     parsedNotes = [];
                     currentNoteIndex = 0;
                     expectedNotes.clear();
-                }
+                } 
             };
 
             function showNotification(message) {
