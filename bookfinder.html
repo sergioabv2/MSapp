@@ -976,24 +976,21 @@ function drawWaterfall() {
     ctx.fillStyle = '#0a0a14';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Centramos el piano visualmente en el canvas
     const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
     const pianoStartX = (canvas.width - pianoTotalWidth) / 2;
 
     parsedNotes.forEach(note => {
-      const visualTime = scrollOffset - VISUAL_OFFSET_SECONDS;
-       const noteStartY = canvas.height - 80 - ((note.startSec - visualTime) * pixelsPerSecond);
+        // ✅ Lógica condicional: aplicamos el desfase SÓLO si NO estamos en modo aprendizaje.
+        const visualTime = $scope.isLearningMode ? scrollOffset : scrollOffset - VISUAL_OFFSET_SECONDS;
+
+        const noteStartY = canvas.height - 80 - ((note.startSec - visualTime) * pixelsPerSecond);
         const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
 
         if (noteEndY < canvas.height && noteStartY > 0) {
-            // ✅ Usamos nuestra nueva función para obtener la posición X precisa
-            // Sumamos 21 porque note.midiNumber va de 0-87, pero el MIDI real es de 21-108
+            // ... el resto de la función se mantiene igual
             const keyX = pianoStartX + getKeyXPosition(note.midiNumber + 21);
             const height = noteStartY - noteEndY;
-
-            // Determinamos el ancho visual de la nota
             const noteVisualWidth = isBlackKey(note.midiNumber + 21) ? blackKeyWidth : whiteKeyWidth;
-
             const isExpected = expectedNotes.has(note.pitch) && Math.abs(note.startSec - scrollOffset) < 0.5;
 
             if (isExpected) {
@@ -1006,26 +1003,28 @@ function drawWaterfall() {
                 ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
             }
 
-            // Dibujamos el rectángulo con el ancho correcto
-            ctx.fillRect(keyX, noteEndY, noteVisualWidth - 2, height); // Restamos 2 para un pequeño margen
+            ctx.fillRect(keyX, noteEndY, noteVisualWidth - 2, height);
             ctx.shadowBlur = 0;
         }
     });
 }
 
-            function animateWaterfall() {
-                if ($scope.isLearningMode) {
-                    if (currentNoteIndex < parsedNotes.length) {
-                        scrollOffset = parsedNotes[currentNoteIndex].startSec;
-                    }
-                } else if (isPlaying) {
-                    scrollOffset = Tone.Transport.seconds;
-                }
+function animateWaterfall() {
+    if ($scope.isLearningMode) {
+        if (currentNoteIndex > 0) {
+            const currentLearningTime = parsedNotes[currentNoteIndex - 1].startSec;
+            scrollOffset = currentLearningTime - VISUAL_OFFSET_SECONDS;
+        } else {
+            // Al inicio, antes de que se procese la primera nota.
+            scrollOffset = 0 - VISUAL_OFFSET_SECONDS;
+        }
+    } else if (isPlaying) {
+        scrollOffset = Tone.Transport.seconds;
+    }
 
-                drawWaterfall();
-                animationFrameId = requestAnimationFrame(animateWaterfall);
-            }
-
+    drawWaterfall();
+    animationFrameId = requestAnimationFrame(animateWaterfall);
+}
 
 function initPianoKeys() {
     const pianoContainer = document.getElementById('pianoKeysVisual');
@@ -1076,29 +1075,35 @@ function initPianoKeys() {
                 }
             }
 
-            function advanceLearningStep() {
-                expectedNotes.clear();
+function advanceLearningStep() {
+    // ✅ PASO DE LIMPIEZA: Apagamos todas las teclas que estaban activas.
+    document.querySelectorAll('.piano-key.active').forEach(key => {
+        key.classList.remove('active');
+    });
 
-                if (currentNoteIndex >= parsedNotes.length) {
-                    showNotification("¡Felicidades! Completaste la pieza 🎉");
-                    $scope.learningProgress = 100;
-                    $scope.$apply();
-                    return;
-                }
+    expectedNotes.clear();
 
-                const nextNoteTime = parsedNotes[currentNoteIndex].startSec;
-                
-                while (currentNoteIndex < parsedNotes.length && 
-                       parsedNotes[currentNoteIndex].startSec === nextNoteTime) {
-                    const note = parsedNotes[currentNoteIndex];
-                    expectedNotes.add(note.pitch);
-                    highlightKey(note.midiNumber, true);
-                    currentNoteIndex++;
-                }
+    if (currentNoteIndex >= parsedNotes.length) {
+        showNotification("¡Felicidades! Completaste la pieza 🎉");
+        $scope.learningProgress = 100;
+        $scope.$apply();
+        return;
+    }
 
-                $scope.learningProgress = Math.round((currentNoteIndex / parsedNotes.length) * 100);
-                $scope.$apply();
-            }
+    const nextNoteTime = parsedNotes[currentNoteIndex].startSec;
+
+    while (currentNoteIndex < parsedNotes.length && 
+           parsedNotes[currentNoteIndex].startSec === nextNoteTime) {
+        const note = parsedNotes[currentNoteIndex];
+        expectedNotes.add(note.pitch);
+        // Ahora, este highlightKey solo coloreará las nuevas notas.
+        highlightKey(note.midiNumber, true); 
+        currentNoteIndex++;
+    }
+
+    $scope.learningProgress = Math.round((currentNoteIndex / parsedNotes.length) * 100);
+    $scope.$apply();
+}
 
            async function startPlayback() {
                 await Tone.start();
