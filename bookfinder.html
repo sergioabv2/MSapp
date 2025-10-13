@@ -689,6 +689,7 @@
             let currentNoteIndex = 0;
             let expectedNotes = new Set();
             let canvas, ctx;
+            let dpr = 1;
             let pianoHeight = 100;
             let animationFrameId;
             let scrollOffset = 0;
@@ -939,17 +940,23 @@ function initCanvas() {
     
     function resizeCanvas() {
         const container = canvas.parentElement;
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
         
-        // ✅ AQUÍ ESTÁ LA MAGIA: Leemos la altura real del elemento del piano.
+        // Obtenemos y guardamos el dpr del dispositivo
+        dpr = window.devicePixelRatio || 1;
+
+        // Ajustamos el tamaño real del "lienzo" a los píxeles físicos
+        canvas.width = container.clientWidth * dpr;
+        canvas.height = container.clientHeight * dpr;
+        
+        // Nos aseguramos de que el tamaño en CSS siga siendo el correcto
+        canvas.style.width = `${container.clientWidth}px`;
+        canvas.style.height = `${container.clientHeight}px`;
         const pianoEl = document.getElementById('pianoKeysVisual');
         if (pianoEl) {
             pianoHeight = pianoEl.offsetHeight;
         }
     }
     
-    // Llamamos a la función una vez para establecer los valores iniciales.
     resizeCanvas(); 
     window.addEventListener('resize', resizeCanvas);
 }
@@ -983,38 +990,45 @@ function getKeyXPosition(midiNote) {
 function drawWaterfall() {
     if (!canvas || !ctx) return;
 
+    // Usamos clearRect para limpiar el buffer de alta resolución
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
     ctx.fillStyle = '#0a0a14';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
-    const pianoStartX = (canvas.width - pianoTotalWidth) / 2;
+    const pianoStartX = (canvas.parentElement.clientWidth - pianoTotalWidth) / 2; // Usamos el ancho del contenedor
 
     parsedNotes.forEach(note => {
-        // ✅ Lógica condicional: aplicamos el desfase SÓLO si NO estamos en modo aprendizaje.
         const visualTime = $scope.isLearningMode ? scrollOffset : scrollOffset - VISUAL_OFFSET_SECONDS;
-
-        const noteStartY = canvas.height - pianoHeight - ((note.startSec - visualTime) * pixelsPerSecond);
+        
+        const cssCanvasHeight = canvas.height / dpr;
+        const noteStartY = cssCanvasHeight - pianoHeight - ((note.startSec - visualTime) * pixelsPerSecond);
         const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
 
-        if (noteEndY < canvas.height && noteStartY > 0) {
-            // ... el resto de la función se mantiene igual
+        if (noteEndY < cssCanvasHeight && noteStartY > 0) {
             const keyX = pianoStartX + getKeyXPosition(note.midiNumber + 21);
             const height = noteStartY - noteEndY;
             const noteVisualWidth = isBlackKey(note.midiNumber + 21) ? blackKeyWidth : whiteKeyWidth;
             const isExpected = expectedNotes.has(note.pitch) && Math.abs(note.startSec - scrollOffset) < 0.5;
 
             if (isExpected) {
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 20 * dpr; // Escalamos el valor de la sombra
                 ctx.shadowColor = 'rgba(139, 92, 246, 0.8)';
                 ctx.fillStyle = 'rgba(139, 92, 246, 0.9)';
             } else {
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 10 * dpr; // Escalamos el valor de la sombra
                 ctx.shadowColor = 'rgba(99, 102, 241, 0.5)';
                 ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
             }
-
-            ctx.fillRect(keyX, noteEndY, noteVisualWidth - 2, height);
-            ctx.shadowBlur = 0;
+            
+            ctx.fillRect(
+                keyX * dpr, 
+                noteEndY * dpr, 
+                (noteVisualWidth - 2) * dpr, // Restamos 2px antes de escalar
+                height * dpr
+            );
+            
+            ctx.shadowBlur = 0; // Reseteamos la sombra
         }
     });
 }
