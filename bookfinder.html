@@ -356,20 +356,21 @@
 
         /* Contenedor principal del piano */
         .piano-keys-visual {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 100px; /* Aumentamos la altura para un mejor efecto visual */
-            background: #181818; /* Un fondo oscuro y sólido para la base */
-            border-top: 4px solid #8b5cf6;
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.7);
-            z-index: 10;
-            display: block; /* Cambiamos de flex a block para posicionamiento absoluto */
-            border-radius: 10px 10px 0 0;
-            padding: 0 10px; /* Espacio a los lados */
-            box-sizing: content-box; /* Para que el padding no afecte el width calculado */
-        }
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100px; 
+    background: #181818; 
+    border-top: 4px solid #8b5cf6;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    display: block; 
+    border-radius: 10px 10px 0 0;
+    /* ✅ Cambios clave: */
+    padding: 0; /* Eliminamos el padding */
+    box-sizing: border-box; /* El ancho calculado será el ancho final */
+}
 
         /* Estilo base para todas las teclas */
         .piano-key {
@@ -668,12 +669,12 @@
 
         app.controller('sheetMusicCtrl', function($scope, $timeout) {
             $scope.sheets = [
-                { id: 1, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Für Elise', composer: 'L.V. Beethoven', pages: 4, rating: 4.7, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/bluebossa.mid", difficulty: 'Grado 5', style: 'Clásico' },
-                { id: 2, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Prelude in C, BWV 846', composer: 'J.S. Bach', pages: 2, rating: 4.9, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/mariah.mid", difficulty: 'Grado 2', style: 'Barroco' },
-                { id: 3, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Nocturne Op.9 No.2', composer: 'F. Chopin', pages: 5, rating: 4.8, type: 'midi', url: "https://bitmidi.com/uploads/2130.mid", difficulty: 'Grado 7', style: 'Romántico' },
-                { id: 4, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Claro de Luna (1er Mov.)', composer: 'L.V. Beethoven', pages: 7, rating: 4.8, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid", difficulty: 'Grado 4', style: 'Clásico' },
-                { id: 5, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Minuet in G', composer: 'Christian Petzold', pages: 2, rating: 4.9, type: 'midi', url: "https://bitmidi.com/uploads/1186.mid", difficulty: 'Grado 1', style: 'Barroco' },
-                { id: 6, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Sonata K.545', composer: 'W.A. Mozart', pages: 8, rating: 4.7, type: 'midi', url: "https://bitmidi.com/uploads/1202.mid", difficulty: 'Grado 6', style: 'Clásico' }
+                { id: 1, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Bohemian Rhapsody', composer: 'Queen', pages: 4, rating: 4.7, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/Bohemian%20Rhapsody%20-%20Queen.mid", difficulty: 'Grado 5', style: 'Pop' },
+                { id: 2, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Little Playmates', composer: 'Chawtal', pages: 2, rating: 4.9, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/Little%20Playmates.mid", difficulty: 'Grado 1', style: 'Clásico' },
+                { id: 3, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Ode to Joy', composer: 'L.V. Beethoven', pages: 5, rating: 4.8, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/Ode%20to%20Joy.mid", difficulty: 'Grado 1', style: 'Clásico' },
+                { id: 4, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Old German Dance', composer: 'Michael Praetorius', pages: 7, rating: 4.8, type: 'midi', url: "hhttps://storage.googleapis.com/mozartacademy-files/midi/Old%20German%20Dance.mid", difficulty: 'Grado 1', style: 'Barroco' },
+                { id: 5, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Trumpet Voluntary', composer: 'Jeremiah Clarke', pages: 2, rating: 4.9, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/TrumpetV.mid", difficulty: 'Grado 1', style: 'Barroco' },
+                { id: 6, img:'https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh', title: 'Jodler', composer: 'Traditional American', pages: 8, rating: 4.7, type: 'midi', url: "https://storage.googleapis.com/mozartacademy-files/midi/jodler.mid", difficulty: 'Grado 1', style: 'Contemporaneo' }
             ];
 
             $scope.filters = { text: '', difficulty: '', style: '' };
@@ -696,6 +697,10 @@
             let pixelsPerSecond = 100;
             const totalKeys = 88;
             const keyWidth = 12;
+            const whiteKeyWidth = 20; // Ancho que ya usas para las teclas blancas
+            const blackKeyWidth = 13; // Ancho que ya usas para las teclas negras
+            const totalWhiteKeys = 52; 
+            const VISUAL_OFFSET_SECONDS = 0.25;
 
             $scope.customFilter = function(sheet) {
                 const textSearch = !$scope.filters.text ||
@@ -940,42 +945,73 @@
                 window.addEventListener('resize', resizeCanvas);
             }
 
-            function drawWaterfall() {
-                if (!canvas || !ctx) return;
+  function isBlackKey(midiNote) {
+    const note = midiNote % 12;
+    return note === 1 || note === 3 || note === 6 || note === 8 || note === 10;
+}
 
-                ctx.fillStyle = '#0a0a14';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                const centerX = canvas.width / 2;
-                const pianoWidth = totalKeys * keyWidth;
-                const pianoStartX = centerX - pianoWidth / 2;
+function getKeyXPosition(midiNote) {
+    const firstMidiNote = 21; // A0, la primera tecla del piano de 88
+    let position = 0;
+    // Contamos las teclas blancas desde el inicio del piano hasta la nota actual
+    for (let i = firstMidiNote; i < midiNote; i++) {
+        if (!isBlackKey(i)) {
+            position++;
+        }
+    }
 
-                parsedNotes.forEach(note => {
-                    const noteStartY = canvas.height - 80 - ((note.startSec - scrollOffset) * pixelsPerSecond);
-                    const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
-                    
-                    if (noteEndY < canvas.height && noteStartY > 0) {
-                        const x = pianoStartX + (note.midiNumber * keyWidth);
-                        const height = noteStartY - noteEndY;
+    if (isBlackKey(midiNote)) {
+        // La tecla negra se posiciona relativa a la tecla blanca anterior, centrada en la división.
+        return (position * whiteKeyWidth) - (blackKeyWidth / 2);
+    } else {
+        // La tecla blanca se posiciona según el número de teclas blancas que la preceden.
+        return position * whiteKeyWidth;
+    }
+}
 
-                        const isExpected = expectedNotes.has(note.pitch) && 
-                                         Math.abs(note.startSec - scrollOffset) < 0.5;
+function drawWaterfall() {
+    if (!canvas || !ctx) return;
 
-                        if (isExpected) {
-                            ctx.shadowBlur = 20;
-                            ctx.shadowColor = 'rgba(139, 92, 246, 0.8)';
-                            ctx.fillStyle = 'rgba(139, 92, 246, 0.9)';
-                        } else {
-                            ctx.shadowBlur = 10;
-                            ctx.shadowColor = 'rgba(99, 102, 241, 0.5)';
-                            ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
-                        }
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                        ctx.fillRect(x, noteEndY, keyWidth - 2, height);
-                        ctx.shadowBlur = 0;
-                    }
-                });
+    // Centramos el piano visualmente en el canvas
+    const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
+    const pianoStartX = (canvas.width - pianoTotalWidth) / 2;
+
+    parsedNotes.forEach(note => {
+      const visualTime = scrollOffset - VISUAL_OFFSET_SECONDS;
+       const noteStartY = canvas.height - 80 - ((note.startSec - visualTime) * pixelsPerSecond);
+        const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
+
+        if (noteEndY < canvas.height && noteStartY > 0) {
+            // ✅ Usamos nuestra nueva función para obtener la posición X precisa
+            // Sumamos 21 porque note.midiNumber va de 0-87, pero el MIDI real es de 21-108
+            const keyX = pianoStartX + getKeyXPosition(note.midiNumber + 21);
+            const height = noteStartY - noteEndY;
+
+            // Determinamos el ancho visual de la nota
+            const noteVisualWidth = isBlackKey(note.midiNumber + 21) ? blackKeyWidth : whiteKeyWidth;
+
+            const isExpected = expectedNotes.has(note.pitch) && Math.abs(note.startSec - scrollOffset) < 0.5;
+
+            if (isExpected) {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = 'rgba(139, 92, 246, 0.8)';
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.9)';
+            } else {
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(99, 102, 241, 0.5)';
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
             }
+
+            // Dibujamos el rectángulo con el ancho correcto
+            ctx.fillRect(keyX, noteEndY, noteVisualWidth - 2, height); // Restamos 2 para un pequeño margen
+            ctx.shadowBlur = 0;
+        }
+    });
+}
 
             function animateWaterfall() {
                 if ($scope.isLearningMode) {
@@ -983,57 +1019,51 @@
                         scrollOffset = parsedNotes[currentNoteIndex].startSec;
                     }
                 } else if (isPlaying) {
-                    scrollOffset += 0.016;
+                    scrollOffset = Tone.Transport.seconds;
                 }
 
                 drawWaterfall();
                 animationFrameId = requestAnimationFrame(animateWaterfall);
             }
 
-            function initPianoKeys() {
-            const pianoContainer = document.getElementById('pianoKeysVisual');
-            if (!pianoContainer) return;
 
-            pianoContainer.innerHTML = ''; // Limpiar el contenedor antes de dibujar
-            
-            // Un piano estándar tiene 88 teclas, comenzando desde la nota MIDI 21 (A0)
-            const firstMidiNote = 21;
-            const lastMidiNote = 108;
-            
-            // Ancho de las teclas para el cálculo de la posición
-            const whiteKeyWidth = 20; // Aumentamos un poco el ancho para un mejor aspecto
-            const blackKeyWidth = 13;
-            
-            let whiteKeyCounter = 0;
-            const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false];
+function initPianoKeys() {
+    const pianoContainer = document.getElementById('pianoKeysVisual');
+    if (!pianoContainer) return;
 
-            for (let midiNote = firstMidiNote; midiNote <= lastMidiNote; midiNote++) {
-                const key = document.createElement('div');
-                const noteIndex = midiNote % 12;
-                const isBlack = isBlackKey[noteIndex];
-                
-                key.classList.add('piano-key');
-                key.dataset.note = midiNote - firstMidiNote; // El data-note ahora es de 0 a 87
-                
-                if (isBlack) {
-                    key.classList.add('black');
-                    key.style.width = `${blackKeyWidth}px`;
-                    // Posicionamos la tecla negra a la mitad del espacio entre dos teclas blancas
-                    key.style.left = `${(whiteKeyCounter - 0.5) * whiteKeyWidth}px`;
-                } else {
-                    key.classList.add('white');
-                    key.style.width = `${whiteKeyWidth}px`;
-                    key.style.left = `${whiteKeyCounter * whiteKeyWidth}px`;
-                    whiteKeyCounter++;
-                }
-                
-                pianoContainer.appendChild(key);
-            }
-            
-            // Ajustamos el ancho total del contenedor del piano
-            const totalWhiteKeys = 52; // Un piano de 88 teclas tiene 52 teclas blancas
-            pianoContainer.style.width = `${totalWhiteKeys * whiteKeyWidth}px`;
+    pianoContainer.innerHTML = ''; 
+
+    const firstMidiNote = 21;
+    const lastMidiNote = 108;
+
+    // Dibuja primero las teclas blancas
+    for (let midiNote = firstMidiNote; midiNote <= lastMidiNote; midiNote++) {
+        if (!isBlackKey(midiNote)) {
+            const key = document.createElement('div');
+            key.classList.add('piano-key', 'white');
+            key.dataset.note = midiNote - firstMidiNote;
+            key.style.width = `${whiteKeyWidth}px`;
+            key.style.left = `${getKeyXPosition(midiNote)}px`; // ✅ Usamos la función central
+            pianoContainer.appendChild(key);
         }
+    }
+
+    // Dibuja las teclas negras encima
+    for (let midiNote = firstMidiNote; midiNote <= lastMidiNote; midiNote++) {
+        if (isBlackKey(midiNote)) {
+            const key = document.createElement('div');
+            key.classList.add('piano-key', 'black');
+            key.dataset.note = midiNote - firstMidiNote;
+            key.style.width = `${blackKeyWidth}px`;
+            key.style.left = `${getKeyXPosition(midiNote)}px`; // ✅ Usamos la función central
+            pianoContainer.appendChild(key);
+        }
+    }
+
+    // Ajustamos el ancho total del contenedor del piano
+    pianoContainer.style.width = `${totalWhiteKeys * whiteKeyWidth}px`;
+}
+
 
             function highlightKey(midiNumber, active) {
                 const key = document.querySelector(`.piano-key[data-note="${midiNumber}"]`);
@@ -1070,29 +1100,36 @@
                 $scope.$apply();
             }
 
-            async function startPlayback() {
+           async function startPlayback() {
                 await Tone.start();
                 isPlaying = true;
-                playbackStartTime = Tone.now();
                 scrollOffset = 0;
+                Tone.Transport.position = 0; // Asegura que el transporte comience desde el principio
 
                 parsedNotes.forEach(note => {
+                    // 1. Programa el inicio de la nota (sonido y visual)
                     Tone.Transport.schedule((time) => {
                         sampler.triggerAttackRelease(note.pitch, note.durSec, time);
                         highlightKey(note.midiNumber, true);
-                        setTimeout(() => highlightKey(note.midiNumber, false), note.durSec * 1000);
                     }, note.startSec);
+
+                    // 2. Programa el fin de la nota (solo visual) con la misma precisión
+                    Tone.Transport.schedule(() => {
+                        highlightKey(note.midiNumber, false);
+                    }, note.startSec + note.durSec);
                 });
 
                 Tone.Transport.start();
             }
 
             function stopPlayback() {
-                isPlaying = false;
-                Tone.Transport.stop();
-                Tone.Transport.cancel();
-                scrollOffset = 0;
-            }
+              isPlaying = false;
+              Tone.Transport.stop();
+              Tone.Transport.cancel();
+              // Reinicia la posición del transporte para la próxima reproducción
+              Tone.Transport.position = 0;
+              scrollOffset = 0;
+          }
 
             $scope.setLearningMode = function() {
                 stopPlayback();
