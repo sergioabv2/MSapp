@@ -1369,55 +1369,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
      
 
- .status-card {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 24px;
-        }
-
-        .status-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .status-icon.connected {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-        }
-
-        .status-icon.disconnected {
-            background: linear-gradient(135deg, #ff6b6b, #e53e3e);
-            color: white;
-        }
-
-        .status-icon.connecting {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
-            color: white;
-        }
-
-        .status-info {
-            flex: 1;
-        }
-
-        .status-info h3 {
-            margin: 0 0 8px 0;
-            font-weight: 600;
-            font-size: 18px;
-            color: #2c3e50;
-        }
-
-        .status-info p {
-            margin: 0;
-            color: #78909c;
-            font-size: 14px;
-        }
 
   .connection-button {
             margin: 0;
@@ -1632,18 +1583,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         }
 
         @media (max-width: 480px) {
-            .status-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 16px;
-            }
-            
-            .status-icon {
-                width: 54px;
-                height: 54px;
-                font-size: 22px;
-            }
-            
+         
             .connection-button i {
                 display: none;
             }
@@ -1901,17 +1841,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       }
     
 
-    .status-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    
-    .status-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 24px; /* 1.5rem -> 24px */
-    }
+   
 }
 
 
@@ -2518,62 +2448,49 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-       :root {
+      :root {
             --primary-blue: #007bff;
             --hover-blue: #0056b3;
             --status-red: #dc3545;
             --status-green: #28a745;
-            
-            /* Paleta de Colores - TEMA CLARO */
-            --light-bg: #ffffff; /* Fondo de la barra */
-            --light-border: #dee2e6; /* Borde inferior y hovers */
-            --dark-text: #212529; /* Texto principal */
-            --muted-text: #6c757d; /* Texto secundario y iconos */
-            --body-bg: #f1f3f5; /* Color de fondo del body */
+            --light-bg: #ffffff;
+            --light-border: #dee2e6;
+            --dark-text: #212529;
+            --muted-text: #6c757d;
+            --body-bg: #f1f3f5;
         }
 
-        /* --- Top Bar: Contenedor Principal --- */
+     
+
         .top-bar {
-         
             height: 55px;
             background-color: var(--light-bg);
-            color: var(--dark-text); /* Texto oscuro */
+            color: var(--dark-text);
             display: flex;
             align-items: center;
             justify-content: space-between;
-          margin-top: 10px;
             padding: 0 20px;
-            border-bottom: 1px solid var(--light-border); /* Borde sutil */
+            border-bottom: 1px solid var(--light-border);
             flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra ligera para dar profundidad */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        /* --- Lado Izquierdo: Status --- */
         .status-container {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .status-icon2 {
+        .status-icon {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             transition: background-color 0.3s ease;
         }
 
-        .status-icon2.disconnected {
-            background-color: var(--status-red);
-        }
-
-        .status-icon2.connecting {
-            background-color: #fd7e14; /* Naranja para "conectando" */
-            animation: pulse 1.5s infinite;
-        }
-
-        .status-icon2.connected {
-            background-color: var(--status-green);
-        }
+        .status-icon.disconnected { background-color: var(--status-red); }
+        .status-icon.connecting { background-color: #fd7e14; animation: pulse 1.5s infinite; }
+        .status-icon.connected { background-color: var(--status-green); }
 
         @keyframes pulse {
             0% { transform: scale(0.9); opacity: 0.7; }
@@ -2581,29 +2498,11 @@ width: 200px; /* Ajusta según el tamaño deseado */
             100% { transform: scale(0.9); opacity: 0.7; }
         }
 
-        .status-text .title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 0;
-            line-height: 1.2;
-        }
+        .status-text .title { font-size: 1rem; font-weight: 600; margin: 0; line-height: 1.2; }
+        .status-text .subtitle { font-size: 0.75rem; color: var(--muted-text); margin: 0; line-height: 1.2; }
 
-        .status-text .subtitle {
-            font-size: 0.75rem;
-            color: var(--muted-text);
-            margin: 0;
-            line-height: 1.2;
-            transition: color 0.3s ease;
-        }
+        .controls-container { display: flex; align-items: center; gap: 15px; }
 
-        /* --- Lado Derecho: Controles --- */
-        .controls-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Botón principal de Conectar */
         #connectBtn {
             background-color: var(--primary-blue);
             color: white;
@@ -2614,57 +2513,53 @@ width: 200px; /* Ajusta según el tamaño deseado */
             font-weight: 600;
             transition: background-color 0.2s ease, opacity 0.3s;
         }
+        #connectBtn:hover { background-color: var(--hover-blue); }
+        #connectBtn:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
 
-        #connectBtn:hover {
-            background-color: var(--hover-blue);
-        }
+        .connected-controls { display: flex; gap: 15px; }
 
-        #connectBtn:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Controles cuando está conectado */
-        .connected-controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        .icon-btn2 {
+        .icon-btn {
             background: none;
             border: none;
-            color: var(--muted-text); /* Color de icono por defecto */
+            color: var(--muted-text);
             cursor: pointer;
             padding: 5px;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s, color 0.2s;
+            position: relative; /* Para el badge de chat */
+        }
+        .icon-btn:hover { background-color: var(--light-border); color: var(--dark-text); }
+        .icon-btn i { font-size: 18px; }
+
+        /* Estilo para el botón de micrófono muteado */
+        .icon-btn.muted i {
+            color: var(--status-red);
         }
 
-        .icon-btn2 svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .icon-btn2:hover {
-            background-color: var(--light-border); /* Fondo gris claro al pasar el mouse */
-            color: var(--dark-text); /* El icono se vuelve más oscuro */
-        }
+        #disconnectBtn { background-color: var(--status-red); color: white; }
+        #disconnectBtn:hover { background-color: #c82333; color: white; }
         
-        /* Botón de desconectar con estilo distintivo */
-        #disconnectBtn {
+        /* Estilo para el badge de chat */
+        .chat-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
             background-color: var(--status-red);
             color: white;
-        }
-
-        #disconnectBtn:hover {
-            background-color: #c82333;
-            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--light-bg);
         }
 
 </style>
@@ -3501,36 +3396,55 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
    <ion-content >
-      <header class="top-bar">
-        <div class="status-container">
-            <div id="statusIcon" class="status-icon2 disconnected"></div>
-            <div class="status-text">
-                <p class="title">Documento Seguro</p>
-                <p id="statusSubtitle" class="subtitle">Desconectado</p>
-            </div>
+     <header class="top-bar">
+    <div class="status-container">
+        <div class="status-icon" ng-class="{
+            'disconnected': webrtc.connectionStatus === 'disconnected' && !isConnecting, 
+            'connecting': isConnecting || webrtc.connectionStatus === 'isConnecting', 
+            'connected': webrtc.connectionStatus === 'connected'
+        }"></div>
+        <div class="status-text">
+            <p class="title">Documento Seguro</p>
+            <p class="subtitle">{{ getStatusMessage() }}</p>
+        </div>
+    </div>
+
+    <div class="controls-container">
+        
+        <div id="disconnectedControls" ng-show="webrtc.connectionStatus === 'disconnected'">
+            <button id="connectBtn" 
+                    ng-click="toggleConnection()" 
+                    ng-disabled="isConnecting">
+                {{ getConnectionButtonText() }}
+            </button>
         </div>
 
-        <div class="controls-container">
-            <div id="disconnectedControls">
-                <button id="connectBtn">Conectar</button>
-            </div>
+        <div id="connectedControls" class="connected-controls" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            
+            <button class="icon-btn" 
+                    title="Micrófono"
+                    ng-click="toggleMicrophone()"
+                    ng-class="{'muted': webrtc.isMuted}">
+                <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+            </button>
 
-            <div id="connectedControls" class="connected-controls hidden">
-                <button class="icon-btn2" title="Micrófono">
-                 <i class="ri-mic-2-line"></i>
-                </button>
-                <button class="icon-btn2" title="Chat">
-                  <i class="ri-message-2-line"></i>
-                </button>
-                <button class="icon-btn2" title="Video">
-                   <i class="ri-movie-line"></i>
-                </button>
-                <button id="disconnectBtn" class="icon-btn2" title="Desconectar">
-                   <i class="ri-logout-box-r-line"></i>
-                </button>
-            </div>
+            <button class="icon-btn" title="Chat" ng-click="openChat()">
+                <i class="fas fa-comment-dots"></i>
+                <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+                    {{ webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages }}
+                </span>
+            </button>
+            
+            <button class="icon-btn" title="Video" ng-click="toggleVideo()">
+                <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+            </button>
+
+            <button id="disconnectBtn" class="icon-btn" title="Desconectar" ng-click="disconnect()">
+                <i class="fas fa-phone-slash"></i>
+            </button>
         </div>
-    </header>
+    </div>
+</header>
 
   <div class="iframe-container2"><iframe src="https://app.mozartacademy.mx/books3" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
@@ -3558,35 +3472,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-
-      <!--   -->
-    <div class="floating-buttons" style="margin-bottom: 20px !important">
-
-      <button class="button floating-btn chat" 
-              ng-click="openChat()" 
-              ng-show="webrtc.connectionStatus !== 'disconnected'"
-             >
-        <i class="fas fa-comment-dots"></i>
-        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
-          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
-        </span>
-      </button>
-      
-      <!-- Botón de Micrófono -->
-      <button class="button floating-btn mic"
-              ng-class="{'muted': webrtc.isMuted}"
-              ng-click="toggleMicrophone()"
-              ng-show="webrtc.connectionStatus !== 'disconnected'">
-        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
-      </button>
-      
-      <!-- Botón de Video -->
-      <button class="button floating-btn video"
-              ng-click="toggleVideo()"
-              ng-show="webrtc.connectionStatus !== 'disconnected'">
-        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
-      </button>
-    </div>
     
     <!-- Modal de Chat Personalizado -->
     <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
@@ -4746,8 +4631,8 @@ app
 .factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getUserData",
-  //  token: localStorage.getItem('MStoken')
-   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    token: localStorage.getItem('MStoken')
+  // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
 
   var config = {
@@ -5166,8 +5051,7 @@ app
       url: "/livestream",
       views: {
         'menuContent': {
-          templateUrl: "livestream.html",
-          controller: 'livestreamCtrl'
+          templateUrl: "livestream.html"
         }
       }
     }) 
@@ -6062,641 +5946,6 @@ $scope.installApp = function () {
     }])
 
 
-       .controller('livestreamCtrl', ['$http', '$scope', '$sce', '$timeout', 'SharedState', function($http, $scope, $sce, $timeout, SharedState) {
- 
-
-
-            // --- ESTADO DE LA UI ---
-            $scope.searchQuery = '';
-            $scope.showPreviewModal = false;
-            $scope.selectedBook = null;
-            $scope.selectedCategory = '';
-            $scope.showPdfViewer = false;
-            $scope.pdfUrl = '';
-            $scope.isLoaded = false;
-            $scope.userSubmittedRecordings = []
-       
-
-             $scope.showUploadModal = false;
-              $scope.showLockedModal = false;
-              $scope.newPdf = {}; 
-               $scope.userPDFs = []; 
-
-
-  SharedState.getNum().then(function(data) {
-     
-    var stage = JSON.parse(data.data.stage);
-     $scope.lvl = stage.lvl;
-                 $scope.lsn = stage.lsn;
-                 $scope.userSubmittedRecordings = stage.exes || [];
-                  $scope.isLoaded = true;
-                  var repertoireFromServer = JSON.parse(data.data.repertoire);
-                    $scope.library = $scope.library.concat(repertoireFromServer);
- 
-  })
-
-
-       var manualsData = [
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
-            { 'lsn': 1, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
-            { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://site.com/midi1.mid' },
-            { 'lsn': 2, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://site.com/midi2.mid' },
-            { 'lsn': 2, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
-            { 'lsn': 3, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
-            { 'lsn': 4, 'id': 1, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
-            { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
-            { 'lsn': 4, 'id': 3, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
-        ] },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
-            { 'lsn': 5, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
-            { 'lsn': 5, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
-            { 'lsn': 6, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
-            { 'lsn': 6, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
-            { 'lsn': 7, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
-            { 'lsn': 7, 'id': 2, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
-            { 'lsn': 7, 'id': 3, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
-            { 'lsn': 8, 'id': 1, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
-        ] },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-    {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-    {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ] },
-    {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
-    {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
-    {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
-    {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7, 'totalExercises': 30},
-];
-
-            
-            // --- TRANSFORMACIÓN DE DATOS ---
-       var manuals = manualsData.map(function(manual) {
-    return {
-        title: manual.title,
-        level: manual.title,
-        author: manual.subtitle,
-        coverUrl: manual.background,
-        pdf: manual.pdf,
-        lvl: manual.lvl,
-        lsn: manual.lsn,
-        lessons: manual.lessons,
-        totalExercises: manual.totalExercises,
-        totalTime: manual.totalTime, // <- AÑADIR ESTA LÍNEA
-        type: 'manual' 
-    };
-});
-
-      
-
-            $scope.library = [
-                { title: 'Fundamentos del Piano', books: manuals },
-            ];
-
-         
-                 
-     
-         
-
-            // Formatear segundos a M:SS
-            $scope.formatTime = function(seconds) {
-                if (isNaN(seconds) || seconds < 0) return "0:00";
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = Math.floor(seconds % 60);
-                return minutes + ":" + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
-            };
-
-            // Desplazamiento del carrusel
-            $scope.scrollCarousel = function(elementId, direction) {
-                const carousel = document.getElementById(elementId);
-                if (carousel) {
-                    const scrollAmount = 200 * direction;
-                    carousel.scrollBy({
-                        left: scrollAmount,
-                        behavior: 'smooth'
-                    });
-                }
-            };
-
-
-          $scope.showTaskModal = false;
-
-          $scope.openTaskModal = function() {
-              $scope.showTaskModal = true;
-          };
-
-          $scope.closeTaskModal = function() {
-              $scope.showTaskModal = false;
-          };
-
-
-
-          // ... dentro de app.controller('libraryCtrl', ...)
-
-// --- ESTADO Y VARIABLES PARA EL MODAL DE VIDEO ---
-$scope.showVideoModal = false;
-$scope.currentVideoUrl = ''; // Guardará la URL del video a reproducir
-
-// --- FUNCIONES PARA EL MODAL DE VIDEO ---
-
-$scope.openVideoModal = function(videoUrl) {
-    if (!videoUrl) return;
-
-    // Transforma la URL de YouTube a un formato "embed" para el iframe
-    const embedUrl = videoUrl.replace("watch?v=", "embed/");
-    
-    // Confía en la URL para poder usarla en ng-src de forma segura
-    $scope.currentVideoUrl = $sce.trustAsResourceUrl(embedUrl);
-    
-    $scope.showVideoModal = true;
-};
-
-$scope.closeVideoModal = function() {
-    $scope.showVideoModal = false;
-    // Es importante limpiar la URL para detener la reproducción del video en segundo plano
-    $scope.currentVideoUrl = '';
-};
-
-
-
-
-             $scope.openUploadModal = function() {
-        $scope.newPdf = {}; // Resetea el formulario
-        $scope.showUploadModal = true;
-    };
-
-    $scope.closeUploadModal = function() {
-        $scope.showUploadModal = false;
-    };
-    
-    $scope.triggerFileInput = function() {
-        document.getElementById('fileInput').click();
-    };
-
-    $scope.onFileSelect = function(event) {
-        var file = event.target.files[0];
-        if (!file || file.type !== 'application/pdf') {
-            alert("Por favor, selecciona un archivo PDF.");
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function(loadEvent) {
-            $scope.$apply(function() {
-                $scope.newPdf.fileData = loadEvent.target.result; // Esto es el Base64
-                $scope.newPdf.fileName = file.name;
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    $scope.saveNewPdf = function() {
-        if (!$scope.newPdf.title || !$scope.newPdf.author || !$scope.newPdf.fileData) {
-            alert("Por favor, completa todos los campos y selecciona un archivo.");
-            return;
-        }
-
-        const newBook = {
-            "title": $scope.newPdf.title,
-            "author": $scope.newPdf.author,
-            "level": $scope.newPdf.grade || "N/A",
-            "coverUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png", // Icono genérico de PDF
-            "pdf": $scope.newPdf.fileData,
-            "isUserUploaded": true // Bandera para identificar estos archivos
-        };
-
-        $scope.userPDFs.push(newBook);
-        $scope.closeUploadModal();
-    };
-    
-    // === LÓGICA PARA ELIMINAR ARCHIVOS (NUEVA) ===
-    $scope.deleteUserPdf = function(index, event) {
-        event.stopPropagation(); // Evita que se abra el modal de vista previa
-        if (confirm("¿Estás seguro de que quieres eliminar este archivo?")) {
-            $scope.userPDFs.splice(index, 1);
-        }
-    };
-
-
-             $scope.showPreview = function(book, categoryTitle) {
-        // Los archivos del usuario nunca están bloqueados
-        if (book.isUserUploaded) {
-            $scope.selectedBook = book;
-            $scope.selectedCategory = categoryTitle;
-            $scope.showPreviewModal = true;
-            return;
-        }
-
-        var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
-        if (isLocked) {
-            $scope.showLockedModal = true;
-            $timeout(function() {
-                $scope.showLockedModal = false;
-            }, 3000); // Se cierra después de 4 segundos
-            return;
-        }
-
-        $scope.selectedBook = book;
-        $scope.selectedCategory = categoryTitle;
-        $scope.showPreviewModal = true;
-    };
-
-            // Mostrar el modal de vista previa
-         /*   $scope.showPreview = function(book, categoryTitle) {
-                var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
-                if (isLocked) {
-                    alert('Este material está bloqueado. ¡Sigue avanzando para desbloquearlo!');
-                    return;
-                }
-                $scope.selectedBook = book;
-                $scope.selectedCategory = categoryTitle;
-                $scope.showPreviewModal = true;
-            }; */
-
-            // Cerrar el modal
-            $scope.closePreviewModal = function(event) {
-                if (event && event.target !== event.currentTarget) {
-                    return;
-                }
-                $scope.showPreviewModal = false;
-            };
-            
-            // Abrir el visor de PDF
-            $scope.openPdfViewer = function(book) {
-                if (!book || !book.pdf) {
-                    alert('No hay un PDF disponible para este libro.');
-                    return;
-                }
-
-                if (!$scope.metronomeAudio) {
-                    $scope.metronomeAudio = document.getElementById('metronomeAudio');
-                }
-                 
-                $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
-                $scope.showPreviewModal = false; // Ocultar modal pequeño
-                $scope.showPdfViewer = true;     // Mostrar visor grande
-            };
-
-            // Cerrar el visor de PDF
-            $scope.closePdfViewer = function() {
-                $scope.showPdfViewer = false;
-                $scope.pdfUrl = ''; // Limpiar la URL para detener la carga
-            };
-               
-               
-               
-  $scope.metronomeActive = false;
-$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
-$scope.baseBPM = 60; // BPM del audio original
-//$scope.metronomeAudio = document.getElementById('metronomeAudio');
-
-// Función para convertir BPM a velocidad de reproducción
-function bpmToPlaybackRate(bpm) {
-  return bpm / $scope.baseBPM;
-}
-
-$scope.toggleMetronome = function() {
-  $scope.metronomeActive = !$scope.metronomeActive;
-  
-  if ($scope.metronomeActive) {
-    // Configurar velocidad inicial
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-    $scope.metronomeAudio.currentTime = 0;
-    $scope.metronomeAudio.play()
-      .catch(e => console.error("Error al reproducir:", e));
-  } else {
-    $scope.metronomeAudio.pause();
-    $scope.metronomeAudio.currentTime = 0;
-  }
-};
-
-$scope.adjustBPM = function(change, event) {
-  // Actualizar valor BPM
-  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
-  
-  // Ajustar velocidad de reproducción si está activo
-  if ($scope.metronomeActive) {
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-  }
-  
-  // Lógica para mantener presionado
-  if (event) {
-    const button = event.target;
-    button.addEventListener('mouseup', clearBPMTimers);
-    button.addEventListener('mouseleave', clearBPMTimers);
-    button.addEventListener('touchend', clearBPMTimers);
-    
-    $scope.bpmTimeout = setTimeout(() => {
-      $scope.bpmInterval = setInterval(() => {
-        $scope.adjustBPM(change);
-        $scope.$apply();
-      }, 100);
-    }, 500);
-  } 
-};
-
-function clearBPMTimers() {
-  clearTimeout($scope.bpmTimeout);
-  clearInterval($scope.bpmInterval);
-} 
-
-
- 
-let mediaRecorder;
-        let audioChunks2 = [];
-        let audioContext2;
-        let animationId;
-
-        $scope.showSaveRecordingModal = false;
-$scope.recording = {};
-
-        // Opciones de audio con supresión de ruido y control de ganancia
-        const constraints = {
-            audio: {
-                noiseSuppression: true,
-                autoGainControl: true,
-                echoCancellation: true
-            }
-        };
-
-    async function startRecordingAndOscilloscope() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks2 = [];
-
-        mediaRecorder.ondataavailable = event => {
-            audioChunks2.push(event.data);
-        };
-
-        // **** ESTA ES LA SECCIÓN MODIFICADA ****
-        mediaRecorder.onstop = () => {
-            cancelAnimationFrame(animationId);
-            if (audioChunks2.length === 0) return;
-
-            const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-
-            // Usamos un elemento de audio temporal para leer la duración
-            const tempAudio = document.createElement('audio');
-            tempAudio.src = audioUrl;
-            tempAudio.onloadedmetadata = () => {
-                // Una vez que tenemos la duración, poblamos el scope y mostramos el modal
-                $scope.$apply(() => {
-                    const duration = tempAudio.duration;
-                    const minutes = Math.floor(duration / 60);
-                    const seconds = Math.floor(duration % 60);
-
-                    $scope.recording = {
-                        url: $sce.trustAsResourceUrl(audioUrl), // URL segura para ng-src
-                        blob: audioBlob,
-                        name: "Grabación " + new Date().toLocaleTimeString(),
-                        author: "", // El usuario puede llenarlo
-                        date: new Date(),
-                        duration: `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-                    };
-
-                    $scope.showSaveRecordingModal = true;
-                });
-            };
-        };
-
-        // ... El resto de la función (analyser, mediaRecorder.start) sigue igual
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-        analyser.fftSize = 2048;
-        mediaRecorder.start();
-
-    } catch (err) {
-        console.error('Error al acceder al micrófono:', err);
-    }
-}
-
-// La función recordWav no necesita cambios
-$scope.recordWav = function() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        $scope.isRecording2 = false;
-    } else {
-        startRecordingAndOscilloscope();
-        $scope.isRecording2 = true;
-    }
-};
-
-// --- AGREGA ESTAS NUEVAS FUNCIONES AL FINAL DE TU CONTROLADOR ---
-
-// Cierra el modal y limpia los datos
-$scope.closeSaveModal = function() {
-    // Revoca el Object URL para liberar memoria
-    if ($scope.recording && $scope.recording.url) {
-        URL.revokeObjectURL($scope.recording.url.toString());
-    }
-    $scope.showSaveRecordingModal = false;
-    $scope.recording = {};
-};
-
-
-
-
-
-// En tu libraryCtrl...
-
-// --- ESTADO Y VARIABLES PARA EL MODAL MIDI ---
-$scope.isMidiModalVisible = false;
-$scope.currentMidi = {}; // Guardará la info del MIDI actual
-
-// Referencias a los elementos del reproductor (se inicializarán al abrir el modal)
-let midiPlayer = null;
-let midiVisualizer = null;
-
-// --- FUNCIONES PARA EL MODAL MIDI ---
-$scope.openMidiModal = function(sourceObject) {
-    if (!sourceObject || !sourceObject.midi) return;
-
-    // Asigna la información del título y autor
-    $scope.currentMidi = {
-        title: sourceObject.task || sourceObject.title, // Usa 'task' si existe, si no, 'title'
-        author: sourceObject.author || '' // El autor puede no estar en el objeto 'task'
-    };
-    
-    // Muestra el modal
-    $scope.isMidiModalVisible = true;
-    
-    // $timeout asegura que el DOM esté actualizado y los elementos sean visibles
-    $timeout(function() {
-        // Inicializa las referencias a los elementos si aún no existen
-        if (!midiPlayer) {
-            midiPlayer = document.getElementById('libraryMidiPlayer');
-            midiVisualizer = document.getElementById('libraryMidiVisualizer');
-        }
-        
-        // Asigna la URL del MIDI al reproductor y visualizador
-        midiPlayer.src = sourceObject.midi;
-        midiVisualizer.src = sourceObject.midi;
-    });
-};
-
-$scope.closeMidiModal = function() {
-    if ($scope.isMidiModalVisible && midiPlayer) {
-        // Detiene la reproducción y limpia las fuentes para liberar memoria
-        midiPlayer.stop();
-        midiPlayer.src = "";
-        if (midiVisualizer) {
-            midiVisualizer.src = "";
-        }
-    }
-    // Oculta el modal y limpia la información
-    $scope.isMidiModalVisible = false;
-    $scope.currentMidi = {};
-};
-
-
-
-
-
-$scope.getCompletedTaskCountForManual = function(manual) {
-    if (!manual || !manual.lessons) return 0;
-    return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
-};
-
-$scope.getManualColor = function(manual) {
-    if (manual.lvl == 0){return '#F44336'}
-    else if(manual.lvl == 1){return '#9024dc'}
-    else if(manual.lvl == 2){return '#1894cc'}
-    else if(manual.lvl == 3){return '#489454'}
-    else if(manual.lvl == 4){return '#fa9223'}
-    else if(manual.lvl == 5){return '#485cb4'}
-};
-
-
-$scope.getMaxLsnInBook = function(book) {
-    if (!book || !book.lessons || book.lessons.length === 0) return 0;
-    return Math.max(...book.lessons.map(l => l.lsn));
-};
-
-$scope.filterTasksForCurrentManual = function(task) {
-    if ($scope.selectedBook.lvl < $scope.lvl) {
-        return true;
-    }
-    if ($scope.selectedBook.lvl === $scope.lvl) {
-        return task.lsn <= $scope.lsn;
-    }
-
-    return false;
-};
-
-
-$scope.sentTasks = []; 
-
-$scope.isTaskCompleted = function(task) {
-    // 1. Si la tarea es de una lección global anterior a la actual del usuario, está completada.
-    if (task.lsn < $scope.lsn) {
-        return true;
-    }
-
-    // 2. Si la tarea es de la lección global actual, busca en las grabaciones del usuario.
-    if (task.lsn === $scope.lsn) {
-        // La búsqueda DEBE incluir tanto 'id' como 'lsn' para ser precisa.
-        const userRecording = $scope.userSubmittedRecordings.find(rec => 
-            rec.id === task.id 
-        );
-        // Solo se considera completada si la grabación existe y su estado es 'completed'.
-        return userRecording && userRecording.status === 'completed';
-    }
-
-    // 3. Si es una lección futura, no está completada.
-    return false;
-};
-
-$scope.getTaskOverallStatus = function(task) {
-    // Primero, usa la función anterior para ver si la tarea ya está completada.
-    if ($scope.isTaskCompleted(task)) {
-        return 'completed';
-    }
-
-    // Si no está completada y pertenece a la lección actual, busca su estado específico.
-    if (task.lsn === $scope.lsn) {
-        // La búsqueda DEBE incluir tanto 'id' como 'lsn'.
-        const userRecording = $scope.userSubmittedRecordings.find(rec => 
-            rec.id === task.id 
-        );
-
-        // Si se encuentra una grabación, ese es su estado actual ('sent' o 'fail').
-        if (userRecording) {
-            return userRecording.status; 
-        }
-    }
-
-    // Si no cumple ninguna de las anteriores, es una tarea pendiente.
-    return null;
-};
-
-$scope.uncompletedFilter = function(lesson) {
-    // Solo se pueden entregar tareas de la lección global actual del usuario.
-    if (lesson.lsn !== $scope.lsn) {
-        return false;
-    }
-    const overallStatus = $scope.getTaskOverallStatus(lesson);
-    // Y que no estén ya completadas o enviadas.
-    return overallStatus !== 'completed' && overallStatus !== 'sent';
-};
-
-
-
-$scope.saveRecording = function() {
-    if (!$scope.recording.selectedTask) {
-        alert("Por favor, selecciona el ejercicio que estás entregando.");
-        return;
-    }
-    const submittedTask = $scope.recording.selectedTask;
-
-    const userRecordingEntry = {
-        lsn: submittedTask.lsn,
-        id: submittedTask.id,
-        audio: $scope.recording.url.toString(),
-        status: 'sent', 
-        notes: $scope.recording.notes,
-        date: $scope.recording.date.toISOString(),
-    };
-
-    $scope.userSubmittedRecordings.push(userRecordingEntry);
-    $scope.closeSaveModal();
-};
-
-// Se ejecuta al hacer clic en "Eliminar"
-$scope.deleteRecording = function() {
-    // No se hace nada, solo se cierra el modal y se liberan los recursos
-    $scope.closeSaveModal();
-};
-
-
-
-}])
 
     .controller('statisticsCtrl', function($scope, $timeout){
    
