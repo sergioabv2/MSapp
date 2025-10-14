@@ -2518,6 +2518,155 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
+       :root {
+            --primary-blue: #007bff;
+            --hover-blue: #0056b3;
+            --status-red: #dc3545;
+            --status-green: #28a745;
+            
+            /* Paleta de Colores - TEMA CLARO */
+            --light-bg: #ffffff; /* Fondo de la barra */
+            --light-border: #dee2e6; /* Borde inferior y hovers */
+            --dark-text: #212529; /* Texto principal */
+            --muted-text: #6c757d; /* Texto secundario y iconos */
+            --body-bg: #f1f3f5; /* Color de fondo del body */
+        }
+
+        /* --- Top Bar: Contenedor Principal --- */
+        .top-bar {
+         
+            height: 55px;
+            background-color: var(--light-bg);
+            color: var(--dark-text); /* Texto oscuro */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          margin-top: 10px;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--light-border); /* Borde sutil */
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra ligera para dar profundidad */
+        }
+
+        /* --- Lado Izquierdo: Status --- */
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon2 {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .status-icon2.disconnected {
+            background-color: var(--status-red);
+        }
+
+        .status-icon2.connecting {
+            background-color: #fd7e14; /* Naranja para "conectando" */
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-icon2.connected {
+            background-color: var(--status-green);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .status-text .title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .status-text .subtitle {
+            font-size: 0.75rem;
+            color: var(--muted-text);
+            margin: 0;
+            line-height: 1.2;
+            transition: color 0.3s ease;
+        }
+
+        /* --- Lado Derecho: Controles --- */
+        .controls-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Botón principal de Conectar */
+        #connectBtn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s ease, opacity 0.3s;
+        }
+
+        #connectBtn:hover {
+            background-color: var(--hover-blue);
+        }
+
+        #connectBtn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Controles cuando está conectado */
+        .connected-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn2 {
+            background: none;
+            border: none;
+            color: var(--muted-text); /* Color de icono por defecto */
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .icon-btn2 svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon-btn2:hover {
+            background-color: var(--light-border); /* Fondo gris claro al pasar el mouse */
+            color: var(--dark-text); /* El icono se vuelve más oscuro */
+        }
+        
+        /* Botón de desconectar con estilo distintivo */
+        #disconnectBtn {
+            background-color: var(--status-red);
+            color: white;
+        }
+
+        #disconnectBtn:hover {
+            background-color: #c82333;
+            color: white;
+        }
+
 </style>
 
 <body>
