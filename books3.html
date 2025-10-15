@@ -510,17 +510,7 @@
             transition: color 0.2s ease;
         }
 
-            .xml-viewer-close {
-            background: none;
-            border: none;
-     position: absolute; 
-     top: 15px;
-     right: 25px;
-            color: black;
-            font-size: 26px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
+         
         
         .pdf-viewer-close:hover {
             color: #d1d1d1;
@@ -1542,7 +1532,7 @@ color: white;
     </div>
     
    <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
-        <div class="pdf-viewer-header" ng-if="selectedBook.type !== 'xml'">
+        <div class="pdf-viewer-header" >
             <h3 class="bookTitle">{{ selectedBook.title }}</h3>
 
 <div class="right-controls">
@@ -1576,9 +1566,7 @@ color: white;
         </div>
 
 
-         <div  ng-if="selectedBook.type === 'xml'">
-           <button class="xml-viewer-close" style="color: black !important" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
-            </div>
+
 
 
 
@@ -1819,7 +1807,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         ]},
         {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
+           "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ] },
         {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
@@ -1899,7 +1887,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         const requestData = {
             action: "getUserData",
            token: localStorage.getItem('MStoken')
-          //    token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+          //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -1996,58 +1984,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         $scope.currentVideoUrl = '';
     };
 
-    $scope.openUploadModal = function() {
-        $scope.newPdf = {};
-        $scope.showUploadModal = true;
-    };
-
-    $scope.closeUploadModal = function() {
-        $scope.showUploadModal = false;
-    };
-
-    $scope.triggerFileInput = function() {
-        document.getElementById('fileInput').click();
-    };
-
-    $scope.onFileSelect = function(event) {
-        var file = event.target.files[0];
-        if (!file || file.type !== 'application/pdf') {
-            alert("Por favor, selecciona un archivo PDF.");
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function(loadEvent) {
-            $scope.$apply(function() {
-                $scope.newPdf.fileData = loadEvent.target.result;
-                $scope.newPdf.fileName = file.name;
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    $scope.saveNewPdf = function() {
-        if (!$scope.newPdf.title || !$scope.newPdf.author || !$scope.newPdf.fileData) {
-            alert("Por favor, completa todos los campos y selecciona un archivo.");
-            return;
-        }
-        const newBook = {
-            "title": $scope.newPdf.title,
-            "author": $scope.newPdf.author,
-            "level": $scope.newPdf.grade || "N/A",
-            "coverUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png",
-            "pdf": $scope.newPdf.fileData,
-            "isUserUploaded": true
-        };
-        $scope.userPDFs.push(newBook);
-        $scope.closeUploadModal();
-    };
-
-    $scope.deleteUserPdf = function(index, event) {
-        event.stopPropagation();
-        if (confirm("¿Estás seguro de que quieres eliminar este archivo?")) {
-            $scope.userPDFs.splice(index, 1);
-        }
-    };
+   
 
     $scope.showPreview = function(book, categoryTitle) {
         if (book.isUserUploaded) {
@@ -2315,23 +2252,67 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         return overallStatus !== 'completed' && overallStatus !== 'sent';
     };
 
-    $scope.saveRecording = function() {
-        if (!$scope.recording.selectedTask) {
-            alert("Por favor, selecciona el ejercicio que estás entregando.");
-            return;
-        }
-        const submittedTask = $scope.recording.selectedTask;
-        const userRecordingEntry = {
-            lsn: submittedTask.lsn,
-            id: submittedTask.id,
-            audio: $scope.recording.url.toString(),
-            status: 'sent',
-            notes: $scope.recording.notes,
-            date: $scope.recording.date.toISOString(),
+ $scope.saveRecording = function() {
+    if (!$scope.recording.selectedTask) {
+        alert("Por favor, selecciona el ejercicio que estás entregando.");
+        return;
+    }
+    
+    // Muestra un indicador de carga (opcional, pero recomendado)
+    $scope.isUploading = true; 
+    
+    const submittedTask = $scope.recording.selectedTask;
+    
+    // Usar FileReader para convertir el Blob a Base64
+    const reader = new FileReader();
+    reader.readAsDataURL($scope.recording.blob); 
+    
+    reader.onloadend = function() {
+        const base64AudioData = reader.result; // Aquí está la cadena Base64
+        
+        const requestData = {
+            action: "newAudio",
+             token: localStorage.getItem('MStoken'),
+          //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
+            audioBase64: base64AudioData, // Enviamos la cadena Base64
+            task: submittedTask, // Enviamos el objeto completo de la tarea
+            notes: $scope.recording.notes || "",
+            date: $scope.recording.date.toISOString()
         };
-        $scope.userSubmittedRecordings.push(userRecordingEntry);
-        $scope.closeSaveModal();
+
+        const config = {
+            headers: { "Content-Type": "text/plain;charset=utf-8" }
+        };
+
+        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+            .then(function(response) {
+                if (response.data.status === "success") {
+                    // Actualiza la UI localmente para que el usuario vea el cambio al instante
+                    const userRecordingEntry = {
+                        lsn: submittedTask.lsn,
+                        id: submittedTask.id,
+                        audio: response.data.audioUrl, // URL devuelta por el servidor
+                        status: 'sent',
+                        notes: requestData.notes,
+                        date: requestData.date,
+                    };
+                    $scope.userSubmittedRecordings.push(userRecordingEntry);
+                    alert("¡Grabación enviada con éxito!");
+                } else {
+                    alert("Hubo un error al enviar tu grabación: " + response.data.message);
+                }
+            })
+            .catch(function(error) {
+                console.error("Error al enviar la grabación:", error);
+                alert("Error de conexión al enviar la grabación. Inténtalo de nuevo.");
+            })
+            .finally(function() {
+                // Oculta el indicador de carga y cierra el modal
+                $scope.isUploading = false; 
+                $scope.closeSaveModal();
+            });
     };
+};
 
     $scope.deleteRecording = function() {
         $scope.closeSaveModal();
@@ -2340,4 +2321,4 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
 }]);
     </script>
 </body>
-</html>    
+</html>     
