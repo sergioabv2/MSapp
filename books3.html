@@ -111,13 +111,7 @@
             margin-bottom: 40px;
         }
 
-        .section-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 16px;
-            padding-left: 5px;
-        }
+       
         
         .carousel-wrapper {
             position: relative;
@@ -1361,16 +1355,62 @@ color: white;
              .task-status {display: none !important;}
             .exercise-list-container{max-height: 240px !important;}
           }
+
+          .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 0; /* CAMBIA ESTO A 0 */
+    padding-left: 5px;
+}
+.refresh-btn {
+    background: none;
+    color: #6e6e73; /* Un color más sutil */
+    border: none;
+    border-radius: 50%; /* Lo hacemos circular */
+    width: 40px;
+    height: 40px;
+    font-size: 18px; /* Tamaño del icono */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra el icono dentro del botón */
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.refresh-btn:hover {
+    background: #f0f0f0; /* Fondo sutil al pasar el ratón */
+    color: #1d1d1f;
+}
+
+.refresh-btn:disabled {
+    color: #adb5bd; /* Color del icono cuando está deshabilitado */
+    cursor: not-allowed;
+    background: none;
+}
     </style>
 </head>
 <body ng-controller="libraryCtrl">
-    <div class="container" ng-hide="showPdfViewer">
-      
-        </div>
+
+
+
+    
 
         <div class="library-content">
             <div class="library-section" ng-repeat="section in library | filter: { books: { title: searchQuery } }">
+               <div class="section-header"> 
                 <h2 class="section-title">{{ section.title }}</h2>
+                 <button class="refresh-btn" ng-if="$first" ng-click="refreshData()" ng-disabled="isRefreshing">
+            <i class="fas" ng-class="{'fa-sync-alt': !isRefreshing, 'fa-spinner fa-spin': isRefreshing}"></i>
+        </button>
+           </div>
                 <div class="carousel-wrapper">
                     <div class="carousel" id="carousel-{{$index}}">
                         <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }" 
@@ -1711,32 +1751,27 @@ color: white;
     </div>
 
     <script>
-        const app = angular.module('libraryApp', []);
+      const app = angular.module('libraryApp', []);
 
- 
-             app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
+app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
 
-           
+    // --- ESTADO DE LA UI ---
+    $scope.searchQuery = '';
+    $scope.showPreviewModal = false;
+    $scope.selectedBook = null;
+    $scope.selectedCategory = '';
+    $scope.showPdfViewer = false;
+    $scope.pdfUrl = '';
+    $scope.isLoaded = false;
+    $scope.userSubmittedRecordings = [];
+    $scope.showUploadModal = false;
+    $scope.showLockedModal = false;
+    $scope.newPdf = {};
+    $scope.userPDFs = [];
 
-            // --- ESTADO DE LA UI ---
-            $scope.searchQuery = '';
-            $scope.showPreviewModal = false;
-            $scope.selectedBook = null;
-            $scope.selectedCategory = '';
-            $scope.showPdfViewer = false;
-            $scope.pdfUrl = '';
-            $scope.isLoaded = false;
-            $scope.userSubmittedRecordings = []
-       
-
-             $scope.showUploadModal = false;
-              $scope.showLockedModal = false;
-              $scope.newPdf = {}; 
-               $scope.userPDFs = []; 
-
-            // --- DATOS DE LA BIBLIOTECA ---
-       var manualsData = [
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
+    // --- DATOS DE LA BIBLIOTECA (INICIALES) ---
+    var manualsData = [
+        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
             { 'lsn': 1, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
             { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://site.com/midi1.mid' },
             { 'lsn': 2, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://site.com/midi2.mid' },
@@ -1746,7 +1781,7 @@ color: white;
             { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
             { 'lsn': 4, 'id': 3, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
         ] },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
             { 'lsn': 5, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
             { 'lsn': 5, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
             { 'lsn': 6, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
@@ -1756,194 +1791,219 @@ color: white;
             { 'lsn': 7, 'id': 3, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
             { 'lsn': 8, 'id': 1, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
         ] },
-    {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ]},
-    {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ]},
-    {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ]},
-    {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
+        {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
             "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
             "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
             "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
         ] },
-    {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
-    {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
-    {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
-    {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7, 'totalExercises': 30},
-];
+        {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
+        {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
+        {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
+        {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7, 'totalExercises': 30},
+    ];
 
-           var piecesData = [
-    { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://admin.mozartacademy.mx/editNew2?fileId=Ode%20to%20Joy%20-%20Var%203.pdf", "lvl": 0, "lsn": 0, "grade": "Preparatory", "midi": "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid"},
-    { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory"},
-    { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory"},
-    { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory"},
-    { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory"},
-    { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory"},
-    { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory"},
-    { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1"},
-    { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1"},
-    { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1"},
-    { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1"},
-    { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2"},
-    { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2"}
-];
-            
-            // --- TRANSFORMACIÓN DE DATOS ---
-       var manuals = manualsData.map(function(manual) {
-    return {
-        title: manual.title,
-        level: manual.title,
-        author: manual.subtitle,
-        coverUrl: manual.background,
-        pdf: manual.pdf,
-        lvl: manual.lvl,
-        lsn: manual.lsn,
-        lessons: manual.lessons,
-        totalExercises: manual.totalExercises,
-        totalTime: manual.totalTime, // <- AÑADIR ESTA LÍNEA
-        type: 'manual' 
-    };
-});
+    var piecesData = [
+        { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://admin.mozartacademy.mx/editNew2?fileId=Ode%20to%20Joy%20-%20Var%203.pdf", "lvl": 0, "lsn": 0, "grade": "Preparatory", "midi": "https://storage.googleapis.com/mozartacademy-files/midi/rach.mid"},
+        { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory"},
+        { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory"},
+        { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory"},
+        { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory"},
+        { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory"},
+        { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory"},
+        { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1"},
+        { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1"},
+        { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1"},
+        { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1"},
+        { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2"},
+        { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2"}
+    ];
 
-         var pieces = piecesData.map(function(piece) {
-    return {
-        title: piece.title,
-        level: piece.grade,
-        author: piece.subtitle,
-        coverUrl: piece.background,
-        pdf: piece.pdf,
-        lvl: piece.lvl,
-        lsn: piece.lsn,
-        midi: piece.midi,
-        // Las propiedades 'totalBars' y 'practiceData' se han eliminado
-        type: 'piece' 
-    };
-}); 
+    // --- TRANSFORMACIÓN DE DATOS ---
+    var manuals = manualsData.map(function(manual) {
+        return {
+            title: manual.title,
+            level: manual.title,
+            author: manual.subtitle,
+            coverUrl: manual.background,
+            pdf: manual.pdf,
+            lvl: manual.lvl,
+            lsn: manual.lsn,
+            lessons: manual.lessons,
+            totalExercises: manual.totalExercises,
+            totalTime: manual.totalTime,
+            type: 'manual'
+        };
+    });
 
-            $scope.library = [
-                { title: 'Fundamentos del Piano', books: manuals },
-                { title: 'Repertorio Formativo', books: pieces },
-                { title: 'Mis Archivos', books: $scope.userPDFs }
-            ];
+    var pieces = piecesData.map(function(piece) {
+        return {
+            title: piece.title,
+            level: piece.grade,
+            author: piece.subtitle,
+            coverUrl: piece.background,
+            pdf: piece.pdf,
+            lvl: piece.lvl,
+            lsn: piece.lsn,
+            midi: piece.midi,
+            type: 'piece'
+        };
+    });
 
-                var requestData = {
-          action: "getUserData",
-       //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-         token: localStorage.getItem('MStoken')
+    // --- ESTRUCTURA INICIAL DE LA BIBLIOTECA ---
+    $scope.library = [
+        { title: 'Fundamentos del Piano', books: manuals },
+        { title: 'Repertorio Formativo', books: pieces },
+        { title: 'Mis Archivos', books: $scope.userPDFs }
+    ];
+
+    // --- NUEVAS VARIABLES PARA EL BOTÓN DE RECARGA ---
+    $scope.isRefreshing = false;
+    let refreshTimeoutPromise;
+
+    // --- FUNCIÓN PARA CARGAR/RECARGAR DATOS DEL USUARIO ---
+    function fetchUserData() {
+        if ($scope.isRefreshing) {
+            console.log("Ya se está recargando la información.");
+            return;
+        }
+
+        $scope.isRefreshing = true;
+        $scope.showLockedModal = false;
+
+        const requestData = {
+            action: "getUserData",
+           token: localStorage.getItem('MStoken')
+          //    token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
-        var config = {
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          } 
+        const config = {
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            timeout: 10000 // Timeout para la solicitud HTTP (10 segundos)
         };
-                 
+
+        refreshTimeoutPromise = $timeout(function() {
+            if ($scope.isRefreshing) {
+                console.warn("La solicitud de recarga ha excedido el tiempo límite de 10 segundos.");
+                $scope.isRefreshing = false;
+                alert("La recarga de datos ha tardado demasiado. Por favor, inténtalo de nuevo.");
+            }
+        }, 10000);
+
         $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-          .then(function(response) { 
-              var repertoire = JSON.parse(response.data.repertoire);
-              var stage = JSON.parse(response.data.stage);
+            .then(function(response) {
+                $timeout.cancel(refreshTimeoutPromise);
 
-                // $scope.library.push(repertoire)
-               $scope.library = $scope.library.concat(repertoire);
+                const repertoire = JSON.parse(response.data.repertoire);
+                const stage = JSON.parse(response.data.stage);
+
+                // Reconstruir $scope.library con los datos actualizados
+                $scope.library = [
+                    { title: 'Fundamentos del Piano', books: manuals },
+                    { title: 'Repertorio Formativo', books: pieces },
+                    { title: 'Mis Archivos', books: $scope.userPDFs }
+                ];
+                $scope.library = $scope.library.concat(repertoire);
+
                 $scope.lvl = stage.lvl;
-                 $scope.lsn = stage.lsn;
-                 $scope.userSubmittedRecordings = stage.exes || [];
-                 $scope.isLoaded = true;
-          })  
+                $scope.lsn = stage.lsn;
+                $scope.userSubmittedRecordings = stage.exes || [];
+                $scope.isLoaded = true;
+                console.log("Datos recargados exitosamente.");
+            })
+            .catch(function(error) {
+                $timeout.cancel(refreshTimeoutPromise);
+                console.error('Error al recargar datos del servidor:', error);
+                alert("Error al recargar la información: " + (error.statusText || "Verifica tu conexión a internet."));
+            })
+            .finally(function() {
+                $scope.isRefreshing = false;
+            });
+    }
 
-         
+    // --- LLAMADA INICIAL PARA CARGAR DATOS ---
+    fetchUserData();
 
-            // Formatear segundos a M:SS
-            $scope.formatTime = function(seconds) {
-                if (isNaN(seconds) || seconds < 0) return "0:00";
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = Math.floor(seconds % 60);
-                return minutes + ":" + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
-            };
-
-            // Desplazamiento del carrusel
-            $scope.scrollCarousel = function(elementId, direction) {
-                const carousel = document.getElementById(elementId);
-                if (carousel) {
-                    const scrollAmount = 200 * direction;
-                    carousel.scrollBy({
-                        left: scrollAmount,
-                        behavior: 'smooth'
-                    });
-                }
-            };
+    // --- FUNCIÓN ng-click PARA EL BOTÓN DE RECARGA ---
+    $scope.refreshData = function() {
+        fetchUserData();
+    };
 
 
-          $scope.showTaskModal = false;
+    // --- RESTO DE FUNCIONES DEL CONTROLADOR ---
 
-          $scope.openTaskModal = function() {
-              $scope.showTaskModal = true;
-          };
+    $scope.formatTime = function(seconds) {
+        if (isNaN(seconds) || seconds < 0) return "0:00";
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return minutes + ":" + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
+    };
 
-          $scope.closeTaskModal = function() {
-              $scope.showTaskModal = false;
-          };
+    $scope.scrollCarousel = function(elementId, direction) {
+        const carousel = document.getElementById(elementId);
+        if (carousel) {
+            const scrollAmount = 200 * direction;
+            carousel.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
+    $scope.showTaskModal = false;
+    $scope.openTaskModal = function() { $scope.showTaskModal = true; };
+    $scope.closeTaskModal = function() { $scope.showTaskModal = false; };
 
-
-          // ... dentro de app.controller('libraryCtrl', ...)
-
-// --- ESTADO Y VARIABLES PARA EL MODAL DE VIDEO ---
-$scope.showVideoModal = false;
-$scope.currentVideoUrl = ''; // Guardará la URL del video a reproducir
-
-// --- FUNCIONES PARA EL MODAL DE VIDEO ---
-
-$scope.openVideoModal = function(videoUrl) {
-    if (!videoUrl) return;
-
-    // Transforma la URL de YouTube a un formato "embed" para el iframe
-    const embedUrl = videoUrl.replace("watch?v=", "embed/");
-    
-    // Confía en la URL para poder usarla en ng-src de forma segura
-    $scope.currentVideoUrl = $sce.trustAsResourceUrl(embedUrl);
-    
-    $scope.showVideoModal = true;
-};
-
-$scope.closeVideoModal = function() {
     $scope.showVideoModal = false;
-    // Es importante limpiar la URL para detener la reproducción del video en segundo plano
     $scope.currentVideoUrl = '';
-};
 
+    $scope.openVideoModal = function(videoUrl) {
+        if (!videoUrl) return;
+        const embedUrl = videoUrl.replace("watch?v=", "embed/");
+        $scope.currentVideoUrl = $sce.trustAsResourceUrl(embedUrl);
+        $scope.showVideoModal = true;
+    };
 
+    $scope.closeVideoModal = function() {
+        $scope.showVideoModal = false;
+        $scope.currentVideoUrl = '';
+    };
 
-
-             $scope.openUploadModal = function() {
-        $scope.newPdf = {}; // Resetea el formulario
+    $scope.openUploadModal = function() {
+        $scope.newPdf = {};
         $scope.showUploadModal = true;
     };
 
     $scope.closeUploadModal = function() {
         $scope.showUploadModal = false;
     };
-    
+
     $scope.triggerFileInput = function() {
         document.getElementById('fileInput').click();
     };
@@ -1957,7 +2017,7 @@ $scope.closeVideoModal = function() {
         var reader = new FileReader();
         reader.onload = function(loadEvent) {
             $scope.$apply(function() {
-                $scope.newPdf.fileData = loadEvent.target.result; // Esto es el Base64
+                $scope.newPdf.fileData = loadEvent.target.result;
                 $scope.newPdf.fileName = file.name;
             });
         };
@@ -1969,423 +2029,314 @@ $scope.closeVideoModal = function() {
             alert("Por favor, completa todos los campos y selecciona un archivo.");
             return;
         }
-
         const newBook = {
             "title": $scope.newPdf.title,
             "author": $scope.newPdf.author,
             "level": $scope.newPdf.grade || "N/A",
-            "coverUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png", // Icono genérico de PDF
+            "coverUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png",
             "pdf": $scope.newPdf.fileData,
-            "isUserUploaded": true // Bandera para identificar estos archivos
+            "isUserUploaded": true
         };
-
         $scope.userPDFs.push(newBook);
         $scope.closeUploadModal();
     };
-    
-    // === LÓGICA PARA ELIMINAR ARCHIVOS (NUEVA) ===
+
     $scope.deleteUserPdf = function(index, event) {
-        event.stopPropagation(); // Evita que se abra el modal de vista previa
+        event.stopPropagation();
         if (confirm("¿Estás seguro de que quieres eliminar este archivo?")) {
             $scope.userPDFs.splice(index, 1);
         }
     };
 
-
-             $scope.showPreview = function(book, categoryTitle) {
-        // Los archivos del usuario nunca están bloqueados
+    $scope.showPreview = function(book, categoryTitle) {
         if (book.isUserUploaded) {
             $scope.selectedBook = book;
             $scope.selectedCategory = categoryTitle;
             $scope.showPreviewModal = true;
             return;
         }
-
         var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
         if (isLocked) {
             $scope.showLockedModal = true;
             $timeout(function() {
                 $scope.showLockedModal = false;
-            }, 3000); // Se cierra después de 4 segundos
+            }, 3000);
             return;
         }
-
         $scope.selectedBook = book;
         $scope.selectedCategory = categoryTitle;
         $scope.showPreviewModal = true;
     };
 
-            // Mostrar el modal de vista previa
-         /*   $scope.showPreview = function(book, categoryTitle) {
-                var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
-                if (isLocked) {
-                    alert('Este material está bloqueado. ¡Sigue avanzando para desbloquearlo!');
-                    return;
-                }
-                $scope.selectedBook = book;
-                $scope.selectedCategory = categoryTitle;
-                $scope.showPreviewModal = true;
-            }; */
+    $scope.closePreviewModal = function(event) {
+        if (event && event.target !== event.currentTarget) {
+            return;
+        }
+        $scope.showPreviewModal = false;
+    };
 
-            // Cerrar el modal
-            $scope.closePreviewModal = function(event) {
-                if (event && event.target !== event.currentTarget) {
-                    return;
-                }
-                $scope.showPreviewModal = false;
-            };
-            
-            // Abrir el visor de PDF
-            $scope.openPdfViewer = function(book) {
-                if (!book || !book.pdf) {
-                    alert('No hay un PDF disponible para este libro.');
-                    return;
-                }
+    $scope.openPdfViewer = function(book) {
+        if (!book || !book.pdf) {
+            alert('No hay un PDF disponible para este libro.');
+            return;
+        }
+        if (!$scope.metronomeAudio) {
+            $scope.metronomeAudio = document.getElementById('metronomeAudio');
+        }
+        $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
+        $scope.showPreviewModal = false;
+        $scope.showPdfViewer = true;
+    };
 
-                if (!$scope.metronomeAudio) {
-                    $scope.metronomeAudio = document.getElementById('metronomeAudio');
-                }
-                 
-                $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
-                $scope.showPreviewModal = false; // Ocultar modal pequeño
-                $scope.showPdfViewer = true;     // Mostrar visor grande
-            };
+    $scope.closePdfViewer = function() {
+        $scope.showPdfViewer = false;
+        $scope.pdfUrl = '';
+    };
 
-            // Cerrar el visor de PDF
-            $scope.closePdfViewer = function() {
-                $scope.showPdfViewer = false;
-                $scope.pdfUrl = ''; // Limpiar la URL para detener la carga
-            };
-               
-               
-               
-  $scope.metronomeActive = false;
-$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
-$scope.baseBPM = 60; // BPM del audio original
-//$scope.metronomeAudio = document.getElementById('metronomeAudio');
+    $scope.metronomeActive = false;
+    $scope.metronomeBPM = 60;
+    $scope.baseBPM = 60;
 
-// Función para convertir BPM a velocidad de reproducción
-function bpmToPlaybackRate(bpm) {
-  return bpm / $scope.baseBPM;
-}
-
-$scope.toggleMetronome = function() {
-  $scope.metronomeActive = !$scope.metronomeActive;
-  
-  if ($scope.metronomeActive) {
-    // Configurar velocidad inicial
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-    $scope.metronomeAudio.currentTime = 0;
-    $scope.metronomeAudio.play()
-      .catch(e => console.error("Error al reproducir:", e));
-  } else {
-    $scope.metronomeAudio.pause();
-    $scope.metronomeAudio.currentTime = 0;
-  }
-};
-
-$scope.adjustBPM = function(change, event) {
-  // Actualizar valor BPM
-  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
-  
-  // Ajustar velocidad de reproducción si está activo
-  if ($scope.metronomeActive) {
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-  }
-  
-  // Lógica para mantener presionado
-  if (event) {
-    const button = event.target;
-    button.addEventListener('mouseup', clearBPMTimers);
-    button.addEventListener('mouseleave', clearBPMTimers);
-    button.addEventListener('touchend', clearBPMTimers);
-    
-    $scope.bpmTimeout = setTimeout(() => {
-      $scope.bpmInterval = setInterval(() => {
-        $scope.adjustBPM(change);
-        $scope.$apply();
-      }, 100);
-    }, 500);
-  } 
-};
-
-function clearBPMTimers() {
-  clearTimeout($scope.bpmTimeout);
-  clearInterval($scope.bpmInterval);
-} 
-
-
- 
-let mediaRecorder;
-        let audioChunks2 = [];
-        let audioContext2;
-        let animationId;
-
-        $scope.showSaveRecordingModal = false;
-$scope.recording = {};
-
-        // Opciones de audio con supresión de ruido y control de ganancia
-        const constraints = {
-            audio: {
-                noiseSuppression: true,
-                autoGainControl: true,
-                echoCancellation: true
-            }
-        };
-
-    async function startRecordingAndOscilloscope() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks2 = [];
-
-        mediaRecorder.ondataavailable = event => {
-            audioChunks2.push(event.data);
-        };
-
-        // **** ESTA ES LA SECCIÓN MODIFICADA ****
-        mediaRecorder.onstop = () => {
-            cancelAnimationFrame(animationId);
-            if (audioChunks2.length === 0) return;
-
-            const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-
-            // Usamos un elemento de audio temporal para leer la duración
-            const tempAudio = document.createElement('audio');
-            tempAudio.src = audioUrl;
-            tempAudio.onloadedmetadata = () => {
-                // Una vez que tenemos la duración, poblamos el scope y mostramos el modal
-                $scope.$apply(() => {
-                    const duration = tempAudio.duration;
-                    const minutes = Math.floor(duration / 60);
-                    const seconds = Math.floor(duration % 60);
-
-                    $scope.recording = {
-                        url: $sce.trustAsResourceUrl(audioUrl), // URL segura para ng-src
-                        blob: audioBlob,
-                        name: "Grabación " + new Date().toLocaleTimeString(),
-                        author: "", // El usuario puede llenarlo
-                        date: new Date(),
-                        duration: `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-                    };
-
-                    $scope.showSaveRecordingModal = true;
-                });
-            };
-        };
-
-        // ... El resto de la función (analyser, mediaRecorder.start) sigue igual
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-        analyser.fftSize = 2048;
-        mediaRecorder.start();
-
-    } catch (err) {
-        console.error('Error al acceder al micrófono:', err);
+    function bpmToPlaybackRate(bpm) {
+        return bpm / $scope.baseBPM;
     }
-}
 
-// La función recordWav no necesita cambios
-$scope.recordWav = function() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        $scope.isRecording2 = false;
-    } else {
-        startRecordingAndOscilloscope();
-        $scope.isRecording2 = true;
+    $scope.toggleMetronome = function() {
+        $scope.metronomeActive = !$scope.metronomeActive;
+        if ($scope.metronomeActive) {
+            $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+            $scope.metronomeAudio.currentTime = 0;
+            $scope.metronomeAudio.play().catch(e => console.error("Error al reproducir:", e));
+        } else {
+            $scope.metronomeAudio.pause();
+            $scope.metronomeAudio.currentTime = 0;
+        }
+    };
+
+    function clearBPMTimers() {
+        clearTimeout($scope.bpmTimeout);
+        clearInterval($scope.bpmInterval);
     }
-};
 
-// --- AGREGA ESTAS NUEVAS FUNCIONES AL FINAL DE TU CONTROLADOR ---
+    $scope.adjustBPM = function(change, event) {
+        $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
+        if ($scope.metronomeActive) {
+            $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
+        }
+        if (event) {
+            const button = event.target;
+            button.addEventListener('mouseup', clearBPMTimers);
+            button.addEventListener('mouseleave', clearBPMTimers);
+            button.addEventListener('touchend', clearBPMTimers);
+            $scope.bpmTimeout = setTimeout(() => {
+                $scope.bpmInterval = setInterval(() => {
+                    $scope.adjustBPM(change);
+                    $scope.$apply();
+                }, 100);
+            }, 500);
+        }
+    };
 
-// Cierra el modal y limpia los datos
-$scope.closeSaveModal = function() {
-    // Revoca el Object URL para liberar memoria
-    if ($scope.recording && $scope.recording.url) {
-        URL.revokeObjectURL($scope.recording.url.toString());
-    }
+    let mediaRecorder;
+    let audioChunks2 = [];
+    let audioContext2;
+    let animationId;
     $scope.showSaveRecordingModal = false;
     $scope.recording = {};
-};
 
-
-
-
-
-// En tu libraryCtrl...
-
-// --- ESTADO Y VARIABLES PARA EL MODAL MIDI ---
-$scope.isMidiModalVisible = false;
-$scope.currentMidi = {}; // Guardará la info del MIDI actual
-
-// Referencias a los elementos del reproductor (se inicializarán al abrir el modal)
-let midiPlayer = null;
-let midiVisualizer = null;
-
-// --- FUNCIONES PARA EL MODAL MIDI ---
-$scope.openMidiModal = function(sourceObject) {
-    if (!sourceObject || !sourceObject.midi) return;
-
-    // Asigna la información del título y autor
-    $scope.currentMidi = {
-        title: sourceObject.task || sourceObject.title, // Usa 'task' si existe, si no, 'title'
-        author: sourceObject.author || '' // El autor puede no estar en el objeto 'task'
-    };
-    
-    // Muestra el modal
-    $scope.isMidiModalVisible = true;
-    
-    // $timeout asegura que el DOM esté actualizado y los elementos sean visibles
-    $timeout(function() {
-        // Inicializa las referencias a los elementos si aún no existen
-        if (!midiPlayer) {
-            midiPlayer = document.getElementById('libraryMidiPlayer');
-            midiVisualizer = document.getElementById('libraryMidiVisualizer');
+    const constraints = {
+        audio: {
+            noiseSuppression: true,
+            autoGainControl: true,
+            echoCancellation: true
         }
-        
-        // Asigna la URL del MIDI al reproductor y visualizador
-        midiPlayer.src = sourceObject.midi;
-        midiVisualizer.src = sourceObject.midi;
-    });
-};
+    };
 
-$scope.closeMidiModal = function() {
-    if ($scope.isMidiModalVisible && midiPlayer) {
-        // Detiene la reproducción y limpia las fuentes para liberar memoria
-        midiPlayer.stop();
-        midiPlayer.src = "";
-        if (midiVisualizer) {
-            midiVisualizer.src = "";
+    async function startRecordingAndOscilloscope() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks2 = [];
+            mediaRecorder.ondataavailable = event => {
+                audioChunks2.push(event.data);
+            };
+            mediaRecorder.onstop = () => {
+                cancelAnimationFrame(animationId);
+                if (audioChunks2.length === 0) return;
+                const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const tempAudio = document.createElement('audio');
+                tempAudio.src = audioUrl;
+                tempAudio.onloadedmetadata = () => {
+                    $scope.$apply(() => {
+                        const duration = tempAudio.duration;
+                        const minutes = Math.floor(duration / 60);
+                        const seconds = Math.floor(duration % 60);
+                        $scope.recording = {
+                            url: $sce.trustAsResourceUrl(audioUrl),
+                            blob: audioBlob,
+                            name: "Grabación " + new Date().toLocaleTimeString(),
+                            author: "",
+                            date: new Date(),
+                            duration: `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                        };
+                        $scope.showSaveRecordingModal = true;
+                    });
+                };
+            };
+            audioContext = new(window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            analyser.fftSize = 2048;
+            mediaRecorder.start();
+        } catch (err) {
+            console.error('Error al acceder al micrófono:', err);
         }
     }
-    // Oculta el modal y limpia la información
+
+    $scope.recordWav = function() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            $scope.isRecording2 = false;
+        } else {
+            startRecordingAndOscilloscope();
+            $scope.isRecording2 = true;
+        }
+    };
+
+    $scope.closeSaveModal = function() {
+        if ($scope.recording && $scope.recording.url) {
+            URL.revokeObjectURL($scope.recording.url.toString());
+        }
+        $scope.showSaveRecordingModal = false;
+        $scope.recording = {};
+    };
+
     $scope.isMidiModalVisible = false;
     $scope.currentMidi = {};
-};
+    let midiPlayer = null;
+    let midiVisualizer = null;
 
-
-
-
-
-$scope.getCompletedTaskCountForManual = function(manual) {
-    if (!manual || !manual.lessons) return 0;
-    return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
-};
-
-$scope.getManualColor = function(manual) {
-    if (manual.lvl == 0){return '#F44336'}
-    else if(manual.lvl == 1){return '#9024dc'}
-    else if(manual.lvl == 2){return '#1894cc'}
-    else if(manual.lvl == 3){return '#489454'}
-    else if(manual.lvl == 4){return '#fa9223'}
-    else if(manual.lvl == 5){return '#485cb4'}
-};
-
-
-$scope.getMaxLsnInBook = function(book) {
-    if (!book || !book.lessons || book.lessons.length === 0) return 0;
-    return Math.max(...book.lessons.map(l => l.lsn));
-};
-
-$scope.filterTasksForCurrentManual = function(task) {
-    if ($scope.selectedBook.lvl < $scope.lvl) {
-        return true;
-    }
-    if ($scope.selectedBook.lvl === $scope.lvl) {
-        return task.lsn <= $scope.lsn;
-    }
-
-    return false;
-};
-
-
-$scope.sentTasks = []; 
-
-$scope.isTaskCompleted = function(task) {
-    // 1. Si la tarea es de una lección global anterior a la actual del usuario, está completada.
-    if (task.lsn < $scope.lsn) {
-        return true;
-    }
-
-    // 2. Si la tarea es de la lección global actual, busca en las grabaciones del usuario.
-    if (task.lsn === $scope.lsn) {
-        // La búsqueda DEBE incluir tanto 'id' como 'lsn' para ser precisa.
-        const userRecording = $scope.userSubmittedRecordings.find(rec => 
-            rec.id === task.id 
-        );
-        // Solo se considera completada si la grabación existe y su estado es 'completed'.
-        return userRecording && userRecording.status === 'completed';
-    }
-
-    // 3. Si es una lección futura, no está completada.
-    return false;
-};
-
-$scope.getTaskOverallStatus = function(task) {
-    // Primero, usa la función anterior para ver si la tarea ya está completada.
-    if ($scope.isTaskCompleted(task)) {
-        return 'completed';
-    }
-
-    // Si no está completada y pertenece a la lección actual, busca su estado específico.
-    if (task.lsn === $scope.lsn) {
-        // La búsqueda DEBE incluir tanto 'id' como 'lsn'.
-        const userRecording = $scope.userSubmittedRecordings.find(rec => 
-            rec.id === task.id 
-        );
-
-        // Si se encuentra una grabación, ese es su estado actual ('sent' o 'fail').
-        if (userRecording) {
-            return userRecording.status; 
-        }
-    }
-
-    // Si no cumple ninguna de las anteriores, es una tarea pendiente.
-    return null;
-};
-
-$scope.uncompletedFilter = function(lesson) {
-    // Solo se pueden entregar tareas de la lección global actual del usuario.
-    if (lesson.lsn !== $scope.lsn) {
-        return false;
-    }
-    const overallStatus = $scope.getTaskOverallStatus(lesson);
-    // Y que no estén ya completadas o enviadas.
-    return overallStatus !== 'completed' && overallStatus !== 'sent';
-};
-
-
-
-$scope.saveRecording = function() {
-    if (!$scope.recording.selectedTask) {
-        alert("Por favor, selecciona el ejercicio que estás entregando.");
-        return;
-    }
-    const submittedTask = $scope.recording.selectedTask;
-
-    const userRecordingEntry = {
-        lsn: submittedTask.lsn,
-        id: submittedTask.id,
-        audio: $scope.recording.url.toString(),
-        status: 'sent', 
-        notes: $scope.recording.notes,
-        date: $scope.recording.date.toISOString(),
+    $scope.openMidiModal = function(sourceObject) {
+        if (!sourceObject || !sourceObject.midi) return;
+        $scope.currentMidi = {
+            title: sourceObject.task || sourceObject.title,
+            author: sourceObject.author || ''
+        };
+        $scope.isMidiModalVisible = true;
+        $timeout(function() {
+            if (!midiPlayer) {
+                midiPlayer = document.getElementById('libraryMidiPlayer');
+                midiVisualizer = document.getElementById('libraryMidiVisualizer');
+            }
+            midiPlayer.src = sourceObject.midi;
+            midiVisualizer.src = sourceObject.midi;
+        });
     };
 
-    $scope.userSubmittedRecordings.push(userRecordingEntry);
-    $scope.closeSaveModal();
-};
+    $scope.closeMidiModal = function() {
+        if ($scope.isMidiModalVisible && midiPlayer) {
+            midiPlayer.stop();
+            midiPlayer.src = "";
+            if (midiVisualizer) {
+                midiVisualizer.src = "";
+            }
+        }
+        $scope.isMidiModalVisible = false;
+        $scope.currentMidi = {};
+    };
 
-// Se ejecuta al hacer clic en "Eliminar"
-$scope.deleteRecording = function() {
-    // No se hace nada, solo se cierra el modal y se liberan los recursos
-    $scope.closeSaveModal();
-};
+    $scope.getCompletedTaskCountForManual = function(manual) {
+        if (!manual || !manual.lessons) return 0;
+        return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
+    };
 
-        }]);
+    $scope.getManualColor = function(manual) {
+        if (manual.lvl == 0) { return '#F44336' }
+        else if (manual.lvl == 1) { return '#9024dc' }
+        else if (manual.lvl == 2) { return '#1894cc' }
+        else if (manual.lvl == 3) { return '#489454' }
+        else if (manual.lvl == 4) { return '#fa9223' }
+        else if (manual.lvl == 5) { return '#485cb4' }
+    };
+
+    $scope.getMaxLsnInBook = function(book) {
+        if (!book || !book.lessons || book.lessons.length === 0) return 0;
+        return Math.max(...book.lessons.map(l => l.lsn));
+    };
+
+    $scope.filterTasksForCurrentManual = function(task) {
+        if ($scope.selectedBook.lvl < $scope.lvl) {
+            return true;
+        }
+        if ($scope.selectedBook.lvl === $scope.lvl) {
+            return task.lsn <= $scope.lsn;
+        }
+        return false;
+    };
+
+    $scope.sentTasks = [];
+
+    $scope.isTaskCompleted = function(task) {
+        if (task.lsn < $scope.lsn) {
+            return true;
+        }
+        if (task.lsn === $scope.lsn) {
+            const userRecording = $scope.userSubmittedRecordings.find(rec =>
+                rec.id === task.id
+            );
+            return userRecording && userRecording.status === 'completed';
+        }
+        return false;
+    };
+
+    $scope.getTaskOverallStatus = function(task) {
+        if ($scope.isTaskCompleted(task)) {
+            return 'completed';
+        }
+        if (task.lsn === $scope.lsn) {
+            const userRecording = $scope.userSubmittedRecordings.find(rec =>
+                rec.id === task.id
+            );
+            if (userRecording) {
+                return userRecording.status;
+            }
+        }
+        return null;
+    };
+
+    $scope.uncompletedFilter = function(lesson) {
+        if (lesson.lsn !== $scope.lsn) {
+            return false;
+        }
+        const overallStatus = $scope.getTaskOverallStatus(lesson);
+        return overallStatus !== 'completed' && overallStatus !== 'sent';
+    };
+
+    $scope.saveRecording = function() {
+        if (!$scope.recording.selectedTask) {
+            alert("Por favor, selecciona el ejercicio que estás entregando.");
+            return;
+        }
+        const submittedTask = $scope.recording.selectedTask;
+        const userRecordingEntry = {
+            lsn: submittedTask.lsn,
+            id: submittedTask.id,
+            audio: $scope.recording.url.toString(),
+            status: 'sent',
+            notes: $scope.recording.notes,
+            date: $scope.recording.date.toISOString(),
+        };
+        $scope.userSubmittedRecordings.push(userRecordingEntry);
+        $scope.closeSaveModal();
+    };
+
+    $scope.deleteRecording = function() {
+        $scope.closeSaveModal();
+    };
+
+}]);
     </script>
 </body>
 </html>    
