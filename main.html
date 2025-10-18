@@ -19,11 +19,6 @@
  <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js" charset="utf-8"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css" rel="stylesheet" type="text/css"> 
@@ -179,6 +174,38 @@ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   color: #1F2937 !important;
 }
 
+.card{
+  font-family: 'Nunito', sans-serif;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+      transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+  padding: 14px 80px 18px 36px;
+  cursor: pointer;
+  height: 120px;
+  align-items: center; 
+   display: flex; 
+  text-decoration: none; 
+}
+
+
+.card:hover{
+     transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+}
+
+.list .card h3{
+  font-weight: 600;
+  font-size: 1.7rem;
+  
+}
+
+.card img{
+  position: absolute;
+  top: 20px;
+  right: 15px;
+  max-height: 120px;
+}
 
 
 
@@ -226,7 +253,179 @@ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 
 
 
+   .drive{
+    height: 450px;
+    width: 100%;
+  }
+  
+  .modal-container {
+    position: fixed;
+    display: table;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    z-index: 1;
+  }
 
+  .modal-container.four {
+    z-index: 0;
+    transform: scale(1);
+  }
+
+  .modal-container.four .modal-background .modalDoc {
+    animation: blowUpModal 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four + body {
+    z-index: 1;
+    animation: blowUpContent 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four.out .modal-background .modalDoc {
+    animation: blowUpModalTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+  .modal-container.four.out + body {
+    animation: blowUpContentTwo 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+
+  .modal-container .modal-background {
+    display: table-cell;
+    background: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    vertical-align: middle;
+  }
+  .modal-container .modal-background .modalDoc {
+    padding: 50px;
+    display: inline-block;
+    border-radius: 3px;
+    font-weight: 300;
+    position: relative;
+  }
+
+.close-modal {
+    display: block;
+    position: absolute;
+  top: 40px;
+    right: 20px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+  @keyframes blowUpContent {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    99.9% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes blowUpContentTwo {
+    0% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes blowUpModal {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes blowUpModalTwo {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
+
+
+
+
+
+
+     
+      .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .add-to-btn {
+      background-color: #E02D44;
+      color: white;
+      border: none;
+      outline: none;
+      font-weight: bold;
+      width: 100%;
+      height: 50px;
+    }
+ 
+#myModal {
+    display: block; 
+  }
+
+   
+.ionic-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.2);
+  border-top: 4px solid #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
    .anim {
     position: relative;
@@ -364,7 +563,9 @@ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 .menubtn{
     display: none;
   }
-
+  .online-badge{
+    display: flex !important;
+  }
  .hintMsg{
         display: none;
     }
@@ -1252,9 +1453,338 @@ width: 200px; /* Ajusta según el tamaño deseado */
 }
 
 
- 
+    :root {
+      --primary: #4a6fa5;
+      --primary-dark: #3a5982;
+      --primary-light: #6b8cbe;
+      --secondary: #ff9e4a;
+      --secondary-dark: #e08530;
+      --success: #4caf50;
+      --danger: #ff6b6b;
+      --warning: #ffc107;
+      --dark: #2c3e50;
+      --light: #f5f7fa;
+      --gray: #78909c;
+      --white: #ffffff;
+      --card-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      --button-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    
+   
+    
+
+    .banner-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%; 
+    height: 110px;
+    overflow: hidden;
+    will-change: transform, opacity;
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+    
+    .piano-content {
+       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      padding-bottom: 2px;
+      padding-top: 13px !important; 
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 120px;
+    }
+    
+    @media (min-width: 800px) {
+      .dashboard {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+    
+ .card2, .card3 {
+            background: white;
+            border-radius: 16px;
+            margin-top: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e7;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .card2:hover, .card3:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+     
+
+ .status-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .status-icon.connected {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .status-icon.disconnected {
+            background: linear-gradient(135deg, #ff6b6b, #e53e3e);
+            color: white;
+        }
+
+        .status-icon.connecting {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: white;
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-info h3 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .status-info p {
+            margin: 0;
+            color: #78909c;
+            font-size: 14px;
+        }
+
+  .connection-button {
+            margin: 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            height: 48px;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+            text-align: center;
+            color: white;
+        }
+
+        .connection-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .connection-button.connected {
+            background: linear-gradient(135deg, #ff6b6b, #e53935);
+        }
+
+        .connection-button.disconnected {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .connection-button.connecting {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            opacity: 0.9;
+        }
 
 
+
+
+  .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-icon.mic.muted {
+            background: #78909c;
+            color: white;
+        }
+
+        .stat-icon.mic {
+            background: linear-gradient(135deg, #ff6b6b, #e53935);
+            color: white;
+        }
+
+        .stat-icon.video {
+            background: linear-gradient(135deg, #42a5f5, #1976d2);
+            color: white;
+        }
+
+        .stat-icon.connection {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: white;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #78909c;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(248, 250, 252, 0.5);
+            margin: 0 -16px;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #78909c;
+        }
+
+        .task-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            cursor: pointer;
+            color: #78909c;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .task-check:hover {
+            color: #4caf50;
+            transform: scale(1.1);
+        }
+
+        .task-item.completed .task-check {
+            color: #4caf50;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .task-date {
+            font-size: 13px;
+            color: #78909c;
+        }
+
+        .task-item.completed .task-date {
+            color: #4caf50;
+        }
 
         .schedule-item {
             display: flex;
@@ -1394,9 +1924,208 @@ width: 200px; /* Ajusta según el tamaño deseado */
             transform: scale(1.05);
         }
 
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .achievement-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .achievement-item.unlocked {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e5e5e7;
+            cursor: pointer;
+        }
+
+        .achievement-item.locked {
+            opacity: 0.6;
+            filter: grayscale(0.8);
+        }
+
+        .achievement-item.unlocked:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .achievement-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .achievement-item.unlocked .achievement-icon {
+            background: linear-gradient(135deg, #4a6fa5, #3a5982);
+            color: white;
+        }
+
+        .achievement-item.locked .achievement-icon {
+            background: #e2e8f0;
+            color: #78909c;
+            box-shadow: none;
+        }
+
+        .achievement-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .teacher-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .teacher-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4a6fa5, #3a5982);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.2);
+        }
+
+        .teacher-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .teacher-info p {
+            margin: 0;
+            color: #78909c;
+            font-size: 14px;
+        }
+
+        .class-details {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .detail-value {
+            color: #4a6fa5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 16px;
+                padding-top: 120px;
+                gap: 16px;
+            }
+            
+            .card-header {
+                padding: 16px 20px;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .status-card {
+                padding: 20px;
+                gap: 16px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .status-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            
+            .status-icon {
+                width: 54px;
+                height: 54px;
+                font-size: 22px;
+            }
+            
+            .connection-button i {
+                display: none;
+            }
+        }
 
 
 
+.instruction-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.instruction-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.instruction-list li:last-child {
+    border-bottom: none;
+}
+
+.instruction-list .number {
+    background: var(--primary-light);
+    color: var(--white);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px; /* 0.8rem -> 12.8px */
+    font-weight: 600;
+    flex-shrink: 0;
+}
 
 .message-preview {
     display: flex;
@@ -1417,7 +2146,18 @@ width: 200px; /* Ajusta según el tamaño deseado */
     background: #f1f5f9;
 }
 
-
+.preview-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 600;
+    flex-shrink: 0;
+}
 
 .preview-content {
     flex: 1;
@@ -1455,6 +2195,71 @@ width: 200px; /* Ajusta según el tamaño deseado */
     background: #f8fafc;
 }
 
+.floating-buttons {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.floating-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: var(--button-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 22px; /* 1.4rem -> 22.4px */
+    position: relative;
+}
+
+.floating-btn:active {
+    transform: scale(0.95);
+}
+
+.floating-btn.chat {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    color: var(--white);
+}
+
+.floating-btn.mic {
+    background: linear-gradient(135deg, var(--danger) 0%, #ff6b6b 100%);
+    box-shadow: 0 0 15px #ff6b6b;
+    color: var(--white);
+}
+
+.floating-btn.mic.muted {
+    background: linear-gradient(135deg, var(--gray) 0%, #546e7a 100%);
+    box-shadow: none; 
+}
+
+.floating-btn.video {
+    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+    color: var(--white);
+}
+
+.chat-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
 
 .video-container {
     position: fixed;
@@ -1551,6 +2356,23 @@ width: 200px; /* Ajusta según el tamaño deseado */
         background-color: #000; 
       }
 
+    
+    .floating-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 19px; /* 1.2rem -> 19.2px */
+    }
+    
+    .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1564,7 +2386,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
       }
     
 
-   
+    .status-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .status-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px; /* 1.5rem -> 24px */
+    }
 }
 
 
@@ -2171,203 +3003,120 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-     
-
-      :root {
-            --primary-blue: #007bff;
-            --hover-blue: #0056b3;
-            --status-red: #dc3545;
-            --status-green: #28a745;
-            --light-bg: #ffffff;
-            --light-border: #dee2e6;
-            --dark-text: #212529;
-            --muted-text: #6c757d;
-            --body-bg: #f1f3f5;
-        }
-
-     
-
-        .top-bar {
-            height: 55px;
-            background-color: var(--light-bg);
-            color: var(--dark-text);
-            display: flex;
+ .online-badge {
+            display: none;
             align-items: center;
-            justify-content: space-between;
-          margin-top: 15px;
-            padding: 0 20px;
-            border-bottom: 1px solid var(--light-border);
-            flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .status-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-.status-indicator-wrapper {
-    position: relative;
-    width: 15px;
-    height: 15px;
-    /* Se alinea con el texto del estatus */
-    margin-top: 2px;
-}
-
-       .status-icon {
-    width: 15px; /* Ajusta el tamaño */
-    height: 15px; /* Ajusta el tamaño */
-    border-radius: 50%;
-    transition: background-color 0.3s ease;
-    /* Asegura que esté por encima de las animaciones */
-    position: relative;
-    z-index: 10;
-}
-
-        .status-icon.disconnected { background-color: var(--status-red); }
-        .status-icon.connecting { background-color: #fd7e14; animation: pulse 1.5s infinite; }
-        .status-icon.connected {background-color: #34d399; }
-
-.status-ring {
-    width: 15px;
-    height: 15px;
-    background-color: #86efac; /* Verde claro de tu ejemplo */
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* Tu código para la animación de pulso */
-.status-pulse {
-    width: 15px;
-    height: 15px;
-    background-color: #34d399; /* Verde principal */
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    /* Retraso para que no se superponga exactamente con el anillo */
-    animation-delay: -1s;
-}
-
-
-        .status-text .title { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.2; }
-        .status-text .subtitle { font-size: 12px; color: var(--muted-text); margin: 0; line-height: 1.2; }
-
-        .controls-container { display: flex; align-items: center; gap: 15px; }
-
-        #connectBtn {
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
+            gap: 8px;
+            background: white;
             padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s ease, opacity 0.3s;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
         }
-        #connectBtn:hover { background-color: var(--hover-blue); }
-        #connectBtn:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
 
-        .connected-controls { display: flex; gap: 15px; }
+        .status-indicator {
+            position: relative;
+            width: 12px;
+            height: 12px;
+        }
 
-        .icon-btn {
-         background-color: #e5e7eb;
-            border: none;
-            color: var(--muted-text);
-            cursor: pointer;
-            padding: 5px;
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
             border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s, color 0.2s;
-            position: relative; /* Para el badge de chat */
-        }
-        .icon-btn:hover { background-color: var(--light-border); color: var(--dark-text); }
-        .icon-btn i { font-size: 18px; }
-
-        /* Estilo para el botón de micrófono muteado */
-        .icon-btn.muted i {
-            color: var(--status-red);
-        }
-
-        #disconnectBtn {   background-color: var(--muted-text);
-            color: #e5e7eb;
-}
-        #disconnectBtn:hover { background-color: #c82333; color: white; }
-        
-        /* Estilo para el badge de chat */
-        .chat-badge {
             position: absolute;
-            top: 0px;
-            right: 0px;
-            background-color: var(--status-red);
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--light-bg);
+            top: 0;
+            left: 0;
         }
 
+        .status-pulse {
+            width: 12px;
+            height: 12px;
+            background-color: #34d399;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
 
-#micBtn.icon-btn {
-    background-color: #e5e7eb; /* Un gris claro y neutro */
-    color: var(--muted-text);
-}
-#micBtn.icon-btn:hover {
-    background-color: #d1d5db; /* Un gris un poco más oscuro al pasar el ratón */
-}
+        .status-ring {
+            width: 12px;
+            height: 12px;
+            background-color: #86efac;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
 
-/* Estilo para el micrófono ABIERTO/ROJO con resplandor */
-#micBtn.icon-btn.mic-active {
-    background-color: var(--status-red);
-    color: white;
-    /* La animación de resplandor */
-    animation: mic-glow 1.5s ease-in-out infinite alternate;
-}
-#micBtn.icon-btn.mic-active:hover {
-    background-color: #c82333; /* Rojo más oscuro al pasar el ratón */
-}
+        .status-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin: 0;
+        }
 
-
-/* --- 3. KEYFRAMES (Añade los que te falten) --- */
-
-@keyframes ping {
-    75%, 100% {
-        transform: scale(3);
-        opacity: 0;
-    }
-}
-
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
 
         @keyframes pulse {
-            0% { transform: scale(0.6); opacity: 0.3; }
-            50% { transform: scale(1.3); opacity: 1; }
-            100% { transform: scale(0.6); opacity: 0.3; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
 
-/* Keyframe para el resplandor del micrófono */
-@keyframes mic-glow {
-    from {
-        box-shadow: 0 0 2px 0px rgba(220, 53, 69, 0.5);
-    }
-    to {
-        box-shadow: 0 0 8px 4px rgba(220, 53, 69, 0.5);
-    }
-}
 
+      .btn2 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          transform: scale(0.8);
+            padding: 5px 30px !important;
+
+            font-size: 17px !important;
+            font-weight: 600 !important;
+            border: 1px solid #000 ;
+    display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-login {
+           margin-right: -10px;
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-login:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-register {
+          margin-right: 15px;
+            background: #e91e63;
+            color: #fff;
+            border: 1px solid #e91e63;
+        }
+
+        .btn-register:hover {
+            background: #d81b60;
+            border-color: #d81b60;
+        }
+
+        .btn2:active {
+            transform: scale(0.78);
+        }
 </style>
 
 <body>
@@ -2387,35 +3136,20 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
   <ion-nav-view animation="slide-left"></ion-nav-view>
 
-    
- <script id="menu.html" type="text/ng-template">
+
+
+
+
+
+
+
+
+
+<script id="main.html" type="text/ng-template">
     <ion-side-menus >
- <ion-side-menu side="left" width='280'  expose-aside-when="large"> 
+ <ion-side-menu side="left" width='280'> 
        
         <ion-content >
-
-   <!--   <div class="profile-user-data clearfix" ng-if="userData.status == 'ACTIVO'">
-    
-          <div class="circle">
-                <img class="profile-pic" src="https://lh3.googleusercontent.com/d/1gA-HKzQXWksHNg8jCbUveFUXoE3jfip_">
-              
-          </div>
-          <div class="main-data" style="margin-top: 12px; " ng-if="!loadingProfile">
-            <h4 class="userLvl">Plan PRO <i class="ri-vip-crown-line" style="color: orange; text-shadow: 0 0 10px orange; margin-right: 4px" ></i></h4>
-
-
-
-
-       
-        <div class="userLvl" ng-if="userData.lvl == 0"> Nivel Preparatorio </div>
-          <div class="userLvl" ng-if="userData.lvl != 0"> Nivel {{userLvl}} </div>
-        <div class="progress">
-          <div class="progress-bar" style="background-color: {{userData.color}};" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{width: userProgress + '%'}" ng-init="startAnimation()"></div>
-        </div>
-          </div>  
-        </div> -->
-     
-
 
   <div class="profile-user-data clearfix" >
 
@@ -2432,19 +3166,82 @@ width: 200px; /* Ajusta según el tamaño deseado */
    
        
     <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="left"><i class="ri-presentation-line" ></i>&nbsp&nbspClassroom</a>   
-     <hr>
- <a href="#/menu/workspace" class="item" ng-class="(activeMenuClr=='workspace')?'menuSelectedColor':''" ng-click="activeMenuClr = 'workspace'" menu-toggle="left"><i class="ri-macbook-line"></i>&nbsp&nbspWorkspace</a>   
+      <hr>    
+ <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-live-line"></i>&nbsp&nbspWorkspace</a>   
    <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-read-line" ></i>&nbsp&nbspReader</a>    
  
           <a href="#/menu/finder" class="item" ng-class="(activeMenuClr=='finder')?'menuSelectedColor':''" ng-click="activeMenuClr = 'finder'" menu-toggle="left"><img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 21px; width: 21px; margin-left: 1px; margin-right: 9px">&nbsp&nbspPlayer</a>  
+  
 
          <hr>
 
      <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-earth-line"></i>&nbsp&nbspMozart Now</a>  
-
+ <a href="#/menu/payment" class="item" menu-toggle="left"><i class="ri-bank-card-2-line" ></i>&nbsp&nbspSuscripción</a> 
 
 <!--
-               <a href="#/menu/recordings" class="item" ng-class="(activeMenuClr=='recordings')?'menuSelectedColor':''" ng-click="activeMenuClr = 'recordings'" menu-toggle="left"><i class="ri-record-circle-line"></i>&nbsp&nbspRecordings</a>
+      <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="left"><i class="ri-aed-line"></i>&nbsp&nbspPráctica</a>  
+
+     -->
+    
+          </ul>
+
+  
+        </ion-content>
+ <ion-footer-bar style="z-index: 999 !important;">
+  <button class="button pull-right" ng-click="dropdownChat()"><i class="icon ri-question-line"></i>Ayuda</button>
+</ion-footer-bar>
+
+      </ion-side-menu>
+      <ion-side-menu-content >        
+        <ion-nav-view name="menuContent"></ion-nav-view>
+      </ion-side-menu-content>
+
+    </ion-side-menus>
+  </script>     
+    
+
+
+
+
+
+    
+ <script id="menu.html" type="text/ng-template">
+    <ion-side-menus >
+ <ion-side-menu side="left" width='280'  expose-aside-when="large"> 
+       
+        <ion-content >
+
+
+     
+
+
+  <div class="profile-user-data clearfix" ng-click="goToHome()">
+
+          <div class="circle">
+              <img class="profile-pic" src="https://lh3.googleusercontent.com/d/1BZhdPgLilUQ5AuDGMHTgwu2TysXIKbe4">
+          </div>
+          <div class="main-data" style="margin-top: 22px;" >
+            <h4 class="userLvl" >Mozart <br>Academy</h4>
+          </div>  
+  </div>
+ 
+ <ul class="list">
+                     
+   
+       
+    <a href="#/menu/lessons" class="item" ng-class="(activeMenuClr=='lessons')?'menuSelectedColor':''" ng-click="activeMenuClr = 'lessons'" menu-toggle="left"><i class="ri-presentation-line" ></i>&nbsp&nbspClassroom</a>   
+      <hr>    
+ <a href="#/menu/livestream" class="item" ng-class="(activeMenuClr=='livestream')?'menuSelectedColor':''" ng-click="activeMenuClr = 'livestream'" menu-toggle="left"><i class="ri-macbook-line"></i>&nbsp&nbspWorkspace</a>   
+   <a href="#/menu/library" class="item" ng-class="(activeMenuClr=='library')?'menuSelectedColor':''" ng-click="activeMenuClr = 'library'" menu-toggle="left"><i class="ri-book-read-line" ></i>&nbsp&nbspReader</a>    
+ 
+          <a href="#/menu/finder" class="item" ng-class="(activeMenuClr=='finder')?'menuSelectedColor':''" ng-click="activeMenuClr = 'finder'" menu-toggle="left"><img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 21px; width: 21px; margin-left: 1px; margin-right: 9px">&nbsp&nbspPlayer</a>  
+      
+
+         <hr>
+     <a href="#/menu/reel" class="item" ng-class="(activeMenuClr=='reel')?'menuSelectedColor':''" ng-click="activeMenuClr = 'reel'" menu-toggle="left"><i class="ri-earth-line"></i>&nbsp&nbspMozart Now</a>  
+     <a href="#/menu/payment" class="item" ng-class="(activeMenuClr=='payment')?'menuSelectedColor':''" ng-click="activeMenuClr = 'payment'" menu-toggle="left"><i class="ri-bank-card-2-line" ></i>&nbsp&nbspSuscripción</a> 
+
+<!--
       <a href="#/menu/courses" class="item" ng-class="(activeMenuClr=='courses')?'menuSelectedColor':''" ng-click="activeMenuClr = 'courses'" menu-toggle="left"><i class="ri-aed-line"></i>&nbsp&nbspPráctica</a>  
 
      -->
@@ -2467,6 +3264,46 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </script>     
     
  
+
+
+
+
+
+
+ <script id="home.html" type="text/ng-template">
+    <ion-view >
+      
+ 
+   <ion-nav-bar class="bar-light" >      
+        <ion-nav-buttons side="right">
+
+  
+
+ <button class="btn2 btn-login" ng-click="goToLogin()">Iniciar sesión</button>
+    <button class="btn2 btn-register" ng-click="goToLogin()">Regístrate</button>
+    
+  </ion-nav-buttons>
+
+
+        <ion-nav-buttons side="left">
+          <button class="button button-clear" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
+           
+        </ion-nav-buttons>  
+
+
+
+    </ion-nav-bar>
+
+
+     <ion-content > 
+        <div class="iframe-container"><iframe src="https://www.mozartacademy.online/home" frameborder="0" allowfullscreen></iframe></div>   
+      </ion-content>
+     
+    </ion-view>
+
+  </script>
+
+
 
 
 
@@ -2954,7 +3791,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-      <script id="workspace.html" type="text/ng-template">
+      <script id="livestream.html" type="text/ng-template">
     <ion-view >
  
        <ion-nav-bar class="bar-light" >      
@@ -3003,7 +3840,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-        
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -3201,74 +4045,233 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-   <ion-content  style="overflow-y: hidden !important;">
-     <header class="top-bar">
-    <div class="status-container">
-         <div class="status-indicator-wrapper">
-        <div class="status-icon" ng-class="{
-            'disconnected': webrtc.connectionStatus === 'disconnected' && !isConnecting, 
-            'connecting': isConnecting || webrtc.connectionStatus === 'isConnecting', 
-            'connected': webrtc.connectionStatus === 'connected'
-        }"></div>
-        
-        <div ng-if="webrtc.connectionStatus === 'connected'">
-            <div class="status-ring"></div>
-            <div class="status-pulse"></div>
-        </div>
-    </div>
-        <div class="status-text">
-            <p class="title">{{ getStatusMessage() }}</p>
-             <p class="subtitle" ng-if="webrtc.connectionStatus === 'connected'">Conexión estable con el profesor</p>
-              <p class="subtitle" ng-if="webrtc.connectionStatus === 'disconnected'">No conectado a ninguna clase</p>
-              <p class="subtitle" ng-if="isConnecting">Esperando aprobación del profesor</p>
-        </div>
+
+   <ion-content class="piano-content" >
+
+
+     <div class="banner-header" >
+        <img src="https://lh3.googleusercontent.com/d/1qLFPKJY7v6-OqU9Sh452RBr90GzbipgI"  class="banner-image">
     </div>
 
-    <div class="controls-container">
-        
-        <div id="disconnectedControls" ng-show="webrtc.connectionStatus === 'disconnected'">
-            <button id="connectBtn" 
-                    ng-click="toggleConnection()" 
+
+      <div class="dashboard" >
+        <!-- Estado de Conexión -->
+        <div class="card3 full-width">
+          <div class="status-card">
+            <div class="status-icon" ng-class="getConnectionClass()">
+              <i class="fas" ng-class="{'fa-wifi': webrtc.connectionStatus === 'connected', 'fa-plug': webrtc.connectionStatus === 'disconnected', 'fa-sync-alt fa-spin': isConnecting}"></i>
+            </div>
+            <div class="status-info">
+              <h3>{{ getStatusMessage() }}</h3>
+              <p ng-if="webrtc.connectionStatus === 'connected'">Conexión estable con el profesor</p>
+              <p ng-if="webrtc.connectionStatus === 'disconnected'">No conectado a ninguna clase</p>
+              <p ng-if="isConnecting">Estableciendo conexión...</p>
+            </div>
+            <button class="button connection-button" 
+                    ng-class="getConnectionButtonClass()"
+                    ng-click="toggleConnection()"
                     ng-disabled="isConnecting">
-                {{ getConnectionButtonText() }}
+              <i class="fas" ng-class="{'fa-plug': webrtc.connectionStatus === 'disconnected', 'fa-times': webrtc.connectionStatus === 'connected', 'fa-sync-alt fa-spin': isConnecting}"></i>
+              {{getConnectionButtonText()}}
             </button>
+          </div>
         </div>
 
-      <!--  <div id="connectedControls" class="connected-controls" ng-show="webrtc.connectionStatus !== 'disconnected'"> -->
-        <div id="connectedControls" class="connected-controls" ng-if="webrtc.connectionStatus === 'connected'"> 
-            
-           <button id="micBtn" class="icon-btn" 
-        title="Micrófono"
-        ng-click="toggleMicrophone()"
-        ng-class="{'mic-active': !webrtc.isMuted}"> <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
-</button>
 
-  <button class="icon-btn" title="Video" ng-click="toggleVideo()">
-                <i class="fas" ng-class="{'fa-video-slash': !showVideo, 'fa-video': showVideo}"></i>
-            </button>
 
-            <button class="icon-btn" title="Chat" ng-click="openChat()">
-                <i class="fas fa-comment-dots"></i>
-                <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
-                    {{ webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages }}
-                </span>
-            </button>
-            
-            <button id="disconnectBtn" class="icon-btn" title="Desconectar" ng-click="disconnect()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+             <!-- Información del profesor -->
+        <div class="card2" >
+          <div class="card-header">
+            <h2><i class="fas fa-user-graduate"></i> Información de la Clase</h2>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+             <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden;">
+      <img src="https://lh3.googleusercontent.com/d/1XFRs3zvx5aao-PnGH3g1k2ehG28RUTIL"style="width: 100%; height: 100%; object-fit: cover;">
     </div>
-</header>
+              <div>
+                <h3 style="margin: 0 0 5px 0;">Profesor Sergio</h3>
+                <p style="margin: 0; color: var(--gray);">Clase de Piano</p>
+              </div>
+            </div>
+            
+            <div style="background: #f8fafc; padding: 12px; border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div style="font-weight: 600;">Duración:</div>
+                <div>60 minutos</div>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div style="font-weight: 600;">Tema:</div>
+                <div ng-if="userDataLevel.lvl === 0">Nivel Preparatorio - Lección {{userDataLevel.lsn}}</div>
+                  <div ng-if="userDataLevel.lvl !== 0">Nivel {{userDataLevel.lvl}} - Lección {{userDataLevel.lsn}}</div>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <div style="font-weight: 600;">Contacto:</div>
+                <div>55 7767 6657</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Estadísticas de conexión -->
+        <div class="card2" ng-show="webrtc.isConnectedToTeacher()">
+          <div class="card-header">
+            <h2><i class="fas fa-chart-line"></i> Estado de Conexión</h2>
+          </div>
+          <div class="card-body">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon mic" ng-class="{'muted': webrtc.isMuted}">
+                  <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+                </div>
+                <div class="stat-value">{{webrtc.isMuted ? 'Silenciado' : 'Activo'}}</div>
+                <div class="stat-label">Micrófono</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon video">
+                  <i class="fas" ng-class="{'fa-video': webrtc.isVideoVisible, 'fa-video-slash': !webrtc.isVideoVisible}"></i>
+                </div>
+                <div class="stat-value">{{webrtc.isVideoVisible ? 'Disponible' : 'No disponible'}}</div>
+                <div class="stat-label">Video</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon connection">
+                  <i class="fas fa-signal"></i>
+                </div>
+                <div class="stat-value">Estable</div>
+                <div class="stat-label">Conexión</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon" style="background: rgba(74, 111, 165, 0.15); color: #4a6fa5;">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">15:42</div>
+                <div class="stat-label">Tiempo de clase</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  <div class="iframe-container2" style=" padding-top: 3px !important;"><iframe src="https://app.mozartacademy.mx/books3" frameborder="0" allowfullscreen ></iframe> </div> 
-      </ion-content>
 
 
+        
+        <!-- Calendario -->
+   <div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
+  <div class="card-header">
+    <h2><i class="fas fa-calendar-alt"></i> Próximas Clases</h2>
+  </div>
+  <div class="card-body" style=" padding-top: 5px; max-height: 240px; overflow-y: auto; position: relative;" id="card-schedule">
+    <div class="schedule-item" ng-repeat="item in userAgenda"  ng-if="item.title !== 'Próximo pago'" id="{{ item.isNextClass ? 'next-class-item' : '' }}">
+      <div class="schedule-date" ng-class="{
+       'schedule-date-past': item.isPast,
+       'schedule-date-inactive': !item.isNextClass && !item.isPast
+     }">
+        <div class="schedule-day">{{ item.start | date:'EEE' }}</div>
+        <div class="schedule-number">{{ item.start | date:'d' }}</div>
+      </div>
+
+
+      <!-- <div class="schedule-info-detailed">
+        <div class="schedule-title">{{ item.title }}</div>
+        <div class="schedule-full-date">{{ item.start | date:'EEEE, d \'de\' MMMM' }}</div>
+        
+        <div class="schedule-time-range">
+        <i class="ri-time-line"></i>  {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+        </div>
+      </div>  -->
+
+
+      <div class="schedule-info-detailed">
+    <div class="schedule-title" 
+         ng-class="{
+           'text-strikethrough': item.isPast,
+           'shadow-text': item.isNextClass
+         }">
+        {{ item.start | date:'EEEE, d \'de\' MMMM' }}
+    </div>
+
+    <div class="schedule-full-date" ng-if="!item.isPast">
+        <i class="ri-time-line"></i> {{ item.start | date:'HH:mm':'UTC' }} a {{ item.end | date:'HH:mm':'UTC' }} Hrs
+    </div>
+
+    <div class="schedule-time-range">
+        <span ng-if="item.isPast">Finalizada</span>
+        <span ng-if="item.isNextClass" style="color: black; text-shadow: 0 0 3px silver;  font-weight: 500;">Próxima clase</span>
+        <span ng-if="!item.isPast && !item.isNextClass">Pendiente</span>
+    </div>
+</div>
+
+
+        <div class="schedule-action-wrapper" >
+        <button class="schedule-btn" ng-if="item.isNextClass" ng-class="{'active': item.isNextClass}">
+          <span >
+            <i  ng-if="item.isNextClass" class="fas fa-bell"></i>
+          </span>
+        </button>
+      </div>
+
+
+    </div>
+
+  </div>
+</div>
+
+
+<!--
+<div class="card2" ng-show="!webrtc.isConnectedToTeacher()">
+  <div class="card-header">
+    <h2><i class="fas fa-trophy"></i> Mis Logros</h2>
+  </div>
+  <div class="card-body">
+    <div class="achievements-grid">
+      <div class="achievement-item unlocked">
+        <div class="achievement-icon">
+          <i class="fas ri-calendar-check-line"></i>
+        </div>
+        <div class="achievement-title">Asistencia</div>
+      </div>
+      <div class="achievement-item unlocked">
+        <div class="achievement-icon">
+          <i class="fas ri-flashlight-line"></i>
+        </div>
+        <div class="achievement-title">Puntualidad</div>
+      </div>
+      <div class="achievement-item locked">
+        <div class="achievement-icon">
+          <i class="fas ri-file-check-line"></i>
+        </div>
+        <div class="achievement-title">Trabajo en casa</div>
+      </div>
+      <div class="achievement-item locked">
+        <div class="achievement-icon">
+          <i class="fas ri-file-marked-line"></i>
+        </div>
+        <div class="achievement-title">Trabajo en clase</div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+
+
+
+
+    
+      </div>
+      
+      <!-- Espacio inferior -->
+     <div class="livestreamBottomSpace"></div> 
+      
+    </ion-content>
+    
     <!-- Contenedor de Video Draggable -->
-     <div id="videoContainer" 
+<!--    <div id="videoContainer" 
          class="video-container" 
-        ng-show="showVideo"
+         ng-show="showVideo"
          ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
       <div class="video-controls">
         <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
@@ -3283,12 +4286,31 @@ width: 200px; /* Ajusta según el tamaño deseado */
              autoplay 
              playsinline>
       </video>
-    </div> 
-
-
-
+    </div>  -->
     
-    <!-- Modal de Chat Personalizado -->
+    <!-- Botones Flotantes -->
+    <div class="floating-buttons">
+
+      <button class="button floating-btn chat" 
+              ng-click="openChat()" 
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+    </div>
+    
+
     <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
       <div class="modal-content3">
         <div class="modal-header3">
@@ -3298,7 +4320,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </button>
         </div>
         <div class="modal-body">
-          <div id="chatContainer" class="chat-messages2">
+          <div  class="chat-messages2">
             <div ng-repeat="message in webrtc.chatMessages track by $index" 
                  class="message-item"
                  ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
@@ -3309,12 +4331,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
           </div>
           <div class="chat-input2">
             <input type="text" 
-                   id="chatMsg2"
+                   id="chatMsg1"
                    ng-model="chatMessage"
                    placeholder="Escribe tu mensaje..."
                    ng-keypress="($event.which === 13) && sendMessage(chatMessage)">
-            <button  ng-click="sendMessage(chatMessage)">
-           <i class="ri-send-plane-2-fill"></i>
+            <button class="button button-positive" ng-click="sendMessage(chatMessage)">
+              <i class="ri-send-plane-2-fill"></i>
             </button>
           </div>
         </div>
@@ -3381,7 +4403,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-           
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -3871,7 +4900,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-nav-bar>
     
       <ion-content>
-        <div class="iframe-container"><iframe src="https://app.mozartacademy.mx/payment2" frameborder="0" allowfullscreen ></iframe></div> 
+        <div class="iframe-container"><iframe src="https://www.mozartacademy.online/pricing" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
     </ion-view>
   </script>
@@ -4211,7 +5240,14 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-            
+             <div class="online-badge" ng-show="webrtc.connectionStatus !== 'disconnected'">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-pulse"></div>
+                <div class="status-ring"></div>
+            </div>
+            <span class="status-text">Online</span>
+        </div>
         </ion-nav-buttons>  
 
        
@@ -4406,10 +5442,97 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
     </ion-nav-bar>
 
+
+
      <ion-content >
   <div class="iframe-container2"><iframe src="https://app.mozartacademy.mx/books2" frameborder="0" allow="fullscreen midi"></iframe></div> 
-   </ion-content>
- 
+
+   
+      </ion-content>
+     <div id="videoContainer" 
+         class="video-container" 
+        ng-show="showVideo"
+         ng-class="{'fullscreen': isFullscreen, 'dragging': isDragging}">
+      <div class="video-controls">
+        <button class="video-control-btn" ng-click="toggleFullscreen()" title="Pantalla Completa">
+          <i class="fas" ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+        </button>
+        <button class="video-control-btn" ng-click="toggleVideo()" title="Ocultar Video">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <video id="remoteVideo" 
+             class="remote-video" 
+             autoplay 
+             playsinline>
+      </video>
+    </div> 
+
+
+
+
+      <!-- Botones Flotantes -->
+    <div class="floating-buttons" style="margin-bottom: 20px !important">
+      <!-- Botón de Chat -->
+      <button class="button floating-btn chat" 
+              ng-click="openChat()" 
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-badge" ng-show="webrtc.unreadMessages > 0">
+          {{webrtc.unreadMessages > 9 ? '9+' : webrtc.unreadMessages}}
+        </span>
+      </button>
+      
+      <!-- Botón de Micrófono -->
+      <button class="button floating-btn mic"
+              ng-class="{'muted': webrtc.isMuted}"
+              ng-click="toggleMicrophone()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-microphone': !webrtc.isMuted, 'fa-microphone-slash': webrtc.isMuted}"></i>
+      </button>
+      
+      <!-- Botón de Video -->
+      <button class="button floating-btn video"
+              ng-click="toggleVideo()"
+              ng-show="webrtc.connectionStatus !== 'disconnected'">
+        <i class="fas" ng-class="{'fa-video': !showVideo, 'fa-video-slash': showVideo}"></i>
+      </button>
+    </div>
+    
+    <!-- Modal de Chat Personalizado -->
+    <div id="chatModal" class="custom-modal" ng-class="{'show': showChatModal}">
+      <div class="modal-content3">
+        <div class="modal-header3">
+          <h3><i class="fas fa-comments"></i> Chat con el Profesor</h3>
+          <button class="button button-clear" ng-click="closeChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="chatContainer" class="chat-messages2">
+            <div ng-repeat="message in webrtc.chatMessages track by $index" 
+                 class="message-item"
+                 ng-class="{'own': message.isOwn, 'other': !message.isOwn}">
+              <div class="message-sender">{{message.sender}}</div>
+              <div class="message-text">{{message.message}}</div>
+              <div class="message-time">{{formatTime(message.timestamp)}}</div>
+            </div>
+          </div>
+          <div class="chat-input2">
+            <input type="text" 
+                   id="chatMsg2"
+                   ng-model="chatMessage"
+                   placeholder="Escribe tu mensaje..."
+                   ng-keypress="($event.which === 13) && sendMessage(chatMessage)">
+            <button  ng-click="sendMessage(chatMessage)">
+           <i class="ri-send-plane-2-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     
     </ion-view>
   </script>   
 
@@ -4447,7 +5570,7 @@ app
   var requestData = {
     action: "getUserData",
     token: localStorage.getItem('MStoken')
-  // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+  //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
 
   var config = {
@@ -4583,9 +5706,8 @@ app
               if (self.connectionStatus === 'isConnecting') {
                   self.disconnect();
                   self.addMessage('Sistema', 'Tiempo de espera de conexión agotado. El profesor no respondió.');
-                  window.location.reload();
               }
-          }, 15000); // 40 segundos
+          }, 40000); // 40 segundos
 
           deferred.resolve();
           $rootScope.$apply();
@@ -4669,7 +5791,7 @@ app
             });
           }
           
-          self.updateStatus('connected', 'Conectado');
+          self.updateStatus('connected', 'Conectado con el profesor');
           $rootScope.$apply();
         });
         
@@ -4791,6 +5913,23 @@ app
 .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
    $stateProvider
+
+  .state('main', {
+      url: "",
+      abstract: true,
+      templateUrl: "main.html",
+      controller: "MenuCtrl2"
+    })
+   .state('main.home', {
+      url: "",
+      views: {
+        'menuContent': {
+          templateUrl: "home.html"
+        }
+      }
+    })
+
+
     .state('menu', {
       url: "/menu",
       abstract: true,
@@ -4863,11 +6002,12 @@ app
         }
       }
     }) 
-     .state('menu.workspace', {
-      url: "/workspace",
+     .state('menu.livestream', {
+      url: "/livestream",
       views: {
         'menuContent': {
-          templateUrl: "workspace.html"
+          templateUrl: "livestream.html",
+          controller: 'livestreamCtrl'
         }
       }
     }) 
@@ -4905,7 +6045,7 @@ app
 
     ; 
 
-  $urlRouterProvider.otherwise("menu/lessons");
+  $urlRouterProvider.otherwise("");
   $ionicConfigProvider.tabs.position('bottom'); 
 })
 
@@ -4987,7 +6127,7 @@ app
 
       $scope.getStatusMessage = function() {
         if ($scope.isConnecting) {
-            return 'Estableciendo conexión...';
+            return 'Esperando aprobación del profesor';
         } else {
             return $scope.webrtc.statusMessage;
         }
@@ -5180,7 +6320,7 @@ $scope.dragTouch = function(event) {
         if ($scope.isConnecting) {
           return 'Conectando...';
         }
-        return $scope.webrtc.connectionStatus === 'connected' ? 'Desconectar' : 'Conectarse';
+        return $scope.webrtc.connectionStatus === 'connected' ? 'Desconectar' : 'Conectar con el profesor';
       };
       
       // Obtener clase del botón de conexión
@@ -5314,6 +6454,8 @@ $scope.dragTouch = function(event) {
       $scope.dropdownNotifVisible = false;
       $scope.dropdownCalendarVisible = false;
 };
+
+
 
     $scope.loadingProfile = true;
     var ahora = new Date();
@@ -5628,14 +6770,18 @@ function cleanInput() {
   $scope.goToStats = function() {
   window.location.href = '#/menu/statistics';
 };
-      $scope.goToAgenda = function() {
-  window.location.href = '#/menu/agenda';
+      $scope.goToLogin = function() {
+  window.location.href = 'https://www.mozartacademy.online/login';
 };
 $scope.goToPayment = function() {
    window.location.href = '#/menu/payment';
 };
     $scope.goToMain = function() {
    window.location.href = '#/main';
+};
+
+ $scope.goToHome = function() {
+   window.location.href = '/';
 };
 
 $scope.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
@@ -5733,6 +6879,33 @@ $scope.installApp = function () {
 
  }])
 
+
+
+.controller('MenuCtrl2', ['$scope', '$ionicSideMenuDelegate', function($scope, $ionicSideMenuDelegate) {
+
+   $scope.goToLogin = function() {
+  window.location.href = '/login';
+};
+
+  $scope.toggleRight = function() {
+    $('.item').removeClass('anim');
+    setTimeout(function() {
+        $('.item').each(function(index) {
+            $(this).addClass('anim').css('animation-delay', (index * 0.1) + 's');
+        });
+    }, 10);
+
+    $ionicSideMenuDelegate.toggleLeft();
+      $scope.isDropdownVisible = false;
+};
+
+   $scope.isDropdownVisible = false;
+    $scope.toggleDropdown = function() {
+      $scope.isDropdownVisible = !$scope.isDropdownVisible;
+    };
+
+}])
+
       .controller('StatusCtrl', ['$scope', 'SharedState', function($scope, SharedState){
   SharedState.getNum().then(function(data) {
        $scope.userData = data.data;
@@ -5762,6 +6935,62 @@ $scope.installApp = function () {
     }])
 
 
+       .controller('livestreamCtrl', function($scope, SharedState, $timeout){
+       var ahora = new Date();
+    var proximaClaseEncontrada = false;
+
+
+  SharedState.getNum().then(function(data) {
+    $scope.userDataLevel = JSON.parse(data.data.stage);
+     $scope.userAgenda = JSON.parse(data.data.agenda);
+      // Procesamos cada item de la agenda
+    $scope.userAgenda.forEach(function(item) {
+        var fechaInicio = new Date(item.start);
+
+        // 1. Calculamos y añadimos la hora de fin (inicio + 1 hora)
+        var fechaFin = new Date(fechaInicio);
+        fechaFin.setHours(fechaFin.getHours() + 1);
+        item.end = fechaFin; // Añadimos la propiedad 'end' al objeto
+
+        item.isPast = fechaInicio < ahora;
+
+        // 2. Buscamos la primera clase futura para marcarla como la "próxima"
+         if (!proximaClaseEncontrada && !item.isPast && item.title !== 'Próximo pago') {
+            item.isNextClass = true;
+            proximaClaseEncontrada = true;
+        } else {
+            item.isNextClass = false;
+        }
+    });
+
+        scrollToNextClass();
+  })
+
+  function scrollToNextClass() {
+    $timeout(function() {
+        var container = document.getElementById('card-schedule'); // o 'agenda-container'
+        var targetElement = document.getElementById('next-class-item');
+  
+        if (container && targetElement) {
+            
+            // --- CÁLCULO MODIFICADO ---
+            var containerHeight = container.clientHeight;
+            var elementHeight = targetElement.clientHeight;
+
+            // Usamos el cálculo robusto de la respuesta anterior
+            var relativeOffsetTop = targetElement.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+
+            // NUEVO CÁLCULO: Alinea la parte inferior del elemento con la parte inferior del contenedor.
+            var newScrollTop = relativeOffsetTop + elementHeight - containerHeight;
+
+            container.scrollTop = newScrollTop;
+        }
+    }, 0);
+}
+
+
+
+})
 
     .controller('statisticsCtrl', function($scope, $timeout){
    
@@ -5922,7 +7151,37 @@ $scope.installApp = function () {
 
   })
 
- 
+  /* .controller('livestreamCtrl', ['$scope', 'SharedState', 'WebRTCService', function($scope,  SharedState, WebRTCService){
+  SharedState.getNum().then(function(data) {
+       $scope.userData = data.data;
+  })
+
+  $scope.service = WebRTCService;
+
+  // Functions for the view
+  $scope.openChatModal = function() {
+    $scope.isChatOpen = true;
+    WebRTCService.unreadCount = 0;
+  };
+  
+  $scope.closeChatModal = function() {
+    $scope.isChatOpen = false;
+  };
+
+  $scope.sendMessage = function() {
+    if (!$scope.chatInput) return;
+    WebRTCService.sendMessage($scope.chatInput);
+    $scope.chatInput = "";
+  };
+
+  // Initialize the service when the controller loads
+  WebRTCService.init();
+
+  
+
+    }])*/
+
+
  
 
     </script>
