@@ -19,7 +19,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--background-gradient); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+
         
         .header { 
             background: white; 
@@ -206,42 +206,39 @@
         .empty-state { text-align: center; padding: 60px 20px; color: #6e6e73; background: white; border-radius: 12px; }
         
         .midi-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #0f0f1e; /* Fondo oscuro de la "página" */
+    
+    /* Compensar el padding de 20px del 'body' para ser 100% pantalla */
+    margin: -20px; 
+    /* Ajustar altura para compensar el margen */
+    min-height: calc(100vh + 40px); 
+    padding: 0;
+}
 
-        .midi-modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+       
 
-        .midi-modal-container {
-            width: 95%;
-            max-width: 1200px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            transform: translateY(30px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-        }
+       .midi-modal-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+    
+    /* Usamos flexbox para estirar el contenido */
+    display: flex;
+    flex-direction: column; 
+    
+    /* Quitamos estilos de modal */
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    transform: none;
+    transition: none;
+}
 
-        .midi-modal-overlay.active .midi-modal-container {
-            transform: translateY(0) scale(1);
-        }
+      
 
         .midi-modal-header {
             padding: 24px 28px;
@@ -289,10 +286,16 @@
             transform: rotate(90deg);
         }
 
-        .midi-modal-body {
-            padding: 0;
-            background: #0f0f1e;
-        }
+       .midi-modal-body {
+    padding: 0;
+    background: #0f0f1e;
+    
+    /* Clave: hacer que el cuerpo crezca */
+    flex-grow: 1; 
+    height: 0; /* Truco de Flexbox para que flex-grow funcione */
+    display: flex;
+    flex-direction: column;
+}
 
         .mode-controls {
             padding: 20px 28px;
@@ -335,12 +338,16 @@
             font-size: 16px;
         }
 
-        .midi-visualizer-wrapper {
-            height: 500px;
-            position: relative;
-            background: linear-gradient(180deg, #0a0a14 0%, #050510 100%);
-            overflow: hidden;
-        }
+       .midi-visualizer-wrapper {
+    /* height: 500px;  <-- BORRA O COMENTA ESTA LÍNEA */
+    position: relative;
+    background: linear-gradient(180deg, #0a0a14 0%, #050510 100%);
+    overflow: hidden;
+    
+    /* Clave: hacer que el visualizador llene el 'body' */
+    flex-grow: 1;
+    height: auto; /* Se ajusta automáticamente */
+}
 
         .canvas-container {
             width: 100%;
@@ -531,11 +538,54 @@
                 flex-direction: column;
             }
         }
+
+
+
+        /* --- INICIO: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
+@media (min-width: 992px) {
+    .desktop-layout-wrapper {
+        display: grid;
+        grid-template-columns: 300px 1fr; /* Sidebar de 300px, resto para contenido */
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .header {
+        position: sticky; /* Lo hace "pegajoso" */
+        top: 20px;
+        max-height: calc(100vh - 40px); /* Altura de ventana menos padding */
+        overflow-y: auto;
+        margin-bottom: 0; /* Quitar margen inferior en desktop */
+    }
+    
+    /* Apilar contenido del header verticalmente */
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px; 
+    }
+
+    .search-box {
+        width: 100%;
+        min-width: auto; /* Resetear min-width */
+    }
+
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch; /* Estirar filtros */
+    }
+    
+    /* Evita que el grid de videos se desborde (como en problemas anteriores) */
+    .main-layout {
+        overflow-x: hidden;
+    }
+}
+/* --- FIN: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
     </style>
 </head>
 <body ng-controller="sheetMusicCtrl">
 
-    <div class="container">
+    <div class="desktop-layout-wrapper" ng-hide="isPreviewVisible">
         <div class="header">
             <div class="header-top">
                 <div class="header-left">
@@ -608,8 +658,8 @@
         </div>
     </div>
 
-    <div class="midi-modal-overlay" ng-class="{'active': isPreviewVisible}" ng-click="hidePreview()">
-        <div class="midi-modal-container" ng-click="$event.stopPropagation()">
+    <div class="midi-modal-overlay" ng-show="isPreviewVisible">
+        <div class="midi-modal-container" >
             <div class="midi-modal-header">
                 <div>
                     <h4 class="midi-modal-title">{{ currentSheet.title }}</h4>
