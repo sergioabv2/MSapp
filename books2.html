@@ -10,7 +10,7 @@
         /* --- Estilos Esenciales (Copiados de tu original) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+
         .header { 
             background: white; 
             border-radius: 16px; 
@@ -54,19 +54,19 @@
         .library-section { margin-bottom: 40px; }
         .section-title { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
         .carousel-wrapper { position: relative; }
-        .carousel { display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+        .carousel { display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none;  }
         .carousel::-webkit-scrollbar { display: none; }
         .book-card { flex: 0 0 auto; width: 180px; cursor: pointer; transition: transform 0.2s ease; }
         .book-card:hover { transform: translateY(-4px); }
         .book-cover { width: 100%; height: 240px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); object-fit: cover; margin-bottom: 12px; }
         .book-title { font-size: 15px; font-weight: 600; color: #343a40; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .book-level { font-size: 13px; color: #6c757d; }
-        .scroll-btn { position: absolute; top: 50%; transform: translateY(-70%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); border: 1px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; opacity: 0; transition: opacity 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .scroll-btn { position: absolute; top: 50%; transform: translateY(-70%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); border: 1px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; z-index: 3000; opacity: 0; transition: opacity 0.2s ease; display: flex; align-items: center; justify-content: center; }
         .carousel-wrapper:hover .scroll-btn { opacity: 1; }
         .scroll-btn.prev { left: -20px; }
         .scroll-btn.next { right: -20px; }
         .pdf-viewer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #212121; z-index: 2000; }
-        .xml-viewer-close { background: none; border: none; position: absolute; top: 15px; right: 25px; color: white; font-size: 26px; cursor: pointer; }
+        .xml-viewer-close { background: none; border: none; position: absolute; top: 15px; right: 25px; color: black; font-size: 26px; cursor: pointer; }
         .pdf-viewer-overlay iframe { width: 100%; height: 100%; border: none; }
 
 
@@ -124,9 +124,8 @@
 
 
 
-/* --- INICIO: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
+
 @media (min-width: 992px) {
-    /* 1. Activa el layout de Grid en el contenedor */
     .desktop-layout-wrapper {
         display: grid;
         /* Define 2 columnas: 300px para el sidebar, 1fr (resto) para el contenido */
@@ -135,7 +134,6 @@
         align-items: flex-start; /* Alinea los items arriba */
     }
 
-    /* 2. Estilos del Header (ahora sidebar) */
     .header {
         position: sticky; /* Lo hace "pegajoso" */
         top: 20px; /* Se pega a 20px del borde superior */
@@ -144,9 +142,10 @@
         margin-bottom: 0; /* Remueve el margen inferior en desktop */
     }
 
-    /* 3. Ajusta el contenido interno del sidebar */
-    
-    /* Apila el título y la barra de búsqueda */
+    .library-content {
+        overflow-x: hidden;
+    }
+
     .header-top {
         flex-direction: column;
         align-items: flex-start;
@@ -168,14 +167,14 @@
         flex-grow: 1;
     }
 }
-/* --- FIN: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
+
     </style>
 </head>
 <body ng-controller="libraryCtrl">
     
-    <div class="container" ng-hide="showPdfViewer">
 
-    <div class="desktop-layout-wrapper">
+
+    <div class="desktop-layout-wrapper"  ng-hide="showPdfViewer">
         <div class="header" >
               <div class="header-top">
             <div class="header-left">
@@ -221,11 +220,13 @@
          </div>
 
 
+
+      <div class="library-content">
+
            <button class="back-button" ng-show="selectedSection" ng-click="goBack()">
         <i class="fas fa-arrow-left"></i> Volver a las secciones
     </button>
 
-      <div class="library-content">
     <div class="library-section" 
          ng-repeat="section in library | filter: { books: { title: searchQuery } }"
          ng-show="!selectedSection || selectedSection === section">
@@ -253,7 +254,7 @@
     </div>
 </div>
   </div>
- </div>
+
 
     <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
         <div>
