@@ -117,6 +117,63 @@
 .back-button:hover {
     background-color: #e5e7eb;
 }
+
+
+
+
+
+
+
+        /* --- INICIO: ESTILOS SIDEBAR DESKTOP (SIN WRAPPER) --- */
+@media (min-width: 992px) {
+
+    /* 1. Convierte el header en un sidebar flotante y pegajoso */
+    .header {
+        float: left;
+        width: 300px;
+        margin-right: 24px; /* Crea un espacio con el contenido */
+        
+        /* Lo hace pegajoso (sticky) */
+        position: sticky;
+        top: 20px; /* Se pega a 20px del borde superior */
+
+        /* Define su altura y scroll interno */
+        max-height: calc(100vh - 40px); 
+        overflow-y: auto;
+        
+        /* Anula el margen inferior de la vista móvil */
+        margin-bottom: 0;
+    }
+
+    /* 2. El contenido principal (.back-button y .library-content)
+       fluirá automáticamente al lado derecho del .header
+       porque este último está "flotando". */
+
+    /* 3. Re-ordena los elementos internos del header */
+    
+    /* Apila el título y la búsqueda */
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* La búsqueda ocupa todo el ancho */
+    .search-box {
+        width: 100%;
+        min-width: auto; /* Resetea el ancho mínimo */
+    }
+
+    /* Apila los filtros */
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        flex-grow: 1;
+    }
+}
+/* --- FIN: ESTILOS SIDEBAR DESKTOP --- */
     </style>
 </head>
 <body ng-controller="libraryCtrl">
