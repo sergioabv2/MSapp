@@ -124,57 +124,62 @@
 
 
 
-        /* --- INICIO: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
+ /* --- INICIO: ESTILOS SIDEBAR DESKTOP (SIN WRAPPER) --- */
 @media (min-width: 992px) {
-    /* 1. Activa el layout de Grid en el contenedor */
-    .desktop-layout-wrapper {
-        display: grid;
-        /* Define 2 columnas: 300px para el sidebar, 1fr (resto) para el contenido */
-        grid-template-columns: 300px 1fr;
-        gap: 24px; /* Espacio entre las columnas */
-        align-items: flex-start; /* Alinea los items arriba */
-    }
 
-    /* 2. Estilos del Header (ahora sidebar) */
+    /* 1. Convierte el header en un sidebar flotante y pegajoso */
     .header {
-        position: sticky; /* Lo hace "pegajoso" */
+        float: left;
+        width: 300px;
+        margin-right: 24px; /* Crea un espacio con el contenido */
+        
+        /* Lo hace pegajoso (sticky) */
+        position: sticky;
         top: 20px; /* Se pega a 20px del borde superior */
-        max-height: calc(100vh - 40px); /* Altura máxima (alto de la ventana - padding) */
-        overflow-y: auto; /* Scroll si el contenido es muy largo */
-        margin-bottom: 0; /* Remueve el margen inferior en desktop */
+
+        /* Define su altura y scroll interno */
+        height: 100vh; 
+        overflow-y: auto;
+        
+        /* Anula el margen inferior de la vista móvil */
+        margin-bottom: 0;
     }
 
-    /* 3. Ajusta el contenido interno del sidebar */
+    /* 2. El contenido principal (.back-button y .library-content)
+       fluirá automáticamente al lado derecho del .header
+       porque este último está "flotando". */
+
+    /* 3. Re-ordena los elementos internos del header */
     
-    /* Apila el título y la barra de búsqueda */
+    /* Apila el título y la búsqueda */
     .header-top {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    /* La barra de búsqueda ocupa todo el ancho del sidebar */
+    /* La búsqueda ocupa todo el ancho */
     .search-box {
         width: 100%;
         min-width: auto; /* Resetea el ancho mínimo */
     }
 
-    /* Apila los dropdowns de filtros */
+    /* Apila los filtros */
     .filters-container {
         flex-direction: column;
-        align-items: stretch; /* Estira los filtros al 100% */
+        align-items: stretch;
     }
 
     .filter-group {
         flex-grow: 1;
     }
 }
-/* --- FIN: NUEVOS ESTILOS PARA SIDEBAR DESKTOP --- */
+/* --- FIN: ESTILOS SIDEBAR DESKTOP --- */
     </style>
 </head>
 <body ng-controller="libraryCtrl">
     
     <div class="container" ng-hide="showPdfViewer">
-     <div class="desktop-layout-wrapper">
+
         <div class="header" >
               <div class="header-top">
             <div class="header-left">
@@ -252,7 +257,7 @@
     </div>
 </div>
   </div>
-    </div>
+
 
     <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
         <div>
