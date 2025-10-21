@@ -558,6 +558,7 @@
             .piano-keys-visual{
                 transform: translateX(-50%) scale(0.8) !important;
             }
+              
 
              .midi-visualizer-wrapper::after {
                 height: 40px;
@@ -570,7 +571,7 @@
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
                 gap: 16px;
             }
-            .midi-modal-container { width: 98%; }
+   
             
             .header-controls { flex-wrap: wrap; }
             .mode-toggle-btn span { display: none; }
@@ -581,7 +582,17 @@
         @media (max-width: 600px) {  
             .videos-grid { 
                 grid-template-columns: 1fr;
+            } 
+
+             .canvas-container{
+                transform: scale(0.5) translateY(140px) !important;
             }
+            .piano-keys-visual{
+                transform: translateX(-50%) scale(0.5) !important;
+            }
+            .midi-visualizer-wrapper::after {
+                height: 100px;
+             }
 
         }
 
@@ -589,6 +600,9 @@
             .filters-container {
                 flex-direction: column;
             }
+             .mode-toggle-btn{
+                display: none;
+             }
         }
 
         @media (min-width: 992px) {
@@ -1373,6 +1387,7 @@
 
             $scope.hidePreview = function() {
                 if ($scope.isPreviewVisible) {
+                    $scope.isPreviewVisible = false;
                     stopPlayback();
                     if (progressUpdateLoop) {
                       $timeout.cancel(progressUpdateLoop);
@@ -1385,7 +1400,6 @@
                     if (animationFrameId) {
                         cancelAnimationFrame(animationFrameId);
                     }
-                    $scope.isPreviewVisible = false;
                     $scope.currentSheet = {};
                     parsedNotes = [];
                     currentNoteIndex = 0;
