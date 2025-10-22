@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
+    <title>KeyNotes - Aprende Piano con Conexión MIDI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
+<script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* --- ESTILOS PARA EL CARROUSEL --- */
+        .carousel-wrapper {
+            position: relative;
+        }
+        .carousel {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .book-card {
+            flex: 0 0 auto;
+            width: 180px;
+            scroll-snap-align: start;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+        .book-card:hover {
+            transform: translateY(-4px);
+        }
+        .book-cover {
+            width: 100%;
+            height: 240px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .book-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #343a40;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .book-author {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 240px;
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .book-card.is-locked .book-cover {
+            filter: grayscale(80%);
+        }
+        .book-card.is-locked .locked-overlay {
+            opacity: 1;
+        }
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-70%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: #343a40;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-wrapper:hover .scroll-btn {
+            opacity: 1;
+        }
+        .scroll-btn:hover {
+            transform: translateY(-70%) scale(1.1);
+        }
+        .scroll-btn.prev {
+            left: -20px;
+        }
+        .scroll-btn.next {
+            right: -20px;
+        }
+
+        /* --- ESTILOS PARA EL MODAL DE VIDEO CORREGIDO --- */
+        .video-modal-content {
+            background: black;
+            padding: 0;
+            width: 90%;
+            max-width: 900px; /* Ancho máximo del video */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative; /* Necesario para posicionar el botón */
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* Proporción 16:9 */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-close-btn {
+            position: absolute;
+            top: 1rem; /* 16px desde arriba */
+            right: 1rem; /* 16px desde la derecha */
+            color: white;
+            font-size: 28px;
+            line-height: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+        .video-close-btn:hover {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        #video-modal {
+    transition: opacity 0.3s ease-in-out;
+}
+
+
+/* Pega este bloque completo dentro de tu etiqueta <style> */
+
+/* MODAL MEJORADO */
+
+/* --- AÑADE ESTAS CLASES PARA LAS TARJETAS DE EJERCICIOS --- */
+.exercise-card {
+    flex: 0 0 auto;
+    width: 280px; /* Más ancho que el book-card */
+    scroll-snap-align: start;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    position: relative;
+}
+.exercise-card:hover {
+    transform: translateY(-4px);
+}
+.exercise-cover {
+    width: 100%;
+    height: 158px; /* Menos alto para un aspecto 16:9 */
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 12px;
+    display: block;
+}
+
+
+.midi-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.midi-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.midi-modal-container {
+    width: 95%;
+    max-width: 900px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+.midi-modal-overlay.active .midi-modal-container {
+    transform: translateY(0) scale(1);
+}
+.midi-modal-header {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.midi-modal-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.midi-modal-composer {
+    margin: 0;
+    color: #a78bfa;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 6px;
+}
+.midi-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.midi-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+.midi-modal-body {
+    padding: 0;
+    background: #0f0f1e;
+}
+.midi-player-wrapper {
+    padding: 20px 28px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+}
+midi-player {
+    width: 100%;
+    --player-bg: transparent;
+    --primary-color: #8b5cf6;
+    --secondary-color: #3b82f6;
+}
+.midi-visualizer-wrapper {
+    height: 400px;
+    position: relative;
+    background: linear-gradient(180deg, #0a0a14 0%, #050510 100%);
+    overflow: hidden;
+}
+.piano-keys {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+    border-top: 2px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+midi-visualizer::part(note) {
+    background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.8);
+}
+midi-visualizer::part(note-sharp) {
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.8);
+}
+.progress-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 80px;
+    left: 50%;
+    width: 2px;
+    background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.8) 30%, rgba(139, 92, 246, 1) 50%, rgba(139, 92, 246, 0.8) 70%, transparent 100%);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
+    z-index: 5;
+}
+
+@keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-purple-50 font-sans">
+    
+ 
+ <section class="relative py-12 lg:py-20 text-center  overflow-hidden" style="background-color:#F8F9FA.;">
+    
+    <div class="absolute inset-0 z-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div class="absolute top-40 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-20 left-1/2 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mx-auto mb-4" >
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4" style="text-shadow: 0 1px 3px silver;">Mozart Academy</h1>
+        </div>
+
+        <h2 class="text-4xl lg:text-5xl font-bold mb-4" >Aprende piano con nuestro reproductor MIDI</h2>
+        <h2 class="text-4xl lg:text-5xl font-bold mb-5" >Toca, mejora, ¡disfruta!</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8">
+            <div class="px-1">
+                <a href="#" class="block bg-transparent border-0 group mb-3">
+                    <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/pianotify_demo.8c61b931.svg" class="w-full rounded shadow-sm group-hover:opacity-80 transition-opacity" alt="Midi tutorials">
+                </a>
+                <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-md shadow-sm font-bold bg-primary text-white bg-blue-800 transition-colors">
+                    Explorar archivos MIDI
+                </a>
+            </div>
+            <div class="px-1">
+                <a href="#" class="block bg-transparent border-0 group mb-3">
+                    <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/sheet-music.5ec462ec.webp" class="w-full rounded shadow-sm group-hover:opacity-80 transition-opacity" alt="Descargar partituras">
+                </a>
+                <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-md shadow-sm font-bold bg-success text-white bg-green-700 transition-colors">
+                    Descargar Partituras
+                </a>
+            </div>
+            <div class="px-1">
+                <a href="#" class="block bg-transparent border-0 group mb-3">
+                    <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/video-covers.2ae56d39.webp" class="w-full rounded shadow-sm group-hover:opacity-80 transition-opacity" alt="Ver video covers">
+                </a>
+                <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-md shadow-sm font-bold bg-danger text-white bg-red-700 transition-colors">
+                    Ver Video Covers
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <div id="como-funciona" class="bg-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Aprende de Forma Interactiva</h2>
+                <p class="text-lg text-gray-600 mt-2">Te escuchamos tocar y te guiamos nota por nota.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+               
+                <div class="space-y-8">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 bg-pink-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">1</div>
+                        <div class="ml-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Conecta tu Piano</h3>
+                            <p class="mt-1 text-gray-600">Usa un cable MIDI-USB para conectar tu teclado o piano digital a tu computadora. ¡Es así de fácil!</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">2</div>
+                        <div class="ml-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Elige una Canción</h3>
+                            <p class="mt-1 text-gray-600">Explora nuestro repertorio y elige la pieza que quieres aprender, desde clásicos hasta éxitos modernos.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">3</div>
+                        <div class="ml-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Toca y Recibe Feedback</h3>
+                            <p class="mt-1 text-gray-600">La partitura cobrará vida. Toca las notas en tu piano y nuestra plataforma te indicará si vas bien y esperará por ti si te equivocas.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div id="video-trigger" class="relative aspect-video rounded-lg shadow-2xl overflow-hidden cursor-pointer group">
+                    <img src="https://lh3.googleusercontent.com/d/1ddzBB0_dKU4RiL6C1qwtOhx42Osv7kAv" alt="Video demostrativo de KeyNotes" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center transition-opacity duration-300 group-hover:bg-opacity-30">
+                        <div class="bg-white bg-opacity-90 rounded-full w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                            <i class="fas fa-play text-4xl text-pink-500 pl-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+      <div class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold mb-8 text-gray-800">Ejercicios Interactivos</h2>
+        <div class="carousel-wrapper">
+            <div class="carousel" id="ejercicios-carousel">
+                <div class="exercise-card" onclick="openMidiModal('https://assets.codepen.io/81395/chopin.mid', 'Escalas de Do Mayor', 'Técnica')">
+                    <img src="https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh" alt="Escalas" class="exercise-cover">
+                    <div class="book-title">Escalas de Do Mayor</div>
+                    <div class="book-author">Técnica</div>
+                </div>
+                <div class="exercise-card" onclick="openMidiModal('https://assets.codepen.io/81395/chopin.mid', 'Arpegios de Do Mayor', 'Técnica')">
+                    <img src="https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh" alt="Arpegios" class="exercise-cover">
+                    <div class="book-title">Arpegios de Do Mayor</div>
+                    <div class="book-author">Técnica</div>
+                </div>
+                <div class="exercise-card" onclick="openMidiModal('https://assets.codepen.io/81395/chopin.mid', 'Hanon No. 1', 'Destreza')">
+                    <img src="https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh" alt="Hanon" class="exercise-cover">
+                    <div class="book-title">Hanon No. 1</div>
+                    <div class="book-author">Destreza</div>
+                </div>
+                <div class="exercise-card ">
+                    <img src="https://lh3.googleusercontent.com/d/1b8uhUqybBb-2ycfH-vyDtPMXM__h79wh" alt="Progresión de Acordes" class="exercise-cover">
+                    <div class="book-title">Progresión de Acordes</div>
+                    <div class="book-author">Armonía</div>
+                    <div class="locked-overlay"><i class="fas fa-lock"></i></div>
+                </div>
+            </div>
+            <button class="scroll-btn prev" onclick="scrollCarousel('ejercicios-carousel', -1)"><i class="fas fa-chevron-left"></i></button>
+            <button class="scroll-btn next" onclick="scrollCarousel('ejercicios-carousel', 1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+    <div class="bg-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="grid grid-cols-4 gap-3">
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1a3urC9fRx8b6CRAt8YaWZQ1_uU-AvENX" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Mozart</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1vXrwiwK7wdImoDRnAgbUjf7Re5ryL7ed" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Haydn</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/17Op_HWCo9YdC2YwpJWlWKSBUfw1mv5UL" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Liszt</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1pysrY83O-9T3AV6cpSHifWK4lbR9YAC_" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Chopin</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/10_RNQHt21xPJk0B_jxolbtmt1f5DkQBx" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Beethoven</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1EaP3Rd1_ShHsjEBLK_HP8344WU-1gpI7" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Bach</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/10_RNQHt21xPJk0B_jxolbtmt1f5DkQBx" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Beethoven</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1vXrwiwK7wdImoDRnAgbUjf7Re5ryL7ed" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Haydn</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1a3urC9fRx8b6CRAt8YaWZQ1_uU-AvENX" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Mozart</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/17Op_HWCo9YdC2YwpJWlWKSBUfw1mv5UL" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Liszt</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1pysrY83O-9T3AV6cpSHifWK4lbR9YAC_" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Chopin</span></div>
+                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1EaP3Rd1_ShHsjEBLK_HP8344WU-1gpI7" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Bach</span></div>
+                </div>
+                <div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 leading-tight">Miles de partituras con acompañamientos profesionales</h2>
+                    <p class="mt-4 text-lg text-gray-600">Disfruta de nuestro creciente catálogo de acompañamientos musicales de alta calidad:</p>
+                    <ul class="mt-6 space-y-2 text-gray-600 list-disc list-inside">
+                        <li>Repertorio de todos los géneros.</li>
+                        <li>Éxitos clásicos adaptados para todos los niveles.</li>
+                        <li>Piezas educativas y de técnica.</li>
+                        <li>Bandas sonoras de películas, Pop, Jazz, y más.</li>
+                    </ul>
+                    <a href="#" class="mt-8 inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-500 transition duration-300">
+                        Explorar el catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+    
+    <div class=" py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold mb-8 text-gray-800">Repertorio Destacado</h2>
+            <div class="carousel-wrapper">
+                <div class="carousel" id="repertorio-carousel">
+                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej" alt="Clair de Lune" class="book-cover"><div class="book-title">Clair de Lune</div><div class="book-author">C. Debussy</div></div>
+                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd" alt="Für Elise" class="book-cover"><div class="book-title">Für Elise</div><div class="book-author">L. v. Beethoven</div></div>
+                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4" alt="Nuvole Bianche" class="book-cover"><div class="book-title">Nuvole Bianche</div><div class="book-author">L. Einaudi</div></div>
+                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh" alt="Preludio en Do Mayor" class="book-cover"><div class="book-title">Preludio en Do Mayor</div><div class="book-author">J.S. Bach</div></div>
+                    <div class="book-card is-locked"><img src="https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P" alt="Nocturne Op.9 No.2" class="book-cover"><div class="book-title">Nocturne Op.9 No.2</div><div class="book-author">F. Chopin</div></div>
+                    <div class="book-card is-locked"><img src="https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi" alt="River Flows In You" class="book-cover"><div class="book-title">River Flows In You</div><div class="book-author">Yiruma</div><div class="locked-overlay"><i class="fas fa-lock"></i></div></div>
+                </div>
+                <button class="scroll-btn prev" onclick="scrollCarousel('repertorio-carousel', -1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="scroll-btn next" onclick="scrollCarousel('repertorio-carousel', 1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+
+  
+
+       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Explora Nuestras Lecciones</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation">
+                <div class="bg-pink-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-graduation-cap text-3xl text-pink-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Nivel Principiante</h3>
+            </div>
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 0.5s;">
+                <div class="bg-purple-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-eye text-3xl text-purple-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Lectura a Primera Vista</h3>
+            </div>
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 1s;">
+                <div class="bg-blue-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-book-open text-3xl text-blue-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Técnica y Teoría</h3>
+            </div>
+            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 1.5s;">
+                <div class="bg-green-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-star text-3xl text-green-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Piezas Populares</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-pink-500 to-purple-500 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-12 text-white">Lo que Dicen Nuestros Alumnos</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div><p class="text-gray-700 mb-6">"Nunca pensé que podría leer música... KeyNotes hizo el proceso tan sencillo e intuitivo. Ahora puedo sentarme al piano y tocar piezas que antes solo soñaba."</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Laura García</h4><p class="text-gray-600">Estudiante Adulta</p></div></div></div>
+                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div><p class="text-gray-700 mb-6">"Dejé el piano por años y me sentía estancado. Esta plataforma me ayudó a retomar mi pasión con un repertorio increíble y ejercicios de lectura que realmente funcionan. ¡Totalmente recomendado!"</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Carlos Mendoza</h4><p class="text-gray-600">Músico Aficionado</p></div></div></div>
+                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i></div><p class="text-gray-700 mb-6">"La mejor herramienta para mi hijo. Aprende a su ritmo, se divierte con las canciones populares y yo puedo ver su progreso. La interfaz es amigable y muy motivadora para los niños."</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Sofía Reyes</h4><p class="text-gray-600">Madre de Familia</p></div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">¡No Pierdas el Ritmo!</h2>
+        <p class="text-xl text-gray-600 mb-8">Recibe actualizaciones semanales sobre nuevas partituras y lecciones</p>
+        <form class="flex">
+            <input type="email" placeholder="Tu correo electrónico" class="flex-grow px-4 py-3 rounded-l-full bg-white text-gray-900 border-2 border-pink-500 focus:outline-none focus:border-purple-500">
+            <button type="submit" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-r-full hover:from-pink-600 hover:to-purple-600 transition duration-300">Suscribirme</button>
+        </form>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between">
+                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-xl font-bold mb-4">KeyNotes</h3><p class="text-gray-400">Domina el Piano, una Nota a la Vez</p></div>
+                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-lg font-semibold mb-4">Navegación</h3><ul class="space-y-2"><li><a href="#" class="text-gray-400 hover:text-white">Lecciones</a></li><li><a href="#" class="text-gray-400 hover:text-white">Repertorio Completo</a></li><li><a href="#" class="text-gray-400 hover:text-white">Precios</a></li><li><a href="#" class="text-gray-400 hover:text-white">Sobre Nosotros</a></li></ul></div>
+                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-lg font-semibold mb-4">Conecta</h3><ul class="space-y-2"><li><a href="#" class="text-gray-400 hover:text-white">Twitter</a></li><li><a href="#" class="text-gray-400 hover:text-white">Facebook</a></li><li><a href="#" class="text-gray-400 hover:text-white">Instagram</a></li></ul></div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="video-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+        <div class="video-modal-content">
+            <button id="close-modal-btn" class="video-close-btn">&times;</button>
+            <div class="video-container">
+                 <iframe id="video-iframe" src="" title="Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div id="midi-visualizer-modal" class="midi-modal-overlay">
+    <div class="midi-modal-container">
+        <div class="midi-modal-header">
+            <div>
+                <h4 id="midi-modal-title" class="midi-modal-title"></h4>
+                <p id="midi-modal-composer" class="midi-modal-composer"></p>
+            </div>
+            <button id="close-midi-modal-btn" class="midi-modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="midi-modal-body">
+            <div class="midi-player-wrapper">
+                <midi-player id="midi-player" sound-font visualizer="#midi-visualizer"></midi-player>
+            </div>
+            <div class="midi-visualizer-wrapper">
+                <div class="progress-indicator"></div>
+                <midi-visualizer id="midi-visualizer" type="waterfall"></midi-visualizer>
+                <div class="piano-keys"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Script para el carrusel
+        function scrollCarousel(elementId, direction) {
+            const carousel = document.getElementById(elementId);
+            if (carousel) {
+                const scrollAmount = 200 * direction; 
+                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+      // SCRIPT PARA EL MODAL DE VIDEO (VERSIÓN MEJORADA)
+const videoTrigger = document.getElementById('video-trigger');
+const videoModal = document.getElementById('video-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const videoIframe = document.getElementById('video-iframe');
+// Asegúrate de que tu URL de YouTube incluye los parámetros para autoplay y sin videos relacionados.
+const videoUrl = "https://www.youtube.com/embed/p1L1eu_QjNA?autoplay=1&rel=0";
+
+// Oculta el modal al principio
+videoModal.style.opacity = '0';
+videoModal.style.pointerEvents = 'none';
+
+const openModal = () => {
+    videoIframe.src = videoUrl;
+    videoModal.classList.remove('hidden');
+    // Forzamos un reflow para que la transición funcione
+    void videoModal.offsetWidth; 
+    videoModal.style.opacity = '1';
+    videoModal.style.pointerEvents = 'auto';
+};
+
+const closeModal = () => {
+    videoIframe.src = "";
+    videoModal.style.opacity = '0';
+    videoModal.style.pointerEvents = 'none';
+    // Opcional: añade la clase 'hidden' después de que la transición termine
+    setTimeout(() => {
+      if (videoModal.style.opacity === '0') {
+         videoModal.classList.add('hidden');
+      }
+    }, 300); // 300ms, igual a la duración de la transición
+};
+
+videoTrigger.addEventListener('click', openModal);
+closeModalBtn.addEventListener('click', closeModal);
+videoModal.addEventListener('click', (event) => {
+    if (event.target === videoModal) {
+        closeModal();
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && videoModal.style.opacity === '1') {
+        closeModal();
+    }
+});
+
+
+
+// ***** NUEVO: SCRIPT PARA EL MODAL DE MIDI VISUALIZER *****
+const midiModal = document.getElementById('midi-visualizer-modal');
+const closeMidiModalBtn = document.getElementById('close-midi-modal-btn');
+const midiPlayer = document.getElementById('midi-player');
+const midiVisualizer = document.getElementById('midi-visualizer');
+const midiModalTitle = document.getElementById('midi-modal-title');
+const midiModalComposer = document.getElementById('midi-modal-composer');
+
+// Función para abrir el modal MIDI
+function openMidiModal(url, title, composer) {
+    midiModalTitle.textContent = title;
+    midiModalComposer.textContent = composer;
+
+    // Usamos un pequeño delay para asegurar que los elementos estén listos
+    setTimeout(() => {
+        midiPlayer.src = url;
+        midiVisualizer.src = url;
+        midiVisualizer.config = {
+            noteHeight: 4,
+            pixelsPerTimeStep: 60,
+            noteSpacing: 2,
+        };
+    }, 100);
+    
+    midiModal.classList.add('active');
+}
+
+// Función para cerrar el modal MIDI
+function closeMidiModal() {
+    if (midiModal.classList.contains('active')) {
+        midiPlayer.stop();
+        midiPlayer.src = "";
+        midiVisualizer.src = "";
+        midiModal.classList.remove('active');
+    }
+}
+
+// Event Listeners
+closeMidiModalBtn.addEventListener('click', closeMidiModal);
+midiModal.addEventListener('click', (event) => {
+    if (event.target === midiModal) {
+        closeMidiModal();
+    }
+});
+
+// Añadimos también el cierre con la tecla Escape para el nuevo modal
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && midiModal.classList.contains('active')) {
+        closeMidiModal();
+    }
+});
+
+
+
+ const searchInput = document.getElementById('searchInput');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+
+    // 2. Simulamos una base de datos de canciones
+    const songDatabase = [
+        'Claro de Luna - Debussy',
+        'Canon en Re Mayor - Pachelbel',
+        'Para Elisa - Beethoven',
+        'Nocturno Op. 9 No. 2 - Chopin',
+        'Marcha Turca - Mozart',
+        'Gymnopédie No. 1 - Satie',
+        'El Vals del Minuto - Chopin',
+        'Rapsodia Húngara No. 2 - Liszt',
+        'La Campanella - Liszt',
+        'Interstellar - Tema Principal',
+        'Bohemian Rhapsody - Queen',
+        'Comptine d’un autre été - Yann Tiersen',
+        'Bolero - Ravel'
+    ];
+
+    // 3. Añadimos un "escuchador" al campo de búsqueda
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        
+        // Limpiamos sugerencias anteriores
+        suggestionsContainer.innerHTML = '';
+
+        if (!query) {
+            return;
+        }
+
+        // ▼▼▼ ¡ESTA ES LA LÍNEA CON LA NUEVA LÓGICA! ▼▼▼
+        const filteredSongs = songDatabase.filter(song => {
+            // Dividimos el título en palabras y verificamos si ALGUNA de ellas
+            // comienza con el texto de búsqueda.
+            return song.toLowerCase().split(' ').some(word => word.startsWith(query));
+        });
+        
+        // Creamos y mostramos cada sugerencia
+        filteredSongs.forEach(song => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'px-6 py-3 cursor-pointer hover:bg-pink-100 text-gray-700';
+            suggestionItem.textContent = song;
+            
+            suggestionItem.addEventListener('click', () => {
+                searchInput.value = song;
+                suggestionsContainer.innerHTML = '';
+            });
+
+            suggestionsContainer.appendChild(suggestionItem);
+        });
+    });
+
+    // Opcional: Cerrar las sugerencias si se hace clic fuera del buscador
+    document.addEventListener('click', (event) => {
+        if (!searchInput.contains(event.target)) {
+            suggestionsContainer.innerHTML = '';
+        }
+    });
+    </script>
+</body>
+</html>
