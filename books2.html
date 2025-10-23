@@ -168,6 +168,41 @@
     }
 }
 
+
+
+
+/* El nuevo contenedor para la imagen y la etiqueta */
+.book-cover-wrapper {
+    position: relative; /* Clave para posicionar la etiqueta 'hija' */
+    /* Mantenemos los estilos que tenía la imagen */
+    width: 100%;
+    height: 240px;
+    margin-bottom: 12px;
+}
+
+/* La imagen ahora debe ajustarse al 100% de su nuevo 'wrapper' */
+.book-cover-wrapper .book-cover {
+    width: 100%;
+    height: 100%;
+    /* Quitamos el margen que ahora tiene el wrapper */
+    margin-bottom: 0; 
+}
+
+/* La nueva etiqueta de grado (similar a tu imagen de ejemplo) */
+.book-grade-label {
+    position: absolute; /* Se posiciona relativo al 'book-cover-wrapper' */
+    bottom: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.75); /* Fondo oscuro semitransparente */
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 10; /* Nos aseguramos que esté por encima de la imagen */
+}
+
+
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -192,6 +227,14 @@
 
 
             <div class="filters-container">
+                <div class="filter-group">
+                <label class="filter-label" for="sort-select">Ordenar por</label>
+                <select id="sort-select" class="filter-select" ng-model="sortOrder">
+                    <option value="-dateAdded">Más Nuevos</option>
+                    <option value="title">Alfabético (A-Z)</option>
+                    <option value="difficulty">Grado (Menor a Mayor)</option>
+                </select>
+            </div>
             <div class="filter-group">
                 <label class="filter-label" for="difficulty-select">Dificultad</label>
                 <select id="difficulty-select" class="filter-select" ng-model="filters.difficulty">
@@ -207,15 +250,7 @@
                     <option value="Grado 8">Grado 8</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label class="filter-label" for="style-select">Estilo</label>
-                <select id="style-select" class="filter-select" ng-model="filters.style">
-                    <option value="">Todos</option>
-                    <option value="Clásico">Clásico</option>
-                    <option value="Barroco">Barroco</option>
-                    <option value="Romántico">Romántico</option>
-                </select>
-            </div>
+          
         </div>
          </div>
 
@@ -228,8 +263,8 @@
     </button>
 
     <div class="library-section" 
-         ng-repeat="section in library | filter: { books: { title: searchQuery } }"
-         ng-show="!selectedSection || selectedSection === section">
+         ng-repeat="section in library"
+         ng-show="(!selectedSection || selectedSection === section) && (section.books | filter: customFilter).length > 0">
         
         <h2 class="section-title" ng-click="selectSection(section)">
              <i class="fas fa-layer-group"></i>
@@ -240,9 +275,19 @@
             <div id="carousel-{{$index}}" 
                  ng-class="{'carousel': !selectedSection, 'grid-view': selectedSection}">
                 
-                <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }"   
+                <div class="book-card" ng-repeat="book in section.books | filter: customFilter | orderBy: sortOrder"   
                      ng-click="openPdf(book)">
-                    <img ng-src="{{ book.coverUrl }}" alt="{{ book.title }}" class="book-cover">
+
+                <div class="book-cover-wrapper">
+        <img ng-src="{{ book.coverUrl }}" class="book-cover">
+
+        <span class="book-grade-label" ng-if="book.difficulty">
+            {{ book.difficulty }}
+        </span>
+    </div>
+
+                 
+
                     <div class="book-title">{{ book.title }}</div>
                     <div class="book-level">{{ book.author }}</div>
                 </div>
@@ -274,57 +319,85 @@
             $scope.pdfUrl = '';
              $scope.filters = { difficulty: '', style: '' };
              $scope.selectedSection = null;
+             $scope.sortOrder = '-dateAdded';
 
-            // --- DATOS DE LOS LIBROS (ESTÁTICOS) ---
-            var piecesData = [
-                { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "https://app.mozartacademy.mx/xml2?file=kuhlau-op20-n1.musicxml" },
-                { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview" },
-                { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview" },
-                { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview" },
-                { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview" },
-                { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview" },
-                { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview" },
-                { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview" },
-                { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview" },
-                { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview" },
-                { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview" },
-                { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview" },
-                { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview" }
-            ];
+
+        
+        var allPiecesData = [
+            // Piezas de Repertorio
+            { "title": "Ode to Joy - var3", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 1", "tags": ['repertorio', 'clasico'] },
+            { "title": "March I", "author": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi", "pdf": "...", "difficulty": "Grado 1", "tags": ['repertorio', 'clasico'] },
+
+            // Piezas de Mozart
+            { "title": "Sonata K. 545", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 5", "tags": ['mozart', 'clasico'] },
+            { "title": "Rondo Alla Turca", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 6", "tags": ['mozart', 'clasico'] },
+
+            // Piezas de Chopin
+            { "title": "Nocturne Op. 9 No. 2", "author": "F. Chopin", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 7", "tags": ['chopin', 'romantico'] },
             
-            // --- TRANSFORMACIÓN DE DATOS (SIMPLIFICADA) ---
-            var pieces = piecesData.map(function(piece) {
-                return {
-                    title: piece.title,
-                    author: piece.subtitle,
-                    coverUrl: piece.background,
-                    pdf: piece.pdf
-                };
-            });
+            // Piezas de Soundtrack
+            { "title": "Interstellar Theme", "author": "H. Zimmer", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 6", "tags": ['soundtrack', 'contemporaneo'] },
+            { "title": "Mia & Sebastian's Theme", "author": "J. Hurwitz", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 5", "tags": ['soundtrack', 'nuevo'], "dateAdded": "2025-10-20" },
 
-            // --- INICIALIZACIÓN DE LA BIBLIOTECA ---
-            $scope.library = [
-                { title: 'Repertorio Formativo', books: pieces }
-            ];
+            // Pieza Nueva/Reciente de ejemplo
+            { "title": "Pieza Reciente", "author": "Compositor", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej", "pdf": "...", "difficulty": "Grado 3", "tags": ['otro'], "dateAdded": "2025-10-15" }
+        ];
+        
 
-            // --- FUNCIONES ---
-
-              var requestData = {
-                action: "getUserData",
-                token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-              //   token: localStorage.getItem('MStoken')
+        var allPieces = allPiecesData.map(function(piece) {
+            return {
+                title: piece.title,
+                author: piece.author,
+                coverUrl: piece.background,
+                pdf: piece.pdf,
+                difficulty: piece.difficulty,
+                tags: piece.tags || [], 
+                dateAdded: piece.dateAdded ? new Date(piece.dateAdded) : null 
             };
-            var config = {
-                headers: { "Content-Type": "text/plain;charset=utf-8" } 
-            };
-                 
-            $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-                .then(function(response) { 
-                    var repertoireFromServer = JSON.parse(response.data.repertoire);
-                    $scope.library = $scope.library.concat(repertoireFromServer);
-                })
-                .catch(function(error) {
-                });
+        });
+
+        var mozartPieces = allPieces.filter(function(piece) {
+            // Usamos .includes() para ser flexibles (funciona con "W.A. Mozart" o "Mozart")
+            return piece.author.toLowerCase().includes('mozart');
+        });
+
+        var chopinPieces = allPieces.filter(function(piece) {
+            return piece.author.toLowerCase().includes('chopin');
+        });
+
+        var soundtrackPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('soundtrack');
+        });
+      
+        var nuevasPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('nuevo');
+        });
+
+        var hoy = new Date();
+        var limiteFecha = new Date();
+        limiteFecha.setDate(hoy.getDate() - 30); // Resta 30 días
+
+        var recientesPieces = allPieces.filter(function(piece) {
+            // Comprueba que la pieza tenga fecha y sea más reciente que la fecha límite
+            return piece.dateAdded && piece.dateAdded > limiteFecha;
+        });
+        
+        var repertorioPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('repertorio');
+        });
+
+
+        $scope.library = [
+            { title: 'Nuevas', books: nuevasPieces },
+            { title: 'Recientes', books: recientesPieces },
+            { title: 'Soundtrack', books: soundtrackPieces },
+            { title: 'Mozart', books: mozartPieces },
+            { title: 'Chopin', books: chopinPieces },
+            { title: 'Repertorio Formativo', books: repertorioPieces }
+        ];
+
+ 
+
 
                 $scope.selectSection = function(section) {
     $scope.selectedSection = section;
@@ -335,12 +408,16 @@ $scope.goBack = function() {
     $scope.selectedSection = null;
 };
 
-                 $scope.customFilter = function(book) {
-                var searchMatch = !$scope.searchQuery || book.title.toLowerCase().includes($scope.searchQuery.toLowerCase());
-                var difficultyMatch = !$scope.filters.difficulty || book.difficulty === $scope.filters.difficulty;
-                var styleMatch = !$scope.filters.style || book.style === $scope.filters.style;
-                return searchMatch && difficultyMatch && styleMatch;
-            };
+     
+ $scope.customFilter = function(book) {
+    
+    // 1. Maneja el 'searchQuery' (Muestra todo si está vacío O filtra si hay texto)
+    var searchMatch = !$scope.searchQuery || book.title.toLowerCase().includes($scope.searchQuery.toLowerCase()) ||
+                     book.author.toLowerCase().includes($scope.searchQuery.toLowerCase());
+    var difficultyMatch = !$scope.filters.difficulty || book.difficulty === $scope.filters.difficulty;
+    var styleMatch = !$scope.filters.style || (book.tags && book.tags.includes($scope.filters.style));
+    return searchMatch && difficultyMatch && styleMatch;
+};    
 
             // Abre el visor de PDF al hacer clic
             $scope.openPdf = function(book) {
