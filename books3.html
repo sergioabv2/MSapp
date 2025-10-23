@@ -703,6 +703,23 @@
     font-size: 16px;
 }
 
+.tool-btn.active-tool {
+    background-color: #b0b0b0; /* Un gris más oscuro que 'silver' (#c0c0c0) */
+    color: #000; /* Ícono y texto más oscuros para mayor énfasis */
+    border-color: #9e9e9e; /* Un borde que coincida */
+    
+    /* La clave: sombra interior para efecto "presionado" */
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
+    
+    /* Opcional: Moverlo 1px para abajo para simular la presión */
+    transform: translateY(1px);
+}
+
+.tool-btn.active-tool:hover {
+    background-color: #b0b0b0; /* Mantiene el color de fondo */
+    transform: translateY(1px); /* Mantiene la posición */
+}
+
 .metronome-btn.active {
   color: #FF9800;
   animation: pulse 0.5s infinite alternate;
@@ -1593,14 +1610,75 @@ color: white;
 
     <div class="time-displays-container">
         
-     <button class="tool-btn record-btn" style="margin-right: 5px;" ng-click="openTaskModal()" > 
+    
+
+<div class.="annotation-tools" style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">
+    
+    <button class="tool-btn" 
+            ng-click="setAnnotationMode('draw')"
+            ng-class="{'active-tool': annotations.mode === 'draw'}">
+        <i class="fas fa-highlighter"></i>
+    </button>
+
+    <button class="tool-btn" 
+            ng-click="setAnnotationMode('text')"
+            ng-class="{'active-tool': annotations.mode === 'text'}">
+        <i class="fas fa-font"></i>
+    </button>
+
+    <div class="tool-btn color-picker" 
+         id="color-picker-container" 
+         ng-click="toggleColorPicker($event)"
+         style="position: relative; cursor: pointer;">
+        
+        <div id="color-preview-circle" 
+             ng-style="{'background-color': annotations.currentColor}"
+             style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid #ccc;">
+        </div>
+        
+        <div class="color-options" 
+             ng-show="annotations.colorPickerOpen"
+             ng-click="$event.stopPropagation()" 
+             style="position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; padding: 5px; z-index: 100;">
+            
+            <div ng-repeat="swatch in annotations.swatches track by $index"
+                 ng-click="selectSwatch(swatch, $event)"
+                 ng-style="{'background-color': swatch}"
+                 class="color-swatch"
+                 style="width: 20px; height: 20px; margin: 2px;">
+            </div>
+            
+            <input type="color" 
+                   ng-model="annotations.hexColor" 
+                   ng-change="onCustomColorChange()"
+                   style="width: 30px; padding: 0; border: none;">
+        </div>
+    </div>
+
+    <button class="tool-btn" 
+            ng-click="setAnnotationMode('erase')"
+            ng-class="{'active-tool': annotations.mode === 'erase'}">
+        <i class="fas fa-eraser"></i>
+    </button>
+
+    <button class="tool-btn" 
+            ng-click="clearAnnotations()">
+        <i class="fas fa-trash-alt"></i>
+    </button>
+
+     <button class="tool-btn " ng-click="openTaskModal()" > 
    <i class="fa-solid fa-clipboard-list"></i>
     </button>
+</div>
+
+
 
     <div class="time-display">
         <span class="value">{{getCompletedTaskCountForManual(selectedBook)}}  /  {{selectedBook.totalExercises}}</span>
         <span class="label">Ejercicios</span>
       </div>
+
+
     </div>  
   </div>
    </div>
@@ -1736,6 +1814,19 @@ color: white;
     </div>
 </div>
 
+
+<canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10;"></canvas>
+
+<input type="text"
+       id="annotation-text-input-field"
+       ng-if="annotations.textInput.active"
+       ng-model="annotations.textInput.value"
+       ng-blur="finalizeTextInput()"
+       ng-keydown="$event.keyCode === 13 && finalizeTextInput()"
+       ng-style="annotations.textInput.style"
+       style="position: absolute; z-index: 10; background: white; border: 1px solid #ccc; font: bold 18px sans-serif; padding: 2px;"
+/>
+
         <iframe ng-src="{{pdfUrl}}" frameborder="0" allow="fullscreen midi"></iframe>
     </div>
 
@@ -1832,6 +1923,12 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2"}
     ];
 
+
+
+
+
+
+
     // --- TRANSFORMACIÓN DE DATOS ---
     var manuals = manualsData.map(function(manual) {
         return {
@@ -1886,8 +1983,8 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
 
         const requestData = {
             action: "getUserData",
-           token: localStorage.getItem('MStoken')
-          //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+          // token: localStorage.getItem('MStoken')
+             token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -1899,7 +1996,6 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
 
         refreshTimeoutPromise = $timeout(function() {
             if ($scope.isRefreshing) {
-                console.warn("La solicitud de recarga ha excedido el tiempo límite de 10 segundos.");
                 $scope.isRefreshing = false;
                 alert("La recarga de datos ha tardado demasiado. Por favor, inténtalo de nuevo.");
             }
@@ -2013,7 +2109,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         $scope.showPreviewModal = false;
     };
 
-    $scope.openPdfViewer = function(book) {
+  /*  $scope.openPdfViewer = function(book) {
         if (!book || !book.pdf) {
             alert('No hay un PDF disponible para este libro.');
             return;
@@ -2024,7 +2120,68 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
         $scope.showPreviewModal = false;
         $scope.showPdfViewer = true;
-    };
+    };*/
+
+
+    $scope.openPdfViewer = function(book) {
+
+$scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
+$scope.showPreviewModal = false;
+$scope.showPdfViewer = true;
+
+if (!$scope.metronomeAudio) {
+            $scope.metronomeAudio = document.getElementById('metronomeAudio');
+        }
+        
+        // Resetea el modo al abrir
+        $scope.annotations.mode = 'none';
+        
+        // Usa $timeout para esperar a que el DOM (ng-show) se renderice
+        $timeout(function() {
+            // Solo inicializa los listeners UNA VEZ
+            if (!canvasInitialized) {
+                const canvas = document.getElementById('annotation-canvas');
+                const iframe = document.querySelector('.pdf-viewer-overlay iframe');
+
+                if (!canvas || !iframe) {
+                    console.error("No se pudo inicializar el canvas de anotaciones.");
+                    return;
+                }
+                
+                // Guarda las referencias en $scope
+                $scope.annotations._canvas = canvas;
+                $scope.annotations._ctx = canvas.getContext('2d');
+                $scope.annotations._iframe = iframe;
+                
+                // Agrega los listeners
+                canvas.addEventListener('mousedown', onCanvasMouseDown);
+                canvas.addEventListener('mousemove', onCanvasMouseMove);
+                canvas.addEventListener('mouseup', onCanvasMouseUp);
+                canvas.addEventListener('mouseout', onCanvasMouseUp); // Importante
+                canvas.addEventListener('click', onCanvasClick);
+                
+                // Listener para redibujar si la ventana cambia
+                window.addEventListener('resize', redrawAllAnnotations);
+                
+                // Cierra el color picker si se hace clic fuera
+                document.addEventListener('click', function(e) {
+                    const picker = document.getElementById('color-picker-container');
+                    if (picker && !picker.contains(e.target) && $scope.annotations.colorPickerOpen) {
+                        $scope.$apply(function() {
+                            $scope.annotations.colorPickerOpen = false;
+                        });
+                    }
+                });
+
+                canvasInitialized = true;
+            }
+            
+            // Redibuja siempre que se abra el visor
+            redrawAllAnnotations();
+            updateCanvasCursor();
+
+        }, 0); // 0ms de espera
+};
 
     $scope.closePdfViewer = function() {
         $scope.showPdfViewer = false;
@@ -2272,8 +2429,8 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         
         const requestData = {
             action: "newAudio",
-             token: localStorage.getItem('MStoken'),
-          //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
+          //   token: localStorage.getItem('MStoken'),
+            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
             audioBase64: base64AudioData, // Enviamos la cadena Base64
             task: submittedTask, // Enviamos el objeto completo de la tarea
             notes: $scope.recording.notes || "",
@@ -2317,6 +2474,343 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
     $scope.deleteRecording = function() {
         $scope.closeSaveModal();
     };
+
+
+
+
+
+
+
+    // --- ESTADO DE ANOTACIONES ---
+$scope.annotations = {
+    // Estado de la herramienta
+    mode: 'none', // 'none', 'draw', 'text', 'erase'
+    isDrawing: false,
+    colorPickerOpen: false,
+    
+    // Datos de dibujo
+    currentColor: 'rgba(255, 223, 89, 0.4)',
+    hexColor: '#FFDF59', // Para el input[type=color]
+    swatches: [
+        'rgba(255, 223, 89, 0.4)', // Amarillo
+        'rgba(255, 159, 243, 0.4)', // Rosa
+        'rgba(168, 255, 220, 0.4)', // Verde
+        'rgba(149, 218, 255, 0.4)'  // Azul
+    ],
+    
+    // Datos guardados
+    annotations: [],
+    textAnnotations: [],
+
+    // Para el input de texto temporal
+    textInput: {
+        active: false,
+        value: '',
+        style: {} // Se llenará con ng-style
+    },
+
+    // Variables de dibujo temporal
+    _temp: { startX: 0, startY: 0 },
+    
+    // Referencias al DOM (las llenaremos después)
+    _canvas: null,
+    _ctx: null,
+    _iframe: null
+}
+
+
+// --- FUNCIONES DE ANOTACIONES (para ng-click) ---
+
+$scope.setAnnotationMode = function(newMode) {
+    if ($scope.annotations.mode === newMode) {
+        newMode = 'none'; // Tocar el mismo botón lo desactiva
+    }
+    $scope.annotations.mode = newMode;
+    $scope.annotations.textInput.active = false; // Oculta el input de texto
+    
+    // Actualiza el cursor del canvas
+    updateCanvasCursor(); 
+};
+
+$scope.toggleColorPicker = function($event) {
+    $event.stopPropagation();
+    $scope.annotations.colorPickerOpen = !$scope.annotations.colorPickerOpen;
+};
+
+$scope.selectSwatch = function(color, $event) {
+    $event.stopPropagation();
+    $scope.annotations.currentColor = color;
+    // (Opcional) Sincronizar el input 'hex' si puedes
+    $scope.annotations.colorPickerOpen = false;
+};
+
+// Se llama cuando el input[type=color] cambia
+$scope.onCustomColorChange = function() {
+    const hex = $scope.annotations.hexColor;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    $scope.annotations.currentColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+    // No cerramos el picker aquí
+};
+
+$scope.closeColorPicker = function() {
+    $scope.annotations.colorPickerOpen = false;
+};
+
+$scope.clearAnnotations = function() {
+    if (confirm('¿Deseas borrar todas las anotaciones?')) {
+        $scope.annotations.annotations = [];
+        $scope.annotations.textAnnotations = [];
+        redrawAllAnnotations();
+    }
+};
+
+
+$scope.finalizeTextInput = function() {
+const input = $scope.annotations.textInput;
+if (input.active && input.value.trim()) {
+const normalizedX = input.x_norm;
+const normalizedY = input.y_norm;
+
+$scope.annotations.textAnnotations.push({
+text: input.value,
+x: normalizedX, 
+y: normalizedY, 
+color: 'rgba(231, 76, 60, 1.0)',
+font: 'bold 18px sans-serif'
+});
+redrawAllAnnotations();
+}
+input.active = false; 
+input.value = '';
+};
+
+
+
+
+
+
+let canvasInitialized = false;
+
+function updateCanvasCursor() {
+    if (!$scope.annotations._canvas) return;
+    const canvas = $scope.annotations._canvas;
+    
+    switch ($scope.annotations.mode) {
+        case 'draw':
+            canvas.style.pointerEvents = 'auto';
+            canvas.style.cursor = 'crosshair';
+            break;
+        case 'text':
+            canvas.style.pointerEvents = 'auto';
+            canvas.style.cursor = 'text';
+            break;
+        case 'erase':
+            canvas.style.pointerEvents = 'auto';
+            canvas.style.cursor = 'pointer';
+            break;
+        default: // 'none'
+            canvas.style.pointerEvents = 'none';
+            canvas.style.cursor = 'default';
+    }
+}
+
+function redrawAllAnnotations() {
+    const canvas = $scope.annotations._canvas;
+    const ctx = $scope.annotations._ctx;
+    const iframe = $scope.annotations._iframe;
+    
+    if (!canvas || !ctx || !iframe) return;
+    
+    const rect = iframe.getBoundingClientRect();
+
+    // Sincroniza el canvas con el iframe
+    canvas.style.top = rect.top + 'px';
+    canvas.style.left = rect.left + 'px';
+    if (canvas.width !== rect.width || canvas.height !== rect.height) {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+    }
+    
+    // Limpia
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibuja rectángulos (leídos desde $scope)
+    $scope.annotations.annotations.forEach(rect => {
+        ctx.fillStyle = rect.color;
+        ctx.fillRect(
+            rect.x * canvas.width,
+            rect.y * canvas.height,
+            rect.width * canvas.width,
+            rect.height * canvas.height
+        );
+    });
+
+    // Dibuja textos (leídos desde $scope)
+    $scope.annotations.textAnnotations.forEach(text => {
+        ctx.fillStyle = text.color;
+        ctx.font = text.font;
+        ctx.textBaseline = 'top';
+        ctx.fillText(
+            text.text,
+            text.x * canvas.width,
+            text.y * canvas.height
+        );
+    });
+}
+
+// --- Listeners del Canvas (requieren $scope.$apply) ---
+
+function onCanvasMouseDown(e) {
+    if ($scope.annotations.mode !== 'draw') return;
+    
+    $scope.annotations.isDrawing = true;
+    const rect = $scope.annotations._canvas.getBoundingClientRect();
+    $scope.annotations._temp.startX = (e.clientX - rect.left) / rect.width;
+    $scope.annotations._temp.startY = (e.clientY - rect.top) / rect.height;
+}
+
+function onCanvasMouseMove(e) {
+    if (!$scope.annotations.isDrawing) return;
+    
+    redrawAllAnnotations(); // Dibuja lo guardado
+    
+    const canvas = $scope.annotations._canvas;
+    const ctx = $scope.annotations._ctx;
+    const temp = $scope.annotations._temp;
+    const rect = canvas.getBoundingClientRect();
+    
+    const currentX = (e.clientX - rect.left) / rect.width;
+    const currentY = (e.clientY - rect.top) / rect.height;
+
+    const width = (currentX - temp.startX) * canvas.width;
+    const height = (currentY - temp.startY) * canvas.height;
+
+    ctx.fillStyle = $scope.annotations.currentColor;
+    ctx.fillRect(temp.startX * canvas.width, temp.startY * canvas.height, width, height);
+}
+
+function onCanvasMouseUp(e) {
+    if (!$scope.annotations.isDrawing) return;
+    $scope.annotations.isDrawing = false;
+    
+    const canvas = $scope.annotations._canvas;
+    const temp = $scope.annotations._temp;
+    const rect = canvas.getBoundingClientRect();
+    
+    const endX = (e.clientX - rect.left) / rect.width;
+    const endY = (e.clientY - rect.top) / rect.height;
+
+    const finalX = Math.min(temp.startX, endX);
+    const finalY = Math.min(temp.startY, endY);
+    const finalWidth = Math.abs(temp.startX - endX);
+    const finalHeight = Math.abs(temp.startY - endY);
+
+    if (finalWidth > 0.01 && finalHeight > 0.01) {
+        const newAnnotation = {
+            x: finalX,
+            y: finalY,
+            width: finalWidth,
+            height: finalHeight,
+            color: $scope.annotations.currentColor
+        };
+        
+        // ¡¡IMPORTANTE!! Usamos $apply porque este es un evento NO-Angular
+        $scope.$apply(function() {
+            $scope.annotations.annotations.push(newAnnotation);
+        });
+    }
+    
+    redrawAllAnnotations();
+}
+
+function onCanvasClick(e) {
+    const mode = $scope.annotations.mode;
+    if (mode === 'text') {
+        handleCanvasClickForText(e);
+    } else if (mode === 'erase') {
+        handleCanvasClickForEraser(e);
+    }
+}
+
+function handleCanvasClickForText(e) {
+    // ¡¡IMPORTANTE!! Usamos $apply
+    $scope.$apply(function() {
+        // Obtenemos la posición relativa al wrapper (el overlay)
+        const wrapperRect = document.querySelector('.pdf-viewer-overlay').getBoundingClientRect();
+        const canvasRect = $scope.annotations._canvas.getBoundingClientRect();
+        
+        const x = e.clientX - wrapperRect.left;
+        const y = e.clientY - wrapperRect.top;
+
+        // Posición del <input> (en píxeles)
+        $scope.annotations.textInput.style = {
+            'left': (e.clientX - wrapperRect.left) + 'px',
+            'top': (e.clientY - wrapperRect.top) + 'px'
+        };
+        
+        // Posición normalizada (0-1) para guardar
+        $scope.annotations.textInput.x_norm = (e.clientX - canvasRect.left) / canvasRect.width;
+        $scope.annotations.textInput.y_norm = (e.clientY - canvasRect.top) / canvasRect.height;
+
+        $scope.annotations.textInput.value = '';
+        $scope.annotations.textInput.active = true;
+    });
+
+    // Enfoca el input después de que Angular lo cree
+    $timeout(function() {
+        const inputField = document.getElementById('annotation-text-input-field');
+        if (inputField) {
+            inputField.focus();
+        }
+    }, 0);
+}
+
+function handleCanvasClickForEraser(e) {
+    const canvas = $scope.annotations._canvas;
+    const rect = canvas.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) / rect.width;
+    const clickY = (e.clientY - rect.top) / rect.height;
+    let somethingWasDeleted = false;
+
+    // ... (Tu lógica de borrado es la misma, solo que lee de $scope) ...
+    
+    // Itera en reversa para los rectángulos
+    for (let i = $scope.annotations.annotations.length - 1; i >= 0; i--) {
+        const annotation = $scope.annotations.annotations[i];
+        if (clickX >= annotation.x && clickX <= annotation.x + annotation.width &&
+            clickY >= annotation.y && clickY <= annotation.y + annotation.height) {
+            $scope.annotations.annotations.splice(i, 1);
+            somethingWasDeleted = true;
+            break;
+        }
+    }
+
+    // Itera en reversa para los textos
+    if (!somethingWasDeleted) {
+        for (let i = $scope.annotations.textAnnotations.length - 1; i >= 0; i--) {
+            const text = $scope.annotations.textAnnotations[i];
+            const textWidthApprox = (text.text.length * 8) / rect.width;
+            const textHeightApprox = 20 / rect.height;
+
+            if (clickX >= text.x && clickX <= text.x + textWidthApprox &&
+                clickY >= text.y && clickY <= text.y + textHeightApprox) {
+                $scope.annotations.textAnnotations.splice(i, 1);
+                somethingWasDeleted = true;
+                break;
+            }
+        }
+    }
+
+    if (somethingWasDeleted) {
+        // ¡¡IMPORTANTE!! $apply para notificar a Angular del borrado
+        $scope.$apply();
+        redrawAllAnnotations();
+    }
+}
+
+
 
 }]);
     </script>
