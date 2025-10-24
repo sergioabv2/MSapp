@@ -1560,7 +1560,7 @@ color: white;
              <button class="tool-btn" 
              ng-click="setActivePanel('recording')"
           ng-class="{'active-tool': activePanel === 'recording'}" > 
-           <i class="fa-solid fa-microphone"></i> Grabación
+           <i class="fa-solid fa-flag"></i> Tareas
             </button>
         </div>
 
@@ -1620,7 +1620,7 @@ color: white;
    <i class="fa-solid fa-microphone"></i>
     </button>
 
-     <button class="tool-btn " ng-click="openTaskModal()" > 
+     <button class="tool-btn " ng-click="openTaskModal()" ng-if="selectedBook.type === 'manual'"> 
    <i class="fa-solid fa-clipboard-list"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
@@ -1649,18 +1649,21 @@ color: white;
 
 
 <div class="progress-info" ng-show="activePanel === 'edition'">
-  <div  style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">    
+  <div  style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">   
+
+  <button class="tool-btn" 
+        ng-click="setAnnotationMode('stroke')"
+        ng-class="{'active-tool': annotations.mode === 'stroke'}">
+    <i class="fas fa-pencil-alt"></i>
+</button>
+
+
     <button class="tool-btn" 
             ng-click="setAnnotationMode('draw')"
             ng-class="{'active-tool': annotations.mode === 'draw'}">
         <i class="fas fa-highlighter"></i>
     </button>
 
-    <button class="tool-btn" 
-            ng-click="setAnnotationMode('text')"
-            ng-class="{'active-tool': annotations.mode === 'text'}">
-        <i class="fas fa-font"></i>
-    </button>
 
     <div class="tool-btn color-picker" 
          id="color-picker-container" 
@@ -1690,6 +1693,12 @@ color: white;
                    style="width: 30px; padding: 0; border: none;">
         </div>
     </div>
+
+       <button class="tool-btn" 
+            ng-click="setAnnotationMode('text')"
+            ng-class="{'active-tool': annotations.mode === 'text'}">
+        <i class="fas fa-language"></i>
+    </button>
 
     <button class="tool-btn" 
             ng-click="setAnnotationMode('erase')"
@@ -1881,17 +1890,19 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
     $scope.newPdf = {};
     $scope.userPDFs = [];
 
-    // --- DATOS DE LA BIBLIOTECA (INICIALES) ---
+    
     var manualsData = [
         {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
-            { 'lsn': 1, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
-            { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://site.com/midi1.mid' },
-            { 'lsn': 2, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://site.com/midi2.mid' },
-            { 'lsn': 2, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
-            { 'lsn': 3, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
-            { 'lsn': 4, 'id': 1, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
-            { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
-            { 'lsn': 4, 'id': 3, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
+            { 'lsn': 1, 'id': 1, 'pag': 4, 'title': 'Ejercicios', 'task': 'Ritmo y métrica', 'video': 'https://www.youtube.com/embed/qh-4OyTcuJw', 'midi': null },
+            { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Ejercicios', 'task': 'Posición de Do', 'video': 'https://www.youtube.com/embed/3wn33KNLy5M', 'midi': null },
+            { 'lsn': 1, 'id': 3, 'pag': 9, 'title': 'Pieza', 'task': 'Oda a la Alegría, var2', 'video': 'https://www.youtube.com/embed/bVWXlV8Neic'},
+            { 'lsn': 2, 'id': 1, 'pag': 10, 'title': 'Teoría', 'task': 'El Grand Staff', 'video': 'https://www.youtube.com/embed/HHF95sBbmwQ'},
+            { 'lsn': 2, 'id': 2, 'pag': 13, 'title': 'Pieza', 'task': 'Oda a la Alegría, var3','midi': 'https://storage.googleapis.com/mozartacademy-files/midi/Ode%20to%20Joy.mid' },
+            { 'lsn': 3, 'id': 1, 'pag': 16, 'title': 'Ejercicios', 'task': 'Intervalos de 2da y 3era', 'video': 'https://www.youtube.com/embed/H4x0TPlSoaQ'},
+                 { 'lsn': 3, 'id': 2, 'pag': 17, 'title': 'Pieza', 'task': 'Mountain Climbing'},
+            { 'lsn': 4, 'id': 1, 'pag': 19, 'title': 'Ejercicios', 'task': 'Intervalos de 4ta y 5ta', 'video': 'https://www.youtube.com/embed/M6DCHr2wVh8' },
+            { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Teoría', 'task': 'Identificación de intervalos' },
+           
         ] },
         {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
             { 'lsn': 5, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
@@ -1936,7 +1947,6 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
         {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
         {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
-        {'title': 'Nivel 3','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif', 'pdf': '', 'lvl': 3, lsn: 7, 'totalExercises': 30},
     ];
 
     var piecesData = [
@@ -2016,7 +2026,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         const requestData = {
             action: "getUserData",
            token: localStorage.getItem('MStoken')
-          //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+         //    token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -2514,18 +2524,15 @@ if (!$scope.metronomeAudio) {
 
 
 
-
-
-    // --- ESTADO DE ANOTACIONES ---
 $scope.annotations = {
-    // Estado de la herramienta
-    mode: 'none', // 'none', 'draw', 'text', 'erase'
+    mode: 'none', 
     isDrawing: false,
     colorPickerOpen: false,
     
     // Datos de dibujo
     currentColor: 'rgba(255, 223, 89, 0.4)',
-    hexColor: '#FFDF59', // Para el input[type=color]
+    hexColor: '#FFDF59',
+    strokeColor: 'rgba(231, 76, 60, 1.0)',
     swatches: [
         'rgba(255, 223, 89, 0.4)', // Amarillo
         'rgba(255, 159, 243, 0.4)', // Rosa
@@ -2536,8 +2543,8 @@ $scope.annotations = {
     // Datos guardados
     annotations: [],
     textAnnotations: [],
+    strokeAnnotations: [],
 
-    // Para el input de texto temporal
     textInput: {
         active: false,
         value: '',
@@ -2545,7 +2552,7 @@ $scope.annotations = {
     },
 
     // Variables de dibujo temporal
-    _temp: { startX: 0, startY: 0 },
+    _temp: { startX: 0, startY: 0, currentStroke: null },
     
     // Referencias al DOM (las llenaremos después)
     _canvas: null,
@@ -2586,7 +2593,7 @@ $scope.onCustomColorChange = function() {
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     $scope.annotations.currentColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
-    // No cerramos el picker aquí
+    $scope.annotations.strokeColor = `rgba(${r}, ${g}, ${b}, 1.0)`;
 };
 
 $scope.closeColorPicker = function() {
@@ -2597,6 +2604,7 @@ $scope.clearAnnotations = function() {
     if (confirm('¿Deseas borrar todas las anotaciones?')) {
         $scope.annotations.annotations = [];
         $scope.annotations.textAnnotations = [];
+        $scope.annotations.strokeAnnotations = [];
         redrawAllAnnotations();
     }
 };
@@ -2636,6 +2644,10 @@ function updateCanvasCursor() {
         case 'draw':
             canvas.style.pointerEvents = 'auto';
             canvas.style.cursor = 'crosshair';
+            break;
+        case 'stroke':
+            canvas.style.pointerEvents = 'auto';
+            canvas.style.cursor = 'crosshair'; 
             break;
         case 'text':
             canvas.style.pointerEvents = 'auto';
@@ -2693,71 +2705,133 @@ function redrawAllAnnotations() {
             text.y * canvas.height
         );
     });
+
+    $scope.annotations.strokeAnnotations.forEach(stroke => {
+        if (!stroke.points || stroke.points.length === 0) return;
+
+        ctx.beginPath();
+        
+        // Mueve al primer punto (convertido a píxeles)
+        const firstPoint = stroke.points[0];
+        ctx.moveTo(firstPoint.x * canvas.width, firstPoint.y * canvas.height);
+        
+        // Dibuja líneas al resto de los puntos
+        stroke.points.forEach(point => {
+            ctx.lineTo(point.x * canvas.width, point.y * canvas.height);
+        });
+        
+        // Aplica el estilo y dibuja
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = stroke.width;
+        ctx.stroke();
+        ctx.closePath();
+    });   
 }
 
 // --- Listeners del Canvas (requieren $scope.$apply) ---
 
 function onCanvasMouseDown(e) {
-    if ($scope.annotations.mode !== 'draw') return;
-    
+    const mode = $scope.annotations.mode;
+    if (mode !== 'draw' && mode !== 'stroke') return;
+
     $scope.annotations.isDrawing = true;
     const rect = $scope.annotations._canvas.getBoundingClientRect();
-    $scope.annotations._temp.startX = (e.clientX - rect.left) / rect.width;
-    $scope.annotations._temp.startY = (e.clientY - rect.top) / rect.height;
+    const x_norm = (e.clientX - rect.left) / rect.width;
+    const y_norm = (e.clientY - rect.top) / rect.height;
+
+    if (mode === 'draw') {
+        // Lógica de rectángulo (existente)
+        $scope.annotations._temp.startX = x_norm;
+        $scope.annotations._temp.startY = y_norm;
+
+    } else if (mode === 'stroke') {
+        // Lógica de trazo (NUEVA)
+        $scope.annotations._temp.currentStroke = { 
+            color: $scope.annotations.strokeColor, 
+            width: 2, 
+            points: [{x: x_norm, y: y_norm}] // Guarda el primer punto normalizado
+        };
+        
+        // Empieza a dibujar en el canvas (en píxeles)
+        const ctx = $scope.annotations._ctx;
+        ctx.beginPath();
+        ctx.moveTo(x_norm * rect.width, y_norm * rect.height);
+        ctx.strokeStyle = $scope.annotations.strokeColor;
+        ctx.lineWidth = 2;
+    }
 }
 
 function onCanvasMouseMove(e) {
     if (!$scope.annotations.isDrawing) return;
-    
-    redrawAllAnnotations(); // Dibuja lo guardado
-    
-    const canvas = $scope.annotations._canvas;
-    const ctx = $scope.annotations._ctx;
-    const temp = $scope.annotations._temp;
-    const rect = canvas.getBoundingClientRect();
-    
-    const currentX = (e.clientX - rect.left) / rect.width;
-    const currentY = (e.clientY - rect.top) / rect.height;
 
-    const width = (currentX - temp.startX) * canvas.width;
-    const height = (currentY - temp.startY) * canvas.height;
+    const mode = $scope.annotations.mode;
+    const rect = $scope.annotations._canvas.getBoundingClientRect();
+    const x_norm = (e.clientX - rect.left) / rect.width;
+    const y_norm = (e.clientY - rect.top) / rect.height;
+    
+    if (mode === 'draw') {
+        // Lógica de rectángulo (existente)
+        redrawAllAnnotations(); 
+        const ctx = $scope.annotations._ctx;
+        const temp = $scope.annotations._temp;
+        const width = (x_norm - temp.startX) * rect.width;
+        const height = (y_norm - temp.startY) * rect.height;
+        ctx.fillStyle = $scope.annotations.currentColor;
+        ctx.fillRect(temp.startX * rect.width, temp.startY * rect.height, width, height);
 
-    ctx.fillStyle = $scope.annotations.currentColor;
-    ctx.fillRect(temp.startX * canvas.width, temp.startY * canvas.height, width, height);
+    } else if (mode === 'stroke') {
+        // Lógica de trazo (NUEVA)
+        // Guarda el punto normalizado
+        $scope.annotations._temp.currentStroke.points.push({x: x_norm, y: y_norm});
+        
+        // Dibuja el segmento (en píxeles)
+        const ctx = $scope.annotations._ctx;
+        ctx.lineTo(x_norm * rect.width, y_norm * rect.height);
+        ctx.stroke();
+    }
 }
 
 function onCanvasMouseUp(e) {
     if (!$scope.annotations.isDrawing) return;
+    
+    const mode = $scope.annotations.mode;
     $scope.annotations.isDrawing = false;
     
-    const canvas = $scope.annotations._canvas;
-    const temp = $scope.annotations._temp;
-    const rect = canvas.getBoundingClientRect();
-    
-    const endX = (e.clientX - rect.left) / rect.width;
-    const endY = (e.clientY - rect.top) / rect.height;
+    if (mode === 'draw') {
+        // Lógica de rectángulo (existente)
+        const rect = $scope.annotations._canvas.getBoundingClientRect();
+        const temp = $scope.annotations._temp;
+        const endX = (e.clientX - rect.left) / rect.width;
+        const endY = (e.clientY - rect.top) / rect.height;
 
-    const finalX = Math.min(temp.startX, endX);
-    const finalY = Math.min(temp.startY, endY);
-    const finalWidth = Math.abs(temp.startX - endX);
-    const finalHeight = Math.abs(temp.startY - endY);
+        const finalX = Math.min(temp.startX, endX);
+        const finalY = Math.min(temp.startY, endY);
+        const finalWidth = Math.abs(temp.startX - endX);
+        const finalHeight = Math.abs(temp.startY - endY);
 
-    if (finalWidth > 0.01 && finalHeight > 0.01) {
-        const newAnnotation = {
-            x: finalX,
-            y: finalY,
-            width: finalWidth,
-            height: finalHeight,
-            color: $scope.annotations.currentColor
-        };
+        if (finalWidth > 0.01 && finalHeight > 0.01) {
+            $scope.$apply(function() {
+                $scope.annotations.annotations.push({
+                    x: finalX, y: finalY, width: finalWidth, height: finalHeight,
+                    color: $scope.annotations.currentColor
+                });
+            });
+        }
+        redrawAllAnnotations();
+
+    } else if (mode === 'stroke') {
+        // Lógica de trazo (NUEVA)
+        const ctx = $scope.annotations._ctx;
+        ctx.closePath(); // Cierra el trazo actual
         
-        // ¡¡IMPORTANTE!! Usamos $apply porque este es un evento NO-Angular
+        // Guarda el trazo en la lista de anotaciones
         $scope.$apply(function() {
-            $scope.annotations.annotations.push(newAnnotation);
+            $scope.annotations.strokeAnnotations.push($scope.annotations._temp.currentStroke);
         });
+        
+        $scope.annotations._temp.currentStroke = null; // Limpia el trazo temporal
+        // No es necesario redibujar, el trazo ya está en el canvas
     }
-    
-    redrawAllAnnotations();
 }
 
 function onCanvasClick(e) {
@@ -2838,8 +2912,32 @@ function handleCanvasClickForEraser(e) {
         }
     }
 
+
+    if (!somethingWasDeleted) {
+        for (let i = $scope.annotations.strokeAnnotations.length - 1; i >= 0; i--) {
+            const stroke = $scope.annotations.strokeAnnotations[i];
+            
+            // Comprueba si el clic está cerca de CUALQUIER punto del trazo
+            const isNear = stroke.points.some(point => {
+                const pixelX = point.x * rect.width;
+                const pixelY = point.y * rect.height;
+                const clickPixelX = clickX * rect.width;
+                const clickPixelY = clickY * rect.height;
+                
+                // Distancia de 10px para borrar
+                const distance = Math.sqrt(Math.pow(pixelX - clickPixelX, 2) + Math.pow(pixelY - clickPixelY, 2));
+                return distance < 10; 
+            });
+
+            if (isNear) {
+                $scope.annotations.strokeAnnotations.splice(i, 1);
+                somethingWasDeleted = true;
+                break;
+            }
+        }
+    }
+
     if (somethingWasDeleted) {
-        // ¡¡IMPORTANTE!! $apply para notificar a Angular del borrado
         $scope.$apply();
         redrawAllAnnotations();
     }
