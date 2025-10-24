@@ -486,7 +486,7 @@
         }
 
         .pdf-viewer-header {
-            height: 60px;
+            height: 45px;
             background-color: #333;
             color: white;
             display: flex;
@@ -1259,8 +1259,7 @@ color: white;
 
 .time-displays-container {
   display: flex;
-  gap: 5px;
-  margin-right: 7px;
+  gap: 2px;
 }
 
 .time-display {
@@ -1552,16 +1551,77 @@ color: white;
         <div class="pdf-viewer-header" >
             <h3 class="bookTitle">{{ selectedBook.title }}</h3>
 
-<div class="right-controls">
+        <div class="right-controls">
+            <button class="tool-btn" 
+            ng-click="setActivePanel('edition')"
+          ng-class="{'active-tool': activePanel === 'edition'}"> 
+           <i class="fa-solid fa-pen-to-square"></i> Edición
+            </button>
+             <button class="tool-btn" 
+             ng-click="setActivePanel('recording')"
+          ng-class="{'active-tool': activePanel === 'recording'}" > 
+           <i class="fa-solid fa-microphone"></i> Grabación
+            </button>
+        </div>
+
+            <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
+        </div>
+
+
+
+
+
+
+     <div class="progress-display2" >
+     
+
+  <div class="progress-info" ng-show="activePanel === 'recording'">
+
+   
+ <div class="time-displays-container" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
+    <div class="progress-bar-container" >
+      <div class="progress-label">Progreso: 100%</div>
+   <div class="progress-bar">
+  <div class="progress-fill" ng-style="{'width': 100 + '%', 'background': getManualColor(selectedBook)}"></div>
+</div>
+    </div>
+ <div class="time-display">
+        <span class="value">{{selectedBook.totalExercises}} / {{selectedBook.totalExercises}}</span>
+        <span class="label">Ejercicios</span>
+  </div>
+  </div>
+
+
+ <div class="time-displays-container" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
+     <div class="progress-bar-container" >
+      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}} %</div>
+   <div class="progress-bar">
+  <div class="progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%', 'background': getManualColor(selectedBook)}"></div>
+</div>
+    </div>
+     <div class="time-display">
+        <span class="value">{{getCompletedTaskCountForManual(selectedBook)}}  /  {{selectedBook.totalExercises}}</span>
+        <span class="label">Ejercicios</span>
+  </div>
+  </div>
+
+
+    <div class="time-displays-container" style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">
+    <div class="right-controls">
   <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
   <div class="metronome-control">
   <!--  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> -->
+
    
     <button class="tool-btn record-btn" ng-click="openMidiModal(selectedBook)" ng-if="selectedBook.type !== 'manual' && selectedBook.midi"> 
    <i class="fa-solid fa-music"></i>
     </button>
     <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
    <i class="fa-solid fa-microphone"></i>
+    </button>
+
+     <button class="tool-btn " ng-click="openTaskModal()" > 
+   <i class="fa-solid fa-clipboard-list"></i>
     </button>
     <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
  <!--    <i class="fa-solid fa-stopwatch"></i>  -->
@@ -1579,41 +1639,17 @@ color: white;
   </div>
 </div>
 
-            <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
-        </div>
+    </div>  
+  </div>
 
 
 
 
 
 
-     <div class="progress-display2" ng-if="selectedBook.type === 'manual'">
-     
 
-  <div class="progress-info" >
-
-    <div class="progress-bar-container" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
-      <div class="progress-label">Progreso: 100%</div>
-   <div class="progress-bar">
-  <div class="progress-fill" ng-style="{'width': 100 + '%', 'background': getManualColor(selectedBook)}"></div>
-</div>
-    </div>
-
-
-     <div class="progress-bar-container" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
-      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}} %</div>
-   <div class="progress-bar">
-  <div class="progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%', 'background': getManualColor(selectedBook)}"></div>
-</div>
-    </div>
-
-
-    <div class="time-displays-container">
-        
-    
-
-<div class.="annotation-tools" style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">
-    
+<div class="progress-info" ng-show="activePanel === 'edition'">
+  <div  style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">    
     <button class="tool-btn" 
             ng-click="setAnnotationMode('draw')"
             ng-class="{'active-tool': annotations.mode === 'draw'}">
@@ -1665,23 +1701,19 @@ color: white;
             ng-click="clearAnnotations()">
         <i class="fas fa-trash-alt"></i>
     </button>
-
-     <button class="tool-btn " ng-click="openTaskModal()" > 
-   <i class="fa-solid fa-clipboard-list"></i>
-    </button>
+  </div>
 </div>
 
 
 
-    <div class="time-display">
-        <span class="value">{{getCompletedTaskCountForManual(selectedBook)}}  /  {{selectedBook.totalExercises}}</span>
-        <span class="label">Ejercicios</span>
-      </div>
 
 
-    </div>  
-  </div>
    </div>
+
+
+
+
+
 
 
 
@@ -1983,8 +2015,8 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
 
         const requestData = {
             action: "getUserData",
-          // token: localStorage.getItem('MStoken')
-             token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+           token: localStorage.getItem('MStoken')
+          //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -2041,7 +2073,10 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
     };
 
 
-    // --- RESTO DE FUNCIONES DEL CONTROLADOR ---
+      $scope.activePanel = ''; 
+$scope.setActivePanel = function(panel) {
+ $scope.activePanel = ($scope.activePanel === panel) ? '' : panel;
+};
 
     $scope.formatTime = function(seconds) {
         if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -2429,8 +2464,8 @@ if (!$scope.metronomeAudio) {
         
         const requestData = {
             action: "newAudio",
-          //   token: localStorage.getItem('MStoken'),
-            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
+             token: localStorage.getItem('MStoken'),
+         //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
             audioBase64: base64AudioData, // Enviamos la cadena Base64
             task: submittedTask, // Enviamos el objeto completo de la tarea
             notes: $scope.recording.notes || "",
