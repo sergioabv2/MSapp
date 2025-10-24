@@ -29,82 +29,7 @@
             margin: 0 auto;
         }
 
-        /* --- Header --- */
-        .header {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #5668E2, #7343D9);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(86, 104, 226, 0.3);
-        }
-
-        .header-info h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 4px;
-        }
-
-        .header-info p {
-            color: #6e6e73;
-            font-size: 16px;
-        }
-
-        /* --- Search Box --- */
-        .search-box {
-            position: relative;
-            min-width: 280px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            border: 1px solid #d1d5db;
-            border-radius: 12px;
-            background: #f8f9fa;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #5668E2;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(86, 104, 226, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-        }
+      
 
         /* --- Library Content --- */
         .library-section {
@@ -510,6 +435,20 @@
             transition: color 0.2s ease;
         }
 
+          .pdf-viewer-fullscreen {
+            background: none;
+            border: none;
+            color: white;
+            margin-right: 13px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+         .pdf-viewer-fullscreen:hover {
+            color: #d1d1d1;
+        }
+
          
         
         .pdf-viewer-close:hover {
@@ -740,7 +679,7 @@
 
 .online-badge-container {
   position: absolute;
- margin-top: 70px !important;
+ margin-top: 90px !important;
   margin-left: 10px !important;
 }
 
@@ -1027,36 +966,33 @@
 
 
 
-/* --- Estilos para el Modal de Video --- */
 .video-modal-content {
     background: black;
     padding: 0;
-    width: 90%;
+    width: 87%;
     max-width: 800px; /* Ancho máximo del video */
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
     border: 1px solid #333;
     border-radius: 12px;
-    overflow: hidden; /* Para que el iframe respete los bordes redondeados */
+    overflow: hidden; 
 }
 
-/* Contenedor responsivo para el video (aspecto 16:9) */
 .video-container {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* Proporción 16:9 (9 / 16 = 0.5625) */
+    padding-top: 52%; 
 }
 
 .video-container iframe {
     position: absolute;
-    top: 0;
+    top: -15px;
     left: 0;
     width: 100%;
     height: 100%;
 }
 
 .video-close-btn {
-
-    top: -40px; /* Posiciona el botón fuera del video */
+    top: -40px; 
     right: 0;
     color: white;
     font-size: 24px;
@@ -1064,8 +1000,6 @@
     border-radius: 50%;
     width: 32px;
     height: 32px;
-  
-    z-index: 10;
 }
 
 .task-status-container {
@@ -1315,51 +1249,44 @@ color: white;
 
 
 
-   /* Responsive */
+
         @media (max-width: 770px) {
             .modal-content {
                 flex-direction: column;
                 max-width: 400px;
-                height: 90vh;
+                height: 570px;
                 overflow-y: auto;
             }
-            .modal-left {
-        padding: 0; /* Para que la imagen ocupe todo el espacio */
-        max-height: 120px; /* Puedes ajustar esta altura */
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        flex-shrink: 0; /* Evita que se encoja más de la cuenta */
-    }
-    
-    /* Cambio 2: Aplica object-fit */
-    .modal-preview-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* La propiedad clave */
-        max-height: none; /* Anula el max-height anterior */
-        border-radius: 0; /* Opcional: quita el borde redondeado para que encaje perfecto */
-    }
+            .exercise-list-container{height: 240px !important;}
+            .modal-left{display: none}
+            .pdf-viewer-fullscreen{display: none}
+            .time-display{display: none}
             .modal-right {
                 width: 100%;
                 padding: 25px;
             }
         
-           .scroll-btn { display: none; }
-        }
+        .scroll-btn { display: none; }
+   }
+
+
+
 
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .search-box { min-width: 100%; }
+
             .carousel-wrapper { margin-left: 0; margin-right: 0; }
                .exercise-list-container{max-height: 320px !important;}
         }
 
           @media (max-width: 558px) {
             .add-file-btn{display: none}
-            .bookTitle{display: none}
-            .modal-left{display: none}
              .task-status {display: none !important;}
-            .exercise-list-container{max-height: 240px !important;}
+             .modal-content {height: 520px !important;}
+            .exercise-list-container{height: 190px !important;}
+            #edit-options{display: none }
+            .nomobile{display: none}
+            .progress-info{ justify-content: flex-end;}
+
           }
 
           .section-header {
@@ -1401,12 +1328,16 @@ color: white;
     cursor: not-allowed;
     background: none;
 }
+
+[ng-cloak], .ng-cloak {
+    display: none !important;
+  }
     </style>
 </head>
 <body ng-controller="libraryCtrl">
 
 
-<div class="container" ng-hide="showPdfViewer">
+<div class="container" ng-hide="showPdfViewer" ng-cloak>
  </div>
     
 
@@ -1554,7 +1485,7 @@ color: white;
         <div class="right-controls">
             <button class="tool-btn" 
             ng-click="setActivePanel('edition')"
-          ng-class="{'active-tool': activePanel === 'edition'}"> 
+          ng-class="{'active-tool': activePanel === 'edition'}" id="edit-options"> 
            <i class="fa-solid fa-pen-to-square"></i> Edición
             </button>
              <button class="tool-btn" 
@@ -1563,6 +1494,11 @@ color: white;
            <i class="fa-solid fa-flag"></i> Tareas
             </button>
         </div>
+
+         <button class="pdf-viewer-fullscreen" ng-click="toggleFullScreen()">
+        <i class="fa-solid" 
+           ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
+       </button>
 
             <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
         </div>
@@ -1578,7 +1514,7 @@ color: white;
   <div class="progress-info" ng-show="activePanel === 'recording'">
 
    
- <div class="time-displays-container" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
+ <div class="time-displays-container nomobile" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
     <div class="progress-bar-container" >
       <div class="progress-label">Progreso: 100%</div>
    <div class="progress-bar">
@@ -1592,9 +1528,9 @@ color: white;
   </div>
 
 
- <div class="time-displays-container" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
+ <div class="time-displays-container nomobile" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
      <div class="progress-bar-container" >
-      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}} %</div>
+      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}}%</div>
    <div class="progress-bar">
   <div class="progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%', 'background': getManualColor(selectedBook)}"></div>
 </div>
@@ -1606,7 +1542,7 @@ color: white;
   </div>
 
 
-    <div class="time-displays-container" style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">
+    <div class="time-displays-container" >
     <div class="right-controls">
   <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
   <div class="metronome-control">
@@ -1879,6 +1815,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
     // --- ESTADO DE LA UI ---
     $scope.searchQuery = '';
     $scope.showPreviewModal = false;
+    $scope.isFullscreen = false;
     $scope.selectedBook = null;
     $scope.selectedCategory = '';
     $scope.showPdfViewer = false;
@@ -2066,8 +2003,6 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
             })
             .catch(function(error) {
                 $timeout.cancel(refreshTimeoutPromise);
-                console.error('Error al recargar datos del servidor:', error);
-                alert("Error al recargar la información: " + (error.statusText || "Verifica tu conexión a internet."));
             })
             .finally(function() {
                 $scope.isRefreshing = false;
@@ -2087,6 +2022,21 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
 $scope.setActivePanel = function(panel) {
  $scope.activePanel = ($scope.activePanel === panel) ? '' : panel;
 };
+
+$scope.toggleFullScreen = function() {
+    if (!document.fullscreenElement) {
+        // Entrar a pantalla completa
+        document.documentElement.requestFullscreen();
+    } else {
+        // Salir de pantalla completa
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+};
+
+
+
 
     $scope.formatTime = function(seconds) {
         if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -2208,7 +2158,6 @@ if (!$scope.metronomeAudio) {
                 // Listener para redibujar si la ventana cambia
                 window.addEventListener('resize', redrawAllAnnotations);
                 
-                // Cierra el color picker si se hace clic fuera
                 document.addEventListener('click', function(e) {
                     const picker = document.getElementById('color-picker-container');
                     if (picker && !picker.contains(e.target) && $scope.annotations.colorPickerOpen) {
@@ -2217,6 +2166,13 @@ if (!$scope.metronomeAudio) {
                         });
                     }
                 });
+
+
+                document.addEventListener('fullscreenchange', function() {
+                    $scope.$apply(function() {
+                        $scope.isFullscreen = !!document.fullscreenElement;
+                        });
+                    });
 
                 canvasInitialized = true;
             }
@@ -2424,7 +2380,7 @@ if (!$scope.metronomeAudio) {
         }
         if (task.lsn === $scope.lsn) {
             const userRecording = $scope.userSubmittedRecordings.find(rec =>
-                rec.id === task.id
+                rec.id === task.id && rec.lsn === task.lsn
             );
             return userRecording && userRecording.status === 'completed';
         }
@@ -2437,7 +2393,7 @@ if (!$scope.metronomeAudio) {
         }
         if (task.lsn === $scope.lsn) {
             const userRecording = $scope.userSubmittedRecordings.find(rec =>
-                rec.id === task.id
+                rec.id === task.id && rec.lsn === task.lsn
             );
             if (userRecording) {
                 return userRecording.status;
@@ -2948,4 +2904,4 @@ function handleCanvasClickForEraser(e) {
 }]);
     </script>
 </body>
-</html>     
+</html>      
