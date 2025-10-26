@@ -347,8 +347,8 @@ width: 100vw;
 
 /* === NUEVO: Espacio para botón Cerrar === */
 #close-btn-placeholder {
-  width: 40px; /* Ancho para el espacio reservado */
-  height: 40px;
+  width: 25px; /* Ancho para el espacio reservado */
+  height: 25px;
 }
 
 /* === NUEVO: Botones Flotantes de Dibujo === */
@@ -644,13 +644,15 @@ display: flex;
         <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
       </div>
         <button id="midi-learn-btn" class="btn" title="Modo Aprendizaje MIDI">
-  <i class="ri-plug-line"></i>
+  <i class="ri-graduation-cap-line"></i>
 </button>
+    
+
     </div>
 
     <div class="controls-group">
     
-        <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
+        <button id="tools-toggle-btn" class="btn">
         <i class="ri-settings-3-line"></i>
       </button>
 
@@ -676,13 +678,13 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
-       <button id="" class="btn" >
-   <i class="ri-hand"></i> 
+         <button id="" class="btn" >
+ <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
     </button>
-
-     <button id="" class="btn" >
- <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i>
+       <button id="" class="btn" > 
+   <i class="ri-hand"></i> D
     </button>
+  
     </div>
   
      <div class="tool-group">
@@ -710,7 +712,7 @@ display: flex;
 
   <div id="sheet-music-wrapper" style="position: relative;">
     <div id="osmd-container"></div>
-    <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+    
     
 </div>
   <div id="status">Cargando...</div>
@@ -723,6 +725,8 @@ display: flex;
         </div>
         <button id="zoom-in2" class="btn speed-ctrl-btn">+</button>
     </div>
+
+
   </div> 
 
   <div id="piano-container">
@@ -1564,7 +1568,7 @@ function onMIDISuccess(access) {
     }
 
     if (!deviceFound) {
-        showModal("Haz clic en 'Modo Aprendizaje' cuando tu teclado MIDI esté conectado.");
+        showModal("Conecta tu teclado MIDI para iniciar el 'Modo Aprendizaje'.");
     } else {
          console.log('Teclado MIDI ya conectado y listo.');
     }
