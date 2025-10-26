@@ -347,8 +347,8 @@ width: 100vw;
 
 /* === NUEVO: Espacio para botón Cerrar === */
 #close-btn-placeholder {
-  width: 25px; /* Ancho para el espacio reservado */
-  height: 25px;
+  width: 40px; /* Ancho para el espacio reservado */
+  height: 40px;
 }
 
 /* === NUEVO: Botones Flotantes de Dibujo === */
@@ -630,8 +630,6 @@ display: flex;
   background-color: #2980b9;
 }
 
-
-
 #midi-status-legend {
   position: fixed;
   /* Lo ponemos encima de los controles de velocidad móviles */
@@ -692,13 +690,11 @@ display: flex;
         <button id="midi-learn-btn" class="btn" title="Modo Aprendizaje MIDI">
   <i class="ri-graduation-cap-line"></i>
 </button>
-    
-
     </div>
 
     <div class="controls-group">
     
-        <button id="tools-toggle-btn" class="btn">
+        <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
         <i class="ri-settings-3-line"></i>
       </button>
 
@@ -724,13 +720,13 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
-         <button id="" class="btn" >
- <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
+       <button id="" class="btn" >
+   <i class="ri-hand"></i> 
     </button>
-       <button id="" class="btn" > 
-   <i class="ri-hand"></i> D
+
+     <button id="" class="btn" >
+ <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i>
     </button>
-  
     </div>
   
      <div class="tool-group">
@@ -758,16 +754,13 @@ display: flex;
 
   <div id="sheet-music-wrapper" style="position: relative;">
     <div id="osmd-container"></div>
-    
+    <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
     
 </div>
   <div id="status">Cargando...</div>
 
-
-
-
+ 
 <div id="midi-status-legend"></div>
-
 
   <div id="piano-container">
     <div id="piano-keys"></div>
@@ -855,9 +848,9 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   setStatus('Cargando partitura...');
 
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const fileId = urlParams.get('file'); // Busca un parámetro llamado 'file'.
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const fileId = urlParams.get('file'); 
   if (fileId) {
 
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
@@ -867,8 +860,11 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
   } else {
     setStatus('Error: No se ha especificado ningún archivo para cargar. Añade "?file=tu-archivo.musicxml" a la URL.');
-    playBtn.disabled = true; // Deshabilita el botón de play
+    playBtn.disabled = true; 
   }
+
+
+
 });
 
     function initOSMD() {
@@ -884,9 +880,9 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
           drawingParameters: "width",
           drawMeasureNumbers: false,
           cursorsOptions: [{ 
-            type: 3, 
-            color: "rgba(52,152,219,0.5)", 
-            alpha: 0.5, 
+            type: 1, 
+            color: "rgba(52,152,219,0.8)", 
+            alpha: 0.8, 
             follow: true 
           }]
         });
@@ -939,12 +935,11 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
       updateZoomDisplay();
     }
 
-    function updateMidiStatusLegend(deviceName = null) {
+function updateMidiStatusLegend(deviceName = null) {
   if (deviceName) {
     midiStatusLegend.innerHTML = `<i class="ri-plug-line"></i> ${deviceName} Conectado`;
     midiStatusLegend.classList.add('is-visible');
   } else {
-    // Si no hay dispositivos, oculta la leyenda
     midiStatusLegend.classList.remove('is-visible');
   }
 }
@@ -1314,7 +1309,6 @@ speedDownBtn.addEventListener('click', () => {
       });
 
  
-
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
       
       // Redimensionar ventana
@@ -1398,18 +1392,18 @@ function toggleCursorType() {
   if (!osmd || !osmd.cursor) return;
 
   // CORRECCIÓN: Se usa .cursorOptions en lugar de .Options
-  const newType = osmd.cursor.cursorOptions.type === 3 ? 5 : 3;
+  const newType = osmd.cursor.cursorOptions.type === 1 ? 3 : 1;
   osmd.cursor.cursorOptions.type = newType;
 
   // Cambia el color del botón para dar feedback visual
-  if (newType === 5) {
+  if (newType === 3) {
     cursorBtn.style.color = '#3498db'; 
-    osmd.cursor.cursorOptions.alpha =0.6;
-    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.6)";
-  } else {
-    cursorBtn.style.color = '#1a1a1a'; 
      osmd.cursor.cursorOptions.alpha = 0.45;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
+  } else {
+    cursorBtn.style.color = '#1a1a1a'; 
+    osmd.cursor.cursorOptions.alpha =0.8;
+    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
   }
 }
 
@@ -1528,7 +1522,7 @@ function advanceLearningStep() {
 function toggleMidiLearnMode() {
     // Si el usuario hace clic pero no hay MIDI, muestra el mensaje y no hagas nada más.
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
-        showModal("⚠️ Dispositivo MIDI no conectado. Conecta tu teclado MIDI para iniciar el 'Modo Aprendizaje'.");
+        showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
         initMidiInput(); // Intenta reconectar por si acaso
         return; // Detiene la función aquí
     }
@@ -1537,6 +1531,7 @@ function toggleMidiLearnMode() {
     stopPlayback(); 
 
     if (isMidiLearnMode) {
+        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = '#e0e0e0';
         playBtn.disabled = true;
         currentLearningIndex = 0;
@@ -1544,9 +1539,9 @@ function toggleMidiLearnMode() {
 
         cursorBtn.style.color = '#3498db';
         Object.assign(osmd.cursor.cursorOptions, {
-            type: 1,
-            alpha: 0.8,
-            color: "rgba(52, 152, 219, 0.8)"
+            type: 5,
+            alpha: 0.7,
+            color: "rgba(52, 152, 219, 0.7)"
         });
         
         // La llamada a initMidiInput() ya no es necesaria aquí porque se hace al cargar la página
@@ -1585,16 +1580,17 @@ function initMidiInput() {
 function onMIDISuccess(access) {
     midiAccess = access;
     let connectedInputs = new Map();
+
     const handlePortChange = (port) => {
-        if (port.type !== 'input') return; 
+        if (port.type !== 'input') return; // Ignoramos puertos de salida
 
         if (port.state === 'connected') {
             console.log(`MIDI Conectado: ${port.name}`);
-            port.onmidimessage = onMIDIMessage; 
+            port.onmidimessage = onMIDIMessage; // Asigna el listener
             connectedInputs.set(port.id, port);
         } else if (port.state === 'disconnected') {
             console.log(`MIDI Desconectado: ${port.name}`);
-            connectedInputs.delete(port.id); 
+            connectedInputs.delete(port.id); // Elimina del rastreo
         }
 
         if (connectedInputs.size > 0) {
@@ -1605,12 +1601,16 @@ function onMIDISuccess(access) {
         }
     };
 
+    // Asigna el listener para futuros cambios (conectar/desconectar)
     midiAccess.onstatechange = (event) => handlePortChange(event.port);
+
+    // Escaneo inicial de dispositivos YA conectados al cargar la página
     const inputs = midiAccess.inputs.values();
     for (const input of inputs) {
         handlePortChange(input); // Usa la misma lógica
     }
 }
+
 
 function onMIDIFailure() {
     showModal("⚠️ No se pudo acceder a tus dispositivos MIDI. Asegúrate de dar permiso en el navegador.");
@@ -1635,7 +1635,6 @@ function onMIDIMessage(event) {
 
             expectedNotes.delete(pitchName);
             console.log(`¡Correcto! Nota ${pitchName}. Faltan ${expectedNotes.size}.`);
-            osmd.cursor.next(); 
             
             if (expectedNotes.size === 0) {
                 setTimeout(() => {
@@ -1651,7 +1650,7 @@ function prepareNextExpectedNotes() {
     expectedNotes.clear();
     if (currentLearningIndex >= parsedNotes.length) {
         console.log("¡Felicidades, terminaste la pieza!");
-        toggleMidiLearnMode(); 
+        toggleMidiLearnMode(); // Desactiva el modo al final
         return;
     }
 
