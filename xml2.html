@@ -629,6 +629,52 @@ display: flex;
 #modal-close-btn:hover {
   background-color: #2980b9;
 }
+
+
+
+#midi-status-legend {
+  position: fixed;
+  /* Lo ponemos encima de los controles de velocidad móviles */
+  bottom: 165px; 
+  left: 10px;
+  z-index: 50;
+  background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
+  color: #fafafa;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* Oculto por defecto */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* No interfiere con clics */
+}
+
+#midi-status-legend.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#midi-status-legend i {
+  font-size: 16px;
+  color: #3498db; /* Ícono azul */
+}
+
+/* En desktop, no hay controles de velocidad, 
+   así que podemos bajar la leyenda */
+@media (min-width: 501px) {
+  #midi-status-legend {
+    bottom: 120px; /* Justo sobre el piano */
+  }
+}
   </style>
 </head>
 <body>
@@ -717,20 +763,13 @@ display: flex;
 </div>
   <div id="status">Cargando...</div>
 
-  <div id="floating-speed-controls">
-    <div class="speed-group">
-        <button id="zoom-out2" class="btn speed-ctrl-btn">−</button>
-        <div class="speed-display">
-          <span class="speed-bpm" id="zoom-label2">Zoom: 100%</span>
-        </div>
-        <button id="zoom-in2" class="btn speed-ctrl-btn">+</button>
-    </div>
 
 
-  </div> 
+
+<div id="midi-status-legend"></div>
+
 
   <div id="piano-container">
-   
     <div id="piano-keys"></div>
   </div>
 
@@ -763,9 +802,6 @@ const speedDownBtn = document.getElementById('speed-down-btn');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomLabel = document.getElementById('zoom-label');
-     const zoomInBtn2 = document.getElementById('zoom-in2');
-    const zoomOutBtn2 = document.getElementById('zoom-out2');
-    const zoomLabel2 = document.getElementById('zoom-label2');
     const currentTimeSpan = document.getElementById('current-time');
 const totalTimeSpan = document.getElementById('total-time');
 const measureSelect = document.getElementById('measure-select');
@@ -777,6 +813,7 @@ const fullscreenBtn = document.getElementById('fullscreen-btn');
 const midiModal = document.getElementById('midi-modal');
 const modalMessage = document.getElementById('modal-message');
 const modalCloseBtn = document.getElementById('modal-close-btn');
+const midiStatusLegend = document.getElementById('midi-status-legend');
 
     let osmd = null;
     let sampler = null;
@@ -811,6 +848,7 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   createPiano88Keys();
   addEventListeners();
   initSampler();
+  initMidiInput();
   
   setStatus('Cargando sonidos de piano...');
   await Tone.loaded();
@@ -900,6 +938,16 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
       
       updateZoomDisplay();
     }
+
+    function updateMidiStatusLegend(deviceName = null) {
+  if (deviceName) {
+    midiStatusLegend.innerHTML = `<i class="ri-plug-line"></i> ${deviceName} Conectado`;
+    midiStatusLegend.classList.add('is-visible');
+  } else {
+    // Si no hay dispositivos, oculta la leyenda
+    midiStatusLegend.classList.remove('is-visible');
+  }
+}
 
     function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -1265,16 +1313,7 @@ speedDownBtn.addEventListener('click', () => {
         applyZoom();
       });
 
-        // Controles de zoom
-      zoomInBtn2.addEventListener('click', () => {
-        currentZoom = Math.min(2.0, currentZoom + 0.1);
-        applyZoom();
-      });
-      
-      zoomOutBtn2.addEventListener('click', () => {
-        currentZoom = Math.max(0.5, currentZoom - 0.1);
-        applyZoom();
-      });
+ 
 
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
       
@@ -1410,7 +1449,6 @@ function toggleFullScreen() {
 
     function updateZoomDisplay() {
       zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
-      zoomLabel2.textContent = `${Math.round(currentZoom * 100)}%`;
     }
 
     function updatePlayButton(isPlaying) {
@@ -1490,7 +1528,7 @@ function advanceLearningStep() {
 function toggleMidiLearnMode() {
     // Si el usuario hace clic pero no hay MIDI, muestra el mensaje y no hagas nada más.
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
-        showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
+        showModal("⚠️ Dispositivo MIDI no conectado. Conecta tu teclado MIDI para iniciar el 'Modo Aprendizaje'.");
         initMidiInput(); // Intenta reconectar por si acaso
         return; // Detiene la función aquí
     }
@@ -1499,7 +1537,6 @@ function toggleMidiLearnMode() {
     stopPlayback(); 
 
     if (isMidiLearnMode) {
-        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = '#e0e0e0';
         playBtn.disabled = true;
         currentLearningIndex = 0;
@@ -1543,34 +1580,35 @@ function initMidiInput() {
     }
 }
 
+
+
 function onMIDISuccess(access) {
     midiAccess = access;
+    let connectedInputs = new Map();
+    const handlePortChange = (port) => {
+        if (port.type !== 'input') return; 
 
-    // ▼▼▼ NUEVO: Escuchamos cambios de estado (conexión/desconexión) ▼▼▼
-    midiAccess.onstatechange = (event) => {
-        const port = event.port;
-        const deviceName = port.name || 'Dispositivo MIDI';
+        if (port.state === 'connected') {
+            console.log(`MIDI Conectado: ${port.name}`);
+            port.onmidimessage = onMIDIMessage; 
+            connectedInputs.set(port.id, port);
+        } else if (port.state === 'disconnected') {
+            console.log(`MIDI Desconectado: ${port.name}`);
+            connectedInputs.delete(port.id); 
+        }
 
-        if (port.state === 'connected' && port.type === 'input') {
-            showModal(`✅ ¡${deviceName} conectado!`, 3000); // Se cierra solo a los 3 seg
-            port.onmidimessage = onMIDIMessage; // Asigna el listener al nuevo dispositivo
-        } else if (port.state === 'disconnected' && port.type === 'input') {
-            showModal(`🔌 ¡${deviceName} desconectado!`, 3000);
+        if (connectedInputs.size > 0) {
+            const firstDeviceName = connectedInputs.values().next().value.name;
+            updateMidiStatusLegend(firstDeviceName);
+        } else {
+            updateMidiStatusLegend(null);
         }
     };
 
-    // Configuración inicial de los dispositivos ya conectados
+    midiAccess.onstatechange = (event) => handlePortChange(event.port);
     const inputs = midiAccess.inputs.values();
-    let deviceFound = false;
     for (const input of inputs) {
-        input.onmidimessage = onMIDIMessage;
-        deviceFound = true;
-    }
-
-    if (!deviceFound) {
-        showModal("Conecta tu teclado MIDI para iniciar el 'Modo Aprendizaje'.");
-    } else {
-         console.log('Teclado MIDI ya conectado y listo.');
+        handlePortChange(input); // Usa la misma lógica
     }
 }
 
@@ -1614,7 +1652,7 @@ function prepareNextExpectedNotes() {
     expectedNotes.clear();
     if (currentLearningIndex >= parsedNotes.length) {
         console.log("¡Felicidades, terminaste la pieza!");
-        toggleMidiLearnMode(); // Desactiva el modo al final
+        toggleMidiLearnMode(); 
         return;
     }
 
