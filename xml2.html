@@ -347,8 +347,8 @@ width: 100vw;
 
 /* === NUEVO: Espacio para botón Cerrar === */
 #close-btn-placeholder {
-  width: 40px; /* Ancho para el espacio reservado */
-  height: 40px;
+  width: 30px; /* Ancho para el espacio reservado */
+  height: 39px;
 }
 
 /* === NUEVO: Botones Flotantes de Dibujo === */
@@ -673,6 +673,31 @@ display: flex;
     bottom: 120px; /* Justo sobre el piano */
   }
 }
+
+
+#right-hand-only-btn.active,
+#left-hand-only-btn.active {
+  background-color: #e0e0e0 !important;
+  color: #3498db !important;
+  border-color: #3498db !important;
+}
+
+.key.midi-active {
+  background-color: #e0e0e0 !important; /* Un gris claro sutil */
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Para teclas blancas */
+.key.white.midi-active {
+  background-color: #e8e8e8 !important;
+}
+
+/* Para teclas negras */
+.key.black.midi-active {
+  background-color: #555555 !important;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4) !important;
+}
+
   </style>
 </head>
 <body>
@@ -720,13 +745,12 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
-       <button id="" class="btn" >
-   <i class="ri-hand"></i> 
-    </button>
-
-     <button id="" class="btn" >
- <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i>
-    </button>
+  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
+    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
+  </button>
+    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
+    <i class="ri-hand"></i> D
+  </button>
     </div>
   
      <div class="tool-group">
@@ -807,6 +831,9 @@ const midiModal = document.getElementById('midi-modal');
 const modalMessage = document.getElementById('modal-message');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const midiStatusLegend = document.getElementById('midi-status-legend');
+const rightHandOnlyBtn = document.getElementById('right-hand-only-btn');
+const leftHandOnlyBtn = document.getElementById('left-hand-only-btn');
+let handFilterMode = 'both';
 
     let osmd = null;
     let sampler = null;
@@ -848,7 +875,12 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   setStatus('Cargando partitura...');
 
 
+/*
+const dynamicUrl = 'https://storage.googleapis.com/mozartacademy-files/xml/kuhlau-op20-n1.musicxml'
+    await loadMusicXMLFromUrl(dynamicUrl);
 
+*/
+   
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
@@ -1285,6 +1317,9 @@ function updateSpeed(newRate) {
     scheduleNotesOnTransport();
 }
 
+ rightHandOnlyBtn.addEventListener('click', toggleRightHandOnly);
+  leftHandOnlyBtn.addEventListener('click', toggleLeftHandOnly);
+
 speedUpBtn.addEventListener('click', () => {
     updateSpeed(playbackRate + speedStep);
 });
@@ -1477,34 +1512,62 @@ function highlightKey(noteName, durSec, hand, persist = false) {
 }
 
 function advanceLearningStep() {
-    clearAllHighlights();
-    expectedNotes.clear();
+  clearAllHighlights();
+  expectedNotes.clear();
 
-    if (currentLearningIndex >= parsedNotes.length) {
-        alert("¡Felicidades, has completado la pieza!");
-        toggleMidiLearnMode();
-        return;
-    }
+  if (currentLearningIndex >= parsedNotes.length) {
+    alert("¡Felicidades, has completado la pieza!");
+    toggleMidiLearnMode();
+    return;
+  }
 
+  let notesInStep = [];
+  let foundValidStep = false;
+
+  // Buscar el siguiente paso que tenga notas según el filtro de mano
+  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    const notesInStep = [];
+    notesInStep = [];
     
+    // Agrupar todas las notas del mismo tiempo
     while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
-        notesInStep.push(parsedNotes[currentLearningIndex]);
-        currentLearningIndex++;
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
     }
 
-    if (notesInStep.length > 0) {
-        // ESTA SÍ AVANZA EL CURSOR (solo para notas después de la primera)
-        osmd.cursor.next();
-        
-        notesInStep.forEach(note => {
-            expectedNotes.add(note.pitch);
-            highlightKey(note.pitch, note.durSec, note.hand, true); 
-        });
-        
-        console.log("Esperando que toques:", Array.from(expectedNotes));
+    // Aplicar filtro de mano y verificar si hay notas válidas
+    const filteredNotes = notesInStep.filter(note => 
+      handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass')
+    );
+
+    if (filteredNotes.length > 0) {
+      // Este paso tiene notas válidas según el filtro
+      foundValidStep = true;
+      notesInStep = filteredNotes;
+      
+      osmd.cursor.next();
+      
+      // Preparar las notas esperadas
+      notesInStep.forEach(note => {
+        expectedNotes.add(note.pitch);
+        highlightKey(note.pitch, note.durSec, note.hand, true);
+      });
+      
+      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // Este paso no tiene notas válidas, avanzar cursor visualmente pero no esperar notas
+      osmd.cursor.next();
+      console.log(`Salto paso sin notas de ${handFilterMode}`);
     }
+  }
+
+  // Si llegamos al final sin encontrar pasos válidos
+  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+    alert("¡Felicidades, has completado la pieza!");
+    toggleMidiLearnMode();
+  }
 }
 
     function setStatus(text) { 
@@ -1516,7 +1579,6 @@ function advanceLearningStep() {
 
 
 function toggleMidiLearnMode() {
-    // Si el usuario hace clic pero no hay MIDI, muestra el mensaje y no hagas nada más.
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
         showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
         initMidiInput(); // Intenta reconectar por si acaso
@@ -1539,8 +1601,11 @@ function toggleMidiLearnMode() {
             color: "rgba(52, 152, 219, 0.7)"
         });
         
-        // PREPARAR LA PRIMERA NOTA SIN AVANZAR EL CURSOR
-        prepareFirstLearningStep(); // Nueva función para la primera nota
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+
+        prepareFirstLearningStep(); 
         
     } else {
         midiLearnBtn.style.background = 'none';
@@ -1551,45 +1616,165 @@ function toggleMidiLearnMode() {
         
         cursorBtn.style.color = '#1a1a1a';
         Object.assign(osmd.cursor.cursorOptions, {
-            type: 3,
-            alpha: 0.45,
-            color: "rgba(52, 152, 219, 0.45)"
+            type: 1,
+            alpha: 0.8,
+            color: "rgba(52, 152, 219, 0.8)"
         });
+
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
     }
 }
 
-// NUEVA FUNCIÓN: Prepara la primera nota sin avanzar el cursor
+
 function prepareFirstLearningStep() {
-    clearAllHighlights();
-    expectedNotes.clear();
+  clearAllHighlights();
+  expectedNotes.clear();
 
-    if (currentLearningIndex >= parsedNotes.length) {
-        alert("¡Felicidades, has completado la pieza!");
-        toggleMidiLearnMode();
-        return;
-    }
+  if (currentLearningIndex >= parsedNotes.length) {
+    alert("¡Felicidades, has completado la pieza!");
+    toggleMidiLearnMode();
+    return;
+  }
 
+  let notesInStep = [];
+  let foundValidStep = false;
+
+  // Buscar el primer paso que tenga notas según el filtro de mano
+  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    const notesInStep = [];
+    notesInStep = [];
     
+    // Agrupar todas las notas del mismo tiempo
     while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
-        notesInStep.push(parsedNotes[currentLearningIndex]);
-        currentLearningIndex++;
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
     }
 
-    if (notesInStep.length > 0) {
-        // SOLO PREPARA LAS NOTAS VISUALES, SIN AVANZAR EL CURSOR
-        notesInStep.forEach(note => {
-            expectedNotes.add(note.pitch);
-            highlightKey(note.pitch, note.durSec, note.hand, true); 
-        });
-        
-        console.log("Esperando que toques:", Array.from(expectedNotes));
+    // Aplicar filtro de mano y verificar si hay notas válidas
+    const filteredNotes = notesInStep.filter(note => 
+      handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass')
+    );
+
+    if (filteredNotes.length > 0) {
+      // Este paso tiene notas válidas según el filtro
+      foundValidStep = true;
+      notesInStep = filteredNotes;
+      
+      // SOLO PREPARAR LAS NOTAS VISUALES, SIN AVANZAR EL CURSOR (es el primer paso)
+      notesInStep.forEach(note => {
+        expectedNotes.add(note.pitch);
+        highlightKey(note.pitch, note.durSec, note.hand, true);
+      });
+      
+      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // Este paso no tiene notas válidas, avanzar cursor visualmente
+      osmd.cursor.next();
+      console.log(`Salto paso inicial sin notas de ${handFilterMode}`);
     }
+  }
+
+  // Si llegamos al final sin encontrar pasos válidos
+  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+    alert("¡No hay notas para la mano seleccionada en esta pieza!");
+    toggleMidiLearnMode();
+  }
 }
 
 
-// Script: añade esta nueva función
+function toggleRightHandOnly() {
+  if (handFilterMode === 'right') {
+    // Si ya está activo, desactivar
+    handFilterMode = 'both';
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+  } else {
+    // Activar solo mano derecha
+    handFilterMode = 'right';
+    rightHandOnlyBtn.style.background = '#e0e0e0';
+    rightHandOnlyBtn.style.color = '#3498db';
+    leftHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+    
+    // Si estaba activo mano izquierda, desactivarlo
+    if (isMidiLearnMode && expectedNotes.size > 0) {
+      reloadCurrentStepWithHandFilter();
+    }
+  }
+  console.log(`Modo de mano: ${handFilterMode}`);
+}
+
+function toggleLeftHandOnly() {
+  if (handFilterMode === 'left') {
+    // Si ya está activo, desactivar
+    handFilterMode = 'both';
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+  } else {
+    // Activar solo mano izquierda
+    handFilterMode = 'left';
+    leftHandOnlyBtn.style.background = '#e0e0e0';
+    leftHandOnlyBtn.style.color = '#3498db';
+    rightHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    
+    // Si estaba activo mano derecha, desactivarlo
+    if (isMidiLearnMode && expectedNotes.size > 0) {
+      reloadCurrentStepWithHandFilter();
+    }
+  }
+  console.log(`Modo de mano: ${handFilterMode}`);
+}
+
+
+function reloadCurrentStepWithHandFilter() {
+  if (!isMidiLearnMode) return;
+  
+  // Retroceder el índice para volver a cargar las notas actuales
+  const currentStepNotes = [];
+  const targetTime = parsedNotes[currentLearningIndex - 1]?.startSec;
+  
+  // Buscar todas las notas del paso actual
+  let tempIndex = currentLearningIndex - 1;
+  while (tempIndex >= 0 && parsedNotes[tempIndex]?.startSec === targetTime) {
+    currentStepNotes.unshift(parsedNotes[tempIndex]);
+    tempIndex--;
+  }
+  
+  // Aplicar filtro de mano
+  clearAllHighlights();
+  expectedNotes.clear();
+  
+  const filteredNotes = currentStepNotes.filter(note => 
+    handFilterMode === 'both' || 
+    (handFilterMode === 'right' && note.hand === 'treble') ||
+    (handFilterMode === 'left' && note.hand === 'bass')
+  );
+  
+  if (filteredNotes.length > 0) {
+    filteredNotes.forEach(note => {
+      expectedNotes.add(note.pitch);
+      highlightKey(note.pitch, note.durSec, note.hand, true);
+    });
+    console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+  } else {
+    // Si el paso actual no tiene notas con el filtro aplicado, avanzar al siguiente
+    console.log(`Paso actual no tiene notas de ${handFilterMode}, avanzando...`);
+    advanceLearningStep();
+  }
+}
+
+
+
+
 function initMidiInput() {
     if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess()
@@ -1643,36 +1828,57 @@ function onMIDIFailure() {
     playBtn.disabled = false;
 }
 
-// Script: añade esta nueva función
-function onMIDIMessage(event) {
-    if (!isMidiLearnMode || expectedNotes.size === 0) return;
 
+
+function onMIDIMessage(event) {
     const command = event.data[0];
     const note = event.data[1];
     const velocity = event.data.length > 2 ? event.data[2] : 0;
 
     if (command === 144 && velocity > 0) {
+        // NOTE ON - Colorear la tecla
         const pitchName = midiNoteToPitchName(note);
-
-        if (expectedNotes.has(pitchName)) {
-            sampler.triggerAttackRelease(pitchName, '8n');
-
-            expectedNotes.delete(pitchName);
-            console.log(`¡Correcto! Nota ${pitchName}. Faltan ${expectedNotes.size}.`);
-            
-            if (expectedNotes.size === 0) {
-                setTimeout(() => {
-                    // Para la primera nota, no necesitamos hacer nada especial con el cursor
-                    // Para notas subsiguientes, usamos advanceLearningStep()
-                    if (currentLearningIndex > 0) {
-                        advanceLearningStep();
-                    } else {
-                        // Esto no debería pasar, pero por seguridad
-                        prepareFirstLearningStep();
-                    }
-                }, 300); 
+        highlightMidiKey(pitchName);
+        
+        // Lógica existente del modo aprendizaje
+        if (isMidiLearnMode && expectedNotes.size > 0) {
+            if (expectedNotes.has(pitchName)) {
+                sampler.triggerAttackRelease(pitchName, '8n');
+                expectedNotes.delete(pitchName);
+                console.log(`¡Correcto! Nota ${pitchName}. Faltan ${expectedNotes.size}.`);
+                
+                if (expectedNotes.size === 0) {
+                    setTimeout(() => {
+                        if (currentLearningIndex > 0) {
+                            advanceLearningStep();
+                        } else {
+                            prepareFirstLearningStep();
+                        }
+                    }, 300); 
+                }
             }
         }
+    } else if (command === 128 || (command === 144 && velocity === 0)) {
+        // NOTE OFF - Quitar el color
+        const pitchName = midiNoteToPitchName(note);
+        unhighlightMidiKey(pitchName);
+    }
+}
+
+// Añade estas nuevas funciones para el coloreado MIDI
+function highlightMidiKey(noteName) {
+    const noteId = noteName.replace('b', '#');
+    const el = document.getElementById(noteId);
+    if (el) {
+        el.classList.add('midi-active');
+    }
+}
+
+function unhighlightMidiKey(noteName) {
+    const noteId = noteName.replace('b', '#');
+    const el = document.getElementById(noteId);
+    if (el) {
+        el.classList.remove('midi-active');
     }
 }
 
