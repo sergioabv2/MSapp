@@ -1857,11 +1857,12 @@ function onMIDIMessage(event) {
 
     if (command === 144 && velocity > 0) {
         // NOTE ON - Colorear la tecla
-        const pitchName = midiNoteToPitchName(note);
+        const pitchName = normalizeNote(midiNoteToPitchName(note)); // ← NORMALIZAR AQUÍ
         highlightMidiKey(pitchName);
         
         // Lógica existente del modo aprendizaje
         if (isMidiLearnMode && expectedNotes.size > 0) {
+            console.log(`MIDI tocó: ${pitchName}, esperando:`, Array.from(expectedNotes)); // DEBUG
             if (expectedNotes.has(pitchName)) {
                 sampler.triggerAttackRelease(pitchName, '8n');
                 expectedNotes.delete(pitchName);
@@ -1876,11 +1877,13 @@ function onMIDIMessage(event) {
                         }
                     }, 300); 
                 }
+            } else {
+                console.log(`Nota incorrecta: ${pitchName}`); // DEBUG
             }
         }
     } else if (command === 128 || (command === 144 && velocity === 0)) {
         // NOTE OFF - Quitar el color
-        const pitchName = midiNoteToPitchName(note);
+        const pitchName = normalizeNote(midiNoteToPitchName(note)); // ← NORMALIZAR AQUÍ TAMBIÉN
         unhighlightMidiKey(pitchName);
     }
 }
