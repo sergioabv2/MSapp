@@ -1476,7 +1476,6 @@ function highlightKey(noteName, durSec, hand, persist = false) {
     }
 }
 
-// Script: Añade esta nueva función principal de aprendizaje
 function advanceLearningStep() {
     clearAllHighlights();
     expectedNotes.clear();
@@ -1496,16 +1495,13 @@ function advanceLearningStep() {
     }
 
     if (notesInStep.length > 0) {
+        // ESTA SÍ AVANZA EL CURSOR (solo para notas después de la primera)
         osmd.cursor.next();
-        const pitchesToPlay = [];
-
-        // Ahora, esta función SOLO prepara lo visual.
+        
         notesInStep.forEach(note => {
             expectedNotes.add(note.pitch);
             highlightKey(note.pitch, note.durSec, note.hand, true); 
         });
-
-        // La línea que reproducía el sonido (sampler.triggerAttackRelease) se ha eliminado de aquí.
         
         console.log("Esperando que toques:", Array.from(expectedNotes));
     }
@@ -1531,7 +1527,6 @@ function toggleMidiLearnMode() {
     stopPlayback(); 
 
     if (isMidiLearnMode) {
-        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = '#e0e0e0';
         playBtn.disabled = true;
         currentLearningIndex = 0;
@@ -1544,11 +1539,10 @@ function toggleMidiLearnMode() {
             color: "rgba(52, 152, 219, 0.7)"
         });
         
-        // La llamada a initMidiInput() ya no es necesaria aquí porque se hace al cargar la página
+        // PREPARAR LA PRIMERA NOTA SIN AVANZAR EL CURSOR
+        prepareFirstLearningStep(); // Nueva función para la primera nota
         
-        advanceLearningStep(); 
     } else {
-        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = 'none';
         playBtn.disabled = false;
         clearAllHighlights(); 
@@ -1561,6 +1555,36 @@ function toggleMidiLearnMode() {
             alpha: 0.45,
             color: "rgba(52, 152, 219, 0.45)"
         });
+    }
+}
+
+// NUEVA FUNCIÓN: Prepara la primera nota sin avanzar el cursor
+function prepareFirstLearningStep() {
+    clearAllHighlights();
+    expectedNotes.clear();
+
+    if (currentLearningIndex >= parsedNotes.length) {
+        alert("¡Felicidades, has completado la pieza!");
+        toggleMidiLearnMode();
+        return;
+    }
+
+    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+    const notesInStep = [];
+    
+    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
+        notesInStep.push(parsedNotes[currentLearningIndex]);
+        currentLearningIndex++;
+    }
+
+    if (notesInStep.length > 0) {
+        // SOLO PREPARA LAS NOTAS VISUALES, SIN AVANZAR EL CURSOR
+        notesInStep.forEach(note => {
+            expectedNotes.add(note.pitch);
+            highlightKey(note.pitch, note.durSec, note.hand, true); 
+        });
+        
+        console.log("Esperando que toques:", Array.from(expectedNotes));
     }
 }
 
@@ -1638,7 +1662,14 @@ function onMIDIMessage(event) {
             
             if (expectedNotes.size === 0) {
                 setTimeout(() => {
-                    advanceLearningStep();
+                    // Para la primera nota, no necesitamos hacer nada especial con el cursor
+                    // Para notas subsiguientes, usamos advanceLearningStep()
+                    if (currentLearningIndex > 0) {
+                        advanceLearningStep();
+                    } else {
+                        // Esto no debería pasar, pero por seguridad
+                        prepareFirstLearningStep();
+                    }
                 }, 300); 
             }
         }
