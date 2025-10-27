@@ -913,6 +913,7 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
 
+
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
@@ -1701,21 +1702,18 @@ function advanceLearningStep() {
 
   let notesInStep = [];
   let foundValidStep = false;
-  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  const TIME_TOLERANCE = 0.001;
 
-  // Buscar el siguiente paso que tenga notas según el filtro de mano
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Agrupar todas las notas que están dentro de la tolerancia de tiempo
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
-    // Aplicar filtro de mano y verificar si hay notas válidas
     const filteredNotes = notesInStep.filter(note => 
       handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
@@ -1723,46 +1721,27 @@ function advanceLearningStep() {
     );
 
     if (filteredNotes.length > 0) {
-      // Este paso tiene notas válidas según el filtro
       foundValidStep = true;
       notesInStep = filteredNotes;
       
-      // IMPORTANTE: Solo avanza el cursor si hay notas que tocar
       osmd.cursor.next();
       
-      // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
       const uniquePitches = new Set();
       
-      // Preparar las notas esperadas (NORMALIZADAS)
-      // Solo incluir notas que NO son continuación de ligadura
       notesInStep.forEach(note => {
         const normalizedNote = normalizeNote(note.pitch);
         
-        // Si es una nota ligada que no es el inicio, no la esperamos
-        if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+        if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
-        } else if (!uniquePitches.has(normalizedNote)) {
-          // Si es continuación de ligadura o duplicada, solo la resaltamos visualmente una vez
-          uniquePitches.add(normalizedNote);
           highlightKey(note.pitch, note.durSec, note.hand, true);
         }
       });
       
-      // Si después de filtrar ligaduras no hay notas que esperar, avanza automáticamente
-      if (expectedNotes.size === 0) {
-        console.log(`Paso con solo notas ligadas, avanzando automáticamente...`);
-        setTimeout(() => advanceLearningStep(), 300);
-        return;
-      }
-      
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     }
-    // Si no hay notas válidas, NO avanzar el cursor y continuar buscando
   }
 
-  // Si llegamos al final sin encontrar pasos válidos
   if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
     alert("¡Felicidades, has completado la pieza!");
     toggleMidiLearnMode();
@@ -1839,21 +1818,18 @@ function prepareFirstLearningStep() {
 
   let notesInStep = [];
   let foundValidStep = false;
-  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  const TIME_TOLERANCE = 0.001;
 
-  // Buscar el primer paso que tenga notas según el filtro de mano
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Agrupar todas las notas que están dentro de la tolerancia de tiempo
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
-    // Aplicar filtro de mano y verificar si hay notas válidas
     const filteredNotes = notesInStep.filter(note => 
       handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
@@ -1861,43 +1837,25 @@ function prepareFirstLearningStep() {
     );
 
     if (filteredNotes.length > 0) {
-      // Este paso tiene notas válidas según el filtro
       foundValidStep = true;
       notesInStep = filteredNotes;
       
-      // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
       const uniquePitches = new Set();
       
-      // SOLO PREPARAR LAS NOTAS VISUALES, SIN AVANZAR EL CURSOR (es el primer paso)
-      // Solo incluir notas que NO son continuación de ligadura
       notesInStep.forEach(note => {
         const normalizedNote = normalizeNote(note.pitch);
         
-        // Si es una nota ligada que no es el inicio, no la esperamos
-        if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+        if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
-        } else if (!uniquePitches.has(normalizedNote)) {
-          // Si es continuación de ligadura o duplicada, solo la resaltamos visualmente una vez
-          uniquePitches.add(normalizedNote);
           highlightKey(note.pitch, note.durSec, note.hand, true);
         }
       });
       
-      // Si después de filtrar ligaduras no hay notas que esperar, avanza automáticamente
-      if (expectedNotes.size === 0) {
-        console.log(`Primer paso con solo notas ligadas, avanzando automáticamente...`);
-        setTimeout(() => advanceLearningStep(), 300);
-        return;
-      }
-      
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     }
-    // Si no hay notas válidas, NO avanzar el cursor y continuar buscando
   }
 
-  // Si llegamos al final sin encontrar pasos válidos
   if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
     alert("¡No hay notas para la mano seleccionada en esta pieza!");
     toggleMidiLearnMode();
@@ -1957,20 +1915,17 @@ function toggleLeftHandOnly() {
 function reloadCurrentStepWithHandFilter() {
   if (!isMidiLearnMode) return;
   
-  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  const TIME_TOLERANCE = 0.001;
   
-  // Retroceder el índice para volver a cargar las notas actuales
   const currentStepNotes = [];
   const targetTime = parsedNotes[currentLearningIndex - 1]?.startSec;
   
-  // Buscar todas las notas del paso actual (con tolerancia)
   let tempIndex = currentLearningIndex - 1;
   while (tempIndex >= 0 && Math.abs(parsedNotes[tempIndex]?.startSec - targetTime) < TIME_TOLERANCE) {
     currentStepNotes.unshift(parsedNotes[tempIndex]);
     tempIndex--;
   }
   
-  // Aplicar filtro de mano
   clearAllHighlights();
   expectedNotes.clear();
   
@@ -1981,34 +1936,20 @@ function reloadCurrentStepWithHandFilter() {
   );
   
   if (filteredNotes.length > 0) {
-    // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
     const uniquePitches = new Set();
     
     filteredNotes.forEach(note => {
       const normalizedNote = normalizeNote(note.pitch);
       
-      // Solo añadir a expectedNotes si NO es continuación de ligadura y no está duplicada
-      if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+      if (!uniquePitches.has(normalizedNote)) {
         uniquePitches.add(normalizedNote);
         expectedNotes.add(normalizedNote);
-        highlightKey(note.pitch, note.durSec, note.hand, true);
-      } else if (!uniquePitches.has(normalizedNote)) {
-        // Si es continuación de ligadura o duplicada, solo resaltar visualmente una vez
-        uniquePitches.add(normalizedNote);
         highlightKey(note.pitch, note.durSec, note.hand, true);
       }
     });
     
-    // Si solo hay notas ligadas, avanzar automáticamente
-    if (expectedNotes.size === 0) {
-      console.log(`Paso actual solo tiene notas ligadas, avanzando...`);
-      setTimeout(() => advanceLearningStep(), 300);
-      return;
-    }
-    
     console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
   } else {
-    // Si el paso actual no tiene notas con el filtro aplicado, avanzar al siguiente
     console.log(`Paso actual no tiene notas de ${handFilterMode}, avanzando...`);
     advanceLearningStep();
   }
