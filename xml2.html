@@ -912,11 +912,7 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   setStatus('Cargando partitura...');
 
 
-/*
-const dynamicUrl = 'https://storage.googleapis.com/mozartacademy-files/xml/prelude-in-c-minor-bwv-999-bach.musicxml'
-    await loadMusicXMLFromUrl(dynamicUrl);
-*/
-   
+
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
@@ -1098,7 +1094,7 @@ function parseMusicXML(xmlText) {
     updateBpmDisplay();
     Tone.Transport.bpm.value = globalTempo;
 
-    const openTies = new Map(); // Mapa para manejar notas ligadas (pitch -> noteObject)
+    const openTies = new Map(); // Mapa para manejar notas ligadas (pitch+staff -> noteObject)
     
     // 1. Itera sobre todas las partes (usualmente 2 en piano)
     xml.querySelectorAll('part').forEach((part, partIndex) => {
@@ -1141,13 +1137,17 @@ function parseMusicXML(xmlText) {
 
                         const isTieStart = !!node.querySelector('tie[type="start"]');
                         const isTieStop = !!node.querySelector('tie[type="stop"]');
+                        
+                        // Clave única para ligaduras: pitch + staff (para manejar la misma nota en ambas manos)
+                        const tieKey = `${pitch}-${hand}`;
 
-                        if (isTieStop && openTies.has(pitch)) {
+                        if (isTieStop && openTies.has(tieKey)) {
                             // ES EL FINAL DE UNA LIGADURA: extiende la duración de la nota original
-                            const existingNote = openTies.get(pitch);
+                            const existingNote = openTies.get(tieKey);
                             existingNote.durSec += durationInBeats * (60.0 / globalTempo);
+                            existingNote.isTied = true; // Marca que esta nota está ligada
                             if (!isTieStart) {
-                                openTies.delete(pitch); // Cierra la ligadura si no empieza una nueva
+                                openTies.delete(tieKey); // Cierra la ligadura si no empieza una nueva
                             }
                         } else {
                             // ES UNA NOTA NUEVA (o el inicio de una ligadura)
@@ -1158,11 +1158,13 @@ function parseMusicXML(xmlText) {
                                 startSec: noteStartTime,
                                 durSec: durationInBeats * (60.0 / globalTempo),
                                 hand: hand,
+                                isTied: false, // Inicialmente no está ligada
+                                isChord: isChord
                             };
                             parsedNotes.push(newNote);
 
                             if (isTieStart) {
-                                openTies.set(pitch, newNote); // Abre una nueva ligadura
+                                openTies.set(tieKey, newNote); // Abre una nueva ligadura
                             }
                         }
                     }
@@ -1182,7 +1184,7 @@ function parseMusicXML(xmlText) {
     totalTimeSpan.textContent = formatTime(totalDuration);
 }
 
- // REEMPLAZA LA FUNCIÓN scheduleNotesOnTransport COMPLETA CON ESTA
+
 function scheduleNotesOnTransport() {
   if (audioPart) audioPart.dispose();
   if (visualPart) visualPart.dispose();
@@ -1190,36 +1192,74 @@ function scheduleNotesOnTransport() {
   osmd.cursor.reset();
   osmd.cursor.hide();
 
-  // Agrupa notas por tiempo de inicio para manejar acordes correctamente
+  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  
+  // Agrupa notas por tiempo de inicio (con tolerancia) para manejar acordes correctamente
   const notesByTime = new Map();
   parsedNotes.forEach(note => {
     const time = note.startSec / playbackRate;
-    if (!notesByTime.has(time)) {
-      notesByTime.set(time, []);
+    
+    // Busca si ya existe un tiempo cercano
+    let foundTime = null;
+    for (let existingTime of notesByTime.keys()) {
+      if (Math.abs(existingTime - time) < TIME_TOLERANCE) {
+        foundTime = existingTime;
+        break;
+      }
     }
-    notesByTime.get(time).push(note);
+    
+    if (foundTime !== null) {
+      notesByTime.get(foundTime).push(note);
+    } else {
+      notesByTime.set(time, [note]);
+    }
   });
 
-  // --- NUEVA LÓGICA PARA EL AUDIO ---
+  // --- NUEVA LÓGICA PARA EL AUDIO (elimina duplicados) ---
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
+    // Eliminar notas duplicadas (misma altura de diferentes voces)
+    const uniquePitches = new Set();
+    const uniqueNotes = notes.filter(note => {
+      const normalizedPitch = normalizeNote(note.pitch);
+      if (uniquePitches.has(normalizedPitch)) {
+        return false; // Ya existe, no la incluimos
+      }
+      uniquePitches.add(normalizedPitch);
+      return true; // Es nueva, la incluimos
+    });
+    
     audioEvents.push({
       time: time,
-      pitches: notes.map(n => n.pitch), // Agrupa las alturas en un arreglo
-      duration: notes[0].durSec / playbackRate, // Usa la duración de la primera nota
+      pitches: uniqueNotes.map(n => n.pitch), // Solo pitches únicos
+      duration: uniqueNotes[0].durSec / playbackRate,
     });
   });
   
-  // El Tone.Part ahora recibe un arreglo de notas para los acordes
+  // El Tone.Part ahora recibe un arreglo de notas para los acordes (sin duplicados)
   audioPart = new Tone.Part((time, value) => {
     sampler.triggerAttackRelease(value.pitches, value.duration, time);
   }, audioEvents).start(0);
 
 
-  // --- LÓGICA VISUAL (PERMANECE IGUAL PERO USA notesByTime) ---
+  // --- LÓGICA VISUAL (también elimina duplicados para el highlight) ---
   const visualEvents = [];
   notesByTime.forEach((notes, time) => {
-    visualEvents.push({ time, notes: notes.map(n => ({...n, duration: n.durSec / playbackRate})) });
+    // Eliminar notas duplicadas para el highlight visual
+    const uniquePitches = new Set();
+    const uniqueNotes = notes.filter(note => {
+      const normalizedPitch = normalizeNote(note.pitch);
+      if (uniquePitches.has(normalizedPitch)) {
+        return false;
+      }
+      uniquePitches.add(normalizedPitch);
+      return true;
+    });
+    
+    visualEvents.push({ 
+      time, 
+      notes: uniqueNotes.map(n => ({...n, duration: n.durSec / playbackRate}))
+    });
   });
 
   visualPart = new Tone.Part((time, value) => {
@@ -1661,14 +1701,16 @@ function advanceLearningStep() {
 
   let notesInStep = [];
   let foundValidStep = false;
+  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
 
   // Buscar el siguiente paso que tenga notas según el filtro de mano
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Agrupar todas las notas del mismo tiempo
-    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
+    // Agrupar todas las notas que están dentro de la tolerancia de tiempo
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
@@ -1685,21 +1727,39 @@ function advanceLearningStep() {
       foundValidStep = true;
       notesInStep = filteredNotes;
       
+      // IMPORTANTE: Solo avanza el cursor si hay notas que tocar
       osmd.cursor.next();
+      
+      // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
+      const uniquePitches = new Set();
       
       // Preparar las notas esperadas (NORMALIZADAS)
+      // Solo incluir notas que NO son continuación de ligadura
       notesInStep.forEach(note => {
         const normalizedNote = normalizeNote(note.pitch);
-        expectedNotes.add(normalizedNote);
-        highlightKey(note.pitch, note.durSec, note.hand, true);
+        
+        // Si es una nota ligada que no es el inicio, no la esperamos
+        if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        } else if (!uniquePitches.has(normalizedNote)) {
+          // Si es continuación de ligadura o duplicada, solo la resaltamos visualmente una vez
+          uniquePitches.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
       });
       
+      // Si después de filtrar ligaduras no hay notas que esperar, avanza automáticamente
+      if (expectedNotes.size === 0) {
+        console.log(`Paso con solo notas ligadas, avanzando automáticamente...`);
+        setTimeout(() => advanceLearningStep(), 300);
+        return;
+      }
+      
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
-    } else {
-      // Este paso no tiene notas válidas, avanzar cursor visualmente pero no esperar notas
-      osmd.cursor.next();
-      console.log(`Salto paso sin notas de ${handFilterMode}`);
     }
+    // Si no hay notas válidas, NO avanzar el cursor y continuar buscando
   }
 
   // Si llegamos al final sin encontrar pasos válidos
@@ -1779,14 +1839,16 @@ function prepareFirstLearningStep() {
 
   let notesInStep = [];
   let foundValidStep = false;
+  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
 
   // Buscar el primer paso que tenga notas según el filtro de mano
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Agrupar todas las notas del mismo tiempo
-    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
+    // Agrupar todas las notas que están dentro de la tolerancia de tiempo
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
@@ -1803,20 +1865,36 @@ function prepareFirstLearningStep() {
       foundValidStep = true;
       notesInStep = filteredNotes;
       
+      // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
+      const uniquePitches = new Set();
+      
       // SOLO PREPARAR LAS NOTAS VISUALES, SIN AVANZAR EL CURSOR (es el primer paso)
+      // Solo incluir notas que NO son continuación de ligadura
       notesInStep.forEach(note => {
-        // NORMALIZAR la nota antes de añadirla a expectedNotes
         const normalizedNote = normalizeNote(note.pitch);
-        expectedNotes.add(normalizedNote);
-        highlightKey(note.pitch, note.durSec, note.hand, true);
+        
+        // Si es una nota ligada que no es el inicio, no la esperamos
+        if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        } else if (!uniquePitches.has(normalizedNote)) {
+          // Si es continuación de ligadura o duplicada, solo la resaltamos visualmente una vez
+          uniquePitches.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
       });
       
+      // Si después de filtrar ligaduras no hay notas que esperar, avanza automáticamente
+      if (expectedNotes.size === 0) {
+        console.log(`Primer paso con solo notas ligadas, avanzando automáticamente...`);
+        setTimeout(() => advanceLearningStep(), 300);
+        return;
+      }
+      
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
-    } else {
-      // Este paso no tiene notas válidas, avanzar cursor visualmente
-      osmd.cursor.next();
-      console.log(`Salto paso inicial sin notas de ${handFilterMode}`);
     }
+    // Si no hay notas válidas, NO avanzar el cursor y continuar buscando
   }
 
   // Si llegamos al final sin encontrar pasos válidos
@@ -1879,13 +1957,15 @@ function toggleLeftHandOnly() {
 function reloadCurrentStepWithHandFilter() {
   if (!isMidiLearnMode) return;
   
+  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  
   // Retroceder el índice para volver a cargar las notas actuales
   const currentStepNotes = [];
   const targetTime = parsedNotes[currentLearningIndex - 1]?.startSec;
   
-  // Buscar todas las notas del paso actual
+  // Buscar todas las notas del paso actual (con tolerancia)
   let tempIndex = currentLearningIndex - 1;
-  while (tempIndex >= 0 && parsedNotes[tempIndex]?.startSec === targetTime) {
+  while (tempIndex >= 0 && Math.abs(parsedNotes[tempIndex]?.startSec - targetTime) < TIME_TOLERANCE) {
     currentStepNotes.unshift(parsedNotes[tempIndex]);
     tempIndex--;
   }
@@ -1901,12 +1981,31 @@ function reloadCurrentStepWithHandFilter() {
   );
   
   if (filteredNotes.length > 0) {
+    // Eliminar duplicados de pitch (múltiples voces pueden tener la misma nota)
+    const uniquePitches = new Set();
+    
     filteredNotes.forEach(note => {
-      // NORMALIZAR la nota antes de añadirla a expectedNotes
       const normalizedNote = normalizeNote(note.pitch);
-      expectedNotes.add(normalizedNote);
-      highlightKey(note.pitch, note.durSec, note.hand, true);
+      
+      // Solo añadir a expectedNotes si NO es continuación de ligadura y no está duplicada
+      if (!note.isTied && !uniquePitches.has(normalizedNote)) {
+        uniquePitches.add(normalizedNote);
+        expectedNotes.add(normalizedNote);
+        highlightKey(note.pitch, note.durSec, note.hand, true);
+      } else if (!uniquePitches.has(normalizedNote)) {
+        // Si es continuación de ligadura o duplicada, solo resaltar visualmente una vez
+        uniquePitches.add(normalizedNote);
+        highlightKey(note.pitch, note.durSec, note.hand, true);
+      }
     });
+    
+    // Si solo hay notas ligadas, avanzar automáticamente
+    if (expectedNotes.size === 0) {
+      console.log(`Paso actual solo tiene notas ligadas, avanzando...`);
+      setTimeout(() => advanceLearningStep(), 300);
+      return;
+    }
+    
     console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
   } else {
     // Si el paso actual no tiene notas con el filtro aplicado, avanzar al siguiente
