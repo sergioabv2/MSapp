@@ -70,21 +70,141 @@
         .pdf-viewer-overlay iframe { width: 100%; height: 100%; border: none; }
 
 
+
+.carousel .book-card {
+    width: 150px; /* Más pequeño que los 180px del grid */
+}
+.carousel .book-cover-wrapper {
+    height: 200px; /* Más bajo que los 240px del grid */
+}
+.carousel .book-title {
+    font-size: 14px;
+}
+.carousel .book-level {
+    font-size: 12px;
+}
+
         
 .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
     transition: color 0.2s ease-in-out;
 }
+
 .section-title:hover {
     color: #5668E2; /* Un color primario para indicar interacción */
 }
-/* Estilo para el nuevo ícono de la sección */
+
+.section-title .fas.fa-chevron-down,
+.section-title .fas.fa-chevron-up {
+    font-size: 16px;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
 .section-title .fa-layer-group {
     margin-right: 10px; /* Añade espacio entre el ícono y el texto */
     color: #7343D9;     /* Opcional: Dale un color para que destaque */
     font-size: 20px;    /* Opcional: Ajusta el tamaño si es necesario */
 }
-/* Contenedor para la vista de cuadrícula (grid) */
+
+
+.section-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* El botón de volver ya tiene margen inferior */
+}
+
+.view-mode-toggle {
+    display: flex;
+    gap: 8px;
+}
+.view-mode-toggle .view-btn {
+    background: #f0f2f5;
+    border: 1px solid #d1d5db;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+.view-mode-toggle .view-btn:hover {
+    background-color: #e5e7eb;
+}
+.view-mode-toggle .view-btn.active {
+    background-color: #5668E2;
+    color: white;
+    border-color: #5668E2;
+}
+
+/* --- 4. Estilos para la VISTA DE LISTA --- */
+.list-view {
+    display: flex;
+    flex-direction: column; /* Apila las tarjetas verticalmente */
+    gap: 1px; /* Crea un efecto de línea divisoria */
+    background-color: #e5e7eb; /* Color de la línea divisoria */
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden; /* Para que el radius afecte a los hijos */
+}
+
+.list-view .book-card {
+    flex: 1 1 100%; /* Ocupa todo el ancho */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: white;
+    padding: 12px;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+}
+.list-view .book-card:hover {
+    transform: none; /* Quitamos el efecto de elevación */
+    background-color: #f8f9fa;
+}
+
+/* Ajustamos la portada para la lista */
+.list-view .book-cover-wrapper {
+    flex: 0 0 60px; /* Ancho fijo y pequeño */
+    height: 80px;
+    margin-bottom: 0;
+}
+.list-view .book-cover {
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+.list-view .book-info {
+    display: flex;
+    flex-direction: column; /* Apila el título y el autor */
+    justify-content: center; /* Centra el bloque de texto verticalmente */
+    flex-grow: 1; /* Opcional: asegura que ocupe el espacio */
+}
+
+.list-view .book-grade-label {
+    display: none; 
+}
+
+/* Ajustamos los textos */
+.list-view .book-title {
+    font-size: 16px;
+    font-weight: 500;
+    white-space: normal; 
+    margin-bottom: 2px;
+}
+.list-view .book-level {
+   font-size: 14px;
+    color: #6c757d; /* Un color más suave para el autor */
+    line-height: 1.3;
+}
+
+
 .grid-view {
     display: flex;
     flex-wrap: wrap;
@@ -258,22 +378,44 @@
 
       <div class="library-content">
 
-           <button class="back-button" ng-show="selectedSection" ng-click="goBack()">
+       <div class="section-header-controls" ng-show="selectedSection">
+    <button class="back-button" ng-click="goBack()">
         <i class="fas fa-arrow-left"></i> Volver a las secciones
     </button>
+    
+    <div class="view-mode-toggle">
+        <button class="view-btn" 
+                ng-class="{'active': viewMode === 'grid'}" 
+                ng-click="setViewMode('grid')">
+            <i class="fas fa-th-large"></i>
+        </button>
+        <button class="view-btn" 
+                ng-class="{'active': viewMode === 'list'}" 
+                ng-click="setViewMode('list')">
+            <i class="fas fa-list"></i>
+        </button>
+    </div>
+</div>
 
     <div class="library-section" 
          ng-repeat="section in library"
          ng-show="(!selectedSection || selectedSection === section) && (section.books | filter: customFilter).length > 0">
         
-        <h2 class="section-title" ng-click="selectSection(section)">
-             <i class="fas fa-layer-group"></i>
-            {{ section.title }}
-        </h2>
+       <h2 class="section-title" ng-click="selectSection(section)">
+    <div> 
+        <i class="fas fa-layer-group"></i>
+        {{ section.title }}
+    </div>
+    <i class="fas" ng-class="{'fa-chevron-up': selectedSection === section, 'fa-chevron-down': selectedSection !== section}"></i>
+</h2>
         
         <div class="carousel-wrapper">
             <div id="carousel-{{$index}}" 
-                 ng-class="{'carousel': !selectedSection, 'grid-view': selectedSection}">
+                 ng-class="{
+                   'carousel': !selectedSection, 
+                   'grid-view': selectedSection && viewMode === 'grid',
+                   'list-view': selectedSection && viewMode === 'list'
+                 }">
                 
                 <div class="book-card" ng-repeat="book in section.books | filter: customFilter | orderBy: sortOrder"   
                      ng-click="openPdf(book)">
@@ -287,9 +429,10 @@
     </div>
 
                  
-
-                    <div class="book-title">{{ book.title }}</div>
-                    <div class="book-level">{{ book.author }}</div>
+<div class="book-info">
+        <div class="book-title">{{ book.title }}</div>
+        <div class="book-level">{{ book.author }}</div>
+    </div>
                 </div>
             </div>
             
@@ -320,6 +463,8 @@
              $scope.filters = { difficulty: '', style: '' };
              $scope.selectedSection = null;
              $scope.sortOrder = '-dateAdded';
+
+             $scope.viewMode = 'list';
 
 
         
@@ -452,10 +597,14 @@
     $scope.selectedSection = section;
 };
 
-// Vuelve a la vista de carrusel
 $scope.goBack = function() {
-    $scope.selectedSection = null;
-};
+        $scope.selectedSection = null;
+        $scope.viewMode = 'list'; // <-- AÑADIR (Resetea a grid al volver)
+    };
+
+    $scope.setViewMode = function(mode) {
+        $scope.viewMode = mode;
+    };
 
      
  $scope.customFilter = function(book) {
