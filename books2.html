@@ -347,14 +347,7 @@
 
 
             <div class="filters-container">
-                <div class="filter-group">
-                <label class="filter-label" for="sort-select">Ordenar por</label>
-                <select id="sort-select" class="filter-select" ng-model="sortOrder">
-                    <option value="-dateAdded">Más Nuevos</option>
-                    <option value="title">Alfabético (A-Z)</option>
-                    <option value="difficulty">Grado (Menor a Mayor)</option>
-                </select>
-            </div>
+              
             <div class="filter-group">
                 <label class="filter-label" for="difficulty-select">Dificultad</label>
                 <select id="difficulty-select" class="filter-select" ng-model="filters.difficulty">
@@ -368,6 +361,20 @@
                     <option value="Grado 6">Grado 6</option>
                     <option value="Grado 7">Grado 7</option>
                     <option value="Grado 8">Grado 8</option>
+                </select>
+            </div>
+
+              <div class="filter-group">
+                <label class="filter-label" for="style-select">Estilo</label>
+                <select id="style-select" class="filter-select" ng-model="filters.style">
+                    <option value="">Todos los estilos</option>
+                    <option value="baroque">Barroco</option>
+                    <option value="classic">Clásico</option>
+                    <option value="romantic">Romanticismo</option>
+                     <option value="postromantic">Post-Romanticismo</option>
+                    <option value="sigloxx">Siglo XX</option>
+                    <option value="jazz">Jazz</option>
+                    <option value="contemporary">Contemporaneo</option>
                 </select>
             </div>
           
@@ -417,7 +424,7 @@
                    'list-view': selectedSection && viewMode === 'list'
                  }">
                 
-                <div class="book-card" ng-repeat="book in section.books | filter: customFilter | orderBy: sortOrder"   
+                <div class="book-card" ng-repeat="book in section.books | filter: customFilter"   
                      ng-click="openPdf(book)">
 
                 <div class="book-cover-wrapper">
@@ -468,74 +475,1061 @@
 
 
         
-       allPiecesData = [
+ var allPiecesData = [
+  {
+    "title": "Arabesque No. 1",
+    "author": "Debussy",
+    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "pdf": "Arabesque1.musicxml",
+    "dateAdded": "2025-10-22",
+    "difficulty": "Grado 5",
+    "style": "postromantic",
+    "tags": []
+  },
+  {
+    "title": "Ave Maria (Solo Piano)",
+    "author": "Schubert",
+    "background": "https://lh3.googleusercontent.com/d/1Px01baKi4rA20cUh8pxUhyhf64NZ-9Zz=s400",
+    "pdf": "Ave_Maria_D839_-_Schubert_-_Solo_Piano_Arrg..musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 4",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "Minuet in G Major BWV Anh. 114",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1wXS1fj4FjdAZcg_CsG3T_8uIHnfSTQvv=s400",
+    "pdf": "Bach_Minuet_in_G_Major_BWV_Anh._114.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Toccata and Fugue in D Minor",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1dP_Y6Nl3VoYDqcAc07gkWkd_qjVmPbJp=s400",
+    "pdf": "Bach_Toccata_and_Fugue_in_D_Minor_Piano_solo.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 8",
+    "style": "baroque",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Bella Ciao",
+    "author": "Traditional",
+    "background": "https://lh3.googleusercontent.com/d/1nRN2uCnsIKQ3KwVsQ3zPUCzAkUefB6KH=s400",
+    "pdf": "Bella_Ciao.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 3",
+    "style": "contemporary",
+    "tags": ["soundtrack"]
+  },
+  {
+    "title": "Canon in D",
+    "author": "Pachelbel",
+    "background": "https://lh3.googleusercontent.com/d/1BSm2nEBpCNOUUL3YdZZMsNIdWkfZVWzK=s400",
+    "pdf": "Canon_in_D.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 4",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Canon in D (Easy)",
+    "author": "Pachelbel",
+    "background": "https://lh3.googleusercontent.com/d/1v8kJEehSQllYAfypubkDm4a9i78qpoyQ=s400",
+    "pdf": "Canon_in_D_easy.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Carol of the Bells (Easy)",
+    "author": "Leontovych",
+    "background": "https://lh3.googleusercontent.com/d/1jt7qDUjLC9hz-Cs4exhpJwIFl9mkoShI=s400",
+    "pdf": "Carol_of_the_Bells_easy_piano.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 2",
+    "style": "sigloxx",
+    "tags": []
+  },
+  {
+    "title": "Ballade No. 1 in G minor Op. 23",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Chopin_-_Ballade_no._1_in_G_minor_Op._23.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Nocturne Op. 9 No. 1",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Chopin_-_Nocturne_Op._9_No._1.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": ["nocturne"]
+  },
+  {
+    "title": "Nocturne Op. 9 No. 2",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1aAFHQ3vdqM3UcSwSg05k_Yj2lhALSUfR=s400",
+    "pdf": "Chopin_-_Nocturne_Op_9_No_2_E_Flat_Major.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 5",
+    "style": "romantic",
+    "tags": ["nocturne"]
+  },
+  {
+    "title": "Clair de Lune",
+    "author": "Debussy",
+    "background": "https://lh3.googleusercontent.com/d/1oq5CQ0CFDLT3FV5uW5gJ-Tt_YgecqCC2=s400",
+    "pdf": "Clair_de_Lune__Debussy.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 6",
+    "style": "postromantic",
+    "tags": []
+  },
+  {
+    "title": "Dance of the Sugar Plum Fairy",
+    "author": "Tchaikovsky",
+    "background": "https://lh3.googleusercontent.com/d/1Q2TjGDXhfB4oF3l8B1i1kVr2ZNybPJMd=s400",
+    "pdf": "Dance_of_the_sugar_plum_fairy.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 5",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "Gymnopedie No. 1",
+    "author": "Erik Satie",
+    "background": "https://lh3.googleusercontent.com/d/14mqe_TMjs3uIUuW3LKYO1YczBzzy7BoB=s400",
+    "pdf": "Erik_Satie_-_Gymnopedie_No.1.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 3",
+    "style": "postromantic",
+    "tags": []
+  },
+  {
+    "title": "Für Elise",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/14K1OmPfxSbmOal9RCDg49BJ_6OiccmSX=s400",
+    "pdf": "Fur_Elise.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Für Elise (Easy Piano)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/19tjbvrTLaFI3__MUB6z2fpfkBiWhITV4=s400",
+    "pdf": "Fur_Elise_Easy_Piano.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 2",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Für Elise (Fingered)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1e0jEdC9J1rbaJe7JgegoJER04qA0vH3p=s400",
+    "pdf": "Fur_Elise_fingered.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Prelude in G Minor",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1_L1f2lhcqplT4-o7yNHDk4jOlRTZrNkx=s400",
+    "pdf": "G_Minor_Bach.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 5",
+    "style": "baroque",
+    "tags": ["prelude"]
+  },
+  {
+    "title": "Gnossienne No. 1",
+    "author": "Erik Satie",
+    "background": "https://lh3.googleusercontent.com/d/1xjJ2GsgIojGmBprQmO9JKEhjtueqxDLD=s400",
+    "pdf": "Gnossienne_No._1.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 4",
+    "style": "postromantic",
+    "tags": []
+  },
+  {
+    "title": "Gymnopédie No. 1",
+    "author": "Erik Satie",
+    "background": "https://lh3.googleusercontent.com/d/1uFwB14fOVlfLHHaimYGNnCTDX-9_IxvK=s400",
+    "pdf": "Gymnopdie_No._1__Satie.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 3",
+    "style": "postromantic",
+    "tags": []
+  },
+  {
+    "title": "Hungarian Dance No. 5",
+    "author": "Brahms",
+    "background": "https://lh3.googleusercontent.com/d/1kRfc4NHkH3lMv4j8_y0KcGLOOwM_DfP2=s400",
+    "pdf": "Hungarian_Dance_No_5_in_G_Minor.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "Liebestraum No. 3",
+    "author": "Liszt",
+    "background": "https://lh3.googleusercontent.com/d/1mUZu4lwTdj7EbtttoIbqXHTitL4VsKub=s400",
+    "pdf": "Liebestraum_No._3_in_A_Major.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Little Playmates",
+    "author": "Traditional",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Little Playmates.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Preparatorio",
+    "style": "contemporary",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Maple Leaf Rag",
+    "author": "Scott Joplin",
+    "background": "https://lh3.googleusercontent.com/d/19a7r6agbU7493cfO4vur1gZxnR52z33w=s400",
+    "pdf": "Maple_Leaf_Rag_Scott_Joplin.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 6",
+    "style": "jazz",
+    "tags": []
+  },
+  {
+    "title": "Mariage d'Amour",
+    "author": "Paul de Senneville",
+    "background": "https://lh3.googleusercontent.com/d/1N5gsxVDnV9h2acXqzEC7SnuuDxW-Nkpa=s400",
+    "pdf": "Mariage_dAmour.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 5",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Minuet in G Major",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1uKM33NN86dwXXSy4mSJ-FTZQReFydklL=s400",
+    "pdf": "Minuet_in_G_Major_Bach.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Piano Sonata No. 16 (Allegro)",
+    "author": "Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1QIjslSxE4gbHRjqcHcukO8b0TD7kDfft=s400",
+    "pdf": "Mozart_-_Piano_Sonata_No._16_-_Allegro.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 6",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Nocturne No. 20 in C# Minor",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Nocturne_No._20_in_C_Minor.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": ["nocturne"]
+  },
+  {
+    "title": "Nocturne in C# Minor",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1q9eQNUQGjIIBkB5bubAtweIfwnFHTzN9=s400",
+    "pdf": "Nocturne_in_C_sharp_Minor.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": ["nocturne"]
+  },
+  {
+    "title": "Nocturne Op. 9 No. 2 (Easy)",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1Qm1Q9BirY1zcMHI5v9FOpEmio8rtAX_z=s400",
+    "pdf": "Nocturne_in_E-flat_Major_Op._9_No._2_Easy.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 3",
+    "style": "romantic",
+    "tags": ["nocturne"]
+  },
+  {
+    "title": "Ode to Joy",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1Y8DwzHWA_tXz5BgWFdIJP30U8XDPP0yo=s400",
+    "pdf": "Ode to Joy.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Preparatorio",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Ode to Joy 2",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1Y8DwzHWA_tXz5BgWFdIJP30U8XDPP0yo=s400",
+    "pdf": "Ode to Joy2.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Preparatorio",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Old German Dance",
+    "author": "Praetorius",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Old German Dance.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 1",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Canon in D",
+    "author": "Pachelbel",
+    "background": "https://lh3.googleusercontent.com/d/1BSm2nEBpCNOUUL3YdZZMsNIdWkfZVWzK=s400",
+    "pdf": "Pachelbell - Canon in D.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 4",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Passacaglia",
+    "author": "Handel",
+    "background": "https://lh3.googleusercontent.com/d/1Xr4umChcMwPKlOMMzKu4MHN0iuUN1QI4=s400",
+    "pdf": "Passacaglia.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 7",
+    "style": "baroque",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Prelude I in C major (WTC 1)",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1PNy8_5A3lUYFHQFQJqDNqrN5P6LsnazB=s400",
+    "pdf": "Prelude_I_in_C_major_BWV_846_-_Well_Tempered_Clavier_First_Book.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 5",
+    "style": "baroque",
+    "tags": ["prelude"]
+  },
+  {
+    "title": "Run Away River",
+    "author": "Unknown",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Run Away River.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Preparatorio",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Schubert Serenade (Arr. Liszt)",
+    "author": "Liszt",
+    "background": "https://lh3.googleusercontent.com/d/17L8DmCP2u0GzhfmzoGjCaGuE6i8gJWSt=s400",
+    "pdf": "Schubert_Serenade_-_Standchen_-_By_Lizst.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 7",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "Sonata No. 16 K. 545",
+    "author": "Mozart",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Sonata_No._16_1st_Movement_K._545.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 6",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Moonlight Sonata (1st Mov.)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1rh1rHd2VhNEuaZ8mf4yd3J-SRSZMZ2eq=s400",
+    "pdf": "Sonate_No._14_Moonlight_1st_Movement.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Moonlight Sonata (3rd Mov.)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Sonate_No._14_Moonlight_3rd_Movement.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 8",
+    "style": "classic",
+    "tags": ["sonata", "virtuoso"]
+  },
+  {
+    "title": "Pathetique Sonata (2nd Mov.)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "Sonate_No._8_Pathetique_2nd_Movement.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Swan Lake",
+    "author": "Tchaikovsky",
+    "background": "https://lh3.googleusercontent.com/d/1J8JgUWDIC9AcBlhZQjeN9Yj41K0FQsOv=s400",
+    "pdf": "Swan_Lake.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 3",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "The Entertainer",
+    "author": "Scott Joplin",
+    "background": "https://lh3.googleusercontent.com/d/1bMkr27px1m0iFe9K0Zpwt_t7PIf-lHV0=s400",
+    "pdf": "The_Entertainer_-_Scott_Joplin.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 5",
+    "style": "jazz",
+    "tags": []
+  },
+  {
+    "title": "Trumpet Voluntary",
+    "author": "Jeremiah Clarke",
+    "background": "https://lh3.googleusercontent.com/d/10v1YsHX7zMP8pI9C9eJSkFXfYbGa9aYx=s400",
+    "pdf": "Trumpet Voluntary.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Turkish March (Rondo Alla Turca)",
+    "author": "Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1HtUdK2SLf_lrTGXlvHbGMm_J2XpzRakW=s400",
+    "pdf": "WA_Mozart_Marche_Turque_Turkish_March_fingered.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 7",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Waltz Op. 64 No. 2",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1ss1mhf17iHqZnr8Gmz7cWqVCSIt7Q6Fp=s400",
+    "pdf": "Waltz_Opus_64_No._2_in_C_Minor.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Waltz in A Minor",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1obItNRug17nbeWiy_gGfrgcaIvq2oRz4=s400",
+    "pdf": "Waltz_in_A_MinorChopin.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 3",
+    "style": "romantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Waltz of the Flowers",
+    "author": "Tchaikovsky",
+    "background": "https://lh3.googleusercontent.com/d/18_zskH1r4NWBudLSktK_5MEiAuo3IkYU=s400",
+    "pdf": "Waltz_of_the_Flowers.musicxml",
+    "dateAdded": "2025-10-25",
+    "difficulty": "Grado 4",
+    "style": "romantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Allegretto in C Major",
+    "author": "Anton Diabelli",
+    "background": "https://lh3.googleusercontent.com/d/1ujUkiFYKb798MvfXA88TQeLQOiiXP6Yy=s400",
+    "pdf": "allegretto-in-c-major-anton-diabelli-8.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 1",
+    "style": "classic",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Allemande",
+    "author": "Johann Hermann Schein",
+    "background": "https://lh3.googleusercontent.com/d/1qOFr2sDrJKmz9KqVIo3IMTC5wJSE2lwp=s400",
+    "pdf": "allemande-johann-hermann-schein.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Comptine d'un autre été (Amelie)",
+    "author": "Yann Tiersen",
+    "background": "https://lh3.googleusercontent.com/d/1GA3KQaGPiEj3hzmMZSf5GT_d3pYjpyZC=s400",
+    "pdf": "amelie.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 4",
+    "style": "soundtrack",
+    "tags": ["soundtrack"]
+  },
+  {
+    "title": "Analytical Sonatinas Op. 39",
+    "author": "Frank Lynes",
+    "background": "https://lh3.googleusercontent.com/d/1LyqEhlQTem6oJSV7XUOMDw2pbR6mfSZp=s400",
+    "pdf": "analytical-sonatinas-op39-frank-lynes.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 3",
+    "style": "classic",
+    "tags": ["sonatina", "exercise"]
+  },
+  {
+    "title": "Aria in F",
+    "author": "J.S. Bach",
+    "background": "https://lh3.googleusercontent.com/d/1Oe1wHma3XdKo00NNhiyBTiekJvrKKyhK=s400",
+    "pdf": "aria-in-f-j-s-bach.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Aria in F Major",
+    "author": "Unknown",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "aria-in-f-major.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Arietta in C Major",
+    "author": "Muzio Clementi",
+    "background": "https://lh3.googleusercontent.com/d/1jVxZq6pv9SX1GmCgyjfTEJDJADCwanxP=s400",
+    "pdf": "arietta-in-c-major-jennifer-linn-muzio-clementi.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Moonlight Sonata (1st Mov.)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1uB-TvKoCRVFPIAEJO5ig-71aMo61qloR=s400",
+    "pdf": "beethoven-piano-sonata-no-14-moonlight-sonata-i-adagio-sostenuto.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Moonlight Sonata (2nd Mov.)",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/14njVW26ixEKcZiRkYrh4EOhRAUJEgXEP=s400",
+    "pdf": "beethoven-piano-sonata-no-14-moonlight-sonata-ii-allegretto.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 6",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Beethoven Virus",
+    "author": "Beethoven (Arr.)",
+    "background": "https://lh3.googleusercontent.com/d/1atxYxPVe8Ghy2H1h07JLtH6Ym9ndk0Rb=s400",
+    "pdf": "beethoven-virus.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 7",
+    "style": "contemporary",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Mikrokosmos Vol. 1 - 001",
+    "author": "Béla Bartók",
+    "background": "https://lh3.googleusercontent.com/d/1yubgOH6h2lleqYuHuHDKlycbNrJvneHF=s400",
+    "pdf": "bela-bartok-mikrokosmos-vol-1-001-six-unison-melodies.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Preparatorio",
+    "style": "sigloxx",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Mikrokosmos Vol. 1 - 002a",
+    "author": "Béla Bartók",
+    "background": "https://lh3.googleusercontent.com/d/19909zvllentDyRa6aBxacNMbT4ETWgEP=s400",
+    "pdf": "bela-bartok-mikrokosmos-vol-1-002a-six-unison-melodies.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Preparatorio",
+    "style": "sigloxx",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Caballos Españoles",
+    "author": "Carlos Gardel",
+    "background": "https://lh3.googleusercontent.com/d/1U0xZKJhV7QE0-5FWxuED1OCC54NUPvFL=s400",
+    "pdf": "caballos-espanoles-carlos-gardel.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 5",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Can't Help Falling in Love",
+    "author": "Elvis Presley",
+    "background": "https://lh3.googleusercontent.com/d/1E4Bz6xzHj9RekUSUkqkA6N_yvcP6sJQE=s400",
+    "pdf": "cant-help-falling-in-love-7.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 3",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Etude Op. 10 No. 1 (Waterfall)",
+    "author": "Frédéric Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1s2ZvwiXbPqlYFPWkC1VozZ31NqZ69Ucj=s400",
+    "pdf": "chopin-frederic-etudes-op-10-1-etude-in-c-major-waterfall.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["etude", "virtuoso"]
+  },
+  {
+    "title": "Etude Op. 10 No. 2 (Chromatique)",
+    "author": "Frédéric Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1yh9F0ZLZMnjoDo0pJgJRtMY9XMrY31XR=s400",
+    "pdf": "chopin-frederic-etudes-op-10-2-etude-in-a-minor-chromatique.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["etude", "virtuoso"]
+  },
+  {
+    "title": "Etude Op. 10 No. 5 (Black Keys)",
+    "author": "Frédéric Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1BK3bWhBIePTyVtXWfPK04vdv5n4MOCkS=s400",
+    "pdf": "chopin-frederic-etudes-op-10-5-etude-in-g-major-black-keys.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["etude", "virtuoso"]
+  },
+  {
+    "title": "Waltz Op. 64 No. 2",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/1Ik5qccbPgADt_VM96ag7ATXEZdow3r_N=s400",
+    "pdf": "chopin-trois-valses-op-64-2-tempo-giusto-in-c-minor.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 6",
+    "style": "romantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Waltz in E Minor (Posth.)",
+    "author": "Chopin",
+    "background": "https://lh3.googleusercontent.com/d/15UMyjMzpVHqnETE95juMqXZTUZk82f8X=s400",
+    "pdf": "chopin-waltz-in-e-minor-b-56-kk-iva15.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 5",
+    "style": "romantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Dance Song (Grade 1)",
+    "author": "Unknown",
+    "background": "https://lh3.googleusercontent.com/d/1VdG2lvwq2TYq5ZDUWv8MDHUteZG_GK8A=s400",
+    "pdf": "dance-song-list-a1-grade-1.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 1",
+    "style": "contemporary",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Gigue a l'Angloise",
+    "author": "Georg Philipp Telemann",
+    "background": "https://lh3.googleusercontent.com/d/1J2P0TlWmNpI_puNfX2_fWuIjxDp6Kbx_=s400",
+    "pdf": "gigue-a-langloise-georg-philipp-telemann.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 3",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "My Sweet and Tender Beast",
+    "author": "Eugen Doga",
+    "background": "https://lh3.googleusercontent.com/d/1InOrEj4B7UDreBYwZy0apjq0c0sC15K3=s400",
+    "pdf": "gingasa-si-tandra-mea-fiara-my-sweet-and-tender-beast-eugen-doga-original.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 5",
+    "style": "soundtrack",
+    "tags": ["waltz", "soundtrack"]
+  },
+  {
+    "title": "Valses Poeticos No. 6",
+    "author": "Enrique Granados",
+    "background": "https://lh3.googleusercontent.com/d/12QBHTxZXfeihT3q-xi9yy9TQrFMwcPHG=s400",
+    "pdf": "granados-enrique-valses-poeticos-no6-quasi-ad-libitum-sentimental.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 6",
+    "style": "postromantic",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Hallelujah (Easy)",
+    "author": "Leonard Cohen",
+    "background": "https://lh3.googleusercontent.com/d/17feRuvlkheh_DyB6Z_70wFGmj-NebIu2=s400",
+    "pdf": "hallelujah-easy-11.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 2",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Hijo de la Luna",
+    "author": "Mecano",
+    "background": "https://lh3.googleusercontent.com/d/1VcI8NxXuEZtIQdFVDT0WEMmogRGSQMiS=s400",
+    "pdf": "hijo-de-la-luna-piano-in-c-minor.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 4",
+    "style": "contemporary",
+    "tags": []
+  },
+  {
+    "title": "Piano Sonata No. 5 (Allegro)",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/10ebcWjkPajF5eaVX7bSpUQUbEBkMDeJk=s400",
+    "pdf": "i-allegro-piano-sonata-no-5-in-g-major-k-189h-w-a-mozart.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 7",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Interstellar (Main Theme)",
+    "author": "Hans Zimmer",
+    "background": "https://lh3.googleusercontent.com/d/1j9L6I0l6iNIhtk0f7pYp6oTokRX_6JcZ=s400",
+    "pdf": "interstellar-by-hans-zimmer-22.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 4",
+    "style": "soundtrack",
+    "tags": ["soundtrack"]
+  },
+  {
+    "title": "Jazz Suite No. 2 (Lyric Waltz)",
+    "author": "Dmitri Shostakovich",
+    "background": "https://lh3.googleusercontent.com/d/1fPMDck9D7m7iz97u34utdIX3_hjYDLd7=s400",
+    "pdf": "jazz-suite-no-2-ii-lyric-waltz-dmitri-shostakovich.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 6",
+    "style": "sigloxx",
+    "tags": ["waltz"]
+  },
+  {
+    "title": "Jodler",
+    "author": "Unknown",
+    "background": "https://lh3.googleusercontent.com/d/1bu6q6cWRiGzg4Upo_oCxdg_j0eAF6Z6D=s400",
+    "pdf": "jodler.musicxml",
+    "dateAdded": "2025-10-23",
+    "difficulty": "Preparatorio",
+    "style": "contemporary",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Menuett",
+    "author": "Johann Krieger",
+    "background": "https://lh3.googleusercontent.com/d/1h7cqgMPK108jn8AWmq9VoD45nG8kwOpW=s400",
+    "pdf": "johann-krieger-menuett.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Sonatina Op. 20 No. 1",
+    "author": "Kuhlau",
+    "background": "https://lh3.googleusercontent.com/d/1hEHqnflsB2UYiSuv7BkoAUTSMb4A5vYK=s400",
+    "pdf": "kuhlau-op20-n1.musicxml",
+    "dateAdded": "2025-10-05",
+    "difficulty": "Grado 4",
+    "style": "classic",
+    "tags": ["sonatina"]
+  },
+  {
+    "title": "Liebestraum No. 3",
+    "author": "Liszt",
+    "background": "https://lh3.googleusercontent.com/d/13Zmp4x8ICkdih84ZvDPlP8Kc9I0jP-Nm=s400",
+    "pdf": "liebestraum-s-541-no-3-in-a-major-liszt.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 8",
+    "style": "romantic",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Little Playmates",
+    "author": "Traditional",
+    "background": "https://lh3.googleusercontent.com/d/1YvdLyFnv6YYzf2bQ5t5qxVOG7d5ysXFZ=s400",
+    "pdf": "little-playmates.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Preparatorio",
+    "style": "contemporary",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Lustig und Traurig",
+    "author": "Beethoven",
+    "background": "https://lh3.googleusercontent.com/d/1FVQWNeFO4O48UKGlJmPzgz4kHDvvc8Uj=s400",
+    "pdf": "lustig-und-traurig-bagatelle-in-c-minor.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 3",
+    "style": "classic",
+    "tags": []
+  },
+  {
+    "title": "Melodie",
+    "author": "Felix Le Couppey",
+    "background": "https://lh3.googleusercontent.com/d/1hMqUGjI5-YeLOyeVl-aqKgEO2lGnpm5e=s400",
+    "pdf": "melodie-felix-le-couppey.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "classic",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Melody in C",
+    "author": "Felix Le Couppey",
+    "background": "https://lh3.googleusercontent.com/d/1zjR1_AKyDbrDAiveIdMpgtxn53ywmB1f=s400",
+    "pdf": "melody-in-c-felix-le-couppey.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "classic",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Melody in F (Grade 1)",
+    "author": "Köhler",
+    "background": "https://lh3.googleusercontent.com/d/1Er0b9Yy0uyKBOMmh3Z7B_Je4TzXRvT7s=s400",
+    "pdf": "melody-in-f-kohler-grade-1-piano-exam-pieces-2025-2026.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 1",
+    "style": "romantic",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Mikrokosmos Vol. 1 (Collection)",
+    "author": "Béla Bartók",
+    "background": "https://lh3.googleusercontent.com/d/1DV5NIqOPV-XeHYqKSBpNCE2EJDOYmh6X=s400",
+    "pdf": "mikrokosmos-sz107-bela-bartok-mikrokosmos-vol-1-bela-bartok-bartok-mikrokosmos-1.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Preparatorio",
+    "style": "sigloxx",
+    "tags": ["exercise"]
+  },
+  {
+    "title": "Minuet in C Minor",
+    "author": "Unknown",
+    "background": "https://lh3.googleusercontent.com/d/12Qjyc2FoVxjuMLh4wdA37MLc-I_w9JfI=s400",
+    "pdf": "minuet-in-c-minor.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Minuet in C",
+    "author": "Reinagle",
+    "background": "https://lh3.googleusercontent.com/d/1ayQHVl9vjjPIffgQMUYuvkTJxpFtBil-=s400",
+    "pdf": "minuet-in-c-reinagle.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Preparatorio",
+    "style": "classic",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Minuet in D Minor",
+    "author": "J.S. Bach (attr.)",
+    "background": "https://lh3.googleusercontent.com/d/1eccs3lAZc6RWM1O1hztJlBalM6bkyFo-=s400",
+    "pdf": "minuet-in-d-minor.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 3",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Minuet in G Major",
+    "author": "J.S. Bach (attr.)",
+    "background": "https://lh3.googleusercontent.com/d/1NMJ2AWtBuVH1OnUQe2ZAD1ng_PB7uyeh=s400",
+    "pdf": "minuet-in-g-major-ii.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 2",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Minuet in G Minor",
+    "author": "J.S. Bach (attr.)",
+    "background": "https://lh3.googleusercontent.com/d/1a1CExYLVr0mzzeScST1CMe5rpCsI31Zv=s400",
+    "pdf": "minuet-in-g-minor.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 3",
+    "style": "baroque",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Misty",
+    "author": "Erroll Garner",
+    "background": "https://lh3.googleusercontent.com/d/1_uTrT-X-lUXv7QcxZZVu7T_yOFcxpexy=s400",
+    "pdf": "misty.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 6",
+    "style": "jazz",
+    "tags": []
+  },
+  {
+    "title": "Moods, Impressions and Souvenirs Op. 41",
+    "author": "Zdenek Fibich",
+    "background": "https://lh3.googleusercontent.com/d/1sb2MyvGAKM1sfea_TauW6tkEdpLtGRjH=s400",
+    "pdf": "moods-impressions-and-souvenirs-op41-zdenek-fibich.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 4",
+    "style": "romantic",
+    "tags": []
+  },
+  {
+    "title": "Minuet K. 6",
+    "author": "Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1hSgB6rfRGog1wOPKf6CY0__TyN5VZl1q=s400",
+    "pdf": "mozart k6.musicxml",
+    "dateAdded": "2025-10-24",
+    "difficulty": "Grado 1",
+    "style": "classic",
+    "tags": ["minuet"]
+  },
+  {
+    "title": "Old German Dance",
+    "author": "Michael Praetorius",
+    "background": "https://lh3.googleusercontent.com/d/1sNoOyqdHKX5XjcwueGw8CMmxwfpHNRIS=s400",
+    "pdf": "old-german-dance-michael-praetorius.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 1",
+    "style": "baroque",
+    "tags": []
+  },
+  {
+    "title": "Once Upon a December (Anastasia)",
+    "author": "Stephen Flaherty",
+    "background": "https://lh3.googleusercontent.com/d/1KlT9g7dB6VlzXzW5sCccHXWaSJoBIal6=s400",
+    "pdf": "once-upon-a-december-from-anastasia.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 4",
+    "style": "soundtrack",
+    "tags": ["soundtrack", "waltz"]
+  },
+  {
+    "title": "Once Upon a December",
+    "author": "Stephen Flaherty",
+    "background": "https://lh3.googleusercontent.com/d/1ukciKCSrpkDokQLBZJPfhyu4tlERhflm=s400",
+    "pdf": "once-upon-a-december-stephen-flaherty-once-upon-a-december-stephen-flaherty.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 4",
+    "style": "soundtrack",
+    "tags": ["soundtrack", "waltz"]
+  },
+  {
+    "title": "Original Rags",
+    "author": "Scott Joplin",
+    "background": "https://lh3.googleusercontent.com/d/1EPGMNuMZT6yvGNqWxK4I0YL5L5x7fQ4_=s400",
+    "pdf": "original-rags-scott-joplin-1899.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 6",
+    "style": "jazz",
+    "tags": []
+  },
+  {
+    "title": "Piano Concerto No. 2 (Adagio)",
+    "author": "Sergei Rachmaninoff",
+    "background": "https://lh3.googleusercontent.com/d/1HlhS_cwu7J15TFbGX-G4PJ3261ozEIS3=s400",
+    "pdf": "piano-concerto-no2-op18-ii-adagio-sostenuto-finale-sergei-rachmaninoff.musicxml",
+    "dateAdded": "2025-10-28",
+    "difficulty": "Grado 7",
+    "style": "postromantic",
+    "tags": ["virtuoso"]
+  },
+  {
+    "title": "Piano Sonata K. 545 (Andante)",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/11pA8DFOQKuUt73hhPlAaisdT-Kjoe3MJ=s400",
+    "pdf": "piano-sonata-n16-k545-wolfgang-amadeus-mozart-k545-andante-analysis.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Piano Sonata No. 1 KV 279",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1U1HUfgOPfkd5vSOI-lFckh5GID_-LgeW=s400",
+    "pdf": "piano-sonata-no-1-mozart-kv-279.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 7",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Piano Sonata No. 10 KV 330",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1OL3_CNToywug4FE-uvJWz-hk3ndWF1VO=s400",
+    "pdf": "piano-sonata-no-10-in-c-major-kv-330-first-movement-with-modulation-wolfgang-amadeus-mozart.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 7",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Piano Sonata No. 11 (Theme)",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/",
+    "pdf": "piano-sonata-no11-in-a-major-k331300i-wolfgang-amadeus-mozart.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 5",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
+  {
+    "title": "Piano Sonata No. 12 KV 332",
+    "author": "W.A. Mozart",
+    "background": "https://lh3.googleusercontent.com/d/1IcSgNIBtzuH3wyhVvjX67kwYnv7VYwTp=s400",
+    "pdf": "piano-sonata-no12-in-f-major-k332300k-wolfgang-amadeus-mozart.musicxml",
+    "dateAdded": "2025-10-27",
+    "difficulty": "Grado 7",
+    "style": "classic",
+    "tags": ["sonata"]
+  },
 
-    { "title": "Bella Ciao", "author": "Folk Song", "background": "https://lh3.googleusercontent.com/d/", "pdf": "https://www.mozart-app.com/xml2?file=Bella_Ciao.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['folk', 'soundtrack', 'nuevo'] },
-    { "title": "La Foule", "author": "Edith Piaf", "background": "https://lh3.googleusercontent.com/d/", "pdf": "https://www.mozart-app.com/xml2?file=Edith Piaf - La Foule.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['popular', 'frances', 'nuevo'] },
-    { "title": "La Vie en Rose (edith)", "author": "Edith Piaf", "background": "https://lh3.googleusercontent.com/d/", "pdf": "https://www.mozart-app.com/xml2?file=edith.musicxml", "dateAdded": "2025-10-10", "difficulty": "Grado 4", "tags": ['popular', 'frances'] },
-    { "title": "Mariage d'Amour", "author": "Paul de Senneville", "background": "https://lh3.googleusercontent.com/d/18UmS8w4J9b2Vizv8xhsm-T5laW3q1lzX=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Mariage_dAmour.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['popular', 'contemporaneo', 'nuevo'] },
+]
 
 
-    { "title": "Minuet in G Major, BWV Anh. 114", "author": "J.S. Bach (Petzold)", "background": "https://lh3.googleusercontent.com/d/1yPbMbMx0j0KECOm39o3LW7uc6PuZRGLF=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Bach_Minuet_in_G_Major_BWV_Anh._114.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 2", "tags": ['barroco', 'repertorio', 'nuevo'] },
-      { "title": "Prelude in C minor, BWV 999", "author": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1yPbMbMx0j0KECOm39o3LW7uc6PuZRGLF=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=prelude-in-c-minor-bwv-999-bach.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 4", "tags": ['barroco', 'repertorio', 'nuevo'] },
-    { "title": "Minuet in G Minor, BWV Anh. 115", "author": "J.S. Bach (Petzold)", "background": "https://lh3.googleusercontent.com/d/1lm-HlLU_xPt_Y-KIj061ACY0x5XUS_Fs=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=G_Minor_Bach.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['barroco', 'repertorio', 'nuevo'] },
-    { "title": "Prelude in C Major, BWV 846", "author": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/11SDBV-27cdWC1wSQEWjQAqvnTD8DIhol=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Prelude_I_in_C_major_BWV_846_-_Well_Tempered_Clavier_First_Book.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['barroco', 'repertorio', 'nuevo'] },
-    { "title": "Toccata and Fugue in D Minor", "author": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/", "pdf": "https://www.mozart-app.com/xml2?file=Bach_Toccata_and_Fugue_in_D_Minor_Piano_solo.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 8", "tags": ['barroco', 'nuevo'] },
-    { "title": "Badinerie", "author": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/", "pdf": "https://www.mozart-app.com/xml2?file=Badinerie - JS Bach.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['barroco', 'nuevo'] },
-    { "title": "Canon in D", "author": "Johann Pachelbel", "background": "https://lh3.googleusercontent.com/d/1miqxybEc4HsloZby2GZVkNmVnDDHXN1h=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Canon_in_D.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['barroco', 'nuevo'] },
-    { "title": "Canon in D (Easy)", "author": "Johann Pachelbel", "background": "https://lh3.googleusercontent.com/d/1miqxybEc4HsloZby2GZVkNmVnDDHXN1h=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Canon_in_D_easy.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 2", "tags": ['barroco', 'repertorio', 'nuevo'] },
-    { "title": "Canon in D (Pachelbell)", "author": "Johann Pachelbel", "background": "https://lh3.googleusercontent.com/d/1miqxybEc4HsloZby2GZVkNmVnDDHXN1h=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Pachelbell - Canon in D.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['barroco', 'nuevo'] },
-    { "title": "Passacaglia", "author": "G.F. Handel", "background": "https://lh3.googleusercontent.com/d/17bA2Mp8sT4jxykMM1Bdx2gj75Nn69Hij=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Passacaglia.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['barroco', 'nuevo'] },
-  
-
-    // --- CLÁSICO (Mozart, Beethoven, Kuhlau) ---
-
-    { "title": "Für Elise", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1psHUEph3V94ZGTEpcQEz8jJKmY6oiA4D=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Fur_Elise.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['clasico', 'repertorio', 'nuevo'] },
-    { "title": "Für Elise (Easy)", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1psHUEph3V94ZGTEpcQEz8jJKmY6oiA4D=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Fur_Elise_Easy_Piano.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 2", "tags": ['clasico', 'repertorio', 'nuevo'] },
-    { "title": "Für Elise (Fingered)", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1psHUEph3V94ZGTEpcQEz8jJKmY6oiA4D=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Fur_Elise_fingered.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['clasico', 'repertorio', 'nuevo'] },
-    { "title": "Moonlight Sonata (1st Mvt)", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_44", "pdf": "https://www.mozart-app.com/xml2?file=Sonate_No._14_Moonlight_1st_Movement.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['clasico', 'romantico', 'nuevo'] },
-    { "title": "Moonlight Sonata (3rd Mvt)", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_45", "pdf": "https://www.mozart-app.com/xml2?file=Sonate_No._14_Moonlight_3rd_Movement.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 8", "tags": ['clasico', 'romantico', 'nuevo'] },
-    { "title": "Pathétique Sonata (2nd Mvt)", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_46", "pdf": "https://www.mozart-app.com/xml2?file=Sonate_No._8_Pathetique_2nd_Movement.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['clasico', 'romantico', 'nuevo'] },
-    { "title": "Piano Sonata No. 16 (Allegro)", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_47", "pdf": "https://www.mozart-app.com/xml2?file=Mozart_-_Piano_Sonata_No._16_-_Allegro.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['clasico', 'mozart', 'nuevo'] },
-    { "title": "Sonata No. 16, K. 545 (1st Mvt)", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_48", "pdf": "https://www.mozart-app.com/xml2?file=Sonata_No._16_1st_Movement_K._545.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['clasico', 'mozart', 'nuevo'] },
-    { "title": "Turkish March (Fingered)", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_49", "pdf": "https://www.mozart-app.com/xml2?file=WA_Mozart_Marche_Turque_Turkish_March_fingered.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['clasico', 'mozart', 'nuevo'] },
-    { "title": "Minuet in F Major, K. 6", "author": "W.A. Mozart", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh0", "pdf": "https://www.mozart-app.com/xml2?file=mozart k6.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 2", "tags": ['clasico', 'mozart', 'repertorio', 'nuevo'] },
-    { "title": "Sonatina Op. 20 No. 1", "author": "Friedrich Kuhlau", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh1", "pdf": "https://www.mozart-app.com/xml2?file=kuhlau-op20-n1.musicxml", "dateAdded": "2025-10-05", "difficulty": "Grado 4", "tags": ['clasico', 'repertorio'] },
-
-    // --- ROMÁNTICO (Chopin, Liszt, Schubert, Tchaikovsky, Brahms) ---
-    { "title": "Ave Maria, D.839", "author": "Franz Schubert", "background": "https://lh3.googleusercontent.com/d/1OHVICPTKnQZGzv8TONfSteQUnVg7mgrf=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Ave_Maria_D839_-_Schubert_-_Solo_Piano_Arrg..musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['romantico', 'nuevo'] },
-    { "title": "Serenade (Liszt arr.)", "author": "Schubert / Liszt", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh3", "pdf": "https://www.mozart-app.com/xml2?file=Schubert_Serenade_-_Standchen_-_By_Lizst.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 8", "tags": ['romantico', 'nuevo'] },
-    { "title": "Ballade No. 1, Op. 23", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh4", "pdf": "https://www.mozart-app.com/xml2?file=Chopin_-_Ballade_no._1_in_G_minor_Op._23.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 8", "tags": ['romantico', 'chopin', 'nuevo'] },
-    { "title": "Nocturne Op. 9 No. 1", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh5", "pdf": "https://www.mozart-app.com/xml2?file=Chopin_-_Nocturne_Op._9_No._1.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['romantico', 'chopin', 'nuevo'] },
-    { "title": "Nocturne Op. 9 No. 2", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh6", "pdf": "https://www.mozart-app.com/xml2?file=Chopin_-_Nocturne_Op_9_No_2_E_Flat_Major.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['romantico', 'chopin', 'nuevo'] },
-    { "title": "Nocturne Op. 9 No. 2 (Easy)", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh7", "pdf": "https://www.mozart-app.com/xml2?file=Nocturne_in_E-flat_Major_Op._9_No._2_Easy.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['romantico', 'chopin', 'repertorio', 'nuevo'] },
-    { "title": "Nocturne No. 20 in C# Minor", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh8", "pdf": "https://www.mozart-app.com/xml2?file=Nocturne_No._20_in_C_Minor.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['romantico', 'chopin', 'nuevo'] },
-    { "title": "Waltz Op. 64 No. 2", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh9", "pdf": "https://www.mozart-app.com/xml2?file=Waltz_Opus_64_No._2_in_C_Minor.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['romantico', 'chopin', 'nuevo'] },
-    { "title": "Waltz in A Minor", "author": "Frédéric Chopin", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P0", "pdf": "https://www.mozart-app.com/xml2?file=Waltz_in_A_MinorChopin.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 4", "tags": ['romantico', 'chopin', 'repertorio', 'nuevo'] },
-    { "title": "Liebestraum No. 3", "author": "Franz Liszt", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P1", "pdf": "https://www.mozart-app.com/xml2?file=Liebestraum_No._3_in_A_Major.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 8", "tags": ['romantico', 'nuevo'] },
-    { "title": "Hungarian Dance No. 5", "author": "Johannes Brahms", "background": "https://lh3.googleusercontent.com/d/1OHVICPTKnQZGzv8TONfSteQUnVg7mgrf=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Hungarian_Dance_No_5_in_G_Minor.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['romantico', 'nuevo'] },
-    { "title": "Dance of the Sugar Plum Fairy", "author": "Pyotr Tchaikovsky", "background": "https://lh3.googleusercontent.com/d/1OHVICPTKnQZGzv8TONfSteQUnVg7mgrf=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Dance_of_the_sugar_plum_fairy.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['romantico', 'navidad', 'nuevo'] },
-    { "title": "Swan Lake Theme", "author": "Pyotr Tchaikovsky", "background": "https://lh3.googleusercontent.com/d/1OHVICPTKnQZGzv8TONfSteQUnVg7mgrf=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Swan_Lake.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['romantico', 'ballet', 'nuevo'] },
-    { "title": "Waltz of the Flowers", "author": "Pyotr Tchaikovsky", "background": "https://lh3.googleusercontent.com/d/1OHVICPTKnQZGzv8TONfSteQUnVg7mgrf=s96-c", "pdf": "https://www.mozart-app.com/xml2?file=Waltz_of_the_Flowers.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 6", "tags": ['romantico', 'navidad', 'ballet', 'nuevo'] },
-
-    // --- IMPRESIONISMO / MINIMALISMO (Debussy, Satie) ---
-    { "title": "Arabesque No. 1", "author": "Claude Debussy", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P6", "pdf": "https://www.mozart-app.com/xml2?file=Arabesque1.musicxml", "dateAdded": "2025-10-22", "difficulty": "Grado 7", "tags": ['impresionismo'] },
-    { "title": "Clair de Lune", "author": "Claude Debussy", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P7", "pdf": "https://www.mozart-app.com/xml2?file=Clair_de_Lune__Debussy.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['impresionismo', 'nuevo'] },
-    { "title": "Gymnopédie No. 1", "author": "Erik Satie", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P8", "pdf": "https://www.mozart-app.com/xml2?file=Erik_Satie_-_Gymnopedie_No.1.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 4", "tags": ['impresionismo', 'minimalista', 'nuevo'] },
-    { "title": "Gnossienne No. 1", "author": "Erik Satie", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P9", "pdf": "https://www.mozart-app.com/xml2?file=Gnossienne_No._1.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 4", "tags": ['impresionismo', 'minimalista', 'nuevo'] },
-    { "title": "Gymnopédie No. 1 (Satie)", "author": "Erik Satie", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi0", "pdf": "https://www.mozart-app.com/xml2?file=Gymnopdie_No._1__Satie.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 4", "tags": ['impresionismo', 'minimalista', 'nuevo'] },
-
-    // --- RAGTIME (Scott Joplin) ---
-    { "title": "Maple Leaf Rag", "author": "Scott Joplin", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi1", "pdf": "https://www.mozart-app.com/xml2?file=Maple_Leaf_Rag_Scott_Joplin.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 7", "tags": ['ragtime', 'nuevo'] },
-    { "title": "The Entertainer", "author": "Scott Joplin", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi2", "pdf": "https://www.mozart-app.com/xml2?file=The_Entertainer_-_Scott_Joplin.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 5", "tags": ['ragtime', 'nuevo'] },
-
-    // --- REPERTORIO DIDÁCTICO ---
-    { "title": "Carol of the Bells (Easy)", "author": "Mykola Leontovych", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi3", "pdf": "https://www.mozart-app.com/xml2?file=Carol_of_the_Bells_easy_piano.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 3", "tags": ['navidad', 'repertorio', 'nuevo'] },
-    { "title": "Little Playmates", "author": "F.X. Chwatal", "background": "https://lh3.googleusercontent.com/d/1lqwie3tWtBLJb6IJpJqgqD6xYA58PtQz", "pdf": "https://www.mozart-app.com/xml2?file=Little Playmates.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 1", "tags": ['repertorio', 'didactico', 'nuevo'] },
-    { "title": "Jodler", "author": "Unknown", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi5", "pdf": "https://www.mozart-app.com/xml2?file=jodler.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 1", "tags": ['repertorio', 'didactico', 'nuevo'] },
-      { "title": "Old German Dance", "author": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd9", "pdf": "https://www.mozart-app.com/xml2?file=Old German Dance.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 1", "tags": ['barroco', 'repertorio', 'nuevo'] },
-          { "title": "Ode to Joy", "author": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_40", "pdf": "https://www.mozart-app.com/xml2?file=Ode%20to%20Joy.musicxml", "dateAdded": "2025-10-23", "difficulty": "Grado 1", "tags": ['clasico', 'repertorio', 'nuevo'] },
-];
         
 
         var allPieces = allPiecesData.map(function(piece) {
@@ -543,51 +1537,85 @@
                 title: piece.title,
                 author: piece.author,
                 coverUrl: piece.background,
-                pdf: piece.pdf,
+                pdf: "https://www.mozart-app.com/xml2?file="+piece.pdf,
                 difficulty: piece.difficulty,
+                style: piece.style,
                 tags: piece.tags || [], 
                 dateAdded: piece.dateAdded ? new Date(piece.dateAdded) : null 
             };
         });
 
-        var mozartPieces = allPieces.filter(function(piece) {
-            // Usamos .includes() para ser flexibles (funciona con "W.A. Mozart" o "Mozart")
-            return piece.author.toLowerCase().includes('mozart');
+          var hoy = new Date();
+        var limiteFecha = new Date();
+        limiteFecha.setDate(hoy.getDate() - 10); // Resta 30 días
+
+        var newPieces = allPieces.filter(function(piece) {
+            // Comprueba que la pieza tenga fecha y sea más reciente que la fecha límite
+            return piece.dateAdded && piece.dateAdded > limiteFecha;
+        }).slice(0, 3);
+        
+        var repertoirePieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('repertoire');
         });
 
-        var chopinPieces = allPieces.filter(function(piece) {
-            return piece.author.toLowerCase().includes('chopin');
+        var exePieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('exercise');
         });
 
-        var soundtrackPieces = allPieces.filter(function(piece) {
+
+        var minuetsPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('minuet');
+        });
+
+        var preludesPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('prelude');
+        });
+
+        var sonatinasPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('sonatina');
+        });
+
+        var sonatasPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('sonata');
+        });
+
+        var waltzesPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('waltz');
+        });
+
+          var nocturnesPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('nocturne');
+        });
+
+        var etudePieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('etude');
+        });
+
+        var virtuosoPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('virtuoso');
+        });
+
+         var soundtrackPieces = allPieces.filter(function(piece) {
             return piece.tags.includes('soundtrack');
         });
       
-        var nuevasPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('nuevo');
-        });
 
-        var hoy = new Date();
-        var limiteFecha = new Date();
-        limiteFecha.setDate(hoy.getDate() - 30); // Resta 30 días
-
-        var recientesPieces = allPieces.filter(function(piece) {
-            // Comprueba que la pieza tenga fecha y sea más reciente que la fecha límite
-            return piece.dateAdded && piece.dateAdded > limiteFecha;
-        });
-        
-        var repertorioPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('repertorio');
-        });
-
+      
 
         $scope.library = [
-            { title: 'Nuevas', books: nuevasPieces },
-            { title: 'Recientes', books: recientesPieces },
-            { title: 'Soundtrack', books: soundtrackPieces },
-            { title: 'Mozart', books: mozartPieces },
-            { title: 'Chopin', books: chopinPieces },
-            { title: 'Repertorio Formativo', books: repertorioPieces }
+            { title: 'Recien añadidas', books: newPieces },
+          { title: 'Todo el catálogo', books: allPieces },
+            { title: 'Vistas en el curso', books: repertoirePieces },     
+             { title: 'Ejercicios', books: exePieces },  
+                 { title: 'Minuetos', books: minuetsPieces },  
+                      { title: 'Preludios', books: preludesPieces }, 
+             { title: 'Sonatinas', books: sonatinasPieces },  
+              { title: 'Sonatas', books: sonatasPieces },
+               { title: 'Waltz', books: waltzesPieces },
+            { title: 'Nocturnos', books: nocturnesPieces },
+             { title: 'Estudios', books: etudePieces },   
+              { title: 'Virtuosismo', books: virtuosoPieces },   
+                { title: 'Soundtracks', books: soundtrackPieces },  
         ];
 
  
@@ -598,9 +1626,14 @@
 };
 
 $scope.goBack = function() {
-        $scope.selectedSection = null;
-        $scope.viewMode = 'list'; // <-- AÑADIR (Resetea a grid al volver)
-    };
+    $scope.selectedSection = null; // 1. Regresa al menú principal de secciones
+    $scope.viewMode = 'list';      // 2. Resetea el modo de vista (como lo tenías)
+    
+    // --- AÑADE ESTO ---
+    $scope.searchQuery = '';             // 3. Limpia el input de búsqueda
+    $scope.filters.difficulty = '';    // 4. Resetea el filtro de dificultad
+    $scope.filters.style = '';         // 5. Resetea el filtro de estilo
+};
 
     $scope.setViewMode = function(mode) {
         $scope.viewMode = mode;
@@ -613,7 +1646,7 @@ $scope.goBack = function() {
     var searchMatch = !$scope.searchQuery || book.title.toLowerCase().includes($scope.searchQuery.toLowerCase()) ||
                      book.author.toLowerCase().includes($scope.searchQuery.toLowerCase());
     var difficultyMatch = !$scope.filters.difficulty || book.difficulty === $scope.filters.difficulty;
-    var styleMatch = !$scope.filters.style || (book.tags && book.tags.includes($scope.filters.style));
+    var styleMatch = !$scope.filters.style || book.style === $scope.filters.style;
     return searchMatch && difficultyMatch && styleMatch;
 };    
 
@@ -642,6 +1675,31 @@ $scope.goBack = function() {
                     carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
                 }
             };
+
+
+var allPiecesSection = $scope.library.find(function(sec) {
+            return sec.title === 'Todo el catálogo';
+        });
+
+        $scope.$watchGroup(['searchQuery', 'filters.difficulty', 'filters.style'], function(newValues, oldValues) {
+            
+            // 3. Evita que se ejecute en la carga inicial del controlador
+            if (newValues === oldValues) {
+                return;
+            }
+            var isAnyFilterActive = !!newValues[0] || !!newValues[1] || !!newValues[2];
+            var wasAnyFilterActive = !!oldValues[0] || !!oldValues[1] || !!oldValues[2];
+
+            if (isAnyFilterActive && !wasAnyFilterActive) {
+                if (allPiecesSection) {
+                    $scope.selectSection(allPiecesSection);
+                }
+            } else if (!isAnyFilterActive && wasAnyFilterActive) {
+                $scope.goBack();
+            }
+        });
+
+
         }]);
     </script>
 </body>
