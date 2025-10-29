@@ -347,8 +347,8 @@ width: 100vw;
 
 /* === NUEVO: Espacio para botón Cerrar === */
 #close-btn-placeholder {
-  width: 40px; /* Ancho para el espacio reservado */
-  height: 40px;
+  width: 30px; /* Ancho para el espacio reservado */
+  height: 39px;
 }
 
 /* === NUEVO: Botones Flotantes de Dibujo === */
@@ -617,7 +617,7 @@ display: flex;
   margin-bottom: 20px;
 }
 
-#modal-close-btn {
+.closeBtn {
   background-color: #3498db;
   color: white;
   padding: 10px 20px;
@@ -626,9 +626,133 @@ display: flex;
   transition: background-color 0.2s;
 }
 
-#modal-close-btn:hover {
+.closeBtn:hover {
   background-color: #2980b9;
 }
+
+#midi-status-legend {
+  position: fixed;
+  /* Lo ponemos encima de los controles de velocidad móviles */
+  bottom: 165px; 
+  left: 10px;
+  z-index: 50;
+  background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
+  color: #fafafa;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* Oculto por defecto */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* No interfiere con clics */
+}
+
+#midi-status-legend.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#midi-status-legend i {
+  font-size: 16px;
+  color: #3498db; /* Ícono azul */
+}
+
+/* En desktop, no hay controles de velocidad, 
+   así que podemos bajar la leyenda */
+@media (min-width: 501px) {
+  #midi-status-legend {
+    bottom: 120px; /* Justo sobre el piano */
+  }
+}
+
+
+#right-hand-only-btn.active,
+#left-hand-only-btn.active {
+  background-color: #e0e0e0 !important;
+  color: #3498db !important;
+  border-color: #3498db !important;
+}
+
+.key.midi-active {
+  background-color: #e0e0e0 !important; /* Un gris claro sutil */
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Para teclas blancas */
+.key.white.midi-active {
+  background-color: #e8e8e8 !important;
+}
+
+/* Para teclas negras */
+.key.black.midi-active {
+  background-color: #555555 !important;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4) !important;
+}
+
+
+.key-name {
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
+  pointer-events: none;
+  z-index: 10;
+  font-family: Arial, sans-serif;
+}
+
+/* Para teclas negras, ajustar posición */
+.key.black .key-name {
+  color: white;
+  bottom: 3px;
+  font-size: 8px;
+}
+
+/* Estilo para el botón activo */
+#show-key-names-btn.active {
+  background-color: #e0e0e0 !important;
+  border-color: #3498db !important;
+}
+
+/* Mejorar contraste en teclas blancas con nombres */
+.key.white.has-name {
+  background: linear-gradient(to bottom, #fff 0%, #f5f5f5 100%);
+}
+
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  /* Animación base que modificaremos con JS */
+  animation: confetti-fall 5s ease-out forwards;
+  z-index: 9999; /* Asegura que esté por encima de todo */
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+
   </style>
 </head>
 <body>
@@ -643,14 +767,15 @@ display: flex;
       <div id="time-display">
         <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
       </div>
+        <button id="midi-learn-btn" class="btn" title="Modo Aprendizaje MIDI">
+  <i class="ri-graduation-cap-line"></i>
+</button>
     </div>
 
     <div class="controls-group">
-      <button id="midi-learn-btn" class="btn" title="Modo Aprendizaje MIDI">
-  <i class="ri-plug-line"></i>
-</button>
+    
         <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
-        <i class="ri-edit-2-line"></i>
+        <i class="ri-settings-3-line"></i>
       </button>
 
           <button id="piano-btn" class="btn" >
@@ -675,31 +800,18 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
-     <div id="color-picker-container" class="btn" title="Seleccionar Color">
-  <div id="color-preview-circle"></div>
-  
-  <div id="color-options">
-    <div class="color-swatch" style="background-color: rgba(255, 223, 89, 0.4);" data-color="rgba(255, 223, 89, 0.4)"></div>
-    <div class="color-swatch" style="background-color: rgba(255, 0, 255, 0.4);" data-color="rgba(255, 0, 255, 0.4)"></div>
-    <div class="color-swatch" style="background-color: rgba(46, 204, 113, 0.4);" data-color="rgba(46, 204, 113, 0.4)"></div>
-    <input type="color" id="custom-color-input" value="#ffdf59" title="Color personalizado">
-  </div>
-</div>
-    <button id="draw-btn" class="btn" title="Activar Lápiz">
-     <i class="ri-shape-line"></i>
-    </button>
-    <button id="text-btn" class="btn" title="Añadir Texto">
-      <i class="ri-text-snippet"></i>
-    </button>
-      <button id="eraser-btn" class="btn" title="Borrador">
-       <i class="ri-eraser-line"></i>
-      </button>
-    <button id="clear-btn" class="btn" title="Borrar Anotaciones">
-      <i class="ri-delete-bin-7-line"></i>
-    </button>
-   
+  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
+    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
+  </button>
+    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
+    <i class="ri-hand"></i> D
+  </button>
     </div>
+  
      <div class="tool-group">
+        <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
+    <i class="ri-font-size"></i> 
+  </button>
           <button id="cursor-btn" class="btn" >
    <i class="ri-layout-left-2-line"></i>
     </button>
@@ -729,18 +841,10 @@ display: flex;
 </div>
   <div id="status">Cargando...</div>
 
-  <div id="floating-speed-controls">
-    <div class="speed-group">
-        <button id="zoom-out2" class="btn speed-ctrl-btn">−</button>
-        <div class="speed-display">
-          <span class="speed-bpm" id="zoom-label2">Zoom: 100%</span>
-        </div>
-        <button id="zoom-in2" class="btn speed-ctrl-btn">+</button>
-    </div>
-  </div> 
+ 
+<div id="midi-status-legend"></div>
 
   <div id="piano-container">
-   
     <div id="piano-keys"></div>
   </div>
 
@@ -748,7 +852,14 @@ display: flex;
   <div id="midi-modal" class="modal-overlay" style="display: none;">
   <div class="modal-content">
     <p id="modal-message">Este es un mensaje de prueba.</p>
-    <button id="modal-close-btn" class="btn">Entendido</button>
+    <button id="modal-close-btn" class="btn closeBtn">Entendido</button>
+  </div>
+</div>
+
+<div id="success-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <p id="success-modal-message">¡Felicidades, has completado la pieza!</p>
+    <button id="success-modal-close-btn" class="btn closeBtn">Continuar</button>
   </div>
 </div>
 
@@ -773,24 +884,26 @@ const speedDownBtn = document.getElementById('speed-down-btn');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomLabel = document.getElementById('zoom-label');
-     const zoomInBtn2 = document.getElementById('zoom-in2');
-    const zoomOutBtn2 = document.getElementById('zoom-out2');
-    const zoomLabel2 = document.getElementById('zoom-label2');
     const currentTimeSpan = document.getElementById('current-time');
 const totalTimeSpan = document.getElementById('total-time');
 const measureSelect = document.getElementById('measure-select');
 const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
-const colorPickerContainer = document.getElementById('color-picker-container');
-const colorPreviewCircle = document.getElementById('color-preview-circle');
-const colorOptions = document.getElementById('color-options');
-const customColorInput = document.getElementById('custom-color-input');
-const eraserBtn = document.getElementById('eraser-btn');
+
 const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
 const midiModal = document.getElementById('midi-modal');
 const modalMessage = document.getElementById('modal-message');
 const modalCloseBtn = document.getElementById('modal-close-btn');
+const midiStatusLegend = document.getElementById('midi-status-legend');
+const rightHandOnlyBtn = document.getElementById('right-hand-only-btn');
+const leftHandOnlyBtn = document.getElementById('left-hand-only-btn');
+let handFilterMode = 'both';
+const showKeyNamesBtn = document.getElementById('show-key-names-btn');
+let showKeyNames = false;
+const successModal = document.getElementById('success-modal');
+const successModalMessage = document.getElementById('success-modal-message');
+const successModalCloseBtn = document.getElementById('success-modal-close-btn');
 
     let osmd = null;
     let sampler = null;
@@ -816,23 +929,6 @@ let expectedNotes = new Set(); // Almacenará las notas que esperamos que el usu
 let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
-const annotationCanvas = document.getElementById('annotation-canvas');
-const annotationCtx = annotationCanvas.getContext('2d');
-const drawBtn = document.getElementById('draw-btn');
-const textBtn = document.getElementById('text-btn');
-const clearBtn = document.getElementById('clear-btn'); 
-let currentDrawingColor = 'rgba(255, 223, 89, 0.4)'; // Color inicial
-let isErasingMode = false;
-const closeColorPicker = () => {
-  colorPickerContainer.classList.remove('is-open');
-};
-
-let isDrawingMode = false;
-let isDrawing = false;
-let annotations = []; 
-let isTextMode = false;
-let textAnnotations = [];
-let startX, startY;
 
 
 
@@ -842,17 +938,16 @@ let startX, startY;
   createPiano88Keys();
   addEventListeners();
   initSampler();
+  initMidiInput();
   
   setStatus('Cargando sonidos de piano...');
   await Tone.loaded();
   setStatus('Cargando partitura...');
 
-  // --- NUEVA LÓGICA PARA CARGAR DESDE LA URL ---
-  
-  // 1. Lee los parámetros de la URL actual del navegador.
-  const urlParams = new URLSearchParams(window.location.search);
-  const fileId = urlParams.get('file'); // Busca un parámetro llamado 'file'.
 
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const fileId = urlParams.get('file'); 
   if (fileId) {
 
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
@@ -861,10 +956,12 @@ let startX, startY;
     await loadMusicXMLFromUrl(dynamicUrl);
 
   } else {
-    // 3. Si no se especificó ningún archivo en la URL, muestra un mensaje.
     setStatus('Error: No se ha especificado ningún archivo para cargar. Añade "?file=tu-archivo.musicxml" a la URL.');
-    playBtn.disabled = true; // Deshabilita el botón de play
+    playBtn.disabled = true; 
   }
+
+
+
 });
 
     function initOSMD() {
@@ -872,7 +969,7 @@ let startX, startY;
         osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
           backend: 'svg',
           drawTitle: true,
-          drawSubtitle: true,   // MUESTRA EL SUBTÍTULO
+          drawSubtitle: true,   
           drawComposer: true, 
           followCursor: true,
           drawPartNames: false,
@@ -880,9 +977,9 @@ let startX, startY;
           drawingParameters: "width",
           drawMeasureNumbers: false,
           cursorsOptions: [{ 
-            type: 3, 
-            color: "rgba(52,152,219,0.5)", 
-            alpha: 0.5, 
+            type: 1, 
+            color: "rgba(52,152,219,0.8)", 
+            alpha: 0.8, 
             follow: true 
           }]
         });
@@ -895,7 +992,6 @@ let startX, startY;
       }
     }
 
-    // Función para configurar reglas según el tamaño de pantalla
     function setupEngravingRulesForScreenSize() {
       if (!osmd || !osmd.EngravingRules) return;
       
@@ -935,6 +1031,15 @@ let startX, startY;
       
       updateZoomDisplay();
     }
+
+function updateMidiStatusLegend(deviceName = null) {
+  if (deviceName) {
+    midiStatusLegend.innerHTML = `<i class="ri-plug-line"></i> ${deviceName} Conectado`;
+    midiStatusLegend.classList.add('is-visible');
+  } else {
+    midiStatusLegend.classList.remove('is-visible');
+  }
+}
 
     function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -1008,8 +1113,7 @@ let startX, startY;
         setStatus(`Error: ${err.message}`);
       }
     }
-    
-// REEMPLAZA TU FUNCIÓN parseMusicXML COMPLETA POR ESTA VERSIÓN FINAL
+
 
 function parseMusicXML(xmlText) {
     parsedNotes = [];
@@ -1023,20 +1127,17 @@ function parseMusicXML(xmlText) {
     updateBpmDisplay();
     Tone.Transport.bpm.value = globalTempo;
 
-    const openTies = new Map(); // Mapa para manejar notas ligadas (pitch -> noteObject)
+    const openTies = new Map(); // pitch+staff+voice -> noteObject
     
-    // 1. Itera sobre todas las partes (usualmente 2 en piano)
     xml.querySelectorAll('part').forEach((part, partIndex) => {
         let currentBeat = 0;
 
-        // 2. Determina la mano de esta parte una sola vez, basándose en la clave
         const clefSign = part.querySelector('measure[number="1"] clef sign')?.textContent;
         const defaultHand = (clefSign === 'F') ? 'bass' : 'treble';
 
         const measures = part.querySelectorAll('measure');
         measures.forEach((measure, measureIndex) => {
             if (partIndex === 0 && measureIndex > 0) {
-                 // Calcula el tiempo de inicio de cada compás (solo para la primera parte)
                 measureStartTimes.push(currentBeat * (60.0 / globalTempo));
             }
             
@@ -1048,7 +1149,6 @@ function parseMusicXML(xmlText) {
                 if (node.tagName === 'note') {
                     const isChord = !!node.querySelector('chord');
                     
-                    // Si NO es parte de un acorde, el tiempo avanza. Si es un acorde, usa el tiempo de la nota anterior.
                     if (!isChord) {
                         currentBeat += durationInBeats;
                     }
@@ -1056,26 +1156,53 @@ function parseMusicXML(xmlText) {
                     if (!node.querySelector('rest') && node.querySelector('pitch')) {
                         const step = node.querySelector('step')?.textContent?.trim();
                         const octave = node.querySelector('octave')?.textContent?.trim();
-                        const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
-                        const accidental = alt === 1 ? '#' : alt === -1 ? 'b' : '';
+                        const alterElement = node.querySelector('alter');
+                        const altValue = alterElement ? parseInt(alterElement.textContent.trim(), 10) : 0;
+
+                        // Manejar todas las alteraciones posibles
+                        let accidental = '';
+                        if (altValue === 2) accidental = '##';
+                        else if (altValue === 1) accidental = '#';
+                        else if (altValue === -1) accidental = 'b';
+                        else if (altValue === -2) accidental = 'bb';
+
                         const pitch = `${step}${accidental}${octave}`;
                         
-                        // Determina la mano: usa el <staff> de la nota si existe, si no, usa la clave de la parte
                         const staffNumber = parseInt(node.querySelector('staff')?.textContent);
                         const hand = !isNaN(staffNumber) ? (staffNumber === 1 ? 'treble' : 'bass') : defaultHand;
+                        
+                        const voice = node.querySelector('voice')?.textContent || '1';
 
                         const isTieStart = !!node.querySelector('tie[type="start"]');
                         const isTieStop = !!node.querySelector('tie[type="stop"]');
+                        
+                        const tieKey = `${pitch}-${hand}-${voice}`;
 
-                        if (isTieStop && openTies.has(pitch)) {
-                            // ES EL FINAL DE UNA LIGADURA: extiende la duración de la nota original
-                            const existingNote = openTies.get(pitch);
+                        if (isTieStop && openTies.has(tieKey)) {
+                            // CONTINUACIÓN DE LIGADURA
+                            const existingNote = openTies.get(tieKey);
+                            
+                            // Crear una nota visual separada (para el cursor)
+                            const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                            const continuationNote = {
+                                pitch: pitch,
+                                startSec: noteStartTime,
+                                durSec: durationInBeats * (60.0 / globalTempo),
+                                hand: hand,
+                                isTied: true,
+                                isTiedContinuation: true, // NUEVA PROPIEDAD
+                                isChord: isChord
+                            };
+                            parsedNotes.push(continuationNote);
+                            
+                            // Extender la duración de la nota original (para el audio)
                             existingNote.durSec += durationInBeats * (60.0 / globalTempo);
+                            
                             if (!isTieStart) {
-                                openTies.delete(pitch); // Cierra la ligadura si no empieza una nueva
+                                openTies.delete(tieKey);
                             }
                         } else {
-                            // ES UNA NOTA NUEVA (o el inicio de una ligadura)
+                            // NOTA NUEVA
                             const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
                             
                             const newNote = {
@@ -1083,13 +1210,34 @@ function parseMusicXML(xmlText) {
                                 startSec: noteStartTime,
                                 durSec: durationInBeats * (60.0 / globalTempo),
                                 hand: hand,
+                                isTied: isTieStart,
+                                isTiedContinuation: false, // NUEVA PROPIEDAD
+                                isChord: isChord
                             };
                             parsedNotes.push(newNote);
 
                             if (isTieStart) {
-                                openTies.set(pitch, newNote); // Abre una nueva ligadura
+                                openTies.set(tieKey, newNote);
                             }
                         }
+                    }else if (node.querySelector('rest')) {
+
+                        const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                        
+                        const staffNumber = parseInt(node.querySelector('staff')?.textContent);
+                        const hand = !isNaN(staffNumber) ? (staffNumber === 1 ? 'treble' : 'bass') : defaultHand;
+                        
+                        const restNote = {
+                            pitch: null, // null indica que es un silencio
+                            startSec: noteStartTime,
+                            durSec: durationInBeats * (60.0 / globalTempo),
+                            hand: hand,
+                            isRest: true, // NUEVA PROPIEDAD
+                            isTied: false,
+                            isTiedContinuation: false,
+                            isChord: isChord
+                        };
+                        parsedNotes.push(restNote);
                     }
                 } else if (node.tagName === 'backup') {
                     currentBeat -= durationInBeats;
@@ -1100,14 +1248,17 @@ function parseMusicXML(xmlText) {
         });
     });
 
-    // Ordenamiento final y cálculo de duración
+    if (openTies.size > 0) {
+        console.warn('Advertencia: Se encontraron ligaduras sin cerrar:', Array.from(openTies.keys()));
+    }
+
     parsedNotes.sort((a, b) => a.startSec - b.startSec);
     const lastNote = parsedNotes[parsedNotes.length - 1];
     totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
     totalTimeSpan.textContent = formatTime(totalDuration);
 }
 
- // REEMPLAZA LA FUNCIÓN scheduleNotesOnTransport COMPLETA CON ESTA
+
 function scheduleNotesOnTransport() {
   if (audioPart) audioPart.dispose();
   if (visualPart) visualPart.dispose();
@@ -1115,49 +1266,90 @@ function scheduleNotesOnTransport() {
   osmd.cursor.reset();
   osmd.cursor.hide();
 
-  // Agrupa notas por tiempo de inicio para manejar acordes correctamente
+  const TIME_TOLERANCE = 0.001;
+  
   const notesByTime = new Map();
   parsedNotes.forEach(note => {
     const time = note.startSec / playbackRate;
-    if (!notesByTime.has(time)) {
-      notesByTime.set(time, []);
+    
+    let foundTime = null;
+    for (let existingTime of notesByTime.keys()) {
+      if (Math.abs(existingTime - time) < TIME_TOLERANCE) {
+        foundTime = existingTime;
+        break;
+      }
     }
-    notesByTime.get(time).push(note);
+    
+    if (foundTime !== null) {
+      notesByTime.get(foundTime).push(note);
+    } else {
+      notesByTime.set(time, [note]);
+    }
   });
 
-  // --- NUEVA LÓGICA PARA EL AUDIO ---
+  // Audio: solo notas reales (sin silencios)
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
-    audioEvents.push({
-      time: time,
-      pitches: notes.map(n => n.pitch), // Agrupa las alturas en un arreglo
-      duration: notes[0].durSec / playbackRate, // Usa la duración de la primera nota
-    });
+    const realNotes = notes.filter(n => !n.isRest); // NUEVO: Filtrar silencios
+    
+    if (realNotes.length > 0) {
+      const uniquePitches = new Set();
+      const uniqueNotes = realNotes.filter(note => {
+        const normalizedPitch = normalizeNote(note.pitch);
+        if (uniquePitches.has(normalizedPitch)) {
+          return false;
+        }
+        uniquePitches.add(normalizedPitch);
+        return true;
+      });
+      
+      audioEvents.push({
+        time: time,
+        pitches: uniqueNotes.map(n => n.pitch),
+        duration: uniqueNotes[0].durSec / playbackRate,
+      });
+    }
   });
   
-  // El Tone.Part ahora recibe un arreglo de notas para los acordes
   audioPart = new Tone.Part((time, value) => {
     sampler.triggerAttackRelease(value.pitches, value.duration, time);
   }, audioEvents).start(0);
 
-
-  // --- LÓGICA VISUAL (PERMANECE IGUAL PERO USA notesByTime) ---
+  // Visual: todas las notas (incluyendo silencios para avanzar el cursor)
   const visualEvents = [];
   notesByTime.forEach((notes, time) => {
-    visualEvents.push({ time, notes: notes.map(n => ({...n, duration: n.durSec / playbackRate})) });
+    const uniquePitches = new Set();
+    const uniqueNotes = notes.filter(note => {
+      if (note.isRest) return true; // NUEVO: Mantener silencios
+      
+      const normalizedPitch = normalizeNote(note.pitch);
+      if (uniquePitches.has(normalizedPitch)) {
+        return false;
+      }
+      uniquePitches.add(normalizedPitch);
+      return true;
+    });
+    
+    visualEvents.push({ 
+      time, 
+      notes: uniqueNotes.map(n => ({...n, duration: n.durSec / playbackRate}))
+    });
   });
 
   visualPart = new Tone.Part((time, value) => {
     Tone.Draw.schedule(() => {
-      // Avanza el cursor una vez por cada grupo de notas (acorde)
       if (value.notes.length > 0) {
-          osmd.cursor.next();
+        osmd.cursor.next();
       }
-      value.notes.forEach(note => highlightKey(note.pitch, note.duration, note.hand));
+      // MODIFICADO: Solo hacer highlight de notas reales
+      value.notes.forEach(note => {
+        if (!note.isRest) {
+          highlightKey(note.pitch, note.duration, note.hand);
+        }
+      });
     }, time);
   }, visualEvents).start(0);
   
-  // Ajusta la duración total
   const newTotalDuration = totalDuration / playbackRate;
   Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
 }
@@ -1235,19 +1427,13 @@ function startProgressUpdate() {
      playBtn.addEventListener('click', async () => {
   await Tone.start();
   if (Tone.Transport.state === 'started') {
-    // --- LÓGICA DE PAUSA ---
     Tone.Transport.pause();
     updatePlayButton(false);
     stopProgressUpdate();
-    
-    // ¡NUEVO! Cancela los timeouts pero NO borra los colores.
-    // Esto hace que las teclas se queden encendidas.
     activeHighlightTimeouts.forEach(clearTimeout);
     activeHighlightTimeouts = [];
 
   } else {
-    // --- LÓGICA DE REANUDAR/PLAY ---
-    // ¡NUEVO! Limpia cualquier tecla que haya quedado encendida de la pausa.
     clearAllHighlights(); 
     
     Tone.Transport.start(Tone.now() + 0.1);
@@ -1278,6 +1464,10 @@ function updateSpeed(newRate) {
     scheduleNotesOnTransport();
 }
 
+ rightHandOnlyBtn.addEventListener('click', toggleRightHandOnly);
+  leftHandOnlyBtn.addEventListener('click', toggleLeftHandOnly);
+  showKeyNamesBtn.addEventListener('click', toggleKeyNames);
+
 speedUpBtn.addEventListener('click', () => {
     updateSpeed(playbackRate + speedStep);
 });
@@ -1301,17 +1491,9 @@ speedDownBtn.addEventListener('click', () => {
         applyZoom();
       });
 
-        // Controles de zoom
-      zoomInBtn2.addEventListener('click', () => {
-        currentZoom = Math.min(2.0, currentZoom + 0.1);
-        applyZoom();
-      });
-      
-      zoomOutBtn2.addEventListener('click', () => {
-        currentZoom = Math.max(0.5, currentZoom - 0.1);
-        applyZoom();
-      });
+      successModalCloseBtn.addEventListener('click', hideSuccessModal);
 
+ 
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
       
       // Redimensionar ventana
@@ -1373,153 +1555,87 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
      modalCloseBtn.addEventListener('click', hideModal);
 
 
-drawBtn.addEventListener('click', () => {
-  isDrawingMode = !isDrawingMode;
-  isTextMode = false;
-  isErasingMode = false; // <-- AÑADE ESTO
+    }
 
-  if (isDrawingMode) {
-    drawBtn.style.background = '#e0e0e0';
-    textBtn.style.background = 'none';
-    eraserBtn.style.background = 'none'; // <-- AÑADE ESTO
-    annotationCanvas.style.pointerEvents = 'auto';
-    annotationCanvas.style.cursor = 'crosshair';
+
+function toggleKeyNames() {
+  showKeyNames = !showKeyNames;
+  
+  if (showKeyNames) {
+    showKeyNamesBtn.style.background = '#e0e0e0';
+    showKeyNamesOnPiano();
   } else {
-    drawBtn.style.background = 'none';
-    annotationCanvas.style.pointerEvents = 'none';
-    annotationCanvas.style.cursor = 'default';
+    showKeyNamesBtn.style.background = 'none';
+    hideKeyNamesOnPiano();
   }
-});
-
-colorPickerContainer.addEventListener('click', (e) => {
-  // Detiene la propagación para que el clic no sea capturado por el listener del 'document'
-  e.stopPropagation(); 
-  colorPickerContainer.classList.toggle('is-open');
-});
-
-document.querySelectorAll('.color-swatch').forEach(swatch => {
-  swatch.addEventListener('click', (e) => {
-    e.stopPropagation(); // Detiene la propagación
-    currentDrawingColor = swatch.dataset.color;
-    colorPreviewCircle.style.backgroundColor = currentDrawingColor;
-    closeColorPicker(); // Cierra el selector
-  });
-});
-
-customColorInput.addEventListener('input', (e) => {
-  const hex = e.target.value;
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  currentDrawingColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
-  colorPreviewCircle.style.backgroundColor = currentDrawingColor;
-  // No cerramos al instante para que el usuario vea el color que eligió
-});
-customColorInput.addEventListener('change', () => {
-    // Cerramos cuando el usuario finaliza la selección de color personalizado
-    closeColorPicker();
-});
-// Lógica del Borrador
-eraserBtn.addEventListener('click', () => {
-    isErasingMode = !isErasingMode;
-    isDrawingMode = false;
-    isTextMode = false;
-
-    if (isErasingMode) {
-        eraserBtn.style.background = '#e0e0e0';
-        drawBtn.style.background = 'none';
-        textBtn.style.background = 'none';
-        annotationCanvas.style.pointerEvents = 'auto';
-        annotationCanvas.style.cursor = 'pointer'; // O un cursor de borrador
-    } else {
-        eraserBtn.style.background = 'none';
-        annotationCanvas.style.pointerEvents = 'none';
-        annotationCanvas.style.cursor = 'default';
-    }
-});
-
-clearBtn.addEventListener('click', clearAnnotations);
-annotationCanvas.addEventListener('mousedown', startDrawing);
-annotationCanvas.addEventListener('mousemove', draw);
-annotationCanvas.addEventListener('mouseup', stopDrawing);
-annotationCanvas.addEventListener('mouseout', stopDrawing); 
-
-textBtn.addEventListener('click', toggleTextMode);
-annotationCanvas.addEventListener('click', (e) => {
-    if (isTextMode) {
-        handleCanvasClickForText(e);
-    } else if (isErasingMode) {
-        handleCanvasClickForEraser(e);
-    }
-});
-
-    }
-
-// Puedes agregar esta función justo antes de addEventListeners()
-function toggleTextMode() {
-  isTextMode = !isTextMode;
-  isDrawingMode = false;
-  isErasingMode = false; // <-- AÑADE ESTO
-
-  if (isTextMode) {
-    textBtn.style.background = '#e0e0e0';
-    drawBtn.style.background = 'none';
-    eraserBtn.style.background = 'none'; // <-- AÑADE ESTO
-    annotationCanvas.style.pointerEvents = 'auto';
-    annotationCanvas.style.cursor = 'text';
-  } else {
-    textBtn.style.background = 'none';
-    annotationCanvas.style.pointerEvents = 'none';
-    annotationCanvas.style.cursor = 'default';
-  }
+  
+  console.log(`Mostrar nombres de teclas: ${showKeyNames}`);
 }
 
+// Función para mostrar nombres en las teclas blancas
+function showKeyNamesOnPiano() {
+  const whiteKeys = document.querySelectorAll('.key.white');
+  
+  whiteKeys.forEach(key => {
+    const noteName = key.id.replace('#', '');
+    const displayName = getAngloSaxonNoteName(noteName);
+    
+    // Crear elemento para el nombre
+    const nameElement = document.createElement('div');
+    nameElement.className = 'key-name';
+    nameElement.textContent = displayName;
+    nameElement.style.cssText = `
+      position: absolute;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      pointer-events: none;
+      z-index: 10;
+    `;
+    
+    key.appendChild(nameElement);
+    key.classList.add('has-name');
+  });
+}
 
-function handleCanvasClickForEraser(e) {
-    const rect = annotationCanvas.getBoundingClientRect();
-    const clickX = (e.clientX - rect.left) / rect.width;
-    const clickY = (e.clientY - rect.top) / rect.height;
-    let somethingWasDeleted = false;
+// Función para ocultar nombres de las teclas
+function hideKeyNamesOnPiano() {
+  const keyNames = document.querySelectorAll('.key-name');
+  keyNames.forEach(nameElement => {
+    nameElement.remove();
+  });
+  
+  const keysWithNames = document.querySelectorAll('.key.has-name');
+  keysWithNames.forEach(key => {
+    key.classList.remove('has-name');
+  });
+}
 
-    // Itera en reversa para evitar problemas de índice al borrar
-    for (let i = annotations.length - 1; i >= 0; i--) {
-        const annotation = annotations[i];
-        if (
-            clickX >= annotation.x &&
-            clickX <= annotation.x + annotation.width &&
-            clickY >= annotation.y &&
-            clickY <= annotation.y + annotation.height
-        ) {
-            annotations.splice(i, 1); // Borra el elemento
-            somethingWasDeleted = true;
-            break; // Borra solo un elemento por clic
-        }
-    }
-
-    if (!somethingWasDeleted) {
-        // Si no se borró un dibujo, busca un texto
-        for (let i = textAnnotations.length - 1; i >= 0; i--) {
-            const text = textAnnotations[i];
-            // Aproxima un área de clic para el texto
-            const textWidthApprox = (text.text.length * 8) / rect.width; // Estimación simple
-            const textHeightApprox = 20 / rect.height;
-
-            if (
-                clickX >= text.x &&
-                clickX <= text.x + textWidthApprox &&
-                clickY >= text.y &&
-                clickY <= text.y + textHeightApprox
-            ) {
-                textAnnotations.splice(i, 1);
-                somethingWasDeleted = true;
-                break;
-            }
-        }
-    }
-
-    if (somethingWasDeleted) {
-        redrawAllAnnotations();
-    }
+// Función para convertir a sistema anglosajón
+function getAngloSaxonNoteName(noteId) {
+  // Mapa de conversión para notas con sostenidos
+  const noteMap = {
+    'C': 'C', 'C#': 'C#',
+    'D': 'D', 'D#': 'D#', 
+    'E': 'E',
+    'F': 'F', 'F#': 'F#',
+    'G': 'G', 'G#': 'G#',
+    'A': 'A', 'A#': 'A#',
+    'B': 'B'
+  };
+  
+  // Extraer la nota y la octava (ej: "C4", "D#5")
+  const noteMatch = noteId.match(/^([A-G]#?)(\d+)$/);
+  if (noteMatch) {
+    const note = noteMatch[1];
+    const octave = noteMatch[2];
+    return `${noteMap[note] || note}`;
+  }
+  
+  return noteId; // Fallback
 }
 
 function populateMeasureSelector() {
@@ -1539,23 +1655,22 @@ function toggleCursorType() {
   if (!osmd || !osmd.cursor) return;
 
   // CORRECCIÓN: Se usa .cursorOptions en lugar de .Options
-  const newType = osmd.cursor.cursorOptions.type === 3 ? 1 : 3;
+  const newType = osmd.cursor.cursorOptions.type === 1 ? 3 : 1;
   osmd.cursor.cursorOptions.type = newType;
 
   // Cambia el color del botón para dar feedback visual
-  if (newType === 1) {
+  if (newType === 3) {
     cursorBtn.style.color = '#3498db'; 
-    osmd.cursor.cursorOptions.alpha =0.8;
-    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
-  } else {
-    cursorBtn.style.color = '#1a1a1a'; 
      osmd.cursor.cursorOptions.alpha = 0.45;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
+  } else {
+    cursorBtn.style.color = '#1a1a1a'; 
+    osmd.cursor.cursorOptions.alpha =0.8;
+    osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
   }
 }
 
 function clearAllHighlights() {
-  // 1. Cancela todos los timeouts pendientes para que no se ejecuten más tarde
   activeHighlightTimeouts.forEach(clearTimeout);
   activeHighlightTimeouts = [];
 
@@ -1591,7 +1706,6 @@ function toggleFullScreen() {
 
     function updateZoomDisplay() {
       zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
-      zoomLabel2.textContent = `${Math.round(currentZoom * 100)}%`;
     }
 
     function updatePlayButton(isPlaying) {
@@ -1605,9 +1719,9 @@ function toggleFullScreen() {
       speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
 
-// Reemplaza tu función highlightKey con esta:
+
 function highlightKey(noteName, durSec, hand, persist = false) {
-    const noteId = noteName.replace('b', '#');
+    const noteId = normalizeNote(noteName);
     const el = document.getElementById(noteId);
     if (!el) return;
 
@@ -1625,39 +1739,117 @@ function highlightKey(noteName, durSec, hand, persist = false) {
     }
 }
 
-// Script: Añade esta nueva función principal de aprendizaje
-function advanceLearningStep() {
-    clearAllHighlights();
-    expectedNotes.clear();
-
-    if (currentLearningIndex >= parsedNotes.length) {
-        alert("¡Felicidades, has completado la pieza!");
-        toggleMidiLearnMode();
-        return;
-    }
-
-    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    const notesInStep = [];
+function normalizeNote(noteName) {
+    const flatToSharp = {
+        // Bemoles simples
+        'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#',
+        // Naturales enarmónicos
+        'Cb': 'B', 'Fb': 'E', 'E#': 'F', 'B#': 'C',
+        // Dobles bemoles
+        'Dbb': 'C', 'Ebb': 'D', 'Fbb': 'D#', 'Gbb': 'F', 'Abb': 'G', 
+        'Bbb': 'A', 'Cbb': 'A#',
+        // Dobles sostenidos
+        'C##': 'D', 'D##': 'E', 'E##': 'F#', 'F##': 'G', 
+        'G##': 'A', 'A##': 'B', 'B##': 'C#'
+    };
     
-    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
-        notesInStep.push(parsedNotes[currentLearningIndex]);
-        currentLearningIndex++;
+    // Regex mejorado para capturar dobles alteraciones
+    const match = noteName.match(/^([A-G])(bb|##|b|#)?(\d+)$/);
+    if (!match) {
+        console.warn(`No se pudo normalizar la nota: ${noteName}`);
+        return noteName;
+    }
+    
+    const [, noteLetter, alteration, octave] = match;
+    const noteWithAlt = noteLetter + (alteration || ''); // Ej: "C##", "Dbb", "E"
+    let normalizedNote = flatToSharp[noteWithAlt] || noteWithAlt;
+    let finalOctave = parseInt(octave);
+    
+    // Casos especiales de cambio de octava
+    if (noteWithAlt === 'Cb') {
+        normalizedNote = 'B';
+        finalOctave -= 1;
+    } else if (noteWithAlt === 'Cbb') {
+        normalizedNote = 'A#';
+        finalOctave -= 1;
+    } else if (noteWithAlt === 'B#') {
+        normalizedNote = 'C';
+        finalOctave += 1;
+    } else if (noteWithAlt === 'B##') {
+        normalizedNote = 'C#';
+        finalOctave += 1;
+    }
+    
+    return normalizedNote + finalOctave;
+}
+
+function advanceLearningStep() {
+  clearAllHighlights();
+  expectedNotes.clear();
+
+  if (currentLearningIndex >= parsedNotes.length) {
+    showSuccessModal("¡Felicidades, has completado la pieza!");
+    showConfetti(200);
+    toggleMidiLearnMode();
+    return;
+  }
+
+  let notesInStep = [];
+  let foundValidStep = false;
+  const TIME_TOLERANCE = 0.001;
+
+  // NUEVO: Saltar automáticamente sobre silencios
+  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+    notesInStep = [];
+    
+    // Recopilar todas las notas en este momento
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
     }
 
-    if (notesInStep.length > 0) {
-        osmd.cursor.next();
-        const pitchesToPlay = [];
+    // Filtrar por mano
+    const filteredNotes = notesInStep.filter(note => 
+      !note.isRest &&
+      (handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass'))
+    );
 
-        // Ahora, esta función SOLO prepara lo visual.
-        notesInStep.forEach(note => {
-            expectedNotes.add(note.pitch);
-            highlightKey(note.pitch, note.durSec, note.hand, true); 
-        });
-
-        // La línea que reproducía el sonido (sampler.triggerAttackRelease) se ha eliminado de aquí.
+    if (filteredNotes.length > 0) {
+      foundValidStep = true;
+      notesInStep = filteredNotes;
+      
+      osmd.cursor.next();
+      
+      const uniquePitches = new Set();
+      
+      notesInStep.forEach(note => {
+        const normalizedNote = normalizeNote(note.pitch);
         
-        console.log("Esperando que toques:", Array.from(expectedNotes));
+        if (!uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
+      });
+      
+      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // NUEVO: Si no hay notas que tocar (solo silencios), avanzar el cursor automáticamente
+      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
+      osmd.cursor.next();
+      // Continuar el bucle para buscar la siguiente nota
     }
+  }
+
+  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+    showSuccessModal("¡Felicidades, has completado la pieza!");
+    showConfetti(200);
+    toggleMidiLearnMode();
+  }
 }
 
     function setStatus(text) { 
@@ -1666,199 +1858,50 @@ function advanceLearningStep() {
     }
 
 
+function showSuccessModal(message) {
+  successModalMessage.textContent = message;
+  successModal.style.display = 'flex';
+  setTimeout(() => {
+    successModal.classList.add('is-visible');
+  }, 10);
+}
 
 
-// Se activa al presionar el clic
-function startDrawing(e) {
-    if (!isDrawingMode) return;
-    isDrawing = true;
+function hideSuccessModal() {
+  successModal.classList.remove('is-visible');
+  setTimeout(() => {
+    successModal.style.display = 'none';
+  }, 300); 
+}
+
+
+function showConfetti(count = 100) {
+  const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
+  for (let i = 0; i < count; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = `${Math.random() * 100}vw`;
+    confetti.style.top = `${-20 - Math.random() * 10}vh`; 
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+    confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
     
-    // Guardamos las coordenadas de inicio NORMALIZADAS (0 a 1)
-    const rect = annotationCanvas.getBoundingClientRect();
-    startX = (e.clientX - rect.left) / rect.width;
-    startY = (e.clientY - rect.top) / rect.height;
-}
-
-// Se activa mientras se mueve el ratón con el clic presionado
-// Reemplaza el contenido de la función draw(e) con esto:
-function draw(e) {
-  if (!isDrawing) return;
-
-  redrawAllAnnotations();
- 
-  const canvasRect = annotationCanvas.getBoundingClientRect();
-  const currentX = (e.clientX - canvasRect.left) / canvasRect.width;
-  const currentY = (e.clientY - canvasRect.top) / canvasRect.height;
-
-  const width = (currentX - startX) * annotationCanvas.width;
-  const height = (currentY - startY) * annotationCanvas.height;
-
-  // ✨ LÍNEA CORREGIDA ✨
-  annotationCtx.fillStyle = currentDrawingColor; 
-  annotationCtx.fillRect(startX * annotationCanvas.width, startY * annotationCanvas.height, width, height);
-}
-
-// Se activa al soltar el clic
-// ENCUENTRA LA FUNCIÓN stopDrawing(e) Y MODIFÍCALA ASÍ:
-function stopDrawing(e) {
-  if (!isDrawing) return;
-  isDrawing = false;
-
-  const rect = annotationCanvas.getBoundingClientRect();
-  const endX = (e.clientX - rect.left) / rect.width;
-  const endY = (e.clientY - rect.top) / rect.height;
-
-  const finalX = Math.min(startX, endX);
-  const finalY = Math.min(startY, endY);
-  const finalWidth = Math.abs(startX - endX);
-  const finalHeight = Math.abs(startY - endY);
-
-  if (finalWidth > 0.01 && finalHeight > 0.01) {
-    annotations.push({
-      x: finalX,
-      y: finalY,
-      width: finalWidth,
-      height: finalHeight,
-      // ---- LÍNEA MODIFICADA ----
-      color: currentDrawingColor 
-    });
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 5000);
   }
-
-  redrawAllAnnotations();
 }
 
-
-function redrawAllAnnotations() {
-    // Asegura que el canvas tenga el tamaño correcto del contenedor de la partitura
-    const rect = osmdContainer.getBoundingClientRect();
-    if (annotationCanvas.width !== rect.width || annotationCanvas.height !== rect.height) {
-        annotationCanvas.width = rect.width;
-        annotationCanvas.height = rect.height;
-    }
-    
-    // Limpia todo
-    annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
-
-    // Dibuja los rectángulos guardados
-    annotations.forEach(rect => {
-        annotationCtx.fillStyle = rect.color;
-        annotationCtx.fillRect(
-            rect.x * annotationCanvas.width, 
-            rect.y * annotationCanvas.height, 
-            rect.width * annotationCanvas.width, 
-            rect.height * annotationCanvas.height
-        );
-    });
-
-    // Dibuja los textos guardados
-    textAnnotations.forEach(text => {
-        annotationCtx.fillStyle = text.color;
-        annotationCtx.font = text.font;
-        annotationCtx.textBaseline = 'top'; // Asegura que el texto se dibuje desde la esquina superior
-        annotationCtx.fillText(
-            text.text,
-            text.x * annotationCanvas.width,
-            text.y * annotationCanvas.height
-        );
-    });
-}
-
-// Se llama al hacer clic en el canvas cuando el modo texto está activo
-function handleCanvasClickForText(e) {
-    if (!isTextMode) return;
-
-    // Busca si ya existe un cuadro de texto en la pantalla.
-    const existingInput = document.body.querySelector('input[type="text"][style*="position: absolute"]');
-
-    if (existingInput) {
-        // Si existe, el clic solo lo finalizará (lo "desenfoca").
-        existingInput.blur(); 
-        return; // Detiene la función aquí para no crear uno nuevo.
-    }
-    
-    // Si no existe ningún cuadro de texto, crea uno nuevo.
-    isDrawing = false; 
-    createTextInput(e);
-}
-
-// Crea y posiciona un <input> temporal sobre el canvas
-function createTextInput(e) {
-    const wrapper = document.getElementById('sheet-music-wrapper');
-    const rect = annotationCanvas.getBoundingClientRect();
-    
-    // Calcula la posición del clic relativa al contenedor de la partitura
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Crea el elemento de input
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.style.position = 'absolute';
-    input.style.left = `${x}px`; // Usa las coordenadas relativas al canvas
-    input.style.top = `${y}px`;
-    input.style.background = 'white';
-    input.style.border = '1px solid #ccc';
-    input.style.font = 'bold 18px sans-serif';
-    input.style.padding = '2px';
-    input.setAttribute('maxlength', '50');
-
-    // Función para guardar el texto y eliminar el input
-    const finalizeText = () => {
-        if (input.value.trim()) {
-            // Guardamos las coordenadas normalizadas (0 a 1)
-            const normalizedX = x / rect.width;
-            const normalizedY = y / rect.height;
-
-            textAnnotations.push({
-                text: input.value,
-                x: normalizedX,
-                y: normalizedY,
-                color: 'rgba(231, 76, 60, 1.0)', // Color rojo para el texto
-                font: 'bold 18px sans-serif'
-            });
-            redrawAllAnnotations();
-        }
-        // Asegúrate de que el input exista antes de intentar eliminarlo
-        if (wrapper.contains(input)) {
-            wrapper.removeChild(input);
-        }
-    };
-
-    input.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') {
-            ev.preventDefault();
-            input.blur();
-        }
-    });
-    input.addEventListener('blur', finalizeText);
-
-    // Agrega el input al contenedor de la partitura y lo enfoca
-    wrapper.appendChild(input);
-    input.focus();
-}
-
-// Reemplaza la función clearAnnotations() con esto:
-function clearAnnotations() {
-    annotations = []; // Vaciamos el arreglo de rectángulos
-    textAnnotations = []; // Vaciamos el arreglo de textos
-    redrawAllAnnotations(); // Limpiamos y redibujamos el canvas vacío
-}
-
-
-// Script: añade esta nueva función
 function toggleMidiLearnMode() {
-    // Si el usuario hace clic pero no hay MIDI, muestra el mensaje y no hagas nada más.
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
         showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
-        initMidiInput(); // Intenta reconectar por si acaso
-        return; // Detiene la función aquí
+        initMidiInput();
+        return; 
     }
 
     isMidiLearnMode = !isMidiLearnMode;
     stopPlayback(); 
 
     if (isMidiLearnMode) {
-        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = '#e0e0e0';
         playBtn.disabled = true;
         currentLearningIndex = 0;
@@ -1866,16 +1909,18 @@ function toggleMidiLearnMode() {
 
         cursorBtn.style.color = '#3498db';
         Object.assign(osmd.cursor.cursorOptions, {
-            type: 1,
-            alpha: 0.8,
-            color: "rgba(52, 152, 219, 0.8)"
+            type: 5,
+            alpha: 0.7,
+            color: "rgba(52, 152, 219, 0.7)"
         });
         
-        // La llamada a initMidiInput() ya no es necesaria aquí porque se hace al cargar la página
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+
+        prepareFirstLearningStep(); 
         
-        advanceLearningStep(); 
     } else {
-        // ... el resto de la función se mantiene igual ...
         midiLearnBtn.style.background = 'none';
         playBtn.disabled = false;
         clearAllHighlights(); 
@@ -1884,54 +1929,215 @@ function toggleMidiLearnMode() {
         
         cursorBtn.style.color = '#1a1a1a';
         Object.assign(osmd.cursor.cursorOptions, {
-            type: 3,
-            alpha: 0.45,
-            color: "rgba(52, 152, 219, 0.45)"
+            type: 1,
+            alpha: 0.8,
+            color: "rgba(52, 152, 219, 0.8)"
         });
+
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
     }
 }
 
 
-// Script: añade esta nueva función
+function prepareFirstLearningStep() {
+  clearAllHighlights();
+  expectedNotes.clear();
+
+  if (currentLearningIndex >= parsedNotes.length) {
+    showSuccessModal("¡Felicidades, has completado la pieza!");
+    showConfetti(200);
+    toggleMidiLearnMode();
+    return;
+  }
+
+  let notesInStep = [];
+  let foundValidStep = false;
+  const TIME_TOLERANCE = 0.001;
+
+  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+    notesInStep = [];
+    
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
+    }
+
+    const filteredNotes = notesInStep.filter(note => 
+      !note.isRest &&
+      (handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass'))
+    );
+
+    if (filteredNotes.length > 0) {
+      foundValidStep = true;
+      notesInStep = filteredNotes;
+      
+      const uniquePitches = new Set();
+      
+      notesInStep.forEach(note => {
+        const normalizedNote = normalizeNote(note.pitch);
+        
+        if (!uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
+      });
+      
+      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    }
+  }
+
+  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+    alert("¡No hay notas para la mano seleccionada en esta pieza!");
+    toggleMidiLearnMode();
+  }
+}
+
+
+function toggleRightHandOnly() {
+  if (handFilterMode === 'right') {
+    // Si ya está activo, desactivar
+    handFilterMode = 'both';
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+  } else {
+    // Activar solo mano derecha
+    handFilterMode = 'right';
+    rightHandOnlyBtn.style.background = '#e0e0e0';
+    rightHandOnlyBtn.style.color = '#3498db';
+    leftHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+    
+    // Si estaba activo mano izquierda, desactivarlo
+    if (isMidiLearnMode && expectedNotes.size > 0) {
+      reloadCurrentStepWithHandFilter();
+    }
+  }
+  console.log(`Modo de mano: ${handFilterMode}`);
+}
+
+function toggleLeftHandOnly() {
+  if (handFilterMode === 'left') {
+    // Si ya está activo, desactivar
+    handFilterMode = 'both';
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    leftHandOnlyBtn.style.color = '#1a1a1a';
+  } else {
+    // Activar solo mano izquierda
+    handFilterMode = 'left';
+    leftHandOnlyBtn.style.background = '#e0e0e0';
+    leftHandOnlyBtn.style.color = '#3498db';
+    rightHandOnlyBtn.style.background = 'none';
+    rightHandOnlyBtn.style.color = '#1a1a1a';
+    
+    // Si estaba activo mano derecha, desactivarlo
+    if (isMidiLearnMode && expectedNotes.size > 0) {
+      reloadCurrentStepWithHandFilter();
+    }
+  }
+  console.log(`Modo de mano: ${handFilterMode}`);
+}
+
+
+function reloadCurrentStepWithHandFilter() {
+  if (!isMidiLearnMode) return;
+  
+  const TIME_TOLERANCE = 0.001;
+  
+  const currentStepNotes = [];
+  const targetTime = parsedNotes[currentLearningIndex - 1]?.startSec;
+  
+  let tempIndex = currentLearningIndex - 1;
+  while (tempIndex >= 0 && Math.abs(parsedNotes[tempIndex]?.startSec - targetTime) < TIME_TOLERANCE) {
+    currentStepNotes.unshift(parsedNotes[tempIndex]);
+    tempIndex--;
+  }
+  
+  clearAllHighlights();
+  expectedNotes.clear();
+  
+  const filteredNotes = currentStepNotes.filter(note => 
+    handFilterMode === 'both' || 
+    (handFilterMode === 'right' && note.hand === 'treble') ||
+    (handFilterMode === 'left' && note.hand === 'bass')
+  );
+  
+  if (filteredNotes.length > 0) {
+    const uniquePitches = new Set();
+    
+    filteredNotes.forEach(note => {
+      const normalizedNote = normalizeNote(note.pitch);
+      
+      if (!uniquePitches.has(normalizedNote)) {
+        uniquePitches.add(normalizedNote);
+        expectedNotes.add(normalizedNote);
+        highlightKey(note.pitch, note.durSec, note.hand, true);
+      }
+    });
+    
+    console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+  } else {
+    console.log(`Paso actual no tiene notas de ${handFilterMode}, avanzando...`);
+    advanceLearningStep();
+  }
+}
+
+
+
+
 function initMidiInput() {
     if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess()
             .then(onMIDISuccess, onMIDIFailure);
-    } else {
-        alert("Tu navegador no soporta Web MIDI API. Prueba con Chrome o Edge.");
-    }
+    } 
 }
+
+
 
 function onMIDISuccess(access) {
     midiAccess = access;
+    let connectedInputs = new Map();
 
-    // ▼▼▼ NUEVO: Escuchamos cambios de estado (conexión/desconexión) ▼▼▼
-    midiAccess.onstatechange = (event) => {
-        const port = event.port;
-        const deviceName = port.name || 'Dispositivo MIDI';
+    const handlePortChange = (port) => {
+        if (port.type !== 'input') return; // Ignoramos puertos de salida
 
-        if (port.state === 'connected' && port.type === 'input') {
-            showModal(`✅ ¡${deviceName} conectado!`, 3000); // Se cierra solo a los 3 seg
-            port.onmidimessage = onMIDIMessage; // Asigna el listener al nuevo dispositivo
-        } else if (port.state === 'disconnected' && port.type === 'input') {
-            showModal(`🔌 ¡${deviceName} desconectado!`, 3000);
+        if (port.state === 'connected') {
+            console.log(`MIDI Conectado: ${port.name}`);
+            port.onmidimessage = onMIDIMessage; // Asigna el listener
+            connectedInputs.set(port.id, port);
+        } else if (port.state === 'disconnected') {
+            console.log(`MIDI Desconectado: ${port.name}`);
+            connectedInputs.delete(port.id); // Elimina del rastreo
+        }
+
+        if (connectedInputs.size > 0) {
+            const firstDeviceName = connectedInputs.values().next().value.name;
+            updateMidiStatusLegend(firstDeviceName);
+        } else {
+            updateMidiStatusLegend(null);
         }
     };
 
-    // Configuración inicial de los dispositivos ya conectados
-    const inputs = midiAccess.inputs.values();
-    let deviceFound = false;
-    for (const input of inputs) {
-        input.onmidimessage = onMIDIMessage;
-        deviceFound = true;
-    }
+    // Asigna el listener para futuros cambios (conectar/desconectar)
+    midiAccess.onstatechange = (event) => handlePortChange(event.port);
 
-    if (!deviceFound) {
-        showModal("Haz clic en 'Modo Aprendizaje' cuando tu teclado MIDI esté conectado.");
-    } else {
-         console.log('Teclado MIDI ya conectado y listo.');
+    // Escaneo inicial de dispositivos YA conectados al cargar la página
+    const inputs = midiAccess.inputs.values();
+    for (const input of inputs) {
+        handlePortChange(input); // Usa la misma lógica
     }
 }
+
 
 function onMIDIFailure() {
     showModal("⚠️ No se pudo acceder a tus dispositivos MIDI. Asegúrate de dar permiso en el navegador.");
@@ -1940,35 +2146,66 @@ function onMIDIFailure() {
     playBtn.disabled = false;
 }
 
-// Script: añade esta nueva función
-function onMIDIMessage(event) {
-    if (!isMidiLearnMode || expectedNotes.size === 0) return;
 
+
+function onMIDIMessage(event) {
     const command = event.data[0];
     const note = event.data[1];
     const velocity = event.data.length > 2 ? event.data[2] : 0;
 
     if (command === 144 && velocity > 0) {
+        // NOTE ON - Colorear la tecla
         const pitchName = midiNoteToPitchName(note);
-
-        if (expectedNotes.has(pitchName)) {
-            // ▼▼▼ CAMBIO PRINCIPAL: El sonido se reproduce AQUÍ ▼▼▼
-            // Como recompensa por tocar la nota correcta.
-            sampler.triggerAttackRelease(pitchName, '8n');
-
-            expectedNotes.delete(pitchName);
-            console.log(`¡Correcto! Nota ${pitchName}. Faltan ${expectedNotes.size}.`);
+        highlightMidiKey(pitchName);
+        
+        // Lógica existente del modo aprendizaje
+        if (isMidiLearnMode && expectedNotes.size > 0) {
+            // NORMALIZAR la nota MIDI para comparación
+            const normalizedMidiNote = normalizeNote(pitchName);
             
-            if (expectedNotes.size === 0) {
-                setTimeout(() => {
-                    advanceLearningStep();
-                }, 300); 
+            // Verificar si la nota normalizada está en expectedNotes
+            if (expectedNotes.has(normalizedMidiNote)) {
+                sampler.triggerAttackRelease(pitchName, '8n');
+                expectedNotes.delete(normalizedMidiNote);
+                console.log(`¡Correcto! Nota ${pitchName} (normalizada: ${normalizedMidiNote}). Faltan ${expectedNotes.size}.`);
+                
+                if (expectedNotes.size === 0) {
+                    setTimeout(() => {
+                        if (currentLearningIndex > 0) {
+                            advanceLearningStep();
+                        } else {
+                            prepareFirstLearningStep();
+                        }
+                    }, 300); 
+                }
+            } else {
+                console.log(`Nota ${pitchName} (normalizada: ${normalizedMidiNote}) no está en expectedNotes:`, Array.from(expectedNotes));
             }
         }
+    } else if (command === 128 || (command === 144 && velocity === 0)) {
+        // NOTE OFF - Quitar el color
+        const pitchName = midiNoteToPitchName(note);
+        unhighlightMidiKey(pitchName);
     }
 }
 
-// Script: añade estas dos funciones de ayuda
+// Añade estas nuevas funciones para el coloreado MIDI
+function highlightMidiKey(noteName) {
+    const noteId = noteName.replace('b', '#');
+    const el = document.getElementById(noteId);
+    if (el) {
+        el.classList.add('midi-active');
+    }
+}
+
+function unhighlightMidiKey(noteName) {
+    const noteId = noteName.replace('b', '#');
+    const el = document.getElementById(noteId);
+    if (el) {
+        el.classList.remove('midi-active');
+    }
+}
+
 
 function prepareNextExpectedNotes() {
     expectedNotes.clear();
