@@ -1798,21 +1798,20 @@ function advanceLearningStep() {
   let foundValidStep = false;
   const TIME_TOLERANCE = 0.001;
 
-  // NUEVO: Saltar automáticamente sobre silencios
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Recopilar todas las notas en este momento
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
-    // Filtrar por mano
+    // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation && // ← NUEVA LÍNEA: Ignora continuaciones de ligaduras
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1838,10 +1837,8 @@ function advanceLearningStep() {
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     } else {
-      // NUEVO: Si no hay notas que tocar (solo silencios), avanzar el cursor automáticamente
-      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
+      console.log(`Silencio o tie detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
       osmd.cursor.next();
-      // Continuar el bucle para buscar la siguiente nota
     }
   }
 
@@ -1966,8 +1963,10 @@ function prepareFirstLearningStep() {
       currentLearningIndex++;
     }
 
+    // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation && // ← NUEVA LÍNEA
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -2015,12 +2014,13 @@ function toggleRightHandOnly() {
     rightHandOnlyBtn.style.color = '#3498db';
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
-    
-    // Si estaba activo mano izquierda, desactivarlo
-    if (isMidiLearnMode && expectedNotes.size > 0) {
-      reloadCurrentStepWithHandFilter();
-    }
   }
+  
+  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
+  if (isMidiLearnMode) {
+    skipToNextRelevantNote();
+  }
+  
   console.log(`Modo de mano: ${handFilterMode}`);
 }
 
@@ -2039,13 +2039,98 @@ function toggleLeftHandOnly() {
     leftHandOnlyBtn.style.color = '#3498db';
     rightHandOnlyBtn.style.background = 'none';
     rightHandOnlyBtn.style.color = '#1a1a1a';
+  }
+  
+  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
+  if (isMidiLearnMode) {
+    skipToNextRelevantNote();
+  }
+  
+  console.log(`Modo de mano: ${handFilterMode}`);
+}
+
+
+
+function skipToNextRelevantNote() {
+  if (!isMidiLearnMode) return;
+  
+  clearAllHighlights();
+  expectedNotes.clear();
+  
+  const TIME_TOLERANCE = 0.001;
+  let foundRelevantNote = false;
+  
+  // Retroceder al inicio del paso actual para recalcular
+  let tempIndex = currentLearningIndex - 1;
+  const currentTime = parsedNotes[tempIndex]?.startSec;
+  
+  // Retroceder hasta el inicio del acorde/paso actual
+  while (tempIndex > 0 && Math.abs(parsedNotes[tempIndex - 1]?.startSec - currentTime) < TIME_TOLERANCE) {
+    tempIndex--;
+  }
+  
+  // Restaurar el índice al inicio del paso actual
+  currentLearningIndex = tempIndex;
+  
+  // Buscar la siguiente nota relevante para la mano seleccionada
+  while (currentLearningIndex < parsedNotes.length && !foundRelevantNote) {
+    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+    const notesInStep = [];
     
-    // Si estaba activo mano derecha, desactivarlo
-    if (isMidiLearnMode && expectedNotes.size > 0) {
-      reloadCurrentStepWithHandFilter();
+    // Recopilar todas las notas en este momento
+    const stepStartIndex = currentLearningIndex;
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
+    }
+    
+    // Filtrar por mano seleccionada
+    const filteredNotes = notesInStep.filter(note => 
+      !note.isRest &&
+      !note.isTiedContinuation &&
+      (handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass'))
+    );
+    
+    if (filteredNotes.length > 0) {
+      // Encontramos notas relevantes, preparar para tocarlas
+      foundRelevantNote = true;
+      
+      // Avanzar el cursor a la posición correcta
+      osmd.cursor.reset();
+      let cursorTime = -1;
+      for (let i = 0; i < stepStartIndex; i++) {
+        if (parsedNotes[i].startSec !== cursorTime) {
+          osmd.cursor.next();
+          cursorTime = parsedNotes[i].startSec;
+        }
+      }
+      
+      // Highlight de las notas esperadas
+      const uniquePitches = new Set();
+      filteredNotes.forEach(note => {
+        const normalizedNote = normalizeNote(note.pitch);
+        if (!uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
+      });
+      
+      console.log(`Saltando a notas relevantes (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // No hay notas relevantes en este paso, avanzar cursor automáticamente
+      osmd.cursor.next();
     }
   }
-  console.log(`Modo de mano: ${handFilterMode}`);
+  
+  if (!foundRelevantNote) {
+    // No se encontraron más notas para la mano seleccionada
+    showSuccessModal(`¡Has completado todas las notas de la mano ${handFilterMode === 'right' ? 'derecha' : 'izquierda'}!`);
+    showConfetti(100);
+  }
 }
 
 
@@ -2066,10 +2151,13 @@ function reloadCurrentStepWithHandFilter() {
   clearAllHighlights();
   expectedNotes.clear();
   
+  // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
   const filteredNotes = currentStepNotes.filter(note => 
-    handFilterMode === 'both' || 
+    !note.isRest &&
+    !note.isTiedContinuation && // ← NUEVA LÍNEA
+    (handFilterMode === 'both' || 
     (handFilterMode === 'right' && note.hand === 'treble') ||
-    (handFilterMode === 'left' && note.hand === 'bass')
+    (handFilterMode === 'left' && note.hand === 'bass'))
   );
   
   if (filteredNotes.length > 0) {
