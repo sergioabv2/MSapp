@@ -913,7 +913,6 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
 
-
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
@@ -1095,20 +1094,17 @@ function parseMusicXML(xmlText) {
     updateBpmDisplay();
     Tone.Transport.bpm.value = globalTempo;
 
-    const openTies = new Map(); // Mapa para manejar notas ligadas (pitch+staff -> noteObject)
+    const openTies = new Map(); // pitch+staff+voice -> noteObject
     
-    // 1. Itera sobre todas las partes (usualmente 2 en piano)
     xml.querySelectorAll('part').forEach((part, partIndex) => {
         let currentBeat = 0;
 
-        // 2. Determina la mano de esta parte una sola vez, basándose en la clave
         const clefSign = part.querySelector('measure[number="1"] clef sign')?.textContent;
         const defaultHand = (clefSign === 'F') ? 'bass' : 'treble';
 
         const measures = part.querySelectorAll('measure');
         measures.forEach((measure, measureIndex) => {
             if (partIndex === 0 && measureIndex > 0) {
-                 // Calcula el tiempo de inicio de cada compás (solo para la primera parte)
                 measureStartTimes.push(currentBeat * (60.0 / globalTempo));
             }
             
@@ -1120,7 +1116,6 @@ function parseMusicXML(xmlText) {
                 if (node.tagName === 'note') {
                     const isChord = !!node.querySelector('chord');
                     
-                    // Si NO es parte de un acorde, el tiempo avanza. Si es un acorde, usa el tiempo de la nota anterior.
                     if (!isChord) {
                         currentBeat += durationInBeats;
                     }
@@ -1128,30 +1123,53 @@ function parseMusicXML(xmlText) {
                     if (!node.querySelector('rest') && node.querySelector('pitch')) {
                         const step = node.querySelector('step')?.textContent?.trim();
                         const octave = node.querySelector('octave')?.textContent?.trim();
-                        const alt = parseInt(node.querySelector('alter')?.textContent?.trim() || '0', 10);
-                        const accidental = alt === 1 ? '#' : alt === -1 ? 'b' : '';
+                        const alterElement = node.querySelector('alter');
+                        const altValue = alterElement ? parseInt(alterElement.textContent.trim(), 10) : 0;
+
+                        // Manejar todas las alteraciones posibles
+                        let accidental = '';
+                        if (altValue === 2) accidental = '##';
+                        else if (altValue === 1) accidental = '#';
+                        else if (altValue === -1) accidental = 'b';
+                        else if (altValue === -2) accidental = 'bb';
+
                         const pitch = `${step}${accidental}${octave}`;
                         
-                        // Determina la mano: usa el <staff> de la nota si existe, si no, usa la clave de la parte
                         const staffNumber = parseInt(node.querySelector('staff')?.textContent);
                         const hand = !isNaN(staffNumber) ? (staffNumber === 1 ? 'treble' : 'bass') : defaultHand;
+                        
+                        const voice = node.querySelector('voice')?.textContent || '1';
 
                         const isTieStart = !!node.querySelector('tie[type="start"]');
                         const isTieStop = !!node.querySelector('tie[type="stop"]');
                         
-                        // Clave única para ligaduras: pitch + staff (para manejar la misma nota en ambas manos)
-                        const tieKey = `${pitch}-${hand}`;
+                        const tieKey = `${pitch}-${hand}-${voice}`;
 
                         if (isTieStop && openTies.has(tieKey)) {
-                            // ES EL FINAL DE UNA LIGADURA: extiende la duración de la nota original
+                            // CONTINUACIÓN DE LIGADURA
                             const existingNote = openTies.get(tieKey);
+                            
+                            // Crear una nota visual separada (para el cursor)
+                            const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                            const continuationNote = {
+                                pitch: pitch,
+                                startSec: noteStartTime,
+                                durSec: durationInBeats * (60.0 / globalTempo),
+                                hand: hand,
+                                isTied: true,
+                                isTiedContinuation: true, // NUEVA PROPIEDAD
+                                isChord: isChord
+                            };
+                            parsedNotes.push(continuationNote);
+                            
+                            // Extender la duración de la nota original (para el audio)
                             existingNote.durSec += durationInBeats * (60.0 / globalTempo);
-                            existingNote.isTied = true; // Marca que esta nota está ligada
+                            
                             if (!isTieStart) {
-                                openTies.delete(tieKey); // Cierra la ligadura si no empieza una nueva
+                                openTies.delete(tieKey);
                             }
                         } else {
-                            // ES UNA NOTA NUEVA (o el inicio de una ligadura)
+                            // NOTA NUEVA
                             const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
                             
                             const newNote = {
@@ -1159,15 +1177,34 @@ function parseMusicXML(xmlText) {
                                 startSec: noteStartTime,
                                 durSec: durationInBeats * (60.0 / globalTempo),
                                 hand: hand,
-                                isTied: false, // Inicialmente no está ligada
+                                isTied: isTieStart,
+                                isTiedContinuation: false, // NUEVA PROPIEDAD
                                 isChord: isChord
                             };
                             parsedNotes.push(newNote);
 
                             if (isTieStart) {
-                                openTies.set(tieKey, newNote); // Abre una nueva ligadura
+                                openTies.set(tieKey, newNote);
                             }
                         }
+                    }else if (node.querySelector('rest')) {
+
+                        const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                        
+                        const staffNumber = parseInt(node.querySelector('staff')?.textContent);
+                        const hand = !isNaN(staffNumber) ? (staffNumber === 1 ? 'treble' : 'bass') : defaultHand;
+                        
+                        const restNote = {
+                            pitch: null, // null indica que es un silencio
+                            startSec: noteStartTime,
+                            durSec: durationInBeats * (60.0 / globalTempo),
+                            hand: hand,
+                            isRest: true, // NUEVA PROPIEDAD
+                            isTied: false,
+                            isTiedContinuation: false,
+                            isChord: isChord
+                        };
+                        parsedNotes.push(restNote);
                     }
                 } else if (node.tagName === 'backup') {
                     currentBeat -= durationInBeats;
@@ -1178,7 +1215,10 @@ function parseMusicXML(xmlText) {
         });
     });
 
-    // Ordenamiento final y cálculo de duración
+    if (openTies.size > 0) {
+        console.warn('Advertencia: Se encontraron ligaduras sin cerrar:', Array.from(openTies.keys()));
+    }
+
     parsedNotes.sort((a, b) => a.startSec - b.startSec);
     const lastNote = parsedNotes[parsedNotes.length - 1];
     totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
@@ -1193,14 +1233,12 @@ function scheduleNotesOnTransport() {
   osmd.cursor.reset();
   osmd.cursor.hide();
 
-  const TIME_TOLERANCE = 0.001; // Tolerancia de 1ms para agrupar notas
+  const TIME_TOLERANCE = 0.001;
   
-  // Agrupa notas por tiempo de inicio (con tolerancia) para manejar acordes correctamente
   const notesByTime = new Map();
   parsedNotes.forEach(note => {
     const time = note.startSec / playbackRate;
     
-    // Busca si ya existe un tiempo cercano
     let foundTime = null;
     for (let existingTime of notesByTime.keys()) {
       if (Math.abs(existingTime - time) < TIME_TOLERANCE) {
@@ -1216,39 +1254,41 @@ function scheduleNotesOnTransport() {
     }
   });
 
-  // --- NUEVA LÓGICA PARA EL AUDIO (elimina duplicados) ---
+  // Audio: solo notas reales (sin silencios)
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
-    // Eliminar notas duplicadas (misma altura de diferentes voces)
-    const uniquePitches = new Set();
-    const uniqueNotes = notes.filter(note => {
-      const normalizedPitch = normalizeNote(note.pitch);
-      if (uniquePitches.has(normalizedPitch)) {
-        return false; // Ya existe, no la incluimos
-      }
-      uniquePitches.add(normalizedPitch);
-      return true; // Es nueva, la incluimos
-    });
+    const realNotes = notes.filter(n => !n.isRest); // NUEVO: Filtrar silencios
     
-    audioEvents.push({
-      time: time,
-      pitches: uniqueNotes.map(n => n.pitch), // Solo pitches únicos
-      duration: uniqueNotes[0].durSec / playbackRate,
-    });
+    if (realNotes.length > 0) {
+      const uniquePitches = new Set();
+      const uniqueNotes = realNotes.filter(note => {
+        const normalizedPitch = normalizeNote(note.pitch);
+        if (uniquePitches.has(normalizedPitch)) {
+          return false;
+        }
+        uniquePitches.add(normalizedPitch);
+        return true;
+      });
+      
+      audioEvents.push({
+        time: time,
+        pitches: uniqueNotes.map(n => n.pitch),
+        duration: uniqueNotes[0].durSec / playbackRate,
+      });
+    }
   });
   
-  // El Tone.Part ahora recibe un arreglo de notas para los acordes (sin duplicados)
   audioPart = new Tone.Part((time, value) => {
     sampler.triggerAttackRelease(value.pitches, value.duration, time);
   }, audioEvents).start(0);
 
-
-  // --- LÓGICA VISUAL (también elimina duplicados para el highlight) ---
+  // Visual: todas las notas (incluyendo silencios para avanzar el cursor)
   const visualEvents = [];
   notesByTime.forEach((notes, time) => {
-    // Eliminar notas duplicadas para el highlight visual
     const uniquePitches = new Set();
     const uniqueNotes = notes.filter(note => {
+      if (note.isRest) return true; // NUEVO: Mantener silencios
+      
       const normalizedPitch = normalizeNote(note.pitch);
       if (uniquePitches.has(normalizedPitch)) {
         return false;
@@ -1265,15 +1305,18 @@ function scheduleNotesOnTransport() {
 
   visualPart = new Tone.Part((time, value) => {
     Tone.Draw.schedule(() => {
-      // Avanza el cursor una vez por cada grupo de notas (acorde)
       if (value.notes.length > 0) {
-          osmd.cursor.next();
+        osmd.cursor.next();
       }
-      value.notes.forEach(note => highlightKey(note.pitch, note.duration, note.hand));
+      // MODIFICADO: Solo hacer highlight de notas reales
+      value.notes.forEach(note => {
+        if (!note.isRest) {
+          highlightKey(note.pitch, note.duration, note.hand);
+        }
+      });
     }, time);
   }, visualEvents).start(0);
   
-  // Ajusta la duración total
   const newTotalDuration = totalDuration / playbackRate;
   Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
 }
@@ -1669,25 +1712,46 @@ function highlightKey(noteName, durSec, hand, persist = false) {
 
 function normalizeNote(noteName) {
     const flatToSharp = {
+        // Bemoles simples
         'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#',
-        'Cb': 'B', 'Fb': 'E', 'E#': 'F', 'B#': 'C'
+        // Naturales enarmónicos
+        'Cb': 'B', 'Fb': 'E', 'E#': 'F', 'B#': 'C',
+        // Dobles bemoles
+        'Dbb': 'C', 'Ebb': 'D', 'Fbb': 'D#', 'Gbb': 'F', 'Abb': 'G', 
+        'Bbb': 'A', 'Cbb': 'A#',
+        // Dobles sostenidos
+        'C##': 'D', 'D##': 'E', 'E##': 'F#', 'F##': 'G', 
+        'G##': 'A', 'A##': 'B', 'B##': 'C#'
     };
     
-    // Extrae la nota (con alteración) y la octava
-    const match = noteName.match(/^([A-G][b#]?)(\d+)$/);
+    // Regex mejorado para capturar dobles alteraciones
+    const match = noteName.match(/^([A-G])(bb|##|b|#)?(\d+)$/);
     if (!match) {
         console.warn(`No se pudo normalizar la nota: ${noteName}`);
         return noteName;
     }
     
-    const [, note, octave] = match;
-    const normalizedNote = flatToSharp[note] || note;
+    const [, noteLetter, alteration, octave] = match;
+    const noteWithAlt = noteLetter + (alteration || ''); // Ej: "C##", "Dbb", "E"
+    let normalizedNote = flatToSharp[noteWithAlt] || noteWithAlt;
+    let finalOctave = parseInt(octave);
     
     // Casos especiales de cambio de octava
-    if (note === 'Cb') return 'B' + (parseInt(octave) - 1);
-    if (note === 'B#') return 'C' + (parseInt(octave) + 1);
+    if (noteWithAlt === 'Cb') {
+        normalizedNote = 'B';
+        finalOctave -= 1;
+    } else if (noteWithAlt === 'Cbb') {
+        normalizedNote = 'A#';
+        finalOctave -= 1;
+    } else if (noteWithAlt === 'B#') {
+        normalizedNote = 'C';
+        finalOctave += 1;
+    } else if (noteWithAlt === 'B##') {
+        normalizedNote = 'C#';
+        finalOctave += 1;
+    }
     
-    return normalizedNote + octave;
+    return normalizedNote + finalOctave;
 }
 
 function advanceLearningStep() {
@@ -1704,16 +1768,19 @@ function advanceLearningStep() {
   let foundValidStep = false;
   const TIME_TOLERANCE = 0.001;
 
+  // NUEVO: Saltar automáticamente sobre silencios
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
+    // Recopilar todas las notas en este momento
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
+    // Filtrar por mano
     const filteredNotes = notesInStep.filter(note => 
       handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
@@ -1739,6 +1806,11 @@ function advanceLearningStep() {
       });
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // NUEVO: Si no hay notas que tocar (solo silencios), avanzar el cursor automáticamente
+      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
+      osmd.cursor.next();
+      // Continuar el bucle para buscar la siguiente nota
     }
   }
 
