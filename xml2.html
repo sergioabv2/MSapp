@@ -1798,20 +1798,21 @@ function advanceLearningStep() {
   let foundValidStep = false;
   const TIME_TOLERANCE = 0.001;
 
+  // NUEVO: Saltar automáticamente sobre silencios
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
+    // Recopilar todas las notas en este momento
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
-    // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
+    // Filtrar por mano
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
-      !note.isTiedContinuation && // ← NUEVA LÍNEA: Ignora continuaciones de ligaduras
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1837,8 +1838,10 @@ function advanceLearningStep() {
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     } else {
-      console.log(`Silencio o tie detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
+      // NUEVO: Si no hay notas que tocar (solo silencios), avanzar el cursor automáticamente
+      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
       osmd.cursor.next();
+      // Continuar el bucle para buscar la siguiente nota
     }
   }
 
@@ -1963,10 +1966,8 @@ function prepareFirstLearningStep() {
       currentLearningIndex++;
     }
 
-    // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
-      !note.isTiedContinuation && // ← NUEVA LÍNEA
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1997,7 +1998,6 @@ function prepareFirstLearningStep() {
     toggleMidiLearnMode();
   }
 }
-
 
 function toggleRightHandOnly() {
   if (handFilterMode === 'right') {
@@ -2048,7 +2048,6 @@ function toggleLeftHandOnly() {
   
   console.log(`Modo de mano: ${handFilterMode}`);
 }
-
 
 
 function skipToNextRelevantNote() {
@@ -2133,7 +2132,6 @@ function skipToNextRelevantNote() {
   }
 }
 
-
 function reloadCurrentStepWithHandFilter() {
   if (!isMidiLearnMode) return;
   
@@ -2151,13 +2149,10 @@ function reloadCurrentStepWithHandFilter() {
   clearAllHighlights();
   expectedNotes.clear();
   
-  // MODIFICACIÓN: Filtrar silencios Y continuaciones de ties
   const filteredNotes = currentStepNotes.filter(note => 
-    !note.isRest &&
-    !note.isTiedContinuation && // ← NUEVA LÍNEA
-    (handFilterMode === 'both' || 
+    handFilterMode === 'both' || 
     (handFilterMode === 'right' && note.hand === 'treble') ||
-    (handFilterMode === 'left' && note.hand === 'bass'))
+    (handFilterMode === 'left' && note.hand === 'bass')
   );
   
   if (filteredNotes.length > 0) {
