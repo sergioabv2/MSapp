@@ -847,7 +847,7 @@ var allPiecesData = [
     "dateAdded": "2025-10-28",
     "difficulty": "Grado 1",
     "style": "classic",
-    "tags": ["exercise"]
+    "tags": []
   },
   {
     "title": "Allemande",
@@ -1040,7 +1040,7 @@ var allPiecesData = [
     "tags": []
   },
   {
-    "title": "Gigue a l'Angloise",
+    "title": "Gigue in G",
     "author": "Georg Philipp Telemann",
     "background": "https://lh3.googleusercontent.com/d/1J2P0TlWmNpI_puNfX2_fWuIjxDp6Kbx_=s400",
     "pdf": "gigue-a-langloise-georg-philipp-telemann.musicxml",
@@ -1177,7 +1177,7 @@ var allPiecesData = [
     "dateAdded": "2025-10-27",
     "difficulty": "Grado 1",
     "style": "classic",
-    "tags": ["exercise"]
+    "tags": []
   },
   {
     "title": "Melody in C",
@@ -1420,7 +1420,7 @@ var allPiecesData = [
     "tags": ["prelude", "virtuoso"]
   },
   {
-    "title": "Promenade in G Major",
+    "title": "Promenade",
     "author": "Alexander Reinagle",
     "background": "https://lh3.googleusercontent.com/d/1TVYxDZ76HjijzyLzOLTDE5Mi3yHbOZ4G=s400",
     "pdf": "promenade-in-g-major-alexander-reinagle.musicxml",
@@ -1488,7 +1488,7 @@ var allPiecesData = [
     "dateAdded": "2025-10-28",
     "difficulty": "Grado 1",
     "style": "classic",
-    "tags": ["etude", "exercise"]
+    "tags": []
   },
   {
     "title": "The Old Windmill",
@@ -1748,18 +1748,7 @@ var allPiecesData = [
             };
         });
 
-        var hoy = new Date();
-var limiteFecha = new Date();
-limiteFecha.setDate(hoy.getDate() - 10); 
-
-var newPieces = allPieces
-    .filter(function(piece) {
-        return piece.dateAdded && new Date(piece.dateAdded) > limiteFecha;
-    })
-    .sort(function(a, b) {
-        return new Date(b.dateAdded) - new Date(a.dateAdded);
-    })
-    .slice(0, 3); 
+  
         
         var repertoirePieces = allPieces.filter(function(piece) {
             return piece.tags.includes('repertoire');
@@ -1810,7 +1799,6 @@ var newPieces = allPieces
       
 
         $scope.library = [
-            { title: 'Recien añadidas', books: newPieces },
             { title: 'Vistas en el curso', books: repertoirePieces },     
              { title: 'Ejercicios', books: exePieces },  
                  { title: 'Minuetos', books: minuetsPieces },  
