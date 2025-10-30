@@ -663,6 +663,16 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
         }
 
+        .level-card.locked {
+    opacity: 0.6;
+    cursor: auto;
+    filter: grayscale(80%);
+}
+.level-card.locked:hover {
+    transform: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
         .card-content {
             display: flex;
             align-items: flex-start;
@@ -736,7 +746,7 @@
             background: linear-gradient(90deg, #8B5CF6, #A855F7);
             border-radius: 2px;
             width: 0%;
-            animation: fillProgress 2s ease-out forwards;
+            transition: width 0.5s ease-out;
             position: relative;
         }
 
@@ -750,7 +760,7 @@
             background: rgba(255, 255, 255, 0.8);
             border-radius: 2px;
             opacity: 0;
-            animation: shimmer 2s ease-out forwards;
+          
         }
 
         @keyframes fillProgress {
@@ -862,7 +872,7 @@
 
                 <div class="level-card" ng-repeat="level in levels" 
                    ng-click="selectLevel(level); startApp()"
-                   ng-class="{'selected': selectedLevel.id === level.id}" >
+                   ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}" >
         <div class="card-content">
           <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i> </div>
            <div class="level-number" ng-if="level.id === 0">P</div>
@@ -880,7 +890,7 @@
                     <span class="time-text">~{{level.duration}}</span>
                 </div>
                 <div class="progress-container2">
-                    <div class="progress-bar2"></div>
+                <div class="progress-bar2" style="width: {{level.progress}}%;"></div>
                 </div>
             </div>
         </div>
@@ -1027,6 +1037,7 @@ $scope.levels = [
         title: 'Nivel Preparatorio', 
         description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
         duration: '~2 horas',
+        progress: 25,
         // Aquí anidamos las lecciones correspondientes a este nivel
         lessons: [
             {
@@ -1124,6 +1135,7 @@ $scope.levels = [
     { 
         id: 1, 
         title: 'Nivel 1', 
+        progress: 0,
         description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
         duration: '~4 horas',
         lessons: [
@@ -1222,6 +1234,7 @@ $scope.levels = [
     { 
         id: 2, 
         title: 'Nivel 2', 
+        progress: 0,
         description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
         duration: '~4 horas',
         lessons: [
@@ -1232,6 +1245,7 @@ $scope.levels = [
     { 
         id: 3, 
         title: 'Nivel 3', 
+        progress: 0,
         description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
         duration: '~8 horas',
         lessons: [
@@ -1242,6 +1256,7 @@ $scope.levels = [
      { 
         id: 4, 
         title: 'Nivel 4', 
+        progress: 0,
         description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
         duration: '~8 horas',
         lessons: [
@@ -1252,6 +1267,7 @@ $scope.levels = [
      { 
         id: 5, 
         title: 'Nivel 5', 
+        progress: 0,
         description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
         duration: '~8 horas',
         lessons: [
