@@ -945,7 +945,6 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   setStatus('Cargando partitura...');
 
 
-
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
@@ -1290,7 +1289,7 @@ function scheduleNotesOnTransport() {
   // Audio: solo notas reales (sin silencios)
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
-    const realNotes = notes.filter(n => !n.isRest); // NUEVO: Filtrar silencios
+    const realNotes = notes.filter(n => !n.isRest && !n.isTiedContinuation); // NUEVO: Filtrar silencios
     
     if (realNotes.length > 0) {
       const uniquePitches = new Set();
@@ -1343,7 +1342,7 @@ function scheduleNotesOnTransport() {
       }
       // MODIFICADO: Solo hacer highlight de notas reales
       value.notes.forEach(note => {
-        if (!note.isRest) {
+        if (!note.isRest && !note.isTiedContinuation) {
           highlightKey(note.pitch, note.duration, note.hand);
         }
       });
@@ -1671,13 +1670,17 @@ function toggleCursorType() {
 }
 
 function clearAllHighlights() {
-  activeHighlightTimeouts.forEach(clearTimeout);
-  activeHighlightTimeouts = [];
+  // OPTIMIZACIÓN: Limpiar timeouts más rápido
+  for (let i = activeHighlightTimeouts.length - 1; i >= 0; i--) {
+    clearTimeout(activeHighlightTimeouts[i]);
+  }
+  activeHighlightTimeouts.length = 0;
 
-  // 2. Busca todas las teclas activas en el DOM y les quita la clase de color
-  document.querySelectorAll('.active-treble, .active-bass').forEach(key => {
+  // OPTIMIZACIÓN: Usar querySelectorAll una sola vez
+  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+  for (const key of activeKeys) {
     key.classList.remove('active-treble', 'active-bass');
-  });
+  }
 }
 
 function toggleFullScreen() {
@@ -1739,6 +1742,16 @@ function highlightKey(noteName, durSec, hand, persist = false) {
     }
 }
 
+
+function highlightKeyInstant(noteName, hand) {
+    const noteId = normalizeNote(noteName);
+    const el = document.getElementById(noteId);
+    if (!el) return;
+
+    const highlightClass = hand === 'treble' ? 'active-treble' : 'active-bass';
+    el.classList.add(highlightClass);
+}
+
 function normalizeNote(noteName) {
     const flatToSharp = {
         // Bemoles simples
@@ -1784,7 +1797,10 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-  clearAllHighlights();
+  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+  activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
+  activeHighlightTimeouts.forEach(clearTimeout);
+  activeHighlightTimeouts.length = 0;
   expectedNotes.clear();
 
   if (currentLearningIndex >= parsedNotes.length) {
@@ -1813,6 +1829,7 @@ function advanceLearningStep() {
     // Filtrar por mano
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation &&
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1832,7 +1849,7 @@ function advanceLearningStep() {
         if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
+          highlightKeyInstant(note.pitch, note.hand);
         }
       });
       
@@ -1942,6 +1959,7 @@ function toggleMidiLearnMode() {
 
 
 function prepareFirstLearningStep() {
+  // Usar la versión optimizada de clearAllHighlights
   clearAllHighlights();
   expectedNotes.clear();
 
@@ -1958,7 +1976,7 @@ function prepareFirstLearningStep() {
 
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    notesInStep = [];
+    notesInStep.length = 0;
     
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
@@ -1968,6 +1986,7 @@ function prepareFirstLearningStep() {
 
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation &&
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1975,19 +1994,19 @@ function prepareFirstLearningStep() {
 
     if (filteredNotes.length > 0) {
       foundValidStep = true;
-      notesInStep = filteredNotes;
       
+      // OPTIMIZACIÓN: Usar Set directamente
       const uniquePitches = new Set();
       
-      notesInStep.forEach(note => {
+      for (const note of filteredNotes) {
         const normalizedNote = normalizeNote(note.pitch);
         
         if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
+          highlightKeyInstant(note.pitch, note.hand);
         }
-      });
+      }
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     }
@@ -2253,13 +2272,13 @@ function onMIDIMessage(event) {
                 console.log(`¡Correcto! Nota ${pitchName} (normalizada: ${normalizedMidiNote}). Faltan ${expectedNotes.size}.`);
                 
                 if (expectedNotes.size === 0) {
-                    setTimeout(() => {
+                   // setTimeout(() => {
                         if (currentLearningIndex > 0) {
                             advanceLearningStep();
                         } else {
                             prepareFirstLearningStep();
                         }
-                    }, 300); 
+                  //  }, 300); 
                 }
             } else {
                 console.log(`Nota ${pitchName} (normalizada: ${normalizedMidiNote}) no está en expectedNotes:`, Array.from(expectedNotes));
