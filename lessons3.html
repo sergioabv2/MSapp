@@ -6,6 +6,7 @@
     <title>Piano Quest Pro</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+   
     <style>
         /* CSS Básico - Sin cambios, excepto por el nuevo botón de regreso */
         :root {
@@ -225,7 +226,7 @@
 
         
 .player-header {
-    padding: 6px 15px;
+    padding-bottom: 15px;
     background: #f5f5f5;
     display: flex;
     justify-content: space-between;
@@ -236,7 +237,7 @@
 
 .player-tools {
     display: flex;
-    gap: 10px;
+
      margin-left: auto;
 }
 
@@ -911,8 +912,19 @@
         <div class="app-container">
 
 
-            <main class="main-content">
-                  <div class="player-header">
+         <main class="main-content">
+    <div id="youtube-container" style="display: none; width: 100%; height: 100%;">
+        <div id="player"></div>
+    </div>
+    <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" 
+            title="Contenido principal" ng-show="!showingVideo"></iframe>
+</main>
+
+
+
+            <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
+
+                     <div class="player-header">
       <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()"><i class="ri-arrow-left-line"></i></button>
       
         <div class="progress-info">
@@ -929,35 +941,11 @@
   
    
   </div>
-  <!-- Controles derechos -->
-  <div class="right-controls">
-    <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
-     <button class="tool-btn" id="mobile-task-icon" ng-bind-html="getMobileTaskIcon()">
-    </button>
-   <div class="metronome-control">
-  <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
-    <i class="ri-timer-flash-line"></i>
-  </button>
-  <div class="bpm-control">
-    <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
-      <i class="ri-subtract-line"></i>
-    </button>
-    <span class="bpm-label">{{metronomeBPM}} BPM</span>
-    <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
-      <i class="ri-add-line"></i>
-    </button>
-  </div>
-</div>
-  </div>
+
 </div>
   </div>   
 </div>
-                <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" title="Contenido principal"></iframe>
-            </main>
 
-
-
-            <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
                 <div class="user-profile">
                    <div class="user-avatar" ng-if="selectedLevel.id === 0">P</div>
                     <div class="user-avatar" ng-if="selectedLevel.id !== 0">{{selectedLevel.id}}</div>
@@ -1008,6 +996,26 @@
         <div class="modal-overlay" id="modalOverlay" ng-style="{'display': modal.show ? 'flex' : 'none'}">
             <div class="modal-content" id="modalContent" ng-bind-html="modal.content"></div>
         </div>
+         <!-- Modal de Pausa -->
+<div id="pauseModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h2 style="color: #d9534f;">¡Atención!</h2>
+        <p>Debes terminar de ver el video para poder avanzar. Por favor, reanuda el video.</p>
+        <button id="closePauseButton" class="modal-button" style="background-color: #f0ad4e;">
+            Cerrar y Reanudar
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Video Terminado -->
+<div id="finishedModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h2 style="color: #5cb85c;">¡Video Terminado!</h2>
+        <p>Has completado el video. ¡Ahora puedes continuar!</p>
+        <button id="continueVideoButton" class="modal-button">Continuar</button>
+    </div>
+</div>
+
         <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
         <div id="recordingIndicator" style="display: none;"> 
             <i class="ri-mic-fill"></i>
@@ -1015,12 +1023,15 @@
         </div>
     </div>
 
+ <script src="https://www.youtube.com/iframe_api"></script>
 <script>
+ 
 const app = angular.module('pianoApp', []);
 
 // Filtro de seguridad para poder usar URLs dinámicas en ng-src
 app.filter('trustAsResourceUrl', ['$sce', function($sce) {
     return function(val) {
+
         return $sce.trustAsResourceUrl(val);
     };
 }]);
@@ -1044,9 +1055,10 @@ $scope.levels = [
                 title: "Lección 1: Fundamentos",
                 unit: 1,
                 tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://www.mozart-app.com/xml2?file=firstlesson.musicxml", iconClass: 'ri-question-line' },
-                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://www.youtube.com/embed/NIYHDXfB9UQ", iconClass: 'ri-mic-line' }
+                    { type: 'video', title: "Ritmo", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                  { type: 'video', title: "Posición de Do", videoId: "3wn33KNLy5M", iconClass: 'ri-play-circle-line' },
+                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://www.mozart-app.com/xml2?file=firstlesson.musicxml", iconClass: 'ri-question-line' },
+                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://mozart-app.com/xml2?file=firstlesson.musicxml", iconClass: 'ri-mic-line' }
                 ]
             },
              {
@@ -1054,7 +1066,7 @@ $scope.levels = [
                 unit: 1,
                 tasks: [
                     { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview" },
                     { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
                 ]
             },
@@ -1294,6 +1306,12 @@ $scope.lessons = [];
     $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
     $scope.progress = 0;
     $scope.currentTaskUrl = '';
+    // Variables para control de video de YouTube
+$scope.showingVideo = false;
+let youtubePlayer = null;
+let videoHasEnded = false;
+let pauseTimer = null;
+let isYouTubeAPIReady = false;
 
     $scope.modal = { show: false, content: '' };
 
@@ -1340,7 +1358,7 @@ $scope.lessons = [];
     $scope.currentTaskIndex = 0;
     $scope.totalTasksCompleted = 0;
     
-    setupMIDI();
+
     updateProgress();
     loadCurrentTask();
 }
@@ -1357,38 +1375,65 @@ $scope.lessons = [];
         }
     };
     
-    $scope.viewTask = (lessonIndex, taskIndex) => {
-        const lesson = $scope.lessons[lessonIndex];
-        const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
-        
-        if(isLessonUnlocked) {
-            $scope.viewingLessonIndex = lessonIndex;
-            $scope.viewingTaskIndex = taskIndex;
-            $scope.currentTaskUrl = lesson.tasks[taskIndex].contentUrl;
-            if($scope.sidebarOpen) { // Cierra el sidebar en móvil al seleccionar una tarea
-                 $timeout(() => $scope.sidebarOpen = false, 200);
-            }
-        }
-    };
+   $scope.viewTask = (lessonIndex, taskIndex) => {
+    const lesson = $scope.lessons[lessonIndex];
+    const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
     
-    function loadCurrentTask() {
-        if ($scope.currentLessonIndex >= $scope.lessons.length) {
-            alert("¡Curso Completado!");
-            speak("¡Has completado todo el curso!", 'important');
-            showConfetti(200);
-            $scope.showLevelSelector(); // Vuelve al selector de niveles
-            return;
+    if(isLessonUnlocked) {
+        $scope.viewingLessonIndex = lessonIndex;
+        $scope.viewingTaskIndex = taskIndex;
+        
+        const task = lesson.tasks[taskIndex];
+        
+        // Si es un video, cárgalo automáticamente
+        if (task.type === 'video') {
+            openVideoModal(task);
+        } else {
+            // Si no es video, carga el iframe normal
+            $scope.currentTaskUrl = task.contentUrl;
         }
         
-        const lesson = $scope.lessons[$scope.currentLessonIndex];
-        const task = lesson.tasks[$scope.currentTaskIndex];
-        
-        lesson.expanded = true; // Expande la lección actual
-        $scope.viewTask($scope.currentLessonIndex, $scope.currentTaskIndex);
-        
-        if (task.type === 'note') speak(`Ahora, ${task.title}`, 'important');
-        else speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
+        if($scope.sidebarOpen) {
+            $timeout(() => $scope.sidebarOpen = false, 200);
+        }
     }
+};
+ function loadCurrentTask() {
+    if ($scope.currentLessonIndex >= $scope.lessons.length) {
+        alert("¡Curso Completado!");
+        speak("¡Has completado todo el curso!", 'important');
+        showConfetti(200);
+        $scope.showLevelSelector();
+        return;
+    }
+    
+    const lesson = $scope.lessons[$scope.currentLessonIndex];
+    const task = lesson.tasks[$scope.currentTaskIndex];
+    
+    lesson.expanded = true;
+    $scope.viewingLessonIndex = $scope.currentLessonIndex;
+    $scope.viewingTaskIndex = $scope.currentTaskIndex;
+    
+    // NUEVA LÓGICA: Si es un video, cárgalo automáticamente
+    if (task.type === 'video') {
+        speak(`Siguiente: ${task.title}.`);
+        openVideoModal(task); // Abre el video automáticamente
+    } 
+    // Si no es video, carga el iframe normal
+    else {
+        $scope.currentTaskUrl = task.contentUrl;
+        if (task.type === 'note') {
+            speak(`Ahora, ${task.title}`, 'important');
+        } else {
+            speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
+        }
+    }
+    
+    // Cierra el sidebar en móvil
+    if($scope.sidebarOpen) {
+        $timeout(() => $scope.sidebarOpen = false, 200);
+    }
+}
     
     function completeCurrentTask() {
         const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
@@ -1456,24 +1501,100 @@ $scope.lessons = [];
         return $sce.trustAsHtml(`<i class="task-interaction-icon ${task.iconClass}" onclick="handleMobileIconClick()"></i>`);
     };
 
-    function openVideoModal(task) {
-        const content = `
-            <h3>Video Lección</h3>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/${task.videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <button id="completeVideoButton" class="modal-button">Completar Tarea</button>`;
-        $scope.modal.content = $sce.trustAsHtml(content);
-        $scope.modal.show = true;
-        $timeout(() => {
-            document.getElementById('completeVideoButton').onclick = () => {
-                $scope.$apply(() => {
-                    closeModal();
-                    completeCurrentTask();
-                });
-            };
-        });
+
+ function initYouTubePlayer(videoId) {
+    videoHasEnded = false; // Reset de la bandera
+    youtubePlayer = new YT.Player('player', {
+        width: '100%',
+        height: '100%',
+        videoId: videoId,
+        playerVars: {
+            'playsinline': 1,
+            'rel': 0
+        },
+        events: {
+            'onReady': function(event) {
+                console.log('Player listo');
+                event.target.playVideo(); // Auto-reproducir cuando esté listo
+            },
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+function onPlayerStateChange(event) {
+    console.log('Estado del video:', event.data); // Para debug
+    
+    const pauseModal = document.getElementById('pauseModal');
+    const finishedModal = document.getElementById('finishedModal');
+    
+    clearTimeout(pauseTimer);
+
+    switch (event.data) {
+        case YT.PlayerState.PLAYING:
+            console.log('Reproduciendo');
+            pauseModal.style.display = 'none';
+            break;
+        
+        case YT.PlayerState.PAUSED:
+            console.log('Pausado');
+            if (!videoHasEnded) {
+                pauseTimer = setTimeout(() => {
+                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
+                        pauseModal.style.display = 'flex';
+                    }
+                }, 250);
+            }
+            break;
+        
+        case YT.PlayerState.ENDED:
+            console.log('Video terminado');
+            videoHasEnded = true;
+            pauseModal.style.display = 'none';
+            finishedModal.style.display = 'flex';
+            break;
+
+        case YT.PlayerState.BUFFERING:
+            console.log('Cargando...');
+            clearTimeout(pauseTimer);
+            break;
     }
+}
+
+
+function openVideoModal(task) {
+    $scope.showingVideo = true;
+    $scope.currentTaskUrl = ''; // Limpia el iframe
+    
+    const youtubeContainer = document.getElementById('youtube-container');
+    const contentIframe = document.getElementById('content-iframe');
+    
+    youtubeContainer.style.display = 'block';
+    contentIframe.style.display = 'none';
+    
+    // Espera a que la API esté lista antes de crear el player
+    if (!isYouTubeAPIReady) {
+        const checkAPI = setInterval(() => {
+            if (typeof YT !== 'undefined' && YT.Player) {
+                isYouTubeAPIReady = true;
+                clearInterval(checkAPI);
+                createOrLoadVideo(task.videoId);
+            }
+        }, 100);
+    } else {
+        createOrLoadVideo(task.videoId);
+    }
+}
+
+// Nueva función auxiliar
+function createOrLoadVideo(videoId) {
+    if (!youtubePlayer) {
+        initYouTubePlayer(videoId);
+    } else {
+        youtubePlayer.loadVideoById(videoId);
+        videoHasEnded = false;
+    }
+}
 
     function openQuizModal(task) {
         const optionsHTML = task.options.map((option, index) => `<button class="quiz-option" data-index="${index}">${option}</button>`).join('');
@@ -1590,40 +1711,7 @@ function openRecordingReviewModal(audioBlob) {
         }
     }
 
-    function setupMIDI() {
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(
-                (midiAccess) => {
-                    speak("Bienvenido a tu lección de piano. ¡Empecemos!", 'important');
-                    for (let input of midiAccess.inputs.values()) {
-                        input.onmidimessage = handleMIDIMessage;
-                    }
-                },
-                () => speak("No pude detectar tu teclado MIDI.", 'important')
-            );
-        }
-    }
-    
-    function handleMIDIMessage(message) {
-        const [command, note, velocity] = message.data;
-        if (command === 144 && velocity > 0) {
-            const noteName = noteMap[note % 12];
-            checkKey(noteName);
-        }
-    }
-    
-    function checkKey(playedKey) {
-        if ($scope.currentLessonIndex >= $scope.lessons.length) return;
-        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
-        if (task.type !== 'note') return;
-
-        if (playedKey === task.key) {
-            speak("¡Correcto!");
-            $scope.$apply(completeCurrentTask);
-        } else {
-            speak("Esa no es la nota, intenta de nuevo.");
-        }
-    }
+  
     
     function showConfetti(count = 100) {
         const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
@@ -1643,97 +1731,46 @@ function openRecordingReviewModal(audioBlob) {
 
 
 
+$timeout(function() {
+    const levelSelector = document.getElementById('levelSelector');
+    const banner = document.querySelector('.banner-header');
+    const closePauseButton = document.getElementById('closePauseButton');
+    const continueVideoButton = document.getElementById('continueVideoButton');
 
+    if (levelSelector && banner) {
+        levelSelector.addEventListener('scroll', function() {
+            let scrollTop = this.scrollTop;
+            let bannerHeight = banner.offsetHeight;
+            banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+            let opacity = 1 - (scrollTop / bannerHeight);
+            banner.style.opacity = Math.max(0, opacity);
+        });
+    }
 
-
-
-
-  
-  $scope.metronomeActive = false;
-$scope.metronomeBPM = 60; // Valor inicial igual al audio base (60 BPM)
-$scope.baseBPM = 60; // BPM del audio original
-$scope.metronomeAudio = document.getElementById('metronomeAudio');
-
-// Función para convertir BPM a velocidad de reproducción
-function bpmToPlaybackRate(bpm) {
-  return bpm / $scope.baseBPM;
-}
-
-$scope.toggleMetronome = function() {
-  $scope.metronomeActive = !$scope.metronomeActive;
-  
-  if ($scope.metronomeActive) {
-    // Configurar velocidad inicial
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-    $scope.metronomeAudio.currentTime = 0;
-    $scope.metronomeAudio.play()
-      .catch(e => console.error("Error al reproducir:", e));
-  } else {
-    $scope.metronomeAudio.pause();
-    $scope.metronomeAudio.currentTime = 0;
-  }
-};
-
-$scope.adjustBPM = function(change, event) {
-  // Actualizar valor BPM
-  $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
-  
-  // Ajustar velocidad de reproducción si está activo
-  if ($scope.metronomeActive) {
-    $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-  }
-  
-  // Lógica para mantener presionado
-  if (event) {
-    const button = event.target;
-    button.addEventListener('mouseup', clearBPMTimers);
-    button.addEventListener('mouseleave', clearBPMTimers);
-    button.addEventListener('touchend', clearBPMTimers);
+    if (closePauseButton) {
+        closePauseButton.onclick = () => {
+            console.log('Cerrando modal de pausa');
+            document.getElementById('pauseModal').style.display = 'none';
+            if (youtubePlayer) youtubePlayer.playVideo();
+        };
+    }
     
-    $scope.bpmTimeout = setTimeout(() => {
-      $scope.bpmInterval = setInterval(() => {
-        $scope.adjustBPM(change);
-        $scope.$apply();
-      }, 100);
-    }, 500);
-  } 
-};
-
-function clearBPMTimers() {
-  clearTimeout($scope.bpmTimeout);
-  clearInterval($scope.bpmInterval);
-} 
-
-
-
-
-
-
-  $timeout(function() {
-        // Obtenemos los dos elementos que necesitamos
-        const levelSelector = document.getElementById('levelSelector');
-        const banner = document.querySelector('.banner-header');
-
-        // Nos aseguramos de que ambos existan antes de continuar
-        if (levelSelector && banner) {
-            
-            // Creamos un "escucha" para el evento de scroll en el contenedor de los niveles
-            levelSelector.addEventListener('scroll', function() {
-                // 'scrollTop' nos dice cuántos píxeles hemos bajado
-                let scrollTop = this.scrollTop;
-                let bannerHeight = banner.offsetHeight;
-
-                // 1. Efecto Parallax: Movemos el banner hacia arriba a la mitad de la velocidad del scroll.
-                // Usamos un valor negativo en translateY para que se mueva hacia arriba.
-                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
-
-                // 2. Efecto de Desvanecimiento: La opacidad irá de 1 a 0 conforme el scroll
-                // avance la altura total del banner.
-                let opacity = 1 - (scrollTop / bannerHeight);
-                banner.style.opacity = Math.max(0, opacity); // Usamos Math.max para que no sea menor a 0
+    if (continueVideoButton) {
+        continueVideoButton.onclick = () => {
+            console.log('Continuando después del video');
+            $scope.$apply(() => {
+                document.getElementById('finishedModal').style.display = 'none';
+                $scope.showingVideo = false;
+                document.getElementById('youtube-container').style.display = 'none';
+                document.getElementById('content-iframe').style.display = 'block';
+                videoHasEnded = false; // Reset para el próximo video
+                completeCurrentTask();
             });
-        }
-    });
+        };
+    }
+});
+
+
 
 
 });
