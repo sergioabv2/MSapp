@@ -1731,6 +1731,15 @@ function openRecordingReviewModal(audioBlob) {
 
 
 
+window.addEventListener('message', function(event) {
+    if (event.data === 'siguienteActividad') {
+        $scope.$apply(() => {
+            completeCurrentTask();
+        });
+    }
+});
+
+
 $timeout(function() {
     const levelSelector = document.getElementById('levelSelector');
     const banner = document.querySelector('.banner-header');
