@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html ng-app="testApp">
 <head>
@@ -90,21 +89,65 @@
             transition: all 0.3s ease;
             text-align: left;
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
 
-        .answer-btn:hover {
+        .answer-btn:not(.correct):not(.incorrect):hover {
             background: #e9ecef;
             border-color: #dee2e6;
             transform: translateX(5px);
         }
 
-        .answer-btn:active {
-            transform: translateX(5px) scale(0.98);
+        .answer-btn.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+            animation: pulse 0.5s ease;
+        }
+
+        .answer-btn.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            animation: shake 0.5s ease;
+        }
+
+        .answer-btn.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .icon {
+            font-size: 24px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .icon.check {
+            color: #28a745;
+        }
+
+        .icon.cross {
+            color: #dc3545;
         }
 
         .navigation {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 15px;
         }
 
@@ -112,12 +155,12 @@
             background: #6c757d;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 40px;
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
-            flex: 1;
+            min-width: 150px;
         }
 
         .nav-btn:hover {
@@ -243,8 +286,13 @@
                 font-size: 48px;
             }
 
-            .navigation {
-                flex-direction: column;
+            .answer-btn {
+                font-size: 14px;
+                padding: 15px 20px;
+            }
+
+            .icon {
+                font-size: 20px;
             }
         }
     </style>
@@ -267,29 +315,29 @@
             <div class="answers">
                 <button class="answer-btn" 
                         ng-repeat="answer in questions[currentQuestion].answers"
-                        ng-click="selectAnswer($index)">
-                    {{answer}}
+                        ng-click="selectAnswer($index)"
+                        ng-class="{
+                            'correct': answered && $index === questions[currentQuestion].correct,
+                            'incorrect': answered && $index === userAnswers[currentQuestion] && $index !== questions[currentQuestion].correct,
+                            'disabled': answered
+                        }">
+                    <span>{{answer}}</span>
+                    <span class="icon check" ng-if="answered && $index === questions[currentQuestion].correct">✓</span>
+                    <span class="icon cross" ng-if="answered && $index === userAnswers[currentQuestion] && $index !== questions[currentQuestion].correct">✗</span>
                 </button>
             </div>
         </div>
 
         <!-- Navigation -->
-        <div class="navigation" ng-if="!showResults">
-            <button class="nav-btn" 
-                    ng-click="previousQuestion()" 
-                    ng-disabled="currentQuestion === 0">
-                ← Anterior
-            </button>
+        <div class="navigation" ng-if="!showResults && answered">
             <button class="nav-btn" 
                     ng-if="currentQuestion < questions.length - 1"
-                    ng-click="nextQuestion()"
-                    ng-disabled="!isAnswered()">
+                    ng-click="nextQuestion()">
                 Siguiente →
             </button>
             <button class="nav-btn finish" 
                     ng-if="currentQuestion === questions.length - 1"
-                    ng-click="finishTest()"
-                    ng-disabled="!isAnswered()">
+                    ng-click="finishTest()">
                 Finalizar Test
             </button>
         </div>
@@ -324,58 +372,58 @@
         angular.module('testApp', [])
             .controller('TestController', ['$scope', '$interval', function($scope, $interval) {
                 // JSON con las preguntas
-                $scope.questions = [
-                    {
-                        question: "¿Cuál es la capital de Francia?",
-                        answers: ["Londres", "París", "Berlín", "Madrid"],
-                        correct: 1
-                    },
-                    {
-                        question: "¿Cuántos continentes hay en el mundo?",
-                        answers: ["5", "6", "7", "8"],
-                        correct: 2
-                    },
-                    {
-                        question: "¿Quién escribió 'Don Quijote de la Mancha'?",
-                        answers: ["Shakespeare", "Cervantes", "García Lorca", "Borges"],
-                        correct: 1
-                    },
-                    {
-                        question: "¿Cuál es el planeta más grande del sistema solar?",
-                        answers: ["Saturno", "Neptuno", "Júpiter", "Urano"],
-                        correct: 2
-                    },
-                    {
-                        question: "¿En qué año comenzó la Segunda Guerra Mundial?",
-                        answers: ["1939", "1941", "1945", "1938"],
-                        correct: 0
-                    },
-                    {
-                        question: "¿Cuál es el océano más grande?",
-                        answers: ["Atlántico", "Índico", "Ártico", "Pacífico"],
-                        correct: 3
-                    },
-                    {
-                        question: "¿Quién pintó la Mona Lisa?",
-                        answers: ["Miguel Ángel", "Leonardo da Vinci", "Rafael", "Donatello"],
-                        correct: 1
-                    },
-                    {
-                        question: "¿Cuál es el idioma más hablado del mundo?",
-                        answers: ["Inglés", "Mandarín", "Español", "Hindi"],
-                        correct: 1
-                    },
-                    {
-                        question: "¿Cuántos huesos tiene el cuerpo humano adulto?",
-                        answers: ["186", "206", "226", "246"],
-                        correct: 1
-                    },
-                    {
-                        question: "¿En qué país se encuentra la Torre Eiffel?",
-                        answers: ["Italia", "España", "Francia", "Alemania"],
-                        correct: 2
-                    }
-                ];
+               $scope.questions = [
+    {
+        question: "¿Cuántos tiempos (pulsos) dura una redonda?",
+        answers: ["2", "4", "1", "3"],
+        correct: 1
+    },
+    {
+        question: "¿Qué nota toca el dedo pulgar (1) de la mano derecha en la posición de Do?",
+        answers: ["Mi", "Sol", "Do", "Fa"],
+        correct: 2
+    },
+    {
+        question: "¿Cuántos tiempos (pulsos) dura una blanca?",
+        answers: ["1", "4", "3", "2"],
+        correct: 3
+    },
+    {
+        question: "¿Qué nota toca el dedo meñique (5) de la mano derecha en la posición de Do?",
+        answers: ["Sol", "Fa", "Re", "Mi"],
+        correct: 0
+    },
+    {
+        question: "¿Cuántos tiempos (pulsos) dura una negra?",
+        answers: ["4", "2", "1", "Medio"],
+        correct: 2
+    },
+    {
+        question: "En la posición de Do, ¿qué dedo de la mano derecha toca la nota Mi (E)?",
+        answers: ["Pulgar (1)", "Índice (2)", "Medio (3)", "Anular (4)"],
+        correct: 2
+    },
+    {
+        question: "¿Qué nota se encuentra justo a la izquierda del grupo de dos teclas negras?",
+        answers: ["Re", "Fa", "Sol", "Do"],
+        correct: 3
+    },
+    {
+        question: "En un compás de 4/4, ¿cuántas negras caben?",
+        answers: ["Dos", "Cuatro", "Tres", "Una"],
+        correct: 1
+    },
+    {
+        question: "En la posición de Do, ¿qué dedo de la mano derecha toca la nota Sol (G)?",
+        answers: ["Medio (3)", "Anular (4)", "Índice (2)", "Meñique (5)"],
+        correct: 3
+    },
+    {
+        question: "¿Cuántas blancas caben en un compás de 4/4?",
+        answers: ["Una", "Dos", "Cuatro", "Tres"],
+        correct: 1
+    }
+];
 
                 // Variables de control
                 $scope.currentQuestion = 0;
@@ -383,6 +431,7 @@
                 $scope.elapsedTime = 0;
                 $scope.showResults = false;
                 $scope.correctAnswers = 0;
+                $scope.answered = false;
 
                 // Iniciar contador de tiempo
                 var timer = $interval(function() {
@@ -391,36 +440,26 @@
 
                 // Funciones
                 $scope.selectAnswer = function(index) {
-                    $scope.userAnswers[$scope.currentQuestion] = index;
-                };
-
-                $scope.isAnswered = function() {
-                    return $scope.userAnswers[$scope.currentQuestion] !== undefined;
+                    if (!$scope.answered) {
+                        $scope.userAnswers[$scope.currentQuestion] = index;
+                        $scope.answered = true;
+                        
+                        // Contar respuestas correctas
+                        if (index === $scope.questions[$scope.currentQuestion].correct) {
+                            $scope.correctAnswers++;
+                        }
+                    }
                 };
 
                 $scope.nextQuestion = function() {
                     if ($scope.currentQuestion < $scope.questions.length - 1) {
                         $scope.currentQuestion++;
-                    }
-                };
-
-                $scope.previousQuestion = function() {
-                    if ($scope.currentQuestion > 0) {
-                        $scope.currentQuestion--;
+                        $scope.answered = false;
                     }
                 };
 
                 $scope.finishTest = function() {
                     $interval.cancel(timer);
-                    
-                    // Calcular respuestas correctas
-                    $scope.correctAnswers = 0;
-                    for (var i = 0; i < $scope.questions.length; i++) {
-                        if ($scope.userAnswers[i] === $scope.questions[i].correct) {
-                            $scope.correctAnswers++;
-                        }
-                    }
-                    
                     $scope.showResults = true;
                     
                     // Enviar mensaje al padre después de 3 segundos
