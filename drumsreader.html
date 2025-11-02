@@ -1,0 +1,2555 @@
+
+
+<html lang="es"> 
+<head> 
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reproductor MusicXML</title>
+   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      padding-bottom: 140px;
+    }
+    
+    /* Top Bar - Minimalista */
+    #top-bar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+
+    
+    #song-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    #song-composer {
+      font-size: 12px;
+      color: #999;
+    }
+ 
+    
+    .btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn:hover:not(:disabled) {
+      background: #f5f5f5;
+    }
+    
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #1a1a1a;
+    }
+
+    .btn i {
+      font-size: 20px;
+      fill: #1a1a1a;
+    }
+    
+    /* Progress Bar */
+   /* AÑADE ESTE NUEVO BLOQUE DE CSS */
+
+
+
+
+/* Posiciona el slider en la parte inferior de la barra superior */
+#progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px; /* Grosor de la barra */
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  /* Variable CSS personalizada para el progreso */
+  --progress: 0%; /* Valor inicial */
+}
+
+/* Estilo para el "thumb" (el círculo que se arrastra) */
+#progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px; /* Tamaño del thumb */
+  height: 12px;
+  background: #3498db; /* Color del thumb */
+  border-radius: 50%;
+
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  margin-top: -4px; /* Centra el thumb verticalmente en la barra */
+}
+
+#progress-bar::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: #3498db;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+/* Estilo para el "track" (la barra completa) */
+/* Para navegadores WebKit: usa un gradiente para simular el progreso */
+#progress-bar::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, #3498db 0%, #3498db var(--progress), #e0e0e0 var(--progress), #e0e0e0 100%);
+  border-radius: 5px; /* Opcional: para que los bordes del track sean suaves */
+}
+
+/* Para Firefox: usa la pseudo-clase estándar */
+#progress-bar::-moz-range-track {
+  width: 100%;
+  height: 3px;
+  background: #e0e0e0; /* Color de la barra no reproducida (fondo blanco) */
+  border-radius: 5px; /* Opcional */
+}
+
+#progress-bar::-moz-range-progress {
+  background: #3498db; /* Color azul para la parte reproducida */
+  height: 3px;
+  border-radius: 5px; /* Opcional */
+}
+  
+    
+   
+    
+    /* Piano - 88 Keys Minimalista */
+    #piano-container {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      padding: 12px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
+      border-top: 1px solid #e0e0e0;
+      transition: transform 0.3s ease;
+    }
+    
+    #piano-container.hidden {
+      transform: translateY(100%);
+    }
+    
+    #piano-keys {
+      display: flex;
+      justify-content: center;
+      min-width: 100%;
+      padding: 0 10px;
+    }
+    
+    .key {
+      border: 1px solid #ddd;
+      position: relative;
+      transition: all 0.05s;
+    }
+    
+    .key.white {
+      width: 16px;
+      height: 90px;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+    }
+    
+    .key.black {
+      width: 10px;
+      height: 58px;
+      background: #1a1a1a;
+      margin-left: -5px;
+      margin-right: -5px;
+      z-index: 2;
+    }
+    
+    .key.active-treble {
+  background: #3498db !important; /* Azul para la mano derecha (treble) */
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
+}
+
+.key.active-bass {
+  background: #de9e37 !important; /* Verde para la mano izquierda (bass) */
+  box-shadow: 0 0 8px rgba(222, 158, 55, 0.6) !important;
+}
+    
+    #status {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 13px;
+    }
+    
+   
+
+#osmd-container {
+  width: 95%; 
+  max-width: 900px; 
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  box-sizing: border-box;
+  overflow: hidden; /* Asegura que el contenido SVG respete los bordes redondeados */
+}
+
+
+
+
+@media (min-width: 830px) {
+  #osmd-container {
+    width: 85%;
+  }
+}
+
+
+/* Ajustes para Desktop */
+@media (min-width: 1100px) {
+  #osmd-container {
+    width: 70%;
+  }
+}
+  
+
+.speed-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.speed-ctrl-btn {
+    font-size: 20px;
+    font-weight: 500;
+    padding: 4px 12px;
+    line-height: 1;
+    border-radius: 0; /* Quitamos bordes individuales */
+    background-color: transparent;
+}
+.speed-ctrl-btn:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+.speed-display {
+
+    text-align: center;
+    min-width: 50px;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.speed-bpm {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    color: #1a1a1a;
+}
+
+.speed-value {
+    font-size: 11px;
+    color: #999;
+    display: block;
+    margin-top: 2px;
+}
+#annotation-canvas {
+height: 100%;
+width: 100vw;
+}
+
+/* === Reestructuración Top Bar === */
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espacio entre elementos dentro de un grupo */
+}
+
+/* === NUEVO: Contador de Tiempo === */
+#time-display {
+  font-size: 13px;
+  color: #555;
+  font-family: 'SF Mono', 'Menlo', 'monospace'; /* Letra monoespaciada para números */
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* === NUEVO: Controles de Zoom Rediseñados (estilo de la imagen) === */
+#zoom-controls {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+#zoom-controls .zoom-display {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+#zoom-controls .zoom-buttons {
+  display: flex;
+}
+
+#zoom-controls .zoom-btn {
+  background-color: #fff;
+  border: none;
+  border-left: 1px solid #e0e0e0; /* Línea divisora */
+  padding: 6px 12px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#zoom-controls .zoom-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* === NUEVO: Espacio para botón Cerrar === */
+#close-btn-placeholder {
+  width: 30px; /* Ancho para el espacio reservado */
+  height: 39px;
+}
+
+/* === NUEVO: Botones Flotantes de Dibujo === */
+#floating-draw-controls {
+  position: sticky;
+  bottom: 105px;
+  float: right;
+  margin-right: 10px;
+  z-index: 50;
+  width: 90px;
+  display: flex;
+  flex-direction: row; /* Apila los botones verticalmente */
+  gap: 5px;
+  background-color: rgba(255, 255, 255, 0.85); /* Fondo semitransparente */
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px); /* Efecto "glassmorphism" para navegadores compatibles */
+}
+
+    /* === NUEVO: Controles de Velocidad Flotantes === */
+#floating-speed-controls {
+  position: sticky;
+  width: 145px;
+  bottom: 105px;
+  display: none;
+  left: 10px; /* Lo posicionamos a la izquierda para balancear la UI */
+  z-index: 50;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* Ajustes a los botones flotantes */
+#floating-draw-controls .btn:hover {
+  background-color: #e9e9e9;
+}
+
+
+
+#measure-select {
+  -webkit-appearance: none; /* Quita el estilo por defecto en Safari/Chrome */
+  -moz-appearance: none; 
+  appearance: none;
+  background-color: white;
+ border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  height: 30px;
+  color: #1a1a1a;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+#measure-select:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+
+
+
+/* === NUEVO: Barra de Herramientas Secundaria === */
+#secondary-top-bar {
+
+display: flex;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+ padding: 0px 15px;
+ top: 60px;
+   position: sticky ;
+   z-index: 999;
+     align-items: center; 
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden; /* Clave para la animación de despliegue */
+  max-height: 0; /* Estado inicial: colapsada */
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animación suave */
+}
+
+/* Estado visible de la barra secundaria */
+#secondary-top-bar.is-visible {
+
+  max-height: 35px; /* Altura suficiente para los botones */
+  padding: 4px 15px; /* Restaura el padding vertical */
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espacio entre los elementos de cada grupo */
+}
+
+
+ /* Mobile adjustments - ESCALADO PARA MÓVILES */
+    @media (max-width: 768px) {
+   
+      
+      /* Aplicamos zoom automático en móviles */
+      .mobile-zoom {
+        transform: scale(0.85);
+        transform-origin: top center;
+      }
+      
+      .key.white {
+        width: 13px;
+        height: 75px;
+      }
+      
+      .key.black {
+        width: 8px;
+        height: 48px;
+        margin-left: -4px;
+        margin-right: -4px;
+      }
+      
+   
+    }
+    
+    @media (max-width: 500px) {
+      #top-bar {
+        padding: 8px 12px;
+      }
+
+      #floating-speed-controls{
+        display: flex !important;
+      }
+
+      .mobile-zoom {
+        transform: scale(0.75);
+        transform-origin: top center;
+      }
+
+      #tools-toggle-btn,
+  #secondary-top-bar {
+    display: none; 
+  }
+  }
+
+   @media (max-width: 440px) {
+       #time-display{
+        display: none;
+      }
+   }
+
+
+/* --- CSS CORRECTO PARA EL COLOR PICKER HORIZONTAL --- */
+
+/* Contenedor del selector de color completo (círculo + opciones) */
+#color-picker-container {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 18px; /* Bordes redondeados para el contenedor */
+  padding: 4px;
+  transition: all 0.3s ease-in-out;
+  /* Importante: quitamos position: relative que ya no es necesario */
+}
+
+/* El círculo que muestra el color actual */
+#color-preview-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  background-color: rgba(255, 223, 89, 0.4);
+  cursor: pointer;
+  flex-shrink: 0; /* Evita que el círculo se encoja */
+}
+
+/* Contenedor de las opciones de color (el que modificamos) */
+#color-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* ESTADO OCULTO INICIAL (sin display:none) */
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 0.3s ease-in-out, opacity 0.2s linear, margin-left 0.3s ease-in-out;
+  margin-left: 0;
+  /* Eliminamos position: absolute y todo lo relacionado a eso */
+}
+
+/* ESTADO ABIERTO: Cuando el contenedor tiene la clase 'is-open' */
+#color-picker-container.is-open #color-options {
+  max-width: 200px; /* Ancho suficiente para mostrar todo */
+  opacity: 1;
+  margin-left: 8px; /* Espacio entre el círculo y las opciones */
+}
+
+/* Muestras de color y el input (sin cambios, pero se incluyen por completitud) */
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+  border: 2px solid #3498db;
+}
+
+#custom-color-input {
+  width: 28px;
+  height: 28px;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === NUEVO: Estilos para el Modal MIDI === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* Asegura que esté por encima de todo */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Estado visible del modal */
+.modal-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 320px;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.is-visible .modal-content {
+  transform: scale(1);
+}
+
+#modal-message {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.closeBtn {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.closeBtn:hover {
+  background-color: #2980b9;
+}
+
+#midi-status-legend {
+  position: fixed;
+  /* Lo ponemos encima de los controles de velocidad móviles */
+  bottom: 165px; 
+  left: 10px;
+  z-index: 50;
+  background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
+  color: #fafafa;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* Oculto por defecto */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* No interfiere con clics */
+}
+
+#midi-status-legend.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#midi-status-legend i {
+  font-size: 16px;
+  color: #3498db; /* Ícono azul */
+}
+
+/* En desktop, no hay controles de velocidad, 
+   así que podemos bajar la leyenda */
+@media (min-width: 501px) {
+  #midi-status-legend {
+    bottom: 120px; /* Justo sobre el piano */
+  }
+}
+
+
+#right-hand-only-btn.active,
+#left-hand-only-btn.active {
+  background-color: #e0e0e0 !important;
+  color: #3498db !important;
+  border-color: #3498db !important;
+}
+
+.key.midi-active {
+  background-color: #e0e0e0 !important; /* Un gris claro sutil */
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Para teclas blancas */
+.key.white.midi-active {
+  background-color: #e8e8e8 !important;
+}
+
+/* Para teclas negras */
+.key.black.midi-active {
+  background-color: #555555 !important;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4) !important;
+}
+
+
+.key-name {
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
+  pointer-events: none;
+  z-index: 10;
+  font-family: Arial, sans-serif;
+}
+
+/* Para teclas negras, ajustar posición */
+.key.black .key-name {
+  color: white;
+  bottom: 3px;
+  font-size: 8px;
+}
+
+/* Estilo para el botón activo */
+#show-key-names-btn.active {
+  background-color: #e0e0e0 !important;
+  border-color: #3498db !important;
+}
+
+/* Mejorar contraste en teclas blancas con nombres */
+.key.white.has-name {
+  background: linear-gradient(to bottom, #fff 0%, #f5f5f5 100%);
+}
+
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  /* Animación base que modificaremos con JS */
+  animation: confetti-fall 5s ease-out forwards;
+  z-index: 9999; /* Asegura que esté por encima de todo */
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+
+
+/* Batería Virtual */
+#drum-container {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  padding: 20px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+  border-top: 2px solid #1a252f;
+  transition: transform 0.3s ease;
+  min-height: 200px;
+}
+
+#drum-container.hidden {
+  transform: translateY(100%);
+}
+
+#drum-kit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.drum-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.drum-pad {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 -2px 4px rgba(0,0,0,0.2);
+  transition: all 0.1s ease;
+  border: 3px solid rgba(255,255,255,0.2);
+}
+
+.drum-pad:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.drum-pad.active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.drum-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Colores específicos */
+.drum-pad.crash { background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%); }
+.drum-pad.ride { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+.drum-pad.tom-high { background: linear-gradient(135deg, #6c3483 0%, #8e44ad 100%); }
+.drum-pad.tom-mid { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); }
+.drum-pad.tom-low { background: linear-gradient(135deg, #9b59b6 0%, #af7ac5 100%); }
+.drum-pad.hihat-closed { background: linear-gradient(135deg, #d68910 0%, #f39c12 100%); }
+.drum-pad.hihat-open { background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%); }
+.drum-pad.snare { background: linear-gradient(135deg, #2980b9 0%, #3498db 100%); }
+.drum-pad.kick { 
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+}
+
+/* Animación de golpe */
+.drum-pad.hit {
+  animation: drumHit 0.3s ease;
+}
+
+@keyframes drumHit {
+  0%, 100% { 
+    transform: scale(1); 
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(0.9); 
+    filter: brightness(1.5);
+    box-shadow: 0 0 20px currentColor;
+  }
+}
+
+/* Modo MIDI activo */
+.drum-pad.midi-active {
+  filter: brightness(1.3);
+  box-shadow: 0 0 15px currentColor;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drum-pad {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .drum-pad.kick {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .drum-label {
+    font-size: 9px;
+  }
+  
+  .drum-row {
+    gap: 10px;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+
+  <div id="top-bar">
+    <div class="controls-group">
+      <button id="play-btn" class="btn" disabled>
+        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+
+      <div id="time-display">
+        <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+      </div>
+        <button id="midi-learn-btn" class="btn" title="Modo Aprendizaje MIDI">
+  <i class="ri-graduation-cap-line"></i>
+</button>
+    </div>
+
+    <div class="controls-group">
+    
+        <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
+        <i class="ri-settings-3-line"></i>
+      </button>
+
+          <button id="piano-btn" class="btn" >
+       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
+      </button>
+
+      <div id="zoom-controls">
+         <div class="speed-display">
+        <span class="zoom-display" id="speed-bpm">120 BPM</span>
+  <span class="speed-value" id="speed-label">1.00x</span>
+   </div>
+        <div class="zoom-buttons">
+            <button class="zoom-btn" id="speed-down-btn">−</button>
+            <button class="zoom-btn" id="speed-up-btn">+</button>
+        </div>
+      </div>
+      <div id="close-btn-placeholder"></div>
+    </div>
+
+    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
+  </div>
+
+   <div id="secondary-top-bar" class="is-visible">
+    <div class="tool-group">
+  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
+    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
+  </button>
+    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
+    <i class="ri-hand"></i> D
+  </button>
+    </div>
+  
+     <div class="tool-group">
+        <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
+    <i class="ri-font-size"></i> 
+  </button>
+          <button id="cursor-btn" class="btn" >
+   <i class="ri-layout-left-2-line"></i>
+    </button>
+     <select id="measure-select" class="btn" title="Iniciar desde el compás...">
+    </select>
+         <div class="speed-group">
+            <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
+            <div class="speed-display">
+              <span class="speed-bpm" id="zoom-label">Zoom: 100%</span>
+            </div>
+            <button id="zoom-in" class="btn speed-ctrl-btn">+</button>
+        </div>
+         <button id="fullscreen-btn" class="btn" >
+   <i class="ri-fullscreen-line"></i>
+    </button>
+    </div>
+     
+  </div>
+
+  <!-- Controles de zoom para móviles -->
+ 
+
+  <div id="sheet-music-wrapper" style="position: relative;">
+    <div id="osmd-container"></div>
+    <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+    
+</div>
+  <div id="status">Cargando...</div>
+
+ 
+<div id="midi-status-legend"></div>
+
+ <div id="drum-container">
+  <div id="drum-kit">
+    <div class="drum-row top-row">
+      <div class="drum-pad crash" data-drum="crash" id="crash">
+        <span class="drum-label">Crash</span>
+      </div>
+      <div class="drum-pad ride" data-drum="ride" id="ride">
+        <span class="drum-label">Ride</span>
+      </div>
+    </div>
+    
+    <div class="drum-row middle-row">
+      <div class="drum-pad tom-high" data-drum="tom-high" id="tom-high">
+        <span class="drum-label">Tom 1</span>
+      </div>
+      <div class="drum-pad tom-mid" data-drum="tom-mid" id="tom-mid">
+        <span class="drum-label">Tom 2</span>
+      </div>
+      <div class="drum-pad tom-low" data-drum="tom-low" id="tom-low">
+        <span class="drum-label">Tom 3</span>
+      </div>
+    </div>
+    
+    <div class="drum-row bottom-row">
+      <div class="drum-pad hihat-closed" data-drum="hihat-closed" id="hihat-closed">
+        <span class="drum-label">Hi-Hat C</span>
+      </div>
+      <div class="drum-pad snare" data-drum="snare" id="snare">
+        <span class="drum-label">Caja</span>
+      </div>
+      <div class="drum-pad hihat-open" data-drum="hihat-open" id="hihat-open">
+        <span class="drum-label">Hi-Hat A</span>
+      </div>
+    </div>
+    
+    <div class="drum-row kick-row">
+      <div class="drum-pad kick" data-drum="kick" id="kick">
+        <span class="drum-label">Bombo</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <div id="midi-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <p id="modal-message">Este es un mensaje de prueba.</p>
+    <button id="modal-close-btn" class="btn closeBtn">Entendido</button>
+  </div>
+</div>
+
+<div id="success-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <p id="success-modal-message">¡Felicidades, has completado la pieza!</p>
+    <button id="success-modal-close-btn" class="btn closeBtn">Continuar</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
+  <script>
+    // ==========================================
+// CONSTANTES Y CONFIGURACIÓN DE BATERÍA
+// ==========================================
+const DRUM_MIDI_MAP = {
+  35: { name: 'Bombo', key: 'kick', color: '#e74c3c' },
+  36: { name: 'Bombo', key: 'kick', color: '#e74c3c' },
+  38: { name: 'Caja', key: 'snare', color: '#3498db' },
+  40: { name: 'Caja', key: 'snare', color: '#3498db' },
+  42: { name: 'Hi-Hat Cerrado', key: 'hihat-closed', color: '#f39c12' },
+  44: { name: 'Hi-Hat Pedal', key: 'hihat-closed', color: '#f39c12' },
+  46: { name: 'Hi-Hat Abierto', key: 'hihat-open', color: '#e67e22' },
+  41: { name: 'Tom Bajo', key: 'tom-low', color: '#9b59b6' },
+  43: { name: 'Tom Bajo', key: 'tom-low', color: '#9b59b6' },
+  45: { name: 'Tom Medio', key: 'tom-mid', color: '#8e44ad' },
+  47: { name: 'Tom Medio', key: 'tom-mid', color: '#8e44ad' },
+  48: { name: 'Tom Alto', key: 'tom-high', color: '#6c3483' },
+  50: { name: 'Tom Alto', key: 'tom-high', color: '#6c3483' },
+  49: { name: 'Crash', key: 'crash', color: '#16a085' },
+  57: { name: 'Crash', key: 'crash', color: '#16a085' },
+  51: { name: 'Ride', key: 'ride', color: '#27ae60' },
+  59: { name: 'Ride', key: 'ride', color: '#27ae60' }
+};
+
+const playBtn = document.getElementById('play-btn');
+const playIcon = document.getElementById('play-icon');
+const pauseIcon = document.getElementById('pause-icon');
+const pianoBtn = document.getElementById('piano-btn');
+const osmdContainer = document.getElementById('osmd-container');
+const statusDiv = document.getElementById('status');
+const drumContainer = document.getElementById('drum-container');
+const progressBar = document.getElementById('progress-bar');
+const speedLabel = document.getElementById('speed-label');
+const speedBpmLabel = document.getElementById('speed-bpm');
+const speedUpBtn = document.getElementById('speed-up-btn');
+const speedDownBtn = document.getElementById('speed-down-btn');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const zoomLabel = document.getElementById('zoom-label');
+const currentTimeSpan = document.getElementById('current-time');
+const totalTimeSpan = document.getElementById('total-time');
+const measureSelect = document.getElementById('measure-select');
+const toolsToggleBtn = document.getElementById('tools-toggle-btn');
+const secondaryTopBar = document.getElementById('secondary-top-bar');
+const cursorBtn = document.getElementById('cursor-btn');
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+const midiModal = document.getElementById('midi-modal');
+const modalMessage = document.getElementById('modal-message');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const midiStatusLegend = document.getElementById('midi-status-legend');
+const rightHandOnlyBtn = document.getElementById('right-hand-only-btn');
+const leftHandOnlyBtn = document.getElementById('left-hand-only-btn');
+const showKeyNamesBtn = document.getElementById('show-key-names-btn');
+const successModal = document.getElementById('success-modal');
+const successModalMessage = document.getElementById('success-modal-message');
+const successModalCloseBtn = document.getElementById('success-modal-close-btn');
+const midiLearnBtn = document.getElementById('midi-learn-btn');
+
+let osmd = null;
+let sampler = null;
+let parsedNotes = [];
+let measureStartTimes = [];
+let globalTempo = 120;
+let playbackRate = 1.0;
+let currentSpeed = 1.0;
+let totalDuration = 0;
+let isPlaying = false;
+let audioPart = null;
+let visualPart = null;
+let progressInterval = null;
+let activeHighlightTimeouts = [];
+let currentZoom = 1.0;
+let isMobile = window.innerWidth <= 768;
+let isMidiLearnMode = false;
+let midiAccess = null;
+let expectedNotes = new Set();
+let currentLearningIndex = 0;
+let handFilterMode = 'both'; // 'both', 'cymbals', 'drums'
+let showKeyNames = true;
+
+// ==========================================
+// INICIALIZACIÓN
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    setStatus('Inicializando...');
+    initOSMD();
+    addEventListeners();
+    initDrumSampler(); // Los sintetizadores se cargan instantáneamente
+    initMidiInput();
+    
+    setStatus('Cargando partitura...');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileId = urlParams.get('file'); 
+    if (fileId) {
+        const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
+        console.log(`Cargando archivo desde URL: ${dynamicUrl}`);
+        await loadMusicXMLFromUrl(dynamicUrl);
+
+        setTimeout(() => {
+            if (!midiAccess || midiAccess.inputs.size === 0) {
+                showModal("🥁 Conecta tu batería electrónica o pad MIDI para iniciar el modo de aprendizaje.");
+                initMidiInput();
+            } else {
+                isMidiLearnMode = true;
+                stopPlayback(); 
+                midiLearnBtn.style.background = '#e0e0e0';
+                playBtn.disabled = true;
+                currentLearningIndex = 0;
+                osmd.cursor.show();
+                cursorBtn.style.color = '#3498db';
+                Object.assign(osmd.cursor.cursorOptions, {
+                    type: 5,
+                    alpha: 0.7,
+                    color: "rgba(52, 152, 219, 0.7)"
+                });
+
+                handFilterMode = 'drums';
+                leftHandOnlyBtn.style.background = '#e0e0e0';
+                leftHandOnlyBtn.style.color = '#3498db';
+                rightHandOnlyBtn.style.background = 'none';
+                rightHandOnlyBtn.style.color = '#1a1a1a';
+                
+                prepareFirstLearningStep(); 
+                showModal("Modo de aprendizaje: Solo Tambores", 2000);
+            }
+        }, 500);
+
+    } else {
+        setStatus('Error: No se ha especificado ningún archivo para cargar. Añade "?file=tu-archivo.musicxml" a la URL.');
+        playBtn.disabled = true; 
+    }
+});
+
+// ==========================================
+// INICIALIZACIÓN DE OSMD
+// ==========================================
+function initOSMD() {
+    try {
+        osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
+            backend: 'svg',
+            drawTitle: true,
+            drawSubtitle: true,   
+            drawComposer: true, 
+            followCursor: true,
+            drawPartNames: false,
+            autoResize: true,
+            drawingParameters: "width",
+            drawMeasureNumbers: false,
+            cursorsOptions: [{ 
+                type: 1, 
+                color: "rgba(52,152,219,0.8)", 
+                alpha: 0.8, 
+                follow: true 
+            }]
+        });
+        
+        setupEngravingRulesForScreenSize();
+        
+    } catch (e) { 
+        setStatus('Error al inicializar'); 
+    }
+}
+
+function setupEngravingRulesForScreenSize() {
+    if (!osmd || !osmd.EngravingRules) return;
+    
+    const width = window.innerWidth;
+    
+    if (width <= 480) {
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 0.8;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.0;
+        osmd.EngravingRules.StaffDistance = 2.8;
+        osmd.EngravingRules.StaffLineWidth = 0.06;
+        osmd.EngravingRules.NoteHeadWidth = 0.8;
+        osmd.zoom = 0.6;
+        currentZoom = 0.6;
+    } else if (width <= 768) {
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.0;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.2;
+        osmd.EngravingRules.StaffDistance = 3.0;
+        osmd.EngravingRules.StaffLineWidth = 0.07;
+        osmd.EngravingRules.NoteHeadWidth = 0.9;
+        osmd.zoom = 0.8;
+        currentZoom = 0.8;
+    } else {
+        osmd.EngravingRules.SystemMaxMeasuresCount = 4;
+        osmd.EngravingRules.MinimumDistanceBetweenNotes = 1.2;
+        osmd.EngravingRules.MinimumDistanceBetweenStaffLines = 2.5;
+        osmd.EngravingRules.StaffDistance = 3.5;
+        osmd.EngravingRules.StaffLineWidth = 0.08;
+        osmd.EngravingRules.NoteHeadWidth = 1.0;
+        osmd.zoom = 1.2;
+        currentZoom = 1.2;
+    }
+    
+    updateZoomDisplay();
+}
+
+// ==========================================
+// INICIALIZACIÓN DE SAMPLER DE BATERÍA
+// ==========================================
+function initDrumSampler() {
+    // Usamos síntesis básica de Tone.js para los sonidos de batería
+    // Esto evita problemas de carga de samples externos
+    
+    const kick = new Tone.MembraneSynth({
+        pitchDecay: 0.05,
+        octaves: 10,
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4, attackCurve: "exponential" }
+    }).toDestination();
+    
+    const snare = new Tone.NoiseSynth({
+        noise: { type: "white" },
+        envelope: { attack: 0.001, decay: 0.2, sustain: 0 }
+    }).toDestination();
+    
+    const hihat = new Tone.MetalSynth({
+        frequency: 200,
+        envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
+        harmonicity: 5.1,
+        modulationIndex: 32,
+        resonance: 4000,
+        octaves: 1.5
+    }).toDestination();
+    
+    const tom = new Tone.MembraneSynth({
+        pitchDecay: 0.08,
+        octaves: 4,
+        envelope: { attack: 0.001, decay: 0.5, sustain: 0.1, release: 0.8 }
+    }).toDestination();
+    
+    const crash = new Tone.MetalSynth({
+        frequency: 250,
+        envelope: { attack: 0.001, decay: 1, release: 2 },
+        harmonicity: 5.1,
+        modulationIndex: 64,
+        resonance: 4000,
+        octaves: 1.5
+    }).toDestination();
+    
+    const ride = new Tone.MetalSynth({
+        frequency: 800,
+        envelope: { attack: 0.001, decay: 0.4, release: 0.2 },
+        harmonicity: 6,
+        modulationIndex: 20,
+        resonance: 2500,
+        octaves: 1
+    }).toDestination();
+    
+    // Objeto sampler simulado con los sintetizadores
+    sampler = {
+        triggerAttackRelease: (notes, duration, time) => {
+            const noteArray = Array.isArray(notes) ? notes : [notes];
+            noteArray.forEach(note => {
+                const now = time || Tone.now();
+                switch(note) {
+                    case 'C1': // Kick
+                        kick.triggerAttackRelease('C2', '8n', now);
+                        break;
+                    case 'D1': // Snare
+                        snare.triggerAttackRelease('8n', now);
+                        break;
+                    case 'F#1': // Hi-hat closed
+                        hihat.triggerAttackRelease('16n', now);
+                        break;
+                    case 'G#1': // Hi-hat open
+                        hihat.triggerAttackRelease('8n', now);
+                        break;
+                    case 'C2': // Tom low
+                        tom.triggerAttackRelease('G2', '8n', now);
+                        break;
+                    case 'D2': // Tom mid
+                        tom.triggerAttackRelease('C3', '8n', now);
+                        break;
+                    case 'E2': // Tom high
+                        tom.triggerAttackRelease('F3', '8n', now);
+                        break;
+                    case 'C#2': // Crash
+                        crash.triggerAttackRelease('16n', now);
+                        break;
+                    case 'D#2': // Ride
+                        ride.triggerAttackRelease('8n', now);
+                        break;
+                }
+            });
+        }
+    };
+    
+    console.log('Sintetizadores de batería inicializados');
+}
+
+// ==========================================
+// FORMATO DE TIEMPO
+// ==========================================
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    const formattedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+    return `${minutes}:${formattedSeconds}`;
+}
+
+// ==========================================
+// CARGA DE MUSICXML
+// ==========================================
+async function loadMusicXMLFromUrl(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error de red');
+        const text = await response.text();
+        await osmd.load(text);
+        osmdContainer.innerHTML = ''; 
+
+        setupEngravingRulesForScreenSize();
+        
+        await osmd.render();
+        populateMeasureSelector();
+        
+        parseDrumMusicXML(text);
+        scheduleDrumNotesOnTransport();
+
+        playBtn.disabled = false;
+        setStatus('');
+    } catch (err) {
+        setStatus(`Error: ${err.message}`);
+    }
+}
+
+// ==========================================
+// PARSER DE MUSICXML PARA BATERÍA
+// ==========================================
+function parseDrumMusicXML(xmlText) {
+    parsedNotes = [];
+    measureStartTimes = [0];
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "application/xml");
+
+    const divisions = parseInt(xml.querySelector("divisions")?.textContent.trim() || "24", 10);
+    const soundTempo = xml.querySelector("direction sound[tempo], sound[tempo]");
+    globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute("tempo")) : 120;
+    updateBpmDisplay();
+    Tone.Transport.bpm.value = globalTempo;
+
+    const openTies = new Map();
+    
+    xml.querySelectorAll('part').forEach((part, partIndex) => {
+        let currentBeat = 0;
+
+        const partName = part.getAttribute('id') || '';
+        const isDrumPart = partName.toLowerCase().includes('drums') || 
+                          partName.toLowerCase().includes('percussion') ||
+                          part.querySelector('measure[number="1"] clef[sign="percussion"]');
+        
+        if (!isDrumPart) {
+            console.log(`Saltando parte ${partName} - No es batería`);
+            return;
+        }
+
+        const measures = part.querySelectorAll('measure');
+        measures.forEach((measure, measureIndex) => {
+            if (partIndex === 0 && measureIndex > 0) {
+                measureStartTimes.push(currentBeat * (60.0 / globalTempo));
+            }
+            
+            const nodes = measure.querySelectorAll('note, backup, forward');
+            nodes.forEach(node => {
+                const durationVal = parseFloat(node.querySelector('duration')?.textContent.trim() || '0');
+                const durationInBeats = durationVal / divisions;
+
+                if (node.tagName === 'note') {
+                    const isChord = !!node.querySelector('chord');
+                    
+                    if (!isChord) {
+                        currentBeat += durationInBeats;
+                    }
+                    
+                    if (!node.querySelector('rest')) {
+                        let drumKey = null;
+                        
+                        // Prioridad 1: Buscar <instrument> con id
+                        const instrumentId = node.querySelector('instrument')?.getAttribute('id');
+                        if (instrumentId) {
+                            drumKey = mapInstrumentIdToDrumKey(instrumentId);
+                        }
+                        
+                        // Prioridad 2: Buscar <unpitched>
+                        if (!drumKey) {
+                            const displayStep = node.querySelector('unpitched display-step')?.textContent?.trim();
+                            const displayOctave = node.querySelector('unpitched display-octave')?.textContent?.trim();
+                            if (displayStep && displayOctave) {
+                                drumKey = mapDisplayToDrumKey(displayStep, displayOctave);
+                            }
+                        }
+                        
+                        // Prioridad 3: Buscar <pitch> (para MusicXML no estándar)
+                        if (!drumKey) {
+                            const step = node.querySelector('pitch step')?.textContent?.trim();
+                            const octave = node.querySelector('pitch octave')?.textContent?.trim();
+                            if (step && octave) {
+                                drumKey = mapDisplayToDrumKey(step, octave);
+                            }
+                        }
+                        
+                        if (drumKey) {
+                            const isTieStart = !!node.querySelector('tie[type="start"]');
+                            const isTieStop = !!node.querySelector('tie[type="stop"]');
+                            const tieKey = `${drumKey}`;
+
+                            if (isTieStop && openTies.has(tieKey)) {
+                                const existingNote = openTies.get(tieKey);
+                                
+                                const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                                const continuationNote = {
+                                    drumKey: drumKey,
+                                    startSec: noteStartTime,
+                                    durSec: durationInBeats * (60.0 / globalTempo),
+                                    isTied: true,
+                                    isTiedContinuation: true,
+                                    isChord: isChord,
+                                    isDrum: true
+                                };
+                                parsedNotes.push(continuationNote);
+                                
+                                existingNote.durSec += durationInBeats * (60.0 / globalTempo);
+                                
+                                if (!isTieStart) {
+                                    openTies.delete(tieKey);
+                                }
+                            } else {
+                                const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                                
+                                const newNote = {
+                                    drumKey: drumKey,
+                                    startSec: noteStartTime,
+                                    durSec: durationInBeats * (60.0 / globalTempo),
+                                    isTied: isTieStart,
+                                    isTiedContinuation: false,
+                                    isChord: isChord,
+                                    isDrum: true
+                                };
+                                parsedNotes.push(newNote);
+
+                                if (isTieStart) {
+                                    openTies.set(tieKey, newNote);
+                                }
+                            }
+                        }
+                    } else {
+                        const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
+                        
+                        const restNote = {
+                            drumKey: null,
+                            startSec: noteStartTime,
+                            durSec: durationInBeats * (60.0 / globalTempo),
+                            isRest: true,
+                            isTied: false,
+                            isTiedContinuation: false,
+                            isChord: isChord,
+                            isDrum: true
+                        };
+                        parsedNotes.push(restNote);
+                    }
+                } else if (node.tagName === 'backup') {
+                    currentBeat -= durationInBeats;
+                } else if (node.tagName === 'forward') {
+                    currentBeat += durationInBeats;
+                }
+            });
+        });
+    });
+
+    if (openTies.size > 0) {
+        console.warn('Advertencia: Se encontraron ligaduras sin cerrar:', Array.from(openTies.keys()));
+    }
+
+    parsedNotes.sort((a, b) => a.startSec - b.startSec);
+    const lastNote = parsedNotes[parsedNotes.length - 1];
+    totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
+    totalTimeSpan.textContent = formatTime(totalDuration);
+}
+
+// ==========================================
+// MAPEO DE NOTACIÓN A COMPONENTES DE BATERÍA
+// ==========================================
+function mapInstrumentIdToDrumKey(instrumentId) {
+    const idMap = {
+        'P1-I36': 'kick',
+        'P1-I35': 'kick',
+        'P1-I38': 'snare',
+        'P1-I40': 'snare',
+        'P1-I42': 'hihat-closed',
+        'P1-I44': 'hihat-closed',
+        'P1-I46': 'hihat-open',
+        'P1-I41': 'tom-low',
+        'P1-I43': 'tom-low',
+        'P1-I45': 'tom-mid',
+        'P1-I47': 'tom-mid',
+        'P1-I48': 'tom-high',
+        'P1-I50': 'tom-high',
+        'P1-I49': 'crash',
+        'P1-I57': 'crash',
+        'P1-I51': 'ride',
+        'P1-I59': 'ride'
+    };
+    return idMap[instrumentId] || null;
+}
+
+function mapDisplayToDrumKey(step, octave) {
+    const notation = `${step}${octave}`;
+    const drumMap = {
+        'F5': 'crash',
+        'E5': 'crash',
+        'C5': 'ride',
+        'D5': 'ride',
+        'A4': 'tom-high',
+        'G4': 'tom-high',
+        'F4': 'tom-mid',
+        'E4': 'tom-mid',
+        'D4': 'tom-low',
+        'C4': 'tom-low',
+        'B3': 'hihat-open',
+        'G3': 'hihat-closed',
+        'A3': 'hihat-closed',
+        'C3': 'snare',
+        'E3': 'snare',
+        'F3': 'kick',
+        'C2': 'kick',
+        'D2': 'kick'
+    };
+    
+    return drumMap[notation] || 'snare';
+}
+
+// ==========================================
+// CONVERSIÓN DRUM KEY A PITCH DE TONE.JS
+// ==========================================
+function drumKeyToTonePitch(drumKey) {
+    const pitchMap = {
+        'kick': 'C1',
+        'snare': 'D1',
+        'hihat-closed': 'F#1',
+        'hihat-open': 'G#1',
+        'tom-low': 'C2',
+        'tom-mid': 'D2',
+        'tom-high': 'E2',
+        'crash': 'C#2',
+        'ride': 'D#2'
+    };
+    return pitchMap[drumKey] || 'D1';
+}
+
+// ==========================================
+// PROGRAMACIÓN DE NOTAS EN TRANSPORT
+// ==========================================
+function scheduleDrumNotesOnTransport() {
+    if (audioPart) audioPart.dispose();
+    if (visualPart) visualPart.dispose();
+    Tone.Transport.cancel();
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+
+    const TIME_TOLERANCE = 0.001;
+    
+    const notesByTime = new Map();
+    parsedNotes.forEach(note => {
+        const time = note.startSec / playbackRate;
+        
+        let foundTime = null;
+        for (let existingTime of notesByTime.keys()) {
+            if (Math.abs(existingTime - time) < TIME_TOLERANCE) {
+                foundTime = existingTime;
+                break;
+            }
+        }
+        
+        if (foundTime !== null) {
+            notesByTime.get(foundTime).push(note);
+        } else {
+            notesByTime.set(time, [note]);
+        }
+    });
+
+    const audioEvents = [];
+    notesByTime.forEach((notes, time) => {
+        const realNotes = notes.filter(n => !n.isRest && !n.isTiedContinuation);
+        
+        if (realNotes.length > 0) {
+            const uniqueDrums = new Set();
+            const uniqueNotes = realNotes.filter(note => {
+                if (uniqueDrums.has(note.drumKey)) {
+                    return false;
+                }
+                uniqueDrums.add(note.drumKey);
+                return true;
+            });
+            
+            audioEvents.push({
+                time: time,
+                drums: uniqueNotes.map(n => drumKeyToTonePitch(n.drumKey)),
+                duration: uniqueNotes[0].durSec / playbackRate,
+            });
+        }
+    });
+    
+    audioPart = new Tone.Part((time, value) => {
+        sampler.triggerAttackRelease(value.drums, value.duration, time);
+    }, audioEvents).start(0);
+
+    const visualEvents = [];
+    notesByTime.forEach((notes, time) => {
+        const uniqueDrums = new Set();
+        const uniqueNotes = notes.filter(note => {
+            if (note.isRest) return true;
+            
+            if (uniqueDrums.has(note.drumKey)) {
+                return false;
+            }
+            uniqueDrums.add(note.drumKey);
+            return true;
+        });
+        
+        visualEvents.push({ 
+            time, 
+            notes: uniqueNotes.map(n => ({...n, duration: n.durSec / playbackRate}))
+        });
+    });
+
+    visualPart = new Tone.Part((time, value) => {
+        Tone.Draw.schedule(() => {
+            if (value.notes.length > 0) {
+                osmd.cursor.next();
+            }
+            value.notes.forEach(note => {
+                if (!note.isRest && !note.isTiedContinuation) {
+                    highlightDrumPad(note.drumKey, note.duration);
+                }
+            });
+        }, time);
+    }, visualEvents).start(0);
+    
+    const newTotalDuration = totalDuration / playbackRate;
+    Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
+}
+
+// ==========================================
+// REPRODUCCIÓN DESDE COMPÁS
+// ==========================================
+function playFromMeasure(measureIndex) {
+    clearAllDrumHighlights();
+
+    if (Tone.Transport.state === 'started') stopPlayback();
+    
+    const startTime = measureStartTimes[measureIndex] || 0;
+    
+    osmd.cursor.reset();
+    
+    let currentTime = -1;
+    parsedNotes.forEach(note => {
+        if (note.startSec < startTime && note.startSec !== currentTime) {
+            osmd.cursor.next();
+            currentTime = note.startSec;
+        }
+    });
+    
+    Tone.Transport.start(Tone.now() + 0.1, startTime / playbackRate);
+    updatePlayButton(true);
+    osmd.cursor.show();
+    startProgressUpdate();
+}
+
+// ==========================================
+// DETENER REPRODUCCIÓN
+// ==========================================
+function stopPlayback() {
+    Tone.Transport.stop();
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    updatePlayButton(false);
+    stopProgressUpdate();
+    
+    clearAllDrumHighlights();
+
+    progressBar.value = 0;
+    progressBar.style.setProperty('--progress', '0%');
+    currentTimeSpan.textContent = '0:00'; 
+}
+
+// ==========================================
+// ACTUALIZACIÓN DE PROGRESO
+// ==========================================
+function startProgressUpdate() {
+    stopProgressUpdate();
+    progressInterval = setInterval(() => {
+        const currentTime = Tone.Transport.seconds;
+        const effectiveTotalDuration = totalDuration / playbackRate;
+        const progress = (currentTime / effectiveTotalDuration) * 100;
+
+        progressBar.value = Math.min(progress, 100);
+        progressBar.style.setProperty('--progress', `${progress}%`);
+        currentTimeSpan.textContent = formatTime(currentTime);
+    }, 100);
+}
+
+function stopProgressUpdate() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
+}
+
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
+function addEventListeners() {
+    playBtn.addEventListener('click', async () => {
+        await Tone.start();
+        if (Tone.Transport.state === 'started') {
+            Tone.Transport.pause();
+            updatePlayButton(false);
+            stopProgressUpdate();
+            activeHighlightTimeouts.forEach(clearTimeout);
+            activeHighlightTimeouts = [];
+        } else {
+            clearAllDrumHighlights(); 
+            
+            Tone.Transport.start(Tone.now() + 0.1);
+            updatePlayButton(true);
+            osmd.cursor.show();
+            startProgressUpdate();
+        }
+    });
+
+    const speedStep = 0.05;
+
+    function updateSpeed(newRate) {
+        if (Tone.Transport.state === 'started') {
+            stopPlayback();
+        } 
+        
+        playbackRate = Math.max(0.25, Math.min(2.0, newRate));
+        
+        const currentBPM = Math.round(globalTempo * playbackRate);
+        speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
+        speedBpmLabel.textContent = `${currentBPM} BPM`;
+        
+        scheduleDrumNotesOnTransport();
+    }
+
+    rightHandOnlyBtn.addEventListener('click', toggleRightHandOnly);
+    leftHandOnlyBtn.addEventListener('click', toggleLeftHandOnly);
+    showKeyNamesBtn.addEventListener('click', toggleKeyNames);
+
+    speedUpBtn.addEventListener('click', () => {
+        updateSpeed(playbackRate + speedStep);
+    });
+
+    speedDownBtn.addEventListener('click', () => {
+        updateSpeed(playbackRate - speedStep);
+    });
+    
+    pianoBtn.addEventListener('click', () => {
+        drumContainer.classList.toggle('hidden');
+    });
+    
+    zoomInBtn.addEventListener('click', () => {
+        currentZoom = Math.min(2.0, currentZoom + 0.1);
+        applyZoom();
+    });
+    
+    zoomOutBtn.addEventListener('click', () => {
+        currentZoom = Math.max(0.5, currentZoom - 0.1);
+        applyZoom();
+    });
+
+    successModalCloseBtn.addEventListener('click', hideSuccessModal);
+    midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
+    
+    window.addEventListener('resize', () => {
+        const newIsMobile = window.innerWidth <= 768;
+        if (newIsMobile !== isMobile) {
+            isMobile = newIsMobile;
+            if (osmd) {
+                setupEngravingRulesForScreenSize();
+                osmd.render();
+            }
+        }
+    });
+    
+    cursorBtn.addEventListener('click', toggleCursorType);
+    fullscreenBtn.addEventListener('click', toggleFullScreen);
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            fullscreenBtn.querySelector('i').className = 'ri-fullscreen-line';
+        }
+    });
+
+    progressBar.addEventListener('input', () => {
+        const seekTime = (progressBar.value / 100) * totalDuration;
+        const progressValue = (progressBar.value / 100) * 100;
+        progressBar.style.setProperty('--progress', `${progressValue}%`);
+
+        let targetMeasureIndex = 0;
+        for (let i = 0; i < measureStartTimes.length; i++) {
+            if (measureStartTimes[i] <= seekTime) {
+                targetMeasureIndex = i;
+            } else {
+                break;
+            }
+        }
+
+        playFromMeasure(targetMeasureIndex);
+    });
+
+    measureSelect.addEventListener('change', () => {
+        const selectedMeasureIndex = parseInt(measureSelect.value, 10);
+        playFromMeasure(selectedMeasureIndex);
+    });
+
+    toolsToggleBtn.addEventListener('click', () => {
+        secondaryTopBar.classList.toggle('is-visible');
+    });
+
+    modalCloseBtn.addEventListener('click', hideModal);
+}
+
+// ==========================================
+// TOGGLE DE NOMBRES DE TECLAS (BATERÍA)
+// ==========================================
+function toggleKeyNames() {
+    showKeyNames = !showKeyNames;
+    
+    if (showKeyNames) {
+        showKeyNamesBtn.style.background = '#e0e0e0';
+        showDrumLabels();
+    } else {
+        showKeyNamesBtn.style.background = 'none';
+        hideDrumLabels();
+    }
+    
+    console.log(`Mostrar nombres de batería: ${showKeyNames}`);
+}
+
+function showDrumLabels() {
+    const drumPads = document.querySelectorAll('.drum-pad .drum-label');
+    drumPads.forEach(label => {
+        label.style.display = 'flex';
+    });
+}
+
+function hideDrumLabels() {
+    const drumPads = document.querySelectorAll('.drum-pad .drum-label');
+    drumPads.forEach(label => {
+        label.style.display = 'none';
+    });
+}
+
+// ==========================================
+// POBLADO DE SELECTOR DE COMPASES
+// ==========================================
+function populateMeasureSelector() {
+    const measureCount = osmd.sheet.SourceMeasures.length;
+    measureSelect.innerHTML = '';
+
+    for (let i = 0; i < measureCount; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Compás ${i + 1}`;
+        measureSelect.appendChild(option);
+    }
+}
+
+// ==========================================
+// TOGGLE DE TIPO DE CURSOR
+// ==========================================
+function toggleCursorType() {
+    if (!osmd || !osmd.cursor) return;
+
+    const newType = osmd.cursor.cursorOptions.type === 1 ? 3 : 1;
+    osmd.cursor.cursorOptions.type = newType;
+
+    if (newType === 3) {
+        cursorBtn.style.color = '#3498db'; 
+        osmd.cursor.cursorOptions.alpha = 0.45;
+        osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
+    } else {
+        cursorBtn.style.color = '#1a1a1a'; 
+        osmd.cursor.cursorOptions.alpha = 0.8;
+        osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
+    }
+}
+
+// ==========================================
+// LIMPIEZA DE HIGHLIGHTS
+// ==========================================
+function clearAllDrumHighlights() {
+    for (let i = activeHighlightTimeouts.length - 1; i >= 0; i--) {
+        clearTimeout(activeHighlightTimeouts[i]);
+    }
+    activeHighlightTimeouts.length = 0;
+
+    const activePads = document.querySelectorAll('.drum-pad.hit, .drum-pad.midi-active');
+    for (const pad of activePads) {
+        pad.classList.remove('hit', 'midi-active');
+    }
+}
+
+// ==========================================
+// PANTALLA COMPLETA
+// ==========================================
+function toggleFullScreen() {
+    const icon = fullscreenBtn.querySelector('i');
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+        icon.className = 'ri-fullscreen-exit-line';
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+            icon.className = 'ri-fullscreen-line';
+        }
+    }
+}
+
+// ==========================================
+// APLICAR ZOOM
+// ==========================================
+function applyZoom() {
+    if (osmd) {
+        osmd.zoom = currentZoom;
+        osmd.render();
+        updateZoomDisplay();
+    }
+}
+
+function updateZoomDisplay() {
+    zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+}
+
+// ==========================================
+// ACTUALIZAR BOTÓN DE PLAY
+// ==========================================
+function updatePlayButton(isPlaying) {
+    playIcon.style.display = isPlaying ? 'none' : 'block';
+    pauseIcon.style.display = isPlaying ? 'block' : 'none';
+}
+
+function updateBpmDisplay() {
+    const currentBPM = Math.round(globalTempo * currentSpeed);
+    speedLabel.textContent = `${currentSpeed.toFixed(2)}x`;
+    speedBpmLabel.textContent = `${currentBPM} BPM`;
+}
+
+// ==========================================
+// HIGHLIGHT DE PADS DE BATERÍA
+// ==========================================
+function highlightDrumPad(drumKey, durSec, persist = false) {
+    const el = document.getElementById(drumKey);
+    if (!el) return;
+
+    el.classList.add('hit');
+    
+    if (!persist) {
+        const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
+        const timeoutId = setTimeout(() => {
+            el.classList.remove('hit');
+            activeHighlightTimeouts = activeHighlightTimeouts.filter(id => id !== timeoutId);
+        }, highlightDuration);
+        activeHighlightTimeouts.push(timeoutId);
+    }
+}
+
+function highlightDrumPadInstant(drumKey) {
+    const el = document.getElementById(drumKey);
+    if (!el) return;
+    el.classList.add('hit');
+}
+
+// ==========================================
+// ACTUALIZACIÓN DE LEYENDA MIDI
+// ==========================================
+function updateMidiStatusLegend(deviceName = null) {
+    if (deviceName) {
+        midiStatusLegend.innerHTML = `<i class="ri-plug-line"></i> ${deviceName} Conectado`;
+        midiStatusLegend.classList.add('is-visible');
+    } else {
+        midiStatusLegend.classList.remove('is-visible');
+    }
+}
+
+// ==========================================
+// AVANZAR PASO DE APRENDIZAJE
+// ==========================================
+function advanceLearningStep() {
+    const activePads = document.querySelectorAll('.drum-pad.hit, .drum-pad.midi-active');
+    activePads.forEach(pad => pad.classList.remove('hit', 'midi-active'));
+    activeHighlightTimeouts.forEach(clearTimeout);
+    activeHighlightTimeouts.length = 0;
+    expectedNotes.clear();
+
+    if (currentLearningIndex >= parsedNotes.length) {
+        handleLearnModeCompletion();
+        return;
+    }
+
+    let notesInStep = [];
+    let foundValidStep = false;
+    const TIME_TOLERANCE = 0.001;
+
+    while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+        notesInStep = [];
+        
+        while (currentLearningIndex < parsedNotes.length && 
+               Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+            notesInStep.push(parsedNotes[currentLearningIndex]);
+            currentLearningIndex++;
+        }
+
+        const filteredNotes = notesInStep.filter(note => 
+            !note.isRest &&
+            !note.isTiedContinuation &&
+            (handFilterMode === 'both' || 
+            (handFilterMode === 'cymbals' && isCymbal(note.drumKey)) ||
+            (handFilterMode === 'drums' && !isCymbal(note.drumKey)))
+        );
+
+        if (filteredNotes.length > 0) {
+            foundValidStep = true;
+            notesInStep = filteredNotes;
+            
+            osmd.cursor.next();
+            
+            const uniqueDrums = new Set();
+            
+            notesInStep.forEach(note => {
+                if (!uniqueDrums.has(note.drumKey)) {
+                    uniqueDrums.add(note.drumKey);
+                    expectedNotes.add(note.drumKey);
+                    highlightDrumPadInstant(note.drumKey);
+                }
+            });
+            
+            console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+        } else {
+            console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
+            osmd.cursor.next();
+        }
+    }
+
+    if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+        showSuccessModal("¡Felicidades, has completado la pieza!");
+        showConfetti(200);
+        toggleMidiLearnMode();
+    }
+}
+
+// ==========================================
+// HELPER: VERIFICAR SI ES PLATO
+// ==========================================
+function isCymbal(drumKey) {
+    return ['crash', 'ride', 'hihat-closed', 'hihat-open'].includes(drumKey);
+}
+
+// ==========================================
+// ESTADO DEL SISTEMA
+// ==========================================
+function setStatus(text) { 
+    statusDiv.textContent = text;
+    statusDiv.style.display = text ? 'block' : 'none';
+}
+
+// ==========================================
+// MODALES
+// ==========================================
+function showSuccessModal(message) {
+    successModalMessage.textContent = message;
+    successModal.style.display = 'flex';
+    setTimeout(() => {
+        successModal.classList.add('is-visible');
+    }, 10);
+}
+
+function hideSuccessModal() {
+    successModal.classList.remove('is-visible');
+    setTimeout(() => {
+        successModal.style.display = 'none';
+    }, 300); 
+}
+
+function showModal(message, duration = 0) {
+    modalMessage.textContent = message;
+    midiModal.style.display = 'flex';
+    setTimeout(() => {
+        midiModal.classList.add('is-visible');
+    }, 10);
+
+    if (duration > 0) {
+        setTimeout(() => {
+            hideModal();
+        }, duration);
+    }
+}
+
+function hideModal() {
+    midiModal.classList.remove('is-visible');
+    setTimeout(() => {
+        midiModal.style.display = 'none';
+    }, 300);
+}
+
+// ==========================================
+// CONFETTI
+// ==========================================
+function showConfetti(count = 100) {
+    const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${-20 - Math.random() * 10}vh`; 
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+        confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
+        
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+    }
+}
+
+// ==========================================
+// MODO APRENDIZAJE MIDI
+// ==========================================
+function toggleMidiLearnMode() {
+    if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
+        showModal("🥁 No se detectó ningún dispositivo MIDI. Por favor, conecta uno e inténtalo de nuevo.");
+        initMidiInput();
+        return; 
+    }
+
+    isMidiLearnMode = !isMidiLearnMode;
+    stopPlayback(); 
+
+    if (isMidiLearnMode) {
+        midiLearnBtn.style.background = '#e0e0e0';
+        playBtn.disabled = true;
+        currentLearningIndex = 0;
+        osmd.cursor.show();
+
+        cursorBtn.style.color = '#3498db';
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 5,
+            alpha: 0.7,
+            color: "rgba(52, 152, 219, 0.7)"
+        });
+        
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+
+        prepareFirstLearningStep(); 
+        
+    } else {
+        midiLearnBtn.style.background = 'none';
+        playBtn.disabled = false;
+        clearAllDrumHighlights(); 
+        osmd.cursor.reset();
+        osmd.cursor.hide();
+        
+        cursorBtn.style.color = '#1a1a1a';
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 1,
+            alpha: 0.8,
+            color: "rgba(52, 152, 219, 0.8)"
+        });
+
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+    }
+}
+
+// ==========================================
+// COMPLETAR MODO APRENDIZAJE
+// ==========================================
+function handleLearnModeCompletion() {
+    if (handFilterMode === 'drums') {
+        showModal("¡Buen trabajo! Ahora vamos con los Platos.", 3000);
+        
+        handFilterMode = 'cymbals';
+        rightHandOnlyBtn.style.background = '#e0e0e0';
+        rightHandOnlyBtn.style.color = '#3498db';
+        leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+
+        currentLearningIndex = 0;
+        osmd.cursor.reset();
+        prepareFirstLearningStep();
+
+    } else if (handFilterMode === 'cymbals') {
+        showModal("¡Excelente! Ahora, todo junto.", 3000);
+        
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+
+        currentLearningIndex = 0;
+        osmd.cursor.reset();
+        prepareFirstLearningStep();
+
+    } else if (handFilterMode === 'both') {
+        showSuccessModal("¡Felicidades, has completado la pieza!");
+        showConfetti(200);
+        toggleMidiLearnMode();
+    }
+}
+
+// ==========================================
+// PREPARAR PRIMER PASO DE APRENDIZAJE
+// ==========================================
+function prepareFirstLearningStep() {
+    clearAllDrumHighlights();
+    expectedNotes.clear();
+
+    if (currentLearningIndex >= parsedNotes.length) {
+        handleLearnModeCompletion();
+        return;
+    }
+
+    let notesInStep = [];
+    let foundValidStep = false;
+    const TIME_TOLERANCE = 0.001;
+
+    while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+        notesInStep.length = 0;
+        
+        while (currentLearningIndex < parsedNotes.length && 
+               Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+            notesInStep.push(parsedNotes[currentLearningIndex]);
+            currentLearningIndex++;
+        }
+
+        const filteredNotes = notesInStep.filter(note => 
+            !note.isRest &&
+            !note.isTiedContinuation &&
+            (handFilterMode === 'both' || 
+            (handFilterMode === 'cymbals' && isCymbal(note.drumKey)) ||
+            (handFilterMode === 'drums' && !isCymbal(note.drumKey)))
+        );
+
+        if (filteredNotes.length > 0) {
+            foundValidStep = true;
+            
+            const uniqueDrums = new Set();
+            
+            for (const note of filteredNotes) {
+                if (!uniqueDrums.has(note.drumKey)) {
+                    uniqueDrums.add(note.drumKey);
+                    expectedNotes.add(note.drumKey);
+                    highlightDrumPadInstant(note.drumKey);
+                }
+            }
+            
+            console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+        }
+    }
+
+    if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+        alert("¡No hay notas para el filtro seleccionado en esta pieza!");
+        toggleMidiLearnMode();
+    }
+}
+
+// ==========================================
+// TOGGLE DE FILTROS DE MANO
+// ==========================================
+function toggleRightHandOnly() {
+    if (handFilterMode === 'cymbals') {
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+    } else {
+        handFilterMode = 'cymbals';
+        rightHandOnlyBtn.style.background = '#e0e0e0';
+        rightHandOnlyBtn.style.color = '#3498db';
+        leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+    }
+    
+    if (isMidiLearnMode) {
+        skipToNextRelevantNote();
+    }
+    
+    console.log(`Modo de filtro: ${handFilterMode}`);
+}
+
+function toggleLeftHandOnly() {
+    if (handFilterMode === 'drums') {
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+    } else {
+        handFilterMode = 'drums';
+        leftHandOnlyBtn.style.background = '#e0e0e0';
+        leftHandOnlyBtn.style.color = '#3498db';
+        rightHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+    }
+    
+    if (isMidiLearnMode) {
+        skipToNextRelevantNote();
+    }
+    
+    console.log(`Modo de filtro: ${handFilterMode}`);
+}
+
+// ==========================================
+// SALTAR A SIGUIENTE NOTA RELEVANTE
+// ==========================================
+function skipToNextRelevantNote() {
+    if (!isMidiLearnMode) return;
+    
+    clearAllDrumHighlights();
+    expectedNotes.clear();
+    
+    const TIME_TOLERANCE = 0.001;
+    let foundRelevantNote = false;
+    
+    let tempIndex = currentLearningIndex - 1;
+    const currentTime = parsedNotes[tempIndex]?.startSec;
+    
+    while (tempIndex > 0 && Math.abs(parsedNotes[tempIndex - 1]?.startSec - currentTime) < TIME_TOLERANCE) {
+        tempIndex--;
+    }
+    
+    currentLearningIndex = tempIndex;
+    
+    while (currentLearningIndex < parsedNotes.length && !foundRelevantNote) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+        const notesInStep = [];
+        
+        const stepStartIndex = currentLearningIndex;
+        while (currentLearningIndex < parsedNotes.length && 
+               Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+            notesInStep.push(parsedNotes[currentLearningIndex]);
+            currentLearningIndex++;
+        }
+        
+        const filteredNotes = notesInStep.filter(note => 
+            !note.isRest &&
+            !note.isTiedContinuation &&
+            (handFilterMode === 'both' || 
+            (handFilterMode === 'cymbals' && isCymbal(note.drumKey)) ||
+            (handFilterMode === 'drums' && !isCymbal(note.drumKey)))
+        );
+        
+        if (filteredNotes.length > 0) {
+            foundRelevantNote = true;
+            
+            osmd.cursor.reset();
+            let cursorTime = -1;
+            for (let i = 0; i < stepStartIndex; i++) {
+                if (parsedNotes[i].startSec !== cursorTime) {
+                    osmd.cursor.next();
+                    cursorTime = parsedNotes[i].startSec;
+                }
+            }
+            
+            const uniqueDrums = new Set();
+            filteredNotes.forEach(note => {
+                if (!uniqueDrums.has(note.drumKey)) {
+                    uniqueDrums.add(note.drumKey);
+                    expectedNotes.add(note.drumKey);
+                    highlightDrumPad(note.drumKey, note.durSec, true);
+                }
+            });
+            
+            console.log(`Saltando a notas relevantes (${handFilterMode}):`, Array.from(expectedNotes));
+        } else {
+            osmd.cursor.next();
+        }
+    }
+    
+    if (!foundRelevantNote) {
+        handleLearnModeCompletion();
+    }
+}
+
+// ==========================================
+// INICIALIZACIÓN DE MIDI
+// ==========================================
+function initMidiInput() {
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess()
+            .then(onMIDISuccess, onMIDIFailure);
+    } 
+}
+
+function onMIDISuccess(access) {
+    midiAccess = access;
+    let connectedInputs = new Map();
+
+    const handlePortChange = (port) => {
+        if (port.type !== 'input') return;
+
+        if (port.state === 'connected') {
+            console.log(`MIDI Conectado: ${port.name}`);
+            port.onmidimessage = onDrumMIDIMessage;
+            connectedInputs.set(port.id, port);
+        } else if (port.state === 'disconnected') {
+            console.log(`MIDI Desconectado: ${port.name}`);
+            connectedInputs.delete(port.id);
+        }
+
+        if (connectedInputs.size > 0) {
+            const firstDeviceName = connectedInputs.values().next().value.name;
+            updateMidiStatusLegend(firstDeviceName);
+        } else {
+            updateMidiStatusLegend(null);
+        }
+    };
+
+    midiAccess.onstatechange = (event) => handlePortChange(event.port);
+
+    const inputs = midiAccess.inputs.values();
+    for (const input of inputs) {
+        handlePortChange(input);
+    }
+}
+
+function onMIDIFailure() {
+    showModal("⚠️ No se pudo acceder a tus dispositivos MIDI. Asegúrate de dar permiso en el navegador.");
+    isMidiLearnMode = false;
+    midiLearnBtn.style.background = 'none';
+    playBtn.disabled = false;
+}
+
+// ==========================================
+// MANEJO DE MENSAJES MIDI
+// ==========================================
+function onDrumMIDIMessage(event) {
+    const command = event.data[0];
+    const midiNote = event.data[1];
+    const velocity = event.data.length > 2 ? event.data[2] : 0;
+
+    if (command === 144 && velocity > 0) {
+        const drumInfo = DRUM_MIDI_MAP[midiNote];
+        if (!drumInfo) {
+            console.log(`Nota MIDI ${midiNote} no mapeada en batería`);
+            return;
+        }
+        
+        const drumKey = drumInfo.key;
+        highlightMidiDrumPad(drumKey);
+        
+        if (isMidiLearnMode && expectedNotes.size > 0) {
+            if (expectedNotes.has(drumKey)) {
+                const pitch = drumKeyToTonePitch(drumKey);
+                sampler.triggerAttackRelease(pitch, '8n');
+                expectedNotes.delete(drumKey);
+                console.log(`¡Correcto! ${drumInfo.name}. Faltan ${expectedNotes.size}.`);
+                
+                if (expectedNotes.size === 0) {
+                    if (currentLearningIndex > 0) {
+                        advanceLearningStep();
+                    } else {
+                        prepareFirstLearningStep();
+                    }
+                }
+            } else {
+                console.log(`Nota ${drumInfo.name} no está en expectedNotes:`, Array.from(expectedNotes));
+            }
+        }
+    } else if (command === 128 || (command === 144 && velocity === 0)) {
+        const drumInfo = DRUM_MIDI_MAP[midiNote];
+        if (drumInfo) {
+            unhighlightMidiDrumPad(drumInfo.key);
+        }
+    }
+}
+
+function highlightMidiDrumPad(drumKey) {
+    const el = document.getElementById(drumKey);
+    if (el) {
+        el.classList.add('midi-active');
+    }
+}
+
+function unhighlightMidiDrumPad(drumKey) {
+    const el = document.getElementById(drumKey);
+    if (el) {
+        el.classList.remove('midi-active');
+    }
+}
+
+// ==========================================
+// CONVERSIÓN DE NOTA MIDI A NOMBRE
+// ==========================================
+function midiNoteToPitchName(midiNote) {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const octave = Math.floor(midiNote / 12) - 1;
+    const noteName = noteNames[midiNote % 12];
+    return noteName + octave;
+}
+  </script>
+</body>
+</html>   
