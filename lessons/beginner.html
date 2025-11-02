@@ -953,9 +953,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`Cargando archivo desde URL: ${dynamicUrl}`);
         await loadMusicXMLFromUrl(dynamicUrl); // Esto habilita el playBtn
 
-        // --- INICIO DE CÓDIGO NUEVO ---
-        // Iniciar el modo de aprendizaje por defecto después de una breve espera
-        
         setTimeout(() => {
             if (!midiAccess || midiAccess.inputs.size === 0) {
                 // Si no hay MIDI, muestra el modal pero no actives el modo
@@ -988,6 +985,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // 3. Preparar el primer paso
                 prepareFirstLearningStep(); 
                 showModal("Modo de aprendizaje: Mano Derecha", 2000);
+                updateStaffOpacity('right');
             }
         }, 500); // 500ms de espera para que MIDI se estabilice
         // --- FIN DE CÓDIGO NUEVO ---
@@ -1826,6 +1824,56 @@ function highlightKeyInstant(noteName, hand) {
     el.classList.add(highlightClass);
 }
 
+
+
+function updateStaffOpacity(mode) {
+    if (!osmd || !osmd.graphic) {
+        console.warn("OSMD no está listo.");
+        return;
+    }
+    
+    const svgContainer = osmdContainer.querySelector('svg');
+    if (!svgContainer) return;
+    
+    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
+    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
+    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+    
+    const staffLineContainers = allGroups.filter(group => {
+        // Contar cuántos sub-grupos con 5+ paths tiene
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
+        });
+        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+        return staffCount > 1;
+    });
+    
+    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
+    
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
+        
+        switch (mode) {
+            case 'right':
+                container.style.opacity = isTreble ? '1' : '0.2';
+                break;
+            case 'left':
+                container.style.opacity = isTreble ? '0.2' : '1';
+                break;
+            case 'both':
+            default:
+                container.style.opacity = '1';
+                break;
+        }
+        container.style.transition = 'opacity 0.3s ease';
+        
+        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
+    });
+}
+
 function normalizeNote(noteName) {
     const flatToSharp = {
         // Bemoles simples
@@ -1980,6 +2028,8 @@ function showConfetti(count = 100) {
   }
 }
 
+
+
 function toggleMidiLearnMode() {
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
         showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
@@ -2003,11 +2053,18 @@ function toggleMidiLearnMode() {
             color: "rgba(52, 152, 219, 0.7)"
         });
         
-        handFilterMode = 'both';
-        rightHandOnlyBtn.style.background = 'none';
+        // MODIFICAR AQUÍ: Siempre iniciar con mano derecha
+        handFilterMode = 'right';
+        rightHandOnlyBtn.style.background = '#e0e0e0';
+        rightHandOnlyBtn.style.color = '#3498db';
         leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
 
         prepareFirstLearningStep(); 
+        updateStaffOpacity('right'); // AGREGAR esta línea
+        
+        // AGREGAR: Mostrar modal de inicio
+        showModal("Modo de aprendizaje: Mano Derecha", 2000);
         
     } else {
         midiLearnBtn.style.background = 'none';
@@ -2024,8 +2081,11 @@ function toggleMidiLearnMode() {
         });
 
         handFilterMode = 'both';
+        updateStaffOpacity('both');
         rightHandOnlyBtn.style.background = 'none';
         leftHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
     }
 }
 
@@ -2040,6 +2100,9 @@ function handleLearnModeCompletion() {
         leftHandOnlyBtn.style.color = '#3498db';
         rightHandOnlyBtn.style.background = 'none';
         rightHandOnlyBtn.style.color = '#1a1a1a';
+
+        // AGREGAR ESTA LÍNEA:
+        updateStaffOpacity('left');
 
         // Resetear la pieza
         currentLearningIndex = 0;
@@ -2056,6 +2119,9 @@ function handleLearnModeCompletion() {
         rightHandOnlyBtn.style.color = '#1a1a1a';
         leftHandOnlyBtn.style.color = '#1a1a1a';
 
+        // AGREGAR ESTA LÍNEA:
+        updateStaffOpacity('both');
+
         // Resetear la pieza
         currentLearningIndex = 0;
         osmd.cursor.reset();
@@ -2065,7 +2131,12 @@ function handleLearnModeCompletion() {
         // Modo final: ya completó todo
         showSuccessModal("¡Felicidades, has completado la pieza!");
         showConfetti(200);
-        toggleMidiLearnMode(); // Desactivamos
+
+        setTimeout(() => {
+            window.parent.postMessage('siguienteActividad', 'https://www.mozart-app.com/lessons3');
+        }, 3000);
+
+        toggleMidiLearnMode();
     }
 }
 
@@ -2144,6 +2215,8 @@ function toggleRightHandOnly() {
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
   }
+
+  updateStaffOpacity(handFilterMode);
   
   // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
@@ -2169,6 +2242,8 @@ function toggleLeftHandOnly() {
     rightHandOnlyBtn.style.background = 'none';
     rightHandOnlyBtn.style.color = '#1a1a1a';
   }
+
+  updateStaffOpacity(handFilterMode);
   
   // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
