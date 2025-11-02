@@ -1038,7 +1038,7 @@ display: flex;
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
   <script>
-    // ==========================================
+   // ==========================================
 // CONSTANTES Y CONFIGURACIÓN DE BATERÍA
 // ==========================================
 const DRUM_MIDI_MAP = {
@@ -1347,23 +1347,36 @@ function formatTime(seconds) {
 // ==========================================
 async function loadMusicXMLFromUrl(url) {
     try {
+        console.log('Cargando MusicXML desde:', url);
         const response = await fetch(url);
         if (!response.ok) throw new Error('Error de red');
         const text = await response.text();
+        
+        console.log('MusicXML cargado, tamaño:', text.length, 'bytes');
+        
         await osmd.load(text);
         osmdContainer.innerHTML = ''; 
 
         setupEngravingRulesForScreenSize();
         
         await osmd.render();
+        console.log('Partitura renderizada');
+        
         populateMeasureSelector();
         
         parseDrumMusicXML(text);
+        
+        if (parsedNotes.length === 0) {
+            playBtn.disabled = true;
+            return;
+        }
+        
         scheduleDrumNotesOnTransport();
 
         playBtn.disabled = false;
         setStatus('');
     } catch (err) {
+        console.error('Error al cargar MusicXML:', err);
         setStatus(`Error: ${err.message}`);
     }
 }
@@ -1388,15 +1401,30 @@ function parseDrumMusicXML(xmlText) {
     xml.querySelectorAll('part').forEach((part, partIndex) => {
         let currentBeat = 0;
 
+        // DETECCIÓN MEJORADA: Buscar cualquier parte que tenga unpitched o clef percussion
         const partName = part.getAttribute('id') || '';
+        const hasUnpitched = part.querySelector('unpitched');
+        const hasPercussionClef = part.querySelector('clef[sign="percussion"]');
+        const hasInstrument = part.querySelector('instrument');
+        
         const isDrumPart = partName.toLowerCase().includes('drums') || 
                           partName.toLowerCase().includes('percussion') ||
-                          part.querySelector('measure[number="1"] clef[sign="percussion"]');
+                          hasPercussionClef ||
+                          hasUnpitched;
+        
+        console.log(`Analizando parte ${partName}:`, {
+            hasUnpitched: !!hasUnpitched,
+            hasPercussionClef: !!hasPercussionClef,
+            hasInstrument: !!hasInstrument,
+            isDrumPart
+        });
         
         if (!isDrumPart) {
             console.log(`Saltando parte ${partName} - No es batería`);
             return;
         }
+        
+        console.log(`✓ Procesando parte de batería: ${partName}`);
 
         const measures = part.querySelectorAll('measure');
         measures.forEach((measure, measureIndex) => {
@@ -1423,6 +1451,7 @@ function parseDrumMusicXML(xmlText) {
                         const instrumentId = node.querySelector('instrument')?.getAttribute('id');
                         if (instrumentId) {
                             drumKey = mapInstrumentIdToDrumKey(instrumentId);
+                            if (drumKey) console.log(`Nota via instrument ID ${instrumentId} -> ${drumKey}`);
                         }
                         
                         // Prioridad 2: Buscar <unpitched>
@@ -1431,6 +1460,7 @@ function parseDrumMusicXML(xmlText) {
                             const displayOctave = node.querySelector('unpitched display-octave')?.textContent?.trim();
                             if (displayStep && displayOctave) {
                                 drumKey = mapDisplayToDrumKey(displayStep, displayOctave);
+                                if (drumKey) console.log(`Nota via unpitched ${displayStep}${displayOctave} -> ${drumKey}`);
                             }
                         }
                         
@@ -1440,7 +1470,16 @@ function parseDrumMusicXML(xmlText) {
                             const octave = node.querySelector('pitch octave')?.textContent?.trim();
                             if (step && octave) {
                                 drumKey = mapDisplayToDrumKey(step, octave);
+                                if (drumKey) console.log(`Nota via pitch ${step}${octave} -> ${drumKey}`);
                             }
+                        }
+                        
+                        if (!drumKey) {
+                            console.warn('No se pudo determinar drumKey para esta nota:', {
+                                hasInstrument: !!node.querySelector('instrument'),
+                                hasUnpitched: !!node.querySelector('unpitched'),
+                                hasPitch: !!node.querySelector('pitch')
+                            });
                         }
                         
                         if (drumKey) {
@@ -1519,6 +1558,13 @@ function parseDrumMusicXML(xmlText) {
     const lastNote = parsedNotes[parsedNotes.length - 1];
     totalDuration = lastNote ? lastNote.startSec + lastNote.durSec : 0;
     totalTimeSpan.textContent = formatTime(totalDuration);
+    
+    console.log(`✓ Parser completado: ${parsedNotes.length} notas encontradas, duración: ${totalDuration}s`);
+    
+    if (parsedNotes.length === 0) {
+        console.error('⚠️ ADVERTENCIA: No se encontraron notas de batería en el archivo');
+        setStatus('Error: No se encontraron notas de batería en este archivo MusicXML');
+    }
 }
 
 // ==========================================
@@ -1549,28 +1595,55 @@ function mapInstrumentIdToDrumKey(instrumentId) {
 
 function mapDisplayToDrumKey(step, octave) {
     const notation = `${step}${octave}`;
+    
+    // Mapeo extendido para cubrir más posibilidades
     const drumMap = {
+        // Platos
         'F5': 'crash',
         'E5': 'crash',
         'C5': 'ride',
         'D5': 'ride',
-        'A4': 'tom-high',
-        'G4': 'tom-high',
-        'F4': 'tom-mid',
+        'B5': 'crash',
+        'A5': 'crash',
+        
+        // Hi-hats
+        'G4': 'hihat-closed',
+        'F#4': 'hihat-closed',
+        'A#4': 'hihat-open',
+        'B4': 'hihat-open',
+        'G#4': 'hihat-open',
+        'A4': 'hihat-open',
+        
+        // Toms
+        'A3': 'tom-high',
+        'F4': 'tom-high',
         'E4': 'tom-mid',
-        'D4': 'tom-low',
+        'D4': 'tom-mid',
         'C4': 'tom-low',
-        'B3': 'hihat-open',
-        'G3': 'hihat-closed',
-        'A3': 'hihat-closed',
-        'C3': 'snare',
+        'A2': 'tom-low',
+        
+        // Caja
         'E3': 'snare',
+        'C3': 'snare',
+        'D3': 'snare',
+        
+        // Hi-hat (posiciones alternativas)
+        'B3': 'hihat-closed',
+        'A3': 'hihat-closed',
+        
+        // Bombo
         'F3': 'kick',
         'C2': 'kick',
-        'D2': 'kick'
+        'D2': 'kick',
+        'E2': 'kick',
+        'F2': 'kick'
     };
     
-    return drumMap[notation] || 'snare';
+    const result = drumMap[notation];
+    if (!result) {
+        console.warn(`Notación ${notation} no mapeada, usando snare por defecto`);
+    }
+    return result || 'snare';
 }
 
 // ==========================================
@@ -2265,6 +2338,15 @@ function prepareFirstLearningStep() {
     clearAllDrumHighlights();
     expectedNotes.clear();
 
+    console.log(`Preparando primer paso. Index: ${currentLearningIndex}, Total notas: ${parsedNotes.length}`);
+
+    if (parsedNotes.length === 0) {
+        console.error('No hay notas parseadas para el modo aprendizaje');
+        showModal("❌ No se encontraron notas de batería en este archivo.");
+        toggleMidiLearnMode();
+        return;
+    }
+
     if (currentLearningIndex >= parsedNotes.length) {
         handleLearnModeCompletion();
         return;
@@ -2305,12 +2387,13 @@ function prepareFirstLearningStep() {
                 }
             }
             
-            console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+            console.log(`✓ Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
         }
     }
 
     if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
-        alert("¡No hay notas para el filtro seleccionado en esta pieza!");
+        console.warn(`No se encontraron notas para el filtro ${handFilterMode}`);
+        showModal(`❌ No hay notas de ${handFilterMode === 'drums' ? 'tambores' : 'platos'} en esta pieza.`);
         toggleMidiLearnMode();
     }
 }
