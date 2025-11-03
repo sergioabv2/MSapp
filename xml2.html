@@ -541,12 +541,29 @@ display: flex;
 }
 
 
-@media (max-width: 768px) {
+ /* Mobile adjustments - ESCALADO PARA MÓVILES */
+    @media (max-width: 768px) {
+   
+      
       /* Aplicamos zoom automático en móviles */
       .mobile-zoom {
         transform: scale(0.85);
         transform-origin: top center;
       }
+      
+      .key.white {
+        width: 13px;
+        height: 75px;
+      }
+      
+      .key.black {
+        width: 8px;
+        height: 48px;
+        margin-left: -4px;
+        margin-right: -4px;
+      }
+      
+   
     }
     
     @media (max-width: 500px) {
@@ -564,10 +581,10 @@ display: flex;
       }
 
       #tools-toggle-btn,
-      #secondary-top-bar {
-        display: none; 
-      }
-    }
+  #secondary-top-bar {
+    display: none; 
+  }
+  }
 
    @media (max-width: 440px) {
        #time-display{
@@ -1001,12 +1018,12 @@ const successModalCloseBtn = document.getElementById('success-modal-close-btn');
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
 
-    // Después de las variables existentes
+
 let waterfallCanvas, waterfallCtx;
 let waterfallAnimationId;
 let pixelsPerSecond = 100;
-const whiteKeyWidth = 16;
-const blackKeyWidth = 10;
+let whiteKeyWidth = 16; // Ya no es const
+let blackKeyWidth = 10; // Ya no es const
 let waterfallScrollOffset = 0;
 
     // Script: al inicio, junto a las otras constantes
@@ -1024,21 +1041,44 @@ function initWaterfallCanvas() {
   waterfallCanvas = document.getElementById('waterfall-canvas');
   if (!waterfallCanvas) return;
   
-  waterfallCtx = waterfallCanvas.getContext('2d');
+  waterfallCtx = waterfallCanvas.getContext('2d');  
+  resizeWaterfallCanvas();
+  updateKeyDimensions()
+  window.addEventListener('resize', resizeWaterfallCanvas);
+}
+
+
+
+function resizeWaterfallCanvas() {
+  if (!waterfallCanvas) return;
   
-  function resizeWaterfallCanvas() {
-    const container = pianoContainer;
-    const dpr = window.devicePixelRatio || 1;
-    
-    waterfallCanvas.width = container.clientWidth * dpr;
-    waterfallCanvas.height = (container.clientHeight - 102) * dpr;
-    
-    waterfallCanvas.style.width = `${container.clientWidth}px`;
-    waterfallCanvas.style.height = `${container.clientHeight - 102}px`;
+  // Actualizar los tamaños de las teclas desde el DOM
+  updateKeyDimensions();
+  
+  const container = pianoContainer;
+  const dpr = window.devicePixelRatio || 1;
+  
+  waterfallCanvas.width = window.innerWidth * dpr;
+  waterfallCanvas.height = (container.clientHeight - 102) * dpr;
+  
+  waterfallCanvas.style.width = `${window.innerWidth}px`;
+  waterfallCanvas.style.height = `${container.clientHeight - 102}px`;
+}
+
+
+function updateKeyDimensions() {
+  // Leer el tamaño real de las teclas del DOM
+  const whiteKey = document.querySelector('.key.white');
+  const blackKey = document.querySelector('.key.black');
+  
+  if (whiteKey) {
+    whiteKeyWidth = whiteKey.offsetWidth;
+  }
+  if (blackKey) {
+    blackKeyWidth = blackKey.offsetWidth;
   }
   
-  resizeWaterfallCanvas();
-  window.addEventListener('resize', resizeWaterfallCanvas);
+  console.log(`Tamaños actualizados: white=${whiteKeyWidth}px, black=${blackKeyWidth}px`);
 }
 
 function getKeyXPosition(midiNote) {
@@ -1120,7 +1160,8 @@ function drawWaterfall() {
   const canvasHeight = waterfallCanvas.height / dpr;
   const totalWhiteKeys = 52;
   const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
-  const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 - 16; // Ajuste hacia la izquierda
+  const offset = whiteKeyWidth === 16 ? -16 : -12; // -16 para full, -12 para reducido
+const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
   
   // Patrón corregido empezando desde A
   const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1]; // A A# B C C# D D# E F F# G G#
@@ -1246,6 +1287,7 @@ function createNoteFlashPiano(noteName, hand) {
   setStatus('Inicializando...');
   initOSMD();
   createPiano88Keys();
+  updateKeyDimensions();
   addEventListeners();
   initSampler();
   initMidiInput();
@@ -1260,8 +1302,10 @@ function createNoteFlashPiano(noteName, hand) {
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
+
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
+
   } else {
     setStatus('Error: No se ha especificado ningún archivo para cargar. Añade "?file=tu-archivo.musicxml" a la URL.');
     playBtn.disabled = true; 
@@ -1844,16 +1888,20 @@ speedDownBtn.addEventListener('click', () => {
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
       
       // Redimensionar ventana
-      window.addEventListener('resize', () => {
-        const newIsMobile = window.innerWidth <= 768;
-        if (newIsMobile !== isMobile) {
-          isMobile = newIsMobile;
-          if (osmd) {
-            setupEngravingRulesForScreenSize();
-            osmd.render();
-          }
-        }
-      });
+window.addEventListener('resize', () => {
+  const newIsMobile = window.innerWidth <= 768;
+  if (newIsMobile !== isMobile) {
+    isMobile = newIsMobile;
+    if (osmd) {
+      setupEngravingRulesForScreenSize();
+      osmd.render();
+    }
+  }
+  // Redimensionar el canvas del waterfall con los nuevos tamaños de teclas
+  if (waterfallCanvas) {
+    resizeWaterfallCanvas();
+  }
+});
       
  cursorBtn.addEventListener('click', toggleCursorType);
   fullscreenBtn.addEventListener('click', toggleFullScreen);
