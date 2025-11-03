@@ -237,6 +237,77 @@
   text-align: center;
   display: block;
 }
+
+
+
+    #text-note-display {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: rgba(26, 26, 26, 0.85);
+      padding: 20px 30px;
+      border-radius: 12px;
+      border: 1px solid #444;
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      min-width: 180px;
+    }
+
+    #note-text {
+      font-size: 32px;
+      font-weight: 300;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      color: #fff;
+      letter-spacing: 2px;
+      text-align: center;
+      display: block;
+    }
+
+    /* Nuevo display de pentagrama a la derecha */
+    #staff-display {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: rgba(26, 26, 26, 0.85);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #444;
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      height: 130px; /* Ajusta este valor según necesites */
+  overflow: hidden; 
+    }
+
+    #staff-svg {
+      display: block;
+      /* Ajustar tamaño si es necesario */
+    }
+
+    /* Estilos para los elementos del pentagrama */
+    .staff-line {
+      stroke: #888;
+      stroke-width: 1;
+    }
+    .ledger-line {
+      stroke: #aaa;
+      stroke-width: 1;
+    }
+    .note-head {
+      fill: #fff;
+    }
+    .note-accidental {
+      fill: #fff;
+      font-size: 28px;
+      font-family: serif;
+    }
+    .clef {
+      fill: #fff;
+      font-size: 70px; /* Clave de Sol */
+      font-family: serif;
+    }
+    .bass-clef {
+      font-size: 40px; /* Clave de Fa */
+    }
     
     /* Mobile Adjustments */
     @media (max-width: 768px) {
@@ -295,6 +366,10 @@
   <span id="note-text">---</span>
 </div>
 
+<div id="staff-display">
+<svg id="staff-svg" width="200" height="150"></svg>
+</div>
+
   <div id="midi-status">
     <i class="ri-plug-line"></i>
     <span id="midi-device-name">MIDI Conectado</span>
@@ -348,6 +423,15 @@
 '0,3,6,9': { name: 'Diminished 7th', short: 'dim7' }, 
 '0,3,6,10': { name: 'Half-Diminished 7th', short: 'm7b5' } 
 };
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+ const staffSvg = document.getElementById('staff-svg');
+ const STAFF_LINE_GAP = 10; 
+ const STAFF_Y_TOP = 40;
+
+ const NOTE_STAFF_OFFSET = { 
+'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 
+ };
     
     // === INICIALIZACIÓN ===
     document.addEventListener('DOMContentLoaded', async () => {
@@ -804,7 +888,158 @@ function updateNoteDisplay() {
     const chord = getChordName(activeNoteNames);
     noteText.textContent = chord;
   }
+
+  if (activeNoteNames.length > 0) {
+    drawNotesOnStaff(activeNoteNames);
+     } else {
+    clearStaff();
+    drawStaffLines();
+    drawClef(true); 
+    }
 }
+
+
+
+// === LÓGICA DE DIBUJO DEL PENTAGRAMA ===
+
+  function createSvgElement(name, attributes) {
+    const el = document.createElementNS(SVG_NAMESPACE, name);
+    for (let key in attributes) {
+      el.setAttribute(key, attributes[key]);
+    }
+    return el;
+  }
+
+  // Limpia el pentagrama
+  function clearStaff() {
+    staffSvg.innerHTML = '';
+  }
+
+  // Dibuja las 5 líneas del pentagrama
+  function drawStaffLines() {
+    for (let i = 0; i < 5; i++) {
+      const y = STAFF_Y_TOP + (i * STAFF_LINE_GAP);
+      const line = createSvgElement('line', {
+        x1: 10, y1: y, x2: 190, y2: y,
+        class: 'staff-line'
+      });
+      staffSvg.appendChild(line);
+    }
+  }
+
+  // Dibuja la clave (Sol o Fa)
+  function drawClef(isTreble) {
+    if (isTreble) {
+      // Clave de Sol 𝄞 (G-Clef)
+      const clef = createSvgElement('text', {
+        x: 15, y: STAFF_Y_TOP + STAFF_LINE_GAP * 3 + 4, // Centrada en la línea G4
+        class: 'clef'
+      });
+      clef.textContent = '𝄞';
+      staffSvg.appendChild(clef);
+    } else {
+      // Clave de Fa 𝄢 (F-Clef)
+      const clef = createSvgElement('text', {
+        x: 15, y: STAFF_Y_TOP + STAFF_LINE_GAP + 14, // Centrada en la línea F3
+        class: 'clef bass-clef'
+      });
+      clef.textContent = '𝄢';
+      staffSvg.appendChild(clef);
+    }
+  }
+
+  // Dibuja una sola nota en el pentagrama
+  function drawSingleNote(midi, xPos, isTreble) {
+    const octave = Math.floor(midi / 12) - 1;
+    const noteIndex = midi % 12;
+    const noteName = NOTE_NAMES[noteIndex];
+    const noteLetter = noteName[0];
+    const hasAccidental = noteName.includes('#');
+    
+let yBase, refMidi, refSteps;
+
+if (isTreble) {
+  // Treble: B4 está en la línea del medio (3era línea)
+  yBase = STAFF_Y_TOP + (STAFF_LINE_GAP * 2); // Línea del medio
+  refMidi = 71; // B4
+  refSteps = (4 * 7) + NOTE_STAFF_OFFSET['B'];
+} else {
+  // Bass: D3 está en la línea del medio (3era línea)
+  yBase = STAFF_Y_TOP + (STAFF_LINE_GAP * 2);
+  refMidi = 50; // D3
+  refSteps = (3 * 7) + NOTE_STAFF_OFFSET['D'];
+}
+
+const note_steps = (octave * 7) + NOTE_STAFF_OFFSET[noteLetter];
+const steps_from_ref = note_steps - refSteps;
+
+// Calcular Y: cada "paso" musical baja medio espacio (GAP/2)
+const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
+    
+    // 3. Dibujar alteración (sostenido/bemol) si es necesario
+    if (hasAccidental) {
+      const accidental = createSvgElement('text', {
+        x: xPos - 22, // Un poco a la izquierda de la nota
+        y: y + 9, // Alinear verticalmente
+        class: 'note-accidental'
+      });
+      accidental.textContent = '♯';
+      staffSvg.appendChild(accidental);
+    }
+    
+    // 4. Dibujar la cabeza de la nota
+    const noteHead = createSvgElement('ellipse', {
+      cx: xPos, cy: y, rx: 7, ry: 5, // Óvalo
+      class: 'note-head'
+    });
+    staffSvg.appendChild(noteHead);
+    
+    // 5. Dibujar líneas adicionales (ledger lines)
+    // Si está por encima de F5 (y=20) o por debajo de E4 (y=60) en Clave de Sol
+    const trebleTopLineY = STAFF_Y_TOP; // F5
+    const trebleBottomLineY = STAFF_Y_TOP + (STAFF_LINE_GAP * 4); // E4
+    
+    // Líneas adicionales abajo (C4, A3, etc.)
+    for (let yLedger = trebleBottomLineY + STAFF_LINE_GAP; yLedger <= y; yLedger += STAFF_LINE_GAP) {
+      drawLedgerLine(xPos, yLedger);
+    }
+    // Líneas adicionales arriba (A5, C6, etc.)
+    for (let yLedger = trebleTopLineY - STAFF_LINE_GAP; yLedger >= y; yLedger -= STAFF_LINE_GAP) {
+      drawLedgerLine(xPos, yLedger);
+    }
+  }
+
+  function drawLedgerLine(x, y) {
+    const line = createSvgElement('line', {
+      x1: x - 12, y1: y, x2: x + 12, y2: y, // Corta
+      class: 'ledger-line'
+    });
+    staffSvg.appendChild(line);
+  }
+
+  // Función principal que orquesta el dibujo
+  function drawNotesOnStaff(notes) {
+    clearStaff();
+    drawStaffLines();
+
+    const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
+    if (midis.length === 0) return;
+
+    // Decidir la clave: Si la nota MÁS BAJA es C4 (60) o más, usa Clave de Sol.
+    // Si es B3 (59) o menos, usa Clave de Fa.
+    const lowestMidi = midis[0];
+    const useTrebleClef = lowestMidi >= 60; 
+    
+    drawClef(useTrebleClef);
+    
+    // Dibujar cada nota
+    let xPos = 80; // Posición X inicial para la primera nota
+    const xGap = 20; // Espacio entre notas
+    
+    midis.forEach((midi, index) => {
+      drawSingleNote(midi, xPos + (index * xGap), useTrebleClef);
+    });
+  }
     
     function showKeyNamesOnPiano() {
       const whiteKeys = document.querySelectorAll('.key.white');
