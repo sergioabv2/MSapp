@@ -234,6 +234,26 @@
 }
     
 
+@keyframes keyPulse {
+  0% { 
+    filter: brightness(1.5);
+    transform: translateY(0);
+  }
+  50% {
+    filter: brightness(2);
+    transform: translateY(2px);
+  }
+  100% { 
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+}
+
+.key.active-treble,
+.key.active-bass {
+  animation: keyPulse 0.15s ease-out;
+}
+
 #waterfall-canvas {
   position: absolute;
   top: 0;
@@ -261,7 +281,7 @@
 .note-flash-piano {
   position: absolute;
   bottom: 102px;
-  width: 30px;
+  width: 20px;
   height: 12px;
   pointer-events: none;
   z-index: 4;
@@ -729,7 +749,7 @@ display: flex;
   /* Lo ponemos encima de los controles de velocidad móviles */
   bottom: 165px; 
   left: 10px;
-  z-index: 50;
+  z-index: 550;
   background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
   color: #fafafa;
   padding: 8px 12px;
@@ -1063,6 +1083,19 @@ function resizeWaterfallCanvas() {
   
   waterfallCanvas.style.width = `${window.innerWidth}px`;
   waterfallCanvas.style.height = `${container.clientHeight - 102}px`;
+  
+  // NUEVO: Ajustar pixelsPerSecond según la altura disponible
+  const availableHeight = container.clientHeight - 102;
+  
+  if (pianoContainer.classList.contains('waterfall-only')) {
+    // En modo waterfall-only, aumentar la velocidad para mostrar más notas
+    pixelsPerSecond = availableHeight / 6; // Muestra aproximadamente 6 segundos de música
+  } else {
+    // En modo normal, velocidad estándar
+    pixelsPerSecond = 100;
+  }
+  
+  console.log(`Altura disponible: ${availableHeight}px, pixelsPerSecond: ${pixelsPerSecond}`);
 }
 
 
@@ -1248,7 +1281,12 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
 }
 
 function animateWaterfall() {
-  if (Tone.Transport.state === 'started') {
+  if (isMidiLearnMode) {
+    // En modo aprendizaje, avanzar según las notas completadas
+    if (currentLearningIndex > 0) {
+      waterfallScrollOffset = parsedNotes[currentLearningIndex - 1].startSec;
+    }
+  } else if (Tone.Transport.state === 'started') {
     waterfallScrollOffset = Tone.Transport.seconds;
   }
   
@@ -1265,10 +1303,13 @@ function createNoteFlashPiano(noteName, hand) {
   
   const totalWhiteKeys = 52;
   const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
-  const pianoStartX = (window.innerWidth - pianoTotalWidth) / 2;
+  
+  // Usar el mismo offset que en drawWaterfall
+  const offset = whiteKeyWidth === 16 ? -16 : -12;
+  const pianoStartX = (window.innerWidth - pianoTotalWidth) / 2 + offset;
   
   const keyX = getKeyXPosition(midiNote);
-  const notePattern = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
+  const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1];
   const isBlack = notePattern[(midiNote - 21) % 12] === 1;
   const keyWidth = isBlack ? blackKeyWidth : whiteKeyWidth;
   const flashX = pianoStartX + keyX + (keyWidth / 2);
@@ -1967,7 +2008,6 @@ function toggleKeyNames() {
   console.log(`Mostrar nombres de teclas: ${showKeyNames}`);
 }
 
-// Función para cambiar entre los 3 modos del piano
 function togglePianoView() {
     // Ciclo: full -> waterfall-only -> piano-only -> full
     if (pianoViewMode === 'full') {
@@ -1989,9 +2029,13 @@ function togglePianoView() {
         pianoBtn.style.backgroundColor = 'transparent';
     }
     
+    // NUEVO: Recalcular el tamaño del canvas y pixelsPerSecond
+    setTimeout(() => {
+        resizeWaterfallCanvas();
+    }, 100);
+    
     console.log('Piano View Mode:', pianoViewMode);
 }
-
 // Función para mostrar nombres en las teclas blancas
 function showKeyNamesOnPiano() {
   const whiteKeys = document.querySelectorAll('.key.white');
@@ -2361,23 +2405,24 @@ function toggleMidiLearnMode() {
         prepareFirstLearningStep(); 
         
     } else {
-        midiLearnBtn.style.background = 'none';
-        playBtn.disabled = false;
-        clearAllHighlights(); 
-        osmd.cursor.reset();
-        osmd.cursor.hide();
-        
-        cursorBtn.style.color = '#1a1a1a';
-        Object.assign(osmd.cursor.cursorOptions, {
-            type: 1,
-            alpha: 0.8,
-            color: "rgba(52, 152, 219, 0.8)"
-        });
+    midiLearnBtn.style.background = 'none';
+    playBtn.disabled = false;
+    clearAllHighlights(); 
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    
+    cursorBtn.style.color = '#1a1a1a';
+    Object.assign(osmd.cursor.cursorOptions, {
+        type: 1,
+        alpha: 0.8,
+        color: "rgba(52, 152, 219, 0.8)"
+    });
 
-        handFilterMode = 'both';
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-    }
+    handFilterMode = 'both';
+    updateStaffOpacity('both'); // NUEVO: Restaurar opacidad normal
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+}
 }
 
 
@@ -2441,6 +2486,55 @@ function prepareFirstLearningStep() {
   }
 }
 
+
+function updateStaffOpacity(mode) {
+    if (!osmd || !osmd.graphic) {
+        console.warn("OSMD no está listo.");
+        return;
+    }
+    
+    const svgContainer = osmdContainer.querySelector('svg');
+    if (!svgContainer) return;
+    
+    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
+    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
+    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+    
+    const staffLineContainers = allGroups.filter(group => {
+        // Contar cuántos sub-grupos con 5+ paths tiene
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
+        });
+        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+        return staffCount > 1;
+    });
+    
+    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
+    
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
+        
+        switch (mode) {
+            case 'right':
+                container.style.opacity = isTreble ? '1' : '0.2';
+                break;
+            case 'left':
+                container.style.opacity = isTreble ? '0.2' : '1';
+                break;
+            case 'both':
+            default:
+                container.style.opacity = '1';
+                break;
+        }
+        container.style.transition = 'opacity 0.3s ease';
+        
+        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
+    });
+}
+
 function toggleRightHandOnly() {
   if (handFilterMode === 'right') {
     // Si ya está activo, desactivar
@@ -2457,6 +2551,9 @@ function toggleRightHandOnly() {
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
   }
+
+  // NUEVO: Actualizar opacidad de los pentagramas
+  updateStaffOpacity(handFilterMode);
   
   // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
@@ -2482,6 +2579,9 @@ function toggleLeftHandOnly() {
     rightHandOnlyBtn.style.background = 'none';
     rightHandOnlyBtn.style.color = '#1a1a1a';
   }
+
+  // NUEVO: Actualizar opacidad de los pentagramas
+  updateStaffOpacity(handFilterMode);
   
   // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
@@ -2692,6 +2792,7 @@ function onMIDIMessage(event) {
             if (expectedNotes.has(normalizedMidiNote)) {
                 sampler.triggerAttackRelease(pitchName, '8n');
                 expectedNotes.delete(normalizedMidiNote);
+                createNoteFlashPiano(pitchName, 'treble');
                 console.log(`¡Correcto! Nota ${pitchName} (normalizada: ${normalizedMidiNote}). Faltan ${expectedNotes.size}.`);
                 
                 if (expectedNotes.size === 0) {
