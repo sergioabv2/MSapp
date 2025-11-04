@@ -1636,11 +1636,10 @@ color: white;
         <i class="fas fa-language"></i>
     </button>
 
-    <button class="tool-btn" 
-            ng-click="setAnnotationMode('erase')"
-            ng-class="{'active-tool': annotations.mode === 'erase'}">
-        <i class="fas fa-eraser"></i>
-    </button>
+   <button class="tool-btn" 
+        ng-click="undoLastAnnotation()">
+    <i class="fas fa-undo"></i>
+</button>
 
     <button class="tool-btn" 
             ng-click="clearAnnotations()">
@@ -2500,6 +2499,7 @@ $scope.annotations = {
     annotations: [],
     textAnnotations: [],
     strokeAnnotations: [],
+    undoStack: [],
 
     textInput: {
         active: false,
@@ -2561,10 +2561,38 @@ $scope.clearAnnotations = function() {
         $scope.annotations.annotations = [];
         $scope.annotations.textAnnotations = [];
         $scope.annotations.strokeAnnotations = [];
+        $scope.annotations.undoStack = []; // <-- AÑADE ESTA LÍNEA
         redrawAllAnnotations();
     }
 };
 
+$scope.undoLastAnnotation = function() {
+    // 1. Saca la última acción del historial
+    const lastAction = $scope.annotations.undoStack.pop();
+    if (!lastAction) return; // No hay nada que deshacer
+
+    let targetArray;
+
+    // 2. Determina de qué arreglo debemos borrarla
+    if (lastAction.type === 'draw') {
+        targetArray = $scope.annotations.annotations;
+    } else if (lastAction.type === 'stroke') {
+        targetArray = $scope.annotations.strokeAnnotations;
+    } else if (lastAction.type === 'text') {
+        targetArray = $scope.annotations.textAnnotations;
+    }
+
+    // 3. Busca y elimina la anotación específica de su arreglo
+    if (targetArray) {
+        const index = targetArray.indexOf(lastAction.data);
+        if (index > -1) {
+            targetArray.splice(index, 1);
+        }
+    }
+
+    // 4. Vuelve a dibujar todo
+    redrawAllAnnotations();
+};
 
 $scope.finalizeTextInput = function() {
 const input = $scope.annotations.textInput;
@@ -2572,13 +2600,15 @@ if (input.active && input.value.trim()) {
 const normalizedX = input.x_norm;
 const normalizedY = input.y_norm;
 
-$scope.annotations.textAnnotations.push({
-text: input.value,
-x: normalizedX, 
-y: normalizedY, 
-color: 'rgba(231, 76, 60, 1.0)',
-font: 'bold 18px sans-serif'
-});
+const newText = {
+        text: input.value,
+        x: normalizedX, 
+        y: normalizedY, 
+        color: 'rgba(231, 76, 60, 1.0)',
+        font: 'bold 18px sans-serif'
+    };
+    $scope.annotations.textAnnotations.push(newText);
+    $scope.annotations.undoStack.push({ type: 'text', data: newText });
 redrawAllAnnotations();
 }
 input.active = false; 
@@ -2767,10 +2797,12 @@ function onCanvasMouseUp(e) {
 
         if (finalWidth > 0.01 && finalHeight > 0.01) {
             $scope.$apply(function() {
-                $scope.annotations.annotations.push({
-                    x: finalX, y: finalY, width: finalWidth, height: finalHeight,
-                    color: $scope.annotations.currentColor
-                });
+               const newRect = {
+            x: finalX, y: finalY, width: finalWidth, height: finalHeight,
+            color: $scope.annotations.currentColor
+        };
+        $scope.annotations.annotations.push(newRect);
+        $scope.annotations.undoStack.push({ type: 'draw', data: newRect });
             });
         }
         redrawAllAnnotations();
@@ -2780,13 +2812,13 @@ function onCanvasMouseUp(e) {
         const ctx = $scope.annotations._ctx;
         ctx.closePath(); // Cierra el trazo actual
         
-        // Guarda el trazo en la lista de anotaciones
+        const currentStroke = $scope.annotations._temp.currentStroke;
         $scope.$apply(function() {
-            $scope.annotations.strokeAnnotations.push($scope.annotations._temp.currentStroke);
+            $scope.annotations.strokeAnnotations.push(currentStroke);
+           $scope.annotations.undoStack.push({ type: 'stroke', data: currentStroke });
         });
         
-        $scope.annotations._temp.currentStroke = null; // Limpia el trazo temporal
-        // No es necesario redibujar, el trazo ya está en el canvas
+        $scope.annotations._temp.currentStroke = null;
     }
 }
 
