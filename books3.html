@@ -1633,8 +1633,14 @@ color: white;
        <button class="tool-btn" 
             ng-click="setAnnotationMode('text')"
             ng-class="{'active-tool': annotations.mode === 'text'}">
-        <i class="fas fa-language"></i>
+        <i class="fas fa-comment"></i>
     </button>
+
+<button class="tool-btn" 
+        ng-click="toggleAnnotationVisibility()"
+        ng-class="{'active-tool': annotations.isVisible}">
+    <i class="fas" ng-class="{'fa-eye': annotations.isVisible, 'fa-eye-slash': !annotations.isVisible}"></i>
+</button>
 
    <button class="tool-btn" 
         ng-click="undoLastAnnotation()">
@@ -1962,7 +1968,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         const requestData = {
             action: "getUserData",
            token: localStorage.getItem('MStoken')
-         //    token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+         //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -2483,6 +2489,7 @@ $scope.annotations = {
     mode: 'none', 
     isDrawing: false,
     colorPickerOpen: false,
+    isVisible: true,
     
     // Datos de dibujo
     currentColor: 'rgba(255, 223, 89, 0.4)',
@@ -2517,7 +2524,12 @@ $scope.annotations = {
 }
 
 
-// --- FUNCIONES DE ANOTACIONES (para ng-click) ---
+
+
+$scope.toggleAnnotationVisibility = function() {
+    $scope.annotations.isVisible = !$scope.annotations.isVisible;
+    redrawAllAnnotations();
+};
 
 $scope.setAnnotationMode = function(newMode) {
     if ($scope.annotations.mode === newMode) {
@@ -2669,6 +2681,10 @@ function redrawAllAnnotations() {
     // Limpia
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (!$scope.annotations.isVisible) {
+    return; 
+    }
+
     // Dibuja rectángulos (leídos desde $scope)
     $scope.annotations.annotations.forEach(rect => {
         ctx.fillStyle = rect.color;
@@ -2806,6 +2822,12 @@ function onCanvasMouseUp(e) {
             });
         }
         redrawAllAnnotations();
+
+        $scope.$apply(function() {
+                    // Llamamos a la función que ya se encarga de cambiar el modo
+                    // y actualizar el cursor.
+                    $scope.setAnnotationMode('none');
+                });
 
     } else if (mode === 'stroke') {
         // Lógica de trazo (NUEVA)
