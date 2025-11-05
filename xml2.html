@@ -892,7 +892,27 @@ display: flex;
   }
 }
 
+/* --- AÑADE ESTE BLOQUE DE CSS --- */
 
+.practice-progress-display {
+  font-size: 13px;
+  color: #555;
+  font-family: 'SF Mono', 'Menlo', 'monospace';
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.practice-progress-display #progress-label {
+  color: #999; /* Un color más sutil para la etiqueta */
+}
+
+.practice-progress-display #progress-value {
+  font-weight: 600;
+  color: #333; /* Color más fuerte para el valor */
+  margin-left: 4px;
+}
   </style>
 </head>
 <body>
@@ -975,10 +995,17 @@ display: flex;
     <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
     <i class="ri-hand"></i> D
   </button>
+    <button id="ai-practice-btn" class="btn" title="Práctica inteligente">
+    <i class="ri-dvd-ai-line" style="margin-right: 7px;"></i> Modo <br>Inteligente
+  </button>
     </div>
   
      <div class="tool-group">
-         <select id="measure-select" class="btn" title="Iniciar desde el compás...">
+        <div id="practice-progress" class="practice-progress-display">
+          <span id="progress-label">Progreso:</span>
+          <span id="progress-value">0%</span>
+      </div>
+         <select id="measure-select" class="btn" title="Ir al compás...">
     </select>
     </div>
   </div>
@@ -1058,6 +1085,8 @@ let showKeyNames = false;
 const successModal = document.getElementById('success-modal');
 const successModalMessage = document.getElementById('success-modal-message');
 const successModalCloseBtn = document.getElementById('success-modal-close-btn');
+const practiceProgressDisplay = document.getElementById('practice-progress');
+const progressValueSpan = document.getElementById('progress-value');
 
     let osmd = null;
     let sampler = null;
@@ -1822,7 +1851,67 @@ function scheduleNotesOnTransport() {
   const newTotalDuration = totalDuration / playbackRate;
   Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
 }
-    
+
+
+
+function updatePracticeProgress() {
+    if (parsedNotes.length === 0) {
+        progressValueSpan.textContent = '0%';
+        return;
+    }
+    const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
+    progressValueSpan.textContent = `${Math.min(percentage, 100)}%`;
+}
+
+function updateMeasureSelectDisplay() {
+    // Si estamos al principio o fuera de los límites, resetea al compás 1.
+    if (currentLearningIndex === 0 || currentLearningIndex > parsedNotes.length) {
+        measureSelect.value = 0;
+        return;
+    }
+    const currentNoteTime = parsedNotes[currentLearningIndex - 1].startSec;
+
+    let currentMeasureIndex = 0;
+    for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+        // Usamos una pequeña tolerancia (0.001s)
+        if (currentNoteTime >= measureStartTimes[i] - 0.001) {
+            currentMeasureIndex = i;
+            break;
+        }
+    }
+
+    // Actualiza el valor del dropdown
+    measureSelect.value = currentMeasureIndex;
+}
+
+function jumpToMeasureInLearnMode(measureIndex) {
+    if (!isMidiLearnMode) return;
+
+    const startTime = measureStartTimes[measureIndex] || 0;
+    let newIndex = 0;
+    for (let i = 0; i < parsedNotes.length; i++) {
+        // Usamos una pequeña tolerancia
+        if (parsedNotes[i].startSec >= startTime - 0.001) { 
+            newIndex = i;
+            break;
+        }
+    }
+    currentLearningIndex = newIndex;
+    osmd.cursor.reset();
+    let uniqueTimeSteps = new Set();
+    for(let i = 0; i < currentLearningIndex; i++) {
+        if (i === 0 || (parsedNotes[i].startSec > parsedNotes[i-1].startSec + 0.001)) {
+           uniqueTimeSteps.add(parsedNotes[i].startSec);
+        }
+    }
+    uniqueTimeSteps.forEach(() => {
+        osmd.cursor.next();
+    });
+    prepareFirstLearningStep(); 
+    measureSelect.value = measureIndex;
+}
+
+
 function playFromMeasure(measureIndex) {
   // ¡NUEVO! Limpia los highlights antes de empezar desde un nuevo punto.
   clearAllHighlights();
@@ -2014,11 +2103,9 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
 });
 
     measureSelect.addEventListener('change', () => {
-        // Obtenemos el índice del compás seleccionado (convertido a número)
         const selectedMeasureIndex = parseInt(measureSelect.value, 10);
-        
-        // Llamamos a la función que ya tenías para reproducir desde un compás
-        playFromMeasure(selectedMeasureIndex);
+        jumpToMeasureInLearnMode(selectedMeasureIndex);
+        //playFromMeasure(selectedMeasureIndex);
     });
 
       toolsToggleBtn.addEventListener('click', () => {
@@ -2369,7 +2456,10 @@ function advanceLearningStep() {
     showSuccessModal("¡Felicidades, has completado la pieza!");
     showConfetti(200);
     toggleMidiLearnMode();
+    return;
   }
+  updateMeasureSelectDisplay();
+  updatePracticeProgress();
 }
 
     function setStatus(text) { 
@@ -2424,6 +2514,7 @@ function toggleMidiLearnMode() {
     if (isMidiLearnMode) {
         midiLearnBtn.style.background = '#e0e0e0';
         playBtn.disabled = true;
+        progressBar.disabled = true;
         currentLearningIndex = 0;
         osmd.cursor.show();
 
@@ -2440,10 +2531,12 @@ function toggleMidiLearnMode() {
         secondaryTopBar2.classList.add('is-visible');
 
         prepareFirstLearningStep(); 
+        measureSelect.value = 0;
         
     } else {
     midiLearnBtn.style.background = 'none';
     playBtn.disabled = false;
+    progressBar.disabled = false;
     clearAllHighlights(); 
     osmd.cursor.reset();
     osmd.cursor.hide();
@@ -2465,7 +2558,6 @@ function toggleMidiLearnMode() {
 
 
 function prepareFirstLearningStep() {
-  // Usar la versión optimizada de clearAllHighlights
   clearAllHighlights();
   expectedNotes.clear();
 
@@ -2522,6 +2614,7 @@ function prepareFirstLearningStep() {
     alert("¡No hay notas para la mano seleccionada en esta pieza!");
     toggleMidiLearnMode();
   }
+  updatePracticeProgress();
 }
 
 
@@ -2834,13 +2927,12 @@ function onMIDIMessage(event) {
                 console.log(`¡Correcto! Nota ${pitchName} (normalizada: ${normalizedMidiNote}). Faltan ${expectedNotes.size}.`);
                 
                 if (expectedNotes.size === 0) {
-                   // setTimeout(() => {
+
                         if (currentLearningIndex > 0) {
                             advanceLearningStep();
                         } else {
                             prepareFirstLearningStep();
                         }
-                  //  }, 300); 
                 }
             } else {
                 console.log(`Nota ${pitchName} (normalizada: ${normalizedMidiNote}) no está en expectedNotes:`, Array.from(expectedNotes));
