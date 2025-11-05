@@ -554,6 +554,31 @@ display: flex;
   padding: 4px 15px; /* Restaura el padding vertical */
 }
 
+
+#secondary-top-bar2 {
+
+display: flex;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+ padding: 0px 15px;
+ top: 60px;
+   position: sticky ;
+   z-index: 999;
+     align-items: center; 
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden; /* Clave para la animación de despliegue */
+  max-height: 0; /* Estado inicial: colapsada */
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animación suave */
+}
+
+/* Estado visible de la barra secundaria */
+#secondary-top-bar2.is-visible {
+
+  max-height: 35px; /* Altura suficiente para los botones */
+  padding: 4px 15px; /* Restaura el padding vertical */
+}
+
 .tool-group {
   display: flex;
   align-items: center;
@@ -601,7 +626,8 @@ display: flex;
       }
 
       #tools-toggle-btn,
-  #secondary-top-bar {
+  #secondary-top-bar,
+   #secondary-top-bar2{
     display: none; 
   }
   }
@@ -896,16 +922,7 @@ display: flex;
        <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
       </button>
 
-      <div id="zoom-controls">
-         <div class="speed-display">
-        <span class="zoom-display" id="speed-bpm">120 BPM</span>
-  <span class="speed-value" id="speed-label">1.00x</span>
-   </div>
-        <div class="zoom-buttons">
-            <button class="zoom-btn" id="speed-down-btn">−</button>
-            <button class="zoom-btn" id="speed-up-btn">+</button>
-        </div>
-      </div>
+     
       <div id="close-btn-placeholder"></div>
     </div>
 
@@ -914,12 +931,16 @@ display: flex;
 
    <div id="secondary-top-bar">
     <div class="tool-group">
-  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
-    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
-  </button>
-    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
-    <i class="ri-hand"></i> D
-  </button>
+ <div id="zoom-controls">
+      <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px;">
+         <div class="speed-display">
+        <span class="zoom-display" id="speed-bpm">120 BPM</span>
+   </div>
+        <div class="zoom-buttons">
+            <button class="zoom-btn" id="speed-down-btn">−</button>
+            <button class="zoom-btn" id="speed-up-btn">+</button>
+        </div>
+      </div>
     </div>
   
      <div class="tool-group">
@@ -929,8 +950,7 @@ display: flex;
           <button id="cursor-btn" class="btn" >
    <i class="ri-layout-left-2-line"></i>
     </button>
-     <select id="measure-select" class="btn" title="Iniciar desde el compás...">
-    </select>
+  
          <div class="speed-group">
             <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
             <div class="speed-display">
@@ -942,7 +962,25 @@ display: flex;
    <i class="ri-fullscreen-line"></i>
     </button>
     </div>
-     
+  </div>
+
+
+
+
+   <div id="secondary-top-bar2" >
+    <div class="tool-group">
+  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
+    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
+  </button>
+    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
+    <i class="ri-hand"></i> D
+  </button>
+    </div>
+  
+     <div class="tool-group">
+         <select id="measure-select" class="btn" title="Iniciar desde el compás...">
+    </select>
+    </div>
   </div>
 
   <!-- Controles de zoom para móviles -->
@@ -993,7 +1031,6 @@ display: flex;
     const pianoKeys = document.getElementById('piano-keys');
     const progressBar = document.getElementById('progress-bar');
     const progressBarContainer = document.getElementById('progress-bar-container');
-    const speedLabel = document.getElementById('speed-label');
     const speedBpmLabel = document.getElementById('speed-bpm');
    const speedUpBtn = document.getElementById('speed-up-btn');
 const speedDownBtn = document.getElementById('speed-down-btn');
@@ -1005,6 +1042,7 @@ const totalTimeSpan = document.getElementById('total-time');
 const measureSelect = document.getElementById('measure-select');
 const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
+const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
 
 const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -1889,7 +1927,6 @@ function updateSpeed(newRate) {
     
     // Actualizar la interfaz
     const currentBPM = Math.round(globalTempo * playbackRate);
-    speedLabel.textContent = `${playbackRate.toFixed(2)}x`;
     speedBpmLabel.textContent = `${currentBPM} BPM`;
     
     // Volver a programar las notas con la nueva velocidad
@@ -2183,7 +2220,6 @@ function toggleFullScreen() {
 
     function updateBpmDisplay() {
       const currentBPM = Math.round(globalTempo * currentSpeed);
-      speedLabel.textContent = `${currentSpeed.toFixed(2)}x`;
       speedBpmLabel.textContent = `${currentBPM} BPM`;
     }
 
@@ -2401,6 +2437,7 @@ function toggleMidiLearnMode() {
         handFilterMode = 'both';
         rightHandOnlyBtn.style.background = 'none';
         leftHandOnlyBtn.style.background = 'none';
+        secondaryTopBar2.classList.add('is-visible');
 
         prepareFirstLearningStep(); 
         
@@ -2418,6 +2455,7 @@ function toggleMidiLearnMode() {
         color: "rgba(52, 152, 219, 0.8)"
     });
 
+    secondaryTopBar2.classList.remove('is-visible');
     handFilterMode = 'both';
     updateStaffOpacity('both'); // NUEVO: Restaurar opacidad normal
     rightHandOnlyBtn.style.background = 'none';
