@@ -145,32 +145,61 @@
   
     
    
+#piano-container {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: #2a2a2a;
+  padding: 12px 0;
+  overflow: hidden;
+  box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
+  border-top: 1px solid #e0e0e0;
+  height: 200px;
+  z-index: 100;
+}
+
+/* Estado 1: Solo waterfall (cubre toda la pantalla) */
+#piano-container.waterfall-only {
+  height: calc(100vh - 60px);
+  top: 60px;
+  bottom: auto;
+  padding: 0 0 12px 0;
+}
+
+
+#piano-container.waterfall-only .hit-line-piano {
+  bottom: 102px;
+}
+
+#piano-container.waterfall-only #waterfall-canvas {
+  height: calc(100% - 102px) !important; 
+  width: 100%;
+}
+
+/* Estado 2: Solo piano (sin waterfall) */
+#piano-container.piano-only {
+  height: 102px;
+}
+
+#piano-container.piano-only #waterfall-canvas,
+#piano-container.piano-only .hit-line-piano {
+  display: none;
+}
     
-    /* Piano - 88 Keys Minimalista */
-    #piano-container {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background: #fff;
-      padding: 12px 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
-      border-top: 1px solid #e0e0e0;
-      transition: transform 0.3s ease;
-    }
+  
     
-    #piano-container.hidden {
-      transform: translateY(100%);
-    }
-    
-    #piano-keys {
-      display: flex;
-      justify-content: center;
-      min-width: 100%;
-      padding: 0 10px;
-    }
+ #piano-keys {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  padding: 0 10px;
+  z-index: 2;
+  height: 102px;
+}
     
     .key {
       border: 1px solid #ddd;
@@ -204,6 +233,91 @@
   box-shadow: 0 0 8px rgba(222, 158, 55, 0.6) !important;
 }
     
+
+@keyframes keyPulse {
+  0% { 
+    filter: brightness(1.5);
+    transform: translateY(0);
+  }
+  50% {
+    filter: brightness(2);
+    transform: translateY(2px);
+  }
+  100% { 
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+}
+
+.key.active-treble,
+.key.active-bass {
+  animation: keyPulse 0.15s ease-out;
+}
+
+#waterfall-canvas {
+  position: absolute;
+  top: 0;
+  left: 50%;  /* ← CAMBIADO de 0 a 50% */
+  transform: translateX(-50%);  /* ← AÑADIDO para centrar */
+  width: 100%;
+  height: calc(100% - 102px);
+  pointer-events: none;
+  z-index: 1;
+  transition: height 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.hit-line-piano {
+  position: absolute;
+  bottom: 102px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 0, 0, 1);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.note-flash-piano {
+  position: absolute;
+  bottom: 102px;
+  width: 20px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  background: white;
+  transform-origin: center bottom;
+}
+
+.note-flash-piano.flash-active {
+  animation: flashEffectPiano 0.4s ease-out;
+}
+
+@keyframes flashEffectPiano {
+  0% {
+    opacity: 0.7;
+    transform: translateX(-50%) translateY(0) scaleY(1);
+    filter: blur(2px);
+    box-shadow: 0 3px 10px 3px rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateX(-50%) translateY(-8px) scaleY(1.3);
+    filter: blur(4px);
+    box-shadow: 0 6px 12px 5px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-15px) scaleY(1.6);
+    filter: blur(6px);
+    box-shadow: 0 8px 15px 6px rgba(255, 255, 255, 0);
+  }
+}
+
+
+
+
     #status {
       text-align: center;
       padding: 40px 20px;
@@ -635,7 +749,7 @@ display: flex;
   /* Lo ponemos encima de los controles de velocidad móviles */
   bottom: 165px; 
   left: 10px;
-  z-index: 50;
+  z-index: 550;
   background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
   color: #fafafa;
   padding: 8px 12px;
@@ -845,6 +959,8 @@ display: flex;
 <div id="midi-status-legend"></div>
 
   <div id="piano-container">
+    <canvas id="waterfall-canvas"></canvas>
+  <div class="hit-line-piano"></div>
     <div id="piano-keys"></div>
   </div>
 
@@ -920,6 +1036,15 @@ const successModalCloseBtn = document.getElementById('success-modal-close-btn');
     let activeHighlightTimeouts = [];
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
+    let pianoViewMode = 'full'; 
+
+
+let waterfallCanvas, waterfallCtx;
+let waterfallAnimationId;
+let pixelsPerSecond = 100;
+let whiteKeyWidth = 16; // Ya no es const
+let blackKeyWidth = 10; // Ya no es const
+let waterfallScrollOffset = 0;
 
     // Script: al inicio, junto a las otras constantes
 const midiLearnBtn = document.getElementById('midi-learn-btn');
@@ -932,18 +1057,287 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
 
+function initWaterfallCanvas() {
+  waterfallCanvas = document.getElementById('waterfall-canvas');
+  if (!waterfallCanvas) return;
+  
+  waterfallCtx = waterfallCanvas.getContext('2d');  
+  resizeWaterfallCanvas();
+  updateKeyDimensions()
+  window.addEventListener('resize', resizeWaterfallCanvas);
+}
+
+
+
+function resizeWaterfallCanvas() {
+  if (!waterfallCanvas) return;
+  
+  // Actualizar los tamaños de las teclas desde el DOM
+  updateKeyDimensions();
+  
+  const container = pianoContainer;
+  const dpr = window.devicePixelRatio || 1;
+  
+  waterfallCanvas.width = window.innerWidth * dpr;
+  waterfallCanvas.height = (container.clientHeight - 102) * dpr;
+  
+  waterfallCanvas.style.width = `${window.innerWidth}px`;
+  waterfallCanvas.style.height = `${container.clientHeight - 102}px`;
+  
+  // NUEVO: Ajustar pixelsPerSecond según la altura disponible
+  const availableHeight = container.clientHeight - 102;
+  
+  if (pianoContainer.classList.contains('waterfall-only')) {
+    // En modo waterfall-only, aumentar la velocidad para mostrar más notas
+    pixelsPerSecond = availableHeight / 6; // Muestra aproximadamente 6 segundos de música
+  } else {
+    // En modo normal, velocidad estándar
+    pixelsPerSecond = 100;
+  }
+  
+  console.log(`Altura disponible: ${availableHeight}px, pixelsPerSecond: ${pixelsPerSecond}`);
+}
+
+
+function updateKeyDimensions() {
+  // Leer el tamaño real de las teclas del DOM
+  const whiteKey = document.querySelector('.key.white');
+  const blackKey = document.querySelector('.key.black');
+  
+  if (whiteKey) {
+    whiteKeyWidth = whiteKey.offsetWidth;
+  }
+  if (blackKey) {
+    blackKeyWidth = blackKey.offsetWidth;
+  }
+  
+  console.log(`Tamaños actualizados: white=${whiteKeyWidth}px, black=${blackKeyWidth}px`);
+}
+
+function getKeyXPosition(midiNote) {
+  const firstMidiNote = 21; // A0
+  const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1]; // A A# B C C# D D# E F F# G G#
+  
+  let whiteKeyIndex = 0;
+  for (let i = firstMidiNote; i < midiNote; i++) {
+    const patternIndex = (i - firstMidiNote) % 12;
+    if (notePattern[patternIndex] === 0) {
+      whiteKeyIndex++;
+    }
+  }
+  
+  const patternIndex = (midiNote - firstMidiNote) % 12;
+  const isBlack = notePattern[patternIndex] === 1;
+  
+  if (isBlack) {
+    // Para teclas negras, posición centrada entre teclas blancas
+    return (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2);
+  } else {
+    return whiteKeyIndex * whiteKeyWidth;
+  }
+}
+
+function pitchToMidiNumber(pitch) {
+  const noteMap = {
+    'C': 0, 'C#': 1, 'Db': 1,
+    'D': 2, 'D#': 3, 'Eb': 3,
+    'E': 4, 'Fb': 4,
+    'F': 5, 'E#': 5, 'F#': 6, 'Gb': 6,
+    'G': 7, 'G#': 8, 'Ab': 8,
+    'A': 9, 'A#': 10, 'Bb': 10,
+    'B': 11, 'Cb': 11,
+    // Dobles sostenidos
+    'C##': 2, 'D##': 4, 'E##': 6, 'F##': 8, 'G##': 10, 'A##': 0, 'B##': 1,
+    // Dobles bemoles
+    'Dbb': 0, 'Ebb': 2, 'Fbb': 3, 'Gbb': 5, 'Abb': 7, 'Bbb': 9, 'Cbb': 10
+  };
+  
+  // Regex mejorado para capturar dobles alteraciones y bemoles
+  const match = pitch.match(/^([A-G])(bb|##|b|#)?(\d+)$/);
+  if (!match) {
+    console.warn(`No se pudo convertir pitch a MIDI: ${pitch}`);
+    return -1;
+  }
+  
+  const [, noteLetter, alteration, octave] = match;
+  const noteWithAlt = noteLetter + (alteration || '');
+  
+  if (!(noteWithAlt in noteMap)) {
+    console.warn(`Nota no reconocida en noteMap: ${noteWithAlt}`);
+    return -1;
+  }
+  
+  let chromaticValue = noteMap[noteWithAlt];
+  let finalOctave = parseInt(octave);
+  
+  // Ajustes de octava para casos especiales
+  if (noteWithAlt === 'Cb' || noteWithAlt === 'Cbb') {
+    finalOctave -= 1;
+  } else if (noteWithAlt === 'B#' || noteWithAlt === 'B##') {
+    finalOctave += 1;
+  } else if (noteWithAlt === 'A##') {
+    finalOctave += 1; // A## = B del siguiente octava
+  }
+  
+  return (finalOctave + 1) * 12 + chromaticValue;
+}
+
+function drawWaterfall() {
+  if (!waterfallCtx || !waterfallCanvas) return;
+  
+  const dpr = window.devicePixelRatio || 1;
+  waterfallCtx.clearRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
+  waterfallCtx.fillStyle = '#2a2a2a';
+  waterfallCtx.fillRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
+  
+  const canvasHeight = waterfallCanvas.height / dpr;
+  const totalWhiteKeys = 52;
+  const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
+  const offset = whiteKeyWidth === 16 ? -16 : -12; // -16 para full, -12 para reducido
+const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
+  
+  // Patrón corregido empezando desde A
+  const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1]; // A A# B C C# D D# E F F# G G#
+  
+  // Primero dibujar todas las notas blancas
+  parsedNotes.forEach(note => {
+    if (note.isRest) return;
+    
+    const midiNote = pitchToMidiNumber(note.pitch);
+    if (midiNote < 21 || midiNote > 108) return;
+    
+    const patternIndex = (midiNote - 21) % 12;
+    const isBlack = notePattern[patternIndex] === 1;
+    
+    // Solo procesar notas blancas en este primer paso
+    if (isBlack) return;
+    
+    const noteStartY = canvasHeight - ((note.startSec - waterfallScrollOffset) * pixelsPerSecond);
+    const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
+    
+    if (noteEndY < canvasHeight && noteStartY > 0) {
+      const keyX = pianoStartX + getKeyXPosition(midiNote);
+      const height = Math.max(1, noteStartY - noteEndY);
+      
+      waterfallCtx.shadowBlur = 40 * dpr;
+      
+      if (note.hand === 'treble') {
+        waterfallCtx.shadowColor = '#60a5fa';
+        waterfallCtx.fillStyle = '#60a5fa';
+      } else {
+        waterfallCtx.shadowColor = '#de9e37';
+        waterfallCtx.fillStyle = '#de9e37';
+      }
+      
+      waterfallCtx.fillRect(
+        keyX * dpr,
+        noteEndY * dpr,
+        (whiteKeyWidth - 2) * dpr,
+        height * dpr
+      );
+    }
+  });
+  
+  // Luego dibujar todas las notas negras (sobre las blancas)
+  parsedNotes.forEach(note => {
+    if (note.isRest) return;
+    
+    const midiNote = pitchToMidiNumber(note.pitch);
+    if (midiNote < 21 || midiNote > 108) return;
+    
+    const patternIndex = (midiNote - 21) % 12;
+    const isBlack = notePattern[patternIndex] === 1;
+    
+    // Solo procesar notas negras en este segundo paso
+    if (!isBlack) return;
+    
+    const noteStartY = canvasHeight - ((note.startSec - waterfallScrollOffset) * pixelsPerSecond);
+    const noteEndY = noteStartY - (note.durSec * pixelsPerSecond);
+    
+    if (noteEndY < canvasHeight && noteStartY > 0) {
+      const keyX = pianoStartX + getKeyXPosition(midiNote);
+      const height = Math.max(1, noteStartY - noteEndY);
+      
+      waterfallCtx.shadowBlur = 30 * dpr;
+      
+      if (note.hand === 'treble') {
+        waterfallCtx.shadowColor = '#3b82f6';
+        waterfallCtx.fillStyle = '#3b82f6';
+      } else {
+        waterfallCtx.shadowColor = '#b45309';
+        waterfallCtx.fillStyle = '#b45309';
+      }
+      
+      waterfallCtx.fillRect(
+        keyX * dpr,
+        noteEndY * dpr,
+        (blackKeyWidth - 1) * dpr,
+        height * dpr
+      );
+    }
+  });
+  
+  waterfallCtx.shadowBlur = 0;
+}
+
+function animateWaterfall() {
+  if (isMidiLearnMode) {
+    // En modo aprendizaje, avanzar según las notas completadas
+    if (currentLearningIndex > 0) {
+      waterfallScrollOffset = parsedNotes[currentLearningIndex - 1].startSec;
+    }
+  } else if (Tone.Transport.state === 'started') {
+    waterfallScrollOffset = Tone.Transport.seconds;
+  }
+  
+  drawWaterfall();
+  waterfallAnimationId = requestAnimationFrame(animateWaterfall);
+}
+
+function createNoteFlashPiano(noteName, hand) {
+  const midiNote = pitchToMidiNumber(noteName);
+  if (midiNote < 21 || midiNote > 108) return;
+  
+  const flash = document.createElement('div');
+  flash.className = 'note-flash-piano flash-active';
+  
+  const totalWhiteKeys = 52;
+  const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
+  
+  // Usar el mismo offset que en drawWaterfall
+  const offset = whiteKeyWidth === 16 ? -16 : -12;
+  const pianoStartX = (window.innerWidth - pianoTotalWidth) / 2 + offset;
+  
+  const keyX = getKeyXPosition(midiNote);
+  const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1];
+  const isBlack = notePattern[(midiNote - 21) % 12] === 1;
+  const keyWidth = isBlack ? blackKeyWidth : whiteKeyWidth;
+  const flashX = pianoStartX + keyX + (keyWidth / 2);
+  
+  flash.style.left = flashX + 'px';
+  
+  pianoContainer.appendChild(flash);
+  
+  setTimeout(() => {
+    flash.remove();
+  }, 400);
+}
+
+
    document.addEventListener('DOMContentLoaded', async () => {
   setStatus('Inicializando...');
   initOSMD();
   createPiano88Keys();
+  updateKeyDimensions();
   addEventListeners();
   initSampler();
   initMidiInput();
+  initWaterfallCanvas(); 
+  animateWaterfall(); 
   
   setStatus('Cargando sonidos de piano...');
   await Tone.loaded();
   setStatus('Cargando partitura...');
-
 
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -951,8 +1345,6 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
   if (fileId) {
 
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
-    
-    console.log(`Cargando archivo desde URL: ${dynamicUrl}`);
     await loadMusicXMLFromUrl(dynamicUrl);
 
   } else {
@@ -1049,6 +1441,7 @@ function updateMidiStatusLegend(deviceName = null) {
     return `${minutes}:${formattedSeconds}`;
 }
 
+    /*
     function initSampler() {
       sampler = new Tone.Sampler({
         urls: { 
@@ -1058,6 +1451,44 @@ function updateMidiStatusLegend(deviceName = null) {
           "A4": "A4.mp3" 
         },
         release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/"
+      }).toDestination();
+    } 
+    */
+
+    function initSampler() {
+      sampler = new Tone.Sampler({
+        urls: { 
+          "C1": "C1.mp3",
+          "D#1": "Ds1.mp3",
+          "F#1": "Fs1.mp3",
+          "A1": "A1.mp3",
+          "C2": "C2.mp3",
+          "D#2": "Ds2.mp3",
+          "F#2": "Fs2.mp3",
+          "A2": "A2.mp3",
+          "C3": "C3.mp3",
+          "D#3": "Ds3.mp3",
+          "F#3": "Fs3.mp3",
+          "A3": "A3.mp3",
+          "C4": "C4.mp3",
+          "D#4": "Ds4.mp3",
+          "F#4": "Fs4.mp3",
+          "A4": "A4.mp3",
+          "C5": "C5.mp3",
+          "D#5": "Ds5.mp3",
+          "F#5": "Fs5.mp3",
+          "A5": "A5.mp3",
+          "C6": "C6.mp3",
+          "D#6": "Ds6.mp3",
+          "F#6": "Fs6.mp3",
+          "A6": "A6.mp3",
+          "C7": "C7.mp3",
+        },
+        attack: 0.01,    // Ataque casi instantáneo (como piano real)
+        decay: 0.2,      // Caída rápida inicial 
+        sustain: 0.3,    // Nivel de sostenido (30% del volumen máximo)
+        release: 3.5, 
         baseUrl: "https://tonejs.github.io/audio/salamander/"
       }).toDestination();
     }
@@ -1290,7 +1721,7 @@ function scheduleNotesOnTransport() {
   // Audio: solo notas reales (sin silencios)
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
-    const realNotes = notes.filter(n => !n.isRest); // NUEVO: Filtrar silencios
+    const realNotes = notes.filter(n => !n.isRest && !n.isTiedContinuation); // NUEVO: Filtrar silencios
     
     if (realNotes.length > 0) {
       const uniquePitches = new Set();
@@ -1343,7 +1774,7 @@ function scheduleNotesOnTransport() {
       }
       // MODIFICADO: Solo hacer highlight de notas reales
       value.notes.forEach(note => {
-        if (!note.isRest) {
+        if (!note.isRest && !note.isTiedContinuation) {
           highlightKey(note.pitch, note.duration, note.hand);
         }
       });
@@ -1390,6 +1821,7 @@ function playFromMeasure(measureIndex) {
   
   // ¡NUEVO! Usa la función de limpieza total para apagar todas las teclas.
   clearAllHighlights();
+  waterfallScrollOffset = 0;
 
   progressBar.value = 0;
   progressBar.style.setProperty('--progress', '0%');
@@ -1477,7 +1909,7 @@ speedDownBtn.addEventListener('click', () => {
 });
  
       pianoBtn.addEventListener('click', () => {
-        pianoContainer.classList.toggle('hidden');
+        togglePianoView();
       });
       
       // Controles de zoom
@@ -1497,16 +1929,20 @@ speedDownBtn.addEventListener('click', () => {
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
       
       // Redimensionar ventana
-      window.addEventListener('resize', () => {
-        const newIsMobile = window.innerWidth <= 768;
-        if (newIsMobile !== isMobile) {
-          isMobile = newIsMobile;
-          if (osmd) {
-            setupEngravingRulesForScreenSize();
-            osmd.render();
-          }
-        }
-      });
+window.addEventListener('resize', () => {
+  const newIsMobile = window.innerWidth <= 768;
+  if (newIsMobile !== isMobile) {
+    isMobile = newIsMobile;
+    if (osmd) {
+      setupEngravingRulesForScreenSize();
+      osmd.render();
+    }
+  }
+  // Redimensionar el canvas del waterfall con los nuevos tamaños de teclas
+  if (waterfallCanvas) {
+    resizeWaterfallCanvas();
+  }
+});
       
  cursorBtn.addEventListener('click', toggleCursorType);
   fullscreenBtn.addEventListener('click', toggleFullScreen);
@@ -1572,6 +2008,34 @@ function toggleKeyNames() {
   console.log(`Mostrar nombres de teclas: ${showKeyNames}`);
 }
 
+function togglePianoView() {
+    // Ciclo: full -> waterfall-only -> piano-only -> full
+    if (pianoViewMode === 'full') {
+        pianoViewMode = 'waterfall-only';
+        pianoContainer.classList.remove('piano-only');
+        pianoContainer.classList.add('waterfall-only');
+        document.getElementById('sheet-music-wrapper').style.display = 'none';
+        pianoBtn.style.backgroundColor = '#e0e0e0';
+    } else if (pianoViewMode === 'waterfall-only') {
+        pianoViewMode = 'piano-only';
+        pianoContainer.classList.remove('waterfall-only');
+        pianoContainer.classList.add('piano-only');
+        document.getElementById('sheet-music-wrapper').style.display = 'block';
+        pianoBtn.style.backgroundColor = '#d0d0d0';
+    } else {
+        pianoViewMode = 'full';
+        pianoContainer.classList.remove('piano-only');
+        document.getElementById('sheet-music-wrapper').style.display = 'block';
+        pianoBtn.style.backgroundColor = 'transparent';
+    }
+    
+    // NUEVO: Recalcular el tamaño del canvas y pixelsPerSecond
+    setTimeout(() => {
+        resizeWaterfallCanvas();
+    }, 100);
+    
+    console.log('Piano View Mode:', pianoViewMode);
+}
 // Función para mostrar nombres en las teclas blancas
 function showKeyNamesOnPiano() {
   const whiteKeys = document.querySelectorAll('.key.white');
@@ -1671,13 +2135,17 @@ function toggleCursorType() {
 }
 
 function clearAllHighlights() {
-  activeHighlightTimeouts.forEach(clearTimeout);
-  activeHighlightTimeouts = [];
+  // OPTIMIZACIÓN: Limpiar timeouts más rápido
+  for (let i = activeHighlightTimeouts.length - 1; i >= 0; i--) {
+    clearTimeout(activeHighlightTimeouts[i]);
+  }
+  activeHighlightTimeouts.length = 0;
 
-  // 2. Busca todas las teclas activas en el DOM y les quita la clase de color
-  document.querySelectorAll('.active-treble, .active-bass').forEach(key => {
+  // OPTIMIZACIÓN: Usar querySelectorAll una sola vez
+  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+  for (const key of activeKeys) {
     key.classList.remove('active-treble', 'active-bass');
-  });
+  }
 }
 
 function toggleFullScreen() {
@@ -1727,8 +2195,10 @@ function highlightKey(noteName, durSec, hand, persist = false) {
 
     const highlightClass = hand === 'treble' ? 'active-treble' : 'active-bass';
     el.classList.add(highlightClass);
+    
+    // NUEVO: Agregar efecto de flash
+    createNoteFlashPiano(noteName, hand);
 
-    // Si NO es persistente, se apaga después de un tiempo
     if (!persist) {
         const highlightDuration = Math.max(80, durSec * 1000 / currentSpeed);
         const timeoutId = setTimeout(() => {
@@ -1737,6 +2207,16 @@ function highlightKey(noteName, durSec, hand, persist = false) {
         }, highlightDuration);
         activeHighlightTimeouts.push(timeoutId);
     }
+}
+
+
+function highlightKeyInstant(noteName, hand) {
+    const noteId = normalizeNote(noteName);
+    const el = document.getElementById(noteId);
+    if (!el) return;
+
+    const highlightClass = hand === 'treble' ? 'active-treble' : 'active-bass';
+    el.classList.add(highlightClass);
 }
 
 function normalizeNote(noteName) {
@@ -1784,7 +2264,10 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-  clearAllHighlights();
+  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+  activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
+  activeHighlightTimeouts.forEach(clearTimeout);
+  activeHighlightTimeouts.length = 0;
   expectedNotes.clear();
 
   if (currentLearningIndex >= parsedNotes.length) {
@@ -1813,6 +2296,7 @@ function advanceLearningStep() {
     // Filtrar por mano
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation &&
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1832,7 +2316,7 @@ function advanceLearningStep() {
         if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
+          highlightKeyInstant(note.pitch, note.hand);
         }
       });
       
@@ -1921,27 +2405,29 @@ function toggleMidiLearnMode() {
         prepareFirstLearningStep(); 
         
     } else {
-        midiLearnBtn.style.background = 'none';
-        playBtn.disabled = false;
-        clearAllHighlights(); 
-        osmd.cursor.reset();
-        osmd.cursor.hide();
-        
-        cursorBtn.style.color = '#1a1a1a';
-        Object.assign(osmd.cursor.cursorOptions, {
-            type: 1,
-            alpha: 0.8,
-            color: "rgba(52, 152, 219, 0.8)"
-        });
+    midiLearnBtn.style.background = 'none';
+    playBtn.disabled = false;
+    clearAllHighlights(); 
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    
+    cursorBtn.style.color = '#1a1a1a';
+    Object.assign(osmd.cursor.cursorOptions, {
+        type: 1,
+        alpha: 0.8,
+        color: "rgba(52, 152, 219, 0.8)"
+    });
 
-        handFilterMode = 'both';
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-    }
+    handFilterMode = 'both';
+    updateStaffOpacity('both'); // NUEVO: Restaurar opacidad normal
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+}
 }
 
 
 function prepareFirstLearningStep() {
+  // Usar la versión optimizada de clearAllHighlights
   clearAllHighlights();
   expectedNotes.clear();
 
@@ -1958,7 +2444,7 @@ function prepareFirstLearningStep() {
 
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    notesInStep = [];
+    notesInStep.length = 0;
     
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
@@ -1968,6 +2454,7 @@ function prepareFirstLearningStep() {
 
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
+      !note.isTiedContinuation &&
       (handFilterMode === 'both' || 
       (handFilterMode === 'right' && note.hand === 'treble') ||
       (handFilterMode === 'left' && note.hand === 'bass'))
@@ -1975,19 +2462,19 @@ function prepareFirstLearningStep() {
 
     if (filteredNotes.length > 0) {
       foundValidStep = true;
-      notesInStep = filteredNotes;
       
+      // OPTIMIZACIÓN: Usar Set directamente
       const uniquePitches = new Set();
       
-      notesInStep.forEach(note => {
+      for (const note of filteredNotes) {
         const normalizedNote = normalizeNote(note.pitch);
         
         if (!uniquePitches.has(normalizedNote)) {
           uniquePitches.add(normalizedNote);
           expectedNotes.add(normalizedNote);
-          highlightKey(note.pitch, note.durSec, note.hand, true);
+          highlightKeyInstant(note.pitch, note.hand);
         }
-      });
+      }
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     }
@@ -1999,6 +2486,54 @@ function prepareFirstLearningStep() {
   }
 }
 
+
+function updateStaffOpacity(mode) {
+    if (!osmd || !osmd.graphic) {
+        console.warn("OSMD no está listo.");
+        return;
+    }
+    
+    const svgContainer = osmdContainer.querySelector('svg');
+    if (!svgContainer) return;
+    
+    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
+    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
+    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+    
+    const staffLineContainers = allGroups.filter(group => {
+        // Contar cuántos sub-grupos con 5+ paths tiene
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
+        });
+        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+        return staffCount > 1;
+    });
+    
+    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
+    
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
+        
+        switch (mode) {
+            case 'right':
+                container.style.opacity = isTreble ? '1' : '0.2';
+                break;
+            case 'left':
+                container.style.opacity = isTreble ? '0.2' : '1';
+                break;
+            case 'both':
+            default:
+                container.style.opacity = '1';
+                break;
+        }
+        container.style.transition = 'opacity 0.3s ease';
+        
+        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
+    });
+}
 
 function toggleRightHandOnly() {
   if (handFilterMode === 'right') {
@@ -2015,12 +2550,16 @@ function toggleRightHandOnly() {
     rightHandOnlyBtn.style.color = '#3498db';
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
-    
-    // Si estaba activo mano izquierda, desactivarlo
-    if (isMidiLearnMode && expectedNotes.size > 0) {
-      reloadCurrentStepWithHandFilter();
-    }
   }
+
+  // NUEVO: Actualizar opacidad de los pentagramas
+  updateStaffOpacity(handFilterMode);
+  
+  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
+  if (isMidiLearnMode) {
+    skipToNextRelevantNote();
+  }
+  
   console.log(`Modo de mano: ${handFilterMode}`);
 }
 
@@ -2039,15 +2578,101 @@ function toggleLeftHandOnly() {
     leftHandOnlyBtn.style.color = '#3498db';
     rightHandOnlyBtn.style.background = 'none';
     rightHandOnlyBtn.style.color = '#1a1a1a';
-    
-    // Si estaba activo mano derecha, desactivarlo
-    if (isMidiLearnMode && expectedNotes.size > 0) {
-      reloadCurrentStepWithHandFilter();
-    }
   }
+
+  // NUEVO: Actualizar opacidad de los pentagramas
+  updateStaffOpacity(handFilterMode);
+  
+  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
+  if (isMidiLearnMode) {
+    skipToNextRelevantNote();
+  }
+  
   console.log(`Modo de mano: ${handFilterMode}`);
 }
 
+
+function skipToNextRelevantNote() {
+  if (!isMidiLearnMode) return;
+  
+  clearAllHighlights();
+  expectedNotes.clear();
+  
+  const TIME_TOLERANCE = 0.001;
+  let foundRelevantNote = false;
+  
+  // Retroceder al inicio del paso actual para recalcular
+  let tempIndex = currentLearningIndex - 1;
+  const currentTime = parsedNotes[tempIndex]?.startSec;
+  
+  // Retroceder hasta el inicio del acorde/paso actual
+  while (tempIndex > 0 && Math.abs(parsedNotes[tempIndex - 1]?.startSec - currentTime) < TIME_TOLERANCE) {
+    tempIndex--;
+  }
+  
+  // Restaurar el índice al inicio del paso actual
+  currentLearningIndex = tempIndex;
+  
+  // Buscar la siguiente nota relevante para la mano seleccionada
+  while (currentLearningIndex < parsedNotes.length && !foundRelevantNote) {
+    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+    const notesInStep = [];
+    
+    // Recopilar todas las notas en este momento
+    const stepStartIndex = currentLearningIndex;
+    while (currentLearningIndex < parsedNotes.length && 
+           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+      notesInStep.push(parsedNotes[currentLearningIndex]);
+      currentLearningIndex++;
+    }
+    
+    // Filtrar por mano seleccionada
+    const filteredNotes = notesInStep.filter(note => 
+      !note.isRest &&
+      !note.isTiedContinuation &&
+      (handFilterMode === 'both' || 
+      (handFilterMode === 'right' && note.hand === 'treble') ||
+      (handFilterMode === 'left' && note.hand === 'bass'))
+    );
+    
+    if (filteredNotes.length > 0) {
+      // Encontramos notas relevantes, preparar para tocarlas
+      foundRelevantNote = true;
+      
+      // Avanzar el cursor a la posición correcta
+      osmd.cursor.reset();
+      let cursorTime = -1;
+      for (let i = 0; i < stepStartIndex; i++) {
+        if (parsedNotes[i].startSec !== cursorTime) {
+          osmd.cursor.next();
+          cursorTime = parsedNotes[i].startSec;
+        }
+      }
+      
+      // Highlight de las notas esperadas
+      const uniquePitches = new Set();
+      filteredNotes.forEach(note => {
+        const normalizedNote = normalizeNote(note.pitch);
+        if (!uniquePitches.has(normalizedNote)) {
+          uniquePitches.add(normalizedNote);
+          expectedNotes.add(normalizedNote);
+          highlightKey(note.pitch, note.durSec, note.hand, true);
+        }
+      });
+      
+      console.log(`Saltando a notas relevantes (${handFilterMode}):`, Array.from(expectedNotes));
+    } else {
+      // No hay notas relevantes en este paso, avanzar cursor automáticamente
+      osmd.cursor.next();
+    }
+  }
+  
+  if (!foundRelevantNote) {
+    // No se encontraron más notas para la mano seleccionada
+    showSuccessModal(`¡Has completado todas las notas de la mano ${handFilterMode === 'right' ? 'derecha' : 'izquierda'}!`);
+    showConfetti(100);
+  }
+}
 
 function reloadCurrentStepWithHandFilter() {
   if (!isMidiLearnMode) return;
@@ -2167,16 +2792,17 @@ function onMIDIMessage(event) {
             if (expectedNotes.has(normalizedMidiNote)) {
                 sampler.triggerAttackRelease(pitchName, '8n');
                 expectedNotes.delete(normalizedMidiNote);
+                createNoteFlashPiano(pitchName, 'treble');
                 console.log(`¡Correcto! Nota ${pitchName} (normalizada: ${normalizedMidiNote}). Faltan ${expectedNotes.size}.`);
                 
                 if (expectedNotes.size === 0) {
-                    setTimeout(() => {
+                   // setTimeout(() => {
                         if (currentLearningIndex > 0) {
                             advanceLearningStep();
                         } else {
                             prepareFirstLearningStep();
                         }
-                    }, 300); 
+                  //  }, 300); 
                 }
             } else {
                 console.log(`Nota ${pitchName} (normalizada: ${normalizedMidiNote}) no está en expectedNotes:`, Array.from(expectedNotes));
@@ -2262,4 +2888,4 @@ function hideModal() {
 
   </script>
 </body>
-</html>   
+</html>    
