@@ -913,6 +913,17 @@ display: flex;
   color: #333; /* Color más fuerte para el valor */
   margin-left: 4px;
 }
+
+#ai-practice-btn.active {
+  background-color: #e0e0e0 !important;
+  border-color: #3498db !important;
+}
+
+.modal-content br {
+  display: block;
+  margin: 8px 0;
+}
+
   </style>
 </head>
 <body>
@@ -996,7 +1007,7 @@ display: flex;
     <i class="ri-hand"></i> D
   </button>
     <button id="ai-practice-btn" class="btn" title="Práctica inteligente">
-    <i class="ri-dvd-ai-line" style="margin-right: 7px;"></i> Modo <br>Inteligente
+    <i class="ri-dvd-ai-line" style="margin-right: 7px;"></i> Práctica <br>Guiada
   </button>
     </div>
   
@@ -1087,6 +1098,7 @@ const successModalMessage = document.getElementById('success-modal-message');
 const successModalCloseBtn = document.getElementById('success-modal-close-btn');
 const practiceProgressDisplay = document.getElementById('practice-progress');
 const progressValueSpan = document.getElementById('progress-value');
+const aiPracticeBtn = document.getElementById('ai-practice-btn');
 
     let osmd = null;
     let sampler = null;
@@ -1104,6 +1116,16 @@ const progressValueSpan = document.getElementById('progress-value');
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
+
+
+    let isIntelligentPracticeMode = false;
+let currentPracticePhase = 'inactive'; // 'inactive', 'right-hand', 'left-hand', 'both-hands', 'consolidation'
+let currentPracticeMeasureSet = 0; // Conjunto de 4 compases actual (0, 1, 2...)
+let practiceAttemptNotes = []; // Notas tocadas en el intento actual
+let practiceStartTime = null;
+let practiceErrors = 0;
+let practiceCorrectNotes = 0;
+let accuracyThreshold = 70; 
 
 
 let waterfallCanvas, waterfallCtx;
@@ -1348,17 +1370,25 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
 }
 
 function animateWaterfall() {
-  if (isMidiLearnMode) {
-    // En modo aprendizaje, avanzar según las notas completadas
-    if (currentLearningIndex > 0) {
-      waterfallScrollOffset = parsedNotes[currentLearningIndex - 1].startSec;
+    
+    // SI ESTÁ EN CUALQUIER MODO DE APRENDIZAJE (normal O inteligente)
+    if (isMidiLearnMode) {
+        
+        // Mover el waterfall al tiempo de la nota anterior (para "esperarla")
+        if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
+            waterfallScrollOffset = parsedNotes[currentLearningIndex - 1].startSec;
+        } else {
+            // Si estamos al principio (índice 0), el offset es 0
+            waterfallScrollOffset = 0;
+        }
+
+    } else if (Tone.Transport.state === 'started') {
+        // Modo de reproducción normal
+        waterfallScrollOffset = Tone.Transport.seconds;
     }
-  } else if (Tone.Transport.state === 'started') {
-    waterfallScrollOffset = Tone.Transport.seconds;
-  }
-  
-  drawWaterfall();
-  waterfallAnimationId = requestAnimationFrame(animateWaterfall);
+    
+    drawWaterfall();
+    waterfallAnimationId = requestAnimationFrame(animateWaterfall);
 }
 
 function createNoteFlashPiano(noteName, hand) {
@@ -2113,6 +2143,8 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
     });
 
      modalCloseBtn.addEventListener('click', hideModal);
+
+     aiPracticeBtn.addEventListener('click', toggleIntelligentPracticeMode);
 
 
     }
@@ -2903,7 +2935,82 @@ function onMIDIFailure() {
 }
 
 
+function onMIDIMessage(event) {
+    const command = event.data[0];
+    const note = event.data[1];
+    const velocity = event.data.length > 2 ? event.data[2] : 0;
 
+    if (command === 144 && velocity > 0) {
+        const pitchName = midiNoteToPitchName(note);
+        highlightMidiKey(pitchName);
+        
+
+if (isIntelligentPracticeMode && isMidiLearnMode) {
+    if (practiceStartTime === null) {
+        practiceStartTime = Date.now();
+    }
+    
+    const normalizedNote = normalizeNote(pitchName);
+    
+    // Verificar si la nota está en las esperadas del modo normal
+    if (expectedNotes.has(normalizedNote)) {
+        // Usar la lógica normal del modo aprendizaje
+        sampler.triggerAttackRelease(pitchName, '8n');
+        expectedNotes.delete(normalizedNote);
+        createNoteFlashPiano(pitchName, 'treble');
+        practiceCorrectNotes++;
+        
+        console.log(`✓ Correcta: ${normalizedNote}, Quedan: ${expectedNotes.size}`);
+        
+        // Cuando se completan todas las notas del paso actual
+        if (expectedNotes.size === 0) {
+            // Avanzar normalmente
+            if (currentLearningIndex > 0) {
+                advanceLearningStep();
+            } else {
+                prepareFirstLearningStep();
+            }
+            
+            // Verificar si completó el rango de compases de esta fase
+            checkPracticePhaseCompletion();
+        }
+        
+        // Actualizar progreso en tiempo real
+        updatePracticeAccuracy();
+    } else {
+        // Nota incorrecta
+        practiceErrors++;
+        console.log(`✗ Error: Nota ${normalizedNote} incorrecta. Total errores: ${practiceErrors}`);
+        updatePracticeAccuracy();
+    }
+    
+    return; // No ejecutar la lógica normal
+}
+        
+        // LÓGICA NORMAL DE LEARNING MODE
+        if (isMidiLearnMode && expectedNotes.size > 0) {
+            const normalizedMidiNote = normalizeNote(pitchName);
+            
+            if (expectedNotes.has(normalizedMidiNote)) {
+                sampler.triggerAttackRelease(pitchName, '8n');
+                expectedNotes.delete(normalizedMidiNote);
+                createNoteFlashPiano(pitchName, 'treble');
+                
+                if (expectedNotes.size === 0) {
+                    if (currentLearningIndex > 0) {
+                        advanceLearningStep();
+                    } else {
+                        prepareFirstLearningStep();
+                    }
+                }
+            }
+        }
+    } else if (command === 128 || (command === 144 && velocity === 0)) {
+        const pitchName = midiNoteToPitchName(note);
+        unhighlightMidiKey(pitchName);
+    }
+}
+/*
 function onMIDIMessage(event) {
     const command = event.data[0];
     const note = event.data[1];
@@ -2944,6 +3051,7 @@ function onMIDIMessage(event) {
         unhighlightMidiKey(pitchName);
     }
 }
+*/
 
 // Añade estas nuevas funciones para el coloreado MIDI
 function highlightMidiKey(noteName) {
@@ -2961,6 +3069,298 @@ function unhighlightMidiKey(noteName) {
         el.classList.remove('midi-active');
     }
 }
+
+
+
+
+//MODO INTELIGENTE
+function toggleIntelligentPracticeMode() {
+    if (!isMidiLearnMode) {
+        showModal("⚠️ Debes activar el Modo Aprendizaje MIDI primero.");
+        return;
+    }
+    
+    if (!midiAccess || midiAccess.inputs.size === 0) {
+        showModal("🎹 No se detectó ningún teclado MIDI conectado.");
+        return;
+    }
+    
+    isIntelligentPracticeMode = !isIntelligentPracticeMode;
+    
+    if (isIntelligentPracticeMode) {
+        aiPracticeBtn.style.background = '#e0e0e0';
+        aiPracticeBtn.style.borderColor = '#3498db';
+        startIntelligentPractice();
+    } else {
+        aiPracticeBtn.style.background = 'none';
+        aiPracticeBtn.style.borderColor = 'transparent';
+        stopIntelligentPractice();
+    }
+}
+
+function startIntelligentPractice() {
+    currentPracticePhase = 'right-hand';
+    currentPracticeMeasureSet = 0;
+    practiceErrors = 0;
+    practiceCorrectNotes = 0;
+    
+    // Saltar al primer compás
+    jumpToMeasureInLearnMode(0);
+    
+    // Iniciar con mano derecha
+    handFilterMode = 'right';
+    updateHandButtons();
+    updateStaffOpacity('right');
+    
+    showModal(`🎹 Práctica Inteligente Iniciada<br><br>
+               Toca los compases 1-4 con la MANO DERECHA.<br><br>
+               El sistema medirá tu precisión y velocidad.`);
+    
+    preparePracticePhase();
+}
+
+function stopIntelligentPractice() {
+    isIntelligentPracticeMode = false;
+    currentPracticePhase = 'inactive';
+    handFilterMode = 'both';
+    updateHandButtons();
+    updateStaffOpacity('both');
+    progressValueSpan.textContent = '0%';
+}
+
+function updatePracticeAccuracy() {
+    const totalNotes = practiceCorrectNotes + practiceErrors;
+    const currentAccuracy = totalNotes > 0 ? 
+        ((practiceCorrectNotes / totalNotes) * 100).toFixed(0) : 100;
+    progressValueSpan.textContent = `${currentAccuracy}%`;
+}
+
+function checkPracticePhaseCompletion() {
+    // Determinar el rango de compases de la fase actual
+    let startMeasure, endMeasure;
+    
+    if (currentPracticePhase === 'consolidation') {
+        startMeasure = 0;
+        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
+    } else {
+        startMeasure = currentPracticeMeasureSet * 4;
+        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
+    }
+    
+    const endTime = measureStartTimes[endMeasure];
+    
+    // Verificar si llegamos al final del rango
+    if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
+        const currentTime = parsedNotes[currentLearningIndex - 1].startSec;
+        
+        // Si ya pasamos el tiempo final del rango, evaluar
+        if (currentTime >= endTime - 0.01) {
+            console.log('✅ Rango de compases completado, evaluando...');
+            setTimeout(() => {
+                evaluatePracticeAttempt();
+            }, 500);
+        }
+    }
+}
+
+function preparePracticePhase() {
+    practiceAttemptNotes = [];
+    practiceStartTime = null;
+    practiceErrors = 0;
+    practiceCorrectNotes = 0;
+    
+    // Determinar el rango de compases a practicar
+    let startMeasure, endMeasure;
+    
+    if (currentPracticePhase === 'consolidation') {
+        startMeasure = 0;
+        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
+    } else {
+        startMeasure = currentPracticeMeasureSet * 4;
+        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
+    }
+    
+    // Saltar al compás de inicio usando la función existente
+    jumpToMeasureInLearnMode(startMeasure);
+    
+    console.log(`Fase: ${currentPracticePhase}, Compases: ${startMeasure + 1}-${endMeasure}, 
+                 Filtro de mano: ${handFilterMode}`);
+}
+
+function areEnharmonicEquivalents(note1, note2) {
+    if (note1 === note2) return true;
+    const midi1 = pitchToMidiNumber(note1);
+    const midi2 = pitchToMidiNumber(note2);
+    
+    return midi1 === midi2;
+}
+
+function updateHandButtons() {
+    if (handFilterMode === 'right') {
+        rightHandOnlyBtn.style.background = '#e0e0e0';
+        rightHandOnlyBtn.style.color = '#3498db';
+        leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+    } else if (handFilterMode === 'left') {
+        leftHandOnlyBtn.style.background = '#e0e0e0';
+        leftHandOnlyBtn.style.color = '#3498db';
+        rightHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+    } else {
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+    }
+}
+
+function evaluatePracticeAttempt() {
+    // Contar las notas esperadas en el rango completado
+    let startMeasure, endMeasure;
+    
+    if (currentPracticePhase === 'consolidation') {
+        startMeasure = 0;
+        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
+    } else {
+        startMeasure = currentPracticeMeasureSet * 4;
+        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
+    }
+    
+    const startTime = measureStartTimes[startMeasure];
+    const endTime = measureStartTimes[endMeasure];
+    
+    // Contar notas esperadas según el filtro de mano
+    const totalExpectedNotes = parsedNotes.filter(note => {
+        return note.startSec >= startTime && 
+               note.startSec < endTime && 
+               !note.isRest && 
+               !note.isTiedContinuation &&
+               ((currentPracticePhase === 'right-hand' && note.hand === 'treble') ||
+                (currentPracticePhase === 'left-hand' && note.hand === 'bass') ||
+                (currentPracticePhase === 'both-hands') ||
+                (currentPracticePhase === 'consolidation'));
+    }).length;
+    
+    if (totalExpectedNotes === 0) {
+        console.warn("No hay notas esperadas para evaluar");
+        advancePracticePhase();
+        return;
+    }
+    
+    const accuracy = ((practiceCorrectNotes / totalExpectedNotes) * 100).toFixed(0);
+    const totalTime = (Date.now() - practiceStartTime) / 1000;
+    const avgTimePerNote = (totalTime / totalExpectedNotes).toFixed(2);
+    
+    progressValueSpan.textContent = `${accuracy}%`;
+    
+    // Mostrar resultados
+    let message = `📊 <strong>Resultados:</strong><br><br>
+                   Precisión: <strong>${accuracy}%</strong><br>
+                   Notas correctas: ${practiceCorrectNotes}/${totalExpectedNotes}<br>
+                   Errores: ${practiceErrors}<br>
+                   Tiempo total: ${totalTime.toFixed(1)}s<br>
+                   Tiempo promedio: ${avgTimePerNote}s/nota<br><br>`;
+    
+    if (parseInt(accuracy) >= accuracyThreshold) {
+        message += '✅ <strong>¡Excelente!</strong> Pasando a la siguiente fase...';
+        showModal(message);
+        setTimeout(() => {
+            hideModal();
+            setTimeout(() => {
+                advancePracticePhase();
+            }, 500);
+        }, 3000);
+    } else {
+        message += `❌ Necesitas al menos <strong>${accuracyThreshold}%</strong> de precisión.<br>
+                    Inténtalo de nuevo.`;
+        showModal(message);
+        setTimeout(() => {
+            hideModal();
+            setTimeout(() => {
+                preparePracticePhase();
+            }, 500);
+        }, 3000);
+    }
+}
+
+function advancePracticePhase() {
+    const startMeasure = currentPracticeMeasureSet * 4;
+    const endMeasure = Math.min(startMeasure + 4, measureStartTimes.length);
+    const measureRange = `${startMeasure + 1}-${endMeasure}`;
+    
+    if (currentPracticePhase === 'right-hand') {
+        currentPracticePhase = 'left-hand';
+        handFilterMode = 'left';
+        updateHandButtons();
+        updateStaffOpacity('left');
+        showModal(`🎹 <strong>Fase 2:</strong><br><br>Ahora practica los compases <strong>${measureRange}</strong><br>con la <strong>MANO IZQUIERDA</strong>.`);
+        setTimeout(() => {
+            hideModal();
+            preparePracticePhase();
+        }, 3000);
+        
+    } else if (currentPracticePhase === 'left-hand') {
+        currentPracticePhase = 'both-hands';
+        handFilterMode = 'both';
+        updateHandButtons();
+        updateStaffOpacity('both');
+        showModal(`🎹 <strong>Fase 3:</strong><br><br>¡Perfecto! Ahora toca los compases <strong>${measureRange}</strong><br>con <strong>AMBAS MANOS</strong>.`);
+        setTimeout(() => {
+            hideModal();
+            preparePracticePhase();
+        }, 3000);
+        
+    } else if (currentPracticePhase === 'both-hands') {
+        const nextSetStart = (currentPracticeMeasureSet + 1) * 4;
+        
+        if (nextSetStart < measureStartTimes.length - 1) {
+            currentPracticeMeasureSet++;
+            currentPracticePhase = 'right-hand';
+            handFilterMode = 'right';
+            updateHandButtons();
+            updateStaffOpacity('right');
+            
+            const newRange = `${nextSetStart + 1}-${Math.min(nextSetStart + 4, measureStartTimes.length)}`;
+            showModal(`🎹 <strong>¡Excelente progreso!</strong><br><br>
+                       Ahora practica los compases <strong>${newRange}</strong><br>
+                       con la <strong>MANO DERECHA</strong>.`);
+            setTimeout(() => {
+                hideModal();
+                preparePracticePhase();
+            }, 3000);
+            
+        } else {
+            startConsolidationPhase();
+        }
+    } else if (currentPracticePhase === 'consolidation') {
+        // Completó la consolidación
+        showSuccessModal("🎉 ¡Felicidades!<br><br>Has completado toda la práctica inteligente.<br>¡Excelente trabajo!");
+        showConfetti(300);
+        setTimeout(() => {
+            stopIntelligentPractice();
+        }, 3000);
+    }
+}
+
+function startConsolidationPhase() {
+    currentPracticePhase = 'consolidation';
+    handFilterMode = 'both';
+    updateHandButtons();
+    updateStaffOpacity('both');
+    
+    const totalMeasures = currentPracticeMeasureSet * 4 + 4;
+    showModal(`🎉 ¡Fase de Consolidación!<br><br>
+               Toca los compases 1-${totalMeasures}<br>
+               con AMBAS MANOS de forma continua.`);
+    
+    jumpToMeasureInLearnMode(0);
+    preparePracticePhase();
+}
+
+
+
+
+
 
 
 function prepareNextExpectedNotes() {
@@ -2991,22 +3391,22 @@ function midiNoteToPitchName(midiNote) {
     return noteName + octave;
 }
 
-// Script: añade estas nuevas funciones de ayuda
+
 function showModal(message, duration = 0) {
-    modalMessage.textContent = message;
+    modalMessage.innerHTML = message; 
+    //modalMessage.textContent = message;
     midiModal.style.display = 'flex';
-    // Usamos un pequeño timeout para que la transición CSS se active
     setTimeout(() => {
         midiModal.classList.add('is-visible');
     }, 10);
 
-    // Si se especifica una duración, el modal se cierra solo
     if (duration > 0) {
         setTimeout(() => {
             hideModal();
         }, duration);
     }
 }
+
 
 function hideModal() {
     midiModal.classList.remove('is-visible');
