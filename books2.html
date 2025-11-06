@@ -321,7 +321,46 @@
     font-weight: 600;
     z-index: 10; /* Nos aseguramos que esté por encima de la imagen */
 }
+/* --- Estilos para el botón de Favorito --- */
+.fav-button {
+    position: absolute;
+    top: 10px;       /* Un poco de espacio desde el borde */
+    right: 10px;      /* Un poco de espacio desde el borde */
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Círculo */
+    background: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+    border: 1px solid #e9ecef;           /* Borde gris claro */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    color: #374151; /* Color del ícono por defecto (gris oscuro) */
+}
 
+.fav-button:hover {
+    background: white;
+    transform: scale(1.05); /* Pequeño efecto al pasar el mouse */
+}
+
+/* Esta clase se aplica al ícono (<i>) cuando es favorito */
+.fav-button .is-favourite-icon {
+    color: #e53935; /* Corazón rojo */
+}
+
+/* Ajuste para la vista de lista (botón más pequeño) */
+.list-view .fav-button {
+    width: 28px;
+    height: 28px;
+    top: 6px;
+    right: 6px;
+}
+.list-view .fav-button .fa-heart {
+    font-size: 14px;
+}
 
     </style>
 </head>
@@ -429,6 +468,12 @@
 
                 <div class="book-cover-wrapper">
         <img ng-src="{{ book.coverUrl }}" class="book-cover">
+        <button class="fav-button" ng-click="$event.stopPropagation(); toggleFavourite(book)">
+            <i ng-class="{
+                'far fa-heart': !isFavourite(book), 
+                'fas fa-heart is-favourite-icon': isFavourite(book)
+               }"></i>
+        </button>
 
         <span class="book-grade-label" ng-if="book.difficulty">
             {{ book.difficulty }}
@@ -485,7 +530,7 @@ var allPiecesData = [
     "style": "postromantic",
     "tags": []
   },
-  {
+   {
     "title": "Ave Maria (Solo Piano)",
     "author": "Schubert",
     "background": "https://lh3.googleusercontent.com/d/1Px01baKi4rA20cUh8pxUhyhf64NZ-9Zz=s400",
@@ -1734,25 +1779,16 @@ var allPiecesData = [
   {
     "title": "Fughetta in E Moll",
     "author": "Zipoli",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1Maz5Mab-DLjKOFU9gqHFUZUyYYudPISm=s400",
     "pdf": "zipoli-fughetta-in-e-moll.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
     "tags": []
   },
   {
-    "title": "You've Got a Friend in Me",
-    "author": "Randy Newman",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
-    "pdf": "youve-got-a-friend-in-me-randy-newman.musicxml",
-    "dateAdded": "2025-11-05",
-    "style": "contemporary",
-    "tags": ["soundtrack"]
-  },
-  {
     "title": "Wedding March",
     "author": "Mendelssohn",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1SDJo-YG6qsCNfmasddbO6lQnr5K-cgBR=s400",
     "pdf": "wedding-march-from-midsummer-nigts-dream-fmendelssohn.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1761,7 +1797,7 @@ var allPiecesData = [
   {
     "title": "Vocalise",
     "author": "Rachmaninoff",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/10lIP9G7ip4YgsCYPhlEXvFfY2e4KbHDv=s400",
     "pdf": "vocalise-by-rachmaninoff-for-violin-and-piano.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1770,7 +1806,7 @@ var allPiecesData = [
   {
     "title": "Tico-Tico no Fubá",
     "author": "Zequinha de Abreu",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1h2lA4khIptIIPjUSkCfZlbzqJhyM-r_u=s400",
     "pdf": "tico-tico-no-fuba-choro-sapeca.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -1779,7 +1815,7 @@ var allPiecesData = [
   {
     "title": "Sonatina No. 2 in C Major",
     "author": "Thomas Attwood",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1dlK63uLVUlxxuSqi15sWxQI6xOEDED0e=s400",
     "pdf": "thomas-attwood-sonatina-no2-in-c-major-all-movements.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1788,7 +1824,7 @@ var allPiecesData = [
   {
     "title": "Study No. 1",
     "author": "Streabbog (Gobbarts)",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1naV7s79j0Ivl-hiLJjfw40M2Y8XHB-82=s400",
     "pdf": "study-no1-jean-louis-gobbarts-who-published-under-streabbog-hei-surname-spelt-backwards.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1797,7 +1833,7 @@ var allPiecesData = [
   {
     "title": "Ständchen (Serenade)",
     "author": "Schubert/Liszt",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1E-lGc-7ToAoDwVLy8bDpZLg5v55m34aA=s400",
     "pdf": "standchen-serenade-f-schubert-arr-liszt-edition-zz-urtext.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1806,7 +1842,7 @@ var allPiecesData = [
   {
     "title": "Sonatina No. 1, Op. 157",
     "author": "Spindler",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1F0gE0UK0sG5ul1hFMmyD2EayDmUNzhr7=s400",
     "pdf": "spindler-sonatina-no-1-op-157.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1815,7 +1851,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 1 (Vivace)",
     "author": "Muzio Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1DdcaiON3RoKrwXOogOyJ2WUN0Eop_3AF=s400",
     "pdf": "sonatina-op36-no1-vivace-muzio-clementi.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1824,7 +1860,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 2",
     "author": "Muzio Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1m4S1MUiW1-TS83CA-LW-EBSkm5O3ZvWM=s400",
     "pdf": "sonatina-op36-no2-muzio-clementi.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1833,7 +1869,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 1 (Mov. 2)",
     "author": "Muzio Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1eF5BUTFpjM6Z7EUjnOWtQq5fnYkbU3Zj=s400",
     "pdf": "sonatina-op-36-no-1-movement-2-by-muzio-clementi.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1842,7 +1878,7 @@ var allPiecesData = [
   {
     "title": "Sonatina in G Major (Anh. 5 No. 1)",
     "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1S2kXp5ALoP_Z3kkpPoZyP9qvc8-RGoVk=s400",
     "pdf": "sonatina-in-g-beethoven-anh5-no1-beethoven.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1851,7 +1887,7 @@ var allPiecesData = [
   {
     "title": "Sonatina in G Major (Op. 36 No. 2, 1st Mov.)",
     "author": "Muzio Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1qxh2_DE11uUtB9WtxIjfmia1OmbDpKN-=s400",
     "pdf": "sonatina-in-g-major-op-36-no-2-1st-movement-muzio-clementi.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1860,7 +1896,7 @@ var allPiecesData = [
   {
     "title": "Sonatina in F Major (Anh. 5 No. 2)",
     "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1WrzQLuBXgIuHzU53Lp2THArFXxhvjNLn=s400",
     "pdf": "sonatina-in-f-major-anh5-no2-beethoven.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1869,7 +1905,7 @@ var allPiecesData = [
   {
     "title": "Sonata No. 25 (1st Mov.)",
     "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1GTwTDpb1ENWBhM5MhEPr8fPJfRBirEz1=s400",
     "pdf": "sonate-no-25-1st-movement.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1878,7 +1914,7 @@ var allPiecesData = [
   {
     "title": "Sonatina in C Major, Op. 36 No. 1",
     "author": "Muzio Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1xp4R_TVyAYztvJDfh8L9r6wsHTFgtqem=s400",
     "pdf": "sonatina-in-c-major-op-36-no-1-muzio-clementi-sonatina-in-c-major-op-36-no-1.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1887,7 +1923,7 @@ var allPiecesData = [
   {
     "title": "Sonata in C Major, K. 545",
     "author": "Mozart",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ls1vcAeVC4mV24t7w7aITnOdPo2z8Hzr=s400",
     "pdf": "sonata-in-c-k545.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1896,7 +1932,7 @@ var allPiecesData = [
   {
     "title": "Solfeggietto",
     "author": "C.P.E. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1mvkk5AyGz6UvVJasY-ojzU1M2Xvw_KtN=s400",
     "pdf": "solfeggietto-c-p-e-bach.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1905,7 +1941,7 @@ var allPiecesData = [
   {
     "title": "Silhouette (Naruto Shippuden)",
     "author": "KANA-BOON",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1fNI5IDBmZAqyrfcBXWXeEeRgW_ZEGMyD=s400",
     "pdf": "silhouette-naruto-shippuden-op16.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -1914,7 +1950,7 @@ var allPiecesData = [
   {
     "title": "Runaway River",
     "author": "Varios",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1RuGnFeIjW3UbfBOA2q8pKdrG4SMeA5Wh=s400",
     "pdf": "runaway-river.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -1923,7 +1959,7 @@ var allPiecesData = [
   {
     "title": "Rigaudon",
     "author": "Telemann",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1xRZJNdm8Cli1CEg4nnfX9i1pMoaT-awr=s400",
     "pdf": "rigaudon-georg-philipp-telemann.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -1932,7 +1968,7 @@ var allPiecesData = [
   {
     "title": "Piano Concerto No. 2",
     "author": "Rachmaninoff",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1tfosCGkPOV_XnEH4nIEJcqfCFkta7Pch=s400",
     "pdf": "rachmaninoff-piano-concerto-2.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1941,7 +1977,7 @@ var allPiecesData = [
   {
     "title": "Prelude and Fugue No. 2 in C Minor (BWV 847)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/16gl5QMl7oVz5fh5qt0g78NV-LcZcpUWL=s400",
     "pdf": "prelude-and-fugue-no-2-in-c-minor-bwv-847-johann-sebastian-bach.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -1950,7 +1986,7 @@ var allPiecesData = [
   {
     "title": "Piano Sonata No. 20, Op. 49 No. 2",
     "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1Ct1Lx9lNX4cOIMHODpCLXStSDwqCiy7N=s400",
     "pdf": "piano-sonata-no-20-in-g-major-op-49-no-2-ludwig-van-beethoven.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -1959,7 +1995,7 @@ var allPiecesData = [
   {
     "title": "Jazz Exercise 3",
     "author": "Oscar Peterson",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1GbP8TleKL0IlxI4ee0A0pfPQX8811qAF=s400",
     "pdf": "oscar-peterson-jazz-exercises-for-piano-exercise-3.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -1968,7 +2004,7 @@ var allPiecesData = [
   {
     "title": "Jazz Exercise 2",
     "author": "Oscar Peterson",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1qH0v-tySfuzkKpiAqIGkl_CYYgRDHbhk=s400",
     "pdf": "oscar-peterson-jazz-exercises-for-piano-exercise-2.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -1977,7 +2013,7 @@ var allPiecesData = [
   {
     "title": "Nocturne Op. 55 No. 1",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/145WRJbjJB8LNyLM6d52HkMI2B-6QW_CY=s400",
     "pdf": "nocturne-opus-55-no-1-in-f-minor.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -1995,7 +2031,7 @@ var allPiecesData = [
   {
     "title": "Moonlight Sonata (3rd Mov.)",
     "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1mUNmK3OIjlrIzvQGQjOCHqzNOgx3uTZ1=s400",
     "pdf": "moonlight-sonata-3rd-movement.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2004,7 +2040,7 @@ var allPiecesData = [
   {
     "title": "Minuetto e Trio",
     "author": "Boccherini",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1V4fjYcH5FQHVaxBB9m5SqPXE9g8PGhbh=s400",
     "pdf": "minuetto-e-trio-no-3-g-275-op-11-no-5-luigi-boccherini.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2013,7 +2049,7 @@ var allPiecesData = [
   {
     "title": "Wood Carving Partita (Castlevania)",
     "author": "Michiru Yamane",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1mOIGdVKNI7SPKhrrrQmPzE4veOcUA-4M=s400",
     "pdf": "michiru-yamane-wood-carving-partita.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2022,7 +2058,7 @@ var allPiecesData = [
   {
     "title": "Merry-Go-Round of Life",
     "author": "Joe Hisaishi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1qmAKeQ9a-fRlFlgImX1czzyzs8dhoHLs=s400",
     "pdf": "merry-go-round-of-life-ren-shengnomerigorando-kyle-landry.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2031,7 +2067,7 @@ var allPiecesData = [
   {
     "title": "Mi Corazón Encantado (Dragon Ball GT)",
     "author": "Varios",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/19k_5Lrk6i1yWjklACU11aRdjMaIsxyQ-=s400",
     "pdf": "mi-corazon-encantado-dragon-ball-gt.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2040,7 +2076,7 @@ var allPiecesData = [
   {
     "title": "Hungarian Rhapsody No. 2",
     "author": "Liszt",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ZFOMLsrmMcWnjZ7PPMJ6Et_TAPRMGmxY=s400",
     "pdf": "liszt-hungarian-rhapsody-no-2.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2049,7 +2085,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 55 No. 1",
     "author": "Kuhlau",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1EQkzxKEHG9LmSDNapnkmLAf7CGdNnjJ-=s400",
     "pdf": "kuhlau-sonatina-op-55-no-1.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2058,7 +2094,7 @@ var allPiecesData = [
   {
     "title": "Las Mañanitas",
     "author": "Traditional",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1aqRFn7NxZYUeVgyIO-u1viMjJBZYyHDd=s400",
     "pdf": "las-mananitas.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2067,7 +2103,7 @@ var allPiecesData = [
   {
     "title": "Just the Way You Are",
     "author": "Billy Joel",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1oglxMgPbwZ4gz2EujATdMkt5E-xRg4Pz=s400",
     "pdf": "just-the-way-you-are-billy-joel-rupert-austin.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2076,7 +2112,7 @@ var allPiecesData = [
   {
     "title": "Giorno's Theme (Jojo's Bizarre Adventure)",
     "author": "Yugo Kanno",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1SoDsOFF7IoDFuJFsqt_ckMjjAJv1kS9p=s400",
     "pdf": "jojos-bizarre-adventure-giornos-piano-theme.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2085,7 +2121,7 @@ var allPiecesData = [
   {
     "title": "Jingle Bells (Jazz)",
     "author": "Varios",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/10jnDMJiwO602OKMOo_Bq16e3ok58DaaI=s400",
     "pdf": "jingle-bells-jazz-piano-holiday-final-arrangement.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -2094,7 +2130,7 @@ var allPiecesData = [
   {
     "title": "It's Beginning to Look a Lot Like Christmas",
     "author": "Meredith Willson",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1C0jed-aBovSg9eviNE8DHC8PqZ-UfD_q=s400",
     "pdf": "its-beginning-to-look-a-lot-like-christmas-for-solo-piano.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -2103,7 +2139,7 @@ var allPiecesData = [
   {
     "title": "Invention No. 1 (BWV 772)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/11CeUzM6pZ7wWr9wC_MwUAgOoWKuWKO93=s400",
     "pdf": "inventionno1-bwv-772-js-bach.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2112,7 +2148,7 @@ var allPiecesData = [
   {
     "title": "Impertience (HWV 494)",
     "author": "Handel",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1zBejMFkyyJqkPiWArniLm2bLjU3H1N46=s400",
     "pdf": "impertience-hw494-georg-friedrich-handel.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2121,7 +2157,7 @@ var allPiecesData = [
   {
     "title": "Golliwog's Cakewalk",
     "author": "Debussy",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1_YoIPBPcI_3DCQ9snIDerowBNwnCKdob=s400",
     "pdf": "golliwogs-cakewalk.musicxml",
     "dateAdded": "2025-11-05",
     "style": "postromantic",
@@ -2130,7 +2166,7 @@ var allPiecesData = [
   {
     "title": "Habanera (from Carmen)",
     "author": "Bizet",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1f7Hb2AaU4EvEqhaDx5CbVZrsSUA0Jiw9=s400",
     "pdf": "habanera-georges-bizet-carmen.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2139,7 +2175,7 @@ var allPiecesData = [
   {
     "title": "Etude Op. 25 No. 5",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ezEZDjCYvDior7rmDPgjn6ebOFtgbb5T=s400",
     "pdf": "fredryk-chopin-etude-op25-no5.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2148,7 +2184,7 @@ var allPiecesData = [
   {
     "title": "Fly Me to the Moon",
     "author": "Bart Howard",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1pNQMQCIryi78015IOuCrrdFmnc-tb1bk=s400",
     "pdf": "fly-me-to-the-moon.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -2157,7 +2193,7 @@ var allPiecesData = [
   {
     "title": "Fly Me to the Moon (Jazz Arrangement)",
     "author": "Bart Howard",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1Cuc_6ZHItCKSVK3YXFIUqqJDNkxSeuRk=s400",
     "pdf": "fly-me-to-the-moon-jazz-arrangement.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -2166,7 +2202,7 @@ var allPiecesData = [
   {
     "title": "Etude Op. 10 No. 4 ('Torrent')",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1dKrZYMQG59QDKf5FaTRXIKu97EdNqgf5=s400",
     "pdf": "etude-op10-no4-torrent-chopin.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2175,7 +2211,7 @@ var allPiecesData = [
   {
     "title": "Etude Op. 10 No. 3 ('Tristesse')",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1Ty2RCCIZWQlEFGOqrYwjY64pyz2AUS6W=s400",
     "pdf": "etude-op10-no3-tristesse-chopin.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2184,7 +2220,7 @@ var allPiecesData = [
   {
     "title": "Etude in A minor, Op. 58 No. 6",
     "author": "Varios",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1eovw4hcadqU9e30k85rm42NtC6ilN3a_=s400",
     "pdf": "etude-in-a-minor-op-58-no-6.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2193,7 +2229,7 @@ var allPiecesData = [
   {
     "title": "Danse Macabre",
     "author": "Saint-Saëns",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1n-lRwmouGV7HU1dMcaM1dqWd5SjWMO8U=s400",
     "pdf": "danse-macabre-saint-saens-piano.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2202,7 +2238,7 @@ var allPiecesData = [
   {
     "title": "Concert Etude 'Gnomenreigen'",
     "author": "Liszt",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1GfNIntqpmj_WgvxIMG5XJLacxdEbwFva=s400",
     "pdf": "concert-etude-gnomenreigen-s145-no2-liszt.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2211,7 +2247,7 @@ var allPiecesData = [
   {
     "title": "Czardas",
     "author": "Vittorio Monti",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1asZdbfqSZVf9zbXHMS3PeMhDIr80428m=s400",
     "pdf": "czardas-vittorio-monti-czardas-vittorio-monti-czardas-main-part.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2220,7 +2256,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 3",
     "author": "Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/18AHj17aJrTGON1TFQfLOTlwLOBQeOl5x=s400",
     "pdf": "clementi-sonatina-no-3-op-36.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2229,7 +2265,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 1",
     "author": "Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1hUUZCGJ3Jb4DA_t5oFnIbiScGk8JQyTM=s400",
     "pdf": "clementi-sonatina-op-36-no-1.musicxml",
     "dateAdded": "2E025-11-05",
     "style": "classic",
@@ -2238,7 +2274,7 @@ var allPiecesData = [
   {
     "title": "Clocks",
     "author": "Coldplay",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ha0TqqCqTWXn0R-rkkuUF5wdmWTP4Lv4=s400",
     "pdf": "clocks-coldplay.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2247,7 +2283,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 1 (Mov. 3)",
     "author": "Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1j8-4gkdXcVWYnqs13-vholFCaotKINCk=s400",
     "pdf": "clementi-muzio-sonatine-op-36-no1-3.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2256,7 +2292,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 1 (Mov. 2)",
     "author": "Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ZXTwiGmb0ZP7ALaRm21vVRk2N2i9A_xK=s400",
     "pdf": "clementi-muzio-sonatine-op-36-no-1-2.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2265,7 +2301,7 @@ var allPiecesData = [
   {
     "title": "Sonatina Op. 36 No. 2",
     "author": "Clementi",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1sPD4JZCoXOrHan0bXKWSLVi4Ok1fVmuM=s400",
     "pdf": "clementi-sonatina-no-2-op-36.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2274,7 +2310,7 @@ var allPiecesData = [
   {
     "title": "Etude Op. 10 No. 12 ('Revolutionary')",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1Pt_8BHDQBuLz6eLfYW4oQWo6apFrh_H6=s400",
     "pdf": "chopin-etude-op10-no12-in-c-minor-revolutionary.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2283,7 +2319,7 @@ var allPiecesData = [
   {
     "title": "Fantasie-Impromptu",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/18g691xwjKvbxzJCFcVzKoXG4DFnWobM1=s400",
     "pdf": "chopin-fantasie-impromptu-a-little-easier.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2292,7 +2328,7 @@ var allPiecesData = [
   {
     "title": "Etude Op. 25 No. 11 ('Winter Wind')",
     "author": "Chopin",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1BxD_vPerwDKGgrcvVrmo70bgFYtDXsb9=s400",
     "pdf": "chopin-etude-op25-no-11-winter-wind.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2301,7 +2337,7 @@ var allPiecesData = [
   {
     "title": "Dance of Pales (Castlevania)",
     "author": "Michiru Yamane",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1indnj9NDH0S7yjWoDyjqLBExH5g_vkMX=s400",
     "pdf": "castlevania-symphony-of-the-night-dance-of-pales.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2310,7 +2346,7 @@ var allPiecesData = [
   {
     "title": "Cantabile",
     "author": "Varios",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1FqoItdNl18pzX4uORl8ZaboSqa8u5WMo=s400",
     "pdf": "cantabile.musicxml",
     "dateAdded": "2025-11-05",
     "style": "classic",
@@ -2319,16 +2355,16 @@ var allPiecesData = [
   {
     "title": "Canon in D",
     "author": "Pachelbel",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1LTfAgFOsBPSymui5QM8uHb_RufK8oXt-=s400",
     "pdf": "canon-in-d-johann-pachelbel-canon-in-d.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
-    "tags": []
+    "tags": ["popular"]
   },
   {
     "title": "Prelude VI (WTC I, BWV 851)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1oyO4v4q58c4iBBLWIuFXz1Ri24kaLNlu=s400",
     "pdf": "bwv-851-the-well-tempered-clavier-part-i-praeludium-vi.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2337,7 +2373,7 @@ var allPiecesData = [
   {
     "title": "Fugue V (WTC I, BWV 850)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1-848NLSN2HSa-bsSmp31RMz9mkXtuzin=s400",
     "pdf": "bwv-850-the-well-tempered-clavier-part-i-fuga-v.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2346,7 +2382,7 @@ var allPiecesData = [
   {
     "title": "Prelude V (WTC I, BWV 850)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1EIBtW77ccqObZaZfolZ6EkEqrKdh6JpY=s400",
     "pdf": "bwv-850-the-well-tempered-clavier-part-i-praeludium-v.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2355,7 +2391,7 @@ var allPiecesData = [
   {
     "title": "Bella Ciao (Easy)",
     "author": "Traditional",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1DwtY8h8PaBXO-jDlCUdu1uJ3o88lq0VQ=s400",
     "pdf": "bella-ciaoeasy-version.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
@@ -2364,7 +2400,7 @@ var allPiecesData = [
   {
     "title": "Little Prelude in C Minor (BWV 999)",
     "author": "J.S. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1xG98rHiJsE0xQIlqFJ2F0YlUJciMsAqZ=s400",
     "pdf": "bach-little-prelude-in-c-minor-bwv-999.musicxml",
     "dateAdded": "2025-11-05",
     "style": "baroque",
@@ -2373,7 +2409,7 @@ var allPiecesData = [
   {
     "title": "March in D Major (BWV Anh. 122)",
     "author": "C.P.E. Bach",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1ypONNgyH0qsgpD7pmlSaDSLPt8pw709B=s400",
     "pdf": "bach-march-in-d-major-bwv-anh-122.musicxml",
     "dateAdded": "2S025-11-05",
     "style": "baroque",
@@ -2382,7 +2418,7 @@ var allPiecesData = [
   {
     "title": "Autumn Leaves",
     "author": "Joseph Kosma",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1K_LFpv0QDjrmlrWjzQ5xidiCFOsDb0H2=s400",
     "pdf": "autumn-leaves-les-feuilles-mortes.musicxml",
     "dateAdded": "2025-11-05",
     "style": "jazz",
@@ -2391,7 +2427,7 @@ var allPiecesData = [
   {
     "title": "Piece Op. 6 No. 2",
     "author": "Aleksandr Gedike",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1sZfz_OVa5xVj0YBIsyjdxnsV26xu_EUd=s400",
     "pdf": "aleksandr-gedike-op6-no2.musicxml",
     "dateAdded": "2025-11-05",
     "style": "romantic",
@@ -2400,12 +2436,13 @@ var allPiecesData = [
   {
     "title": "A Thousand Years (Easy)",
     "author": "Christina Perri",
-    "background": "https://lh3.googleusercontent.com/d/1qrKd7soQAqXsA9xy-Y9oQzPIp23Tei2q=s400",
+    "background": "https://lh3.googleusercontent.com/d/1WGI-7WhsKXIVBbgsu-_iwA8jkb4gJInk=s400",
     "pdf": "a-thousand-years-christina-perri-easy-vesion.musicxml",
     "dateAdded": "2025-11-05",
     "style": "contemporary",
     "tags": ["soundtrack"]
   }
+  
 
 ];
 
@@ -2425,31 +2462,23 @@ var allPiecesData = [
             };
         });
 
-  
+      
+      var favouritesPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('favourites');
+        });
         
-        var repertoirePieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('repertoire');
+   
+
+     
+
+        var popularPieces = allPieces.filter(function(piece) {
+            return piece.tags.includes('popular');
         });
 
-        var exePieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('exercise');
-        });
-
-
-        var minuetsPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('minuet');
-        });
-
-        var preludesPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('prelude');
-        });
-
-        var sonatinasPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('sonatina');
-        });
+      
 
         var sonatasPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('sonata');
+            return piece.tags.includes('sonata') || piece.tags.includes('sonatina')
         });
 
         var waltzesPieces = allPieces.filter(function(piece) {
@@ -2476,11 +2505,8 @@ var allPiecesData = [
       
 
         $scope.library = [
-            { title: 'Vistas en el curso', books: repertoirePieces },     
-             { title: 'Ejercicios', books: exePieces },  
-                 { title: 'Minuetos', books: minuetsPieces },  
-                      { title: 'Preludios', books: preludesPieces }, 
-             { title: 'Sonatinas', books: sonatinasPieces },  
+          { title: 'Favoritas', books: favouritesPieces },
+             { title: 'Populares', books: popularPieces }, 
               { title: 'Sonatas', books: sonatasPieces },
                { title: 'Waltz', books: waltzesPieces },
             { title: 'Nocturnos', books: nocturnesPieces },
@@ -2552,6 +2578,39 @@ $scope.goBack = function() {
 var allPiecesSection = $scope.library.find(function(sec) {
             return sec.title === 'Todo el catálogo';
         });
+
+$scope.isFavourite = function(book) {
+    if (!book || !book.tags) return false;
+    return book.tags.includes('favourites');
+};
+
+// Lógica para añadir/quitar favoritos
+$scope.toggleFavourite = function(book) {
+    if (!book || !book.tags) return;
+    
+    const tagIndex = book.tags.indexOf('favourites');
+    
+    if (tagIndex > -1) {
+        // --- Ya es favorito: Lo quitamos ---
+        book.tags.splice(tagIndex, 1);
+        
+        // Lo quitamos también del array 'favouritesPieces'
+        const favArrayIndex = favouritesPieces.indexOf(book);
+        if (favArrayIndex > -1) {
+            favouritesPieces.splice(favArrayIndex, 1);
+        }
+        
+    } else {
+        // --- No es favorito: Lo añadimos ---
+        book.tags.push('favourites');
+        
+        // Lo añadimos también al array 'favouritesPieces'
+        if (favouritesPieces.indexOf(book) === -1) {
+            // Lo añadimos al principio de la lista
+            favouritesPieces.unshift(book); 
+        }
+    }
+};
 
         $scope.$watchGroup(['searchQuery', 'filters.difficulty', 'filters.style'], function(newValues, oldValues) {
             
