@@ -1676,8 +1676,9 @@ function parseMusicXML(xmlText) {
 
                 if (node.tagName === 'note') {
                     const isChord = !!node.querySelector('chord');
+                    const isGrace = !!node.querySelector('grace'); // NUEVO: Detectar grace notes
                     
-                    if (!isChord) {
+                    if (!isChord && !isGrace) {
                         currentBeat += durationInBeats;
                     }
                     
@@ -1718,8 +1719,9 @@ function parseMusicXML(xmlText) {
                                 durSec: durationInBeats * (60.0 / globalTempo),
                                 hand: hand,
                                 isTied: true,
-                                isTiedContinuation: true, // NUEVA PROPIEDAD
-                                isChord: isChord
+                                isTiedContinuation: true,
+                                isChord: isChord,
+                                isGrace: isGrace // NUEVO
                             };
                             parsedNotes.push(continuationNote);
                             
@@ -1733,14 +1735,18 @@ function parseMusicXML(xmlText) {
                             // NOTA NUEVA
                             const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
                             
+                            // NUEVO: Grace notes tienen duración muy corta
+                            const noteDuration = isGrace ? 0.05 : (durationInBeats * (60.0 / globalTempo));
+                            
                             const newNote = {
                                 pitch: pitch,
                                 startSec: noteStartTime,
-                                durSec: durationInBeats * (60.0 / globalTempo),
+                                durSec: noteDuration,
                                 hand: hand,
                                 isTied: isTieStart,
-                                isTiedContinuation: false, // NUEVA PROPIEDAD
-                                isChord: isChord
+                                isTiedContinuation: false,
+                                isChord: isChord,
+                                isGrace: isGrace // NUEVO
                             };
                             parsedNotes.push(newNote);
 
@@ -1748,7 +1754,7 @@ function parseMusicXML(xmlText) {
                                 openTies.set(tieKey, newNote);
                             }
                         }
-                    }else if (node.querySelector('rest')) {
+                    } else if (node.querySelector('rest')) {
 
                         const noteStartTime = (currentBeat - durationInBeats) * (60.0 / globalTempo);
                         
@@ -1756,14 +1762,15 @@ function parseMusicXML(xmlText) {
                         const hand = !isNaN(staffNumber) ? (staffNumber === 1 ? 'treble' : 'bass') : defaultHand;
                         
                         const restNote = {
-                            pitch: null, // null indica que es un silencio
+                            pitch: null,
                             startSec: noteStartTime,
                             durSec: durationInBeats * (60.0 / globalTempo),
                             hand: hand,
-                            isRest: true, // NUEVA PROPIEDAD
+                            isRest: true,
                             isTied: false,
                             isTiedContinuation: false,
-                            isChord: isChord
+                            isChord: isChord,
+                            isGrace: false // NUEVO
                         };
                         parsedNotes.push(restNote);
                     }
