@@ -7,10 +7,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
-<script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
 
 <style>
 body {
@@ -243,50 +239,7 @@ body {
   color: #0079D3;
 }
 
-.midi-thumbnail-wrapper {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
-  padding: 40px;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-  margin-top: 12px;
-   width: 100%;
-      max-width: 400px;
-}
 
-.midi-thumbnail-wrapper:hover {
-  transform: translateY(-2px);
-}
-
-.midi-play-btn {
-  width: 70px;
-  height: 70px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-}
-
-.midi-play-btn i {
-  color: white;
-  font-size: 32px;
-  margin-left: 4px;
-}
-
-.midi-title {
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.midi-subtitle {
-  color: rgba(255,255,255,0.9);
-  font-size: 14px;
-}
 
 .poll-container {
   padding: 16px 0;
@@ -341,67 +294,7 @@ body {
   padding: 0 16px;
 }
 
-.midi-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
-}
 
-.midi-modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.midi-modal {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow: hidden;
-  transform: translateY(20px);
-  transition: transform 0.3s;
-}
-
-.midi-modal-overlay.active .midi-modal {
-  transform: translateY(0);
-}
-
-.midi-modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #edeff1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.midi-modal-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.midi-modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #7c7c7c;
-  cursor: pointer;
-}
-
-.midi-modal-body {
-  padding: 20px;
-}
 
 .comments-section {
   background: white;
@@ -515,23 +408,7 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-  #mainMidiVisualizer {
-      display: flex;
-      justify-content: center;
-      transform: scale(0.5);
-    }
 
-    @media (max-width: 600px) {
-      #mainMidiVisualizer {
-        transform: scale(0.4);
-      }
-    }
-
-    @media (max-width: 470px) {
-      #mainMidiVisualizer {
-        transform: scale(0.3);
-      }
-    }
 </style>
 </head>
 
@@ -544,11 +421,27 @@ body {
           <i class="ri-home-4-line"></i>
           <span>Inicio</span>
         </div>
-        <div class="filter-option" ng-class="{'active': filter === 'midi'}" ng-click="filterPosts('midi')">
-          <i class="ri-music-2-line"></i>
-          <span>Composiciones MIDI</span>
+        <div class="filter-option" ng-class="{'active': filter === 'request'}" ng-click="filterPosts('request')">
+          <i class="ri-play-list-add-line"></i>
+          <span>Petición de canciones</span>
         </div>
-        <div class="filter-option" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')">
+         <div class="filter-option" ng-class="{'active': filter === 'event'}" ng-click="filterPosts('event')">
+          <i class="ri-calendar-event-line"></i>
+          <span>Eventos</span>
+        </div>
+         <div class="filter-option" ng-class="{'active': filter === 'composition'}" ng-click="filterPosts('composition')">
+          <i class="ri-file-paper-2-line"></i>
+          <span>Composición</span>
+        </div>
+         <div class="filter-option" ng-class="{'active': filter === 'biomechanics'}" ng-click="filterPosts('biomechanics')">
+          <i class="ri-hand"></i>
+          <span>Biomecánica</span>
+        </div>
+      
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Acerca de</div>
+          <div class="filter-option" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')">
           <i class="ri-user-line"></i>
           <span>Mis Publicaciones</span>
         </div>
@@ -557,12 +450,6 @@ body {
           <span>Guardados</span>
         </div>
       </div>
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Acerca de</div>
-        <p style="font-size: 13px; color: #7c7c7c; line-height: 1.6; margin: 0;">
-          Comunidad dedicada al aprendizaje musical. Comparte tus composiciones, participa en encuestas y conecta con otros músicos.
-        </p>
       </div>
     </aside>
 
@@ -600,31 +487,20 @@ body {
           </div>
 
           <div class="post-content">
-            <div ng-if="post.type == 'text'">
+            <div ng-if="post.media == 'text'">
                  <div class="post-title" ng-if="post.header">{{post.header}}</div>
-              <div class="post-text">{{post.url}}</div>
+              <div class="post-text">{{post.content}}</div>
             </div>
 
-            <div ng-if="post.type == 'img'">
+            <div ng-if="post.media == 'img'">
               <div class="post-title" ng-if="post.header">{{post.header}}</div>
-              <img class="post-image" ng-src="{{post.url}}" ng-click="openComments(post)" />
+              <img class="post-image" ng-src="{{post.content}}" ng-click="openComments(post)" />
             </div>
 
-            <div ng-if="post.type == 'midi'">
-              <div class="post-title">{{post.header || 'Composición MIDI'}}</div>
-                     <div style="display: flex; justify-content: center;">
-              <div class="midi-thumbnail-wrapper" ng-click="openMidiModal(post)">
-                <div class="midi-play-btn">
-                  <i class="ri-play-fill"></i>
-                </div>
-                <div class="midi-title">{{post.header}}</div>
-                <div class="midi-subtitle">Haz clic para reproducir</div>
-              </div>
-              </div>
-            </div>
+      
 
-            <div ng-if="post.type == 'poll'">
-              <div class="post-title">{{post.url}}</div>
+            <div ng-if="post.media == 'poll'">
+              <div class="post-title">{{post.content}}</div>
               <div class="poll-container">
                 <div class="poll-option" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'voted': post.userHasVoted}">
                   <div class="poll-bar" ng-if="post.userHasVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
@@ -640,7 +516,7 @@ body {
             </div>
           </div>
 
-          <div class="post-actions" ng-if="post.type != 'poll'">
+          <div class="post-actions" ng-if="post.media != 'poll'">
             <button class="action-btn" ng-class="{'liked': isPostLiked(post)}" ng-click="newLike($index, post)">
               <i ng-class="isPostLiked(post) ? 'ri-heart-fill' : 'ri-heart-line'"></i>
               <span>{{post.likes.length}}</span>
@@ -672,24 +548,13 @@ body {
           </div>
 
           <div class="post-content">
-            <div ng-if="selectedPostForComments.type == 'text'">
-              <div class="post-text">{{selectedPostForComments.url}}</div>
+            <div ng-if="selectedPostForComments.media == 'text'">
+              <div class="post-text">{{selectedPostForComments.content}}</div>
             </div>
 
-            <div ng-if="selectedPostForComments.type == 'img'">
+            <div ng-if="selectedPostForComments.media == 'img'">
               <div class="post-title" ng-if="selectedPostForComments.header">{{selectedPostForComments.header}}</div>
-              <img class="post-image" ng-src="{{selectedPostForComments.url}}" />
-            </div>
-
-            <div ng-if="selectedPostForComments.type == 'midi'">
-              <div class="post-title">{{selectedPostForComments.header || 'Composición MIDI'}}</div>
-              <div class="midi-thumbnail-wrapper" ng-click="openMidiModal(selectedPostForComments)">
-                <div class="midi-play-btn">
-                  <i class="ri-play-fill"></i>
-                </div>
-                <div class="midi-title">{{selectedPostForComments.header}}</div>
-                <div class="midi-subtitle">Haz clic para reproducir</div>
-              </div>
+              <img class="post-image" ng-src="{{selectedPostForComments.content}}" />
             </div>
           </div>
 
@@ -730,25 +595,7 @@ body {
     </main>
   </div>
 
-  <div class="midi-modal-overlay" ng-class="{'active': midiModalOpen}" ng-click="closeMidiModal()">
-    <div class="midi-modal" ng-click="$event.stopPropagation()">
-      <div class="midi-modal-header">
-        <div>
-          <h4 class="midi-modal-title">{{currentMidi.header || 'Reproductor MIDI'}}</h4>
-          <div class="post-time">Por {{currentMidi.user}}</div>
-        </div>
-        <button class="midi-modal-close" ng-click="closeMidiModal()">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-      <div class="midi-modal-body">
-        <midi-player id="mainMidiPlayer" sound-font visualizer="#mainMidiVisualizer"></midi-player>
-        <div style="height: 200px; margin-top: 20px;">
-          <midi-visualizer id="mainMidiVisualizer" type="waterfall"></midi-visualizer>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <dialog id="dialog-post">
     <div style="padding: 20px; width: 500px; max-width: 90vw;">
@@ -790,7 +637,7 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       $scope.filterPosts('all');
       $scope.userDataLoaded = false;
       $scope.data.forEach(post => {
-        if (post.type === 'poll') {
+        if (post.media === 'poll') {
           post.userHasVoted = post.likes.some(opt => opt.users.includes($scope.user));
         }
       });
@@ -821,7 +668,7 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     } else if (type === 'saved') {
       $scope.filteredData = $scope.data.filter(post => $scope.isPostSaved(post));
     } else {
-      $scope.filteredData = $scope.data.filter(post => post.type === type);
+      $scope.filteredData = $scope.data.filter(post => post.branch === type);
     }
     $scope.itemsPerPage = 6;
   };
@@ -874,30 +721,7 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     post.userHasVoted = true;
   };
 
-  $scope.currentMidi = null;
-  $scope.midiModalOpen = false;
 
-  $scope.openMidiModal = function (post) {
-    $scope.currentMidi = post;
-    $scope.midiModalOpen = true;
-    $timeout(function () {
-      const player = document.getElementById('mainMidiPlayer');
-      const visualizer = document.getElementById('mainMidiVisualizer');
-      if (player && visualizer) {
-        player.setAttribute('src', post.url);
-        visualizer.setAttribute('src', post.url);
-      }
-    }, 100);
-  };
-
-  $scope.closeMidiModal = function () {
-    const player = document.getElementById('mainMidiPlayer');
-    if (player && player.player) {
-      player.player.stop();
-    }
-    $scope.midiModalOpen = false;
-    $scope.currentMidi = null;
-  };
 
   $scope.newPost = function (data) {
     if (!data) return;
