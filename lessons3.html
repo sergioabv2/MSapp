@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="es" ng-app="pianoApp">
 <head>
     <meta charset="UTF-8">
@@ -6,48 +6,50 @@
     <title>Piano Quest Pro</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-   
+    <link rel="stylesheet" href="styles.css">
+</head>
+
     <style>
-        /* CSS Básico - Sin cambios, excepto por el nuevo botón de regreso */
-        :root {
-            --bg-color: #f0f2f5;
-            --main-content-bg: #ffffff;
-            --text-color: #333333;
-            --sidebar-bg: #f5f5f5;
-            --sidebar-text: #212529;
-            --header-bg: #212529;
-            --header-text: #ffffff;
-            --lesson-header-bg: #f8f9fa;
-            --lesson-header-hover: #e2e6ea;
-            --primary-accent: #6f42c1;
-            --success-green: #28a745;
-            --danger-red: #dc3545;
-            --modal-bg: rgba(0,0,0,0.5);
-            --modal-content-bg: #ffffff;
-            --medium-gray: #adb5bd;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-color);
-             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        #levelSelector, #pianoApp {
-            height: 100%;
-        }
+        /* Variables CSS */
+:root {
+    --bg-color: #f0f2f5;
+    --main-content-bg: #ffffff;
+    --text-color: #333333;
+    --sidebar-bg: #f5f5f5;
+    --sidebar-text: #212529;
+    --header-bg: #212529;
+    --header-text: #ffffff;
+    --lesson-header-bg: #f8f9fa;
+    --lesson-header-hover: #e2e6ea;
+    --primary-accent: #6f42c1;
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+    --modal-bg: rgba(0,0,0,0.5);
+    --modal-content-bg: #ffffff;
+    --medium-gray: #adb5bd;
+}
 
-      /*  #levelSelector {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 40px 20px;
-            overflow-y: auto;
-        }*/
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
 
-      #levelSelector {
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#levelSelector, #pianoApp {
+    height: 100%;
+}
+
+/* ========== SELECTOR DE NIVELES ========== */
+#levelSelector {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
@@ -55,507 +57,641 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 100px;
-    
-    /* --- AÑADE ESTA LÍNEA --- */
-    padding: 120px 0 0 0; /* 120px arriba, 0 en los demás lados */
+    padding: 120px 0 0 0;
 }
 
-        .level-container {
+.level-container {
     display: grid;
-    grid-template-columns: 230px 1fr; /* Columna principal flexible y columna derecha fija */
-    gap: 15px; /* Espacio entre las columnas */
-    max-width: 1200px; /* Aumentamos el ancho máximo para que quepan bien */
+    grid-template-columns: 230px 1fr;
+    gap: 15px;
+    max-width: 1200px;
     width: 100%;
-    padding: 20px; /* Añadimos padding para que el contenido no pegue a los bordes */
-
-  
+    padding: 20px;
 }
-        .level-header {
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 40px 30px;
-            text-align: center;
-        }
-        .level-header h1 { font-size: 2.2rem; margin-bottom: 12px; }
-        .level-header p { font-size: 1.1rem; opacity: 0.9; }
-        .levels-grid {
-            display: grid;
-            grid-template-columns: 1fr; padding: 10px 20px;
-            gap: 20px;
-        }
-      
 
+.level-header {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 40px 30px;
+    text-align: center;
+}
 
+.level-header h1 { 
+    font-size: 2.2rem; 
+    margin-bottom: 12px; 
+}
 
-.level-card-left {
-    padding: 5px 7px;
-    flex-shrink: 0; /* Evita que se encoja */
-    width: 30%; /* Ancho del panel izquierdo */
+.level-header p { 
+    font-size: 1.1rem; 
+    opacity: 0.9; 
+}
+
+.levels-grid {
+    display: grid;
+    grid-template-columns: 1fr; 
+    padding: 10px 20px;
+    gap: 20px;
+}
+
+/* Tarjetas de nivel */
+.level-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e7;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.level-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.level-card.locked {
+    opacity: 0.6;
+    cursor: auto;
+    filter: grayscale(80%);
+}
+
+.level-card.locked:hover {
+    transform: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-content {
     display: flex;
-    background-color: ;
-    flex-direction: column;
-    justify-content: center; /* Centra el contenido verticalmente */
-  /*  background-color: rgba(111, 66, 193, 0.3); */
+    align-items: flex-start;
+    gap: 20px;
 }
 
-
-
-/* 4. Panel derecho (claro) */
-.level-card-right {
-    padding: 5px 7px;
-    flex-grow: 1; /* Ocupa el espacio restante */
+.level-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    border-radius: 50%;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
+.level-info {
+    flex: 1;
+    min-width: 0;
+}
 
-        .level-card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .level-number {
-            width: 40px; height: 40px; background: var(--primary-accent);
-            color: white; border-radius: 50%; font-weight: 600; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .level-title { font-size: 1.3rem; font-weight: 600; color: var(--text-color); }
-        .level-description { color: var(--text-color); opacity: 0.8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px; }
-        .level-duration { color: var(--primary-accent); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-        .level-duration::before { content: '⏱️'; }
-        .continue-btn-container { margin: 30px; margin-top: 0; text-align: center; }
-        .continue-btn {
-            background: var(--primary-accent); color: white;
-            padding: 16px 40px; border: none; border-radius: 8px;
-            font-size: 1.1rem; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.6; pointer-events: none;
-        }
+.level-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+}
 
-        .continue-btn2 {
-            background: var(--primary-accent); color: white;
-            bottom: 0;
-            right: 0;
-            width: 130px;
-            padding: 16px 40px; border: none; border-radius: 8px;
-            font-size: 1.1rem; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.6; pointer-events: none;
-        }
+.level-description {
+    color: #6e6e73;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
 
-        .continue-btn.active { opacity: 1; pointer-events: all; }
-        .continue-btn:hover.active { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3); }
+.level-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
 
-        /* ============================================= */
-        /* == ESTILOS PARA LA APP DE PIANO ============= */
-        /* ============================================= */
-         #pianoApp { display: flex; flex-direction: column; }
-        .app-header { display: none; }
-        .app-container { display: flex; flex: 1; overflow: hidden; }
-        .menu-toggle-btn { display: none; position: fixed; top: 10px; left: 15px; background: var(--sidebar-bg); color: var(--sidebar-text); border: none; font-size: 1.5rem; cursor: pointer; z-index: 1002; width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .sidebar { width: 320px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; border-left: 1px solid var(--lesson-header-bg); }
-        .main-content { flex-grow: 1; background-color: var(--main-content-bg); display: flex;   flex-direction: column;}
-        #content-iframe { width: 100%; height: 100%; border: none; }
-        .user-profile { display: flex; align-items: center; margin-bottom: 25px; }
-        .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-right: 15px; }
-        .user-info .name { font-size: 1.1rem; font-weight: 600; }
-        .user-info .plan { font-size: 0.8rem; color: #adb5bd; }
-        .progress-bar { width: 100%; height: 11px; background-color: var(--lesson-header-bg); border-radius: 4px; overflow: hidden; margin-bottom: 30px; }
-        .progress-fill { height: 100%; background-color: var(--primary-accent); width: 0%; transition: width 0.5s ease-in-out; }
-        .lessons-container { flex-grow: 1; overflow-y: auto; }
-        .lesson-header { display: flex; align-items: center; border: 1px solid var(--medium-gray); font-weight: bold; font-size: 1rem; padding: 12px; background-color: var(--lesson-header-bg); border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s; }
-        .lesson-header.unlocked { cursor: pointer; }
-        .lesson-header.unlocked:hover { background-color: var(--lesson-header-hover); }
-        .lesson-header.completed { background-color: #E8E8E8; color: black; border-color: var(--success-green);}
-       /*  .lesson-header.completed { background-color: gray; color: white; border-color: var(--success-green);}*/
-        .lesson-header .icon { font-size: 1.2rem; margin-right: 10px; }
-        .tasks-list { list-style: none; padding-left: 15px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
-        .tasks-list.expanded { max-height: 500px; }
-        .task-item { display: flex; align-items: center; padding: 10px 5px; font-size: 0.95rem; opacity: 0.7; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-        .task-item:hover { background-color: var(--lesson-header-hover); }
-        .task-item.is-viewing { background-color: rgba(111, 66, 193, 0.08); }
-        .task-item.active { opacity: 1; font-weight: bold; background-color: rgba(111, 66, 193, 0.2); border-left: 3px solid var(--primary-accent); padding-left: 10px; }
-        .task-item.completed { opacity: 1; }
-        .task-item.completed .task-title { text-decoration: line-through; }
-        .task-status { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--medium-gray); margin-right: 10px; flex-shrink: 0; }
-        .task-item.active .task-status { border-color: var(--primary-accent); }
-        .task-item.completed .task-status { background-color: var(--success-green); border-color: var(--success-green); }
-        .task-interaction-icon { cursor: pointer; margin-left: auto; font-size: 1.5rem; z-index: 2; }
-        #recordingIndicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--danger-red); color: white; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; z-index: 1020; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: 500; }
-       #recordingIndicator::before { content: ''; position: absolute; inset: 0; background-color: var(--danger-red); border-radius: 20px; z-index: -1; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 70% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; align-items: center; justify-content: center; z-index: 1010; }
-        .modal-content { background: var(--modal-content-bg); padding: 20px; border-radius: 8px; width: 90%; max-width: 640px; text-align: center; }
-        #audio-playback { width: 100%; margin: 15px 0; }
-        .modal-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 15px; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .modal-button { padding: 10px 20px; border: none; border-radius: 5px; background-color: var(--primary-accent); color: white; font-size: 1rem; cursor: pointer; }
-        .modal-button.delete { background-color: var(--danger-red); }
-        .quiz-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
-        .quiz-option { padding: 12px; border: 1px solid var(--medium-gray); color: var(--text-color); background-color: transparent; border-radius: 5px; cursor: pointer; }
-        .quiz-option:hover { background-color: var(--lesson-header-hover); }
-        .confetti { position: fixed; width: 10px; height: 10px; opacity: 0; animation: confetti-fall 5s ease-out forwards; }
-        @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+.time-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+}
 
-        /* Estilos del nuevo botón "Regresar" */
-      
+.time-text {
+    color: #8B5CF6;
+    font-size: 14px;
+    font-weight: 500;
+}
 
-        @media (max-width: 800px) {
-            .levels-grid { grid-template-columns: 1fr; padding: 30px 20px; }
-            .level-header { padding: 30px 20px; }
-            .level-header h1 { font-size: 1.8rem; }
-            .app-header {
-                display: flex; align-items: center; justify-content: center; /* Centrado */
-                padding: 0 15px; height: 45px;
-                position: fixed; top: 0; width: 100%; z-index: 999;
-                background-color: var(--header-bg);
-            }
-            
+.progress-container2 {
+    width: 190px;
+    height: 10px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
 
-            .menu-toggle-btn { display: flex; align-items: center; justify-content: center; top: 50px; left: 15px; right: auto; } /* Ajustado a la derecha */
-            .sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 300px; max-width: 80%; z-index: 1001; transform: translateX(100%); transition: transform 0.3s ease-in-out; border-left: 1px solid var(--lesson-header-bg); border-right: none; }
-            .sidebar.is-open { transform: translateX(0); }
-            .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
-            .sidebar-overlay.is-active { opacity: 1; visibility: visible; }
-        }
+.progress-bar2 {
+    height: 100%;
+    background: linear-gradient(90deg, #8B5CF6, #A855F7);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s ease-out;
+}
 
+.lockLvlIco {
+    position: absolute;
+    font-size: 20px;
+    right: 15px;
+    top: 15px;
+}
 
+/* ========== APP DE PIANO ========== */
+#pianoApp { 
+    display: flex; 
+    flex-direction: column; 
+}
 
-        
+.app-header { 
+    display: none; 
+}
+
+.app-container { 
+    display: flex; 
+    flex: 1; 
+    overflow: hidden; 
+}
+
+.menu-toggle-btn { 
+    display: none; 
+    position: fixed; 
+    top: 10px; 
+    left: 15px; 
+    background: var(--sidebar-bg); 
+    color: var(--sidebar-text); 
+    border: none; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    z-index: 1002; 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 50%; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+}
+
+/* ========== SIDEBAR REDISEÑADO ========== */
+.sidebar { 
+    width: 380px; 
+    background-color: #ffffff;
+    color: var(--sidebar-text); 
+    display: flex; 
+    flex-direction: column; 
+    padding: 25px; 
+    flex-shrink: 0; 
+    border-left: 1px solid #dee2e6; 
+    box-shadow: -2px 0 8px rgba(0,0,0,0.05); 
+}
+
+/* ========== MAIN CONTENT REDISEÑADO ========== */
+.main-content { 
+    flex-grow: 1; 
+    background-color: #000000; 
+    display: flex; 
+    flex-direction: column; 
+    position: relative; 
+}
+
+#content-iframe { 
+    width: 100%; 
+    height: 100%; 
+    border: none; 
+}
+
+/* ========== USER PROFILE REDISEÑADO ========== */
+.user-profile { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 20px; 
+    padding-bottom: 20px; 
+    border-bottom: 1px solid #e9ecef; 
+}
+
+.user-avatar { 
+    width: 48px; 
+    height: 48px; 
+    border-radius: 12px; 
+    background: linear-gradient(135deg, #8B5CF6, #A855F7); 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    margin-right: 15px; 
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); 
+}
+
+.user-info .name { 
+    font-size: 1rem; 
+    font-weight: 600; 
+    color: #1d1d1f; 
+    margin-bottom: 4px; 
+}
+
+.user-info .plan { 
+    font-size: 0.75rem; 
+    color: #6e6e73; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
+
+/* ========== PROGRESS BAR REDISEÑADO ========== */
+.progress-bar { 
+    width: 100%; 
+    height: 8px; 
+    background-color: #e9ecef; 
+    border-radius: 10px; 
+    overflow: hidden; 
+    margin-bottom: 25px; 
+}
+
+.progress-fill { 
+    height: 100%; 
+    background: linear-gradient(90deg, #8B5CF6, #A855F7); 
+    width: 0%; 
+    transition: width 0.5s ease-in-out; 
+    border-radius: 10px; 
+}
+
+/* ========== LESSONS CONTAINER REDISEÑADO ========== */
+.lessons-container { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+    padding-right: 8px; 
+}
+
+.lessons-container::-webkit-scrollbar { 
+    width: 6px; 
+}
+
+.lessons-container::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+
+.lessons-container::-webkit-scrollbar-thumb { 
+    background: #d1d5db; 
+    border-radius: 10px; 
+}
+
+.lessons-container::-webkit-scrollbar-thumb:hover { 
+    background: #9ca3af; 
+}
+
+/* ========== LESSON HEADER REDISEÑADO ========== */
+/* Agregar chevron y línea divisora a lesson-header */
+.lesson-header {
+    display: flex;
+    align-items: center;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 14px 12px;
+    background-color: transparent;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s;
+    color: #1d1d1f;
+    border-bottom: 1px solid #e9ecef; /* NUEVA LÍNEA DIVISORA */
+    position: relative; /* PARA EL CHEVRON */
+}
+
+/* Agregar chevron con ::after */
+.lesson-header::after {
+    content: '\EA4E'; 
+    font-family: 'remixicon';
+    margin-left: auto;
+    font-size: 1.2rem;
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+/* Rotar chevron cuando está expandido */
+.lesson-header.expanded::after {
+    transform: rotate(180deg);
+}
+
+/* Ajustar el span del título para que no empuje el chevron */
+.lesson-header span {
+    flex: 1;
+}
+
+.lesson-header.unlocked { 
+    cursor: pointer; 
+}
+
+.lesson-header.unlocked:hover { 
+    background-color: #f5f5f7; 
+}
+
+.lesson-header.completed { 
+    background-color: #f0fdf4; 
+    color: #15803d; 
+    border: 1px solid #bbf7d0; 
+}
+
+.lesson-header .icon { 
+    font-size: 1.1rem; 
+    margin-right: 12px; 
+    opacity: 0.6; 
+}
+
+/* ========== TASKS LIST REDISEÑADO ========== */
+.tasks-list { 
+    list-style: none; 
+    padding-left: 8px; 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.4s ease-out; 
+    margin-bottom: 8px; 
+}
+
+.tasks-list.expanded { 
+    max-height: 500px; 
+}
+
+.task-item { 
+    display: flex; 
+    align-items: center; 
+    padding: 10px 12px; 
+    font-size: 0.85rem; 
+    opacity: 0.7; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    margin-bottom: 2px; 
+}
+
+.task-item:hover { 
+    background-color: #f5f5f7; 
+    opacity: 1; 
+}
+
+.task-item.is-viewing { 
+    background-color: rgba(139, 92, 246, 0.08); 
+}
+
+.task-item.active { 
+    opacity: 1; 
+    font-weight: 600; 
+    background-color: rgba(139, 92, 246, 0.15); 
+    border-left: 3px solid #8B5CF6; 
+    padding-left: 10px; 
+}
+
+.task-item.completed { 
+    opacity: 1; 
+}
+
+.task-item.completed .task-title { 
+    text-decoration: line-through; 
+    color: #6e6e73; 
+}
+
+.task-status { 
+    width: 16px; 
+    height: 16px; 
+    border-radius: 50%; 
+    border: 2px solid #d1d5db; 
+    margin-right: 10px; 
+    flex-shrink: 0; 
+}
+
+.task-item.active .task-status { 
+    border-color: #8B5CF6; 
+    background-color: #8B5CF6; 
+}
+
+.task-item.completed .task-status { 
+    background-color: var(--success-green); 
+    border-color: var(--success-green); 
+    position: relative; 
+}
+
+.task-item.completed .task-status::after { 
+    content: '✓'; 
+    position: absolute; 
+    color: white; 
+    font-size: 10px; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+}
+
+.task-interaction-icon { 
+    cursor: pointer; 
+    margin-left: auto; 
+    font-size: 1.5rem; 
+    z-index: 2; 
+}
+
+/* ========== UNIT SEPARATOR REDISEÑADO ========== */
+.unit-separator {
+    font-weight: 700;
+    color: #1d1d1f;
+    padding: 12px 12px 8px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+    background-color: transparent;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.unit-separator:first-child {
+    margin-top: 0;
+}
+
+/* ========== PLAYER HEADER REDISEÑADO ========== */
 .player-header {
-    padding-bottom: 15px;
-    background: #f5f5f5;
+    padding: 12px 20px;
+    background: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e9ecef;
     flex-wrap: wrap;
 }
 
-.player-tools {
-    display: flex;
-
-     margin-left: auto;
-}
-
-.tool-btn {
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    padding: 5px 12px;
+#back-to-levels-btn {
+    background: #f5f5f7;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     cursor: pointer;
+    font-weight: 500;
+    color: #1d1d1f;
+    transition: background 0.2s;
 }
 
-.tool-btn:hover {
-    background: #f0f0f0;
+#back-to-levels-btn:hover {
+    background: #e5e5e7;
 }
 
-.tool-btn i {
-    font-size: 16px;
+/* ========== MODALES REDISEÑADOS ========== */
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: var(--modal-bg); 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 1010; 
 }
 
-.progress-display {
-  padding: 1px 10px;
-  background: #f9f9f9;
-  border-bottom: 1px solid #eee;
-  font-family: 'Roboto Mono', monospace;
+/* MODAL PARA VIDEO (dentro del contenedor) */
+.video-modal-overlay { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.85); 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 100; 
+    backdrop-filter: blur(4px); 
 }
 
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: nowrap;
+.modal-content { 
+    background: var(--modal-content-bg); 
+    padding: 20px; 
+    border-radius: 8px; 
+    width: 90%; 
+    max-width: 640px; 
+    text-align: center; 
 }
 
-.progress-bar-container {
-  flex: 1;
-  min-width: 0;
-  padding-right: 15px;
+.video-modal-content { 
+    background: white; 
+    padding: 32px; 
+    border-radius: 16px; 
+    max-width: 400px; 
+    text-align: center; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
 }
 
-.time-displays-container {
-  display: flex;
-  gap: 5px;
-  margin-right: 7px;
+.video-modal-content h2 { 
+    margin: 0 0 16px 0; 
+    font-size: 1.5rem; 
 }
 
-.time-display {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 60px;
+.video-modal-content p { 
+    margin: 0 0 24px 0; 
+    color: #6e6e73; 
+    line-height: 1.6; 
 }
 
-.time-display .label {
-  font-size: 11px;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-right: -10px;
+.video-modal-content .modal-button { 
+    width: 100%; 
+    padding: 14px 24px; 
+    font-size: 1rem; 
+    border-radius: 10px; 
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.time-display .value {
-  font-weight: bold;
-  font-size: 14px;
-  color: #333;
-
+.video-modal-content .modal-button:hover {
+    transform: scale(1.02);
 }
 
-
-.progress-bar {
-
-  overflow: hidden;
-  height: 24px;
-  width: 130px;
-  background: #e0e0e0;
-  border-radius: 4px;
+#audio-playback { 
+    width: 100%; 
+    margin: 15px 0; 
 }
 
-
-.progress-fill {
-    height: 24px;
-    background: #AA336A; /* Green for the filled part */
-    border-radius: 2px;
-    transition: width 0.3s ease;
-    display: block;
+.modal-buttons { 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 15px; 
 }
 
-.player-container {
-    flex: 1;
-    width: 100%;
-    min-height: 0; /* Para que el iframe no desborde */
+.modal-button { 
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 5px; 
+    background-color: var(--primary-accent); 
+    color: white; 
+    font-size: 1rem; 
+    cursor: pointer; 
 }
 
-.player-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
+.modal-button.delete { 
+    background-color: var(--danger-red); 
 }
 
-/* Estilo para metrónomo activo */
-.metronome-active {
-    background: #ffeb3b !important;
-    border-color: #ffc107 !important;
+/* ========== INDICADORES Y EFECTOS ========== */
+#recordingIndicator { 
+    position: fixed; 
+    bottom: 20px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background-color: var(--danger-red); 
+    color: white; 
+    padding: 8px 15px; 
+    border-radius: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    z-index: 1020; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+    font-weight: 500; 
 }
 
-/* Estilo para grabación activa */
-.recording-active {
-    background: #ffebee !important;
-    border-color: #ef9a9a !important;
-    color: #f44336 !important;
+#recordingIndicator::before { 
+    content: ''; 
+    position: absolute; 
+    inset: 0; 
+    background-color: var(--danger-red); 
+    border-radius: 20px; 
+    z-index: -1; 
+    animation: pulse 1.5s infinite; 
 }
 
-.recording-active i {
-    color: #f44336 !important;
-    animation: pulse 1.5s infinite;
+@keyframes pulse { 
+    0% { transform: scale(0.95); opacity: 0.7; } 
+    70% { transform: scale(1.1); opacity: 0; } 
+    100% { transform: scale(0.95); opacity: 0; } 
 }
 
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+.confetti { 
+    position: fixed; 
+    width: 10px; 
+    height: 10px; 
+    opacity: 0; 
+    animation: confetti-fall 5s ease-out forwards; 
 }
 
-
-
-.close-btn2 {
-
-  top: 1.7rem;
-  right: 1.7rem;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+@keyframes confetti-fall { 
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } 
 }
 
-.close-btn2:hover {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-
-@media(max-width: 550px){
-  .mobile{
-    display: none;
-  }
-    .player-header {
-    justify-content: space-between; /* Fuerza los elementos restantes a los extremos */
-  }
-  
-  .player-tools {
-    margin-left: auto; /* Empuja a la derecha */
-  }
-}
-
-
-/* Efecto vidrio para métricas en móvil */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Contenedor de métricas para móvil */
-.mobile-metrics {
-  display: flex;
-  justify-content: space-around;
-  margin-top: -30px;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 2;
-}
-
-.metric-item {
-  display: flex;
-  flex-direction: column;
-
-  padding: 0 10px;
-}
-
-.metric-value {
-  font-weight: bold;
-  font-size: 16px;
-  color: white;
-}
-
-.metric-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 4px;
-}
-
-
-
-  
-  
-.tool-btn.active {
-  background: white;
-  border-color: #bdbdbd;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-}
-.recording-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-
-}
-
-.left-controls {
-  display: flex;
-  gap: 8px;
-  margin-right: auto; /* Empuja todo a la izquierda */
-}
-
-.right-controls {
-  display: flex;
-  gap: 8px;
-  margin-left: auto; /* Empuja todo a la derecha */
-}
-
-.metronome-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bpm-control {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 4px 8px;
-}
-
-.bpm-buttons {
-  display: flex;
-}
-
-.bpm-btn {
-  background: transparent;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.bpm-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.bpm-label {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 14px;
-  min-width: 50px;
-  text-align: center;
-}
-
-/* Estilos para estados activos */
-.record-btn.active {
-  color: #f44336;
-  animation: pulse 1.5s infinite;
-}
-
-.metronome-btn.active {
-  color: #FF9800;
-  animation: pulse 0.5s infinite alternate;
-}
-
-@keyframes pulse {
-  from { opacity: 1; }
-  to { opacity: 0.7; }
-}
-  
-  
-  .record-btn.active {
-  color: #f44336;
-  animation: pulse 1.5s infinite;
-}
-
-
-/*
+/* ========== BANNER ========== */
 .banner-header {
-    width: 98vw;          
-    max-width: 1200px;   
-    height: 150px;       
-    margin: 0 auto;      
-    margin-top: 5px;
-    border-radius: 16px;
-    overflow: hidden;     
-}
-*/
-
-.banner-header {
-    /* --- PROPIEDADES MODIFICADAS Y NUEVAS --- */
     position: absolute;
     top: 0;
     left: 0;
     z-index: 10;
-    
-    /* --- PROPIEDADES QUE SE MANTIENEN --- */
-    width: 100%;  /* Asegúrate que sea 100% y no 98vw */
+    width: 100%;
     height: 110px;
     overflow: hidden;
     will-change: transform, opacity;
@@ -568,39 +704,44 @@
     display: block;
 }
 
-
 .pending-tasks {
     background-color: var(--main-content-bg);
     border: 1px solid #e0e0e0;
     border-radius: 12px;
     padding: 20px;
-    height: fit-content; /* Se ajusta a la altura de su contenido */
+    height: fit-content;
 }
+
 .pending-tasks h4 {
     margin-bottom: 15px;
     font-size: 1rem;
     color: var(--text-color);
 }
+
 .pending-tasks ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
+
 .pending-tasks li {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
 }
+
 .task-icon {
     font-size: 1.5rem;
     color: var(--primary-accent);
     margin-right: 15px;
 }
+
 .task-info span {
     display: block;
     font-size: 0.8rem;
     color: #6c757d;
 }
+
 .task-info .info {
     font-size: 0.95rem;
     font-weight: 500;
@@ -618,344 +759,274 @@
     font-weight: 600;
 }
 
-/* Importante: Hacerlo responsivo en pantallas pequeñas */
-@media (max-width: 900px) {
-    .level-container {
-        grid-template-columns: 1fr; /* Apila las columnas una sobre otra */
-    }
-    .pending-tasks {
-        order: -1; /* Mueve las tareas pendientes arriba de los niveles en móvil */
-    }
+/* ========== QUIZ ========== */
+.quiz-options { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    margin: 20px 0; 
 }
 
+.quiz-option { 
+    padding: 12px; 
+    border: 1px solid var(--medium-gray); 
+    color: var(--text-color); 
+    background-color: transparent; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background-color 0.2s;
+}
 
-/* Dentro de tu etiqueta <style> */
+.quiz-option:hover { 
+    background-color: var(--lesson-header-hover); 
+}
 
+.sidebar-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.5); 
+    z-index: 1000; 
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
+}
+
+.sidebar-overlay.is-active { 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
-    /* 1. Ocultamos el panel de tareas pendientes en móvil */
     .pending-tasks {
         display: none; 
     }
 
-    /* 2. Ajustamos el contenedor para que muestre una única columna */
     .level-container {
-        grid-template-columns: 1fr; /* Forzamos una sola columna */
-        gap: 0; /* Eliminamos el espacio, ya que solo hay una columna visible */
-        padding: 10px; /* Reducimos el padding en pantallas pequeñas */
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 10px;
     }
 }
 
-
-         .level-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e5e5e7;
-
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .level-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .level-card.locked {
-    opacity: 0.6;
-    cursor: auto;
-    filter: grayscale(80%);
+@media (max-width: 800px) {
+    .levels-grid { 
+        grid-template-columns: 1fr; 
+        padding: 30px 20px; 
+    }
+    
+    .level-header { 
+        padding: 30px 20px; 
+    }
+    
+    .level-header h1 { 
+        font-size: 1.8rem; 
+    }
+    
+    .app-header {
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        padding: 0 15px; 
+        height: 45px;
+        position: fixed; 
+        top: 0; 
+        width: 100%; 
+        z-index: 999;
+        background-color: var(--header-bg);
+    }
+    
+    .menu-toggle-btn { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        top: 50px; 
+        left: 15px; 
+        right: auto; 
+    }
+    
+    .sidebar { 
+        position: fixed; 
+        top: 0; 
+        right: 0; 
+        height: 100%; 
+        width: 300px; 
+        max-width: 80%; 
+        z-index: 1001; 
+        transform: translateX(100%); 
+        transition: transform 0.3s ease-in-out; 
+        border-left: 1px solid var(--lesson-header-bg); 
+        border-right: none; 
+    }
+    
+    .sidebar.is-open { 
+        transform: translateX(0); 
+    }
 }
-.level-card.locked:hover {
-    transform: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
 
-        .card-content {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-        }
+@media (max-width: 550px) { 
+    .level-card {
+        transform: scale(0.9);
+    }
+    
+    .level-description {
+        font-size: 13px;
+    }
+    
+    .level-title {
+        font-size: 22px;
+    }
+    
+    .level-card:hover {
+        transform: scale(0.92);
+    }
 
-        .level-number {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #8B5CF6, #A855F7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            font-weight: 600;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-        }
-
-        .level-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .level-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 8px;
-        }
-
-        .level-description {
-            color: #6e6e73;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .level-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .time-icon {
-            width: 16px;
-            height: 16px;
-            opacity: 0.6;
-        }
-
-        .time-text {
-            color: #8B5CF6;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .progress-container2 {
-            width: 190px;
-            height: 10px;
-            background: #f0f0f0;
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar2 {
-            height: 100%;
-            background: linear-gradient(90deg, #8B5CF6, #A855F7);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.5s ease-out;
-            position: relative;
-        }
-
-        .progress-bar2::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 6px;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 2px;
-            opacity: 0;
-          
-        }
-
-        @keyframes fillProgress {
-            from { width: 0%; }
-            to { width: 25%; }
-        }
-
-        @keyframes shimmer {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        /* Estados interactivos */
-        .level-card:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Responsive */
-        @media (max-width: 550px) { 
-        .level-card {
-               transform: scale(0.9);
-         }
-          .level-description {
-            font-size: 13px;
-          }
-            
-          .level-title {
-            font-size: 22px;
-        }
-         
-        .level-card:hover {
-            transform: scale(0.92);
-        }
-
-          .level-container {
+    .level-container {
         padding: 1px; 
-          }
+    }
 
-           .levels-grid {
-            padding: 10px 10px;
-            gap: 2px;
-        }
-      }
-      
-           .lockLvlIco{
-  position: absolute;
-  font-size: 20px;
-  right: 15px;
-  top: 15px;
-}
-
-
-.unit-separator {
-    font-weight: bold;
-    color: #a0a0a0;
-    padding: 15px 20px 5px;
-    text-transform: uppercase;
-    font-size: 0.8em;
-    letter-spacing: 1px;
-    background-color: #f0f2f5; /* Un color de fondo sutil */
-    border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
-    margin-top: 10px;
-}
-
-.unit-separator:first-child {
-    margin-top: 0;
-    border-top: none;
+    .levels-grid {
+        padding: 10px 10px;
+        gap: 2px;
+    }
+    
+    .mobile {
+        display: none;
+    }
+    
+    .player-header {
+        justify-content: space-between;
+    }
 }
     </style>
-</head>
-<body ng-controller="PianoController" >
+<body ng-controller="PianoController">
 
-     <div class="banner-header" ng-show="currentView === 'levelSelector'">
-        <img src="https://lh3.googleusercontent.com/d/1vn_w1YjLx9qaEkuQ6bfRNoYvLCvK_l-Z"  class="banner-image">
+    <div class="banner-header" ng-show="currentView === 'levelSelector'">
+        <img src="https://lh3.googleusercontent.com/d/1vn_w1YjLx9qaEkuQ6bfRNoYvLCvK_l-Z" class="banner-image">
     </div>
     
-    <div id="levelSelector" ng-show="currentView === 'levelSelector'" >
-        <div class="level-container" >
+    <div id="levelSelector" ng-show="currentView === 'levelSelector'">
+        <div class="level-container">
 
-              <div class="pending-tasks">
-        <h4>Tareas Pendientes</h4>
-        <ul>
-            <li>
-                <div class="task-icon"><i class="ri-quill-pen-line"></i></div>
-                <div class="task-info">
-                    <span>Lección 2</span>
-                    <div class="info">Quiz de Postura</div>
-                </div>
-            </li>
-            <li>
-                <div class="task-icon"><i class="ri-mic-line"></i></div>
-                <div class="task-info">
-                    <span>Lección 3</span>
-                    <div class="info">Graba tu melodía</div>
-                </div>
-            </li>
-        </ul>
-    </div>
-           
+            <div class="pending-tasks">
+                <h4>Tareas Pendientes</h4>
+                <ul>
+                    <li>
+                        <div class="task-icon"><i class="ri-quill-pen-line"></i></div>
+                        <div class="task-info">
+                            <span>Lección 2</span>
+                            <div class="info">Quiz de Postura</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="task-icon"><i class="ri-mic-line"></i></div>
+                        <div class="task-info">
+                            <span>Lección 3</span>
+                            <div class="info">Graba tu melodía</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
             <div class="levels-grid">
-               
-
-             
-
-
                 <div class="level-card" ng-repeat="level in levels" 
-                   ng-click="selectLevel(level); startApp()"
-                   ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}" >
-        <div class="card-content">
-          <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i> </div>
-           <div class="level-number" ng-if="level.id === 0">P</div>
-            <div class="level-number" ng-if="level.id !== 0">{{level.id}}</div>
-            <div class="level-info">
-                <h2 class="level-title">{{level.title}}</h2>
-                <p class="level-description">
-                  {{level.description}}
-                </p>
-                <div class="level-meta">
-                    <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                    </svg>
-                    <span class="time-text">~{{level.duration}}</span>
-                </div>
-                <div class="progress-container2">
-                <div class="progress-bar2" style="width: {{level.progress}}%;"></div>
+                    ng-click="selectLevel(level); startApp()"
+                    ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}">
+                    <div class="card-content">
+                        <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
+                        <div class="level-number" ng-if="level.id === 0">P</div>
+                        <div class="level-number" ng-if="level.id !== 0">{{level.id}}</div>
+                        <div class="level-info">
+                            <h2 class="level-title">{{level.title}}</h2>
+                            <p class="level-description">{{level.description}}</p>
+                            <div class="level-meta">
+                                <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                </svg>
+                                <span class="time-text">~{{level.duration}}</span>
+                            </div>
+                            <div class="progress-container2">
+                                <div class="progress-bar2" style="width: {{level.progress}}%;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-            </div>
-
-
-         <!--     <div class="continue-btn-container">
-                <button class="continue-btn" ng-class="{'active': selectedLevel}" ng-click="startApp()">Iniciar</button>
-            </div>  -->
         </div>
     </div>
 
     <div id="pianoApp" ng-show="currentView === 'app'">
-    
         <button id="menu-toggle" class="menu-toggle-btn" ng-click="toggleSidebar()"><i class="ri-menu-line"></i></button>
+        
         <div class="app-container">
 
+            <main class="main-content">
+                <div id="youtube-container" style="display: none; width: 100%; height: 100%; position: relative;">
+                    <div id="player"></div>
+                    
+                    <!-- Modal de Pausa dentro del contenedor de video -->
+                    <div id="pauseModal" class="video-modal-overlay">
+                        <div class="video-modal-content">
+                            <h2 style="color: #f59e0b;">¡Atención!</h2>
+                            <p>Debes terminar de ver el video para poder avanzar. Por favor, reanuda el video.</p>
+                            <button id="closePauseButton" class="modal-button" style="background-color: #f59e0b; color: white; border: none;">
+                                Cerrar y Reanudar
+                            </button>
+                        </div>
+                    </div>
 
-         <main class="main-content">
-    <div id="youtube-container" style="display: none; width: 100%; height: 100%;">
-        <div id="player"></div>
-    </div>
-    <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" 
-            title="Contenido principal" ng-show="!showingVideo"></iframe>
-</main>
-
-
+                    <!-- Modal de Video Terminado dentro del contenedor de video -->
+                    <div id="finishedModal" class="video-modal-overlay">
+                        <div class="video-modal-content">
+                            <h2 style="color: #10b981;">¡Video Terminado!</h2>
+                            <p>Has completado el video. ¡Ahora puedes continuar con la siguiente actividad!</p>
+                            <button id="continueVideoButton" class="modal-button" style="background: linear-gradient(135deg, #8B5CF6, #A855F7); color: white; border: none;">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" 
+                        title="Contenido principal" ng-show="!showingVideo"></iframe>
+            </main>
 
             <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
 
-                     <div class="player-header">
-      <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()"><i class="ri-arrow-left-line"></i></button>
-      
-        <div class="progress-info">
+                <div class="player-header">
+                    <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()">
+                        <i class="ri-arrow-left-line"></i> Volver
+                    </button>
+                    
+                    <div class="progress-info">
+                        <div class="recording-indicator" ng-show="isRecording2">
+                            <div class="recording-dot"></div>
+                            <span>Grabando...</span>
+                        </div>
 
-          <div class="recording-indicator" ng-show="isRecording2">
-    <div class="recording-dot"></div>
-    <span>Grabando...</span>
-  </div>
-
- <div class="recording-controls">
-
-  <!-- Controles izquierdos -->
-  <div class="left-controls">
-  
-   
-  </div>
-
-</div>
-  </div>   
-</div>
+                        <div class="recording-controls">
+                            <div class="left-controls"></div>
+                        </div>
+                    </div>   
+                </div>
 
                 <div class="user-profile">
-                   <div class="user-avatar" ng-if="selectedLevel.id === 0">P</div>
+                    <div class="user-avatar" ng-if="selectedLevel.id === 0">P</div>
                     <div class="user-avatar" ng-if="selectedLevel.id !== 0">{{selectedLevel.id}}</div>
                     
                     <div class="user-info">
                         <div class="name">{{selectedLevel.title}}</div>
-                        <div class="plan">Unidad  {{lessons[currentLessonIndex].unit || ''}}</div>
+                        <div class="plan">Unidad {{lessons[currentLessonIndex].unit || ''}}</div>
                     </div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" style="width: {{progress}}%;"></div></div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{progress}}%;"></div>
+                </div>
+                
                 <div class="lessons-container">
 
                     <div class="unit-separator" 
@@ -964,13 +1035,14 @@
                         Unidad {{lesson.unit}}
                     </div>
                                  
-                      <div class="lesson-item" ng-repeat-end data-lesson-index="{{$index}}">
+                    <div class="lesson-item" ng-repeat-end data-lesson-index="{{$index}}">
                         <div class="lesson-header" 
-                             ng-class="{
-                                'completed': lesson.completed, 
-                                'unlocked': $index === 0 || lessons[$index - 1].completed,
-                                'locked': $index > 0 && !lessons[$index - 1].completed
-                             }"
+                              ng-class="{
+                                    'completed': lesson.completed, 
+                                    'unlocked': $index === 0 || lessons[$index - 1].completed,
+                                    'locked': $index > 0 && !lessons[$index - 1].completed,
+                                    'expanded': lesson.expanded
+                                 }"
                              ng-click="toggleLesson(lesson)">
                             <i class="icon" ng-class="{'ri-lock-fill': $index > 0 && !lessons[$index - 1].completed}"></i>
                             <span>{{lesson.title}}</span>
@@ -993,45 +1065,30 @@
                 </div>
             </aside>
         </div>
+        
         <div class="modal-overlay" id="modalOverlay" ng-style="{'display': modal.show ? 'flex' : 'none'}">
             <div class="modal-content" id="modalContent" ng-bind-html="modal.content"></div>
         </div>
-         <!-- Modal de Pausa -->
-<div id="pauseModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <h2 style="color: #d9534f;">¡Atención!</h2>
-        <p>Debes terminar de ver el video para poder avanzar. Por favor, reanuda el video.</p>
-        <button id="closePauseButton" class="modal-button" style="background-color: #f0ad4e;">
-            Cerrar y Reanudar
-        </button>
-    </div>
-</div>
-
-<!-- Modal de Video Terminado -->
-<div id="finishedModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <h2 style="color: #5cb85c;">¡Video Terminado!</h2>
-        <p>Has completado el video. ¡Ahora puedes continuar!</p>
-        <button id="continueVideoButton" class="modal-button">Continuar</button>
-    </div>
-</div>
-
+        
         <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
+        
         <div id="recordingIndicator" style="display: none;"> 
             <i class="ri-mic-fill"></i>
-             <span>Grabando...</span>
+            <span>Grabando...</span>
         </div>
     </div>
 
- <script src="https://www.youtube.com/iframe_api"></script>
-<script>
- 
-const app = angular.module('pianoApp', []);
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app.js"></script>
+
+</body>
+
+    <script>
+        const app = angular.module('pianoApp', []);
 
 // Filtro de seguridad para poder usar URLs dinámicas en ng-src
 app.filter('trustAsResourceUrl', ['$sce', function($sce) {
     return function(val) {
-
         return $sce.trustAsResourceUrl(val);
     };
 }]);
@@ -1042,258 +1099,227 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     // == DATOS Y ESTADO DE LA APLICACIÓN
     // =============================================
     $scope.currentView = 'levelSelector';
-$scope.levels = [
-    { 
-        id: 0, 
-        title: 'Nivel Preparatorio', 
-        description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
-        duration: '~5 horas',
-        progress: 25,
-        // Aquí anidamos las lecciones correspondientes a este nivel
-        lessons: [
-            {
-                title: "Lección 1: Fundamentos",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Ritmo", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
-                     { type: 'exercise', title: "Posición de Do", contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml", iconClass: 'ri-flashlight-line' },
-                    { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line' }
-                ]
-            },
-             {
-                title: "Lección 2: GrandStaff",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 3: Dirección",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 4: Intervalos",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 5: Frases",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 6: Acordes",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-             {
-                title: "Lección 7: Corcheas",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-             {
-                title: "Lección 8: C Position",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 9: G Position",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 10: Tie",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-        ]
-    },
-    { 
-        id: 1, 
-        title: 'Nivel 1', 
-        progress: 0,
-        description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
-        duration: '~4 horas',
-        lessons: [
-             {
-                title: "Lección 1: Escalas Mayores",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, contentUrl: "https://admin.mozartacademy.mx/edit2", iconClass: 'ri-question-line' },
-                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
-                ]
-            },
-             {
-                title: "Lección 2: Tonalidad de G",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 3: Pentaescalas",
-                unit: 1,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 4: Cambio de Posición",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 5: Intervalos de 6ta",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 6: Tonalidad de F",
-                unit: 2,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-             {
-                title: "Lección 7: Grupo 1",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-             {
-                title: "Lección 8: Más Notación",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 9: Síncopas",
-                unit: 3,
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-            {
-                title: "Lección 10: Pieza Final",
-                unit: "Final",
-                tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                    { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                ]
-            },
-        ]
-    },
-    { 
-        id: 2, 
-        title: 'Nivel 2', 
-        progress: 0,
-        description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
-        duration: '~4 horas',
-        lessons: [
-            // Aquí irían las lecciones del Nivel 2
-            { title: "Lección 3: Escalas Mayores", tasks: [ /* ... */ ] }
-        ]
-    },
-    { 
-        id: 3, 
-        title: 'Nivel 3', 
-        progress: 0,
-        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
-        duration: '~8 horas',
-        lessons: [
-            // Aquí irían las lecciones del Nivel 3
-            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
-        ]
-    },
-     { 
-        id: 4, 
-        title: 'Nivel 4', 
-        progress: 0,
-        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
-        duration: '~8 horas',
-        lessons: [
-            // Aquí irían las lecciones del Nivel 3
-            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
-        ]
-    },
-     { 
-        id: 5, 
-        title: 'Nivel 5', 
-        progress: 0,
-        description: 'Profundiza en acordes complejos, arpegios y piezas musicales más elaboradas.', 
-        duration: '~8 horas',
-        lessons: [
-            // Aquí irían las lecciones del Nivel 3
-            { title: "Lección 4: Acordes y Progresiones", tasks: [ /* ... */ ] }
-        ]
-    }
-];
+    
+    $scope.levels = [
+        { 
+            id: 0, 
+            title: 'Nivel Preparatorio', 
+            description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
+            duration: '5 horas',
+            progress: 25,
+            lessons: [
+                {
+                    title: "Lección 1: Fundamentos",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Ritmo", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Posición de Do", contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml", iconClass: 'ri-flashlight-line' },
+                        { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line' }
+                    ]
+                },
+                {
+                    title: "Lección 2: GrandStaff",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                        { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                    ]
+                },
+                {
+                    title: "Lección 3: Dirección",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Dirección de Notas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'note', title: "Práctica de Dirección", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                        { type: 'note', title: "Ejercicio Final", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
+                    ]
+                },
+                {
+                    title: "Lección 4: Intervalos",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Teoría de Intervalos", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Práctica de Intervalos", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 5: Frases",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Construyendo Frases", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Práctica de Frases", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 6: Acordes",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Introducción a Acordes", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Práctica de Acordes", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 7: Corcheas",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Ritmo de Corcheas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Práctica de Corcheas", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 8: C Position",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Posición de Do", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Ejercicios en Do", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 9: G Position",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Posición de Sol", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Ejercicios en Sol", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 10: Tie",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Ligaduras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Práctica de Ligaduras", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                }
+            ]
+        },
+        { 
+            id: 1, 
+            title: 'Nivel 1', 
+            progress: 0,
+            description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
+            duration: '4 horas',
+            lessons: [
+                {
+                    title: "Lección 1: Escalas Mayores",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                        { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
+                        { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
+                    ]
+                },
+                {
+                    title: "Lección 2: Tonalidad de G",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                    ]
+                },
+                {
+                    title: "Lección 3: Pentaescalas",
+                    unit: 1,
+                    tasks: [
+                        { type: 'video', title: "Pentaescalas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 4: Cambio de Posición",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Cambios", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 5: Intervalos de 6ta",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Sextas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 6: Tonalidad de F",
+                    unit: 2,
+                    tasks: [
+                        { type: 'video', title: "Fa Mayor", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 7: Grupo 1",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Grupo 1", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 8: Más Notación",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Notación Avanzada", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 9: Síncopas",
+                    unit: 3,
+                    tasks: [
+                        { type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                },
+                {
+                    title: "Lección 10: Pieza Final",
+                    unit: "Final",
+                    tasks: [
+                        { type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
+                    ]
+                }
+            ]
+        },
+        { 
+            id: 2, 
+            title: 'Nivel 2', 
+            progress: 0,
+            description: 'Profundiza en técnicas avanzadas y piezas más complejas.', 
+            duration: '6 horas',
+            lessons: [
+                { title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }
+            ]
+        },
+        { 
+            id: 3, 
+            title: 'Nivel 3', 
+            progress: 0,
+            description: 'Domina técnicas profesionales y repertorio clásico.', 
+            duration: '8 horas',
+            lessons: [
+                { title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }
+            ]
+        },
+        { 
+            id: 4, 
+            title: 'Nivel 4', 
+            progress: 0,
+            description: 'Perfecciona tu interpretación y expresión musical.', 
+            duration: '10 horas',
+            lessons: [
+                { title: "Lección 1: Interpretación", unit: 1, tasks: [] }
+            ]
+        },
+        { 
+            id: 5, 
+            title: 'Nivel 5', 
+            progress: 0,
+            description: 'Nivel maestro: repertorio complejo y composición.', 
+            duration: '12 horas',
+            lessons: [
+                { title: "Lección 1: Composición", unit: 1, tasks: [] }
+            ]
+        }
+    ];
 
-
-$scope.lessons = [];
+    $scope.lessons = [];
     $scope.selectedLevel = null;
     $scope.sidebarOpen = false;
-
-
 
     // Variables de estado del curso
     $scope.currentLevelIndex = 0;
@@ -1302,15 +1328,16 @@ $scope.lessons = [];
     $scope.viewingLessonIndex = 0;
     $scope.viewingTaskIndex = 0;
     $scope.totalTasksCompleted = 0;
-    $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+    $scope.totalTasks = 0;
     $scope.progress = 0;
     $scope.currentTaskUrl = '';
+    
     // Variables para control de video de YouTube
-$scope.showingVideo = false;
-let youtubePlayer = null;
-let videoHasEnded = false;
-let pauseTimer = null;
-let isYouTubeAPIReady = false;
+    $scope.showingVideo = false;
+    let youtubePlayer = null;
+    let videoHasEnded = false;
+    let pauseTimer = null;
+    let isYouTubeAPIReady = false;
 
     $scope.modal = { show: false, content: '' };
 
@@ -1318,8 +1345,6 @@ let isYouTubeAPIReady = false;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
-
-    const noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
     // =============================================
     // == LÓGICA DE CAMBIO DE VISTAS Y NIVELES
@@ -1336,7 +1361,6 @@ let isYouTubeAPIReady = false;
 
     $scope.showLevelSelector = () => {
         $scope.currentView = 'levelSelector';
-        // Aquí podrías agregar lógica para guardar el progreso antes de salir.
     };
 
     $scope.toggleSidebar = () => {
@@ -1344,24 +1368,22 @@ let isYouTubeAPIReady = false;
     };
     
     function initApp() {
-    $scope.lessons = angular.copy($scope.selectedLevel.lessons);
-    $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+        $scope.lessons = angular.copy($scope.selectedLevel.lessons);
+        $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
 
-    $scope.lessons.forEach(lesson => {
-        lesson.completed = false;
-        lesson.expanded = false;
-        lesson.tasks.forEach(task => task.completed = false);
-    });
-    
-    $scope.currentLessonIndex = 0;
-    $scope.currentTaskIndex = 0;
-    $scope.totalTasksCompleted = 0;
-    
-
-    updateProgress();
-    loadCurrentTask();
-}
-
+        $scope.lessons.forEach(lesson => {
+            lesson.completed = false;
+            lesson.expanded = false;
+            lesson.tasks.forEach(task => task.completed = false);
+        });
+        
+        $scope.currentLessonIndex = 0;
+        $scope.currentTaskIndex = 0;
+        $scope.totalTasksCompleted = 0;
+        
+        updateProgress();
+        loadCurrentTask();
+    }
 
     // =============================================
     // == LÓGICA DE LECCIONES Y TAREAS
@@ -1374,65 +1396,60 @@ let isYouTubeAPIReady = false;
         }
     };
     
-   $scope.viewTask = (lessonIndex, taskIndex) => {
-    const lesson = $scope.lessons[lessonIndex];
-    const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
+    $scope.viewTask = (lessonIndex, taskIndex) => {
+        const lesson = $scope.lessons[lessonIndex];
+        const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
+        
+        if(isLessonUnlocked) {
+            $scope.viewingLessonIndex = lessonIndex;
+            $scope.viewingTaskIndex = taskIndex;
+            
+            const task = lesson.tasks[taskIndex];
+            
+            if (task.type === 'video') {
+                openVideoModal(task);
+            } else {
+                $scope.currentTaskUrl = task.contentUrl;
+            }
+            
+            if($scope.sidebarOpen) {
+                $timeout(() => $scope.sidebarOpen = false, 200);
+            }
+        }
+    };
     
-    if(isLessonUnlocked) {
-        $scope.viewingLessonIndex = lessonIndex;
-        $scope.viewingTaskIndex = taskIndex;
+    function loadCurrentTask() {
+        if ($scope.currentLessonIndex >= $scope.lessons.length) {
+            alert("¡Curso Completado!");
+            speak("¡Has completado todo el curso!", 'important');
+            showConfetti(200);
+            $scope.showLevelSelector();
+            return;
+        }
         
-        const task = lesson.tasks[taskIndex];
+        const lesson = $scope.lessons[$scope.currentLessonIndex];
+        const task = lesson.tasks[$scope.currentTaskIndex];
         
-        // Si es un video, cárgalo automáticamente
+        lesson.expanded = true;
+        $scope.viewingLessonIndex = $scope.currentLessonIndex;
+        $scope.viewingTaskIndex = $scope.currentTaskIndex;
+        
         if (task.type === 'video') {
+            speak(`Siguiente: ${task.title}.`);
             openVideoModal(task);
         } else {
-            // Si no es video, carga el iframe normal
             $scope.currentTaskUrl = task.contentUrl;
+            if (task.type === 'note') {
+                speak(`Ahora, ${task.title}`, 'important');
+            } else {
+                speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
+            }
         }
         
         if($scope.sidebarOpen) {
             $timeout(() => $scope.sidebarOpen = false, 200);
         }
     }
-};
- function loadCurrentTask() {
-    if ($scope.currentLessonIndex >= $scope.lessons.length) {
-        alert("¡Curso Completado!");
-        speak("¡Has completado todo el curso!", 'important');
-        showConfetti(200);
-        $scope.showLevelSelector();
-        return;
-    }
-    
-    const lesson = $scope.lessons[$scope.currentLessonIndex];
-    const task = lesson.tasks[$scope.currentTaskIndex];
-    
-    lesson.expanded = true;
-    $scope.viewingLessonIndex = $scope.currentLessonIndex;
-    $scope.viewingTaskIndex = $scope.currentTaskIndex;
-    
-    // NUEVA LÓGICA: Si es un video, cárgalo automáticamente
-    if (task.type === 'video') {
-        speak(`Siguiente: ${task.title}.`);
-        openVideoModal(task); // Abre el video automáticamente
-    } 
-    // Si no es video, carga el iframe normal
-    else {
-        $scope.currentTaskUrl = task.contentUrl;
-        if (task.type === 'note') {
-            speak(`Ahora, ${task.title}`, 'important');
-        } else {
-            speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
-        }
-    }
-    
-    // Cierra el sidebar en móvil
-    if($scope.sidebarOpen) {
-        $timeout(() => $scope.sidebarOpen = false, 200);
-    }
-}
     
     function completeCurrentTask() {
         const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
@@ -1458,7 +1475,6 @@ let isYouTubeAPIReady = false;
         $scope.currentLessonIndex++;
         $scope.currentTaskIndex = 0;
         
-        // Carga la siguiente lección o finaliza el curso
         $timeout(loadCurrentTask, 1500);
     }
     
@@ -1484,122 +1500,111 @@ let isYouTubeAPIReady = false;
             case 'record': toggleRecording(); break;
         }
     };
-    
-    $scope.getMobileTaskIcon = () => {
-        if ($scope.currentView !== 'app' || $scope.currentLessonIndex >= $scope.lessons.length) return '';
-        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
-        if (!task.iconClass) return '';
-        
-        // Función para manejar el clic desde el HTML generado dinámicamente
-        window.handleMobileIconClick = () => {
-            $scope.$apply(() => {
-                $scope.handleTaskInteraction({ stopPropagation: () => {} }, $scope.currentLessonIndex, $scope.currentTaskIndex);
-            });
-        };
-        
-        return $sce.trustAsHtml(`<i class="task-interaction-icon ${task.iconClass}" onclick="handleMobileIconClick()"></i>`);
-    };
 
-
- function initYouTubePlayer(videoId) {
-    videoHasEnded = false; // Reset de la bandera
-    youtubePlayer = new YT.Player('player', {
-        width: '100%',
-        height: '100%',
-        videoId: videoId,
-        playerVars: {
-            'playsinline': 1,
-            'rel': 0
-        },
-        events: {
-            'onReady': function(event) {
-                console.log('Player listo');
-                event.target.playVideo(); // Auto-reproducir cuando esté listo
-            },
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-
-function onPlayerStateChange(event) {
-    console.log('Estado del video:', event.data); // Para debug
-    
-    const pauseModal = document.getElementById('pauseModal');
-    const finishedModal = document.getElementById('finishedModal');
-    
-    clearTimeout(pauseTimer);
-
-    switch (event.data) {
-        case YT.PlayerState.PLAYING:
-            console.log('Reproduciendo');
-            pauseModal.style.display = 'none';
-            break;
-        
-        case YT.PlayerState.PAUSED:
-            console.log('Pausado');
-            if (!videoHasEnded) {
-                pauseTimer = setTimeout(() => {
-                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
-                        pauseModal.style.display = 'flex';
-                    }
-                }, 250);
-            }
-            break;
-        
-        case YT.PlayerState.ENDED:
-            console.log('Video terminado');
-            videoHasEnded = true;
-            pauseModal.style.display = 'none';
-            finishedModal.style.display = 'flex';
-            break;
-
-        case YT.PlayerState.BUFFERING:
-            console.log('Cargando...');
-            clearTimeout(pauseTimer);
-            break;
-    }
-}
-
-
-function openVideoModal(task) {
-    $scope.showingVideo = true;
-    $scope.currentTaskUrl = ''; // Limpia el iframe
-    
-    const youtubeContainer = document.getElementById('youtube-container');
-    const contentIframe = document.getElementById('content-iframe');
-    
-    youtubeContainer.style.display = 'block';
-    contentIframe.style.display = 'none';
-    
-    // Espera a que la API esté lista antes de crear el player
-    if (!isYouTubeAPIReady) {
-        const checkAPI = setInterval(() => {
-            if (typeof YT !== 'undefined' && YT.Player) {
-                isYouTubeAPIReady = true;
-                clearInterval(checkAPI);
-                createOrLoadVideo(task.videoId);
-            }
-        }, 100);
-    } else {
-        createOrLoadVideo(task.videoId);
-    }
-}
-
-// Nueva función auxiliar
-function createOrLoadVideo(videoId) {
-    if (!youtubePlayer) {
-        initYouTubePlayer(videoId);
-    } else {
-        youtubePlayer.loadVideoById(videoId);
+    // =============================================
+    // == FUNCIONES DE YOUTUBE
+    // =============================================
+    function initYouTubePlayer(videoId) {
         videoHasEnded = false;
+        youtubePlayer = new YT.Player('player', {
+            width: '100%',
+            height: '100%',
+            videoId: videoId,
+            playerVars: {
+                'playsinline': 1,
+                'rel': 0
+            },
+            events: {
+                'onReady': function(event) {
+                    console.log('Player listo');
+                    event.target.playVideo();
+                },
+                'onStateChange': onPlayerStateChange
+            }
+        });
     }
-}
+
+    function onPlayerStateChange(event) {
+        console.log('Estado del video:', event.data);
+        
+        const pauseModal = document.getElementById('pauseModal');
+        const finishedModal = document.getElementById('finishedModal');
+        
+        clearTimeout(pauseTimer);
+
+        switch (event.data) {
+            case YT.PlayerState.PLAYING:
+                console.log('Reproduciendo');
+                pauseModal.style.display = 'none';
+                break;
+            
+            case YT.PlayerState.PAUSED:
+                console.log('Pausado');
+                if (!videoHasEnded) {
+                    pauseTimer = setTimeout(() => {
+                        if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
+                            pauseModal.style.display = 'flex';
+                        }
+                    }, 250);
+                }
+                break;
+            
+            case YT.PlayerState.ENDED:
+                console.log('Video terminado');
+                videoHasEnded = true;
+                pauseModal.style.display = 'none';
+                finishedModal.style.display = 'flex';
+                break;
+
+            case YT.PlayerState.BUFFERING:
+                console.log('Cargando...');
+                clearTimeout(pauseTimer);
+                break;
+        }
+    }
+
+    function openVideoModal(task) {
+        $scope.showingVideo = true;
+        $scope.currentTaskUrl = '';
+        
+        const youtubeContainer = document.getElementById('youtube-container');
+        const contentIframe = document.getElementById('content-iframe');
+        
+        youtubeContainer.style.display = 'block';
+        contentIframe.style.display = 'none';
+        
+        if (!isYouTubeAPIReady) {
+            const checkAPI = setInterval(() => {
+                if (typeof YT !== 'undefined' && YT.Player) {
+                    isYouTubeAPIReady = true;
+                    clearInterval(checkAPI);
+                    createOrLoadVideo(task.videoId);
+                }
+            }, 100);
+        } else {
+            createOrLoadVideo(task.videoId);
+        }
+    }
+
+    function createOrLoadVideo(videoId) {
+        if (!youtubePlayer) {
+            initYouTubePlayer(videoId);
+        } else {
+            youtubePlayer.loadVideoById(videoId);
+            videoHasEnded = false;
+        }
+    }
 
     function openQuizModal(task) {
-        const optionsHTML = task.options.map((option, index) => `<button class="quiz-option" data-index="${index}">${option}</button>`).join('');
+        const optionsHTML = task.options.map((option, index) => 
+            `<button class="quiz-option" data-index="${index}">${option}</button>`
+        ).join('');
+        
         const content = `
-            <h3>Quiz Rápido</h3><p>${task.question}</p>
+            <h3>Quiz Rápido</h3>
+            <p>${task.question}</p>
             <div class="quiz-options">${optionsHTML}</div>`;
+            
         $scope.modal.content = $sce.trustAsHtml(content);
         $scope.modal.show = true;
 
@@ -1634,16 +1639,19 @@ function createOrLoadVideo(videoId) {
             speak("Grabación detenida.");
             return;
         }
+        
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
+            
             mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 openRecordingReviewModal(audioBlob);
                 stream.getTracks().forEach(track => track.stop());
             };
+            
             mediaRecorder.start();
             isRecording = true;
             indicator.style.display = 'flex';
@@ -1654,51 +1662,48 @@ function createOrLoadVideo(videoId) {
         }
     }
     
-  // VERSIÓN CORREGIDA Y ROBUSTA
-function openRecordingReviewModal(audioBlob) {
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const content = `
-        <h3>Revisa tu Grabación</h3>
-        <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
-        <audio id="audio-playback" src="${audioUrl}" controls></audio>
-        <div class="modal-buttons">
-            <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
-            <button id="completeRecording" class="modal-button">Completar Tarea</button>
-        </div>`;
-    
-    $scope.modal.content = $sce.trustAsHtml(content);
-    $scope.modal.show = true;
-
-    // Apenas se muestre el modal, asignamos el listener al CONTENEDOR.
-    $timeout(() => {
-        const modalContent = document.getElementById('modalContent');
+    function openRecordingReviewModal(audioBlob) {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const content = `
+            <h3>Revisa tu Grabación</h3>
+            <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
+            <audio id="audio-playback" src="${audioUrl}" controls></audio>
+            <div class="modal-buttons">
+                <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
+                <button id="completeRecording" class="modal-button">Completar Tarea</button>
+            </div>`;
         
-        if (modalContent) {
-            modalContent.onclick = function(event) {
-                // Verificamos el ID del elemento que recibió el clic
-                const targetId = event.target.id;
+        $scope.modal.content = $sce.trustAsHtml(content);
+        $scope.modal.show = true;
 
-                if (targetId === 'deleteRecording') {
-                    $scope.$apply(closeModal);
-                } 
-                
-                else if (targetId === 'completeRecording') {
-                    $scope.$apply(() => {
-                        closeModal();
-                        completeCurrentTask();
-                    });
-                }
-            };
-        }
-    }, 0); // Un timeout de 0 es suficiente para esperar a que el DOM se actualice.
-}
+        $timeout(() => {
+            const modalContent = document.getElementById('modalContent');
+            
+            if (modalContent) {
+                modalContent.onclick = function(event) {
+                    const targetId = event.target.id;
+
+                    if (targetId === 'deleteRecording') {
+                        $scope.$apply(closeModal);
+                    } 
+                    else if (targetId === 'completeRecording') {
+                        $scope.$apply(() => {
+                            closeModal();
+                            completeCurrentTask();
+                        });
+                    }
+                };
+            }
+        }, 0);
+    }
+    
     function closeModal() {
         $scope.modal.show = false;
         $scope.modal.content = '';
     }
 
     // =============================================
-    // == MIDI, VOZ Y EFECTOS
+    // == VOZ Y EFECTOS
     // =============================================
     function speak(text, priority = 'normal') {
         if ('speechSynthesis' in window) {
@@ -1709,8 +1714,6 @@ function openRecordingReviewModal(audioBlob) {
             speechSynthesis.speak(utterance);
         }
     }
-
-  
     
     function showConfetti(count = 100) {
         const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
@@ -1727,64 +1730,62 @@ function openRecordingReviewModal(audioBlob) {
         }
     }
 
-
-
-
-window.addEventListener('message', function(event) {
-    if (event.data === 'siguienteActividad') {
-        $scope.$apply(() => {
-            completeCurrentTask();
-        });
-    }
-});
-
-
-$timeout(function() {
-    const levelSelector = document.getElementById('levelSelector');
-    const banner = document.querySelector('.banner-header');
-    const closePauseButton = document.getElementById('closePauseButton');
-    const continueVideoButton = document.getElementById('continueVideoButton');
-
-    if (levelSelector && banner) {
-        levelSelector.addEventListener('scroll', function() {
-            let scrollTop = this.scrollTop;
-            let bannerHeight = banner.offsetHeight;
-            banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
-            let opacity = 1 - (scrollTop / bannerHeight);
-            banner.style.opacity = Math.max(0, opacity);
-        });
-    }
-
-    if (closePauseButton) {
-        closePauseButton.onclick = () => {
-            console.log('Cerrando modal de pausa');
-            document.getElementById('pauseModal').style.display = 'none';
-            if (youtubePlayer) youtubePlayer.playVideo();
-        };
-    }
-    
-    if (continueVideoButton) {
-        continueVideoButton.onclick = () => {
-            console.log('Continuando después del video');
+    // =============================================
+    // == COMUNICACIÓN ENTRE FRAMES
+    // =============================================
+    window.addEventListener('message', function(event) {
+        if (event.data === 'siguienteActividad') {
             $scope.$apply(() => {
-                document.getElementById('finishedModal').style.display = 'none';
-                $scope.showingVideo = false;
-                document.getElementById('youtube-container').style.display = 'none';
-                document.getElementById('content-iframe').style.display = 'block';
-                videoHasEnded = false; // Reset para el próximo video
                 completeCurrentTask();
             });
-        };
-    }
+        }
+    });
+
+    // =============================================
+    // == INICIALIZACIÓN DE EVENTOS
+    // =============================================
+    $timeout(function() {
+        const levelSelector = document.getElementById('levelSelector');
+        const banner = document.querySelector('.banner-header');
+        const closePauseButton = document.getElementById('closePauseButton');
+        const continueVideoButton = document.getElementById('continueVideoButton');
+
+        // Parallax del banner
+        if (levelSelector && banner) {
+            levelSelector.addEventListener('scroll', function() {
+                let scrollTop = this.scrollTop;
+                let bannerHeight = banner.offsetHeight;
+                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+                let opacity = 1 - (scrollTop / bannerHeight);
+                banner.style.opacity = Math.max(0, opacity);
+            });
+        }
+
+        // Botón cerrar modal de pausa
+        if (closePauseButton) {
+            closePauseButton.onclick = () => {
+                console.log('Cerrando modal de pausa');
+                document.getElementById('pauseModal').style.display = 'none';
+                if (youtubePlayer) youtubePlayer.playVideo();
+            };
+        }
+        
+        // Botón continuar después del video
+        if (continueVideoButton) {
+            continueVideoButton.onclick = () => {
+                console.log('Continuando después del video');
+                $scope.$apply(() => {
+                    document.getElementById('finishedModal').style.display = 'none';
+                    $scope.showingVideo = false;
+                    document.getElementById('youtube-container').style.display = 'none';
+                    document.getElementById('content-iframe').style.display = 'block';
+                    videoHasEnded = false;
+                    completeCurrentTask();
+                });
+            };
+        }
+    });
+
 });
-
-
-
-
-});
-
-
-</script>
-
-</body>
+    </script>
 </html>
