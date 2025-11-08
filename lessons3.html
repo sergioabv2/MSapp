@@ -580,6 +580,17 @@ body {
     color: #6e6e73; 
 }
 
+.task-item.task-locked {
+    opacity: 0.5;
+    cursor: default; 
+}
+
+/* Quitar cualquier efecto hover que tengas en tareas bloqueadas */
+.task-item.task-locked:hover {
+    background-color: transparent; 
+    color: inherit; 
+}
+
 .task-status { 
     width: 16px; 
     height: 16px; 
@@ -1236,7 +1247,8 @@ body {
                                 ng-class="{
                                     'completed': task.completed,
                                     'active': currentLessonIndex === $parent.$index && currentTaskIndex === $index,
-                                    'is-viewing': viewingLessonIndex === $parent.$index && viewingTaskIndex === $index
+                                    'is-viewing': viewingLessonIndex === $parent.$index && viewingTaskIndex === $index,
+                                    'task-locked': ($parent.$index > currentLessonIndex) || ($parent.$index === currentLessonIndex && $index > currentTaskIndex)
                                 }">
                                 <div class="task-status"></div>
                                 <span class="task-title">{{task.title}}</span>
@@ -1637,27 +1649,42 @@ function updatePendingTasks() {
         }
     };
     
-    $scope.viewTask = (lessonIndex, taskIndex) => {
-        const lesson = $scope.lessons[lessonIndex];
-        const isLessonUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
-        
-        if(isLessonUnlocked) {
-            $scope.viewingLessonIndex = lessonIndex;
-            $scope.viewingTaskIndex = taskIndex;
-            
-            const task = lesson.tasks[taskIndex];
-            
-            if (task.type === 'video') {
-                openVideoModal(task);
-            } else {
-                $scope.currentTaskUrl = task.contentUrl;
-            }
-            
-            if($scope.sidebarOpen) {
-                $timeout(() => $scope.sidebarOpen = false, 200);
-            }
-        }
-    };
+$scope.viewTask = (lessonIndex, taskIndex) => {
+    // 1. Comprobar si la tarea es futura
+    const isFutureTask = (lessonIndex > $scope.currentLessonIndex) || 
+                         (lessonIndex === $scope.currentLessonIndex && taskIndex > $scope.currentTaskIndex);
+
+    if (isFutureTask) {
+        console.log("Tarea bloqueada. Completa la actual primero.");
+        return; // No hacer nada
+    }
+
+    // 2. Si no es futura (es actual o pasada), mostrar su contenido
+    $scope.viewingLessonIndex = lessonIndex;
+    $scope.viewingTaskIndex = taskIndex;
+    
+    const task = $scope.lessons[lessonIndex].tasks[taskIndex];
+    const youtubeContainer = document.getElementById('youtube-container');
+    const contentIframe = document.getElementById('content-iframe');
+
+    if (task.type === 'video') {
+        // Mostrar video
+        $scope.showingVideo = true;
+        contentIframe.style.display = 'none';
+        youtubeContainer.style.display = 'block';
+        openVideoModal(task); // Tu función ya maneja la carga del video
+    } else {
+        // Mostrar iframe (ejercicio, quiz, etc.)
+        $scope.showingVideo = false;
+        youtubeContainer.style.display = 'none';
+        contentIframe.style.display = 'block';
+        $scope.currentTaskUrl = task.contentUrl;
+    }
+    
+    if($scope.sidebarOpen) {
+        $timeout(() => $scope.sidebarOpen = false, 200);
+    }
+};
     
     function loadCurrentTask() {
         if ($scope.currentLessonIndex >= $scope.lessons.length) {
