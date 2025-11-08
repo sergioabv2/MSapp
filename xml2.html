@@ -924,6 +924,22 @@ display: flex;
   margin: 8px 0;
 }
 
+/* Agregar después del estilo de #measure-select */
+#cancel-loop-btn {
+  background-color: #fff;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+#cancel-loop-btn:hover {
+  background-color: #fee;
+}
+
+#cancel-loop-btn.active {
+  background-color: #e74c3c;
+  color: white;
+}
+
   </style>
 </head>
 <body>
@@ -1018,6 +1034,17 @@ display: flex;
       </div>
          <select id="measure-select" class="btn" title="Ir al compás...">
     </select>
+
+      <select id="measure-until" class="btn" title="Hasta compás..." disabled>
+      <option value="-1">Sin límite</option>
+    </select>
+    
+    <!-- NUEVO: BOTÓN PARA CANCELAR LOOP -->
+    <button id="cancel-loop-btn" class="btn" title="Cancelar modo loop" style="display: none;">
+      <i class="ri-close-circle-line"></i>
+    </button>
+
+
     </div>
   </div>
 
@@ -1099,6 +1126,12 @@ const successModalCloseBtn = document.getElementById('success-modal-close-btn');
 const practiceProgressDisplay = document.getElementById('practice-progress');
 const progressValueSpan = document.getElementById('progress-value');
 const aiPracticeBtn = document.getElementById('ai-practice-btn');
+
+const measureUntil = document.getElementById('measure-until');
+const cancelLoopBtn = document.getElementById('cancel-loop-btn');
+let loopMeasureStart = -1;
+let loopMeasureEnd = -1;
+let isLoopMode = false;
 
     let osmd = null;
     let sampler = null;
@@ -2140,11 +2173,54 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
   playFromMeasure(targetMeasureIndex);
 });
 
-    measureSelect.addEventListener('change', () => {
-        const selectedMeasureIndex = parseInt(measureSelect.value, 10);
+  measureSelect.addEventListener('change', () => {
+    const selectedMeasureIndex = parseInt(measureSelect.value, 10);
+    
+    // Habilitar measure-until y actualizar sus opciones
+    measureUntil.disabled = false;
+    updateMeasureUntilOptions(selectedMeasureIndex);
+    
+    // Si no hay loop activo, solo saltar al compás
+    if (!isLoopMode) {
         jumpToMeasureInLearnMode(selectedMeasureIndex);
-        //playFromMeasure(selectedMeasureIndex);
-    });
+    } else {
+        // Si hay loop, reiniciar con el nuevo rango
+        loopMeasureStart = selectedMeasureIndex;
+        if (measureUntil.value !== '-1') {
+            loopMeasureEnd = parseInt(measureUntil.value, 10);
+        }
+        jumpToMeasureInLearnMode(loopMeasureStart);
+    }
+});
+
+  measureUntil.addEventListener('change', () => {
+    const untilValue = measureUntil.value;
+    
+    if (untilValue === '-1') {
+        // Desactivar modo loop
+        deactivateLoopMode();
+    } else {
+        // Activar modo loop
+        loopMeasureStart = parseInt(measureSelect.value, 10);
+        loopMeasureEnd = parseInt(untilValue, 10);
+        isLoopMode = true;
+        cancelLoopBtn.style.display = 'flex';
+        cancelLoopBtn.classList.add('active');
+        
+        console.log(`Loop activado: compases ${loopMeasureStart + 1} a ${loopMeasureEnd + 1}`);
+        
+        // Saltar al inicio del loop
+        jumpToMeasureInLearnMode(loopMeasureStart);
+    }
+});
+
+// NUEVO: Event listener para cancelar loop
+cancelLoopBtn.addEventListener('click', () => {
+    deactivateLoopMode();
+    measureUntil.value = '-1';
+});
+
+
 
       toolsToggleBtn.addEventListener('click', () => {
         secondaryTopBar.classList.toggle('is-visible');
@@ -2157,6 +2233,30 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
 
     }
 
+
+
+function updateMeasureUntilOptions(startIndex) {
+    const measureCount = osmd.sheet.SourceMeasures.length;
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    
+    // Solo mostrar compases posteriores al seleccionado
+    for (let i = startIndex + 1; i < measureCount; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Compás ${i + 1}`;
+        measureUntil.appendChild(option);
+    }
+}
+
+// NUEVA FUNCIÓN: Desactivar modo loop
+function deactivateLoopMode() {
+    isLoopMode = false;
+    loopMeasureStart = -1;
+    loopMeasureEnd = -1;
+    cancelLoopBtn.style.display = 'none';
+    cancelLoopBtn.classList.remove('active');
+    console.log('Modo loop desactivado');
+}
 
 function toggleKeyNames() {
   showKeyNames = !showKeyNames;
@@ -2268,13 +2368,19 @@ function getAngloSaxonNoteName(noteId) {
 
 function populateMeasureSelector() {
     const measureCount = osmd.sheet.SourceMeasures.length;
-    measureSelect.innerHTML = ''; // Limpiamos opciones previas
+    measureSelect.innerHTML = '';
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
 
     for (let i = 0; i < measureCount; i++) {
         const option = document.createElement('option');
-        option.value = i; // El valor será el índice del compás (0, 1, 2...)
-        option.textContent = `Compás ${i + 1}`; // El texto para el usuario (1, 2, 3...)
+        option.value = i;
+        option.textContent = `Compás ${i + 1}`;
         measureSelect.appendChild(option);
+        
+        const option2 = document.createElement('option');
+        option2.value = i;
+        option2.textContent = `Compás ${i + 1}`;
+        measureUntil.appendChild(option2);
     }
 }
 
@@ -2433,30 +2539,48 @@ function advanceLearningStep() {
   activeHighlightTimeouts.length = 0;
   expectedNotes.clear();
 
+  // VERIFICAR SI LLEGAMOS AL FINAL DEL LOOP
+  if (isLoopMode && loopMeasureEnd !== -1) {
+    if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
+      const currentTime = parsedNotes[currentLearningIndex - 1].startSec;
+      const endTime = measureStartTimes[loopMeasureEnd];
+      
+      // Si ya pasamos el compás final, volver al inicio del loop
+      if (currentTime >= endTime - 0.01) {
+        console.log('🔄 Loop completado, reiniciando desde compás', loopMeasureStart + 1);
+        jumpToMeasureInLearnMode(loopMeasureStart);
+        return;
+      }
+    }
+  }
+
   if (currentLearningIndex >= parsedNotes.length) {
-    showSuccessModal("¡Felicidades, has completado la pieza!");
-    showConfetti(200);
-    toggleMidiLearnMode();
-    return;
+    if (isLoopMode) {
+      console.log('🔄 Final de pieza alcanzado, reiniciando loop desde compás', loopMeasureStart + 1);
+      jumpToMeasureInLearnMode(loopMeasureStart);
+      return;
+    } else {
+      showSuccessModal("¡Felicidades, has completado la pieza!");
+      showConfetti(200);
+      toggleMidiLearnMode();
+      return;
+    }
   }
 
   let notesInStep = [];
   let foundValidStep = false;
   const TIME_TOLERANCE = 0.001;
 
-  // NUEVO: Saltar automáticamente sobre silencios
   while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
     const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
     notesInStep = [];
     
-    // Recopilar todas las notas en este momento
     while (currentLearningIndex < parsedNotes.length && 
            Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
       notesInStep.push(parsedNotes[currentLearningIndex]);
       currentLearningIndex++;
     }
 
-    // Filtrar por mano
     const filteredNotes = notesInStep.filter(note => 
       !note.isRest &&
       !note.isTiedContinuation &&
@@ -2485,19 +2609,23 @@ function advanceLearningStep() {
       
       console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     } else {
-      // NUEVO: Si no hay notas que tocar (solo silencios), avanzar el cursor automáticamente
       console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
       osmd.cursor.next();
-      // Continuar el bucle para buscar la siguiente nota
     }
   }
 
   if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
-    showSuccessModal("¡Felicidades, has completado la pieza!");
-    showConfetti(200);
-    toggleMidiLearnMode();
+    if (isLoopMode) {
+      console.log('🔄 Final alcanzado, reiniciando loop');
+      jumpToMeasureInLearnMode(loopMeasureStart);
+    } else {
+      showSuccessModal("¡Felicidades, has completado la pieza!");
+      showConfetti(200);
+      toggleMidiLearnMode();
+    }
     return;
   }
+  
   updateMeasureSelectDisplay();
   updatePracticeProgress();
 }
