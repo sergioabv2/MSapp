@@ -183,7 +183,7 @@ body {
 
 .progress-container2 {
     width: 190px;
-    height: 10px;
+    height: 12px;
     background: #f0f0f0;
     border-radius: 2px;
     overflow: hidden;
@@ -251,28 +251,151 @@ body {
     box-shadow: -2px 0 8px rgba(0,0,0,0.05); 
 }
 
-/* ========== MAIN CONTENT REDISEÑADO ========== */
+
+
 .main-content { 
     flex-grow: 1; 
-    background-color: #000000; 
-    display: flex; 
-    flex-direction: column; 
-    position: relative; 
+    background-color: #f5f5f5;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    height: 100%;
 }
 
+.video-wrapper {
+    width: 100%;
+    min-height: calc(100vh - 0px); /* Altura completa visible */
+    background-color: #000000;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+}
+
+#youtube-container,
 #content-iframe { 
     width: 100%; 
-    height: 100%; 
-    border: none; 
+    height: 100%;
+    border: none;
+}
+
+.content-below {
+    background-color: #ffffff;
+    padding: 30px;
+    min-height: 100vh;
+}
+
+.content-below h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 20px;
+}
+
+.content-below p {
+    color: #6e6e73;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+
+.lesson-description {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.lesson-description h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 12px;
+}
+
+/* Sección de objetivos */
+.lesson-objectives {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.lesson-objectives h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 15px;
+}
+
+.lesson-objectives ul {
+    list-style: none;
+    padding: 0;
+}
+
+.lesson-objectives li {
+    padding: 10px 0;
+    padding-left: 30px;
+    position: relative;
+    color: #4b5563;
+}
+
+.lesson-objectives li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #8B5CF6;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Notas importantes */
+.lesson-notes {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.lesson-notes h4 {
+    color: #f57c00;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lesson-notes p {
+    color: #5d4037;
+    margin: 0;
+}
+
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* ========== USER PROFILE REDISEÑADO ========== */
 .user-profile { 
     display: flex; 
     align-items: center; 
+    margin-top: 10px;
     margin-bottom: 20px; 
-    padding-bottom: 20px; 
-    border-bottom: 1px solid #e9ecef; 
+    padding-bottom: 10px; 
 }
 
 .user-avatar { 
@@ -307,7 +430,7 @@ body {
 /* ========== PROGRESS BAR REDISEÑADO ========== */
 .progress-bar { 
     width: 100%; 
-    height: 8px; 
+    height: 20px; 
     background-color: #e9ecef; 
     border-radius: 10px; 
     overflow: hidden; 
@@ -327,6 +450,7 @@ body {
     flex-grow: 1; 
     overflow-y: auto; 
     padding-right: 8px; 
+    border-top: 1px solid #e9ecef; 
 }
 
 .lessons-container::-webkit-scrollbar { 
@@ -360,8 +484,8 @@ body {
     margin-bottom: 4px;
     transition: background-color 0.2s;
     color: #1d1d1f;
-    border-bottom: 1px solid #e9ecef; /* NUEVA LÍNEA DIVISORA */
-    position: relative; /* PARA EL CHEVRON */
+    border-bottom: 1px solid #D3D3D3; 
+    position: relative; 
 }
 
 /* Agregar chevron con ::after */
@@ -510,9 +634,11 @@ body {
     margin-top: 0;
 }
 
-/* ========== PLAYER HEADER REDISEÑADO ========== */
+
+
 .player-header {
-    padding: 12px 20px;
+    margin-top: -10px;
+    padding: 12px 10px;
     background: #ffffff;
     display: flex;
     justify-content: space-between;
@@ -730,6 +856,29 @@ body {
     margin-bottom: 15px;
 }
 
+/* Estilos para tareas completadas en pending-tasks */
+.pending-tasks li.completed {
+    opacity: 0.5;
+}
+
+.pending-tasks li.completed .task-info .info {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.pending-tasks li.completed .task-icon {
+    color: #28a745;
+}
+
+.pending-tasks li.completed .task-icon i::before {
+    content: '\EB7B'; /* Código de check-line de Remix Icon */
+}
+
+/* Animación sutil cuando se completa */
+.pending-tasks li.completed {
+    transition: all 0.3s ease;
+}
+
 .task-icon {
     font-size: 1.5rem;
     color: var(--primary-accent);
@@ -865,6 +1014,15 @@ body {
     .sidebar.is-open { 
         transform: translateX(0); 
     }
+
+    .video-wrapper {
+        height: 300px;
+        min-height: 300px;
+    }
+    
+    .content-below {
+        padding: 20px 15px;
+    }
 }
 
 @media (max-width: 550px) { 
@@ -911,29 +1069,26 @@ body {
     <div id="levelSelector" ng-show="currentView === 'levelSelector'">
         <div class="level-container">
 
-            <div class="pending-tasks">
-                <h4>Tareas Pendientes</h4>
-                <ul>
-                    <li>
-                        <div class="task-icon"><i class="ri-quill-pen-line"></i></div>
-                        <div class="task-info">
-                            <span>Lección 2</span>
-                            <div class="info">Quiz de Postura</div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="task-icon"><i class="ri-mic-line"></i></div>
-                        <div class="task-info">
-                            <span>Lección 3</span>
-                            <div class="info">Graba tu melodía</div>
-                        </div>
-                    </li>
-                </ul>
+<div class="pending-tasks" >
+    <h4>Tareas Pendientes</h4>
+    <ul ng-if="pendingTasks.length > 0">
+        <li ng-repeat="task in pendingTasks" ng-class="{'completed': task.completed}">
+            <div class="task-icon"><i class="{{task.iconClass}}"></i></div>
+            <div class="task-info">
+                <span>{{task.lessonTitle}}</span>
+                <div class="info">{{task.taskTitle}}</div>
             </div>
+        </li>
+    </ul>
+    <div ng-if="pendingTasks.length === 0" style="text-align: center; color: #6e6e73; padding: 20px;">
+        <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
+        <p style="margin-top: 10px;">¡No tienes tareas pendientes!</p>
+    </div>
+</div>
 
             <div class="levels-grid">
                 <div class="level-card" ng-repeat="level in levels" 
-                    ng-click="selectLevel(level); startApp()"
+                    ng-click="selectLevel(level)"
                     ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}">
                     <div class="card-content">
                         <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
@@ -992,6 +1147,44 @@ body {
                 
                 <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" 
                         title="Contenido principal" ng-show="!showingVideo"></iframe>
+
+                        <!-- Contenido debajo del video dinámico -->
+<div class="content-below" ng-if="currentLessonIndex < lessons.length">
+    
+    <div ng-if="lessons[currentLessonIndex].tasks[currentTaskIndex].type === 'video'">
+        <div class="lesson-description">
+            <h3>Sobre este video</h3>
+            <p>{{lessons[currentLessonIndex].tasks[currentTaskIndex].title}}</p>
+        </div>
+        
+        <div class="lesson-notes">
+            <h4><i class="ri-video-line"></i> Instrucciones</h4>
+            <p>Mira el video completo antes de continuar. Puedes pausar y rebobinar las veces que necesites.</p>
+        </div>
+    </div>
+    
+    <div ng-if="lessons[currentLessonIndex].tasks[currentTaskIndex].type === 'exercise'">
+        <div class="lesson-description">
+            <h3>Ejercicio práctico</h3>
+            <p>Practica con tu piano siguiendo las instrucciones en pantalla.</p>
+        </div>
+        
+        <div class="lesson-notes">
+            <h4><i class="ri-flashlight-line"></i> Consejo</h4>
+            <p>Tómate tu tiempo. La calidad es más importante que la velocidad.</p>
+        </div>
+    </div>
+    
+    <!-- Objetivos comunes para todas las tareas -->
+    <div class="lesson-objectives">
+        <h3>Objetivos de la lección</h3>
+        <ul>
+            <li>Dominar la técnica fundamental</li>
+            <li>Desarrollar memoria muscular</li>
+            <li>Mejorar la coordinación</li>
+        </ul>
+    </div>
+</div>
             </main>
 
             <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
@@ -1000,17 +1193,6 @@ body {
                     <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()">
                         <i class="ri-arrow-left-line"></i> Volver
                     </button>
-                    
-                    <div class="progress-info">
-                        <div class="recording-indicator" ng-show="isRecording2">
-                            <div class="recording-dot"></div>
-                            <span>Grabando...</span>
-                        </div>
-
-                        <div class="recording-controls">
-                            <div class="left-controls"></div>
-                        </div>
-                    </div>   
                 </div>
 
                 <div class="user-profile">
@@ -1071,11 +1253,6 @@ body {
         </div>
         
         <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
-        
-        <div id="recordingIndicator" style="display: none;"> 
-            <i class="ri-mic-fill"></i>
-            <span>Grabando...</span>
-        </div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
@@ -1111,6 +1288,7 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
                 {
                     title: "Lección 1: Fundamentos",
                     unit: 1,
+                    description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
                     tasks: [
                         { type: 'video', title: "Ritmo", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
                         { type: 'exercise', title: "Posición de Do", contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml", iconClass: 'ri-flashlight-line' },
@@ -1120,6 +1298,7 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
                 {
                     title: "Lección 2: GrandStaff",
                     unit: 1,
+                    description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
                     tasks: [
                         { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
                         { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
@@ -1318,8 +1497,10 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     ];
 
     $scope.lessons = [];
+    $scope.pendingTasks = [];
     $scope.selectedLevel = null;
     $scope.sidebarOpen = false;
+    $scope.savedProgress = {};
 
     // Variables de estado del curso
     $scope.currentLevelIndex = 0;
@@ -1350,7 +1531,10 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     // == LÓGICA DE CAMBIO DE VISTAS Y NIVELES
     // =============================================
     $scope.selectLevel = (level) => {
-        $scope.selectedLevel = level;
+        if ($scope.currentLevelIndex >= level.id) {
+            $scope.selectedLevel = level;
+            $scope.startApp();
+        }
     };
 
     $scope.startApp = () => {
@@ -1359,15 +1543,50 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         initApp();
     };
 
-    $scope.showLevelSelector = () => {
-        $scope.currentView = 'levelSelector';
-    };
+  $scope.showLevelSelector = () => {
+    // Guardar el progreso actual antes de salir
+    if ($scope.selectedLevel) {
+        $scope.savedProgress[$scope.selectedLevel.id] = {
+            lessons: angular.copy($scope.lessons),
+            currentLessonIndex: $scope.currentLessonIndex,
+            currentTaskIndex: $scope.currentTaskIndex,
+            totalTasksCompleted: $scope.totalTasksCompleted,
+            progress: $scope.progress
+        };
+        
+        // Actualizar el progreso en el objeto level
+        $scope.selectedLevel.progress = $scope.progress;
+        
+        // Actualizar currentLevelIndex si completó todas las tareas
+        if ($scope.currentLessonIndex >= $scope.lessons.length) {
+            $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
+        }
+    }
+    
+    $scope.currentView = 'levelSelector';
+};
 
     $scope.toggleSidebar = () => {
         $scope.sidebarOpen = !$scope.sidebarOpen;
     };
     
-    function initApp() {
+function initApp() {
+    // Verificar si hay progreso guardado para este nivel
+    if ($scope.savedProgress[$scope.selectedLevel.id]) {
+        const saved = $scope.savedProgress[$scope.selectedLevel.id];
+        
+        // Restaurar el progreso guardado
+        $scope.lessons = angular.copy(saved.lessons);
+        $scope.currentLessonIndex = saved.currentLessonIndex;
+        $scope.currentTaskIndex = saved.currentTaskIndex;
+        $scope.totalTasksCompleted = saved.totalTasksCompleted;
+        $scope.progress = saved.progress;
+        $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+        
+        updatePendingTasks();
+        loadCurrentTask();
+    } else {
+        // Si no hay progreso guardado, iniciar desde cero
         $scope.lessons = angular.copy($scope.selectedLevel.lessons);
         $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
 
@@ -1382,12 +1601,34 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         $scope.totalTasksCompleted = 0;
         
         updateProgress();
+        updatePendingTasks();
         loadCurrentTask();
     }
+}
 
-    // =============================================
-    // == LÓGICA DE LECCIONES Y TAREAS
-    // =============================================
+function updatePendingTasks() {
+    $scope.pendingTasks = [];
+    
+    if ($scope.currentLessonIndex < $scope.lessons.length) {
+        const currentLesson = $scope.lessons[$scope.currentLessonIndex];
+        
+
+        const tasksToShow = currentLesson.tasks.slice(0, 3);
+        
+        tasksToShow.forEach((task, index) => {
+            $scope.pendingTasks.push({
+                lessonTitle: currentLesson.title,
+                taskTitle: task.title,
+                taskType: task.type,
+                lessonIndex: $scope.currentLessonIndex,
+                taskIndex: index,
+                iconClass: task.iconClass || getIconForTaskType(task.type),
+                completed: task.completed 
+            });
+        });
+    }
+}
+
     $scope.toggleLesson = (lesson) => {
         const lessonIndex = $scope.lessons.indexOf(lesson);
         const isUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
@@ -1451,40 +1692,45 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         }
     }
     
-    function completeCurrentTask() {
-        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
-        task.completed = true;
+  function completeCurrentTask() {
+    const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
+    task.completed = true;
 
-        $scope.totalTasksCompleted++;
-        updateProgress();
-        
-        $scope.currentTaskIndex++;
-        if ($scope.currentTaskIndex >= $scope.lessons[$scope.currentLessonIndex].tasks.length) {
-            completeLesson();
-        } else {
-            $timeout(loadCurrentTask, 1200);
-        }
+    $scope.totalTasksCompleted++;
+    updateProgress();
+    updatePendingTasks(); // AGREGAR ESTA LÍNEA
+    
+    $scope.currentTaskIndex++;
+    if ($scope.currentTaskIndex >= $scope.lessons[$scope.currentLessonIndex].tasks.length) {
+        completeLesson();
+    } else {
+        $timeout(loadCurrentTask, 1200);
+    }
+}
+    
+function completeLesson() {
+    const lesson = $scope.lessons[$scope.currentLessonIndex];
+    speak(`¡Felicidades! Has completado la ${lesson.title}.`, 'important');
+    lesson.completed = true;
+    showConfetti();
+    
+    $scope.currentLessonIndex++;
+    $scope.currentTaskIndex = 0;
+    
+    // Si completó todas las lecciones del nivel, desbloquear el siguiente
+    if ($scope.currentLessonIndex >= $scope.lessons.length) {
+        $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
+        speak("¡Has completado todo el nivel! El siguiente nivel ha sido desbloqueado.", 'important');
     }
     
-    function completeLesson() {
-        const lesson = $scope.lessons[$scope.currentLessonIndex];
-        speak(`¡Felicidades! Has completado la ${lesson.title}.`, 'important');
-        lesson.completed = true;
-        showConfetti();
-        
-        $scope.currentLessonIndex++;
-        $scope.currentTaskIndex = 0;
-        
-        $timeout(loadCurrentTask, 1500);
-    }
-    
+    $timeout(loadCurrentTask, 1500);
+}
+
     function updateProgress() {
         $scope.progress = ($scope.totalTasksCompleted / $scope.totalTasks) * 100;
     }
 
-    // =============================================
-    // == INTERACCIÓN DE TAREAS (MODALES, GRABACIÓN)
-    // =============================================
+   
     $scope.handleTaskInteraction = ($event, lessonIndex, taskIndex) => {
         $event.stopPropagation();
         
