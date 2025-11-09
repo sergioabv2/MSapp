@@ -2272,7 +2272,6 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         const requestData = {
             action: "getUserData",
            token: localStorage.getItem('MStoken')
-          //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -2292,7 +2291,7 @@ app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($
         $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
             .then(function(response) {
                 $timeout.cancel(refreshTimeoutPromise);
-
+                $scope.userStatus = response.data.status
                 const repertoire = JSON.parse(response.data.repertoire);
                 const stage = JSON.parse(response.data.stage);
 
