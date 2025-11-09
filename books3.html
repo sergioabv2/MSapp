@@ -1452,6 +1452,109 @@ color: white;
         width: 300px;   /* Ancho fijo para la tarjeta */
     }
 }
+
+
+
+
+/* --- Estilos para el Contenido de Usuario Inactivo (Versión Sales) --- */
+
+/* Ajusta el contenedor principal para que la tarjeta de ventas crezca */
+.inactive-user-content {
+    flex-grow: 1;
+    min-width: 0; /* Arreglo de Flexbox */
+}
+
+/* La tarjeta principal que contiene la oferta */
+.sales-pitch-card {
+    background: #ffffff; /* Fondo blanco tipo Apple */
+    border-radius: 12px;
+    padding: 40px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.sales-header h2 {
+    font-size: 2.2em; /* Título prominente */
+    color: #1d1d1f;
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.sales-header p {
+    font-size: 1.1em;
+    color: #6e6e73; /* Texto secundario gris */
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto 30px auto; /* Centrado y con margen inferior */
+}
+
+/* Lista de características */
+.sales-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 450px; /* Centra la lista de features */
+}
+
+.sales-feature-item {
+    display: flex;
+    align-items: center; /* Alinea icono y texto */
+    text-align: left;
+    gap: 20px; /* Espacio entre icono y texto */
+    margin-bottom: 25px;
+}
+
+.sales-feature-icon {
+    flex-shrink: 0;
+    font-size: 2em;
+    color: #1877f2; /* Azul Facebook como acento */
+    width: 50px;
+    text-align: center;
+}
+
+.sales-feature-text h3 {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 4px;
+}
+
+.sales-feature-text p {
+    font-size: 0.95em;
+    color: #6c757d;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.sales-cta-section {
+    margin-top: 40px; /* Espacio antes del botón */
+}
+
+/* Estilos del CTA (ya deberías tenerlos, pero los pongo por si acaso) */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1877f2; /* Azul Facebook */
+    color: #ffffff;
+    padding: 16px 32px;
+    border-radius: 980px;
+    text-decoration: none;
+    font-size: 1.05em;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    background: #1565e0;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+}
     </style>
 </head>
 <body ng-controller="libraryCtrl">
@@ -1488,7 +1591,56 @@ color: white;
                 </div>
             </div>
 
-        <div class="library-content">
+
+        <div class="inactive-user-content" ng-if="userStatus !== 'ACTIVO'">
+    
+    <div class="sales-pitch-card">
+        
+        <div class="sales-header">
+            <h2>🎹 Clases One-to-One: El Siguiente Nivel</h2>
+            <p>Tu membresía está inactiva. ¡Reactívala para desbloquear tu biblioteca y acceder a lecciones personalizadas con seguimiento de un profesor real!</p>
+        </div>
+
+        <ul class="sales-feature-list">
+            <li class="sales-feature-item">
+                <div class="sales-feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="sales-feature-text">
+                    <h3>Atención Personalizada</h3>
+                    <p>Clases one-to-one (presencial o en línea) enfocadas 100% en tu progreso y necesidades.</p>
+                </div>
+            </li>
+            <li class="sales-feature-item">
+                <div class="sales-feature-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <div class="sales-feature-text">
+                    <h3>Tecnología de Punta</h3>
+                    <p>Plataforma interactiva con WebRTC de alta calidad para clases en línea fluidas y sin retraso.</p>
+                </div>
+            </li>
+            <li class="sales-feature-item">
+                <div class="sales-feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="sales-feature-text">
+                    <h3>Seguimiento Real</h3>
+                    <p>Envía tus tareas y grabaciones directamente desde la app y recibe feedback de tu profesor.</p>
+                </div>
+            </li>
+        </ul>
+
+        <div class="sales-cta-section">
+            <a href="#" class="cta-button" onclick="alert('Redirigir a la página de reactivación/contacto')">
+                <i class="fas fa-arrow-circle-right" style="margin-right: 8px;"></i>
+                Ver Planes y Reactivar
+            </a>
+        </div>
+    </div>
+</div>
+
+        <div class="library-content" ng-if="userStatus === 'ACTIVO'">
             <div class="library-section" ng-repeat="section in library | filter: { books: { title: searchQuery } }">
                <div class="section-header"> 
                 <h2 class="section-title">{{ section.title }}</h2>
