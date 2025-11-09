@@ -3,398 +3,622 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Sessions - Clases de Piano Online</title>
+    <title>Fundamentos del Piano - Clases One-to-One</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- 1. Base y Tipografía Minimalista --- */
-        body, html {
+        :root {
+            --facebook-blue: #1877f2;
+            --apple-body-bg: #f5f5f7; /* Gris claro para el fondo */
+            --apple-card-bg: #ffffff; /* Blanco puro para tarjetas */
+            --apple-text-primary: #1d1d1f; /* Texto oscuro principal */
+            --apple-text-secondary: #6e6e73; /* Texto gris secundario */
+            --apple-border: #e8e8e8; /* Borde sutil */
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--apple-body-bg); /* Fondo gris claro */
+            min-height: 100vh;
+            color: var(--apple-text-primary); /* Texto oscuro */
+            overflow-x: hidden;
         }
 
         .container {
-            width: 90%;
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 60px 0;
+            padding: 60px 40px;
         }
 
-        h1, h2, h3 {
-            color: #2c3e50;
-            line-height: 1.3;
-            font-weight: 600;
-        }
-
-        p {
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        /* --- 2. Header Limpio --- */
         .header {
-            background-color: #ffffff;
-            padding: 15px 5%;
-            border-bottom: 1px solid #e0e0e0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .header .logo {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #3498db; /* Azul de acento */
-            text-decoration: none;
-        }
-
-        /* --- 3. Hero Section Minimalista --- */
-        .hero {
-            background-color: #ffffff;
             text-align: center;
-            padding: 80px 20px;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
         }
 
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #e74c3c;
-            font-weight: 600;
-            font-size: 0.9em;
-            border: 1px solid #e74c3c22;
-            background-color: #e74c3c08;
-            padding: 6px 14px;
+        .header h1 {
+            color: var(--apple-text-primary);
+            font-size: 4em;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-shadow: none; /* Sin sombra en modo claro */
+        }
+
+        .header p {
+            color: var(--apple-text-secondary);
+            font-size: 1.5em;
+            font-weight: 400;
+        }
+
+        /* Reemplazando .glass-card por un estilo de tarjeta Apple claro */
+        .glass-card {
+            background: var(--apple-card-bg); /* Fondo blanco */
+            backdrop-filter: none; /* Quitamos el blur */
+            -webkit-backdrop-filter: none;
             border-radius: 20px;
-            margin-bottom: 20px;
+            border: 1px solid var(--apple-border); /* Borde sutil */
+            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08); /* Sombra suave */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.1);
         }
 
-        .hero h1 {
-            font-size: 2.8em;
-            color: #34495e;
-            margin-bottom: 15px;
+        .hero-section {
+            padding: 60px;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease;
         }
 
-        .hero p {
-            font-size: 1.2em;
-            color: #555;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-text h2 {
+            font-size: 3.5em;
+            color: var(--apple-text-primary);
+            margin-bottom: 24px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .hero-text p {
+            font-size: 1.25em;
+            line-height: 1.6;
+            color: var(--apple-text-secondary);
+            margin-bottom: 40px;
+            font-weight: 400;
         }
 
         .cta-button {
-            display: inline-block;
-            background-color: #3498db;
-            color: #ffffff;
-            padding: 14px 30px;
-            font-size: 1.05em;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--facebook-blue); /* Color de acento */
+            color: #ffffff; /* Texto blanco */
+            padding: 16px 32px;
+            border-radius: 980px;
             text-decoration: none;
-            border-radius: 50px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .cta-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
+            transform: scale(1.05);
+            background: #1565e0; /* Tono más oscuro de Facebook */
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- 4. Demo de la Interfaz (Estilo Limpio y Elegante) --- */
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 15px;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.1em;
-            color: #777;
-            margin-bottom: 40px;
-        }
-
-        .zoom-demo-light {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        .video-demo {
+            border-radius: 20px;
             overflow: hidden;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .zoom-content {
-            display: grid;
-            grid-template-columns: 3fr 1fr; /* Profesor más grande */
-            gap: 15px;
-            padding: 15px;
+            position: relative;
+            background: #e8e8e8; /* Fondo gris para el video */
+            border: 1px solid #dcdcdc;
         }
 
         .video-placeholder {
-            background: #f0f0f0;
-            border-radius: 8px;
-            position: relative;
-            border: 1px solid #e0e0e0;
+            width: 100%;
+            height: 380px;
+            background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            color: #888;
-            font-weight: 500;
-            gap: 10px;
-        }
-
-        .video-placeholder.main-video {
-            min-height: 450px;
-        }
-
-        .video-placeholder.student-video {
-            min-height: 200px;
-            font-size: 0.9em;
-        }
-        
-        /* Icono de cámara para los placeholders */
-        .video-placeholder::before {
-            content: '🎥';
-            font-size: 1.8em;
-            opacity: 0.4;
-        }
-        .student-video::before {
-            font-size: 1.2em;
-        }
-
-        .video-label {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(44, 62, 80, 0.7); /* Texto oscuro semi-transparente */
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .zoom-controls-light {
-            background: #fdfdfd;
-            border-top: 1px solid #e0e0e0;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .control-btn-light {
-            background: transparent;
-            border: none;
-            color: #555;
+            position: relative;
             cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
-        }
-        
-        .control-btn-light svg {
-            width: 22px;
-            height: 22px;
-            stroke-width: 2;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .control-btn-light:hover {
-            background-color: #f0f0f0;
+        .video-placeholder:hover {
+            transform: scale(1.02);
         }
 
-        .control-btn-light.danger {
-            color: #e74c3c;
-        }
-        
-        .control-btn-light.danger:hover {
-            background-color: #e74c3c1a;
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9); /* Botón si puede tener efecto */
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
         }
 
-        /* --- 5. Sección de Features (Tarjetas Limpias) --- */
-        .features {
-            background-color: #ffffff;
-            border-top: 1px solid #e0e0e0;
+        .play-button:hover {
+            background: white;
+            transform: scale(1.15);
         }
-        
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 24px solid var(--facebook-blue); /* Icono en azul */
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            margin-left: 6px;
+        }
+
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
         }
 
         .feature-card {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            padding: 25px;
-            border-radius: 12px;
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            padding: 40px 30px;
+            animation: fadeInUp 1s ease;
         }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+        .feature-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .feature-card:nth-child(3) {
+            animation-delay: 0.2s;
         }
 
         .feature-icon {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            line-height: 1;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: rgba(24, 119, 242, 0.1); /* Fondo azul claro */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--facebook-blue); /* Icono azul */
         }
 
         .feature-card h3 {
-            font-size: 1.25em;
-            margin-bottom: 10px;
-            color: #3498db;
+            color: var(--apple-text-primary);
+            font-size: 1.5em;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
-        /* --- 6. Footer --- */
-        .footer {
-            background-color: #2c3e50;
-            color: #ecf0f1;
+        .feature-card p {
+            color: var(--apple-text-secondary);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .levels-section {
+            padding: 60px;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .section-title {
             text-align: center;
-            padding: 40px 0;
-            margin-top: 60px;
-        }
-        
-        .footer p {
-            color: #bdc3c7;
-            margin: 0;
+            color: var(--apple-text-primary);
+            font-size: 3em;
+            margin-bottom: 50px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
-        /* --- Animaciones y Responsividad --- */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.2em;
-            }
+        .level-card {
+            background: var(--apple-body-bg); /* Tarjetas interiores en gris claro */
+            backdrop-filter: none;
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 1px solid var(--apple-border);
+            transition: all 0.3s ease;
+        }
 
-            .zoom-content {
-                grid-template-columns: 1fr; /* Columnas apiladas */
-            }
-            
-            .video-placeholder.main-video {
-                min-height: 350px;
-            }
-            .video-placeholder.student-video {
-                min-height: 150px;
-            }
+        .level-card:hover {
+            background: #eef2f9; /* Un gris-azulado muy sutil */
+            transform: translateY(-5px);
+        }
 
-            .zoom-controls-light {
-                gap: 5px;
+        .level-number {
+            display: inline-flex;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(24, 119, 242, 0.1); /* Fondo azul claro */
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--facebook-blue); /* Número azul */
+            margin-bottom: 20px;
+        }
+
+        .level-card h3 {
+            font-size: 2em;
+            color: var(--apple-text-primary);
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .level-card ul {
+            list-style: none;
+            color: var(--apple-text-secondary);
+        }
+
+        .level-card ul li {
+            padding: 10px 0;
+            padding-left: 28px;
+            position: relative;
+            font-weight: 400;
+        }
+
+        .level-card ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--facebook-blue); /* Checkmark azul */
+            font-weight: 700;
+        }
+
+        .testimonials-section {
+            padding: 60px;
+            margin-bottom: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--apple-body-bg); /* Tarjetas interiores en gris */
+            backdrop-filter: none;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--apple-border);
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateX(8px);
+            background: #eef2f9;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: var(--apple-text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.7;
+            font-weight: 400;
+            font-size: 1.05em;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--apple-text-primary);
+            font-style: normal;
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e8e8e8; /* Gris para avatar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--apple-text-secondary);
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .final-cta {
+            text-align: center;
+            padding: 80px 60px;
+        }
+
+        .final-cta h2 {
+            color: var(--apple-text-primary);
+            font-size: 3.5em;
+            margin-bottom: 24px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .final-cta p {
+            font-size: 1.25em;
+            color: var(--apple-text-secondary);
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Overlay oscuro */
+            backdrop-filter: blur(8px); /* Blur para el fondo */
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--apple-card-bg); /* Modal blanco */
+            backdrop-filter: none;
+            padding: 60px;
+            border-radius: 28px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h3 {
+            color: var(--apple-text-primary);
+            margin-bottom: 24px;
+            font-weight: 700;
+            font-size: 2em;
+        }
+
+        .modal p {
+            color: var(--apple-text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .close-modal {
+            background: var(--facebook-blue);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 980px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.05);
+            background: #1565e0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid, .levels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 3em;
+            }
+
+            .hero-text h2 {
+                font-size: 2.5em;
+            }
+        }
     </style>
 </head>
 <body>
-
- 
-
-    <section class="container">
-
-     
-
-
-        <h2 class="section-title">Sesiones Online</h2>
-        <p class="section-subtitle">Una experiencia uno a uno, enfocada en ti.</p>
-
-         <div class="live-badge">
-            <div class="live-dot"></div>
-            SESIONES EN VIVO
+    <div class="container">
+        <div class="header">
+            <h1>🎹 Fundamentos del Piano</h1>
+            <p>Clases Personalizadas One-to-One</p>
         </div>
 
-        <div class="zoom-demo-light">
-            <div class="zoom-content">
-                <div class="video-placeholder main-video">
-                    <span>Vista del Profesor (Manos)</span>
-                    <div class="video-label">
-                        Prof. Alejandro
-                    </div>
+        <div class="glass-card hero-section">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2>Aprende piano a tu ritmo</h2>
+                    <p>Clases individuales adaptadas a tu nivel, ya sea presencial o en línea con tecnología WebRTC de alta calidad. Metodología probada con los manuales "Essentials of Piano Book".</p>
+                    <a href="#" class="cta-button" onclick="showModal(event)">
+                        <i class="fas fa-graduation-cap" style="margin-right: 8px;"></i>
+                        Inscríbete ahora
+                    </a>
                 </div>
-                
-                <div class="video-placeholder student-video">
-                    <span>Tu Vista</span>
-                    <div class="video-label">
-                        Tú (Estudiante)
+                <div class="video-demo">
+                    <div class="video-placeholder" onclick="playDemo()">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="zoom-controls-light">
-                <button class="control-btn-light" aria-label="Activar Micrófono">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                </button>
-                <button class="control-btn-light" aria-label="Activar Video">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                </button>
-                <button class="control-btn-light" aria-label="Compartir Pantalla">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-                </button>
-                <button class="control-btn-light" aria-label="Abrir Chat">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                </button>
-                <button class="control-btn-light danger" aria-label="Finalizar Llamada">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.8 12.8 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.8 12.8 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path></svg>
-                </button>
+        </div>
+
+        <div class="features-grid">
+            <div class="glass-card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>Atención Personalizada</h3>
+                <p>Clases one-to-one completamente enfocadas en tu progreso individual</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <h3>Modalidad Flexible</h3>
+                <p>Presencial o en línea con conexión WebRTC de alta calidad</p>
+            </div>
+            <div class="glass-card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Material Profesional</h3>
+                <p>Manuales "Essentials of Piano Book" de nivel 1 a 3</p>
             </div>
         </div>
-    </section>
 
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Todo lo que Incluye tu Sesión</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Feedback Instantáneo</h3>
-                    <p>Corrección de postura, técnica y ritmo en tiempo real. Es la ventaja principal de una clase en vivo.</p>
+        <div class="glass-card levels-section">
+            <h2 class="section-title">Nuestros niveles</h2>
+            <div class="levels-grid">
+                <div class="level-card">
+                    <div class="level-number">1</div>
+                    <h3>Nivel 1</h3>
+                    <ul>
+                        <li>Postura y técnica básica</li>
+                        <li>Lectura de partituras</li>
+                        <li>Melodías simples</li>
+                        <li>Ritmo y tempo</li>
+                    </ul>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎼</div>
-                    <h3>Material Personalizado</h3>
-                    <p>Usamos partituras y ejercicios adaptados a tus metas, ya sea tocar Mozart, Jazz o música moderna.</p>
+                <div class="level-card">
+                    <div class="level-number">2</div>
+                    <h3>Nivel 2</h3>
+                    <ul>
+                        <li>Acordes y armonía</li>
+                        <li>Coordinación de manos</li>
+                        <li>Escalas mayores</li>
+                        <li>Repertorio intermedio</li>
+                    </ul>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📹</div>
-                    <h3>Sesiones Grabadas</h3>
-                    <p>Opcionalmente, grabamos tu clase para que puedas repasarla y practicar durante la semana.</p>
+                <div class="level-card">
+                    <div class="level-number">3</div>
+                    <h3>Nivel 3</h3>
+                    <ul>
+                        <li>Técnica avanzada</li>
+                        <li>Interpretación musical</li>
+                        <li>Repertorio clásico</li>
+                        <li>Improvisación</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section class="container" id="agendar">
-        <div style="text-align: center; background: #fff; padding: 50px 30px; border-radius: 12px; border: 1px solid #e0e0e0;">
-            <h2 style="font-size: 2.2em; margin-bottom: 20px;">Comienza tu Viaje Musical Hoy</h2>
-            <p style="font-size: 1.1em; max-width: 600px; margin: 0 auto 30px auto;">Nuestra clase muestra de 20 minutos es la mejor forma de conocernos, evaluar tu nivel y definir un plan de estudios.</p>
-            <a href="#" class="cta-button">Agenda clase muestra</a>
+        <div class="glass-card testimonials-section">
+            <h2 class="section-title">Lo que dicen nuestros alumnos</h2>
+            <div class="testimonial-card">
+                <p>"Las clases en línea son increíbles. La calidad de video y audio es perfecta, siento que mi profesor está justo a mi lado."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MG</div>
+                    <span>María González, Nivel 2</span>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p>"El material didáctico es excelente y el método de enseñanza personalizado me ha ayudado a avanzar más rápido de lo que esperaba."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">CR</div>
+                    <span>Carlos Ramírez, Nivel 1</span>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p>"Poder elegir entre clases presenciales y en línea me da la flexibilidad que necesito con mi trabajo."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">AT</div>
+                    <span>Ana Torres, Nivel 3</span>
+                </div>
+            </div>
         </div>
-    </section>
 
-    <footer class="footer">
-        <p>&copy; 2025 Mozart Academy. Todos los derechos reservados.</p>
-    </footer>
+        <div class="glass-card final-cta">
+            <h2>¿Listo para comenzar?</h2>
+            <p>Únete a nuestra comunidad de estudiantes y descubre el pianista que llevas dentro</p>
+            <a href="#" class="cta-button" onclick="showModal(event)">
+                <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                Solicitar información
+            </a>
+        </div>
+    </div>
 
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3>¡Bienvenido! 🎵</h3>
+            <p>Para inscribirte en nuestras clases de piano, por favor contacta con nosotros para más información sobre horarios y disponibilidad.</p>
+            <p><strong>Email:</strong> info@pianoclasses.com<br>
+            <strong>WhatsApp:</strong> +52 55 1234 5678</p>
+            <button class="close-modal" onclick="closeModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function showModal(e) {
+            e.preventDefault();
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function playDemo() {
+            alert('Aquí se reproduciría un video demostrativo de cómo funcionan las clases en línea con WebRTC. Puedes integrar un video real de YouTube o Vimeo.');
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
 </body>
 </html>
