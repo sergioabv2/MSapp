@@ -399,7 +399,7 @@ body.theme-red .key.black.active {
     }
     .note-accidental {
       fill: #333;
-      font-size: 28px;
+      font-size: 20px;
       font-family: serif;
     }
     .clef {
@@ -539,7 +539,7 @@ body.theme-red .key.black.active {
     let currentColorKey = 'blue';
 
     // === CONSTANTES PARA DETECCIÓN DE ACORDES ===
- const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+ const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
  const CHORD_MAP = {
  '0,4,7': { name: 'Major', short: '' },
 '0,3,7': { name: 'Minor', short: 'm' },
@@ -581,15 +581,15 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
     // === SAMPLER (SONIDO DEL PIANO) ===
     function initSampler() {
       sampler = new Tone.Sampler({
-        urls: { 
-          "C1": "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", "A1": "A1.mp3",
-          "C2": "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", "A2": "A2.mp3",
-          "C3": "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", "A3": "A3.mp3",
-          "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", "A4": "A4.mp3",
-          "C5": "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", "A5": "A5.mp3",
-          "C6": "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", "A6": "A6.mp3",
-          "C7": "C7.mp3",
-        },
+                urls: { 
+            "C1": "C1.mp3", "Eb1": "Ds1.mp3", "Gb1": "Fs1.mp3", "A1": "A1.mp3",
+            "C2": "C2.mp3", "Eb2": "Ds2.mp3", "Gb2": "Fs2.mp3", "A2": "A2.mp3",
+            "C3": "C3.mp3", "Eb3": "Ds3.mp3", "Gb3": "Fs3.mp3", "A3": "A3.mp3",
+            "C4": "C4.mp3", "Eb4": "Ds4.mp3", "Gb4": "Fs4.mp3", "A4": "A4.mp3",
+            "C5": "C5.mp3", "Eb5": "Ds5.mp3", "Gb5": "Fs5.mp3", "A5": "A5.mp3",
+            "C6": "C6.mp3", "Eb6": "Ds6.mp3", "Gb6": "Fs6.mp3", "A6": "A6.mp3",
+            "C7": "C7.mp3",
+          },
         attack: 0.01,
         decay: 0.2,
         sustain: 0.3,
@@ -602,7 +602,7 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
     function createPiano88Keys() {
       pianoKeys.innerHTML = '';
       const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-      const blackKeys = { 'C': 'C#', 'D': 'D#', 'F': 'F#', 'G': 'G#', 'A': 'A#' };
+      const blackKeys = { 'C': 'Db', 'D': 'Eb', 'F': 'Gb', 'G': 'Ab', 'A': 'Bb' };
       
       for (let octave = 0; octave <= 8; octave++) {
         const startNote = octave === 0 ? 9 : 0;
@@ -651,7 +651,7 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
       allKeys.forEach(key => {
         const rect = key.getBoundingClientRect();
         const noteName = key.dataset.note;
-        const isBlack = noteName.includes('#');
+        const isBlack = noteName.includes('b');
         const keyWidth = isBlack ? blackKeyWidth : whiteKeyWidth;
         
         keyPositions[noteName] = rect.left + (keyWidth / 2);
@@ -913,7 +913,7 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
     }
     
     function midiNoteToPitchName(midiNote) {
-      const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+      const noteNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
       const octave = Math.floor(midiNote / 12) - 1;
       const noteName = noteNames[midiNote % 12];
       return noteName + octave;
@@ -951,9 +951,9 @@ function getInterval(note1, note2) {
 
 // Convertir nombre de nota a MIDI
 function noteNameToMidi(noteName) {
-  const noteMap = { 'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 
-                    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11 };
-  const match = noteName.match(/^([A-G]#?)(\d+)$/);
+  const noteMap = { 'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 
+                    'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11 };
+  const match = noteName.match(/^([A-G]b?)(\d+)$/);
   if (!match) return 0;
   const [, note, octave] = match;
   return (parseInt(octave) + 1) * 12 + noteMap[note];
@@ -1090,7 +1090,7 @@ function updateNoteDisplay() {
     const noteIndex = midi % 12;
     const noteName = NOTE_NAMES[noteIndex];
     const noteLetter = noteName[0];
-    const hasAccidental = noteName.includes('#');
+    const hasAccidental = noteName.includes('b');
     
 let yBase, refMidi, refSteps;
 
@@ -1115,11 +1115,11 @@ const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
     // 3. Dibujar alteración (sostenido/bemol) si es necesario
     if (hasAccidental) {
       const accidental = createSvgElement('text', {
-        x: xPos - 22, // Un poco a la izquierda de la nota
-        y: y + 9, // Alinear verticalmente
+        x: xPos - 28, // Un poco a la izquierda de la nota
+        y: y + 5, // Alinear verticalmente
         class: 'note-accidental'
       });
-      accidental.textContent = '♯';
+      accidental.textContent = '♭';
       staffSvg.appendChild(accidental);
     }
     
@@ -1251,12 +1251,12 @@ const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
         resizeWaterfallCanvas();
       });
       
-      // Teclado de computadora
+
       const keyMap = {
-        'a': 'C4', 'w': 'C#4', 's': 'D4', 'e': 'D#4', 'd': 'E4',
-        'f': 'F4', 't': 'F#4', 'g': 'G4', 'y': 'G#4', 'h': 'A4',
-        'u': 'A#4', 'j': 'B4', 'k': 'C5', 'o': 'C#5', 'l': 'D5'
-      };
+          'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4',
+          'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4',
+          'u': 'Bb4', 'j': 'B4', 'k': 'C5', 'o': 'Db5', 'l': 'D5'
+        };
       
       const keysPressed = {};
       
