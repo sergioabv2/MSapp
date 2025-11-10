@@ -42,25 +42,74 @@
       align-items: center;
     }
     
-    .btn {
-      background: rgba(52, 152, 219, 0.2);
-      border: 1px solid #3498db;
-      color: #3498db;
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 6px;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    
-    .btn:hover {
-      background: rgba(52, 152, 219, 0.3);
-      transform: translateY(-1px);
-    }
+    /* --- ESTILO BASE DEL BOTÓN (SIN COLOR) --- */
+.btn {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent; /* Borde base */
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* --- TEMA AZUL (Por defecto) --- */
+body.theme-blue .btn {
+  background: rgba(52, 152, 219, 0.2);
+  border-color: #3498db;
+  color: #3498db;
+}
+body.theme-blue .btn:hover {
+  background: rgba(52, 152, 219, 0.3);
+}
+body.theme-blue .key.active {
+  background: #3498db !important;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.8) !important;
+}
+body.theme-blue .key.black.active {
+  background: #2980b9 !important;
+}
+
+/* --- TEMA NARANJA --- */
+body.theme-orange .btn {
+  background: rgba(221, 158, 55, 0.2);
+  border-color: #DD9E37;
+  color: #DD9E37;
+}
+body.theme-orange .btn:hover {
+  background: rgba(221, 158, 55, 0.3);
+}
+body.theme-orange .key.active {
+  background: #DD9E37 !important;
+  box-shadow: 0 0 15px rgba(221, 158, 55, 0.8) !important;
+}
+body.theme-orange .key.black.active {
+  background: #b9812f !important; /* Naranja más oscuro */
+}
+
+
+body.theme-red .btn {
+  background: rgba(231, 76, 60, 0.2); /* Rojo (de #e74c3c) */
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+body.theme-red .btn:hover {
+  background: rgba(231, 76, 60, 0.3);
+}
+body.theme-red .key.active {
+  background: #e74c3c !important; /* Rojo */
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.8) !important;
+}
+body.theme-red .key.black.active {
+  background: #c0392b !important; /* Rojo más oscuro */
+}
     
     .btn:active {
       transform: translateY(0);
@@ -134,15 +183,7 @@
       z-index: 2;
     }
     
-    .key.active {
-      background: #3498db !important;
-      box-shadow: 0 0 15px rgba(52, 152, 219, 0.8) !important;
-      transform: translateY(2px);
-    }
-    
-    .key.black.active {
-      background: #2980b9 !important;
-    }
+ 
 
     .key.midi-active {
       background-color: #e0e0e0 !important;
@@ -361,7 +402,7 @@
   <div id="top-bar">
     <div class="title">🎹 Free Play</div>
     <div class="controls">
-      <button  class="btn" title="Selecciona color">
+      <button id="colorChange" class="btn" title="Selecciona color">
         <span>Azul</span>
       </button>
     </div>
@@ -395,6 +436,7 @@
     const waterfallCtx = waterfallCanvas.getContext('2d');
     const midiStatus = document.getElementById('midi-status');
     const midiDeviceName = document.getElementById('midi-device-name');
+    const colorChangeBtn = document.getElementById('colorChange');
     
     let sampler = null;
     let midiAccess = null;
@@ -412,7 +454,28 @@
     let pianoStartX = 0;
     
     const pixelsPerSecond = 150;
-    const fadeOutDuration = 3000; // 1 segundo para desvanecerse
+    const fadeOutDuration = 3000; 
+
+
+    const COLORS = {
+      blue: {
+        white: '52, 152, 219',  // #3498db (El azul que ya tenías)
+        black: '41, 128, 185',  // #2980b9
+        name: 'Azul'
+      },
+      orange: {
+        white: '221, 158, 55', // #DD9E37
+        black: '187, 134, 47', // Un naranja más oscuro
+        name: 'Naranja'
+      },
+     red: { 
+        white: '231, 76, 60',  // #e74c3c (Un rojo vivo, puedes ajustarlo si quieres otro)
+        black: '192, 57, 43',  // #c0392b (Un rojo más oscuro)
+        name: 'Rojo' 
+      }
+    };
+
+    let currentColorKey = 'blue';
 
     // === CONSTANTES PARA DETECCIÓN DE ACORDES ===
  const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -447,6 +510,8 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
       resizeWaterfallCanvas();
       startWaterfallAnimation();
       addEventListeners();
+
+      document.body.classList.add('theme-blue');
       
       await Tone.loaded();
       console.log('Piano listo para tocar!');
@@ -630,14 +695,16 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
         yPosition * dpr
       );
       
+      const currentPalette = COLORS[currentColorKey];
+
       if (noteData.isBlack) {
-        gradient.addColorStop(0, `rgba(41, 128, 185, ${0.9 * opacity})`);
-        gradient.addColorStop(1, `rgba(41, 128, 185, ${0.3 * opacity})`);
-        waterfallCtx.shadowColor = `rgba(41, 128, 185, ${0.7 * opacity})`;
+        gradient.addColorStop(0, `rgba(${currentPalette.black}, ${0.9 * opacity})`);
+        gradient.addColorStop(1, `rgba(${currentPalette.black}, ${0.3 * opacity})`);
+        waterfallCtx.shadowColor = `rgba(${currentPalette.black}, ${0.7 * opacity})`;
       } else {
-        gradient.addColorStop(0, `rgba(52, 152, 219, ${0.8 * opacity})`);
-        gradient.addColorStop(1, `rgba(52, 152, 219, ${0.2 * opacity})`);
-        waterfallCtx.shadowColor = `rgba(52, 152, 219, ${0.6 * opacity})`;
+        gradient.addColorStop(0, `rgba(${currentPalette.white}, ${0.8 * opacity})`);
+        gradient.addColorStop(1, `rgba(${currentPalette.white}, ${0.2 * opacity})`);
+        waterfallCtx.shadowColor = `rgba(${currentPalette.white}, ${0.6 * opacity})`;
       }
       
       waterfallCtx.fillStyle = gradient;
@@ -1074,6 +1141,31 @@ const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
           noteOff(noteName, 'mouse-release');
         }
       });
+
+
+     colorChangeBtn.addEventListener('click', () => {
+      let newColorKey = 'blue'; // Almacena la *próxima* clave de color
+
+      // Determina el siguiente color
+      if (currentColorKey === 'blue') {
+        newColorKey = 'orange';
+      } else if (currentColorKey === 'orange') {
+        newColorKey = 'red';
+      } else {
+        newColorKey = 'blue';
+      }
+
+      // 1. Actualiza la clase del body para cambiar el CSS
+      document.body.classList.remove('theme-blue', 'theme-orange', 'theme-red');
+      document.body.classList.add('theme-' + newColorKey);
+
+      // 2. Actualiza la variable de JS (para el waterfall)
+      currentColorKey = newColorKey;
+
+      // 3. Actualiza el texto del botón
+      const colorName = COLORS[currentColorKey].name;
+      colorChangeBtn.querySelector('span').textContent = colorName;
+    });
       
 
       
