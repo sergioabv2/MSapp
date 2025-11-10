@@ -125,7 +125,7 @@ body.theme-red .key.black.active {
     
     /* Piano Container */
     #piano-container {
-      position: fixed;
+      position: relative;
       left: 0;
       bottom: 0;
       width: 100%;
@@ -134,13 +134,25 @@ body.theme-red .key.black.active {
       background: #e9e9e9;
       overflow: hidden;
     }
+
+    #piano-container::before {
+  content: '';
+  position: absolute;
+  bottom: 0; /* Coincide con el 'bottom' de #piano-keys */
+  left: 0;
+  width: 100%;
+  height: 122px; /* Coincide con el 'height' de #piano-keys */
+  background: #2a2a2a;
+  border-top: 1px solid #333;
+  z-index: 1; /* Se pone detrás de las teclas */
+}
     
     #waterfall-canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: calc(100% - 117px);
+      height: calc(100% - 142px);
       pointer-events: none;
       z-index: 1;
     }
@@ -183,7 +195,43 @@ body.theme-red .key.black.active {
       z-index: 2;
     }
     
- 
+
+.active-note-label {
+  position: absolute;
+  top: -20px; /* Posición por encima de la tecla */
+  left: 50%;
+  transform: translateX(-50%);
+  color: #f1f1f1; /* Color de texto blanco/claro */
+  font-size: 10px;
+  font-weight: bold;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap; /* Evita que el texto se rompa */
+  z-index: 10;
+}
+
+.key.black .active-note-label {
+  color: #fff; /* Asegura que sean blancas en teclas negras */
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* --- NUEVO: Estilo para etiquetas de nota DENTRO de la carcasa --- */
+.casing-note-label {
+  position: absolute;
+  top: 50%; /* Centrado verticalmente */
+  transform: translate(-50%, -50%); /* Centrado horizontal (con 'left' de JS) y vertical */
+  color: #f1f1f1;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.4); /* Fondo sutil como en tu imagen */
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 5; /* Asegura que esté sobre la carcasa (z-index: 4) */
+}
 
     .key.midi-active {
       background-color: #e0e0e0 !important;
@@ -217,11 +265,22 @@ body.theme-red .key.black.active {
       bottom: 3px;
       font-size: 8px;
     }
+
+    #piano-top-casing {
+  position: absolute;
+  bottom: 122px; /* A 10px del borde superior de las teclas blancas */
+  left: 0;
+  width: 100%;
+  height: 20px; /* Altura de la carcasa */
+  background: #2a2a2a; /* Color negro/gris oscuro */
+  box-shadow: inset 0 -2px 5px rgba(0,0,0,0.3); /* Pequeña sombra interna */
+  z-index: 4; /* Encima del hit-line y las teclas */
+}
     
     /* Hit Line */
     .hit-line {
       position: absolute;
-      bottom: 125px;
+      bottom: 142px;
       left: 0;
       right: 0;
       height: 2px;
@@ -423,6 +482,7 @@ body.theme-red .key.black.active {
 
   <div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
+    <div id="piano-top-casing"></div>
     <div class="hit-line"></div>
     <div id="piano-keys"></div>
   </div>
@@ -437,6 +497,7 @@ body.theme-red .key.black.active {
     const midiStatus = document.getElementById('midi-status');
     const midiDeviceName = document.getElementById('midi-device-name');
     const colorChangeBtn = document.getElementById('colorChange');
+    const pianoTopCasing = document.getElementById('piano-top-casing');
     
     let sampler = null;
     let midiAccess = null;
@@ -605,10 +666,10 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
       const container = document.getElementById('piano-container');
       
       waterfallCanvas.width = window.innerWidth * dpr;
-      waterfallCanvas.height = (container.clientHeight - 102) * dpr;
+      waterfallCanvas.height = (container.clientHeight - 142) * dpr;
       
       waterfallCanvas.style.width = `${window.innerWidth}px`;
-      waterfallCanvas.style.height = `${container.clientHeight - 102}px`;
+      waterfallCanvas.style.height = `${container.clientHeight - 142}px`;
       
       setTimeout(() => {
         calculateKeyPositions();
@@ -735,14 +796,24 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
       // Activar sonido
       sampler.triggerAttack(noteName);
       
-      // Highlight visual
       const keyElement = document.getElementById(noteName);
       if (keyElement) {
         keyElement.classList.add('active');
       }
+
+      // --- NUEVO: Añadir etiqueta a la carcasa superior ---
+      const noteLabel = document.createElement('div');
+      noteLabel.className = 'casing-note-label'; // Usaremos una nueva clase
+      noteLabel.id = 'label-' + noteName; // ID único para encontrarlo y borrarlo
+      noteLabel.textContent = getNoteNameSimple(noteName);
       
-      // Agregar a notas activas
-      const xPos = keyPositions[noteName];
+      // Usamos la posición X pre-calculada de la tecla
+      const xPos = keyPositions[noteName]; 
+      noteLabel.style.left = `${xPos}px`;
+      
+      pianoTopCasing.appendChild(noteLabel);
+          
+
       const isBlack = noteName.includes('#');
       const keyWidth = isBlack ? blackKeyWidth - 2 : whiteKeyWidth - 2;
       
@@ -763,12 +834,17 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
       // Detener sonido
       sampler.triggerRelease(noteName);
       
-      // Quitar highlight visual
       const keyElement = document.getElementById(noteName);
-      if (keyElement) {
-        keyElement.classList.remove('active');
-      }
-      
+          if (keyElement) {
+            keyElement.classList.remove('active');
+          }
+
+          // --- NUEVO: Eliminar etiqueta de la carcasa ---
+          const existingLabel = document.getElementById('label-' + noteName);
+          if (existingLabel) {
+            existingLabel.remove();
+          }
+              
       // Mover a historial con duración fija
       const noteData = activeNotes[noteName];
       noteData.releaseTime = Date.now();
