@@ -1246,9 +1246,7 @@ app.filter('trustAsResourceUrl', ['$sce', function($sce) {
 
 app.controller('PianoController', function($scope, $http, $sce, $timeout) {
 
-    // =============================================
-    // == DATOS Y ESTADO DE LA APLICACIÓN
-    // =============================================
+
     $scope.currentView = 'levelSelector';
     
     $scope.levels = [
@@ -1260,93 +1258,382 @@ app.controller('PianoController', function($scope, $http, $sce, $timeout) {
             progress: 0,
             lessons: [
                 {
-                    title: "Lección 1: Fundamentos",
-                    unit: 1,
-                    description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
-                    tasks: [
-                      { type: 'video', title: "Ritmo y Posición de Do", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line', instructions: "Mira este video con mucha atención. Aprenderás los fundamentos del ritmo y cómo encontrar la posición de Do en el piano.", tip: "No te saltes partes. Puedes pausar y tomar notas si lo necesitas.", objective: ["Comprender el concepto de ritmo y métrica", "Aprender a localizar la posición de Do", "Tocar tus primeras notas" ] },
-                       { type: 'exercise', title: "Ode to Joy - var1", contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", iconClass: 'ri-flashlight-line' },
-                        { type: 'exercise', title: "Ejercicios en Posición de Do", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-flashlight-line' },
-                        { type: 'video', title: "Melodía y Armonía", videoId: "bVWXlV8Neic", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Ode to Joy - var2", contentUrl: "https://drive.google.com/file/d/1ijz--ytWa1WkdnngZW3sO6ukzAKCphZt/preview", iconClass: 'ri-flashlight-line' },
-                        { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line' }
-                    ]
-                },
-                {
-                    title: "Lección 2: GrandStaff",
-                    unit: 1,
-                    description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
-                    tasks: [
-                        { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml" },
-                        { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                    ]
-                },
-                {
-                    title: "Lección 3: Dirección",
-                    unit: 1,
-                    tasks: [
-                        { type: 'video', title: "Dirección de Notas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'note', title: "Práctica de Dirección", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
-                        { type: 'note', title: "Ejercicio Final", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
-                    ]
-                },
-                {
-                    title: "Lección 4: Intervalos",
-                    unit: 1,
-                    tasks: [
-                        { type: 'video', title: "Teoría de Intervalos", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Práctica de Intervalos", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 5: Frases",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Construyendo Frases", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Práctica de Frases", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 6: Acordes",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Introducción a Acordes", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Práctica de Acordes", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 7: Corcheas",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Ritmo de Corcheas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Práctica de Corcheas", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 8: C Position",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Posición de Do", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Ejercicios en Do", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 9: G Position",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Posición de Sol", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Ejercicios en Sol", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 10: Tie",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Ligaduras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Práctica de Ligaduras", contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                }
+      title: "Lección 1: Fundamentos",
+      unit: 1,
+      description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Ritmo y Posición de Do", 
+          videoId: "Q4r5gnfAtzs", 
+          iconClass: 'ri-play-circle-line', 
+          instructions: "Mira este video con mucha atención. Aprenderás los fundamentos del ritmo y cómo encontrar la posición de Do en el piano.", 
+          tip: "No te saltes partes. Puedes pausar y tomar notas si lo necesitas.", 
+          objective: ["Comprender el concepto de ritmo y métrica", "Aprender a localizar la posición de Do", "Tocar tus primeras notas"] 
+        },
+        { 
+          type: 'exercise', 
+          title: "Ode to Joy - var1", 
+          contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica esta primera variación de Ode to Joy usando la posición de Do que acabas de aprender.",
+          tip: "Comienza muy lento. Es mejor tocar despacio y correcto que rápido con errores.",
+          objective: ["Aplicar la posición de Do en una melodía conocida", "Desarrollar coordinación básica", "Mantener un tempo constante"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios en Posición de Do", 
+          contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Completa estos ejercicios diseñados para fortalecer tu técnica en la posición de Do.",
+          tip: "Presta atención a la digitación sugerida. Los números indican qué dedo usar.",
+          objective: ["Fortalecer la memoria muscular en posición de Do", "Mejorar la precisión de las notas", "Practicar cambios de dedo suaves"]
+        },
+        { 
+          type: 'video', 
+          title: "Melodía y Armonía", 
+          videoId: "bVWXlV8Neic", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Observa cómo la melodía y la armonía trabajan juntas para crear música completa.",
+          tip: "Identifica cuál mano toca la melodía y cuál toca el acompañamiento.",
+          objective: ["Distinguir entre melodía y armonía", "Comprender el rol de cada mano", "Prepararte para tocar con ambas manos simultáneamente"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ode to Joy - var2", 
+          contentUrl: "https://drive.google.com/file/d/1ijz--ytWa1WkdnngZW3sO6ukzAKCphZt/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Toca esta segunda variación que incorpora armonía básica con la mano izquierda.",
+          tip: "Practica cada mano por separado primero, luego júntalas lentamente.",
+          objective: ["Coordinar ambas manos tocando juntas", "Aplicar conceptos de melodía y armonía", "Desarrollar independencia entre las manos"]
+        },
+        { 
+          type: 'quiz', 
+          title: "Quiz de Review", 
+          contentUrl: "https://mozart-app.com/lessons/quiz", 
+          iconClass: 'ri-question-line',
+          instructions: "Responde estas preguntas para verificar tu comprensión de los conceptos fundamentales.",
+          tip: "Si fallas alguna pregunta, revisa el contenido correspondiente antes de continuar.",
+          objective: ["Evaluar tu comprensión de ritmo y métrica", "Verificar conocimiento de la posición de Do", "Reforzar conceptos de melodía y armonía"]
+        }
+      ]
+    },
+    {
+      title: "Lección 2: Grand Staff",
+      unit: 1,
+      description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
+      tasks: [
+        { 
+          type: 'video', 
+          title: "El Grand Staff", 
+          videoId: "HHF95sBbmwQ", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende a leer el pentagrama completo con las claves de Sol y Fa juntas.",
+          tip: "Memoriza que la clave de Sol es para la mano derecha y la clave de Fa para la izquierda.",
+          objective: ["Comprender la estructura del Grand Staff", "Identificar notas en ambas claves", "Relacionar el pentagrama con las teclas del piano"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1Ys_fybQsMIjS4zaCRLO9lV8qsvmvooXq/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica la lectura de notas en el Grand Staff con estos ejercicios progresivos.",
+          tip: "Di el nombre de cada nota en voz alta antes de tocarla para reforzar el aprendizaje.",
+          objective: ["Mejorar la lectura a primera vista", "Reconocer rápidamente notas en ambas claves", "Desarrollar fluidez en la lectura musical"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ode to Joy - var3", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=Ode to Joy.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta esta variación leyendo directamente del Grand Staff completo.",
+          tip: "Usa el reproductor interactivo para escuchar cómo debe sonar antes de practicar.",
+          objective: ["Aplicar lectura del Grand Staff en una pieza musical", "Integrar conocimientos previos", "Ganar confianza en la lectura de partituras"]
+        }
+      ]
+    },
+    {
+      title: "Lección 3: Dirección",
+      unit: 1,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Intervalos de 2da y 3era", 
+          videoId: "H4x0TPlSoaQ", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Descubre cómo se mueven las notas por pasos (2das) y saltos pequeños (3eras) en el teclado.",
+          tip: "Los intervalos son la distancia entre dos notas. Practica identificarlos visualmente en el pentagrama.",
+          objective: ["Reconocer intervalos de 2da y 3era", "Comprender el movimiento melódico", "Tocar intervalos con precisión"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1Dom_0ZjNoslBKZpUa3IUDN8XMzcxZ1Jd/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Completa estos ejercicios para dominar el reconocimiento y ejecución de intervalos de 2da y 3era.",
+          tip: "Observa la dirección del movimiento: ¿la nota sube o baja? Esto te ayudará a anticipar.",
+          objective: ["Practicar intervalos ascendentes y descendentes", "Mejorar la lectura direccional", "Desarrollar anticipación visual"]
+        }
+      ]
+    },
+    {
+      title: "Lección 4: Intervalos",
+      unit: 1,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Intervalos de 4ta y 5ta", 
+          videoId: "M6DCHr2wVh8", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Explora intervalos más grandes que crean sonidos característicos en la música.",
+          tip: "Las 5tas suenan muy estables y potentes. Las 4tas tienen un sonido abierto y brillante.",
+          objective: ["Identificar intervalos de 4ta y 5ta", "Comprender sus cualidades sonoras", "Tocar saltos más amplios con precisión"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1G3Cun9yL_xl8ZJUhDJE5CAYTXMQUCIZY/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica estos ejercicios que combinan todos los intervalos aprendidos hasta ahora.",
+          tip: "Los saltos grandes requieren preparación visual. Mira con anticipación dónde irán tus dedos.",
+          objective: ["Dominar intervalos de 4ta y 5ta", "Combinar diferentes tipos de intervalos", "Mejorar la precisión en saltos"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Teoría", 
+          contentUrl: "https://drive.google.com/file/d/1PmVBq1jbKZyFOK3T-CWDNhZ7Tba428Lr/preview", 
+          iconClass: 'ri-question-line',
+          instructions: "Refuerza tu comprensión teórica de los intervalos con estos ejercicios escritos.",
+          tip: "Entender la teoría te ayudará a aprender piezas más rápido en el futuro.",
+          objective: ["Consolidar conocimiento teórico de intervalos", "Identificar intervalos en partituras", "Conectar teoría con práctica"]
+        }
+      ]
+    },
+    {
+      title: "Lección 5: Frases",
+      unit: 2,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Construcción de Frases", 
+          videoId: "RJnwVQHexW0", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende cómo las notas se agrupan en frases musicales, similar a las oraciones en el lenguaje.",
+          tip: "Las frases musicales tienen un inicio, desarrollo y final. Respira entre frases como al hablar.",
+          objective: ["Comprender el concepto de frase musical", "Identificar frases en partituras", "Tocar con expresión natural"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Práctica de Frases", 
+          contentUrl: "https://drive.google.com/file/d/1gum-qE-LUdxxRNmjh39A1xImbqYRABAX/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Trabaja estos ejercicios prestando atención especial a la forma de las frases.",
+          tip: "Levanta ligeramente las manos al final de cada frase para crear separación natural.",
+          objective: ["Aplicar fraseo en ejercicios prácticos", "Desarrollar sensibilidad musical", "Crear interpretaciones más expresivas"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Run Away River", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=Run Away River.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta esta pieza aplicando todo lo aprendido sobre frases musicales.",
+          tip: "Imagina que estás contando una historia. Cada frase es parte de la narrativa.",
+          objective: ["Ejecutar una pieza completa con buen fraseo", "Demostrar comprensión musical", "Expresar musicalidad personal"]
+        }
+      ]
+    },
+    {
+      title: "Lección 6: Acordes",
+      unit: 2,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Construcción de Acordes", 
+          videoId: "Y2MokfVUSqs", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Descubre cómo se construyen los acordes a partir de intervalos apilados.",
+          tip: "Un acorde es simplemente tres o más notas tocadas simultáneamente. Comienza identificando la nota base.",
+          objective: ["Comprender la estructura de los acordes", "Identificar las notas que forman un acorde", "Preparar las manos para tocar acordes"]
+        },
+        { 
+          type: 'video', 
+          title: "Acorde C y G7", 
+          videoId: "n7qaCP5a-Pc", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende a formar y tocar los acordes de Do mayor y Sol séptima, fundamentales en muchas piezas.",
+          tip: "Memoriza la forma de estos acordes. Son los más usados en música para principiantes.",
+          objective: ["Dominar los acordes de C y G7", "Cambiar entre acordes suavemente", "Comprender su función armónica"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1UtQsQYtjkYxqbVnCGfTmNa85xtnhG3W7/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica cambios de acordes y patrones de acompañamiento con estos ejercicios.",
+          tip: "Mantén los dedos curvados y toca todas las notas del acorde al mismo tiempo.",
+          objective: ["Ejecutar acordes con claridad", "Desarrollar fuerza en los dedos", "Practicar transiciones entre acordes"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Trumpet Voluntary", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=Trumpet Voluntary.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta esta pieza clásica que incorpora los acordes que has aprendido.",
+          tip: "La mano derecha lleva la melodía principal. Asegúrate de que suene más fuerte que los acordes.",
+          objective: ["Combinar melodía y acordes en una interpretación", "Aplicar balance dinámico", "Ejecutar una pieza de repertorio clásico"]
+        }
+      ]
+    },
+    {
+      title: "Lección 7: Corcheas y Staccato",
+      unit: 2,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Corcheas", 
+          videoId: "LJIBynkI1Cs", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende a tocar corcheas, las notas que duran la mitad de un tiempo.",
+          tip: "Las corcheas se cuentan '1-y-2-y-3-y-4-y'. Practica contando en voz alta.",
+          objective: ["Comprender el valor rítmico de las corcheas", "Tocar ritmos con corcheas", "Mantener pulso constante en ritmos más rápidos"]
+        },
+        { 
+          type: 'video', 
+          title: "Staccato", 
+          videoId: "5zX6CFXf6cQ", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Descubre el staccato, una técnica que crea notas cortas y separadas.",
+          tip: "Staccato significa 'picado'. Imagina que tocas una estufa caliente - rápido y ligero.",
+          objective: ["Ejecutar la articulación staccato correctamente", "Distinguir entre legato y staccato", "Añadir variedad expresiva a tu interpretación"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1DquyL0GuDR3zojHcmzBLPZaA598DMLbu/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica corcheas y staccato con estos ejercicios diseñados específicamente para estas técnicas.",
+          tip: "Alterna entre tocar legato y staccato para sentir la diferencia en tu cuerpo.",
+          objective: ["Dominar ritmos con corcheas", "Perfeccionar la técnica staccato", "Combinar diferentes articulaciones"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Old German Dance", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=old-german-dance-michael-praetorius.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta esta danza alemana que utiliza corcheas y staccato para crear un carácter alegre.",
+          tip: "Esta pieza debe sonar juguetona y ligera. Deja que tu muñeca esté relajada.",
+          objective: ["Aplicar corcheas en contexto musical", "Usar staccato expresivamente", "Interpretar música del periodo renacentista"]
+        }
+      ]
+    },
+    {
+      title: "Lección 8: Posición de Do",
+      unit: 3,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Posición de Do II", 
+          videoId: "KopYT505jHA", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Expande tu conocimiento de la posición de Do explorando diferentes octavas y variaciones.",
+          tip: "La posición de Do puede empezar en diferentes lugares del teclado. El patrón es siempre el mismo.",
+          objective: ["Reconocer la posición de Do en diferentes octavas", "Trasladar posiciones fluidamente", "Ampliar tu rango en el teclado"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1uuu7dX6SRoOIi1aqzTEJ1xj8CbfW6Uft/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Trabaja estos ejercicios que te llevan por diferentes posiciones de Do en el teclado.",
+          tip: "Mantén la forma de la mano constante cuando cambies de posición.",
+          objective: ["Practicar cambios de posición", "Desarrollar orientación en el teclado", "Fortalecer técnica en múltiples registros"]
+        },
+        { 
+          type: 'video', 
+          title: "Marcas de Tempo y Dinámicas", 
+          videoId: "fOHFGsq-cGw", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende a interpretar las indicaciones de velocidad y volumen en las partituras.",
+          tip: "Términos como 'forte' (fuerte) y 'piano' (suave) son en italiano. Son universales en la música.",
+          objective: ["Comprender términos de tempo comunes", "Reconocer símbolos dinámicos", "Aplicar variaciones de velocidad y volumen"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Waltz", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=waltz-carl-czerny.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta este vals aplicando todas las indicaciones de tempo y dinámicas.",
+          tip: "Un vals tiene ritmo de 3/4. El primer tiempo debe sentirse más fuerte que el 2 y 3.",
+          objective: ["Ejecutar un vals con estilo apropiado", "Aplicar indicaciones de interpretación", "Desarrollar sensibilidad musical avanzada"]
+        }
+      ]
+    },
+    {
+      title: "Lección 9: Posición de Sol",
+      unit: 3,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Posición de Sol", 
+          videoId: "jGM_qOcewYg", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Aprende una nueva posición fundamental: la posición de Sol, que expande tus posibilidades melódicas.",
+          tip: "En posición de Sol, tu pulgar derecho empieza en la nota Sol. Encuentra todas las teclas Sol primero.",
+          objective: ["Dominar la posición de Sol", "Comparar con la posición de Do", "Tocar en nuevas tonalidades"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/1CfqcsxDsyCwxo8ZhhOrejiiJcgyEzxCE/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica estos ejercicios específicos para familiarizarte con la posición de Sol.",
+          tip: "Compara la sensación de esta posición con la de Do. Nota las similitudes y diferencias.",
+          objective: ["Establecer memoria muscular en posición de Sol", "Practicar digitación correcta", "Ganar confianza en la nueva posición"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Bagpipe", 
+          contentUrl: "https://drive.google.com/file/d/16hYD36HcMS-WRqzR9pBvSLHCxifOTkWc/preview", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Toca esta pieza que imita el sonido de la gaita, usando la posición de Sol.",
+          tip: "Las gaitas tienen un sonido constante y mantenido. Toca con articulación suave y fluida.",
+          objective: ["Aplicar posición de Sol en repertorio", "Crear carácter específico en la interpretación", "Desarrollar control de sonido sostenido"]
+        }
+      ]
+    },
+    {
+      title: "Lección 10: Ligaduras",
+      unit: 3,
+      tasks: [
+        { 
+          type: 'video', 
+          title: "Ligadura de prolongación", 
+          videoId: "edjG-czdX2Y", 
+          iconClass: 'ri-play-circle-line',
+          instructions: "Descubre cómo las ligaduras conectan notas para extender su duración.",
+          tip: "Una ligadura une dos notas de la misma altura. Solo tocas la primera, pero mantienes el sonido.",
+          objective: ["Comprender el concepto de ligadura", "Identificar ligaduras en partituras", "Ejecutar ritmos sincopados correctamente"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Ejercicios", 
+          contentUrl: "https://drive.google.com/file/d/16dc7Bkc7KtoP95hA1Tcni_i4M7eDfNLf/preview", 
+          iconClass: 'ri-todo-line',
+          instructions: "Practica con ejercicios que incluyen ligaduras en diferentes contextos rítmicos.",
+          tip: "Cuenta en voz alta y mantén el dedo presionado durante toda la duración combinada.",
+          objective: ["Ejecutar ligaduras correctamente", "Desarrollar precisión rítmica avanzada", "Mantener pulso constante con ritmos complejos"]
+        },
+        { 
+          type: 'exercise', 
+          title: "Sonatina", 
+          contentUrl: "https://www.mozart-app.com/xml2?file=sonatina.musicxml", 
+          iconClass: 'ri-file-music-line',
+          instructions: "Interpreta esta sonatina que incorpora todas las técnicas aprendidas, incluyendo ligaduras.",
+          tip: "Una sonatina es una 'pequeña sonata'. Tócala con elegancia y atención al detalle.",
+          objective: ["Integrar todas las técnicas aprendidas", "Interpretar una pieza de forma musical completa", "Demostrar progreso técnico y musical"]
+        }
+      ]
+    }
             ]
         },
         { 
@@ -1508,6 +1795,7 @@ app.controller('PianoController', function($scope, $http, $sce, $timeout) {
        const requestData = {
             action: "getUserData",
            token: localStorage.getItem('MStoken')
+           // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
