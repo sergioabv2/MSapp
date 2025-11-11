@@ -1168,13 +1168,26 @@ const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
     
     drawClef(useTrebleClef);
     
-    // Dibujar cada nota
-    let xPos = 80; // Posición X inicial para la primera nota
-    const xGap = 0; // Espacio entre notas
+let xPos = 90; // Posición X inicial para la primera nota
+
+midis.forEach((midi, index) => {
+  // Calcular si esta nota necesita desfase (es una 2da respecto a la anterior)
+  let needsOffset = false;
+  
+  if (index > 0) {
+    const prevMidi = midis[index - 1];
+    const interval = Math.abs(midi - prevMidi);
     
-    midis.forEach((midi, index) => {
-      drawSingleNote(midi, xPos + (index * xGap), useTrebleClef);
-    });
+    // Si es una 2da (1 o 2 semitonos), esta nota se desfasa
+    if (interval === 1 || interval === 2) {
+      needsOffset = true;
+    }
+  }
+  
+  // Dibujar la nota en xPos base o con offset
+  const noteXPos = needsOffset ? xPos - 12 : xPos;
+  drawSingleNote(midi, noteXPos, useTrebleClef);
+});
   }
     
     function showKeyNamesOnPiano() {
