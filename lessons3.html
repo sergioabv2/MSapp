@@ -281,7 +281,7 @@ body {
 .content-below {
     background-color: #ffffff;
     padding: 30px;
-    min-height: 100vh;
+    min-height: 80vh;
 }
 
 .content-below h2 {
@@ -516,11 +516,7 @@ body {
     background-color: #f5f5f7; 
 }
 
-.lesson-header.completed { 
-    background-color: #f0fdf4; 
-    color: #15803d; 
-    border: 1px solid #bbf7d0; 
-}
+
 
 .lesson-header .icon { 
     font-size: 1.1rem; 
@@ -775,39 +771,6 @@ body {
     background-color: var(--danger-red); 
 }
 
-/* ========== INDICADORES Y EFECTOS ========== */
-#recordingIndicator { 
-    position: fixed; 
-    bottom: 20px; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    background-color: var(--danger-red); 
-    color: white; 
-    padding: 8px 15px; 
-    border-radius: 20px; 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    z-index: 1020; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
-    font-weight: 500; 
-}
-
-#recordingIndicator::before { 
-    content: ''; 
-    position: absolute; 
-    inset: 0; 
-    background-color: var(--danger-red); 
-    border-radius: 20px; 
-    z-index: -1; 
-    animation: pulse 1.5s infinite; 
-}
-
-@keyframes pulse { 
-    0% { transform: scale(0.95); opacity: 0.7; } 
-    70% { transform: scale(1.1); opacity: 0; } 
-    100% { transform: scale(0.95); opacity: 0; } 
-}
 
 .confetti { 
     position: fixed; 
@@ -1160,39 +1123,32 @@ body {
                         title="Contenido principal" ng-show="!showingVideo"></iframe>
 
                         <!-- Contenido debajo del video dinámico -->
-<div class="content-below" ng-if="currentLessonIndex < lessons.length">
+<div class="content-below" ng-if="currentViewingTask">
     
-    <div ng-if="lessons[currentLessonIndex].tasks[currentTaskIndex].type === 'video'">
-        <div class="lesson-description">
-            <h3>Sobre este video</h3>
-            <p>{{lessons[currentLessonIndex].tasks[currentTaskIndex].title}}</p>
-        </div>
-        
-        <div class="lesson-notes">
-            <h4><i class="ri-video-line"></i> Instrucciones</h4>
-            <p>Mira el video completo antes de continuar. Puedes pausar y rebobinar las veces que necesites.</p>
-        </div>
+    <div class="lesson-description">
+        <h3>Sobre esta actividad</h3>
+        <p>{{currentViewingTask.title}}</p>
     </div>
     
-    <div ng-if="lessons[currentLessonIndex].tasks[currentTaskIndex].type === 'exercise'">
-        <div class="lesson-description">
-            <h3>Ejercicio práctico</h3>
-            <p>Practica con tu piano siguiendo las instrucciones en pantalla.</p>
-        </div>
-        
-        <div class="lesson-notes">
-            <h4><i class="ri-flashlight-line"></i> Consejo</h4>
-            <p>Tómate tu tiempo. La calidad es más importante que la velocidad.</p>
-        </div>
+    <div class="lesson-notes" ng-if="currentViewingTask.instructions">
+        <h4>
+            <i class="ri-video-line" ng-if="currentViewingTask.type === 'video'"></i>
+            <i class="ri-pencil-ruler-2-line" ng-if="currentViewingTask.type === 'exercise'"></i>
+            <i class="ri-question-line" ng-if="currentViewingTask.type === 'quiz'"></i>
+            Instrucciones
+        </h4>
+        <p>{{currentViewingTask.instructions}}</p>
     </div>
     
-    <!-- Objetivos comunes para todas las tareas -->
-    <div class="lesson-objectives">
-        <h3>Objetivos de la lección</h3>
+    <div class="lesson-notes" style="background: #e6f7ff; border-left-color: #17a2b8;" ng-if="currentViewingTask.tip">
+        <h4><i class="ri-flashlight-line"></i> Consejo</h4>
+        <p>{{currentViewingTask.tip}}</p>
+    </div>
+
+    <div class="lesson-objectives" ng-if="currentViewingTask.objective && currentViewingTask.objective.length > 0">
+        <h3>Objetivos de la actividad</h3>
         <ul>
-            <li>Dominar la técnica fundamental</li>
-            <li>Desarrollar memoria muscular</li>
-            <li>Mejorar la coordinación</li>
+            <li ng-repeat="obj in currentViewingTask.objective">{{obj}}</li>
         </ul>
     </div>
 </div>
@@ -1308,7 +1264,7 @@ app.controller('PianoController', function($scope, $http, $sce, $timeout) {
                     unit: 1,
                     description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
                     tasks: [
-                      { type: 'video', title: "Ritmo y Posición de Do", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                      { type: 'video', title: "Ritmo y Posición de Do", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line', instructions: "Mira este video con mucha atención. Aprenderás los fundamentos del ritmo y cómo encontrar la posición de Do en el piano.", tip: "No te saltes partes. Puedes pausar y tomar notas si lo necesitas.", objective: ["Comprender el concepto de ritmo y métrica", "Aprender a localizar la posición de Do", "Tocar tus primeras notas" ] },
                        { type: 'exercise', title: "Ode to Joy - var1", contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", iconClass: 'ri-flashlight-line' },
                         { type: 'exercise', title: "Ejercicios en Posición de Do", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-flashlight-line' },
                         { type: 'video', title: "Melodía y Armonía", videoId: "bVWXlV8Neic", iconClass: 'ri-play-circle-line' },
@@ -1544,20 +1500,14 @@ app.controller('PianoController', function($scope, $http, $sce, $timeout) {
     let videoHasEnded = false;
     let pauseTimer = null;
     let isYouTubeAPIReady = false;
+    $scope.currentViewingTask = null;
 
     $scope.modal = { show: false, content: '' };
-
-    // Variables de grabación
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-
 
 
        const requestData = {
             action: "getUserData",
-          // token: localStorage.getItem('MStoken')
-            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+           token: localStorage.getItem('MStoken')
         };
 
         const config = {
@@ -1800,6 +1750,7 @@ $scope.viewTask = (lessonIndex, taskIndex) => {
     $scope.viewingTaskIndex = taskIndex;
     
     const task = $scope.lessons[lessonIndex].tasks[taskIndex];
+    $scope.currentViewingTask = task;
     const youtubeContainer = document.getElementById('youtube-container');
     const contentIframe = document.getElementById('content-iframe');
 
@@ -1831,6 +1782,7 @@ function loadCurrentTask() {
         const lesson = $scope.lessons[$scope.currentLessonIndex];
         const task = lesson.tasks[$scope.currentTaskIndex];
         
+        $scope.currentViewingTask = task;
         lesson.expanded = true;
         $scope.viewingLessonIndex = $scope.currentLessonIndex;
         $scope.viewingTaskIndex = $scope.currentTaskIndex;
@@ -1850,6 +1802,7 @@ function loadCurrentTask() {
     const lesson = $scope.lessons[$scope.currentLessonIndex];
     const task = lesson.tasks[$scope.currentTaskIndex];
     
+    $scope.currentViewingTask = task;
     lesson.expanded = true;
     $scope.viewingLessonIndex = $scope.currentLessonIndex;
     $scope.viewingTaskIndex = $scope.currentTaskIndex;
@@ -1919,22 +1872,7 @@ function completeLesson() {
         $scope.progress = ($scope.totalTasksCompleted / $scope.totalTasks) * 100;
     }
 
-   
-    $scope.handleTaskInteraction = ($event, lessonIndex, taskIndex) => {
-        $event.stopPropagation();
-        
-        if (lessonIndex !== $scope.currentLessonIndex || taskIndex !== $scope.currentTaskIndex) {
-            speak("Por favor, completa la tarea activa primero para usar esta función.");
-            return;
-        }
-
-        const task = $scope.lessons[lessonIndex].tasks[taskIndex];
-        switch (task.type) {
-            case 'video': openVideoModal(task); break;
-            case 'quiz': openQuizModal(task); break;
-            case 'record': toggleRecording(); break;
-        }
-    };
+ 
 
     // =============================================
     // == FUNCIONES DE YOUTUBE
@@ -2062,75 +2000,9 @@ function completeLesson() {
         });
     }
     
-    async function toggleRecording() {
-        const indicator = document.getElementById('recordingIndicator');
-        const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
-
-        if (isRecording) {
-            mediaRecorder.stop();
-            isRecording = false;
-            indicator.style.display = 'none';
-            task.iconClass = 'ri-mic-line';
-            speak("Grabación detenida.");
-            return;
-        }
-        
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            
-            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                openRecordingReviewModal(audioBlob);
-                stream.getTracks().forEach(track => track.stop());
-            };
-            
-            mediaRecorder.start();
-            isRecording = true;
-            indicator.style.display = 'flex';
-            task.iconClass = 'ri-stop-fill';
-            speak("Grabando.");
-        } catch (err) {
-            speak("Error, no pude acceder a tu micrófono. Por favor, otorga los permisos.");
-        }
-    }
+ 
     
-    function openRecordingReviewModal(audioBlob) {
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const content = `
-            <h3>Revisa tu Grabación</h3>
-            <p>Escucha tu melodía. Si te gusta, completa la tarea.</p>
-            <audio id="audio-playback" src="${audioUrl}" controls></audio>
-            <div class="modal-buttons">
-                <button id="deleteRecording" class="modal-button delete">Grabar de Nuevo</button>
-                <button id="completeRecording" class="modal-button">Completar Tarea</button>
-            </div>`;
-        
-        $scope.modal.content = $sce.trustAsHtml(content);
-        $scope.modal.show = true;
-
-        $timeout(() => {
-            const modalContent = document.getElementById('modalContent');
-            
-            if (modalContent) {
-                modalContent.onclick = function(event) {
-                    const targetId = event.target.id;
-
-                    if (targetId === 'deleteRecording') {
-                        $scope.$apply(closeModal);
-                    } 
-                    else if (targetId === 'completeRecording') {
-                        $scope.$apply(() => {
-                            closeModal();
-                            completeCurrentTask();
-                        });
-                    }
-                };
-            }
-        }, 0);
-    }
+  
     
     function closeModal() {
         $scope.modal.show = false;
