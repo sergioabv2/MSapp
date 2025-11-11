@@ -1237,7 +1237,13 @@ body {
                                     'expanded': lesson.expanded
                                  }"
                              ng-click="toggleLesson(lesson)">
-                            <i class="icon" ng-class="{'ri-lock-fill': $index > 0 && !lessons[$index - 1].completed}"></i>
+                            <i class="icon" 
+                       ng-class="{
+                           'ri-check-line': lesson.completed,
+                           'ri-lock-fill': !lesson.completed && $index > 0 && !lessons[$index - 1].completed
+                       }"
+                       ng-style="{'color': lesson.completed ? 'var(--success-green)' : 'inherit'}">
+                    </i>
                             <span>{{lesson.title}}</span>
                         </div>
                         <ul class="tasks-list" ng-class="{'expanded': lesson.expanded}">
@@ -1282,7 +1288,7 @@ app.filter('trustAsResourceUrl', ['$sce', function($sce) {
     };
 }]);
 
-app.controller('PianoController', function($scope, $sce, $timeout) {
+app.controller('PianoController', function($scope, $http, $sce, $timeout) {
 
     // =============================================
     // == DATOS Y ESTADO DE LA APLICACIÓN
@@ -1295,15 +1301,18 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
             title: 'Nivel Preparatorio', 
             description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
             duration: '5 horas',
-            progress: 25,
+            progress: 0,
             lessons: [
                 {
                     title: "Lección 1: Fundamentos",
                     unit: 1,
-                    description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
+                    description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
                     tasks: [
-                        { type: 'video', title: "Ritmo", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
-                        { type: 'exercise', title: "Posición de Do", contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml", iconClass: 'ri-flashlight-line' },
+                      { type: 'video', title: "Ritmo y Posición de Do", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                       { type: 'exercise', title: "Ode to Joy - var1", contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", iconClass: 'ri-flashlight-line' },
+                        { type: 'exercise', title: "Ejercicios en Posición de Do", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-flashlight-line' },
+                        { type: 'video', title: "Melodía y Armonía", videoId: "bVWXlV8Neic", iconClass: 'ri-play-circle-line' },
+                        { type: 'exercise', title: "Ode to Joy - var2", contentUrl: "https://drive.google.com/file/d/1ijz--ytWa1WkdnngZW3sO6ukzAKCphZt/preview", iconClass: 'ri-flashlight-line' },
                         { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line' }
                     ]
                 },
@@ -1313,7 +1322,7 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
                     description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
                     tasks: [
                         { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" },
+                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://www.mozart-app.com/lessons/beginner?file=firstlesson.musicxml" },
                         { type: 'note', title: "Toca la nota Sol", key: 'G', contentUrl: "https://app.mozartacademy.mx/grandstaff" }
                     ]
                 },
@@ -1508,15 +1517,17 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         }
     ];
 
+
+
+  
     $scope.lessons = [];
     $scope.pendingTasks = [];
     $scope.selectedLevel = null;
     $scope.sidebarOpen = false;
     $scope.savedProgress = {};
 
-    // Variables de estado del curso
-    $scope.currentLevelIndex = 0;
-    $scope.currentLessonIndex = 0;
+   $scope.currentLevelIndex = 0;
+  $scope.currentLessonIndex = 0;
     $scope.currentTaskIndex = 0;
     $scope.viewingLessonIndex = 0;
     $scope.viewingTaskIndex = 0;
@@ -1524,6 +1535,8 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     $scope.totalTasks = 0;
     $scope.progress = 0;
     $scope.currentTaskUrl = '';
+    $scope.serverLevelIndex = 0; 
+    $scope.serverLessonIndex = 0;
     
     // Variables para control de video de YouTube
     $scope.showingVideo = false;
@@ -1539,6 +1552,48 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
     let audioChunks = [];
     let isRecording = false;
 
+
+
+       const requestData = {
+            action: "getUserData",
+          // token: localStorage.getItem('MStoken')
+            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+        };
+
+        const config = {
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+        };
+
+        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+            .then(function(response) {
+                $scope.userStatus = response.data.status
+                const stage = JSON.parse(response.data.stage);
+                $scope.serverLevelIndex = stage.lvl;
+            $scope.serverLessonIndex = stage.lsn;
+            $scope.currentLevelIndex = stage.lvl; 
+            $scope.levels.forEach(level => {
+                if (level.id < $scope.currentLevelIndex) {
+                    level.progress = 100; // Marcar niveles anteriores como 100%
+                } else if (level.id > $scope.currentLevelIndex) {
+                    level.progress = 0; // Marcar niveles futuros como 0%
+                }
+                // Si el nivel es el actual, dejamos el progreso que trae por defecto
+            });
+            initApp($scope.serverLevelIndex, $scope.serverLessonIndex);
+               // $scope.userSubmittedRecordings = stage.exes || [];
+            }).catch(function(error) {
+               $scope.serverLevelIndex = 0;
+            $scope.serverLessonIndex = 0;
+            $scope.currentLevelIndex = 0;
+
+            $scope.levels.forEach(level => {
+            level.progress = 0;
+        });
+               initApp(0, 0);
+            })
+
     // =============================================
     // == LÓGICA DE CAMBIO DE VISTAS Y NIVELES
     // =============================================
@@ -1551,11 +1606,18 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
 
     $scope.startApp = () => {
         if (!$scope.selectedLevel) return;
+
+        const levelToLoad = $scope.selectedLevel.id;
+        let lessonToLoad = 0; 
+        if (levelToLoad === $scope.serverLevelIndex) {
+            lessonToLoad = $scope.serverLessonIndex;
+        }
+
         $scope.currentView = 'app';
-        initApp();
+        initApp(levelToLoad, lessonToLoad);
     };
 
-  $scope.showLevelSelector = () => {
+$scope.showLevelSelector = () => {
     // Guardar el progreso actual antes de salir
     if ($scope.selectedLevel) {
         $scope.savedProgress[$scope.selectedLevel.id] = {
@@ -1575,6 +1637,13 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         }
     }
     
+    // NUEVO: Recalcular el progreso de todos los niveles basado en savedProgress
+    $scope.levels.forEach(level => {
+        if ($scope.savedProgress[level.id]) {
+            level.progress = $scope.savedProgress[level.id].progress;
+        }
+    });
+    
     $scope.currentView = 'levelSelector';
 };
 
@@ -1582,8 +1651,43 @@ app.controller('PianoController', function($scope, $sce, $timeout) {
         $scope.sidebarOpen = !$scope.sidebarOpen;
     };
     
-function initApp() {
-    // Verificar si hay progreso guardado para este nivel
+function initApp(startLevelIdx, startLessonIdx) {
+    if (!$scope.levels[startLevelIdx]) {
+        console.error("El nivel " + startLevelIdx + " no existe. Empezando en 0.");
+        startLevelIdx = 0;
+        startLessonIdx = 0;
+    }
+
+    $scope.selectedLevel = $scope.levels[startLevelIdx];
+
+    // NUEVO: Marcar como completados todos los niveles inferiores
+    $scope.levels.forEach((level, idx) => {
+        if (idx < startLevelIdx) {
+            // Marcar todas las lecciones del nivel como completadas
+            if (!$scope.savedProgress[level.id]) {
+                const completedLessons = angular.copy(level.lessons);
+                completedLessons.forEach(lesson => {
+                    lesson.completed = true;
+                    lesson.expanded = false;
+                    lesson.tasks.forEach(task => {
+                        task.completed = true;
+                    });
+                });
+                
+                // Guardar el progreso completo del nivel
+                $scope.savedProgress[level.id] = {
+                    lessons: completedLessons,
+                    currentLessonIndex: completedLessons.length,
+                    currentTaskIndex: 0,
+                    totalTasksCompleted: completedLessons.reduce((acc, l) => acc + l.tasks.length, 0),
+                    progress: 100
+                };
+            }
+            // Actualizar el progreso visual del nivel
+            level.progress = 100;
+        }
+    });
+
     if ($scope.savedProgress[$scope.selectedLevel.id]) {
         const saved = $scope.savedProgress[$scope.selectedLevel.id];
         
@@ -1597,25 +1701,57 @@ function initApp() {
         
         updatePendingTasks();
         loadCurrentTask();
+
     } else {
-        // Si no hay progreso guardado, iniciar desde cero
         $scope.lessons = angular.copy($scope.selectedLevel.lessons);
         $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
 
-        $scope.lessons.forEach(lesson => {
-            lesson.completed = false;
-            lesson.expanded = false;
-            lesson.tasks.forEach(task => task.completed = false);
+        const defaultLessonIndex = startLessonIdx; // Lección de inicio
+        const defaultTaskIndex = 0; // Siempre empezamos al inicio de la lección
+        
+        $scope.totalTasksCompleted = 0; // Iniciar contador
+
+        $scope.lessons.forEach((lesson, l_idx) => {
+            if (l_idx < defaultLessonIndex) {
+                // Lección ANTERIOR: Marcar todo como completo
+                lesson.completed = true;
+                lesson.expanded = false; // Colapsada
+                lesson.tasks.forEach(task => {
+                    task.completed = true;
+                    $scope.totalTasksCompleted++;
+                });
+
+            } else if (l_idx === defaultLessonIndex) {
+                // Lección ACTUAL: Expandir y marcar como activa
+                lesson.completed = false;
+                lesson.expanded = true; // Expandir esta lección
+                lesson.tasks.forEach((task, t_idx) => {
+                    // Marcar tareas previas como completas (si defaultTaskIndex fuera > 0)
+                    if (t_idx < defaultTaskIndex) { 
+                        task.completed = true;
+                        $scope.totalTasksCompleted++;
+                    } else {
+                        task.completed = false;
+                    }
+                });
+
+            } else {
+                // Lección FUTURA: Todo bloqueado
+                lesson.completed = false;
+                lesson.expanded = false;
+                lesson.tasks.forEach(task => task.completed = false);
+            }
         });
-        
-        $scope.currentLessonIndex = 0;
-        $scope.currentTaskIndex = 0;
-        $scope.totalTasksCompleted = 0;
-        
+        $scope.currentLessonIndex = defaultLessonIndex;
+        $scope.currentTaskIndex = defaultTaskIndex;
         updateProgress();
         updatePendingTasks();
         loadCurrentTask();
     }
+    
+    // *** AGREGAR ESTE BLOQUE AL FINAL ***
+    // Actualizar el progreso visual del nivel actual
+    $scope.selectedLevel.progress = $scope.progress;
 }
 
 function updatePendingTasks() {
@@ -1686,14 +1822,11 @@ $scope.viewTask = (lessonIndex, taskIndex) => {
     }
 };
     
-    function loadCurrentTask() {
-        if ($scope.currentLessonIndex >= $scope.lessons.length) {
-            alert("¡Curso Completado!");
-            speak("¡Has completado todo el curso!", 'important');
-            showConfetti(200);
-            $scope.showLevelSelector();
-            return;
-        }
+function loadCurrentTask() {
+    if ($scope.currentLessonIndex >= $scope.lessons.length) {
+        // Nivel completado - mostrar última lección en lugar de mensaje
+        $scope.currentLessonIndex = $scope.lessons.length - 1;
+        $scope.currentTaskIndex = $scope.lessons[$scope.currentLessonIndex].tasks.length - 1;
         
         const lesson = $scope.lessons[$scope.currentLessonIndex];
         const task = lesson.tasks[$scope.currentTaskIndex];
@@ -1702,22 +1835,41 @@ $scope.viewTask = (lessonIndex, taskIndex) => {
         $scope.viewingLessonIndex = $scope.currentLessonIndex;
         $scope.viewingTaskIndex = $scope.currentTaskIndex;
         
+        // Cargar el contenido de la última tarea
         if (task.type === 'video') {
-            speak(`Siguiente: ${task.title}.`);
             openVideoModal(task);
         } else {
+            $scope.showingVideo = false;
+            document.getElementById('youtube-container').style.display = 'none';
+            document.getElementById('content-iframe').style.display = 'block';
             $scope.currentTaskUrl = task.contentUrl;
-            if (task.type === 'note') {
-                speak(`Ahora, ${task.title}`, 'important');
-            } else {
-                speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
-            }
         }
-        
-        if($scope.sidebarOpen) {
-            $timeout(() => $scope.sidebarOpen = false, 200);
+        return;
+    }
+    
+    const lesson = $scope.lessons[$scope.currentLessonIndex];
+    const task = lesson.tasks[$scope.currentTaskIndex];
+    
+    lesson.expanded = true;
+    $scope.viewingLessonIndex = $scope.currentLessonIndex;
+    $scope.viewingTaskIndex = $scope.currentTaskIndex;
+    
+    if (task.type === 'video') {
+        speak(`Siguiente: ${task.title}.`);
+        openVideoModal(task);
+    } else {
+        $scope.currentTaskUrl = task.contentUrl;
+        if (task.type === 'note') {
+            speak(`Ahora, ${task.title}`, 'important');
+        } else {
+            speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
         }
     }
+    
+    if($scope.sidebarOpen) {
+        $timeout(() => $scope.sidebarOpen = false, 200);
+    }
+}
     
   function completeCurrentTask() {
     const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
@@ -1747,7 +1899,17 @@ function completeLesson() {
     // Si completó todas las lecciones del nivel, desbloquear el siguiente
     if ($scope.currentLessonIndex >= $scope.lessons.length) {
         $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
+        
+        // MOSTRAR MENSAJE DE NIVEL COMPLETADO
         speak("¡Has completado todo el nivel! El siguiente nivel ha sido desbloqueado.", 'important');
+        showConfetti(200);
+        
+        $timeout(() => {
+            alert("¡Nivel Completado! 🎉\n\nHas terminado todas las lecciones de este nivel.\nEl siguiente nivel ha sido desbloqueado.");
+            $scope.showLevelSelector();
+        }, 1500);
+        
+        return; // No cargar más tareas
     }
     
     $timeout(loadCurrentTask, 1500);
