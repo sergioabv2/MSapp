@@ -2886,14 +2886,14 @@ function advanceLearningStep() {
   activeHighlightTimeouts.length = 0;
   expectedNotes.clear();
 
-  // VERIFICAR SI LLEGAMOS AL FINAL DEL LOOP
+
   if (isLoopMode && loopMeasureEnd !== -1) {
-    if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
-      const currentTime = parsedNotes[currentLearningIndex - 1].startSec;
-      const endTime = measureStartTimes[loopMeasureEnd];
-      
-      // Si ya pasamos el compás final, volver al inicio del loop
-      if (currentTime >= endTime - 0.01) {
+    if (currentLearningIndex < parsedNotes.length) {
+      const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+      const endTime = loopMeasureEnd + 1 < measureStartTimes.length 
+        ? measureStartTimes[loopMeasureEnd + 1] 
+        : totalDuration;
+      if (nextNoteTime >= endTime) {
         console.log('🔄 Loop completado, reiniciando desde compás', loopMeasureStart + 1);
         jumpToMeasureInLearnMode(loopMeasureStart);
         return;
