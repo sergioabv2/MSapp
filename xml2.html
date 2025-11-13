@@ -953,12 +953,7 @@ display: flex;
   transition: all 0.3s ease;
 }
 
-.midi-learn-highlight:hover:not(:disabled) {
-  background: #2a2a2a !important;
-  border-color: #444 !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
+
 
 .midi-learn-highlight:active {
   transform: translateY(0);
@@ -1255,6 +1250,87 @@ display: flex;
   }
 }
 
+
+.tutorial-parent-highlight {
+    z-index: 3000 !important;
+    position: relative; /* Asegura el contexto de apilamiento */
+}
+
+#tutorial-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Clase para resaltar el elemento del tutorial actual */
+.tutorial-highlight {
+    position: relative;
+    z-index: 3001 !important; /* Encima del overlay */
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.1); /* Ligero fondo para que se vea */
+}
+
+/* Asegura que los botones dentro del highlight sean clickeables */
+.tutorial-highlight > .btn {
+    position: relative;
+    z-index: 3001;
+}
+
+/* Corrección para elementos como el <select> */
+.tutorial-highlight::before {
+    content: '';
+    position: absolute;
+    top: -5px; left: -5px;
+    right: -5px; bottom: -5px;
+    border: 3px solid #3498db;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* --- NUEVO: Estilos para la alerta MIDI del tutorial --- */
+.tutorial-alert-banner {
+    position: absolute;
+    bottom: 0; /* Se alinea en la parte inferior del banner padre */
+    left: 50%;
+    
+    /* Inicia oculto y 10px debajo del borde inferior */
+    transform: translateX(-50%) translateY(calc(100% + 10px)); 
+    
+    background: #fffbe6; /* Amarillo pálido de alerta */
+    color: #8a6d3b; /* Color de texto oscuro */
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #f9e6af; /* Borde amarillo */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1490; /* Detrás del banner principal (1500) */
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    pointer-events: none;
+    white-space: nowrap; /* Evita que el texto se parta */
+}
+
+/* Clase 'show' que usará JavaScript para mostrar la alerta */
+.tutorial-alert-banner.show {
+    opacity: 1;
+    /* La desliza 15px por debajo del borde */
+    transform: translateX(-50%) translateY(calc(100% + 15px)); 
+    pointer-events: auto;
+}
+
+.tutorial-alert-banner i {
+    font-size: 18px;
+    color: #d9a500; /* Ícono de advertencia */
+}
+
   </style>
 </head>
 <body>
@@ -1271,9 +1347,17 @@ display: flex;
       Conecta tu teclado MIDI y practica nota por nota siguiendo las indicaciones visuales.
     </div>
   </div>
-  <button class="welcome-banner-close" id="welcome-banner-close">Entendido</button>
-</div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-left: 10px;">
+  <button class="welcome-banner-close" id="start-tutorial-btn">Tutorial</button>
+  <button class="welcome-banner-close" id="welcome-banner-close" style="background-color: #666;">Cerrar</button>
+  </div>
 
+  <div id="tutorial-midi-alert" class="tutorial-alert-banner">
+        <i class="ri-error-warning-line"></i>
+        <span>Conecta tu piano por MIDI para iniciar el tutorial</span>
+    </div>
+
+</div>
 
     <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
@@ -1404,6 +1488,21 @@ display: flex;
   </div>
 </div>
 
+<div id="tutorial-overlay" class="modal-overlay" style="display: none; z-index: 2999;">
+  <div id="tutorial-modal" class="modal-content" style="max-width: 400px; text-align: left; border: 2px solid #3498db;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h4 id="tutorial-title" style="margin: 0; color: #3498db; font-size: 1.2em;"></h4>
+        <button id="tutorial-close-btn" class="btn" title="Cerrar Tutorial" style="padding: 4px 8px; border: 1px solid #ddd;">
+            <i class="ri-close-line"></i>
+        </button>
+    </div>
+    <p id="tutorial-text" style="font-size: 14px; line-height: 1.6;"></p>
+    <div id="tutorial-nav" style="margin-top: 20px; text-align: right;">
+        <button id="tutorial-next-btn" class="btn closeBtn" style="display: none;">Siguiente</button>
+    </div>
+  </div>
+</div>
+
 <div id="success-modal" class="modal-overlay" style="display: none;">
   <div class="modal-content">
     <p id="success-modal-message">¡Felicidades, has completado la pieza!</p>
@@ -1458,6 +1557,52 @@ const progressValueSpan = document.getElementById('progress-value');
 const welcomeBanner = document.getElementById('welcome-banner');
 const welcomeBannerClose = document.getElementById('welcome-banner-close');
 const WELCOME_BANNER_SHOWN_KEY = 'welcomeBannerShown';
+
+const startTutorialBtn = document.getElementById('start-tutorial-btn');
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialModal = document.getElementById('tutorial-modal');
+const tutorialTitle = document.getElementById('tutorial-title');
+const tutorialText = document.getElementById('tutorial-text');
+const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+const tutorialMidiAlert = document.getElementById('tutorial-midi-alert');
+let tutorialAlertTimeout = null;
+let currentTutorialStep = 0;
+let tutorialSteps = [];
+
+// --- NUEVO: Definición de los pasos del tutorial (Corregido) ---
+tutorialSteps = [
+    {
+        elementId: 'midi-learn-btn',
+        title: 'Modo Aprendizaje',
+        text: 'Este es el botón principal. Al presionarlo, activas el <strong>Modo Aprendizaje</strong> y se mostrará la barra de herramientas de práctica (la que veremos a continuación).'
+    },
+    {
+        elementId: 'left-hand-only-btn',
+        title: 'Filtro de Mano Izquierda',
+        text: 'Este botón filtra la partitura y el modo aprendizaje para mostrar <strong>solo las notas de la mano izquierda</strong> (clave de Fa).'
+    },
+    {
+        elementId: 'right-hand-only-btn',
+        title: 'Filtro de Mano Derecha',
+        text: 'Activa este botón para practicar <strong>solo las notas de la mano derecha</strong> (clave de Sol).'
+    },
+    {
+        elementId: 'practice-progress',
+        title: 'Progreso de Práctica',
+        text: 'Esta barra muestra <strong>cuánto has completado</strong> de la pieza nota por nota mientras estás en "Modo Aprendizaje".'
+    },
+    {
+        elementId: 'measure-select',
+        title: 'Saltar al Compás',
+        text: 'Usa este menú para <strong>saltar a cualquier compás</strong> de la pieza e iniciar tu práctica desde allí.'
+    },
+    {
+        elementId: 'measure-until',
+        title: 'Modo Loop (Bucle)',
+        text: 'Selecciona un compás aquí para <strong>crear un bucle de práctica</strong>. El sistema repetirá la sección entre el "Compás de inicio" y este.'
+    }
+];
 
 const measureUntil = document.getElementById('measure-until');
 const cancelLoopBtn = document.getElementById('cancel-loop-btn');
@@ -2262,6 +2407,110 @@ function scheduleNotesOnTransport() {
 
 
 
+
+
+function startTutorial() {
+    currentTutorialStep = 0;
+    
+    // Oculta el banner de bienvenida
+    welcomeBanner.classList.remove('show');
+    
+    // Asegúrate de que la barra de herramientas #2 esté visible
+    secondaryTopBar2.classList.add('is-visible');
+    
+    // Muestra el overlay del tutorial
+    tutorialOverlay.style.display = 'flex';
+    setTimeout(() => tutorialOverlay.classList.add('is-visible'), 10);
+    
+    // Muestra el primer paso
+    showTutorialStep(currentTutorialStep);
+}
+
+
+function endTutorial() {
+    tutorialOverlay.classList.remove('is-visible');
+    setTimeout(() => {
+        tutorialOverlay.style.display = 'none';
+    }, 300); // Espera la animación de salida
+    
+    // Limpia cualquier highlight restante
+    const highlightedEl = document.querySelector('.tutorial-highlight');
+    if (highlightedEl) {
+        highlightedEl.classList.remove('tutorial-highlight');
+    }
+
+    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
+    const parent = document.querySelector('.tutorial-parent-highlight');
+    if (parent) {
+        parent.classList.remove('tutorial-parent-highlight');
+    }
+    // --- FIN MODIFICACIÓN ---
+}
+
+function showTutorialStep(stepIndex) {
+    // 1. Limpiar el highlight anterior (botón)
+    const oldHighlightedEl = document.querySelector('.tutorial-highlight');
+    if (oldHighlightedEl) {
+        oldHighlightedEl.classList.remove('tutorial-highlight');
+    }
+    
+    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
+    const oldParent = document.querySelector('.tutorial-parent-highlight');
+    if (oldParent) {
+        oldParent.classList.remove('tutorial-parent-highlight');
+    }
+    // --- FIN MODIFICACIÓN ---
+
+    // 2. Obtener los datos del paso actual
+    const step = tutorialSteps[stepIndex];
+    if (!step) return; // Seguridad
+
+    // 3. Resaltar el nuevo elemento
+    const element = document.getElementById(step.elementId);
+    if (element) {
+        element.classList.add('tutorial-highlight');
+        
+        // --- MODIFICACIÓN: Encontrar y elevar el padre ---
+        // Buscamos la barra (top-bar o secondary-top-bar2) que lo contiene
+        const parentContext = element.closest('#top-bar, #secondary-top-bar, #secondary-top-bar2');
+        if (parentContext) {
+            parentContext.classList.add('tutorial-parent-highlight');
+        }
+        // --- FIN MODIFICACIÓN ---
+        
+        // Opcional: Si el botón está oculto (ej: cancel-loop-btn), muéstralo
+        if (window.getComputedStyle(element).display === 'none') {
+             element.style.display = 'flex'; 
+        }
+    }
+
+    // 4. Actualizar el contenido del modal
+    tutorialTitle.textContent = step.title;
+    tutorialText.innerHTML = step.text; // Usamos innerHTML por las etiquetas <strong>
+
+    // 5. Ajustar el botón "Siguiente"
+    if (stepIndex < tutorialSteps.length - 1) {
+        tutorialNextBtn.textContent = 'Siguiente';
+        tutorialNextBtn.style.display = 'inline-block';
+    } else {
+        // Es el último paso
+        tutorialNextBtn.textContent = 'Finalizar';
+        tutorialNextBtn.style.display = 'inline-block'; // Mostrar para finalizar
+    }
+}
+
+
+function nextTutorialStep() {
+    currentTutorialStep++;
+    
+    if (currentTutorialStep < tutorialSteps.length) {
+        showTutorialStep(currentTutorialStep);
+    } else {
+        // Se hizo clic en "Finalizar"
+        endTutorial();
+    }
+}
+
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
         progressValueSpan.textContent = '0%';
@@ -2570,6 +2819,31 @@ cancelLoopBtn.addEventListener('click', () => {
     });
 
      modalCloseBtn.addEventListener('click', hideModal);
+
+   startTutorialBtn.addEventListener('click', () => {
+    if (tutorialAlertTimeout) {
+        clearTimeout(tutorialAlertTimeout);
+        tutorialMidiAlert.classList.remove('show');
+    }
+    if (midiAccess && midiAccess.inputs.size > 0) {
+        startTutorial();
+    } else {
+        tutorialMidiAlert.classList.add('show');
+        tutorialAlertTimeout = setTimeout(() => {
+            tutorialMidiAlert.classList.remove('show');
+            tutorialAlertTimeout = null;
+        }, 3500);
+    }
+});
+    tutorialCloseBtn.addEventListener('click', endTutorial);
+    tutorialNextBtn.addEventListener('click', nextTutorialStep);
+
+    // Opcional: Cierra el tutorial si se hace clic en el fondo (el overlay)
+    tutorialOverlay.addEventListener('click', (e) => {
+        if (e.target === tutorialOverlay) {
+            endTutorial();
+        }
+    });
 
 
     }
