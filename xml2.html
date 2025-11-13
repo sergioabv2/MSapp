@@ -1,4 +1,4 @@
-
+ 
 <html lang="es"> 
 <head> 
   <meta charset="utf-8" />
@@ -1033,6 +1033,11 @@ display: flex;
   transform: translateX(-50%) translateY(0);
 }
 
+.midi-learn-highlight.tutorial-highlight:hover::before,
+.midi-learn-highlight.tutorial-highlight:hover::after {
+    display: none !important;
+}
+
 /* Banner de bienvenida minimalista */
 .welcome-banner {
   position: fixed;
@@ -1258,8 +1263,125 @@ display: flex;
 
 #tutorial-overlay {
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     background: rgba(0, 0, 0, 0.4);
+    display: block; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2999;
+}
+
+/* REEMPLAZA tus estilos de #tutorial-modal con todo esto */
+#tutorial-modal {
+    position: absolute;
+    background: #ffffff;
+    color: black;
+    padding: 20px 24px;
+    border-radius: 12px;
+    /* Usamos el azul de tu app para la sombra */
+    box-shadow: 0 8px 32px rgba(52, 152, 219, 0.4); 
+    max-width: 350px;
+    
+    /* Animación de entrada (adaptada de tu .dialog-box) */
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 3001; /* Sobre el padre (3000) y el overlay (2999) */
+    
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    
+    /* Oculto por defecto hasta que JS lo posicione y muestre */
+    display: none; 
+}
+
+/* Clase 'show' para la animación de entrada */
+#tutorial-modal.show {
+    display: block; /* Lo hace visible */
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+
+#tutorial-modal::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    
+    /* Posición controlable con variables CSS */
+    top: -10px;
+    left: var(--arrow-left, 50%); /* Por defecto centrado */
+    transform: translateX(-50%);
+    
+    /* El triángulo (apunta hacia arriba) */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ffffff;
+}
+
+/* NUEVO: Flecha que apunta hacia abajo (cuando el modal está ARRIBA del botón) */
+#tutorial-modal::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    
+    bottom: -10px;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #ffffff;
+    
+    /* Oculta por defecto */
+    display: none;
+}
+
+/* Clase para mostrar la flecha inferior cuando el modal está arriba */
+#tutorial-modal.arrow-bottom::after {
+    display: block;
+}
+
+#tutorial-modal.arrow-bottom::before {
+    display: none;
+}
+
+/* Estilos internos del modal (re-aplicados) */
+#tutorial-modal #tutorial-title {
+    margin: 0 0 15px 0;
+    color: #3498db;
+    font-size: 1.2em;
+}
+
+#tutorial-modal #tutorial-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+#tutorial-modal #tutorial-text strong {
+    color: #1a1a1a;
+}
+
+#tutorial-modal #tutorial-nav {
+    margin-top: 20px;
+    text-align: right;
+}
+
+/* Ajusta el botón de cerrar (ya no es un .btn genérico) */
+#tutorial-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
 }
 
 /* Clase para resaltar el elemento del tutorial actual */
@@ -1330,6 +1452,15 @@ display: flex;
     font-size: 18px;
     color: #d9a500; /* Ícono de advertencia */
 }
+
+/* Resaltar el contenedor del piano durante el tutorial */
+#piano-keys.tutorial-highlight {
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
+    border-radius: 6px;
+    z-index: 3001 !important;
+    position: relative;
+}
+
 
   </style>
 </head>
@@ -1570,12 +1701,13 @@ let tutorialAlertTimeout = null;
 let currentTutorialStep = 0;
 let tutorialSteps = [];
 
-// --- NUEVO: Definición de los pasos del tutorial (Corregido) ---
 tutorialSteps = [
     {
         elementId: 'midi-learn-btn',
         title: 'Modo Aprendizaje',
-        text: 'Este es el botón principal. Al presionarlo, activas el <strong>Modo Aprendizaje</strong> y se mostrará la barra de herramientas de práctica (la que veremos a continuación).'
+        text: 'Este es el botón principal. <strong>Haz clic en él ahora</strong> para activar el Modo Aprendizaje y ver la barra de herramientas de práctica.',
+        requiresClick: true,
+        targetAction: 'click-midi-learn'
     },
     {
         elementId: 'left-hand-only-btn',
@@ -1585,7 +1717,16 @@ tutorialSteps = [
     {
         elementId: 'right-hand-only-btn',
         title: 'Filtro de Mano Derecha',
-        text: 'Activa este botón para practicar <strong>solo las notas de la mano derecha</strong> (clave de Sol).'
+        text: '<strong>Haz clic en este botón</strong> para activar el filtro de mano derecha y continuar.',
+        requiresClick: true,
+        targetAction: 'click-right-hand'
+    },
+    {
+        elementId: 'piano-keys', // NUEVO PASO
+        title: '¡Prueba el Piano!',
+        text: 'Ahora <strong>toca en tu teclado MIDI la nota que se muestra en azul</strong> para avanzar. Así es como funciona el modo aprendizaje.',
+        requiresClick: true,
+        targetAction: 'play-correct-note'
     },
     {
         elementId: 'practice-progress',
@@ -1600,7 +1741,7 @@ tutorialSteps = [
     {
         elementId: 'measure-until',
         title: 'Modo Loop (Bucle)',
-        text: 'Selecciona un compás aquí para <strong>crear un bucle de práctica</strong>. El sistema repetirá la sección entre el "Compás de inicio" y este.'
+        text: 'Selecciona un compás aquí para <strong>crear un bucle de práctica</strong>. El sistema repetirará la sección entre el "Compás de inicio" y este.'
     }
 ];
 
@@ -2412,91 +2553,162 @@ function scheduleNotesOnTransport() {
 function startTutorial() {
     currentTutorialStep = 0;
     
-    // Oculta el banner de bienvenida
     welcomeBanner.classList.remove('show');
-    
-    // Asegúrate de que la barra de herramientas #2 esté visible
     secondaryTopBar2.classList.add('is-visible');
     
-    // Muestra el overlay del tutorial
-    tutorialOverlay.style.display = 'flex';
+    // Oculta el modal (quita .show) antes de mostrar el overlay
+    tutorialModal.classList.remove('show'); 
+    
+    tutorialOverlay.style.display = 'block'; // Cambiado de 'flex' a 'block'
     setTimeout(() => tutorialOverlay.classList.add('is-visible'), 10);
     
-    // Muestra el primer paso
     showTutorialStep(currentTutorialStep);
 }
 
 
 function endTutorial() {
+    tutorialModal.classList.remove('show'); 
+    
     tutorialOverlay.classList.remove('is-visible');
     setTimeout(() => {
         tutorialOverlay.style.display = 'none';
-    }, 300); // Espera la animación de salida
+    }, 400); // Sincroniza con la animación del modal
     
-    // Limpia cualquier highlight restante
     const highlightedEl = document.querySelector('.tutorial-highlight');
     if (highlightedEl) {
         highlightedEl.classList.remove('tutorial-highlight');
     }
 
-    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
     const parent = document.querySelector('.tutorial-parent-highlight');
     if (parent) {
         parent.classList.remove('tutorial-parent-highlight');
     }
-    // --- FIN MODIFICACIÓN ---
+    
+    // NUEVO: Restablecer el filtro de manos a "ambas"
+    if (isMidiLearnMode) {
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+        updateStaffOpacity('both');
+        
+        // Recargar el paso actual con ambas manos
+        if (currentLearningIndex > 0) {
+            // Retroceder al inicio del paso actual
+            const currentTime = parsedNotes[currentLearningIndex - 1]?.startSec;
+            let tempIndex = currentLearningIndex - 1;
+            
+            while (tempIndex > 0 && Math.abs(parsedNotes[tempIndex - 1]?.startSec - currentTime) < 0.001) {
+                tempIndex--;
+            }
+            
+            currentLearningIndex = tempIndex;
+            prepareFirstLearningStep();
+        }
+    }
 }
 
 function showTutorialStep(stepIndex) {
-    // 1. Limpiar el highlight anterior (botón)
+    // 1. Limpiar highlights anteriores
     const oldHighlightedEl = document.querySelector('.tutorial-highlight');
     if (oldHighlightedEl) {
         oldHighlightedEl.classList.remove('tutorial-highlight');
     }
-    
-    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
     const oldParent = document.querySelector('.tutorial-parent-highlight');
     if (oldParent) {
         oldParent.classList.remove('tutorial-parent-highlight');
     }
-    // --- FIN MODIFICACIÓN ---
 
-    // 2. Obtener los datos del paso actual
+    // 2. Ocultar el modal (para reposicionarlo)
+    const modal = tutorialModal;
+    modal.classList.remove('show', 'arrow-bottom');
+
     const step = tutorialSteps[stepIndex];
-    if (!step) return; // Seguridad
+    if (!step) return;
 
     // 3. Resaltar el nuevo elemento
     const element = document.getElementById(step.elementId);
-    if (element) {
-        element.classList.add('tutorial-highlight');
-        
-        // --- MODIFICACIÓN: Encontrar y elevar el padre ---
-        // Buscamos la barra (top-bar o secondary-top-bar2) que lo contiene
-        const parentContext = element.closest('#top-bar, #secondary-top-bar, #secondary-top-bar2');
-        if (parentContext) {
-            parentContext.classList.add('tutorial-parent-highlight');
-        }
-        // --- FIN MODIFICACIÓN ---
-        
-        // Opcional: Si el botón está oculto (ej: cancel-loop-btn), muéstralo
-        if (window.getComputedStyle(element).display === 'none') {
-             element.style.display = 'flex'; 
-        }
+    if (!element) {
+        console.error("Elemento del tutorial no encontrado:", step.elementId);
+        return;
     }
 
+    element.classList.add('tutorial-highlight');
+    
+    // MODIFICADO: Manejar el contenedor padre del piano
+    let parentContext;
+    if (step.elementId === 'piano-keys') {
+        parentContext = document.getElementById('piano-container');
+    } else {
+        parentContext = element.closest('#top-bar, #secondary-top-bar, #secondary-top-bar2');
+    }
+    
+    if (parentContext) {
+        parentContext.classList.add('tutorial-parent-highlight');
+    }
+    
+    if (window.getComputedStyle(element).display === 'none') {
+         element.style.display = 'flex'; 
+    }
+    
     // 4. Actualizar el contenido del modal
     tutorialTitle.textContent = step.title;
-    tutorialText.innerHTML = step.text; // Usamos innerHTML por las etiquetas <strong>
+    tutorialText.innerHTML = step.text;
 
-    // 5. Ajustar el botón "Siguiente"
-    if (stepIndex < tutorialSteps.length - 1) {
+    // Mostrar u ocultar el botón "Siguiente" según si requiere interacción
+    if (step.requiresClick) {
+        tutorialNextBtn.style.display = 'none';
+    } else if (stepIndex < tutorialSteps.length - 1) {
         tutorialNextBtn.textContent = 'Siguiente';
         tutorialNextBtn.style.display = 'inline-block';
     } else {
-        // Es el último paso
         tutorialNextBtn.textContent = 'Finalizar';
-        tutorialNextBtn.style.display = 'inline-block'; // Mostrar para finalizar
+        tutorialNextBtn.style.display = 'inline-block';
     }
+    
+    // 5. IMPORTANTE: Forzar que el modal sea visible (pero sin animación aún)
+    modal.style.display = 'block';
+    modal.style.opacity = '0';
+
+    // 6. Calcular posición DESPUÉS de que el modal tenga sus dimensiones
+    setTimeout(() => {
+        const rect = element.getBoundingClientRect();
+        const modalWidth = modal.offsetWidth;
+        const modalHeight = modal.offsetHeight;
+        const gap = 15;
+
+        let modalTop = rect.bottom + gap;
+        let isModalAbove = false;
+        
+        // MODIFICADO: Para el piano, siempre poner el modal arriba
+        if (step.elementId === 'piano-keys' || modalTop + modalHeight > window.innerHeight - 10) {
+            modalTop = rect.top - modalHeight - gap;
+            isModalAbove = true;
+            modal.classList.add('arrow-bottom');
+        }
+        
+        let modalLeft = rect.left + (rect.width / 2) - (modalWidth / 2);
+
+        if (modalLeft < 10) {
+            modalLeft = 10;
+        }
+        if (modalLeft + modalWidth > window.innerWidth - 10) {
+            modalLeft = window.innerWidth - 10 - modalWidth;
+        }
+
+        const buttonCenterX = rect.left + (rect.width / 2);
+        const modalLeftEdge = modalLeft;
+        const arrowPosition = buttonCenterX - modalLeftEdge;
+        const clampedArrowPosition = Math.max(20, Math.min(arrowPosition, modalWidth - 20));
+
+        modal.style.top = `${modalTop}px`;
+        modal.style.left = `${modalLeft}px`;
+        modal.style.setProperty('--arrow-left', `${clampedArrowPosition}px`);
+        
+        modal.style.opacity = '';
+        modal.classList.add('show');
+    }, 10);
 }
 
 
@@ -3154,6 +3366,10 @@ function advanceLearningStep() {
   activeHighlightTimeouts.length = 0;
   expectedNotes.clear();
 
+  if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 3) {
+    nextTutorialStep(); 
+  }
+
 
   if (isLoopMode && loopMeasureEnd !== -1) {
     if (currentLearningIndex < parsedNotes.length) {
@@ -3316,6 +3532,10 @@ function toggleMidiLearnMode() {
 
         prepareFirstLearningStep(); 
         measureSelect.value = 0;
+
+        if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 0) {
+            nextTutorialStep(); // Avanzar automáticamente al paso 1
+        }
         
     } else {
     midiLearnBtn.style.background = 'none';
@@ -3334,7 +3554,7 @@ function toggleMidiLearnMode() {
 
     secondaryTopBar2.classList.remove('is-visible');
     handFilterMode = 'both';
-    updateStaffOpacity('both'); // NUEVO: Restaurar opacidad normal
+    updateStaffOpacity('both'); 
     rightHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.background = 'none';
 }
@@ -3465,17 +3685,15 @@ function toggleRightHandOnly() {
     rightHandOnlyBtn.style.color = '#3498db';
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
-  }
 
-  // NUEVO: Actualizar opacidad de los pentagramas
+    if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 2) {
+        nextTutorialStep(); // Avanzar automáticamente al paso 3
+    }
+  }
   updateStaffOpacity(handFilterMode);
-  
-  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
     skipToNextRelevantNote();
   }
-  
-  console.log(`Modo de mano: ${handFilterMode}`);
 }
 
 function toggleLeftHandOnly() {
