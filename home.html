@@ -909,6 +909,304 @@
 
 
 
+/* --- TABS PREVIEW SECTION --- */
+.tabs-container {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px hsla(0, 0%, 0%, .08);
+    overflow: hidden;
+}
+
+.tabs-nav {
+    display: flex;
+    justify-content: center;
+    background: var(--cultured);
+    border-bottom: 1px solid var(--light-gray);
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 18px 25px;
+    font-size: var(--fs-7);
+    font-weight: var(--fw-500);
+    color: var(--sonic-silver);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.tab-btn:hover {
+    color: var(--gunmetal);
+}
+
+.tab-btn.active {
+    color: var(--dodger-blue);
+    border-bottom-color: var(--dodger-blue);
+}
+
+.tabs-content {
+    padding: 30px;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos Pestaña 1: Ruta de Aprendizaje */
+.level-preview-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.level-preview-card.is-locked {
+    background: var(--cultured);
+    opacity: 0.7;
+}
+
+.level-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: var(--fw-600);
+    background: var(--light-gray);
+    color: var(--sonic-silver);
+}
+
+.level-info {
+    flex-grow: 1;
+}
+
+.level-info h3 {
+    font-size: var(--fs-5);
+    margin-bottom: 5px;
+}
+.level-info p {
+    font-size: var(--fs-7);
+    color: var(--sonic-silver);
+}
+
+.level-time {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--fs-8);
+    color: var(--granite-gray);
+    margin-top: 8px;
+}
+.level-time ion-icon {
+    font-size: 14px;
+}
+
+.level-progress {
+    width: 120px;
+    flex-shrink: 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--dodger-blue);
+    border-radius: 4px;
+}
+
+.level-lock {
+    font-size: 24px;
+    color: var(--sonic-silver);
+    padding: 0 10px;
+}
+
+/* Estilos Pestaña 2 y 3: Previews */
+.feature-preview-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+    align-items: flex-start;
+}
+
+.feature-player-preview {
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 5px 15px hsla(0, 0%, 0%, .1);
+    position: relative;
+    overflow: hidden;
+}
+
+.player-overlay-text {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, hsla(0, 0%, 0%, 0.8), transparent);
+    padding: 40px 20px 20px;
+    color: var(--white);
+    text-align: center;
+}
+
+.player-overlay-text.is-video {
+    background: hsla(0, 0%, 0%, 0.5);
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.player-overlay-text ion-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+.player-overlay-text.is-video ion-icon {
+    font-size: 60px;
+    color: hsla(0, 0%, 100%, 0.8);
+}
+
+.player-overlay-text h4 {
+    color: var(--white);
+    font-size: var(--fs-5);
+    margin-bottom: 5px;
+}
+.player-overlay-text p {
+    font-size: var(--fs-7);
+    color: var(--light-gray);
+}
+
+
+.feature-sidebar-preview {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.sidebar-title {
+    font-size: var(--fs-6);
+    font-weight: var(--fw-600);
+    color: var(--gunmetal);
+}
+.sidebar-subtitle {
+    font-size: var(--fs-8);
+    font-weight: var(--fw-500);
+    text-transform: uppercase;
+    color: var(--sonic-silver);
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.lesson-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: var(--fs-7);
+    color: var(--sonic-silver);
+}
+.lesson-list li ion-icon {
+    font-size: 18px;
+}
+.lesson-list li.completed {
+    color: var(--sonic-silver);
+}
+.lesson-list li.completed ion-icon {
+    color: hsl(145, 63%, 42%);
+}
+.lesson-list li.active {
+    color: var(--gunmetal);
+    font-weight: var(--fw-500);
+}
+.lesson-list li.active ion-icon {
+    color: var(--dodger-blue);
+}
+
+.lesson-list.tasks .task-icon {
+    font-size: 20px;
+    &.video { color: #8a63f6; }
+    &.sheet { color: #3a86f6; }
+    &.quiz { color: #f6a63a; }
+}
+
+/* --- Ajustes Responsive para Tabs --- */
+@media (max-width: 768px) {
+    .tabs-nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .tabs-nav::-webkit-scrollbar { display: none; }
+    
+    .tab-btn {
+        flex-shrink: 0;
+        font-size: 14px;
+        padding: 15px;
+    }
+
+    .tabs-content {
+        padding: 20px;
+    }
+
+    .feature-preview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-player-preview {
+        /* En móvil, la barra lateral va primero */
+        order: 2;
+    }
+    .feature-sidebar-preview {
+        order: 1;
+        margin-bottom: 20px;
+    }
+
+    .level-preview-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .level-progress, .level-lock {
+        width: 100%;
+    }
+    .level-lock {
+        text-align: right;
+    }
+}
+
+
         /* RESPONSIVE */
         @media (min-width: 500px) {
             :root {
@@ -1027,25 +1325,6 @@
             </div>
         </section>
 
-        <!-- FEATURES GRID -->
-        <section class="features-grid">
-            <div class="container">
-               <div class="features-grid-container">
-                    <div class="feature-card">
-                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/pianotify_demo.8c61b931.svg" alt="Tutoriales MIDI">
-                        <button class="btn btn-primary">Explorar archivos MIDI</button>
-                    </div>
-                    <div class="feature-card">
-                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/sheet-music.5ec462ec.webp" alt="Partituras">
-                        <button class="btn btn-primary" style="background: hsl(145, 65%, 45%); border-color: hsl(145, 65%, 45%);">Descargar Partituras</button>
-                    </div>
-                    <div class="feature-card">
-                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/video-covers.2ae56d39.webp" alt="Video Covers">
-                        <button class="btn btn-primary" style="background: hsl(0, 75%, 55%); border-color: hsl(0, 75%, 55%);">Ver Video Covers</button>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- HOW IT WORKS -->
         <section class="how-it-works" id="como-funciona">
@@ -1166,38 +1445,116 @@
         </section>
 
         <!-- CATEGORIES -->
-        <section class="categories" id="lecciones">
-            <div class="container">
-                <h2 class="h2 section-title">Explora Nuestras Lecciones</h2>
-                <div class="categories-grid">
-                    <div class="category-card">
-                        <div class="category-icon">
-                            <ion-icon name="school"></ion-icon>
+      <section class="categories" id="lecciones" style="background: var(--cultured);">
+    <div class="container">
+        <h2 class="h2 section-title">Un Vistazo a Tus Lecciones</h2>
+        <p class="section-text" style="text-align: center; max-width: 600px; margin: 0 auto 50px;">
+            No solo te damos canciones, te ofrecemos una ruta de aprendizaje completa con videos, teoría y ejercicios interactivos.
+        </p>
+
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="tab-1">
+                    <ion-icon name="list-outline"></ion-icon> Ruta de Aprendizaje
+                </button>
+                <button class="tab-btn" data-tab="tab-2">
+                    <ion-icon name="musical-notes-outline"></ion-icon> Ejercicios Interactivos
+                </button>
+                <button class="tab-btn" data-tab="tab-3">
+                    <ion-icon name="videocam-outline"></ion-icon> Lecciones en Video
+                </button>
+            </div>
+
+            <div class="tabs-content">
+
+                <div class="tab-pane active" id="tab-1">
+                    <div class="level-preview-card">
+                        <div class="level-icon" style="background-color: #e0d6ff; color: #8a63f6;">P</div>
+                        <div class="level-info">
+                            <h3 class="h4">Nivel Preparatorio</h3>
+                            <p>Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.</p>
+                            <span class="level-time"><ion-icon name="time-outline"></ion-icon> ~5 horas</span>
                         </div>
-                        <h3>Nivel Principiante</h3>
+                        <div class="level-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="category-card">
-                        <div class="category-icon">
-                            <ion-icon name="eye"></ion-icon>
+                    <div class="level-preview-card">
+                        <div class="level-icon" style="background-color: #d6eaff; color: #3a86f6;">1</div>
+                        <div class="level-info">
+                            <h3 class="h4">Nivel 1</h3>
+                            <p>Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.</p>
+                            <span class="level-time"><ion-icon name="time-outline"></ion-icon> ~4 horas</span>
                         </div>
-                        <h3>Lectura a Primera Vista</h3>
+                        <div class="level-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="category-card">
-                        <div class="category-icon">
-                            <ion-icon name="book"></ion-icon>
+                    <div class="level-preview-card is-locked">
+                        <div class="level-icon">2</div>
+                        <div class="level-info">
+                            <h3 class="h4">Nivel 2</h3>
+                            <p>Profundiza en técnica, nuevos acordes y piezas más complejas.</p>
                         </div>
-                        <h3>Técnica y Teoría</h3>
-                    </div>
-                    <div class="category-card">
-                        <div class="category-icon">
-                            <ion-icon name="star"></ion-icon>
+                        <div class="level-lock">
+                            <ion-icon name="lock-closed"></ion-icon>
                         </div>
-                        <h3>Piezas Populares</h3>
                     </div>
                 </div>
-            </div>
-        </section>
 
+                <div class="tab-pane" id="tab-2">
+                    <div class="feature-preview-grid">
+                        <div class="feature-player-preview" style="background-image: url('https://lh3.googleusercontent.com/d/184uHhgibesucdovPI0e0KMrf5jj_UwqX=s1000');">
+                             <div class="player-overlay-text">
+                                <ion-icon name="game-controller"></ion-icon>
+                                <h4>Modo Aprendizaje</h4>
+                                <p>Conecta tu MIDI y recibe feedback nota por nota.</p>
+                            </div>
+                        </div>
+                        <div class="feature-sidebar-preview">
+                            <h4 class="sidebar-title">Nivel Preparatorio</h4>
+                            <p class="sidebar-subtitle">UNIDAD 3</p>
+                            <ul class="lesson-list">
+                                <li class="completed"><ion-icon name="checkmark-circle"></ion-icon> Lección 1: Fundamentos</li>
+                                <li class="completed"><ion-icon name="checkmark-circle"></ion-icon> Lección 2: Grand Staff</li>
+                                <li class="active"><ion-icon name="chevron-forward"></ion-icon> Lección 3: Dirección</li>
+                                <li><ion-icon name="ellipse-outline"></ion-icon> Lección 4: Intervalos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-3">
+                    <div class="feature-preview-grid">
+                        <div class="feature-player-preview" style="background-image: url('https://lh3.googleusercontent.com/d/1a3urC9fRx8b6CRAt8YaWZQ1_uU-AvENX5');">
+                            <div class="player-overlay-text is-video">
+                                <ion-icon name="play-circle"></ion-icon>
+                                <h4>Clases en Video</h4>
+                                <p>Aprende teoría y conceptos clave con lecciones en video que debes completar para avanzar.</p>
+                            </div>
+                        </div>
+                        <div class="feature-sidebar-preview">
+                            <h4 class="sidebar-title">Lección 1: Fundamentos</h4>
+                            <p class="sidebar-subtitle">TAREAS DE LA LECCIÓN</p>
+                            <ul class="lesson-list tasks">
+                                <li class="active"><ion-icon name="play-circle" class="task-icon video"></ion-icon> Ritmo y Posición de Do</li>
+                                <li><ion-icon name="document-text" class="task-icon sheet"></ion-icon> Ode to Joy - var1</li>
+                                <li><ion-icon name="document-text" class="task-icon sheet"></ion-icon> Ejercicios en Posición de Do</li>
+                                <li><ion-icon name="play-circle" class="task-icon video"></ion-icon> Melodía y Armonía</li>
+                                <li><ion-icon name="help-circle" class="task-icon quiz"></ion-icon> Quiz de Review</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
         <!-- TESTIMONIALS -->
         <section class="testimonials" id="testimonios">
             <div class="container">
@@ -1498,6 +1855,32 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // 4. INICIAR EL PROCESO
         buildComposerPage(0); // Carga la primera página
         setInterval(changeComposerPage, 5000); // Cambia de página cada 5 segundos
+    }
+
+
+    const tabsContainer = document.querySelector('.tabs-container');
+    
+    // Solo ejecuta si el contenedor de pestañas existe en la página
+    if (tabsContainer) {
+        const tabButtons = tabsContainer.querySelectorAll('.tab-btn');
+        const tabPanes = tabsContainer.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabTarget = button.getAttribute('data-tab');
+
+                // 1. Quitar 'active' de todos los botones y pestañas
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                // 2. Añadir 'active' al botón clickeado y a la pestaña correspondiente
+                button.classList.add('active');
+                const targetPane = tabsContainer.querySelector(`#${tabTarget}`);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
+            });
+        });
     }
 });
 
