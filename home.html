@@ -3,72 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
-    <title>KeyNotes - Aprende Piano con Conexión MIDI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
-<script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
+    <title>Mozart Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
     <style>
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
+        :root {
+            --white: hsl(0, 0%, 100%);
+            --cultured: hsl(210, 12%, 97%);
+            --light-gray: hsl(0, 0%, 80%);
+            --silver-chalice: hsl(0, 0%, 66%);
+            --sonic-silver: hsl(208, 7%, 46%);
+            --granite-gray: hsl(0, 0%, 40%);
+            --charcoal: hsl(210, 29%, 24%);
+            --gunmetal: hsl(216, 14%, 21%);
+            --oxford-blue: hsl(219, 37%, 18%);
+            --dodger-blue: hsl(205, 100%, 50%);
+            --jet: hsl(0, 0%, 20%);
+            
+            --gradient: linear-gradient(0.5turn, hsl(213, 42%, 91%), hsl(0, 0%, 100%));
+            
+            --ff-rubik: "Rubik", sans-serif;
+            
+            --fs-1: 28px;
+            --fs-2: 26px;
+            --fs-3: 24px;
+            --fs-4: 20px;
+            --fs-5: 18px;
+            --fs-6: 17px;
+            --fs-7: 15px;
+            --fs-8: 13px;
+            
+            --fw-300: 300;
+            --fw-400: 400;
+            --fw-500: 500;
+            --fw-600: 600;
+            
+            --transition: 0.25s ease-in-out;
+            --section-padding: 80px 0;
         }
 
-        /* --- ESTILOS PARA EL CARROUSEL --- */
-        .carousel-wrapper {
-            position: relative;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        li { list-style: none; }
+        a { text-decoration: none; }
+        input { font: inherit; background: none; width: 100%; }
+        button { background: none; border: none; font: inherit; cursor: pointer; }
+        a, img, span, input, button, ion-icon { display: block; }
+        ion-icon { --ionicon-stroke-width: 25px; }
+        :focus { outline-offset: 4px; }
+        html { font-family: var(--ff-rubik); scroll-behavior: smooth; }
+        body { background: var(--white); color: var(--sonic-silver); line-height: 1.6; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background-color: hsl(0, 0%, 90%); }
+        ::-webkit-scrollbar-thumb { background-color: hsl(0, 0%, 80%); }
+        ::-webkit-scrollbar-thumb:hover { background-color: hsl(0, 0%, 70%); }
+
+        .container { padding: 0 15px; max-width: 1200px; margin: 0 auto; }
+
+        .btn {
+            color: var(--oxford-blue);
+            font-size: var(--fs-7);
+            font-weight: var(--fw-500);
+            text-transform: capitalize;
+            padding: 14px 32px;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            transition: var(--transition);
         }
+
+        .btn-primary { 
+            background: var(--dodger-blue); 
+            color: var(--white); 
+            border-color: var(--dodger-blue); 
+        }
+        .btn-primary:is(:hover, :focus) { 
+            background: hsl(205, 100%, 55%);
+            border-color: hsl(205, 100%, 55%);
+        }
+
+        .h1, .h2, .h3, .h4 { 
+            color: var(--gunmetal); 
+            font-weight: var(--fw-500); 
+            line-height: 1.2;
+        }
+        .h1 { font-size: var(--fs-1); }
+        .h2 { font-size: var(--fs-2); }
+        .h3 { font-size: var(--fs-3); }
+        .h4 { font-size: var(--fs-5); }
+
+        .section-text { color: var(--sonic-silver); line-height: 1.6; }
+        .section-subtitle { 
+            color: var(--sonic-silver); 
+            font-size: var(--fs-8); 
+            font-weight: var(--fw-500); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        /* HEADER */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: transparent;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        header.active { 
+            background: var(--white); 
+            box-shadow: 0 2px 10px hsla(0, 0%, 0%, .1); 
+            padding: 15px 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { 
+            color: var(--gunmetal); 
+            font-size: 24px; 
+            font-weight: var(--fw-600); 
+        }
+
+        .nav-open-btn, .nav-close-btn { 
+            font-size: 35px; 
+            color: var(--silver-chalice); 
+            padding: 5px;
+        }
+
+        .nav-close-btn { 
+            position: absolute; 
+            top: 10px; 
+            right: 15px; 
+        }
+
+        .navbar {
+            background: var(--white);
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100vh;
+            padding-top: 60px;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: -2px 0 10px hsla(0, 0%, 0%, .1);
+            z-index: 1001;
+        }
+
+        .navbar.active { right: 0; visibility: visible; }
+        
+        .navbar-link { 
+            color: var(--granite-gray); 
+            font-size: var(--fs-5); 
+            font-weight: var(--fw-500); 
+            padding: 20px; 
+            transition: var(--transition);
+        }
+        .navbar-link:is(:hover, :focus) { background: hsla(0, 0%, 0%, .05); }
+
+        .navbar-item:not(:last-child) { border-bottom: 1px solid hsla(0, 0%, 0%, .05); }
+
+        .navbar .btn-primary { 
+            width: 100%; 
+            text-align: left; 
+            padding: 20px; 
+            border-radius: 0; 
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: transparent;
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 999;
+        }
+
+        .overlay.active { 
+            background: hsla(0, 0%, 0%, .5); 
+            pointer-events: all; 
+        }
+
+        /* HERO */
+        .hero { 
+            position: relative; 
+            padding-top: 140px; 
+            padding-bottom: 80px; 
+            z-index: 1; 
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient);
+            z-index: -1;
+        }
+
+        .hero-content { margin-bottom: 40px; }
+        
+        .hero-title { 
+            margin-bottom: 20px; 
+            color: var(--gunmetal);
+        }
+        
+        .hero-form { margin-bottom: 25px; }
+
+        .input-field {
+            background: var(--white);
+            color: var(--jet);
+            font-weight: var(--fw-300);
+            padding: 14px 18px;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .input-field:focus { 
+            border-color: var(--dodger-blue); 
+            outline: none; 
+        }
+
+        .hero-text { 
+            color: var(--sonic-silver); 
+            font-size: var(--fs-7); 
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hero-text span { position: relative; }
+        
+        .hero-text span:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -8px;
+            width: 1px;
+            height: 100%;
+            background: var(--sonic-silver);
+        }
+
+        .hero-banner img { width: 100%; }
+
+        /* FEATURES GRID */
+        .features-grid {
+            padding: var(--section-padding);
+        }
+
+        .features-grid-container {
+            display: grid;
+            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px hsla(0, 0%, 0%, .05);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 5px 20px hsla(0, 0%, 0%, .1); 
+        }
+
+        .feature-card img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card .btn { width: 100%; }
+
+        /* HOW IT WORKS */
+        .how-it-works { 
+            background: var(--cultured); 
+            padding: var(--section-padding); 
+        }
+
+        .how-it-works .section-title { 
+            text-align: center; 
+            margin-bottom: 15px; 
+        }
+
+        .how-it-works .section-text { 
+            text-align: center; 
+            max-width: 600px; 
+            margin: 0 auto 50px; 
+        }
+
+        .steps-container {
+            display: grid;
+            gap: 40px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            background: var(--dodger-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: var(--fw-600);
+        }
+
+        .step-content h3 {
+            margin-bottom: 10px;
+        }
+
+        .video-trigger {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px hsla(0, 0%, 0%, .1);
+        }
+
+        .video-trigger img { width: 100%; display: block; }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: hsla(0, 0%, 0%, .4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .video-trigger:hover .video-overlay {
+            background: hsla(0, 0%, 0%, .3);
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .video-trigger:hover .play-button {
+            transform: scale(1.1);
+        }
+
+        .play-button ion-icon {
+            font-size: 30px;
+            color: var(--dodger-blue);
+            margin-left: 5px;
+        }
+
+        /* COMPOSERS GRID */
+        .composers-section { padding: var(--section-padding); }
+
+        .composers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .composer-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px hsla(0, 0%, 0%, .1);
+        }
+
+        .composer-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .composer-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, hsla(0, 0%, 0%, .6), transparent);
+        }
+
+        .composer-name {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: var(--white);
+            font-weight: var(--fw-500);
+            font-size: var(--fs-8);
+        }
+
+        .composers-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .composers-content ul {
+            margin: 20px 0 30px 20px;
+        }
+
+        .composers-content li {
+            list-style: disc;
+            color: var(--sonic-silver);
+            margin-bottom: 8px;
+        }
+
+        /* CAROUSEL */
+        .carousel-section { 
+            background: var(--cultured); 
+            padding: var(--section-padding); 
+        }
+
+        .carousel-section .section-title {
+            margin-bottom: 30px;
+        }
+
+        .carousel-wrapper { position: relative; }
+
         .carousel {
             display: flex;
             gap: 20px;
             overflow-x: auto;
-            padding: 10px 5px;
+            padding: 10px 5px 20px;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
-        .carousel::-webkit-scrollbar {
-            display: none;
-        }
+
+        .carousel::-webkit-scrollbar { display: none; }
+
         .book-card {
             flex: 0 0 auto;
             width: 180px;
             scroll-snap-align: start;
             cursor: pointer;
-            transition: transform 0.2s ease;
-            position: relative;
+            transition: var(--transition);
         }
-        .book-card:hover {
-            transform: translateY(-4px);
-        }
+
+        .book-card:hover { transform: translateY(-5px); }
+
         .book-cover {
             width: 100%;
             height: 240px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             object-fit: cover;
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--light-gray);
             margin-bottom: 12px;
-            display: block;
         }
+
         .book-title {
             font-size: 15px;
-            font-weight: 600;
-            color: #343a40;
+            font-weight: var(--fw-600);
+            color: var(--gunmetal);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 5px;
         }
+
         .book-author {
             font-size: 13px;
-            color: #6c757d;
+            color: var(--sonic-silver);
         }
+
         .locked-overlay {
             position: absolute;
             top: 0;
@@ -84,64 +509,357 @@
             font-size: 32px;
             backdrop-filter: blur(2px);
             opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
+            transition: var(--transition);
         }
-        .book-card.is-locked .book-cover {
-            filter: grayscale(80%);
-        }
-        .book-card.is-locked .locked-overlay {
-            opacity: 1;
-        }
+
+        .book-card.is-locked { position: relative; }
+        .book-card.is-locked .book-cover { filter: grayscale(80%); }
+        .book-card.is-locked .locked-overlay { opacity: 1; }
+
         .scroll-btn {
             position: absolute;
             top: 50%;
-            transform: translateY(-70%);
+            transform: translateY(-50%);
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #e9ecef;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            color: #343a40;
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            box-shadow: 0 2px 8px hsla(0,0,0,.1);
+            color: var(--gunmetal);
             font-size: 16px;
             cursor: pointer;
             z-index: 10;
             opacity: 0;
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .carousel-wrapper:hover .scroll-btn {
-            opacity: 1;
-        }
-        .scroll-btn:hover {
-            transform: translateY(-70%) scale(1.1);
-        }
-        .scroll-btn.prev {
-            left: -20px;
-        }
-        .scroll-btn.next {
-            right: -20px;
+
+        .carousel-wrapper:hover .scroll-btn { opacity: 1; }
+        .scroll-btn:hover { transform: translateY(-50%) scale(1.1); }
+        .scroll-btn.prev { left: -20px; }
+        .scroll-btn.next { right: -20px; }
+
+        /* CATEGORIES */
+        .categories { padding: var(--section-padding); }
+        
+        .categories .section-title {
+            text-align: center;
+            margin-bottom: 50px;
         }
 
-        /* --- ESTILOS PARA EL MODAL DE VIDEO CORREGIDO --- */
+        .categories-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 5px 20px hsla(0, 0%, 0%, .05);
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px hsla(0, 0%, 0%, .1);
+        }
+
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-icon ion-icon {
+            font-size: 35px;
+        }
+
+        .category-card:nth-child(1) .category-icon {
+            background: hsl(330, 100%, 95%);
+            color: hsl(330, 100%, 50%);
+        }
+
+        .category-card:nth-child(2) .category-icon {
+            background: hsl(270, 100%, 95%);
+            color: hsl(270, 100%, 50%);
+        }
+
+        .category-card:nth-child(3) .category-icon {
+            background: hsl(205, 100%, 95%);
+            color: hsl(205, 100%, 50%);
+        }
+
+        .category-card:nth-child(4) .category-icon {
+            background: hsl(145, 100%, 95%);
+            color: hsl(145, 100%, 40%);
+        }
+
+        .category-card h3 {
+            font-size: var(--fs-5);
+        }
+
+        /* TESTIMONIALS */
+        .testimonials {
+            background: var(--cultured);
+            padding: var(--section-padding);
+        }
+
+        .testimonials .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px hsla(0, 0%, 0%, .05);
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .stars ion-icon {
+            color: #FFD700;
+            font-size: 18px;
+        }
+
+        .testimonial-text {
+            color: var(--sonic-silver);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--light-gray);
+        }
+
+        .author-name {
+            font-weight: var(--fw-600);
+            color: var(--gunmetal);
+            margin-bottom: 3px;
+        }
+
+        .author-role {
+            font-size: var(--fs-8);
+            color: var(--sonic-silver);
+        }
+
+        /* NEWSLETTER */
+        .newsletter { padding: var(--section-padding); }
+
+        .newsletter-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter h2 {
+            margin-bottom: 15px;
+        }
+
+        .newsletter p {
+            margin-bottom: 30px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+        }
+
+        /* FOOTER */
+        .footer-top {
+            padding: var(--section-padding);
+            background: var(--cultured);
+        }
+
+        .footer-brand {
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: var(--fw-600);
+            color: var(--gunmetal);
+            margin-bottom: 20px;
+        }
+
+        .footer-link-box {
+            display: grid;
+            gap: 40px;
+        }
+
+        .footer-list li:not(:last-child) {
+            margin-bottom: 15px;
+        }
+
+        .footer-list h4 {
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: var(--sonic-silver);
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--granite-gray);
+            text-decoration: underline;
+        }
+
+        .divider {
+            border: none;
+            height: 1px;
+            background: var(--light-gray);
+        }
+
+        .footer-bottom {
+            padding: 30px 0;
+            background: var(--cultured);
+        }
+
+        .footer-bottom .container {
+            text-align: center;
+        }
+
+        .copyright {
+            color: var(--sonic-silver);
+            margin-bottom: 15px;
+        }
+
+        .social-list {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            color: var(--sonic-silver);
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--granite-gray);
+            text-decoration: underline;
+        }
+
+        /* GO TOP BUTTON */
+        .go-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--dodger-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            box-shadow: 0 5px 15px hsla(0, 0%, 0%, .2);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 999;
+        }
+
+        .go-top-btn.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .go-top-btn:hover {
+            background: hsl(205, 100%, 55%);
+            transform: translateY(-3px);
+        }
+
+        /* VIDEO MODAL */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            background: hsla(0, 0%, 0%, .8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .video-modal.active {
+            display: flex;
+        }
+
         .video-modal-content {
-            background: black;
-            padding: 0;
+            background: var(--jet);
             width: 90%;
-            max-width: 900px; /* Ancho máximo del video */
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            max-width: 900px;
             border-radius: 12px;
             overflow: hidden;
-            position: relative; /* Necesario para posicionar el botón */
+            box-shadow: 0 10px 40px hsla(0, 0%, 0%, .5);
+            position: relative;
         }
+
+        .video-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: hsla(0, 0%, 0%, .5);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .video-close-btn:hover {
+            background: hsla(0, 0%, 0%, .7);
+        }
+
         .video-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* Proporción 16:9 */
+            padding-top: 56.25%;
         }
+
         .video-container iframe {
             position: absolute;
             top: 0;
@@ -149,611 +867,640 @@
             width: 100%;
             height: 100%;
         }
-        .video-close-btn {
-            position: absolute;
-            top: 1rem; /* 16px desde arriba */
-            right: 1rem; /* 16px desde la derecha */
-            color: white;
-            font-size: 28px;
-            line-height: 1;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s ease;
+
+      
+
+.composers-grid-wrapper {
+    position: relative; /* Necesario para el contexto de la animación */
+    overflow: hidden;   /* ¡La parte más importante! Oculta el deslizamiento */
+    margin-bottom: 40px; /* Restaura el espacio que tenía el grid */
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%); /* Desliza hacia la derecha */
+        opacity: 0;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%); /* Entra desde la izquierda */
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-out-right {
+    animation: slideOutRight 0.5s ease-out forwards;
+}
+
+.slide-in-from-left {
+    animation: slideInFromLeft 0.5s ease-in forwards;
+}
+
+
+
+
+        /* RESPONSIVE */
+        @media (min-width: 500px) {
+            :root {
+                --fs-1: 32px;
+                --fs-2: 30px;
+                --fs-3: 28px;
+                --fs-5: 19px;
+            }
+
+            .container { max-width: 480px; }
+            .categories-grid { grid-template-columns: repeat(2, 1fr); }
+            .composers-grid { grid-template-columns: repeat(4, 1fr); }
         }
-        .video-close-btn:hover {
-            background: rgba(0, 0, 0, 0.6);
+
+        @media (min-width: 768px) {
+            :root {
+                --fs-1: 40px;
+                --fs-2: 36px;
+                --fs-3: 32px;
+            }
+
+            .container { max-width: 820px; }
+
+            .hero .container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 50px;
+                align-items: center;
+            }
+
+            .hero-content { margin-bottom: 0; }
+            .steps-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+                align-items: center;
+            }
+
+            .composers-content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+                align-items: center;
+            }
+
+            .categories-grid { grid-template-columns: repeat(4, 1fr); }
+
+            .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+
+            .footer-link-box { grid-template-columns: repeat(4, 1fr); }
+
+            .footer-bottom .container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .copyright { margin-bottom: 0; }
         }
 
-        #video-modal {
-    transition: opacity 0.3s ease-in-out;
-}
+        @media (min-width: 1024px) {
+            :root {
+                --fs-1: 48px;
+                --fs-2: 42px;
+                --fs-3: 38px;
+                --section-padding: 100px 0;
+            }
 
+            .container { max-width: 990px; }
 
-/* Pega este bloque completo dentro de tu etiqueta <style> */
+            header { padding: 30px 0; }
+            header.active { padding: 20px 0; }
 
-/* MODAL MEJORADO */
+            .hero { padding-top: 180px; }
 
-/* --- AÑADE ESTAS CLASES PARA LAS TARJETAS DE EJERCICIOS --- */
-.exercise-card {
-    flex: 0 0 auto;
-    width: 280px; /* Más ancho que el book-card */
-    scroll-snap-align: start;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    position: relative;
-}
-.exercise-card:hover {
-    transform: translateY(-4px);
-}
-.exercise-cover {
-    width: 100%;
-    height: 158px; /* Menos alto para un aspecto 16:9 */
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    object-fit: cover;
-    border: 1px solid #f0f0f0;
-    margin-bottom: 12px;
-    display: block;
-}
-
-
-.midi-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.midi-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-.midi-modal-container {
-    width: 95%;
-    max-width: 900px;
-    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    transform: translateY(30px) scale(0.95);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-}
-.midi-modal-overlay.active .midi-modal-container {
-    transform: translateY(0) scale(1);
-}
-.midi-modal-header {
-    padding: 24px 28px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
-    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-.midi-modal-title {
-    margin: 0;
-    color: #ffffff;
-    font-size: 1.6rem;
-    font-weight: 700;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-.midi-modal-composer {
-    margin: 0;
-    color: #a78bfa;
-    font-size: 1rem;
-    font-weight: 400;
-    margin-top: 6px;
-}
-.midi-modal-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #ffffff;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    line-height: 1;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.midi-modal-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
-}
-.midi-modal-body {
-    padding: 0;
-    background: #0f0f1e;
-}
-.midi-player-wrapper {
-    padding: 20px 28px;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
-    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
-}
-midi-player {
-    width: 100%;
-    --player-bg: transparent;
-    --primary-color: #8b5cf6;
-    --secondary-color: #3b82f6;
-}
-.midi-visualizer-wrapper {
-    height: 400px;
-    position: relative;
-    background: linear-gradient(180deg, #0a0a14 0%, #050510 100%);
-    overflow: hidden;
-}
-.piano-keys {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
-    border-top: 2px solid rgba(139, 92, 246, 0.3);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-}
-midi-visualizer::part(note) {
-    background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
-    border-radius: 4px 4px 0 0;
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.3);
-    border: 1px solid rgba(139, 92, 246, 0.8);
-}
-midi-visualizer::part(note-sharp) {
-    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.3);
-    border: 1px solid rgba(59, 130, 246, 0.8);
-}
-.progress-indicator {
-    position: absolute;
-    top: 0;
-    bottom: 80px;
-    left: 50%;
-    width: 2px;
-    background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.8) 30%, rgba(139, 92, 246, 1) 50%, rgba(139, 92, 246, 0.8) 70%, transparent 100%);
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
-    z-index: 5;
-}
-
-@keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
+            .hero .container { gap: 80px; }
         }
-        .animate-blob {
-            animation: blob 7s infinite;
+
+        @media (min-width: 1200px) {
+            :root {
+                --fs-1: 52px;
+                --fs-2: 46px;
+                --fs-3: 42px;
+            }
+
+            .container { max-width: 1140px; }
         }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
     </style>
 </head>
-<body class="bg-gradient-to-b from-blue-50 to-purple-50 font-sans">
-    
- 
- <section class="relative py-12 lg:py-20 text-center  overflow-hidden" style="background-color:#F8F9FA.;">
-    
-   <div class="absolute inset-0 z-0">
-     <!--   <div class="absolute top-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div class="absolute top-40 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>  
-        <div class="absolute bottom-20 left-1/2 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div> -->
-    </div>  
+<body>
+    <!-- HEADER -->
+   
 
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="header">
-    
-    <div class="mx-auto mb-8 text-center">
-        <h1 class="text-5xl lg:text-6xl font-extrabold mb-6 leading-tight" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            La aplicación de acompañamiento para músicos
-        </h1>
-        <p class="text-xl lg:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto font-medium">
-            Practica y progresa divirtiéndote con más de 11,000 partituras y acompañamientos para todos los niveles
-        </p>
-    </div>
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="h1 hero-title">La aplicación de acompañamiento para músicos</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-16">
-        <div class="px-1">
-            <a href="#" class="block bg-transparent border-0 group mb-3">
-                <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/pianotify_demo.8c61b931.svg" class="w-full rounded-xl shadow-lg group-hover:opacity-80 group-hover:shadow-xl transition-all duration-300" alt="Midi tutorials">
-            </a>
-            <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-lg shadow-md font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300">
-                Explorar archivos MIDI
-            </a>
-        </div>
-        <div class="px-1">
-            <a href="#" class="block bg-transparent border-0 group mb-3">
-                <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/sheet-music.5ec462ec.webp" class="w-full rounded-xl shadow-lg group-hover:opacity-80 group-hover:shadow-xl transition-all duration-300" alt="Descargar partituras">
-            </a>
-            <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-lg shadow-md font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300">
-                Descargar Partituras
-            </a>
-        </div>
-        <div class="px-1">
-            <a href="#" class="block bg-transparent border-0 group mb-3">
-                <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/video-covers.2ae56d39.webp" class="w-full rounded-xl shadow-lg group-hover:opacity-80 group-hover:shadow-xl transition-all duration-300" alt="Ver video covers">
-            </a>
-            <a href="#" class="mt-3 inline-flex items-center justify-center w-full md:w-auto text-lg px-6 py-3 rounded-lg shadow-md font-bold bg-red-600 hover:bg-red-700 text-white transition-all duration-300">
-                Ver Video Covers
-            </a>
+                    <form class="hero-form">
+                        <br><br>
+                        <button type="submit" class="btn btn-primary">Comenzar Gratis</button>
+                    </form>
+
+                    <div class="hero-text">
+                        <span>30 días gratis</span>
+                        <span>Soporte exclusivo</span>
+                        <span>Sin cargos ocultos</span>
+                    </div>
+                </div>
+
+                <figure class="hero-banner">
+                    <img src="https://lh3.googleusercontent.com/d/1OGH73fXAvPHs_J7e2UQrHH6tvEGI_4EW" >
+                </figure>
+            </div>
+        </section>
+
+        <!-- FEATURES GRID -->
+        <section class="features-grid">
+            <div class="container">
+               <div class="features-grid-container">
+                    <div class="feature-card">
+                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/pianotify_demo.8c61b931.svg" alt="Tutoriales MIDI">
+                        <button class="btn btn-primary">Explorar archivos MIDI</button>
+                    </div>
+                    <div class="feature-card">
+                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/sheet-music.5ec462ec.webp" alt="Partituras">
+                        <button class="btn btn-primary" style="background: hsl(145, 65%, 45%); border-color: hsl(145, 65%, 45%);">Descargar Partituras</button>
+                    </div>
+                    <div class="feature-card">
+                        <img src="https://cdn.pianotify.com/build/250626a0/img/homepage/video-covers.2ae56d39.webp" alt="Video Covers">
+                        <button class="btn btn-primary" style="background: hsl(0, 75%, 55%); border-color: hsl(0, 75%, 55%);">Ver Video Covers</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="how-it-works" id="como-funciona">
+            <div class="container">
+                <p class="section-subtitle">Proceso Simple</p>
+                <h2 class="h2 section-title">Aprende de Forma Interactiva</h2>
+                <p class="section-text">Te escuchamos tocar y te guiamos nota por nota en tu camino hacia la maestría musical</p>
+
+                <div class="steps-container">
+                    <div>
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3 class="h4">Conecta tu Piano</h3>
+                                <p class="section-text">Usa un cable MIDI-USB para conectar tu teclado o piano digital a tu computadora. Es rápido y sencillo.</p>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3 class="h4">Elige una Canción</h3>
+                                <p class="section-text">Explora nuestro amplio repertorio y selecciona la pieza que deseas aprender, desde clásicos hasta éxitos modernos.</p>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3 class="h4">Toca y Recibe Feedback</h3>
+                                <p class="section-text">La partitura cobra vida. Toca las notas y nuestra plataforma te guía en tiempo real, esperando si es necesario.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="video-trigger" id="video-trigger">
+                        <img src="https://lh3.googleusercontent.com/d/1ddzBB0_dKU4RiL6C1qwtOhx42Osv7kAv" alt="Video Demo">
+                        <div class="video-overlay">
+                            <div class="play-button">
+                                <ion-icon name="play"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPOSERS SECTION -->
+       <section class="composers-section">
+    <div class="container">
+        <div class="composers-content">
+            
+            <div class="composers-grid-wrapper">
+                <div class="composers-grid" id="composers-grid-dynamic">
+                    </div>
+            </div>
+
+            <div> <p class="section-subtitle">Catálogo Extenso</p>
+                <h2 class="h2">Miles de partituras con acompañamientos profesionales</h2>
+                <p class="section-text">Disfruta de nuestro creciente catálogo de acompañamientos musicales de alta calidad para todos los niveles y géneros.</p>
+                <ul>
+                    <li>Repertorio de todos los géneros musicales</li>
+                    <li>Clásicos adaptados para cada nivel</li>
+                    <li>Piezas educativas y de técnica</li>
+                    <li>Bandas sonoras, Pop, Jazz y más</li>
+                </ul>
+                <button class="btn btn-primary" style="margin-top: 25px;">Explorar el catálogo</button>
+            </div>
         </div>
     </div>
-</div>
 </section>
 
-    <div id="como-funciona" class="bg-white py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800">Aprende de Forma Interactiva</h2>
-                <p class="text-lg text-gray-600 mt-2">Te escuchamos tocar y te guiamos nota por nota.</p>
+        <!-- CAROUSEL SECTION -->
+        <section class="carousel-section" id="repertorio">
+            <div class="container">
+                <h2 class="h2 section-title">Repertorio Destacado</h2>
+                <div class="carousel-wrapper">
+                    <div class="carousel" id="repertorio-carousel">
+                        <div class="book-card" onclick="openMidiModal('https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle.mid', 'Clair de Lune', 'C. Debussy')">
+                            <img src="https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej" alt="Clair de Lune" class="book-cover">
+                            <div class="book-title">Clair de Lune</div>
+                            <div class="book-author">C. Debussy</div>
+                        </div>
+                        <div class="book-card" onclick="openMidiModal('https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle.mid', 'Für Elise', 'L. v. Beethoven')">
+                            <img src="https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd" alt="Für Elise" class="book-cover">
+                            <div class="book-title">Für Elise</div>
+                            <div class="book-author">L. v. Beethoven</div>
+                        </div>
+                        <div class="book-card" onclick="openMidiModal('https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle.mid', 'Nuvole Bianche', 'L. Einaudi')">
+                            <img src="https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4" alt="Nuvole Bianche" class="book-cover">
+                            <div class="book-title">Nuvole Bianche</div>
+                            <div class="book-author">L. Einaudi</div>
+                        </div>
+                        <div class="book-card" onclick="openMidiModal('https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle.mid', 'Preludio en Do Mayor', 'J.S. Bach')">
+                            <img src="https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh" alt="Preludio" class="book-cover">
+                            <div class="book-title">Preludio en Do Mayor</div>
+                            <div class="book-author">J.S. Bach</div>
+                        </div>
+                        <div class="book-card">
+                            <img src="https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P" alt="Nocturne" class="book-cover">
+                            <div class="book-title">Nocturne Op.9 No.2</div>
+                            <div class="book-author">F. Chopin</div>
+                        </div>
+                        <div class="book-card">
+                            <img src="https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi" alt="River Flows" class="book-cover">
+                            <div class="book-title">River Flows In You</div>
+                            <div class="book-author">Yiruma</div>
+                        </div>
+                    </div>
+                    <button class="scroll-btn prev" onclick="scrollCarousel('repertorio-carousel', -1)">
+                        <ion-icon name="chevron-back"></ion-icon>
+                    </button>
+                    <button class="scroll-btn next" onclick="scrollCarousel('repertorio-carousel', 1)">
+                        <ion-icon name="chevron-forward"></ion-icon>
+                    </button>
+                </div>
             </div>
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-               
-                <div class="space-y-8">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-12 h-12 bg-pink-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">1</div>
-                        <div class="ml-6">
-                            <h3 class="text-xl font-semibold text-gray-800">Conecta tu Piano</h3>
-                            <p class="mt-1 text-gray-600">Usa un cable MIDI-USB para conectar tu teclado o piano digital a tu computadora. ¡Es así de fácil!</p>
+        </section>
+
+        <!-- CATEGORIES -->
+        <section class="categories" id="lecciones">
+            <div class="container">
+                <h2 class="h2 section-title">Explora Nuestras Lecciones</h2>
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <ion-icon name="school"></ion-icon>
                         </div>
+                        <h3>Nivel Principiante</h3>
                     </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">2</div>
-                        <div class="ml-6">
-                            <h3 class="text-xl font-semibold text-gray-800">Elige una Canción</h3>
-                            <p class="mt-1 text-gray-600">Explora nuestro repertorio y elige la pieza que quieres aprender, desde clásicos hasta éxitos modernos.</p>
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <ion-icon name="eye"></ion-icon>
                         </div>
+                        <h3>Lectura a Primera Vista</h3>
                     </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">3</div>
-                        <div class="ml-6">
-                            <h3 class="text-xl font-semibold text-gray-800">Toca y Recibe Feedback</h3>
-                            <p class="mt-1 text-gray-600">La partitura cobrará vida. Toca las notas en tu piano y nuestra plataforma te indicará si vas bien y esperará por ti si te equivocas.</p>
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <ion-icon name="book"></ion-icon>
                         </div>
+                        <h3>Técnica y Teoría</h3>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <ion-icon name="star"></ion-icon>
+                        </div>
+                        <h3>Piezas Populares</h3>
                     </div>
                 </div>
-                 <div id="video-trigger" class="relative aspect-video rounded-lg shadow-2xl overflow-hidden cursor-pointer group">
-                    <img src="https://lh3.googleusercontent.com/d/1ddzBB0_dKU4RiL6C1qwtOhx42Osv7kAv" alt="Video demostrativo de KeyNotes" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center transition-opacity duration-300 group-hover:bg-opacity-30">
-                        <div class="bg-white bg-opacity-90 rounded-full w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                            <i class="fas fa-play text-4xl text-pink-500 pl-2"></i>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section class="testimonials" id="testimonios">
+            <div class="container">
+                <h2 class="h2 section-title">Lo que Dicen Nuestros Alumnos</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                        </div>
+                        <p class="testimonial-text">"Nunca pensé que podría leer música... esta app hizo el proceso tan sencillo e intuitivo. Ahora puedo sentarme al piano y tocar piezas que antes solo soñaba."</p>
+                        <div class="testimonial-author">
+                            <div class="author-img"></div>
+                            <div>
+                                <div class="author-name">Laura García</div>
+                                <div class="author-role">Estudiante Adulta</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                        </div>
+                        <p class="testimonial-text">"Dejé el piano por años y me sentía estancado. Esta plataforma me ayudó a retomar mi pasión con un repertorio increíble y ejercicios de lectura que realmente funcionan."</p>
+                        <div class="testimonial-author">
+                            <div class="author-img"></div>
+                            <div>
+                                <div class="author-name">Carlos Mendoza</div>
+                                <div class="author-role">Músico Aficionado</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star"></ion-icon>
+                            <ion-icon name="star-half"></ion-icon>
+                        </div>
+                        <p class="testimonial-text">"La mejor herramienta para mi hijo. Aprende a su ritmo, se divierte con las canciones populares y yo puedo ver su progreso. La interfaz es muy motivadora."</p>
+                        <div class="testimonial-author">
+                            <div class="author-img"></div>
+                            <div>
+                                <div class="author-name">Sofía Reyes</div>
+                                <div class="author-role">Madre de Familia</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-
-  
-
-    <div class=" py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-16 items-center">
-                <div class="grid grid-cols-4 gap-3">
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1a3urC9fRx8b6CRAt8YaWZQ1_uU-AvENX" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Mozart</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1vXrwiwK7wdImoDRnAgbUjf7Re5ryL7ed" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Haydn</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/17Op_HWCo9YdC2YwpJWlWKSBUfw1mv5UL" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Liszt</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1pysrY83O-9T3AV6cpSHifWK4lbR9YAC_" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Chopin</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/10_RNQHt21xPJk0B_jxolbtmt1f5DkQBx" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Beethoven</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1EaP3Rd1_ShHsjEBLK_HP8344WU-1gpI7" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Bach</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/10_RNQHt21xPJk0B_jxolbtmt1f5DkQBx" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Beethoven</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1vXrwiwK7wdImoDRnAgbUjf7Re5ryL7ed" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Haydn</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1a3urC9fRx8b6CRAt8YaWZQ1_uU-AvENX" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Mozart</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/17Op_HWCo9YdC2YwpJWlWKSBUfw1mv5UL" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Liszt</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1pysrY83O-9T3AV6cpSHifWK4lbR9YAC_" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Chopin</span></div>
-                    <div class="relative aspect-square rounded-lg overflow-hidden shadow-md"><img src="https://lh3.googleusercontent.com/d/1EaP3Rd1_ShHsjEBLK_HP8344WU-1gpI7" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black bg-opacity-30"></div><span class="absolute bottom-2 left-2 text-white font-semibold text-sm">Bach</span></div>
+        <!-- NEWSLETTER -->
+        <section class="newsletter">
+            <div class="container">
+                <div class="newsletter-content">
+                    <h2 class="h2">¡No Pierdas el Ritmo!</h2>
+                    <p class="section-text">Recibe actualizaciones semanales sobre nuevas partituras y lecciones</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Tu correo electrónico" class="input-field" required>
+                        <button type="submit" class="btn btn-primary">Suscribirme</button>
+                    </form>
                 </div>
-                <div>
-                    <h2 class="text-4xl font-extrabold text-gray-800 leading-tight">Miles de partituras con acompañamientos profesionales</h2>
-                    <p class="mt-4 text-lg text-gray-600">Disfruta de nuestro creciente catálogo de acompañamientos musicales de alta calidad:</p>
-                    <ul class="mt-6 space-y-2 text-gray-600 list-disc list-inside">
-                        <li>Repertorio de todos los géneros.</li>
-                        <li>Éxitos clásicos adaptados para todos los niveles.</li>
-                        <li>Piezas educativas y de técnica.</li>
-                        <li>Bandas sonoras de películas, Pop, Jazz, y más.</li>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo">Mozart Academy</a>
+                    <p class="section-text">Domina el Piano, una Nota a la Vez. Plataforma profesional de aprendizaje musical con tecnología MIDI avanzada.</p>
+                </div>
+
+                <div class="footer-link-box">
+                    <ul class="footer-list">
+                        <li><h4>Compañía</h4></li>
+                        <li><a href="#" class="footer-link">Sobre Nosotros</a></li>
+                        <li><a href="#" class="footer-link">Carreras</a></li>
+                        <li><a href="#" class="footer-link">Prensa</a></li>
+                        <li><a href="#" class="footer-link">Contacto</a></li>
                     </ul>
-                    <a href="#" class="mt-8 inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg hover:bg-yellow-500 transition duration-300">
-                        Explorar el catálogo
-                    </a>
+
+                    <ul class="footer-list">
+                        <li><h4>Descubre</h4></li>
+                        <li><a href="#" class="footer-link">Blog</a></li>
+                        <li><a href="#" class="footer-link">Lecciones</a></li>
+                        <li><a href="#" class="footer-link">Precios</a></li>
+                        <li><a href="#" class="footer-link">Testimonios</a></li>
+                    </ul>
+
+                    <ul class="footer-list">
+                        <li><h4>Legal</h4></li>
+                        <li><a href="#" class="footer-link">Términos de Uso</a></li>
+                        <li><a href="#" class="footer-link">Privacidad</a></li>
+                        <li><a href="#" class="footer-link">Cookies</a></li>
+                        <li><a href="#" class="footer-link">Mapa del Sitio</a></li>
+                    </ul>
+
+                    <ul class="footer-list">
+                        <li><h4>Soporte</h4></li>
+                        <li><a href="#" class="footer-link">FAQ</a></li>
+                        <li><a href="#" class="footer-link">Ayuda</a></li>
+                        <li><a href="#" class="footer-link">Comunidad</a></li>
+                        <li><a href="#" class="footer-link">Chat en Vivo</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
 
- 
-    
-    <div class="bg-white py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold mb-8 text-gray-800">Repertorio Destacado</h2>
-            <div class="carousel-wrapper">
-                <div class="carousel" id="repertorio-carousel">
-                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej" alt="Clair de Lune" class="book-cover"><div class="book-title">Clair de Lune</div><div class="book-author">C. Debussy</div></div>
-                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd" alt="Für Elise" class="book-cover"><div class="book-title">Für Elise</div><div class="book-author">L. v. Beethoven</div></div>
-                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4" alt="Nuvole Bianche" class="book-cover"><div class="book-title">Nuvole Bianche</div><div class="book-author">L. Einaudi</div></div>
-                    <div class="book-card"><img src="https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh" alt="Preludio en Do Mayor" class="book-cover"><div class="book-title">Preludio en Do Mayor</div><div class="book-author">J.S. Bach</div></div>
-                    <div class="book-card is-locked"><img src="https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P" alt="Nocturne Op.9 No.2" class="book-cover"><div class="book-title">Nocturne Op.9 No.2</div><div class="book-author">F. Chopin</div></div>
-                    <div class="book-card is-locked"><img src="https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi" alt="River Flows In You" class="book-cover"><div class="book-title">River Flows In You</div><div class="book-author">Yiruma</div><div class="locked-overlay"><i class="fas fa-lock"></i></div></div>
-                </div>
-                <button class="scroll-btn prev" onclick="scrollCarousel('repertorio-carousel', -1)"><i class="fas fa-chevron-left"></i></button>
-                <button class="scroll-btn next" onclick="scrollCarousel('repertorio-carousel', 1)"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
-    </div>
+        <hr class="divider">
 
-
-  
-
-       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Explora Nuestras Lecciones</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
-            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation">
-                <div class="bg-pink-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-graduation-cap text-3xl text-pink-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Nivel Principiante</h3>
-            </div>
-            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 0.5s;">
-                <div class="bg-purple-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-eye text-3xl text-purple-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Lectura a Primera Vista</h3>
-            </div>
-            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 1s;">
-                <div class="bg-blue-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-book-open text-3xl text-blue-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Técnica y Teoría</h3>
-            </div>
-            <div class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition duration-300 float-animation" style="animation-delay: 1.5s;">
-                <div class="bg-green-100 rounded-full p-4 inline-block mb-4"><i class="fas fa-star text-3xl text-green-500"></i></div><h3 class="text-lg font-semibold text-gray-800">Piezas Populares</h3>
-            </div>
-        </div>
-    </div>
-    
-    <div class="bg-gradient-to-r from-pink-500 to-purple-500 py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold mb-12 text-white">Lo que Dicen Nuestros Alumnos</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div><p class="text-gray-700 mb-6">"Nunca pensé que podría leer música... KeyNotes hizo el proceso tan sencillo e intuitivo. Ahora puedo sentarme al piano y tocar piezas que antes solo soñaba."</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Laura García</h4><p class="text-gray-600">Estudiante Adulta</p></div></div></div>
-                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div><p class="text-gray-700 mb-6">"Dejé el piano por años y me sentía estancado. Esta plataforma me ayudó a retomar mi pasión con un repertorio increíble y ejercicios de lectura que realmente funcionan. ¡Totalmente recomendado!"</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Carlos Mendoza</h4><p class="text-gray-600">Músico Aficionado</p></div></div></div>
-                <div class="bg-white rounded-xl p-8 shadow-lg text-left"><div class="flex mb-4"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i></div><p class="text-gray-700 mb-6">"La mejor herramienta para mi hijo. Aprende a su ritmo, se divierte con las canciones populares y yo puedo ver su progreso. La interfaz es amigable y muy motivadora para los niños."</p><div class="flex items-center"><img src="https://via.placeholder.com/60" alt="Testimonial Author" class="w-12 h-12 rounded-full mr-4"><div><h4 class="font-semibold text-gray-800">Sofía Reyes</h4><p class="text-gray-600">Madre de Familia</p></div></div></div>
-            </div>  
-        </div>
-    </div>
-
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <h2 class="text-3xl font-bold mb-4 text-gray-800">¡No Pierdas el Ritmo!</h2>
-        <p class="text-xl text-gray-600 mb-8">Recibe actualizaciones semanales sobre nuevas partituras y lecciones</p>
-        <form class="flex">
-            <input type="email" placeholder="Tu correo electrónico" class="flex-grow px-4 py-3 rounded-l-full bg-white text-gray-900 border-2 border-pink-500 focus:outline-none focus:border-purple-500">
-            <button type="submit" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-r-full hover:from-pink-600 hover:to-purple-600 transition duration-300">Suscribirme</button>
-        </form>
-    </div>
-
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap justify-between">
-                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-xl font-bold mb-4">KeyNotes</h3><p class="text-gray-400">Domina el Piano, una Nota a la Vez</p></div>
-                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-lg font-semibold mb-4">Navegación</h3><ul class="space-y-2"><li><a href="#" class="text-gray-400 hover:text-white">Lecciones</a></li><li><a href="#" class="text-gray-400 hover:text-white">Repertorio Completo</a></li><li><a href="#" class="text-gray-400 hover:text-white">Precios</a></li><li><a href="#" class="text-gray-400 hover:text-white">Sobre Nosotros</a></li></ul></div>
-                <div class="w-full md:w-1/4 mb-6 md:mb-0"><h3 class="text-lg font-semibold mb-4">Conecta</h3><ul class="space-y-2"><li><a href="#" class="text-gray-400 hover:text-white">Twitter</a></li><li><a href="#" class="text-gray-400 hover:text-white">Facebook</a></li><li><a href="#" class="text-gray-400 hover:text-white">Instagram</a></li></ul></div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="copyright">&copy; Mozart Academy. Todos los derechos reservados</p>
+                <ul class="social-list">
+                    <li><a href="#" class="social-link">Twitter</a></li>
+                    <li><a href="#" class="social-link">Facebook</a></li>
+                    <li><a href="#" class="social-link">Instagram</a></li>
+                    <li><a href="#" class="social-link">YouTube</a></li>
+                </ul>
             </div>
         </div>
     </footer>
 
-    <div id="video-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+    <!-- GO TOP BUTTON -->
+    <a href="#home" class="go-top-btn" data-go-top>
+        <ion-icon name="arrow-up"></ion-icon>
+    </a>
+
+    <!-- VIDEO MODAL -->
+    <div id="video-modal" class="video-modal">
         <div class="video-modal-content">
-            <button id="close-modal-btn" class="video-close-btn">&times;</button>
-            <div class="video-container">
-                 <iframe id="video-iframe" src="" title="Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-    </div>
-
-    <div id="midi-visualizer-modal" class="midi-modal-overlay">
-    <div class="midi-modal-container">
-        <div class="midi-modal-header">
-            <div>
-                <h4 id="midi-modal-title" class="midi-modal-title"></h4>
-                <p id="midi-modal-composer" class="midi-modal-composer"></p>
-            </div>
-            <button id="close-midi-modal-btn" class="midi-modal-close">
-                <i class="fas fa-times"></i>
+            <button id="close-modal-btn" class="video-close-btn">
+                <ion-icon name="close"></ion-icon>
             </button>
-        </div>
-        <div class="midi-modal-body">
-            <div class="midi-player-wrapper">
-                <midi-player id="midi-player" sound-font visualizer="#midi-visualizer"></midi-player>
-            </div>
-            <div class="midi-visualizer-wrapper">
-                <div class="progress-indicator"></div>
-                <midi-visualizer id="midi-visualizer" type="waterfall"></midi-visualizer>
-                <div class="piano-keys"></div>
+            <div class="video-container">
+                <iframe id="video-iframe" src="" title="Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
     </div>
-</div>
 
-    <script>
-        // Script para el carrusel
-        function scrollCarousel(elementId, direction) {
-            const carousel = document.getElementById(elementId);
-            if (carousel) {
-                const scrollAmount = 200 * direction; 
-                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            }
-        }
+ 
+<script>
+   
 
-      // SCRIPT PARA EL MODAL DE VIDEO (VERSIÓN MEJORADA)
-const videoTrigger = document.getElementById('video-trigger');
-const videoModal = document.getElementById('video-modal');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const videoIframe = document.getElementById('video-iframe');
-// Asegúrate de que tu URL de YouTube incluye los parámetros para autoplay y sin videos relacionados.
-const videoUrl = "https://www.youtube.com/embed/p1L1eu_QjNA?autoplay=1&rel=0";
-
-// Oculta el modal al principio
-videoModal.style.opacity = '0';
-videoModal.style.pointerEvents = 'none';
-
-const openModal = () => {
-    videoIframe.src = videoUrl;
-    videoModal.classList.remove('hidden');
-    // Forzamos un reflow para que la transición funcione
-    void videoModal.offsetWidth; 
-    videoModal.style.opacity = '1';
-    videoModal.style.pointerEvents = 'auto';
-};
-
-const closeModal = () => {
-    videoIframe.src = "";
-    videoModal.style.opacity = '0';
-    videoModal.style.pointerEvents = 'none';
-    // Opcional: añade la clase 'hidden' después de que la transición termine
-    setTimeout(() => {
-      if (videoModal.style.opacity === '0') {
-         videoModal.classList.add('hidden');
-      }
-    }, 300); // 300ms, igual a la duración de la transición
-};
-
-videoTrigger.addEventListener('click', openModal);
-closeModalBtn.addEventListener('click', closeModal);
-videoModal.addEventListener('click', (event) => {
-    if (event.target === videoModal) {
-        closeModal();
-    }
-});
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && videoModal.style.opacity === '1') {
-        closeModal();
-    }
-});
-
-
-
-// ***** NUEVO: SCRIPT PARA EL MODAL DE MIDI VISUALIZER *****
-const midiModal = document.getElementById('midi-visualizer-modal');
-const closeMidiModalBtn = document.getElementById('close-midi-modal-btn');
-const midiPlayer = document.getElementById('midi-player');
-const midiVisualizer = document.getElementById('midi-visualizer');
-const midiModalTitle = document.getElementById('midi-modal-title');
-const midiModalComposer = document.getElementById('midi-modal-composer');
-
-// Función para abrir el modal MIDI
-function openMidiModal(url, title, composer) {
-    midiModalTitle.textContent = title;
-    midiModalComposer.textContent = composer;
-
-    // Usamos un pequeño delay para asegurar que los elementos estén listos
-    setTimeout(() => {
-        midiPlayer.src = url;
-        midiVisualizer.src = url;
-        midiVisualizer.config = {
-            noteHeight: 4,
-            pixelsPerTimeStep: 60,
-            noteSpacing: 2,
-        };
-    }, 100);
+    // GO TOP BUTTON
+    const goTopBtn = document.querySelector('[data-go-top]');
     
-    midiModal.classList.add('active');
-}
+    window.addEventListener('scroll', function() {
+        if (window.scrollY >= 800) {
+            goTopBtn.classList.add('active');
+        } else {
+            goTopBtn.classList.remove('active');
+        }
+    });
 
-// Función para cerrar el modal MIDI
-function closeMidiModal() {
-    if (midiModal.classList.contains('active')) {
-        midiPlayer.stop();
-        midiPlayer.src = "";
-        midiVisualizer.src = "";
-        midiModal.classList.remove('active');
+    // VIDEO MODAL
+    const videoTrigger = document.getElementById('video-trigger');
+    const videoModal = document.getElementById('video-modal');
+    const closeVideoBtn = document.getElementById('close-modal-btn');
+    const videoIframe = document.getElementById('video-iframe');
+    const videoSrc = "https://www.youtube.com/embed/8A-q_9-T6a4?autoplay=1&rel=0"; // Cambia esta URL por la de tu video
+
+    if (videoTrigger) {
+        videoTrigger.addEventListener('click', function() {
+            videoIframe.src = videoSrc;
+            videoModal.classList.add('active');
+        });
     }
-}
 
-// Event Listeners
-closeMidiModalBtn.addEventListener('click', closeMidiModal);
-midiModal.addEventListener('click', (event) => {
-    if (event.target === midiModal) {
-        closeMidiModal();
+    const closeVideoModal = function() {
+        videoModal.classList.remove('active');
+        videoIframe.src = ""; // Detiene la reproducción del video
     }
-});
 
-// Añadimos también el cierre con la tecla Escape para el nuevo modal
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && midiModal.classList.contains('active')) {
-        closeMidiModal();
+    if (closeVideoBtn) {
+        closeVideoBtn.addEventListener('click', closeVideoModal);
     }
-});
+
+    if (videoModal) {
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+    }
+
+    // CAROUSEL SCROLL
+    function scrollCarousel(carouselId, direction) {
+        const carousel = document.getElementById(carouselId);
+        if (carousel) {
+            // Calcula el ancho de un "libro" para scrollear
+            const cardWidth = carousel.querySelector('.book-card').offsetWidth + 20; // 20 es el 'gap'
+            const scrollAmount = cardWidth * 3 * direction; // Mueve 3 tarjetas a la vez
+            
+            carousel.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }
 
 
 
- const searchInput = document.getElementById('searchInput');
-    const suggestionsContainer = document.getElementById('suggestionsContainer');
-
-    // 2. Simulamos una base de datos de canciones
-    const songDatabase = [
-        'Claro de Luna - Debussy',
-        'Canon en Re Mayor - Pachelbel',
-        'Para Elisa - Beethoven',
-        'Nocturno Op. 9 No. 2 - Chopin',
-        'Marcha Turca - Mozart',
-        'Gymnopédie No. 1 - Satie',
-        'El Vals del Minuto - Chopin',
-        'Rapsodia Húngara No. 2 - Liszt',
-        'La Campanella - Liszt',
-        'Interstellar - Tema Principal',
-        'Bohemian Rhapsody - Queen',
-        'Comptine d’un autre été - Yann Tiersen',
-        'Bolero - Ravel'
+document.addEventListener('DOMContentLoaded', (event) => {
+    // 1. LOS DATOS DE LOS COMPOSITORES (Añade tantos como quieras)
+    const composerPages = [
+        [ // Página 1
+            { name: 'Mozart', img: 'https://lh3.googleusercontent.com/d/1sZfz_OVa5xVj0YBIsyjdxnsV26xu_EUd=s200' },
+            { name: 'Haydn', img: 'https://lh3.googleusercontent.com/d/1E-lGc-7ToAoDwVLy8bDpZLg5v55m34aA=s200' },
+            { name: 'Liszt', img: 'https://lh3.googleusercontent.com/d/1qxh2_DE11uUtB9WtxIjfmia1OmbDpKN-=s200' },
+            { name: 'Chopin', img: 'https://lh3.googleusercontent.com/d/1ls1vcAeVC4mV24t7w7aITnOdPo2z8Hzr=s200' },
+            { name: 'Beethoven', img: 'https://lh3.googleusercontent.com/d/1GbP8TleKL0IlxI4ee0A0pfPQX8811qAF=s200' },
+            { name: 'Bach', img: 'https://lh3.googleusercontent.com/d/1n-lRwmouGV7HU1dMcaM1dqWd5SjWMO8U=s200' },
+            { name: 'Debussy', img: 'https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej=s200' }, 
+            { name: 'Einaudi', img: 'https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4=s200' }
+        ],
+        [ // Página 2
+            { name: 'Tchaikovsky', img: 'https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh=s200' },
+            { name: 'Handel', img: 'https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P=s200' },
+            { name: 'Brahms', img: 'https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi=s200' },
+            { name: 'Schubert', img: 'https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd=s200' },
+            { name: 'Rachmaninoff', img: 'https://lh3.googleusercontent.com/d/1puzIt1Uu4OwP0WcFQYVm_z0gFfdMCQEH=s200' },
+            { name: 'Wagner', img: 'https://lh3.googleusercontent.com/d/1atxYxPVe8Ghy2H1h07JLtH6Ym9ndk0Rb=s200' },
+            { name: 'Verdi', img: 'https://lh3.googleusercontent.com/d/1EjDNSVQbpZg0kn9HJExu7RC2cPnCAyLd=s200' },
+            { name: 'Strauss', img: 'https://lh3.googleusercontent.com/d/1UImeOjJkgbfZAcg4Jgeo3Glff8HYCBT4=s200' }
+        ],
+        [ // Página 3 (¡Puedes añadir más!)
+            { name: 'Vivaldi', img: 'https://lh3.googleusercontent.com/d/1EIBtW77ccqObZaZfolZ6EkEqrKdh6JpY=s200' },
+            { name: 'Schumann', img: 'https://lh3.googleusercontent.com/d/1indnj9NDH0S7yjWoDyjqLBExH5g_vkMX=s200' },
+            { name: 'Grieg', img: 'https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej=s200' },
+            { name: 'Satie', img: 'https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd=s200' },
+            { name: 'Paganini', img: 'https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4=s200' },
+            { name: 'Dvorak', img: 'https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh=s200' },
+            { name: 'Mendelssohn', img: 'https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P=s200' },
+            { name: 'Ravel', img: 'https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi=s200' }
+        ]
     ];
 
-    // 3. Añadimos un "escuchador" al campo de búsqueda
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase();
-        
-        // Limpiamos sugerencias anteriores
-        suggestionsContainer.innerHTML = '';
+    let currentPageIndex = 0;
+    const gridContainer = document.getElementById('composers-grid-dynamic');
 
-        if (!query) {
-            return;
-        }
-
-        // ▼▼▼ ¡ESTA ES LA LÍNEA CON LA NUEVA LÓGICA! ▼▼▼
-        const filteredSongs = songDatabase.filter(song => {
-            // Dividimos el título en palabras y verificamos si ALGUNA de ellas
-            // comienza con el texto de búsqueda.
-            return song.toLowerCase().split(' ').some(word => word.startsWith(query));
-        });
-        
-        // Creamos y mostramos cada sugerencia
-        filteredSongs.forEach(song => {
-            const suggestionItem = document.createElement('div');
-            suggestionItem.className = 'px-6 py-3 cursor-pointer hover:bg-pink-100 text-gray-700';
-            suggestionItem.textContent = song;
+    if (gridContainer) {
+        // 2. FUNCIÓN PARA CONSTRUIR UNA PÁGINA
+        function buildComposerPage(pageIndex) {
+            const pageData = composerPages[pageIndex];
+            gridContainer.innerHTML = ''; // Limpia el grid actual
             
-            suggestionItem.addEventListener('click', () => {
-                searchInput.value = song;
-                suggestionsContainer.innerHTML = '';
+            pageData.forEach(composer => {
+                gridContainer.innerHTML += `
+                    <div class="composer-card">
+                        <img src="${composer.img}" alt="${composer.name}">
+                        <div class="composer-overlay"></div>
+                        <span class="composer-name">${composer.name}</span>
+                    </div>
+                `;
             });
-
-            suggestionsContainer.appendChild(suggestionItem);
-        });
-    });
-
-    // Opcional: Cerrar las sugerencias si se hace clic fuera del buscador
-    document.addEventListener('click', (event) => {
-        if (!searchInput.contains(event.target)) {
-            suggestionsContainer.innerHTML = '';
         }
-    });
-    </script>
+
+        // 3. FUNCIÓN PARA CAMBIAR DE PÁGINA CON ANIMACIÓN
+        function changeComposerPage() {
+            // Aplica la animación de salida
+            gridContainer.classList.add('slide-out-right');
+            
+            // Espera a que termine la animación de salida (500ms)
+            setTimeout(() => {
+                // Actualiza el índice de la página
+                currentPageIndex = (currentPageIndex + 1) % composerPages.length;
+                
+                // Construye el nuevo contenido del grid
+                buildComposerPage(currentPageIndex);
+                
+                // Quita la animación de salida y aplica la de entrada
+                gridContainer.classList.remove('slide-out-right');
+                gridContainer.classList.add('slide-in-from-left');
+
+                // Limpia la clase de entrada después de que termine
+                setTimeout(() => {
+                    gridContainer.classList.remove('slide-in-from-left');
+                }, 500); // Debe coincidir con la duración de la animación
+
+            }, 500); // Debe coincidir con la duración de la animación
+        }
+
+        // 4. INICIAR EL PROCESO
+        buildComposerPage(0); // Carga la primera página
+        setInterval(changeComposerPage, 5000); // Cambia de página cada 5 segundos
+    }
+});
+
+</script>
 </body>
-</html>
+</html> 
