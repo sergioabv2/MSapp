@@ -1956,7 +1956,7 @@ $scope.showLevelSelector = () => {
         $scope.sidebarOpen = !$scope.sidebarOpen;
     };
     
-function initApp(startLevelIdx, startLessonIdx) {
+function initApp(startLevelIdx, startLessonIdx, autoLoad = true) {
     if (!$scope.levels[startLevelIdx]) {
         console.error("El nivel " + startLevelIdx + " no existe. Empezando en 0.");
         startLevelIdx = 0;
@@ -2005,7 +2005,9 @@ function initApp(startLevelIdx, startLessonIdx) {
         $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
         
         updatePendingTasks();
-        loadCurrentTask();
+        if (autoLoad) {
+            loadCurrentTask();
+        }
 
     } else {
         $scope.lessons = angular.copy($scope.selectedLevel.lessons);
@@ -2051,11 +2053,10 @@ function initApp(startLevelIdx, startLessonIdx) {
         $scope.currentTaskIndex = defaultTaskIndex;
         updateProgress();
         updatePendingTasks();
-        loadCurrentTask();
+        if (autoLoad) {
+            loadCurrentTask();
+        }
     }
-    
-    // *** AGREGAR ESTE BLOQUE AL FINAL ***
-    // Actualizar el progreso visual del nivel actual
     $scope.selectedLevel.progress = $scope.progress;
 }
 
