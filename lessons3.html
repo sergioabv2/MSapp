@@ -1852,6 +1852,7 @@ app.controller('PianoController', function($scope, $http, $sce, $timeout) {
     let videoHasEnded = false;
     let pauseTimer = null;
     let isYouTubeAPIReady = false;
+    let shouldAutoplayVideo = false;
     $scope.currentViewingTask = null;
 
     $scope.modal = { show: false, content: '' };
@@ -2192,6 +2193,7 @@ function loadCurrentTask() {
     if ($scope.currentTaskIndex >= $scope.lessons[$scope.currentLessonIndex].tasks.length) {
         completeLesson();
     } else {
+        shouldAutoplayVideo = true;
         $timeout(loadCurrentTask, 1200);
     }
 }
@@ -2204,12 +2206,9 @@ function completeLesson() {
     
     $scope.currentLessonIndex++;
     $scope.currentTaskIndex = 0;
-    
-    // Si completó todas las lecciones del nivel, desbloquear el siguiente
+
     if ($scope.currentLessonIndex >= $scope.lessons.length) {
         $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
-        
-        // MOSTRAR MENSAJE DE NIVEL COMPLETADO
         speak("¡Has completado todo el nivel! El siguiente nivel ha sido desbloqueado.", 'important');
         showConfetti(200);
         
@@ -2218,9 +2217,9 @@ function completeLesson() {
             $scope.showLevelSelector();
         }, 1500);
         
-        return; // No cargar más tareas
+        return; 
     }
-    
+    shouldAutoplayVideo = true;
     $timeout(loadCurrentTask, 1500);
 }
 
@@ -2230,9 +2229,7 @@ function completeLesson() {
 
  
 
-    // =============================================
-    // == FUNCIONES DE YOUTUBE
-    // =============================================
+
     function initYouTubePlayer(videoId) {
         videoHasEnded = false;
         youtubePlayer = new YT.Player('player', {
@@ -2245,8 +2242,9 @@ function completeLesson() {
             },
             events: {
                 'onReady': function(event) {
-                    console.log('Player listo');
-                    event.target.playVideo();
+                    if (shouldAutoplayVideo) {
+                        event.target.playVideo();
+                    }
                 },
                 'onStateChange': onPlayerStateChange
             }
@@ -2321,7 +2319,11 @@ function completeLesson() {
         } else {
             youtubePlayer.loadVideoById(videoId);
             videoHasEnded = false;
+            if (shouldAutoplayVideo) {
+                youtubePlayer.playVideo();
+            }
         }
+        shouldAutoplayVideo = false;
     }
 
     function openQuizModal(task) {
