@@ -1,623 +1,673 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" ng-app="teacherApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundamentos del Piano - Clases One-to-One</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Encuentra tu Profesor de Piano</title>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --facebook-blue: #1877f2;
-            --apple-body-bg: #f5f5f7; /* Gris claro para el fondo */
-            --apple-card-bg: #ffffff; /* Blanco puro para tarjetas */
-            --apple-text-primary: #1d1d1f; /* Texto oscuro principal */
-            --apple-text-secondary: #6e6e73; /* Texto gris secundario */
-            --apple-border: #e8e8e8; /* Borde sutil */
+            --primary-color: #FF4757; /* Color tipo Superprof (Rojo/Coral) para resaltar */
+            --primary-hover: #ff6b81;
+            --secondary-color: #2ed573; /* Verde para precios/éxito */
+            --text-dark: #2f3542;
+            --text-light: #747d8c;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --card-hover: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-gradient); 
+            min-height: 100vh; 
+            padding: 20px; 
+            color: var(--text-dark);
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: var(--apple-body-bg); /* Fondo gris claro */
-            min-height: 100vh;
-            color: var(--apple-text-primary); /* Texto oscuro */
-            overflow-x: hidden;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 60px 40px;
+        /* --- HEADER --- */
+        .header { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 20px 30px; 
+            margin-bottom: 30px; 
+            box-shadow: var(--card-shadow); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInDown 1s ease;
+        .header-brand { display: flex; align-items: center; gap: 15px; }
+        .header-icon { 
+            width: 50px; height: 50px; 
+            background: var(--primary-color); 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 22px; 
         }
+        .header-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        .header-text p { color: var(--text-light); font-size: 14px; }
 
-        .header h1 {
-            color: var(--apple-text-primary);
-            font-size: 4em;
-            margin-bottom: 16px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            text-shadow: none; /* Sin sombra en modo claro */
+        .search-container { flex-grow: 1; max-width: 500px; position: relative; }
+        .search-input { 
+            width: 100%; 
+            padding: 14px 20px 14px 45px; 
+            border-radius: 50px; 
+            border: 1px solid #dfe4ea; 
+            background: #f1f2f6;
+            font-size: 15px;
+            transition: all 0.3s;
         }
+        .search-input:focus { outline: none; background: white; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #a4b0be; }
 
-        .header p {
-            color: var(--apple-text-secondary);
-            font-size: 1.5em;
-            font-weight: 400;
-        }
-
-        /* Reemplazando .glass-card por un estilo de tarjeta Apple claro */
-        .glass-card {
-            background: var(--apple-card-bg); /* Fondo blanco */
-            backdrop-filter: none; /* Quitamos el blur */
-            -webkit-backdrop-filter: none;
-            border-radius: 20px;
-            border: 1px solid var(--apple-border); /* Borde sutil */
-            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08); /* Sombra suave */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        .hero-section {
-            padding: 60px;
-            margin-bottom: 30px;
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .hero-text h2 {
-            font-size: 3.5em;
-            color: var(--apple-text-primary);
-            margin-bottom: 24px;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-        }
-
-        .hero-text p {
-            font-size: 1.25em;
-            line-height: 1.6;
-            color: var(--apple-text-secondary);
-            margin-bottom: 40px;
-            font-weight: 400;
-        }
-
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--facebook-blue); /* Color de acento */
-            color: #ffffff; /* Texto blanco */
-            padding: 16px 32px;
-            border-radius: 980px;
-            text-decoration: none;
-            font-size: 1.05em;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .cta-button:hover {
-            transform: scale(1.05);
-            background: #1565e0; /* Tono más oscuro de Facebook */
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .video-demo {
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            background: #e8e8e8; /* Fondo gris para el video */
-            border: 1px solid #dcdcdc;
-        }
-
-        .video-placeholder {
+        /* --- NUEVO BANNER DE SERVICIO (estilo user) --- */
+        .service-banner {
             width: 100%;
-            height: 380px;
-            background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
-            cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        .service-banner-img {
+            width: 100%;
+            display: block;
+            min-height: 450px;
+            object-fit: cover;
+            filter: brightness(0.9);
+        }
+        .service-banner-text {
+            position: absolute;
+            top: 40%; /* Ajustado para dejar espacio al header */
+            left: 6%;
+            -ms-transform: translateY(-50%);
+            -webkit-transform: translateY(-50%);
+            -moz-transform: translateY(-50%);
+            -o-transform: translateY(-50%);
+            transform: translateY(-50%);
+            z-index: 5; /* Para estar sobre la imagen */
+        }
+        .service-banner-text strong {
+            font-family: 'Inter', sans-serif; /* Mantenemos la fuente */
+            font-size: 48px; /* Tamaño adaptado */
+            line-height: 1.2;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .service-banner-text strong span {
+            font-family: 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            display: block;
+        }
+        .service-banner-text p {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            margin: 10px 0 0;
+            max-width: 500px;
         }
 
-        .video-placeholder:hover {
-            transform: scale(1.02);
-        }
-
-        .play-button {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.9); /* Botón si puede tener efecto */
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* --- Modificación del HEADER --- */
+        .header { 
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            width: auto; /* Para que se ajuste al left/right */
+            
+            background: rgba(255, 255, 255, 0.9); /* Fondo semi-transparente */
+            backdrop-filter: blur(8px); /* Efecto glass */
+            
+            border-radius: 12px; /* Radio más pequeño */
+            padding: 15px 25px; /* Padding ajustado */
+            margin-bottom: 0; /* Quitar margen */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
             z-index: 10;
         }
+        .header-brand { gap: 12px; }
+        .header-icon { width: 45px; height: 45px; font-size: 20px; }
+        .header-text h1 { font-size: 20px; }
+        .header-text p { font-size: 13px; }
 
-        .play-button:hover {
+        /* --- LAYOUT GRID --- */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* --- SIDEBAR FILTERS --- */
+        .filters-panel {
             background: white;
-            transform: scale(1.15);
-        }
-
-        .play-icon {
-            width: 0;
-            height: 0;
-            border-left: 24px solid var(--facebook-blue); /* Icono en azul */
-            border-top: 14px solid transparent;
-            border-bottom: 14px solid transparent;
-            margin-left: 6px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-
-        .feature-card {
-            padding: 40px 30px;
-            animation: fadeInUp 1s ease;
-        }
-
-        .feature-card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .feature-card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
+            padding: 25px;
             border-radius: 16px;
-            background: rgba(24, 119, 242, 0.1); /* Fondo azul claro */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: var(--facebook-blue); /* Icono azul */
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 20px;
         }
-
-        .feature-card h3 {
-            color: var(--apple-text-primary);
-            font-size: 1.5em;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .feature-card p {
-            color: var(--apple-text-secondary);
-            line-height: 1.6;
-            font-weight: 400;
-        }
-
-        .levels-section {
-            padding: 60px;
-            margin-bottom: 30px;
-            animation: fadeInUp 1s ease;
-        }
-
-        .section-title {
-            text-align: center;
-            color: var(--apple-text-primary);
-            font-size: 3em;
-            margin-bottom: 50px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .level-card {
-            background: var(--apple-body-bg); /* Tarjetas interiores en gris claro */
-            backdrop-filter: none;
-            padding: 40px 30px;
-            border-radius: 20px;
-            border: 1px solid var(--apple-border);
-            transition: all 0.3s ease;
-        }
-
-        .level-card:hover {
-            background: #eef2f9; /* Un gris-azulado muy sutil */
-            transform: translateY(-5px);
-        }
-
-        .level-number {
-            display: inline-flex;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: rgba(24, 119, 242, 0.1); /* Fondo azul claro */
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--facebook-blue); /* Número azul */
-            margin-bottom: 20px;
-        }
-
-        .level-card h3 {
-            font-size: 2em;
-            color: var(--apple-text-primary);
-            margin-bottom: 24px;
-            font-weight: 700;
-        }
-
-        .level-card ul {
-            list-style: none;
-            color: var(--apple-text-secondary);
-        }
-
-        .level-card ul li {
-            padding: 10px 0;
-            padding-left: 28px;
-            position: relative;
-            font-weight: 400;
-        }
-
-        .level-card ul li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--facebook-blue); /* Checkmark azul */
-            font-weight: 700;
-        }
-
-        .testimonials-section {
-            padding: 60px;
-            margin-bottom: 30px;
-        }
-
-        .testimonial-card {
-            background: var(--apple-body-bg); /* Tarjetas interiores en gris */
-            backdrop-filter: none;
-            padding: 35px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--apple-border);
-            transition: all 0.3s ease;
-        }
-
-        .testimonial-card:hover {
-            transform: translateX(8px);
-            background: #eef2f9;
-        }
-
-        .testimonial-card p {
-            font-style: italic;
-            color: var(--apple-text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.7;
-            font-weight: 400;
-            font-size: 1.05em;
-        }
-
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--apple-text-primary);
-            font-style: normal;
-            display: flex;
-            align-items: center;
-        }
-
-        .author-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e8e8e8; /* Gris para avatar */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--apple-text-secondary);
-            font-weight: bold;
-            margin-right: 12px;
-        }
-
-        .final-cta {
-            text-align: center;
-            padding: 80px 60px;
-        }
-
-        .final-cta h2 {
-            color: var(--apple-text-primary);
-            font-size: 3.5em;
-            margin-bottom: 24px;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-        }
-
-        .final-cta p {
-            font-size: 1.25em;
-            color: var(--apple-text-secondary);
-            margin-bottom: 48px;
-            font-weight: 400;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Overlay oscuro */
-            backdrop-filter: blur(8px); /* Blur para el fondo */
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--apple-card-bg); /* Modal blanco */
-            backdrop-filter: none;
-            padding: 60px;
-            border-radius: 28px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal h3 {
-            color: var(--apple-text-primary);
-            margin-bottom: 24px;
-            font-weight: 700;
-            font-size: 2em;
-        }
-
-        .modal p {
-            color: var(--apple-text-secondary);
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-
-        .close-modal {
-            background: var(--facebook-blue);
-            color: white;
-            border: none;
-            padding: 14px 36px;
-            border-radius: 980px;
+        .filters-panel h3 { font-size: 18px; margin-bottom: 20px; font-weight: 700; }
+        .filter-group { margin-bottom: 25px; }
+        .filter-label { font-weight: 600; font-size: 13px; color: var(--text-dark); display: block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-select { 
+            width: 100%; padding: 12px; 
+            border: 1px solid #dfe4ea; border-radius: 8px; 
+            background: #fff; font-size: 14px; color: var(--text-dark); 
             cursor: pointer;
-            font-size: 1em;
-            margin-top: 24px;
+        }
+        .filter-select:focus { border-color: var(--primary-color); outline: none; }
+
+        /* --- TEACHERS GRID --- */
+        .teachers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        
+        /* --- TEACHER CARD --- */
+        .teacher-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
             transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .teacher-card:hover { transform: translateY(-5px); box-shadow: var(--card-hover); }
+        
+        /* Encabezado de la tarjeta con foto */
+        .card-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+        .teacher-avatar {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .teacher-basics h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .teacher-rating { color: #ffa502; font-size: 13px; font-weight: 600; }
+        .review-count { color: var(--text-light); font-weight: 400; font-size: 12px; }
+
+        /* Cuerpo de la tarjeta */
+        .card-body { padding: 20px; flex-grow: 1; }
+        .teacher-headline { 
+            font-size: 14px; color: var(--text-dark); 
+            margin-bottom: 15px; line-height: 1.5; 
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        
+        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag { 
+            background: #f1f2f6; color: var(--text-light); 
+            padding: 4px 10px; border-radius: 4px; 
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+        }
+        .tag.lang { background: #e3f2fd; color: #2196f3; }
+
+        /* Pie de la tarjeta (Precio y Acción) */
+        .card-footer {
+            padding: 15px 20px;
+            background: #fafbfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f2f6;
+        }
+        .price-info { display: flex; flex-direction: column; }
+        .price-amount { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .price-label { font-size: 11px; color: var(--text-light); }
+        
+        .btn-profile {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 8px;
             font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .btn-profile:hover { background: var(--primary-color); color: white; }
+
+        /* --- SUPER TEACHER BADGE --- */
+        .super-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: #fffa65; color: #4b4b4b;
+            padding: 4px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: 800;
+            display: flex; align-items: center; gap: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .close-modal:hover {
-            transform: scale(1.05);
-            background: #1565e0;
+        /* --- MODAL (Estilo similar al tuyo) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal-card {
+            background: white; width: 90%; max-width: 800px;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            transform: translateY(20px); transition: 0.3s;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        
+        /* Modal Layout */
+        .modal-grid { display: grid; grid-template-columns: 1fr 300px; }
+        .modal-content { padding: 30px; }
+        .modal-sidebar { background: #f8f9fa; padding: 30px; border-left: 1px solid #eee; }
+
+        .video-placeholder {
+            width: 100%; height: 250px;
+            background: #000; border-radius: 12px;
+            margin-bottom: 20px; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            color: white; flex-direction: column; gap: 10px; cursor: pointer;
+        }
+        .play-btn { 
+            width: 60px; height: 60px; background: var(--primary-color); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 0 0 10px rgba(255, 71, 87, 0.3);
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .booking-btn {
+            width: 100%; background: var(--primary-color); color: white;
+            border: none; padding: 15px; border-radius: 10px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; transition: 0.2s;
+        }
+        .booking-btn:hover { background: var(--primary-hover); transform: scale(1.02); }
+
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .filters-panel { display: none; } /* Ocultar filtros en móvil por simplicidad, o hacer colapsables */
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-sidebar { border-left: none; border-top: 1px solid #eee; }
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* --- Media Queries para el Banner (del ejemplo) --- */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .service-banner-text strong { font-size: 42px; }
+            .service-banner-text strong span { font-size: 28px; }
+            .service-banner-text p { font-size: 16px; }
         }
 
-        @media (max-width: 1024px) {
-            .hero-content {
-                grid-template-columns: 1fr;
+        @media only screen and (max-width: 991px) {
+            .service-banner-text strong { font-size: 32px; line-height: 1.3; }
+            .service-banner-text strong span { font-size: 24px; }
+            .service-banner-text p { font-size: 14px; }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
             }
-
-            .features-grid, .levels-grid {
-                grid-template-columns: 1fr;
+        }
+        @media only screen and (max-width: 767px) {
+            .service-banner-img {
+                min-height: 350px;
+                object-fit: cover;
             }
-
-            .header h1 {
-                font-size: 3em;
+            .service-banner-text {
+                top: 35%; /* Subimos el texto */
+                left: 4%;
+                right: 4%;
+                width: 92%;
             }
-
-            .hero-text h2 {
-                font-size: 2.5em;
+             .header {
+                position: relative; /* Lo sacamos del position absolute */
+                width: 95%;
+                margin: -50px auto 0 auto; /* Lo montamos sobre la imagen */
+                bottom: auto;
+                left: auto;
+                right: auto;
             }
+            .main-layout { margin-top: 20px; } /* Añadimos margen */
+        }
+        @media only screen and (max-width: 575px) {
+            .service-banner-text strong {
+                background: rgba(0, 0, 0, 0.6);
+                padding: 10px;
+                width: 100%;
+                display: block;
+                border-radius: 8px;
+            }
+            .service-banner-img { min-height: 300px; }
+             .header {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                border: none;
+                box-shadow: var(--card-shadow);
+            }
+            .service-banner { 
+                border-radius: 0; /* Quitamos borde en móvil */
+                margin-bottom: 0;
+            }
+            body { padding: 0; } /* Ajustamos padding del body */
+            .main-layout { margin-top: 20px; padding: 0 15px; }
+        }
+        @media only screen and (max-width: 480px) {
+            .service-banner-text strong span { font-size: 20px; }
+            .service-banner-text { left: 4%; }
+            .header { padding: 15px; }
+            .header-brand { flex-direction: column; text-align: center; gap: 8px; }
+            .search-container { width: 100%; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <p>Clases Personalizadas One-to-One</p>
-        </div>
+<body ng-controller="teacherCtrl">
 
-        <div class="glass-card hero-section">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h2>Aprende piano a tu ritmo</h2>
-                    <p>Clases individuales adaptadas a tu nivel, ya sea presencial o en línea con tecnología WebRTC de alta calidad. Metodología probada con los manuales "Essentials of Piano Book".</p>
-                    <a href="#" class="cta-button" onclick="showModal(event)">
-                        <i class="fas fa-graduation-cap" style="margin-right: 8px;"></i>
-                        Inscríbete ahora
-                    </a>
-                </div>
-                <div class="video-demo">
-                    <div class="video-placeholder" onclick="playDemo()">
-                        <div class="play-button">
-                            <div class="play-icon"></div>
-                        </div>
+    <div class="container">
+        
+        <!-- INICIO NUEVA ESTRUCTURA BANNER + HEADER -->
+        <section class="service-banner">
+            
+            <!-- Imagen de fondo -->
+            <img src="https://lh3.googleusercontent.com/d/1H9xdzo04g5JNch0ffrFFL0lIm8AlxEJ5" alt="Clases de piano online" class="service-banner-img">
+
+            <!-- Texto del banner (adaptado del ejemplo) -->
+            <div class="service-banner-text">
+                <strong>
+                    <span>Clases 1-a-1</span>
+                    Tu Profesor Personal
+                </strong>
+                <p>
+                    Elige un profesor verificado de cualquier parte del mundo. <br>
+                    Conéctate en vivo en nuestra sala virtual.
+                </p>
+            </div>
+
+            <!-- Header (movido aquí) -->
+            <header class="header">
+                <div class="header-brand">
+                    <div class="header-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="header-text">
+                        <h1>Profesores de Piano</h1>
+                        <p>Clases 1 a 1 en nuestra sala virtual</p>
                     </div>
                 </div>
-            </div>
-        </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Buscar por nombre, idioma o estilo..." ng-model="filters.text">
+                </div>
+            </header>
+        </section>
+        <!-- FIN NUEVA ESTRUCTURA -->
 
-        <div class="features-grid">
-            <div class="glass-card feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <h3>Atención Personalizada</h3>
-                <p>Clases one-to-one completamente enfocadas en tu progreso individual</p>
-            </div>
-            <div class="glass-card feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-laptop"></i>
-                </div>
-                <h3>Modalidad Flexible</h3>
-                <p>Presencial o en línea con conexión WebRTC de alta calidad</p>
-            </div>
-            <div class="glass-card feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <h3>Material Profesional</h3>
-                <p>Manuales "Essentials of Piano Book" de nivel 1 a 3</p>
-            </div>
-        </div>
 
-        <div class="glass-card levels-section">
-            <h2 class="section-title">Nuestros niveles</h2>
-            <div class="levels-grid">
-                <div class="level-card">
-                    <div class="level-number">1</div>
-                    <h3>Nivel 1</h3>
-                    <ul>
-                        <li>Postura y técnica básica</li>
-                        <li>Lectura de partituras</li>
-                        <li>Melodías simples</li>
-                        <li>Ritmo y tempo</li>
-                    </ul>
-                </div>
-                <div class="level-card">
-                    <div class="level-number">2</div>
-                    <h3>Nivel 2</h3>
-                    <ul>
-                        <li>Acordes y armonía</li>
-                        <li>Coordinación de manos</li>
-                        <li>Escalas mayores</li>
-                        <li>Repertorio intermedio</li>
-                    </ul>
-                </div>
-                <div class="level-card">
-                    <div class="level-number">3</div>
-                    <h3>Nivel 3</h3>
-                    <ul>
-                        <li>Técnica avanzada</li>
-                        <li>Interpretación musical</li>
-                        <li>Repertorio clásico</li>
-                        <li>Improvisación</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- ELIMINADO EL ANTIGUO BANNER DE SERVICIO -->
 
-        <div class="glass-card testimonials-section">
-            <h2 class="section-title">Lo que dicen nuestros alumnos</h2>
-            <div class="testimonial-card">
-                <p>"Las clases en línea son increíbles. La calidad de video y audio es perfecta, siento que mi profesor está justo a mi lado."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">MG</div>
-                    <span>María González, Nivel 2</span>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <p>"El material didáctico es excelente y el método de enseñanza personalizado me ha ayudado a avanzar más rápido de lo que esperaba."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">CR</div>
-                    <span>Carlos Ramírez, Nivel 1</span>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <p>"Poder elegir entre clases presenciales y en línea me da la flexibilidad que necesito con mi trabajo."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">AT</div>
-                    <span>Ana Torres, Nivel 3</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="glass-card final-cta">
-            <h2>¿Listo para comenzar?</h2>
-            <p>Únete a nuestra comunidad de estudiantes y descubre el pianista que llevas dentro</p>
-            <a href="#" class="cta-button" onclick="showModal(event)">
-                <i class="fas fa-envelope" style="margin-right: 8px;"></i>
-                Solicitar información
-            </a>
+        <div class="main-layout">
+            <!-- SIDEBAR FILTERS -->
+            <aside class="filters-panel">
+                <h3>Filtrar Resultados</h3>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Especialidad</label>
+                    <select class="filter-select" ng-model="filters.specialty">
+                        <option value="">Todas</option>
+                        <option value="Clásico">Piano Clásico</option>
+                        <option value="Jazz">Jazz & Improvisación</option>
+                        <option value="Pop">Pop & Moderno</option>
+                        <option value="Niños">Iniciación Niños</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Idioma</label>
+                    <select class="filter-select" ng-model="filters.language">
+                        <option value="">Cualquiera</option>
+                        <option value="Español">Español</option>
+                        <option value="Inglés">Inglés</option>
+                        <option value="Francés">Francés</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Precio Máximo (USD)</label>
+                    <select class="filter-select" ng-model="filters.priceMax">
+                        <option value="">Sin límite</option>
+                        <option value="20">Hasta $20</option>
+                        <option value="35">Hasta $35</option>
+                        <option value="50">Hasta $50</option>
+                    </select>
+                </div>
+            </aside>
+
+            <!-- TEACHERS GRID -->
+            <main class="teachers-grid">
+                <div class="teacher-card" ng-repeat="teacher in teachers | filter:customFilter | orderBy:'price'">
+                    
+                    <div class="super-badge" ng-if="teacher.superProf">
+                        <i class="fas fa-medal"></i> Super Teacher
+                    </div>
+
+                    <div class="card-header">
+                        <img ng-src="{{teacher.photo}}" alt="{{teacher.name}}" class="teacher-avatar">
+                        <div class="teacher-basics">
+                            <h2>{{teacher.name}}</h2>
+                            <div class="teacher-rating">
+                                <i class="fas fa-star"></i> {{teacher.rating}}
+                                <span class="review-count">({{teacher.reviews}} reseñas)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="tags-container">
+                            <span class="tag lang" ng-repeat="lang in teacher.languages">{{lang}}</span>
+                            <span class="tag">{{teacher.specialty}}</span>
+                        </div>
+                        <p class="teacher-headline">{{teacher.headline}}</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="price-info">
+                            <span class="price-amount">${{teacher.price}}</span>
+                            <span class="price-label">/ hora</span>
+                        </div>
+                        <button class="btn-profile" ng-click="openProfile(teacher)">Ver Perfil</button>
+                    </div>
+
+                </div>
+            </main>
         </div>
     </div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h3>¡Bienvenido! 🎵</h3>
-            <p>Para inscribirte en nuestras clases de piano, por favor contacta con nosotros para más información sobre horarios y disponibilidad.</p>
-            <p><strong>Email:</strong> info@pianoclasses.com<br>
-            <strong>WhatsApp:</strong> +52 55 1234 5678</p>
-            <button class="close-modal" onclick="closeModal()">Cerrar</button>
+    <!-- PROFILE MODAL -->
+    <div class="modal-overlay" ng-class="{'active': selectedTeacher}" ng-click="closeProfile()">
+        <div class="modal-card" ng-click="$event.stopPropagation()">
+            <div class="modal-grid" ng-if="selectedTeacher">
+                
+                <!-- Left Content -->
+                <div class="modal-content">
+                    <div class="video-placeholder">
+                        <div class="play-btn"><i class="fas fa-play"></i></div>
+                        <span>Video de presentación</span>
+                    </div>
+                    
+                    <h2 style="margin-bottom: 10px;">Sobre {{selectedTeacher.name}}</h2>
+                    <p style="color: #555; line-height: 1.6;">
+                        {{selectedTeacher.bio}}
+                    </p>
+                    
+                    <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Metodología</h3>
+                    <div class="tags-container">
+                        <span class="tag" style="background: #eee;" ng-repeat="method in selectedTeacher.methodology">
+                            <i class="fas fa-check" style="color:var(--secondary-color); margin-right:5px;"></i> {{method}}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar (Booking) -->
+                <div class="modal-sidebar">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img ng-src="{{selectedTeacher.photo}}" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px;">
+                        <h3 style="font-size: 18px;">{{selectedTeacher.name}}</h3>
+                        <div style="color: #ffa502; font-size: 14px; margin-top: 5px;">
+                            <i class="fas fa-star"></i> {{selectedTeacher.rating}}
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;">
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Tarifa por clase</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--text-dark);">${{selectedTeacher.price}}</div>
+                    </div>
+
+                    <div style="font-size: 13px; color: #666; margin-bottom: 20px;">
+                        <i class="fas fa-video" style="margin-right: 8px;"></i> Aula Virtual Propia<br>
+                        <i class="fas fa-clock" style="margin-right: 8px;"></i> Respuesta en 1h
+                    </div>
+
+                    <button class="booking-btn" ng-click="bookClass()">
+                        Reservar Clase
+                    </button>
+                    <button style="width: 100%; background: none; border: none; color: #888; margin-top: 15px; cursor: pointer; font-size: 13px;" ng-click="closeProfile()">
+                        Cerrar ventana
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
 
     <script>
-        function showModal(e) {
-            e.preventDefault();
-            document.getElementById('modal').style.display = 'flex';
-        }
+        const app = angular.module('teacherApp', []);
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
+        app.controller('teacherCtrl', function($scope) {
+            
+            // Datos simulados de profesores
+            $scope.teachers = [
+                {
+                    id: 1,
+                    name: "Elena K.",
+                    photo: "https://i.pravatar.cc/150?img=5",
+                    headline: "Pianista de conservatorio con 10 años de experiencia. Especialista en técnica Rusa y preparación de exámenes.",
+                    bio: "¡Hola! Soy Elena. Me gradué del Conservatorio de Moscú y llevo enseñando piano online más de 5 años. Mi enfoque es técnico pero muy musical. Utilizo el sistema de videollamada de la academia para corregir tu postura y digitación en tiempo real.",
+                    rating: 5.0,
+                    reviews: 42,
+                    price: 45,
+                    languages: ["Español", "Ruso"],
+                    specialty: "Clásico",
+                    superProf: true,
+                    methodology: ["Lectura a primera vista", "Técnica Rusa", "Teoría Musical"]
+                },
+                {
+                    id: 2,
+                    name: "David Ross",
+                    photo: "https://i.pravatar.cc/150?img=11",
+                    headline: "Jazz Piano y Armonía Moderna. Aprende a improvisar desde la primera clase.",
+                    bio: "Si quieres dejar de leer partituras y empezar a crear tu propia música, soy tu profesor. Te enseñaré los secretos del Jazz, voicings y cómo tocar en banda.",
+                    rating: 4.8,
+                    reviews: 18,
+                    price: 30,
+                    languages: ["Inglés", "Español"],
+                    specialty: "Jazz",
+                    superProf: false,
+                    methodology: ["Improvisación", "Real Book", "Oído Musical"]
+                },
+                {
+                    id: 3,
+                    name: "Sarah M.",
+                    photo: "https://i.pravatar.cc/150?img=9",
+                    headline: "Iniciación al piano para niños y adultos. Paciente y divertida.",
+                    bio: "Me encanta trabajar con principiantes. Uso juegos y metodología Suzuki para que aprender piano no sea aburrido. ¡Hablamos en clase!",
+                    rating: 4.9,
+                    reviews: 120,
+                    price: 25,
+                    languages: ["Inglés", "Francés"],
+                    specialty: "Niños",
+                    superProf: true,
+                    methodology: ["Suzuki", "Juegos Rítmicos", "Canciones Disney"]
+                },
+                {
+                    id: 4,
+                    name: "Carlos Ruiz",
+                    photo: "https://i.pravatar.cc/150?img=3",
+                    headline: "Compositor y pianista. Te ayudo a tocar tus canciones pop favoritas.",
+                    bio: "Enfocado en música moderna, covers y composición. Si quieres tocar Coldplay o Einaudi, reserva una clase conmigo.",
+                    rating: 4.7,
+                    reviews: 8,
+                    price: 20,
+                    languages: ["Español"],
+                    specialty: "Pop",
+                    superProf: false,
+                    methodology: ["Acordes", "Acompañamiento", "Producción"]
+                }
+            ];
 
-        function playDemo() {
-            alert('Aquí se reproduciría un video demostrativo de cómo funcionan las clases en línea con WebRTC. Puedes integrar un video real de YouTube o Vimeo.');
-        }
+            $scope.filters = { text: '', specialty: '', language: '', priceMax: '' };
+            $scope.selectedTeacher = null;
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
+            // Lógica de filtrado
+            $scope.customFilter = function(teacher) {
+                // Filtro Texto (Nombre o Headline)
+                const textMatch = !$scope.filters.text || 
+                    teacher.name.toLowerCase().includes($scope.filters.text.toLowerCase()) || 
+                    teacher.headline.toLowerCase().includes($scope.filters.text.toLowerCase());
+                
+                // Filtro Especialidad
+                const specMatch = !$scope.filters.specialty || teacher.specialty === $scope.filters.specialty;
+                
+                // Filtro Idioma (busca si el idioma seleccionado está en el array del profesor)
+                const langMatch = !$scope.filters.language || teacher.languages.includes($scope.filters.language);
+
+                // Filtro Precio
+                const priceMatch = !$scope.filters.priceMax || teacher.price <= parseInt($scope.filters.priceMax);
+
+                return textMatch && specMatch && langMatch && priceMatch;
+            };
+
+            // Modal Actions
+            $scope.openProfile = function(teacher) {
+                $scope.selectedTeacher = teacher;
+                document.body.style.overflow = 'hidden'; // Prevenir scroll de fondo
+            };
+
+            $scope.closeProfile = function() {
+                $scope.selectedTeacher = null;
+                document.body.style.overflow = 'auto';
+            };
+
+            $scope.bookClass = function() {
+                alert("Redirigiendo al sistema de pagos y calendario para agendar con " + $scope.selectedTeacher.name);
+            };
+        });
     </script>
 </body>
 </html>
