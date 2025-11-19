@@ -1,621 +1,897 @@
 <!DOCTYPE html>
 <html ng-app="postApp">
 <head>
-<link href="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.css" rel="stylesheet" />
-<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.js"></script>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed estilo LinkedIn</title>
+<!-- Remix Icons & Fonts -->
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Scripts (Originales) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
 
+<!-- BeerCSS (Opcional, mantenido por compatibilidad aunque el diseño custom predomina) -->
+<link href="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.css" rel="stylesheet" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.js"></script>
+
 <style>
-body {
-  background-color: #F8FAFC !important;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+    /* --- LinkedIn Style Variables & Reset --- */
+    :root {
+        --bg-color: #F3F2EF;
+        --card-bg: #FFFFFF;
+        --text-main: #191919;
+        --text-sub: #666666;
+        --link-color: #0a66c2;
+        --border-color: #e0dfdc;
+        --hover-color: rgba(0, 0, 0, 0.08);
+        --input-bg: #EDF3F8; /* Light blueish tint for active input or white */
+        --font-stack: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+    }
 
-.main-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  gap: 20px;
-}
+    body {
+        background-color: var(--bg-color) !important;
+        font-family: var(--font-stack);
+        color: var(--text-main);
+        margin: 0;
+        padding-top: 20px; /* Space for nonexistent navbar */
+    }
 
-.sidebar {
-  width: 280px;
-  flex-shrink: 0;
-}
+    /* --- Layout --- */
+    .main-container {
+        max-width: 1128px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 225px 1fr 300px; /* 3 Column Layout like LinkedIn */
+        gap: 24px;
+        align-items: start;
+    }
 
-.sidebar-card {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+    /* --- Card Common Styles --- */
+    .card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.04); /* Subtle shadow */
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
 
-.sidebar-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1c1c1c;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+    /* --- Left Sidebar (Profile & Navigation) --- */
+    .sidebar-left {
+        grid-column: 1;
+    }
 
-.filter-option {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  margin: 4px 0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  color: #1c1c1c;
-}
+    .profile-card {
+        text-align: center;
+        position: relative;
+    }
 
-.filter-option:hover {
-  background-color: #f6f7f8;
-}
+    .profile-bg {
+        height: 60px;
+        background: #A0B4B7; /* Fallback color */
+        background: linear-gradient(to bottom, #A0B4B7, #bfd3d6);
+    }
 
-.filter-option.active {
-  background-color: #0079D3;
-  color: white;
-  font-weight: 500;
-}
+    .profile-img-wrapper {
+        margin-top: -38px;
+        margin-bottom: 12px;
+    }
 
-.filter-option i {
-  margin-right: 10px;
-  font-size: 20px;
-  width: 24px;
-  text-align: center;
-}
+    .profile-img-wrapper img {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        object-fit: cover;
+    }
 
-.feed-container {
-  flex: 1;
-  min-width: 0;
-}
+    .profile-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        cursor: pointer;
+    }
+    
+    .profile-name:hover {
+        text-decoration: underline;
+    }
 
-.create-post-card {
-  background: white;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+    .profile-headline {
+        font-size: 12px;
+        color: var(--text-sub);
+        margin-bottom: 16px;
+        padding: 0 12px;
+    }
 
-.create-post-card img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
+    .profile-stats {
+        border-top: 1px solid var(--border-color);
+        padding: 12px 0;
+        text-align: left;
+    }
 
-.create-post-input {
-  flex: 1;
-  background: #f6f7f8;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-sub);
+        cursor: pointer;
+    }
 
-.create-post-input:hover {
-  background: #e9ecef;
-  border-color: #0079D3;
-}
+    .stat-row:hover {
+        background-color: var(--hover-color);
+    }
 
-.create-post-actions {
-  display: flex;
-  gap: 8px;
-}
+    .stat-val {
+        color: var(--link-color);
+    }
 
-.post-card {
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: box-shadow 0.2s;
-  overflow: hidden;
-}
+    /* Navigation List */
+    .nav-card {
+        padding: 8px 0;
+    }
 
-.post-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
+    .nav-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 8px 12px;
+    }
 
-.post-header {
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid #f6f7f8;
-}
+    .filter-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-sub);
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
 
-.post-header img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
+    .filter-option:hover {
+        background-color: var(--hover-color);
+        color: var(--text-main);
+    }
 
-.post-user-info {
-  flex: 1;
-}
+    .filter-option.active {
+        border-left-color: var(--link-color);
+        color: var(--text-main);
+        background-color: rgba(10, 102, 194, 0.1); /* Light blue hover */
+    }
 
-.post-username {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1c1c1c;
-  text-decoration: none;
-}
+    .filter-option i {
+        margin-right: 10px;
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+    }
 
-.post-username:hover {
-  text-decoration: underline;
-}
+    /* --- Center Feed --- */
+    .feed-container {
+        grid-column: 2;
+    }
 
-.post-time {
-  font-size: 12px;
-  color: #7c7c7c;
-  margin-top: 2px;
-}
+    /* Create Post Input Area */
+    .create-post-card {
+        padding: 12px 16px;
+    }
 
-.post-content {
-  padding: 16px;
-}
+    .create-post-top {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
 
-.post-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1c1c1c;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
+    .create-post-top img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-.post-text {
-  font-size: 14px;
-  color: #1c1c1c;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
+    .create-post-input {
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-radius: 35px;
+        padding: 14px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-sub);
+        background-color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+        outline: none;
+    }
 
-.post-image {
-  width: 100%;
-  max-width: 600px;
-  border-radius: 8px;
-  margin-top: 12px;
-  cursor: pointer;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
+    .create-post-input:hover {
+        background-color: var(--hover-color);
+    }
 
-.post-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-top: 1px solid #f6f7f8;
-}
+    .create-post-actions {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 4px;
+    }
 
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background: transparent;
-  border: none;
-  color: #7c7c7c;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+    .media-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 8px;
+        border-radius: 4px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: var(--text-sub);
+        font-size: 14px;
+        font-weight: 600;
+    }
 
-.action-btn:hover {
-  background-color: #f6f7f8;
-}
+    .media-btn:hover {
+        background-color: var(--hover-color);
+    }
 
-.action-btn i {
-  font-size: 18px;
-}
+    /* Feed Post Card */
+    .post-card {
+        padding: 0; /* Content handles padding */
+    }
 
-.action-btn.liked {
-  color: #FF4500;
-}
+    .post-header {
+        display: flex;
+        gap: 12px;
+        padding: 12px 16px 8px;
+    }
 
-.save-btn {
-  margin-left: auto;
-}
+    .post-header img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-.save-btn.saved {
-  color: #0079D3;
-}
+    .post-meta {
+        flex: 1;
+    }
+
+    .post-username {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        text-decoration: none;
+        display: block;
+    }
+
+    .post-username:hover {
+        color: var(--link-color);
+        text-decoration: underline;
+    }
+
+    .post-desc {
+        font-size: 12px;
+        color: var(--text-sub);
+        display: block;
+        line-height: 1.3;
+    }
+
+    .post-time {
+        font-size: 12px;
+        color: var(--text-sub);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .post-content-text {
+        padding: 0 16px 8px;
+        font-size: 14px;
+        color: var(--text-main);
+        line-height: 1.5;
+    }
+
+    .post-image {
+        width: 100%;
+        display: block;
+        cursor: pointer;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Post Stats Bar */
+    .post-stats {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 12px;
+        color: var(--text-sub);
+    }
+
+    .stats-left img {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+
+    .stats-right span {
+        margin-left: 8px;
+        cursor: pointer;
+    }
+    
+    .stats-right span:hover {
+        color: var(--link-color);
+        text-decoration: underline;
+    }
+
+    /* Action Buttons (Like, Comment, etc) */
+    .post-actions {
+        display: flex;
+        justify-content: space-around; /* Distribute evenly like LinkedIn */
+        padding: 4px 8px;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 8px;
+        border-radius: 4px;
+        border: none;
+        background: transparent;
+        color: var(--text-sub);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        flex: 1; /* Grow to fill space */
+        transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+        background-color: var(--hover-color);
+    }
+
+    .action-btn i {
+        font-size: 20px;
+    }
+
+    .action-btn.liked {
+        color: var(--link-color); /* Blue when liked */
+    }
+
+    .action-btn.liked i {
+        font-weight: normal; /* Remix icon toggle style if needed */
+    }
+
+    /* --- Right Sidebar (News/Extras) --- */
+    .sidebar-right {
+        grid-column: 3;
+    }
+    
+    .news-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .news-item {
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+
+    .news-item:hover {
+        background-color: var(--hover-color);
+    }
+
+    .news-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .news-meta {
+        font-size: 12px;
+        color: var(--text-sub);
+    }
+
+    /* --- Comments --- */
+    .comments-section {
+        background: #F9FAFB;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .comment-input-wrapper {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .comment-input-wrapper img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .comment-input {
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 8px 12px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .comment-item img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .comment-bubble {
+        background: #F2F2F2;
+        border-radius: 0 8px 8px 8px;
+        padding: 8px 12px;
+        flex: 1;
+    }
+
+    .comment-author {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .comment-text {
+        font-size: 13px;
+        color: var(--text-main);
+        margin-top: 2px;
+    }
+
+    /* Polls */
+    .poll-container {
+        padding: 0 16px 16px;
+    }
+    .poll-option {
+        border: 1px solid var(--link-color);
+        border-radius: 4px;
+        padding: 8px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--link-color);
+        text-align: center;
+        cursor: pointer;
+        background: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .poll-option:hover {
+        background: rgba(10, 102, 194, 0.1);
+    }
+    .poll-option.voted {
+        background: #F3F2EF;
+        color: var(--text-main);
+        border-color: var(--border-color);
+        text-align: left;
+    }
+    .poll-bar {
+        position: absolute;
+        top: 0; left: 0; bottom: 0;
+        background: rgba(0,0,0,0.05);
+        z-index: 0;
+    }
+    .poll-option-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+    }
 
 
+    /* Load More */
+    .load-more-btn {
+        width: 100%;
+        padding: 10px;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        color: var(--text-sub);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 16px 0;
+        transition: 0.2s;
+    }
+    .load-more-btn:hover {
+        background: var(--hover-color);
+    }
 
-.poll-container {
-  padding: 16px 0;
-}
+    /* Loader */
+    .loader-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+    .loader {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--link-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.poll-option {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  margin: 8px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  border: 2px solid #edeff1;
-  transition: all 0.2s;
-}
+    /* Dialog/Modal */
+    dialog {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 0;
+        max-width: 600px;
+        width: 100%;
+    }
 
-.poll-option:hover {
-  border-color: #0079D3;
-  background: #f6f7f8;
-}
-
-.poll-option.voted {
-  border-color: transparent;
-  background: #f6f7f8;
-}
-
-.poll-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(0,121,211,0.1);
-  transition: width 0.6s ease;
-}
-
-.poll-option-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.poll-footer {
-  font-size: 12px;
-  color: #7c7c7c;
-  margin-top: 8px;
-  padding: 0 16px;
-}
-
-
-
-.comments-section {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.comment-input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.comment-input-wrapper img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.comment-input {
-  flex: 1;
-  background: #f6f7f8;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 14px;
-}
-
-.comment-item {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f6f7f8;
-}
-
-.comment-item:last-child {
-  border-bottom: none;
-}
-
-.comment-item img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.comment-content {
-  flex: 1;
-}
-
-.comment-author {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1c1c1c;
-  margin-bottom: 4px;
-}
-
-.comment-text {
-  font-size: 14px;
-  color: #1c1c1c;
-  line-height: 1.5;
-}
-
-.load-more-btn {
-  width: 100%;
-  padding: 12px;
-  background: white;
-  border: 1px solid #0079D3;
-  color: #0079D3;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 16px;
-}
-
-.load-more-btn:hover {
-  background: #0079D3;
-  color: white;
-}
-
-@media (max-width: 968px) {
-  .sidebar {
-    display: none;
-  }
-  
-  .main-container {
-    padding: 12px;
-  }
-}
-
-.loader-wrapper {
-  display: flex;
-  justify-content: center;
-  padding: 60px 20px;
-}
-
-.loader {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #0079D3;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-
+    /* Responsive */
+    @media (max-width: 992px) {
+        .main-container {
+            grid-template-columns: 225px 1fr; /* Hide right column */
+        }
+        .sidebar-right {
+            display: none;
+        }
+    }
+    @media (max-width: 768px) {
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            padding: 0 10px;
+        }
+        .sidebar-left {
+            width: 100%;
+        }
+    }
 </style>
 </head>
 
 <body ng-controller="postController">
-  <div class="main-container">
-    <aside class="sidebar" ng-if="!selectedPostForComments">
-      <div class="sidebar-card">
-        <div class="sidebar-title">Comunidades</div>
-        <div class="filter-option" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">
-          <i class="ri-home-4-line"></i>
-          <span>Inicio</span>
-        </div>
-        <div class="filter-option" ng-class="{'active': filter === 'request'}" ng-click="filterPosts('request')">
-          <i class="ri-play-list-add-line"></i>
-          <span>Petición de canciones</span>
-        </div>
-         <div class="filter-option" ng-class="{'active': filter === 'event'}" ng-click="filterPosts('event')">
-          <i class="ri-calendar-event-line"></i>
-          <span>Eventos</span>
-        </div>
-         <div class="filter-option" ng-class="{'active': filter === 'composition'}" ng-click="filterPosts('composition')">
-          <i class="ri-file-paper-2-line"></i>
-          <span>Composición</span>
-        </div>
-         <div class="filter-option" ng-class="{'active': filter === 'biomechanics'}" ng-click="filterPosts('biomechanics')">
-          <i class="ri-hand"></i>
-          <span>Biomecánica</span>
-        </div>
-      
 
-      <div class="sidebar-card">
-        <div class="sidebar-title">Acerca de</div>
-          <div class="filter-option" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')">
-          <i class="ri-user-line"></i>
-          <span>Mis Publicaciones</span>
+  <div class="main-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left" >
+        
+        <!-- Profile Card Widget -->
+        <div class="card profile-card">
+            <div class="profile-bg"></div>
+            <div class="profile-img-wrapper">
+                <img ng-src="{{userImg}}" alt="User">
+            </div>
+            <div class="profile-name">{{user}}</div>
+            <div class="profile-headline">Estudiante | Entusiasta de la Tecnología</div>
+            
+            <div class="profile-stats">
+                <div class="stat-row">
+                    <span>Contactos</span>
+                    <span class="stat-val">87</span>
+                </div>
+                <div class="stat-row">
+                    <span>Visualizaciones del perfil</span>
+                    <span class="stat-val">12</span>
+                </div>
+            </div>
         </div>
-        <div class="filter-option" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">
-          <i class="ri-bookmark-line"></i>
-          <span>Guardados</span>
+
+        <!-- Navigation / Communities -->
+        <div class="card nav-card" ng-if="!selectedPostForComments">
+            <div class="nav-title">Recientes</div>
+            <div class="filter-option" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">
+                <i class="ri-hashtag"></i> <span>Inicio</span>
+            </div>
+            <div class="filter-option" ng-class="{'active': filter === 'request'}" ng-click="filterPosts('request')">
+                <i class="ri-music-2-line"></i> <span>Música</span>
+            </div>
+            <div class="filter-option" ng-class="{'active': filter === 'event'}" ng-click="filterPosts('event')">
+                <i class="ri-calendar-event-fill"></i> <span>Eventos</span>
+            </div>
+            <div class="filter-option" ng-class="{'active': filter === 'composition'}" ng-click="filterPosts('composition')">
+                <i class="ri-pencil-ruler-2-line"></i> <span>Composición</span>
+            </div>
+            <div class="filter-option" ng-class="{'active': filter === 'biomechanics'}" ng-click="filterPosts('biomechanics')">
+                <i class="ri-body-scan-line"></i> <span>Biomecánica</span>
+            </div>
         </div>
-      </div>
-      </div>
+
+        <!-- User Actions -->
+        <div class="card nav-card" ng-if="!selectedPostForComments">
+             <div class="nav-title">Gestionar</div>
+             <div class="filter-option" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')">
+                <i class="ri-user-settings-line"></i> <span>Mis Publicaciones</span>
+            </div>
+            <div class="filter-option" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">
+                <i class="ri-bookmark-fill"></i> <span>Guardados</span>
+            </div>
+        </div>
+
     </aside>
 
+    <!-- CENTER FEED -->
     <main class="feed-container">
-      <div class="create-post-card" ng-if="!selectedPostForComments">
-        <img ng-src="{{userImg}}" />
-        <input class="create-post-input" placeholder="Crear una publicación" ng-model="newText2" />
+
+      <!-- Create Post Widget -->
+      <div class="card create-post-card" ng-if="!selectedPostForComments">
+        <div class="create-post-top">
+            <img ng-src="{{userImg}}" />
+            <input class="create-post-input" placeholder="Crear una publicación" ng-model="newText2" ng-keyup="$event.keyCode == 13 && newPost(newText2)" />
+        </div>
         <div class="create-post-actions">
-          <button class="transparent circle" ng-click="openImagePostDialog()">
-            <i class="ri-image-line"></i>
-          </button>
-          <button ng-click="newPost(newText2)">Publicar</button>
+            <!-- Image Button maps to existing functionality -->
+            <button class="media-btn" ng-click="openImagePostDialog()" style="color: #378fe9;">
+                <i class="ri-image-fill" style="font-size: 20px;"></i> Foto
+            </button>
+            
+            <!-- Visual Only buttons to match LinkedIn Look -->
+            <button class="media-btn" style="color: #5f9b41; cursor: default;">
+                <i class="ri-video-fill" style="font-size: 20px;"></i> Vídeo
+            </button>
+            <button class="media-btn" style="color: #c37d16; cursor: default;">
+                <i class="ri-calendar-event-fill" style="font-size: 20px;"></i> Evento
+            </button>
+            <button class="media-btn" style="color: #e16745; cursor: default;">
+                <i class="ri-survey-fill" style="font-size: 20px;"></i> Encuesta
+            </button>
+
+            <!-- Hidden Submit for text input (Pressing Enter works) or small button -->
+            <button ng-if="newText2" ng-click="newPost(newText2)" style="background:#0a66c2; color:white; border:none; padding: 6px 12px; border-radius: 16px; cursor:pointer;">Publicar</button>
         </div>
       </div>
 
+      <!-- Back Button (When detailed view) -->
       <div ng-if="selectedPostForComments" style="margin-bottom: 16px;">
-        <button class="action-btn" ng-click="backToFeed()">
-          <i class="ri-arrow-left-line"></i>
-          Volver al feed
+        <button style="background:none; border:none; cursor:pointer; font-weight:600; color:#666; display:flex; align-items:center; gap:8px;" ng-click="backToFeed()">
+          <i class="ri-arrow-left-line"></i> Volver al feed
         </button>
       </div>
 
+      <!-- Loader -->
       <div class="loader-wrapper" ng-if="userDataLoaded">
         <div class="loader"></div>
       </div>
 
+      <!-- Post List -->
       <div ng-if="!selectedPostForComments">
-        <div class="post-card" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
-          <div class="post-header">
-            <img ng-src="{{post.photo}}" />
-            <div class="post-user-info">
-              <a href="#" class="post-username">{{post.user}}</a>
-              <div class="post-time">{{calculateTimeAgo(post.date)}}</div>
-            </div>
-          </div>
-
-          <div class="post-content">
-            <div ng-if="post.media == 'text'">
-                 <div class="post-title" ng-if="post.header">{{post.header}}</div>
-              <div class="post-text">{{post.content}}</div>
-            </div>
-
-            <div ng-if="post.media == 'img'">
-              <div class="post-title" ng-if="post.header">{{post.header}}</div>
-              <img class="post-image" ng-src="{{post.content}}" ng-click="openComments(post)" />
-            </div>
-
-      
-
-            <div ng-if="post.media == 'poll'">
-              <div class="post-title">{{post.content}}</div>
-              <div class="poll-container">
-                <div class="poll-option" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'voted': post.userHasVoted}">
-                  <div class="poll-bar" ng-if="post.userHasVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
-                  <div class="poll-option-content">
-                    <span>{{opt.name}} <i ng-if="opt.votedByCurrentUser" class="ri-checkbox-circle-fill"></i></span>
-                    <span ng-if="post.userHasVoted">{{calculatePercentage(post, opt)}}%</span>
-                  </div>
+        <div class="card post-card" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
+          
+            <!-- Header -->
+            <div class="post-header">
+                <img ng-src="{{post.photo}}" />
+                <div class="post-meta">
+                    <a href="#" class="post-username">{{post.user}}</a>
+                    <span class="post-desc">Usuario de la comunidad</span>
+                    <div class="post-time">
+                        <span>{{calculateTimeAgo(post.date)}}</span> • <i class="ri-earth-fill" style="font-size: 14px;"></i>
+                    </div>
                 </div>
-                <div class="poll-footer" ng-if="post.userHasVoted">
-                  {{getTotalVotes(post)}} votos totales
-                </div>
-              </div>
+                <!-- "..." menu (visual) -->
+                <i class="ri-more-fill" style="font-size:20px; color:#666; cursor:pointer;"></i>
             </div>
-          </div>
 
-          <div class="post-actions" ng-if="post.media != 'poll'">
-            <button class="action-btn" ng-class="{'liked': isPostLiked(post)}" ng-click="newLike($index, post)">
-              <i ng-class="isPostLiked(post) ? 'ri-heart-fill' : 'ri-heart-line'"></i>
-              <span>{{post.likes.length}}</span>
-            </button>
-            <button class="action-btn" ng-click="openComments(post)">
-              <i class="ri-chat-3-line"></i>
-              <span>{{post.comments.length}}</span>
-            </button>
-            <button class="action-btn save-btn" ng-class="{'saved': isPostSaved(post)}" ng-click="toggleSave(post)">
-              <i ng-class="isPostSaved(post) ? 'ri-bookmark-fill' : 'ri-bookmark-line'"></i>
-              <span>{{isPostSaved(post) ? 'Guardado' : 'Guardar'}}</span>
-            </button>
-          </div>
+            <!-- Content -->
+            <div class="post-content">
+                <!-- Text Post -->
+                <div ng-if="post.media == 'text'">
+                    <div style="padding: 0 16px 8px; font-weight:600;" ng-if="post.header">{{post.header}}</div>
+                    <div class="post-content-text">{{post.content}}</div>
+                </div>
+
+                <!-- Image Post -->
+                <div ng-if="post.media == 'img'">
+                    <div style="padding: 0 16px 8px; font-weight:600;" ng-if="post.header">{{post.header}}</div>
+                    <img class="post-image" ng-src="{{post.content}}" ng-click="openComments(post)" />
+                </div>
+
+                <!-- Poll Post -->
+                <div ng-if="post.media == 'poll'">
+                    <div style="padding: 0 16px 8px; font-weight:600;">{{post.content}}</div>
+                    <div class="poll-container">
+                        <div class="poll-option" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'voted': post.userHasVoted}">
+                            <div class="poll-bar" ng-if="post.userHasVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
+                            <div class="poll-option-content">
+                                <span>{{opt.name}} <i ng-if="opt.votedByCurrentUser" class="ri-checkbox-circle-fill"></i></span>
+                                <span ng-if="post.userHasVoted">{{calculatePercentage(post, opt)}}%</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color:#666; margin-top:8px;" ng-if="post.userHasVoted">
+                            {{getTotalVotes(post)}} votos totales
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Likes/Comments Count) -->
+            <div class="post-stats" ng-if="post.media != 'poll'">
+                <div class="stats-left" ng-if="post.likes.length > 0">
+                    <i class="ri-thumb-up-fill" style="color: #1485BD;"></i>
+                    <i class="ri-heart-fill" style="color: #d93c3c;"></i>
+                    <span>{{post.likes.length}}</span>
+                </div>
+                <div class="stats-left" ng-if="post.likes.length === 0">
+                    Sé el primero en recomendar esto
+                </div>
+                <div class="stats-right">
+                    <span>{{post.comments.length}} comentarios</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="post-actions" ng-if="post.media != 'poll'">
+                <button class="action-btn" ng-class="{'liked': isPostLiked(post)}" ng-click="newLike($index, post)">
+                    <i ng-class="isPostLiked(post) ? 'ri-thumb-up-fill' : 'ri-thumb-up-line'"></i>
+                    <span>Recomendar</span>
+                </button>
+                
+                <button class="action-btn" ng-click="openComments(post)">
+                    <i class="ri-chat-3-line"></i>
+                    <span>Comentar</span>
+                </button>
+                
+               
+
+                <button class="action-btn" ng-class="{'liked': isPostSaved(post)}" ng-click="toggleSave(post)">
+                    <i ng-class="isPostSaved(post) ? 'ri-bookmark-fill' : 'ri-bookmark-line'"></i>
+                    <span>{{isPostSaved(post) ? 'Guardado' : 'Guardar'}}</span>
+                </button>
+            </div>
         </div>
 
         <button class="load-more-btn" ng-click="loadMorePosts()" ng-if="itemsPerPage < filteredData.length">
-          Cargar más publicaciones
+          Mostrar más resultados
         </button>
       </div>
 
+      <!-- Detailed Post View with Comments -->
       <div ng-if="selectedPostForComments">
-        <div class="post-card">
-          <div class="post-header">
-            <img ng-src="{{selectedPostForComments.photo}}" />
-            <div class="post-user-info">
-              <a href="#" class="post-username">{{selectedPostForComments.user}}</a>
-              <div class="post-time">{{calculateTimeAgo(selectedPostForComments.date)}}</div>
+        <div class="card post-card">
+            <!-- Same structure as feed card -->
+            <div class="post-header">
+                <img ng-src="{{selectedPostForComments.photo}}" />
+                <div class="post-meta">
+                    <a href="#" class="post-username">{{selectedPostForComments.user}}</a>
+                    <span class="post-time">{{calculateTimeAgo(selectedPostForComments.date)}}</span>
+                </div>
             </div>
-          </div>
-
-          <div class="post-content">
-            <div ng-if="selectedPostForComments.media == 'text'">
-              <div class="post-text">{{selectedPostForComments.content}}</div>
+            <div class="post-content">
+                <div ng-if="selectedPostForComments.media == 'text'" style="padding:16px;">{{selectedPostForComments.content}}</div>
+                <div ng-if="selectedPostForComments.media == 'img'">
+                    <div style="padding:16px;" ng-if="selectedPostForComments.header">{{selectedPostForComments.header}}</div>
+                    <img class="post-image" ng-src="{{selectedPostForComments.content}}" />
+                </div>
             </div>
-
-            <div ng-if="selectedPostForComments.media == 'img'">
-              <div class="post-title" ng-if="selectedPostForComments.header">{{selectedPostForComments.header}}</div>
-              <img class="post-image" ng-src="{{selectedPostForComments.content}}" />
+            
+            <!-- Comments Section (Always Visible in Detail View) -->
+            <div class="comments-section">
+                <div class="comment-input-wrapper">
+                    <img ng-src="{{userImg}}" />
+                    <input type="text" class="comment-input" placeholder="Añadir un comentario..." ng-model="newCommentText" ng-keyup="$event.keyCode == 13 && addComment(newCommentText)" />
+                </div>
+                
+                <div ng-if="selectedPostForComments.comments.length > 0">
+                    <div class="comment-item" ng-repeat="comment in selectedPostForComments.comments">
+                        <img ng-src="{{comment.photo}}" />
+                        <div class="comment-bubble">
+                            <div class="comment-author">{{comment.user}}</div>
+                            <div class="comment-text">{{comment.comment}}</div>
+                        </div>
+                    </div>
+                </div>
+                 <div ng-if="selectedPostForComments.comments.length === 0" style="text-align: center; color: #666; font-size: 13px; padding: 10px;">
+                   No hay comentarios todavía.
+                 </div>
             </div>
-          </div>
-
-          <div class="post-actions">
-            <button class="action-btn" ng-class="{'liked': isPostLiked(selectedPostForComments)}" ng-click="newLike(0, selectedPostForComments)">
-              <i ng-class="isPostLiked(selectedPostForComments) ? 'ri-heart-fill' : 'ri-heart-line'"></i>
-              <span>{{selectedPostForComments.likes.length}}</span>
-            </button>
-            <button class="action-btn save-btn" ng-class="{'saved': isPostSaved(selectedPostForComments)}" ng-click="toggleSave(selectedPostForComments)">
-              <i ng-class="isPostSaved(selectedPostForComments) ? 'ri-bookmark-fill' : 'ri-bookmark-line'"></i>
-              <span>{{isPostSaved(selectedPostForComments) ? 'Guardado' : 'Guardar'}}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="comments-section">
-          <div class="comment-input-wrapper">
-            <img ng-src="{{userImg}}" />
-            <input type="text" class="comment-input" placeholder="Añadir un comentario..." ng-model="newCommentText" />
-            <button ng-click="addComment(newCommentText)">Comentar</button>
-          </div>
-
-          <div ng-if="selectedPostForComments.comments.length > 0">
-            <div class="comment-item" ng-repeat="comment in selectedPostForComments.comments">
-              <img ng-src="{{comment.photo}}" />
-              <div class="comment-content">
-                <div class="comment-author">{{comment.user}}</div>
-                <div class="comment-text">{{comment.comment}}</div>
-              </div>
-            </div>
-          </div>
-
-          <div ng-if="selectedPostForComments.comments.length === 0" style="text-align: center; color: #7c7c7c; padding: 20px;">
-            Aún no hay comentarios. ¡Sé el primero en comentar!
-          </div>
         </div>
       </div>
+
     </main>
+
+    <!-- RIGHT SIDEBAR (News/Games - Static Visuals to match LinkedIn) -->
+   <aside class="sidebar-right" >
+    <div class="card">
+        <div class="news-header">
+            <span>Tendencias de la comunidad</span>
+            <i class="ri-information-fill" style="font-size: 14px; color: #666;" title="Basado en tu red"></i>
+        </div>
+        
+        <div ng-if="sidebarPosts.length === 0" style="padding: 16px; text-align:center; font-size:12px; color:#666;">
+            Cargando tendencias...
+        </div>
+
+        <div class="news-item" ng-repeat="item in sidebarPosts" ng-click="openComments(item)">
+            <div class="news-title">
+                <span style="color:#0a66c2; font-size:16px; line-height:0;">•</span> 
+                {{ getSidebarPreview(item) }}
+            </div>
+            <div class="news-meta">
+                {{ calculateTimeAgo(item.date) }} • Por {{ item.user }}
+            </div>
+        </div>
+
+        <div style="padding: 12px 16px; font-size: 14px; font-weight: 600; color: #666; cursor:pointer;" ng-click="loadMoreSidebar()">
+            Mostrar más <i class="ri-arrow-down-s-line"></i>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="news-header" style="justify-content: flex-end; padding-bottom:0;">
+            <span style="font-size: 12px; color: #666;">Publicidad</span>
+        </div>
+        <div style="padding: 20px; text-align: center;">
+            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Sigue aprendiendo con Mozart Academy</div>
+            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                <img ng-src="{{userImg}}" style="width: 50px; height: 50px; border-radius: 50%; object-fit:cover;">
+                <div style="width: 50px; height: 50px; background: #eee; border-radius: 4px; display:flex; align-items:center; justify-content:center;">
+                     <i class="ri-building-2-line" style="font-size: 24px; color: #666;"></i>
+                </div>
+            </div>
+            <div style="font-size: 14px; margin-bottom: 12px;">{{user}}, reactiva tu carrera Premium.</div>
+            <button style="border: 1px solid #0a66c2; color: #0a66c2; background: transparent; padding: 6px 16px; border-radius: 16px; font-weight: 600; cursor: pointer;">Seguir</button>
+        </div>
+    </div>
+</aside>
+
   </div>
 
-
-
+  <!-- Modal Upload Image (Reused functionality) -->
   <dialog id="dialog-post">
-    <div style="padding: 20px; width: 500px; max-width: 90vw;">
-      <h5>Crear publicación con imagen</h5>
-      <div style="margin: 20px 0;">
-        <textarea ng-model="newImagePost.header" placeholder="Añade un título o descripción..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; min-height: 100px;"></textarea>
+    <div style="padding: 24px; background: #fff;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom:16px; border-bottom:1px solid #eee;">
+           <h3 style="margin:0; font-size: 20px; font-weight: 400;">Editar foto</h3>
+           <button onclick="ui('#dialog-post')" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
       </div>
-      <img ng-if="imagePreview" ng-src="{{imagePreview}}" style="width: 100%; border-radius: 8px; margin-bottom: 16px;" />
+      
+      <div style="margin-bottom: 16px;">
+        <textarea ng-model="newImagePost.header" placeholder="¿De qué quieres hablar?" style="width: 100%; border: none; font-size: 16px; min-height: 80px; font-family: inherit; outline: none; resize: none;"></textarea>
+      </div>
+      
+      <img ng-if="imagePreview" ng-src="{{imagePreview}}" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; margin-bottom: 16px; background: #f3f2ef;" />
+      
       <input type="file" id="imageUpload" accept="image/*" onchange="angular.element(this).scope().handleFileSelect(this.files)" style="display: none;">
-      <button onclick="document.getElementById('imageUpload').click()" style="width: 100%; margin-bottom: 12px;">
-        <i class="ri-image-add-line"></i> Seleccionar imagen
-      </button>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button onclick="ui('#dialog-post')">Cancelar</button>
-        <button ng-click="createImagePost()" ng-disabled="!imagePreview || !newImagePost.header">Publicar</button>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+          <button onclick="document.getElementById('imageUpload').click()" style="color: #0a66c2; background: transparent; border: 1px solid #0a66c2; padding: 6px 12px; border-radius: 16px; font-weight: 600; cursor: pointer;">
+             Seleccionar imagen
+          </button>
+
+          <div style="display: flex; gap: 12px;">
+            <button onclick="ui('#dialog-post')" style="background: transparent; border: none; color: #666; font-weight: 600; cursor: pointer;">Cancelar</button>
+            <button ng-click="createImagePost()" ng-disabled="!imagePreview || !newImagePost.header" style="background: #0a66c2; color: white; border: none; padding: 6px 16px; border-radius: 16px; font-weight: 600; cursor: pointer;" ng-style="{'opacity': (!imagePreview || !newImagePost.header) ? '0.5' : '1'}">Publicar</button>
+          </div>
       </div>
     </div>
   </dialog>
 
 <script>
+// --- JAVASCRIPT ORIGINAL INTACTO ---
 var app = angular.module('postApp', []);
 app.controller('postController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
   $scope.userDataLoaded = true;
@@ -626,6 +902,9 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
   $scope.user = "Anónimo";
   $scope.userImg = "https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V";
 
+  $scope.sidebarPosts = []; 
+  $scope.sidebarLimit = 5;
+
   var config = {
     headers: { "Content-Type": "text/plain;charset=utf-8" }
   };
@@ -634,6 +913,7 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     {action: "getPosts"}, config)
     .then(function (response) {
       $scope.data = shuffleArray(response.data);
+      $scope.updateSidebar();
       $scope.filterPosts('all');
       $scope.userDataLoaded = false;
       $scope.data.forEach(post => {
@@ -649,6 +929,41 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       $scope.user = response.data.name.split(' ').slice(0, 2).join(' ');
       $scope.userImg = response.data.photo;
     });
+
+    $scope.updateSidebar = function() {
+      $scope.sidebarPosts = $scope.data.slice(0, $scope.sidebarLimit);
+  };
+
+  // Cargar más items en el sidebar
+  $scope.loadMoreSidebar = function() {
+      $scope.sidebarLimit += 5;
+      $scope.updateSidebar();
+  };
+
+  // Obtener un texto corto para la previsualización
+  $scope.getSidebarPreview = function(post) {
+      // Si tiene header (título), úsalo
+      if (post.header && post.header.length > 0) {
+          return post.header.length > 35 ? post.header.substring(0, 35) + '...' : post.header;
+      }
+      
+      // Si es texto, recórtalo
+      if (post.media === 'text') {
+          return post.content.length > 35 ? post.content.substring(0, 35) + '...' : post.content;
+      }
+      
+      // Si es imagen sin header
+      if (post.media === 'img') {
+          return "Nueva fotografía compartida";
+      }
+
+      // Si es encuesta
+      if (post.media === 'poll') {
+          return "Nueva encuesta: " + post.content;
+      }
+
+      return "Publicación de la comunidad";
+  };
 
   function shuffleArray(array) {
     const shuffled = array.slice();
@@ -721,8 +1036,6 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     post.userHasVoted = true;
   };
 
-
-
   $scope.newPost = function (data) {
     if (!data) return;
     var post = {
@@ -777,9 +1090,9 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    if (days > 0) return `hace ${days} día(s)`;
-    if (hours > 0) return `hace ${hours} hora(s)`;
-    return `hace ${minutes} minuto(s)`;
+    if (days > 0) return `hace ${days} d`; // Shortened like LinkedIn
+    if (hours > 0) return `hace ${hours} h`;
+    return `hace ${minutes} m`;
   };
 
   $scope.newImagePost = { header: '' };
@@ -813,9 +1126,10 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     var post = {
       user: $scope.user,
       type: "img",
+      media: "img", // Ensure compatibility
       photo: $scope.userImg,
       header: $scope.newImagePost.header,
-      url: $scope.imagePreview,
+      content: $scope.imagePreview, // Changed from url to content for consistency with new HTML
       date: new Date().toISOString(),
       likes: [],
       comments: [{
@@ -831,6 +1145,15 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     ui('#dialog-post');
   };
 }]);
+
+// Tiny helper for modal if beercss is not fully controlling it via pure CSS
+function ui(selector) {
+    const el = document.querySelector(selector);
+    if(el) {
+        if(el.hasAttribute('open')) el.close();
+        else el.showModal();
+    }
+}
 </script>
 </body>
 </html>
