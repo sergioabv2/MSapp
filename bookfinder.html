@@ -1,1295 +1,992 @@
-<html lang="es"> 
-<head> 
+<!DOCTYPE html>
+<html lang="es">
+<head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Piano Virtual - Free Play</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Piano Pro - Ultimate</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary-color: #3498db;
+      --primary-glow: rgba(52, 152, 219, 0.6);
+      --bg-color: #f4f4f4; /* Fondo claro original */
+      --panel-bg: rgba(255, 255, 255, 0.9); /* Paneles blancos */
+      --text-color: #333;
+      --staff-stroke: #333;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f4f4f4; 
-        color: #333;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: var(--bg-color); 
+      color: var(--text-color);
       overflow: hidden;
       height: 100vh;
+      width: 100vw;
     }
     
-    /* Top Bar */
-    #top-bar {
-      background: rgba(255, 255, 255, 0.95); 
-  border-bottom: 1px solid #ddd;
+    /* --- UI Overlay --- */
+    #ui-layer {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: auto;
+    }
+
+    .status-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
       padding: 12px 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    /* Settings Menu */
+    #settings-btn {
+      background: white;
+      border: 1px solid #ddd;
+      color: #555;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #settings-btn:hover { background: #f9f9f9; }
+
+    #settings-menu {
+      position: absolute;
+      top: 70px; right: 20px;
+      width: 220px;
+      display: none;
+      pointer-events: auto;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #settings-menu.open { display: flex; }
+
+    .setting-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      backdrop-filter: blur(10px);
+      font-size: 14px;
     }
-    
-    .title {
-      font-size: 18px;
-      font-weight: 600;
+
+    /* Botones de Color */
+    .color-dots { display: flex; gap: 8px; }
+    .dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .dot.blue { background: #3498db; }
+    .dot.orange { background: #DD9E37; }
+    .dot.red { background: #e74c3c; }
+    .dot.active { border-color: #333; transform: scale(1.1); }
+
+    /* Displays */
+    #chord-display {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-align: center;
+      min-width: 150px;
       color: #333;
+      font-family: 'SF Pro Display', sans-serif;
     }
-    
-    .controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
+
+    #midi-info {
+      font-size: 12px;
+      color: #666;
+      display: flex; align-items: center; gap: 6px;
     }
-    
-    /* --- ESTILO BASE DEL BOTÓN (SIN COLOR) --- */
-.btn {
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid transparent; /* Borde base */
-}
+    #midi-info.active { color: #27ae60; font-weight: bold; }
 
-.btn:active {
-  transform: translateY(0);
-}
-
-/* --- TEMA AZUL (Por defecto) --- */
-body.theme-blue .btn {
-  background: rgba(52, 152, 219, 0.2);
-  border-color: #3498db;
-  color: #3498db;
-}
-body.theme-blue .btn:hover {
-  background: rgba(52, 152, 219, 0.3);
-}
-body.theme-blue .key.active {
-  background: #3498db !important;
-  box-shadow: 0 0 15px rgba(52, 152, 219, 0.8) !important;
-}
-body.theme-blue .key.black.active {
-  background: #2980b9 !important;
-}
-
-/* --- TEMA NARANJA --- */
-body.theme-orange .btn {
-  background: rgba(221, 158, 55, 0.2);
-  border-color: #DD9E37;
-  color: #DD9E37;
-}
-body.theme-orange .btn:hover {
-  background: rgba(221, 158, 55, 0.3);
-}
-body.theme-orange .key.active {
-  background: #DD9E37 !important;
-  box-shadow: 0 0 15px rgba(221, 158, 55, 0.8) !important;
-}
-body.theme-orange .key.black.active {
-  background: #b9812f !important; /* Naranja más oscuro */
-}
-
-
-body.theme-red .btn {
-  background: rgba(231, 76, 60, 0.2); /* Rojo (de #e74c3c) */
-  border-color: #e74c3c;
-  color: #e74c3c;
-}
-body.theme-red .btn:hover {
-  background: rgba(231, 76, 60, 0.3);
-}
-body.theme-red .key.active {
-  background: #e74c3c !important; /* Rojo */
-  box-shadow: 0 0 15px rgba(231, 76, 60, 0.8) !important;
-}
-body.theme-red .key.black.active {
-  background: #c0392b !important; /* Rojo más oscuro */
-}
-    
-    .btn:active {
-      transform: translateY(0);
-    }
-    
-    .btn i {
-      font-size: 18px;
-    }
-    
-    #show-key-names-btn.active {
-      background: rgba(52, 152, 219, 0.4);
-    }
-    
-    /* Piano Container */
-    #piano-container {
-      position: relative;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: calc(100vh - 60px);
-      top: 60px;
-      background: #e9e9e9;
+    /* Staff (Pentagrama) - Ajustado para SVG Original */
+    #staff-container {
+      margin-top: 10px;
+      width: 220px; 
+      height: 150px;
       overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.3s;
     }
+    #staff-container.hidden { opacity: 0; pointer-events: none; }
+    
+    /* Estilos SVG Pentagrama Originales */
+    .staff-line { stroke: #999; stroke-width: 1; }
+    .ledger-line { stroke: #888; stroke-width: 1; }
+    .note-head { fill: #333; }
+    .note-accidental { fill: #333; font-family: serif; font-size: 16px; font-weight: bold; }
+    .clef { fill: #333; font-family: serif; font-size: 60px; }
+    .bass-clef { font-size: 45px; }
 
-    #piano-container::before {
-  content: '';
-  position: absolute;
-  bottom: 0; /* Coincide con el 'bottom' de #piano-keys */
-  left: 0;
-  width: 100%;
-  height: 122px; /* Coincide con el 'height' de #piano-keys */
-  background: #2a2a2a;
-  border-top: 1px solid #333;
-  z-index: 1; /* Se pone detrás de las teclas */
-}
-    
-    #waterfall-canvas {
+    /* Pedal Indicator */
+    #pedal-indicator {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: calc(100% - 142px);
-      pointer-events: none;
-      z-index: 1;
-    }
-    
-    /* Piano Keys */
-    #piano-keys {
-      position: absolute;
-      bottom: 25px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
+      background: rgba(52, 152, 219, 0.1);
+      color: var(--primary-color);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      border: 1px solid var(--primary-color);
+    }
+    #pedal-indicator.active {
+      opacity: 1;
+      background: var(--primary-color);
+      color: white;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    /* --- Canvas & Piano --- */
+    #main-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #e9e9e9; /* Fondo del canvas */
+    }
+
+    #waterfall-canvas {
+      display: block;
+      width: 100%;
+      height: calc(100% - 122px); /* Ajustado a altura piano original */
+    }
+
+    /* Piano Area */
+    #piano-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 122px;
+      background: #2a2a2a;
+      border-top: 1px solid #333;
       display: flex;
       justify-content: center;
-      z-index: 2;
-      height: 102px;
+      overflow: hidden; /* Esconde teclas extra si la pantalla es muy pequeña */
+    }
+
+    #hit-line {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 0, 0, 0.7); /* Línea roja clásica de Synthesia */
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+      z-index: 10;
+      pointer-events: none;
     }
     
-    .key {
-      border: 1px solid #ddd;
+    /* Carcasa superior del piano para etiquetas */
+    #piano-top-casing {
+        position: absolute;
+        bottom: 122px;
+        left: 0; width: 100%; height: 20px;
+        background: #333;
+        z-index: 4;
+        display: flex; justify-content: center; /* Para alinear elementos hijos si los hay */
+    }
+
+    /* Etiquetas flotantes de notas activas */
+    .casing-note-label {
+        position: absolute;
+        top: 10px;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(0,0,0,0.6);
+        padding: 2px 6px;
+        border-radius: 4px;
+        pointer-events: none;
+        transform: translateX(-50%);
+        z-index: 20;
+    }
+
+    #piano-keys {
       position: relative;
-      transition: all 0.05s;
+      height: 102px;
+      display: flex;
+      justify-content: center;
+      margin-top: 20px; /* Espacio para la carcasa */
+      /* Width automático basado en contenido */
+    }
+
+    .key {
+      position: relative;
+      float: left;
       cursor: pointer;
+      transition: all 0.05s;
       user-select: none;
     }
-    
+
+    /* Estilos de Teclas Originales para mantener proporción */
     .key.white {
-      width: 16px;
+      width: 16px; /* Fijo original */
       height: 90px;
       background: #fff;
       border: 1px solid #ccc;
       border-right: 1px solid #e0e0e0;
+      border-radius: 0 0 3px 3px;
+      z-index: 1;
     }
-    
+    .key.white.active {
+      background: var(--primary-color) !important;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
     .key.black {
-      width: 10px;
+      width: 10px; /* Fijo original */
       height: 58px;
       background: #333;
       border: 1px solid #555;
       margin-left: -5px;
       margin-right: -5px;
       z-index: 2;
+      border-radius: 0 0 2px 2px;
     }
-    
-
-.active-note-label {
-  position: absolute;
-  top: -20px; /* Posición por encima de la tecla */
-  left: 50%;
-  transform: translateX(-50%);
-  color: #f1f1f1; /* Color de texto blanco/claro */
-  font-size: 10px;
-  font-weight: bold;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
-  padding: 2px 4px;
-  border-radius: 3px;
-  white-space: nowrap; /* Evita que el texto se rompa */
-  z-index: 10;
-}
-
-.key.black .active-note-label {
-  color: #fff; /* Asegura que sean blancas en teclas negras */
-  background: rgba(0, 0, 0, 0.7);
-}
-
-/* --- NUEVO: Estilo para etiquetas de nota DENTRO de la carcasa --- */
-.casing-note-label {
-  position: absolute;
-  top: 50%; /* Centrado verticalmente */
-  transform: translate(-50%, -50%); /* Centrado horizontal (con 'left' de JS) y vertical */
-  color: #f1f1f1;
-  font-size: 11px;
-  font-weight: 600;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.4); /* Fondo sutil como en tu imagen */
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  z-index: 5; /* Asegura que esté sobre la carcasa (z-index: 4) */
-}
-
-    .key.midi-active {
-      background-color: #e0e0e0 !important;
-      box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2) !important;
+    .key.black.active {
+      background: #2980b9 !important; /* Un tono más oscuro para negras */
     }
 
-    .key.white.midi-active {
-      background-color: #e8e8e8 !important;
+    /* Media Queries Originales para proporción */
+    @media (max-width: 768px) {
+      .key.white { width: 13px; height: 75px; }
+      .key.black { width: 8px; height: 48px; margin-left: -4px; margin-right: -4px; }
+    }
+    @media (max-width: 500px) {
+      .key.white { width: 11px; height: 65px; }
+      .key.black { width: 7px; height: 42px; margin-left: -3.5px; margin-right: -3.5px; }
     }
 
-    .key.black.midi-active {
-      background-color: #555555 !important;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4) !important;
-    }
-    
-    /* Key Labels */
+    /* Etiquetas de notas en teclas */
     .key-name {
       position: absolute;
       bottom: 5px;
       width: 100%;
       text-align: center;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: bold;
-      color: #555;
-      pointer-events: none;
-      z-index: 10;
-    }
-    
-    .key.black .key-name {
-      color: #f1f1f1;
-      bottom: 3px;
-      font-size: 8px;
-    }
-
-    #piano-top-casing {
-  position: absolute;
-  bottom: 122px; /* A 10px del borde superior de las teclas blancas */
-  left: 0;
-  width: 100%;
-  height: 20px; /* Altura de la carcasa */
-  background: #2a2a2a; /* Color negro/gris oscuro */
-  box-shadow: inset 0 -2px 5px rgba(0,0,0,0.3); /* Pequeña sombra interna */
-  z-index: 4; /* Encima del hit-line y las teclas */
-}
-    
-    /* Hit Line */
-    .hit-line {
-      position: absolute;
-      bottom: 122px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: rgba(255, 0, 0, 1);
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-      z-index: 5;
+      color: #777;
       pointer-events: none;
     }
-    
-    /* MIDI Status */
-    #midi-status {
-      position: fixed;
-      bottom: 155px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 13px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      backdrop-filter: blur(10px);
-      z-index: 999;
-    }
-    
-    #midi-status.connected {
-      display: flex;
-      border-color: #e74c3c;
-    }
-    
-    #midi-status i {
-      color: #e74c3c;
-      font-size: 16px;
-    }
+    .key.black .key-name { color: #eee; bottom: 3px; font-size: 8px; }
+    .hide-labels .key-name { display: none; }
 
-    #note-display {
-  position: fixed;
-  top: 80px;
-  left: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 20px 30px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  backdrop-filter: blur(10px);
-  z-index: 999;
-  min-width: 180px;
-}
-
-#note-text {
-  font-size: 32px;
-  font-weight: 300;
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
-  color: #333 !important;
-  letter-spacing: 2px;
-  text-align: center;
-  display: block;
-}
-
-
-
-    #text-note-display {
-      position: fixed;
-      top: 80px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 20px 30px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      backdrop-filter: blur(10px);
-      z-index: 999;
-      min-width: 180px;
-    }
-
-    #note-text {
-      font-size: 32px;
-      font-weight: 300;
-      font-family: 'SF Pro Display', -apple-system, sans-serif;
-      color: #fff;
-      letter-spacing: 2px;
-      text-align: center;
-      display: block;
-    }
-
-    /* Nuevo display de pentagrama a la derecha */
-    #staff-display {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      backdrop-filter: blur(10px);
-      z-index: 999;
-      height: 130px; /* Ajusta este valor según necesites */
-  overflow: hidden; 
-    }
-
-    #staff-svg {
-      display: block;
-      /* Ajustar tamaño si es necesario */
-    }
-
-    /* Estilos para los elementos del pentagrama */
-    .staff-line {
-      stroke: #aaa;
-      stroke-width: 1;
-    }
-    .ledger-line {
-      stroke: #888;
-      stroke-width: 1;
-    }
-    .note-head {
-      fill: #333;
-    }
-    .note-accidental {
-      fill: #333;
-      font-size: 20px;
-      font-family: serif;
-    }
-    .clef {
-      fill: #333;
-      font-size: 70px; /* Clave de Sol */
-      font-family: serif;
-    }
-    .bass-clef {
-      font-size: 40px; /* Clave de Fa */
-    }
-    
-    /* Mobile Adjustments */
-    @media (max-width: 768px) {
-      #top-bar {
-        padding: 10px 15px;
-      }
-
-      .clef{
-        font-size: 45px;
-      }
-      
-      .title {
-        font-size: 16px;
-      }
-      
-      .btn {
-        padding: 6px 12px;
-        font-size: 13px;
-      }
-      
-      .key.white {
-        width: 13px;
-        height: 75px;
-      }
-      
-      .key.black {
-        width: 8px;
-        height: 48px;
-        margin-left: -4px;
-        margin-right: -4px;
-      }
-    }
-    
-    @media (max-width: 500px) {
-      .key.white {
-        width: 11px;
-        height: 65px;
-      }
-      
-      .key.black {
-        width: 7px;
-        height: 42px;
-      }
-    }
   </style>
 </head>
-<body>
+<body class="theme-blue">
 
-  <div id="top-bar">
-    <div class="title">🎹 Free Play</div>
-    <div class="controls">
-      <button id="colorChange" class="btn" title="Selecciona color">
-        <span>Azul</span>
-      </button>
+  <!-- Capa de Interfaz -->
+  <div id="ui-layer">
+    <div class="top-bar">
+      <div class="status-group">
+        <!-- Acordes -->
+        <div id="chord-display" class="glass-panel">---</div>
+        
+        <!-- Pentagrama -->
+        <div id="staff-container" class="glass-panel">
+          <svg id="staff-svg" width="100%" height="100%"></svg>
+        </div>
+        
+        <!-- Estado MIDI -->
+        <div id="midi-info" class="glass-panel">
+          <i class="ri-plug-line"></i>
+          <span id="midi-device-name">MIDI Desconectado</span>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <button id="settings-btn" class="glass-panel"><i class="ri-settings-3-line"></i></button>
+        <div id="settings-menu" class="glass-panel">
+          <div class="setting-row">
+            <span>Color</span>
+            <div class="color-dots">
+              <div class="dot blue active" data-color="blue"></div>
+              <div class="dot orange" data-color="orange"></div>
+              <div class="dot red" data-color="red"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span>Nombres Teclas</span>
+            <input type="checkbox" id="toggle-labels">
+          </div>
+          <div class="setting-row">
+            <span>Pentagrama</span>
+            <input type="checkbox" id="toggle-staff" checked>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div id="pedal-indicator"><i class="ri-footprint-fill"></i> PEDAL</div>
   </div>
 
-  <div id="note-display">
-  <span id="note-text">---</span>
-</div>
-
-<div id="staff-display">
-<svg id="staff-svg" width="200" height="150"></svg>
-</div>
-
-  <div id="midi-status">
-    <i class="ri-plug-line"></i>
-    <span id="midi-device-name">MIDI Conectado</span>
-  </div>
-
-  <div id="piano-container">
+  <!-- Lienzo y Piano -->
+  <div id="main-container">
     <canvas id="waterfall-canvas"></canvas>
+    
+    <!-- Carcasa para etiquetas flotantes -->
     <div id="piano-top-casing"></div>
-    <div class="hit-line"></div>
-    <div id="piano-keys"></div>
+    
+    <div id="piano-wrapper">
+        <div id="hit-line"></div>
+        <div id="piano-keys" class="hide-labels"></div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
   <script>
-    // === VARIABLES GLOBALES ===
-    const pianoKeys = document.getElementById('piano-keys');
-    const waterfallCanvas = document.getElementById('waterfall-canvas');
-    const waterfallCtx = waterfallCanvas.getContext('2d');
-    const midiStatus = document.getElementById('midi-status');
-    const midiDeviceName = document.getElementById('midi-device-name');
-    const colorChangeBtn = document.getElementById('colorChange');
-    const pianoTopCasing = document.getElementById('piano-top-casing');
-    
-    let sampler = null;
-    let midiAccess = null;
-    let showKeyNames = false;
-    let whiteKeyWidth = 16;
-    let blackKeyWidth = 10;
-    let animationId = null;
-    
-    // Array para almacenar las notas activas y sus historias
-    let activeNotes = {}; // { noteName: { startTime, xPos, isBlack, keyWidth } }
-    let noteHistory = []; // Historial de notas completadas con duración fija
-    
-    // Mapa para almacenar posiciones X de las teclas
-    let keyPositions = {};
-    let pianoStartX = 0;
-    
-    const pixelsPerSecond = 150;
-    const fadeOutDuration = 3000; 
-
-
-    const COLORS = {
-      blue: {
-        white: '52, 152, 219',  // #3498db (El azul que ya tenías)
-        black: '41, 128, 185',  // #2980b9
-        name: 'Azul'
-      },
-      orange: {
-        white: '221, 158, 55', // #DD9E37
-        black: '187, 134, 47', // Un naranja más oscuro
-        name: 'Naranja'
-      },
-     red: { 
-        white: '231, 76, 60',  // #e74c3c (Un rojo vivo, puedes ajustarlo si quieres otro)
-        black: '192, 57, 43',  // #c0392b (Un rojo más oscuro)
-        name: 'Rojo' 
-      }
+ 
+    const CONFIG = {
+      pixelsPerSecond: 180, 
+      fadeOutTime: 2000,
+      staffYTop: 40,
+      staffLineGap: 10
     };
 
-    let currentColorKey = 'blue';
-
-    // === CONSTANTES PARA DETECCIÓN DE ACORDES ===
- const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
- const CHORD_MAP = {
- '0,4,7': { name: 'Major', short: '' },
-'0,3,7': { name: 'Minor', short: 'm' },
- '0,3,6': { name: 'Diminished', short: 'dim' },
-'0,4,8': { name: 'Augmented', short: 'aug' },
-'0,4,7,10': { name: 'Dominant 7th', short: '7' }, 
-'0,4,7,11': { name: 'Major 7th', short: 'maj7' }, 
-'0,3,7,10': { name: 'Minor 7th', short: 'm7' },
-'0,3,6,9': { name: 'Diminished 7th', short: 'dim7' }, 
-'0,3,6,10': { name: 'Half-Diminished 7th', short: 'm7b5' } 
-};
-
-const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
- const staffSvg = document.getElementById('staff-svg');
- const STAFF_LINE_GAP = 10; 
- const STAFF_Y_TOP = 40;
-
- const NOTE_STAFF_OFFSET = { 
-'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 
- };
+    const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
     
-    // === INICIALIZACIÓN ===
-    document.addEventListener('DOMContentLoaded', async () => {
-      createPiano88Keys();
-      updateKeyDimensions();
-      calculateKeyPositions();
-      initSampler();
-      initMidiInput();
-      resizeWaterfallCanvas();
-      startWaterfallAnimation();
-      addEventListeners();
+    // Mapa de Acordes Original
+    const CHORD_MAP = {
+        '0,4,7': { name: 'Major', short: '' },
+        '0,3,7': { name: 'Minor', short: 'm' },
+        '0,3,6': { name: 'Diminished', short: 'dim' },
+        '0,4,8': { name: 'Augmented', short: 'aug' },
+        '0,4,7,10': { name: 'Dominant 7th', short: '7' }, 
+        '0,4,7,11': { name: 'Major 7th', short: 'maj7' }, 
+        '0,3,7,10': { name: 'Minor 7th', short: 'm7' },
+        '0,3,6,9': { name: 'Diminished 7th', short: 'dim7' }, 
+        '0,3,6,10': { name: 'Half-Diminished 7th', short: 'm7b5' } 
+    };
 
-      document.body.classList.add('theme-blue');
+    const THEMES = {
+      blue:   { main: '#3498db', glow: 'rgba(52, 152, 219, 0.8)' },
+      orange: { main: '#DD9E37', glow: 'rgba(221, 158, 55, 0.8)' },
+      red:    { main: '#e74c3c', glow: 'rgba(231, 76, 60, 0.8)' }
+    };
+
+    // Estado Global
+    let state = {
+      activeNotes: {}, // { id: { startTime, x, w, color, velocity, isBlack } }
+      history: [],     
+      particles: [],   
+      sustain: false,
+      currentTheme: 'blue'
+    };
+
+    // Referencias DOM
+    const els = {
+      canvas: document.getElementById('waterfall-canvas'),
+      ctx: document.getElementById('waterfall-canvas').getContext('2d'),
+      keysContainer: document.getElementById('piano-keys'),
+      chordDisplay: document.getElementById('chord-display'),
+      staffSvg: document.getElementById('staff-svg'),
+      staffContainer: document.getElementById('staff-container'),
+      pedalIndicator: document.getElementById('pedal-indicator'),
+      settingsMenu: document.getElementById('settings-menu'),
+      casing: document.getElementById('piano-top-casing')
+    };
+
+    let keyMetrics = {}; // { "C4": { x: 100, w: 20, isBlack: false } }
+    let sampler;
+
+    // ==========================================
+    // INICIALIZACIÓN
+    // ==========================================
+    async function init() {
+      renderKeys(); // Renderiza teclas HTML
+      initAudio();
+      initMIDI();
+      setupUI();
       
-      await Tone.loaded();
-      console.log('Piano listo para tocar!');
-    });
-    
-    // === SAMPLER (SONIDO DEL PIANO) ===
-    function initSampler() {
-      sampler = new Tone.Sampler({
-                urls: { 
-            "C1": "C1.mp3", "Eb1": "Ds1.mp3", "Gb1": "Fs1.mp3", "A1": "A1.mp3",
-            "C2": "C2.mp3", "Eb2": "Ds2.mp3", "Gb2": "Fs2.mp3", "A2": "A2.mp3",
-            "C3": "C3.mp3", "Eb3": "Ds3.mp3", "Gb3": "Fs3.mp3", "A3": "A3.mp3",
-            "C4": "C4.mp3", "Eb4": "Ds4.mp3", "Gb4": "Fs4.mp3", "A4": "A4.mp3",
-            "C5": "C5.mp3", "Eb5": "Ds5.mp3", "Gb5": "Fs5.mp3", "A5": "A5.mp3",
-            "C6": "C6.mp3", "Eb6": "Ds6.mp3", "Gb6": "Fs6.mp3", "A6": "A6.mp3",
-            "C7": "C7.mp3",
-          },
-        attack: 0.01,
-        decay: 0.2,
-        sustain: 0.3,
-        release: 3.5,
-        baseUrl: "https://tonejs.github.io/audio/salamander/"
-      }).toDestination();
+      // Esperar a que el DOM renderice para calcular posiciones
+      setTimeout(() => {
+        resizeCanvas();
+        recalcKeyMetrics();
+        loop(); // Iniciar loop visual
+      }, 100);
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        recalcKeyMetrics();
+      });
+      
+      // Inputs de Teclado
+      setupKeyboardInput();
     }
-    
-    // === CREAR PIANO DE 88 TECLAS ===
-    function createPiano88Keys() {
-      pianoKeys.innerHTML = '';
+
+    // ==========================================
+    // LÓGICA MUSICAL (Acordes e Intervalos)
+    // ==========================================
+    function noteNameToMidi(noteName) {
+      const noteMap = { 'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 
+                        'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11 };
+      const match = noteName.match(/^([A-G]b?)(\d+)$/);
+      if (!match) return 0;
+      const [, note, octave] = match;
+      // Normalizar sostenidos a bemoles si vienen del input
+      let n = note;
+      if(n.includes('#')) { 
+          // Simplificación: Convertir # a b para el mapa
+          // (En una app completa usaríamos lógica de teoría musical más compleja)
+      }
+      return (parseInt(octave) + 1) * 12 + noteMap[n];
+    }
+
+    function getNoteNameSimple(noteName) {
+       return noteName.replace(/[0-9]/g, '');
+    }
+
+    function getInterval(note1, note2) {
+      const intervals = ['Unison', 'Minor 2nd', 'Major 2nd', 'Minor 3rd', 
+      'Major 3rd', 'Perfect 4th', 'Tritone', 'Perfect 5th',
+      'Minor 6th', 'Major 6th', 'Minor 7th', 'Major 7th', 'Octave'];
+      
+      const midi1 = noteNameToMidi(note1);
+      const midi2 = noteNameToMidi(note2);
+      const semitones = Math.abs(midi2 - midi1) % 12;
+      
+      return intervals[semitones] || 'Interval';
+    }
+
+    function getChordName(notes) {
+      if (notes.length < 3) return null;
+      const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
+      const bassNoteMidi = midis[0];
+      const bassNoteName = NOTE_NAMES[bassNoteMidi % 12];
+      const pitchClasses = [...new Set(midis.map(m => m % 12))];
+
+      for (let i = 0; i < 12; i++) {
+        const potentialRoot = i;
+        const intervals = pitchClasses
+          .map(pc => (pc - potentialRoot + 12) % 12)
+          .sort((a, b) => a - b);
+        
+        const signature = intervals.join(',');
+        const chordInfo = CHORD_MAP[signature];
+        
+        if (chordInfo) {
+          const rootNoteName = NOTE_NAMES[potentialRoot];
+          if (rootNoteName === bassNoteName) {
+            return rootNoteName + chordInfo.short;
+          } else {
+            return rootNoteName + chordInfo.short + '/' + bassNoteName;
+          }
+        }
+      }
+      return null;
+    }
+
+    function updateMusicalDisplays() {
+        const activeNames = Object.keys(state.activeNotes);
+        
+        // 1. Texto (Acorde / Intervalo / Nota)
+        let text = '---';
+        if (activeNames.length === 1) {
+            text = getNoteNameSimple(activeNames[0]);
+        } else if (activeNames.length === 2) {
+            text = getInterval(activeNames[0], activeNames[1]);
+        } else if (activeNames.length >= 3) {
+            text = getChordName(activeNames) || 'Unknown';
+        }
+        els.chordDisplay.innerText = text;
+
+        // 2. Pentagrama
+        drawStaff(activeNames);
+    }
+
+    // ==========================================
+    // RENDERIZADO DEL PIANO (DOM)
+    // ==========================================
+    function renderKeys() {
+      els.keysContainer.innerHTML = '';
       const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
       const blackKeys = { 'C': 'Db', 'D': 'Eb', 'F': 'Gb', 'G': 'Ab', 'A': 'Bb' };
       
+      // Piano de 88 teclas estándar
       for (let octave = 0; octave <= 8; octave++) {
-        const startNote = octave === 0 ? 9 : 0;
+        const startNote = octave === 0 ? 9 : 0; // Empezar en A0
         
         for (let i = startNote; i <= 6; i++) {
-          if (octave === 0 && i < 9) continue;
-          if (octave === 8 && i > 0) break;
+          if (octave === 8 && i > 0) break; // Terminar en C8
           
           const note = pattern[i % 7];
           const noteName = `${note}${octave}`;
           
+          // Tecla Blanca
           const whiteKey = document.createElement('div');
           whiteKey.className = 'key white';
-          whiteKey.id = noteName;
+          whiteKey.id = `key-${noteName}`;
           whiteKey.dataset.note = noteName;
-          pianoKeys.appendChild(whiteKey);
           
+          // Etiqueta
+          const label = document.createElement('div');
+          label.className = 'key-name';
+          label.innerText = noteName;
+          whiteKey.appendChild(label);
+
+          // Eventos
+          addKeyEvents(whiteKey, noteName);
+          els.keysContainer.appendChild(whiteKey);
+
+          // Tecla Negra
           if (blackKeys[note] && !(octave === 8 && note === 'C')) {
             const blackNoteName = `${blackKeys[note]}${octave}`;
             const blackKey = document.createElement('div');
             blackKey.className = 'key black';
-            blackKey.id = blackNoteName;
+            blackKey.id = `key-${blackNoteName}`;
             blackKey.dataset.note = blackNoteName;
-            pianoKeys.appendChild(blackKey);
+            
+            const bLabel = document.createElement('div');
+            bLabel.className = 'key-name';
+            bLabel.innerText = blackNoteName;
+            blackKey.appendChild(bLabel);
+
+            addKeyEvents(blackKey, blackNoteName);
+            els.keysContainer.appendChild(blackKey);
           }
         }
       }
     }
-    
-    // === DIMENSIONES DE TECLAS ===
-    function updateKeyDimensions() {
-      const whiteKey = document.querySelector('.key.white');
-      const blackKey = document.querySelector('.key.black');
-      
-      if (whiteKey) whiteKeyWidth = whiteKey.offsetWidth;
-      if (blackKey) blackKeyWidth = blackKey.offsetWidth;
+
+    function addKeyEvents(el, note) {
+        el.addEventListener('mousedown', () => triggerNoteOn(note, 1));
+        el.addEventListener('mouseup', () => triggerNoteOff(note));
+        el.addEventListener('mouseleave', () => triggerNoteOff(note));
     }
-    
-    // === CALCULAR POSICIONES X DE TODAS LAS TECLAS ===
-    function calculateKeyPositions() {
-      keyPositions = {};
-      const pianoKeysRect = pianoKeys.getBoundingClientRect();
-      pianoStartX = pianoKeysRect.left;
-      
-      const allKeys = document.querySelectorAll('.key');
-      allKeys.forEach(key => {
-        const rect = key.getBoundingClientRect();
-        const noteName = key.dataset.note;
-        const isBlack = noteName.includes('b');
-        const keyWidth = isBlack ? blackKeyWidth : whiteKeyWidth;
-        
-        keyPositions[noteName] = rect.left + (keyWidth / 2);
-      });
-      
-      console.log('Posiciones calculadas:', Object.keys(keyPositions).length, 'teclas');
-    }
-    
-    // === CANVAS WATERFALL ===
-    function resizeWaterfallCanvas() {
-      const dpr = window.devicePixelRatio || 1;
-      const container = document.getElementById('piano-container');
-      
-      waterfallCanvas.width = window.innerWidth * dpr;
-      waterfallCanvas.height = (container.clientHeight - 142) * dpr;
-      
-      waterfallCanvas.style.width = `${window.innerWidth}px`;
-      waterfallCanvas.style.height = `${container.clientHeight - 142}px`;
-      
-      setTimeout(() => {
-        calculateKeyPositions();
-      }, 100);
-    }
-    
-    // === DIBUJAR WATERFALL ===
-    function drawWaterfall() {
-      const dpr = window.devicePixelRatio || 1;
-      waterfallCtx.clearRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
-      
-      const currentTime = Date.now();
-      const canvasHeight = waterfallCanvas.height / dpr;
-      
-      // Primero dibujar notas blancas del historial
-      noteHistory.forEach(noteData => {
-        if (noteData.isBlack) return;
-        drawNote(noteData, currentTime, canvasHeight, dpr, true);
-      });
-      
-      // Luego notas blancas activas
-      for (let noteName in activeNotes) {
-        const noteData = activeNotes[noteName];
-        if (noteData.isBlack) continue;
-        drawNote(noteData, currentTime, canvasHeight, dpr, false);
-      }
-      
-      // Después notas negras del historial
-      noteHistory.forEach(noteData => {
-        if (!noteData.isBlack) return;
-        drawNote(noteData, currentTime, canvasHeight, dpr, true);
-      });
-      
-      // Finalmente notas negras activas
-      for (let noteName in activeNotes) {
-        const noteData = activeNotes[noteName];
-        if (!noteData.isBlack) continue;
-        drawNote(noteData, currentTime, canvasHeight, dpr, false);
-      }
-      
-      // Limpiar notas del historial que ya se desvanecieron
-      noteHistory = noteHistory.filter(note => {
-        const timeSinceRelease = currentTime - note.releaseTime;
-        return timeSinceRelease < fadeOutDuration;
-      });
-      
-      waterfallCtx.shadowBlur = 0;
-    }
-    
-    function drawNote(noteData, currentTime, canvasHeight, dpr, isHistory) {
-      const xPos = noteData.xPos;
-      const keyWidth = noteData.keyWidth;
-      
-      let height, yPosition, opacity;
-      
-      if (isHistory) {
-        // Nota liberada - altura fija con fade out
-        const duration = noteData.duration / 1000;
-        height = Math.min(duration * pixelsPerSecond, canvasHeight);
-        
-        const timeSinceRelease = currentTime - noteData.releaseTime;
-        const fadeProgress = timeSinceRelease / fadeOutDuration;
-        opacity = Math.max(0, 1 - fadeProgress);
-        
-        // Continúa subiendo mientras se desvanece
-       const scrollAmount = (timeSinceRelease / 1000) * pixelsPerSecond;
-        yPosition = canvasHeight - height - scrollAmount;
-        
-      } else {
-        // Nota activa - creciendo
-        const elapsedTime = (currentTime - noteData.startTime) / 1000;
-        height = Math.min(elapsedTime * pixelsPerSecond, canvasHeight);
-        yPosition = canvasHeight - height;
-        opacity = 1;
-      }
-      
-      if (yPosition + height < 0) return; // Fuera de la pantalla
-      
-      // Gradiente con opacidad
-      const gradient = waterfallCtx.createLinearGradient(
-        xPos * dpr, 
-        (yPosition + height) * dpr, 
-        xPos * dpr, 
-        yPosition * dpr
-      );
-      
-      const currentPalette = COLORS[currentColorKey];
 
-      if (noteData.isBlack) {
-        gradient.addColorStop(0, `rgba(${currentPalette.black}, ${0.9 * opacity})`);
-        gradient.addColorStop(1, `rgba(${currentPalette.black}, ${0.3 * opacity})`);
-        waterfallCtx.shadowColor = `rgba(${currentPalette.black}, ${0.7 * opacity})`;
-      } else {
-        gradient.addColorStop(0, `rgba(${currentPalette.white}, ${0.8 * opacity})`);
-        gradient.addColorStop(1, `rgba(${currentPalette.white}, ${0.2 * opacity})`);
-        waterfallCtx.shadowColor = `rgba(${currentPalette.white}, ${0.6 * opacity})`;
-      }
-      
-      waterfallCtx.fillStyle = gradient;
-      waterfallCtx.shadowBlur = 15 * dpr * opacity;
-      
-      waterfallCtx.fillRect(
-        (xPos - keyWidth / 2) * dpr,
-        yPosition * dpr,
-        keyWidth * dpr,
-        height * dpr
-      );
-    }
-    
-    // === ANIMACIÓN CONTINUA ===
-    function startWaterfallAnimation() {
-      function animate() {
-        drawWaterfall();
-        animationId = requestAnimationFrame(animate);
-      }
-      animate();
-    }
-    
-    // === TOCAR NOTA (NOTE ON) ===
-    function noteOn(noteName, source = 'click') {
-      // Solo crear si no existe ya
-      if (activeNotes[noteName]) return;
-      
-      // Activar sonido
-      sampler.triggerAttack(noteName);
-      
-      const keyElement = document.getElementById(noteName);
-      if (keyElement) {
-        keyElement.classList.add('active');
-      }
-
-      // --- NUEVO: Añadir etiqueta a la carcasa superior ---
-      const noteLabel = document.createElement('div');
-      noteLabel.className = 'casing-note-label'; // Usaremos una nueva clase
-      noteLabel.id = 'label-' + noteName; // ID único para encontrarlo y borrarlo
-      noteLabel.textContent = getNoteNameSimple(noteName);
-      
-      // Usamos la posición X pre-calculada de la tecla
-      const xPos = keyPositions[noteName]; 
-      noteLabel.style.left = `${xPos}px`;
-      
-      pianoTopCasing.appendChild(noteLabel);
-          
-
-      const isBlack = noteName.includes('#');
-      const keyWidth = isBlack ? blackKeyWidth - 2 : whiteKeyWidth - 2;
-      
-      activeNotes[noteName] = {
-        startTime: Date.now(),
-        xPos: xPos,
-        isBlack: isBlack,
-        keyWidth: keyWidth
-      };
-      
-      updateNoteDisplay();
-    }
-    
-    // === SOLTAR NOTA (NOTE OFF) ===
-    function noteOff(noteName, source = 'click') {
-      if (!activeNotes[noteName]) return;
-      
-      // Detener sonido
-      sampler.triggerRelease(noteName);
-      
-      const keyElement = document.getElementById(noteName);
-          if (keyElement) {
-            keyElement.classList.remove('active');
-          }
-
-          // --- NUEVO: Eliminar etiqueta de la carcasa ---
-          const existingLabel = document.getElementById('label-' + noteName);
-          if (existingLabel) {
-            existingLabel.remove();
-          }
-              
-      // Mover a historial con duración fija
-      const noteData = activeNotes[noteName];
-      noteData.releaseTime = Date.now();
-      noteData.duration = noteData.releaseTime - noteData.startTime;
-      
-      noteHistory.push(noteData);
-      delete activeNotes[noteName];
-      
-      updateNoteDisplay();
-    }
-    
-    // === MIDI INPUT ===
-    function initMidiInput() {
-      if (navigator.requestMIDIAccess) {
-        navigator.requestMIDIAccess()
-          .then(onMIDISuccess, onMIDIFailure);
-      }
-    }
-    
-    function onMIDISuccess(access) {
-      midiAccess = access;
-      
-      access.onstatechange = (event) => {
-        if (event.port.type === 'input') {
-          if (event.port.state === 'connected') {
-            event.port.onmidimessage = onMIDIMessage;
-            midiDeviceName.textContent = event.port.name;
-            midiStatus.classList.add('connected');
-            console.log(`🎹 MIDI conectado: ${event.port.name}`);
-          } else {
-            midiStatus.classList.remove('connected');
-          }
-        }
-      };
-      
-      const inputs = access.inputs.values();
-      for (const input of inputs) {
-        if (input.state === 'connected') {
-          input.onmidimessage = onMIDIMessage;
-          midiDeviceName.textContent = input.name;
-          midiStatus.classList.add('connected');
-        }
-      }
-    }
-    
-    function onMIDIFailure() {
-      console.warn('⚠️ No se pudo acceder a MIDI');
-    }
-    
-    function onMIDIMessage(event) {
-      const command = event.data[0];
-      const note = event.data[1];
-      const velocity = event.data.length > 2 ? event.data[2] : 0;
-      
-      const pitchName = midiNoteToPitchName(note);
-      
-      if (command === 144 && velocity > 0) {
-        // NOTE ON
-        noteOn(pitchName, 'MIDI');
-        highlightMidiKey(pitchName);
-      } else if (command === 128 || (command === 144 && velocity === 0)) {
-        // NOTE OFF
-        noteOff(pitchName, 'MIDI');
-        unhighlightMidiKey(pitchName);
-      }
-    }
-    
-    function midiNoteToPitchName(midiNote) {
-      const noteNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-      const octave = Math.floor(midiNote / 12) - 1;
-      const noteName = noteNames[midiNote % 12];
-      return noteName + octave;
-    }
-    
-    function highlightMidiKey(noteName) {
-      const el = document.getElementById(noteName);
-      if (el) el.classList.add('active');
-    }
-    
-    function unhighlightMidiKey(noteName) {
-      const el = document.getElementById(noteName);
-      if (el) el.classList.remove('active');
-    }
-    
-
-
-    // Mapeo de números MIDI a nombres de notas
-function getNoteNameSimple(noteName) {
-  return noteName.replace(/[0-9]/g, ''); // Quita el número de octava
-}
-
-// Calcular intervalo entre dos notas
-function getInterval(note1, note2) {
-  const intervals = ['Unison', 'Minor 2nd', 'Major 2nd', 'Minor 3rd', 
- 'Major 3rd', 'Perfect 4th', 'Tritone', 'Perfect 5th',
- 'Minor 6th', 'Major 6th', 'Minor 7th', 'Major 7th', 'Octave'];
-  
-  const midi1 = noteNameToMidi(note1);
-  const midi2 = noteNameToMidi(note2);
-  const semitones = Math.abs(midi2 - midi1) % 12;
-  
-  return intervals[semitones] || 'Interval';
-}
-
-// Convertir nombre de nota a MIDI
-function noteNameToMidi(noteName) {
-  const noteMap = { 'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 
-                    'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11 };
-  const match = noteName.match(/^([A-G]b?)(\d+)$/);
-  if (!match) return 0;
-  const [, note, octave] = match;
-  return (parseInt(octave) + 1) * 12 + noteMap[note];
-}
-
-// Detectar acorde
-function getChordName(notes) {
-  if (notes.length < 3) return null;
-
-  // 1. Obtener números MIDI y ordenarlos para encontrar el bajo
-  const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
-  
-  // 2. Obtener la nota más grave (el bajo)
-  const bassNoteMidi = midis[0];
-  const bassNoteName = NOTE_NAMES[bassNoteMidi % 12];
-  
-  // 3. Obtener "clases de nota" únicas (números 0-11)
-  // Esto maneja el "espaciamiento" (voicings) en diferentes octavas
-  const pitchClasses = [...new Set(midis.map(m => m % 12))];
-
-  // 4. Probar cada una de las 12 notas como posible tónica (root)
-  for (let i = 0; i < 12; i++) {
-    const potentialRoot = i;
-    
-    // 5. Calcular los intervalos desde esta tónica potencial
-    const intervals = pitchClasses
-      .map(pc => (pc - potentialRoot + 12) % 12) // (pc - root) mod 12
-      .sort((a, b) => a - b);
-    
-    // 6. Crear una "firma" (signature) de los intervalos (ej: "0,4,7")
-    const signature = intervals.join(',');
-    
-    // 7. Buscar esta firma en nuestro mapa de acordes
-    const chordInfo = CHORD_MAP[signature];
-    
-    if (chordInfo) {
-      // ¡Encontramos un acorde!
-      const rootNoteName = NOTE_NAMES[potentialRoot];
-      
-      // 8. Comprobar si es una inversión
-      if (rootNoteName === bassNoteName) {
-        // Posición fundamental (ej: C, E, G -> "C")
-        return rootNoteName + chordInfo.short;
-      } else {
-        // Inversión (ej: E, G, C -> "C/E")
-        return rootNoteName + chordInfo.short + '/' + bassNoteName;
-      }
-    }
-  }
-
-  // No se encontró ningún acorde conocido
-  return null;
-}
-
-// Actualizar el display
-function updateNoteDisplay() {
-  const noteText = document.getElementById('note-text');
-  const activeNoteNames = Object.keys(activeNotes);
-  
-  if (activeNoteNames.length === 0) {
-    noteText.textContent = '-';
-  } else if (activeNoteNames.length === 1) {
-    noteText.textContent = getNoteNameSimple(activeNoteNames[0]);
-  } else if (activeNoteNames.length === 2) {
-    const interval = getInterval(activeNoteNames[0], activeNoteNames[1]);
-    noteText.textContent = interval;
-  } else {
-    const chord = getChordName(activeNoteNames);
-    noteText.textContent = chord;
-  }
-
-  if (activeNoteNames.length > 0) {
-    drawNotesOnStaff(activeNoteNames);
-     } else {
-    clearStaff();
-    drawStaffLines();
-    drawClef(true); 
-    }
-}
-
-
-
-// === LÓGICA DE DIBUJO DEL PENTAGRAMA ===
-
-  function createSvgElement(name, attributes) {
-    const el = document.createElementNS(SVG_NAMESPACE, name);
-    for (let key in attributes) {
-      el.setAttribute(key, attributes[key]);
-    }
-    return el;
-  }
-
-  // Limpia el pentagrama
-  function clearStaff() {
-    staffSvg.innerHTML = '';
-  }
-
-  // Dibuja las 5 líneas del pentagrama
-  function drawStaffLines() {
-    for (let i = 0; i < 5; i++) {
-      const y = STAFF_Y_TOP + (i * STAFF_LINE_GAP);
-      const line = createSvgElement('line', {
-        x1: 10, y1: y, x2: 190, y2: y,
-        class: 'staff-line'
-      });
-      staffSvg.appendChild(line);
-    }
-  }
-
-  // Dibuja la clave (Sol o Fa)
-  function drawClef(isTreble) {
-    if (isTreble) {
-      // Clave de Sol 𝄞 (G-Clef)
-      const clef = createSvgElement('text', {
-        x: 15, y: STAFF_Y_TOP + STAFF_LINE_GAP * 3 + 4, // Centrada en la línea G4
-        class: 'clef'
-      });
-      clef.textContent = '𝄞';
-      staffSvg.appendChild(clef);
-    } else {
-      // Clave de Fa 𝄢 (F-Clef)
-      const clef = createSvgElement('text', {
-        x: 15, y: STAFF_Y_TOP + STAFF_LINE_GAP + 14, // Centrada en la línea F3
-        class: 'clef bass-clef'
-      });
-      clef.textContent = '𝄢';
-      staffSvg.appendChild(clef);
-    }
-  }
-
-  // Dibuja una sola nota en el pentagrama
-  function drawSingleNote(midi, xPos, isTreble) {
-    const octave = Math.floor(midi / 12) - 1;
-    const noteIndex = midi % 12;
-    const noteName = NOTE_NAMES[noteIndex];
-    const noteLetter = noteName[0];
-    const hasAccidental = noteName.includes('b');
-    
-let yBase, refMidi, refSteps;
-
-if (isTreble) {
-  // Treble: B4 está en la línea del medio (3era línea)
-  yBase = STAFF_Y_TOP + (STAFF_LINE_GAP * 2); // Línea del medio
-  refMidi = 71; // B4
-  refSteps = (4 * 7) + NOTE_STAFF_OFFSET['B'];
-} else {
-  // Bass: D3 está en la línea del medio (3era línea)
-  yBase = STAFF_Y_TOP + (STAFF_LINE_GAP * 2);
-  refMidi = 50; // D3
-  refSteps = (3 * 7) + NOTE_STAFF_OFFSET['D'];
-}
-
-const note_steps = (octave * 7) + NOTE_STAFF_OFFSET[noteLetter];
-const steps_from_ref = note_steps - refSteps;
-
-// Calcular Y: cada "paso" musical baja medio espacio (GAP/2)
-const y = yBase - (steps_from_ref * (STAFF_LINE_GAP / 2));
-    
-    // 3. Dibujar alteración (sostenido/bemol) si es necesario
-    if (hasAccidental) {
-      const accidental = createSvgElement('text', {
-        x: xPos - 28, // Un poco a la izquierda de la nota
-        y: y + 5, // Alinear verticalmente
-        class: 'note-accidental'
-      });
-      accidental.textContent = '♭';
-      staffSvg.appendChild(accidental);
-    }
-    
-    // 4. Dibujar la cabeza de la nota
-    const noteHead = createSvgElement('ellipse', {
-      cx: xPos, cy: y, rx: 7, ry: 5, // Óvalo
-      class: 'note-head'
-    });
-    staffSvg.appendChild(noteHead);
-    
-    // 5. Dibujar líneas adicionales (ledger lines)
-    // Si está por encima de F5 (y=20) o por debajo de E4 (y=60) en Clave de Sol
-    const trebleTopLineY = STAFF_Y_TOP; // F5
-    const trebleBottomLineY = STAFF_Y_TOP + (STAFF_LINE_GAP * 4); // E4
-    
-    // Líneas adicionales abajo (C4, A3, etc.)
-    for (let yLedger = trebleBottomLineY + STAFF_LINE_GAP; yLedger <= y; yLedger += STAFF_LINE_GAP) {
-      drawLedgerLine(xPos, yLedger);
-    }
-    // Líneas adicionales arriba (A5, C6, etc.)
-    for (let yLedger = trebleTopLineY - STAFF_LINE_GAP; yLedger >= y; yLedger -= STAFF_LINE_GAP) {
-      drawLedgerLine(xPos, yLedger);
-    }
-  }
-
-  function drawLedgerLine(x, y) {
-    const line = createSvgElement('line', {
-      x1: x - 12, y1: y, x2: x + 12, y2: y, // Corta
-      class: 'ledger-line'
-    });
-    staffSvg.appendChild(line);
-  }
-
-  // Función principal que orquesta el dibujo
-  function drawNotesOnStaff(notes) {
-    clearStaff();
-    drawStaffLines();
-
-    const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
-    if (midis.length === 0) return;
-
-    // Decidir la clave: Si la nota MÁS BAJA es C4 (60) o más, usa Clave de Sol.
-    // Si es B3 (59) o menos, usa Clave de Fa.
-    const lowestMidi = midis[0];
-    const useTrebleClef = lowestMidi >= 60; 
-    
-    drawClef(useTrebleClef);
-    
-let xPos = 90; // Posición X inicial para la primera nota
-
-midis.forEach((midi, index) => {
-  // Calcular si esta nota necesita desfase (es una 2da respecto a la anterior)
-  let needsOffset = false;
-  
-  if (index > 0) {
-    const prevMidi = midis[index - 1];
-    const interval = Math.abs(midi - prevMidi);
-    
-    // Si es una 2da (1 o 2 semitonos), esta nota se desfasa
-    if (interval === 1 || interval === 2) {
-      needsOffset = true;
-    }
-  }
-  
-  // Dibujar la nota en xPos base o con offset
-  const noteXPos = needsOffset ? xPos - 12 : xPos;
-  drawSingleNote(midi, noteXPos, useTrebleClef);
-});
-  }
-    
-    function showKeyNamesOnPiano() {
-      const whiteKeys = document.querySelectorAll('.key.white');
-      whiteKeys.forEach(key => {
-        const nameElement = document.createElement('div');
-        nameElement.className = 'key-name';
-        nameElement.textContent = key.dataset.note;
-        key.appendChild(nameElement);
-      });
-    }
-    
-    function hideKeyNamesOnPiano() {
-      const keyNames = document.querySelectorAll('.key-name');
-      keyNames.forEach(el => el.remove());
-    }
-    
-    // === EVENT LISTENERS ===
-    function addEventListeners() {
-      // Mouse down/up en teclas
-      pianoKeys.addEventListener('mousedown', async (e) => {
-        await Tone.start();
-        if (e.target.classList.contains('key')) {
-          const noteName = e.target.dataset.note;
-          noteOn(noteName, 'mouse');
-        }
-      });
-      
-      pianoKeys.addEventListener('mouseup', (e) => {
-        if (e.target.classList.contains('key')) {
-          const noteName = e.target.dataset.note;
-          noteOff(noteName, 'mouse');
-        }
-      });
-      
-      // Soltar mouse fuera del piano
-      document.addEventListener('mouseup', () => {
-        // Liberar todas las notas activas del mouse
-        for (let noteName in activeNotes) {
-          noteOff(noteName, 'mouse-release');
-        }
-      });
-
-
-     colorChangeBtn.addEventListener('click', () => {
-      let newColorKey = 'blue'; // Almacena la *próxima* clave de color
-
-      // Determina el siguiente color
-      if (currentColorKey === 'blue') {
-        newColorKey = 'orange';
-      } else if (currentColorKey === 'orange') {
-        newColorKey = 'red';
-      } else {
-        newColorKey = 'blue';
-      }
-
-      // 1. Actualiza la clase del body para cambiar el CSS
-      document.body.classList.remove('theme-blue', 'theme-orange', 'theme-red');
-      document.body.classList.add('theme-' + newColorKey);
-
-      // 2. Actualiza la variable de JS (para el waterfall)
-      currentColorKey = newColorKey;
-
-      // 3. Actualiza el texto del botón
-      const colorName = COLORS[currentColorKey].name;
-      colorChangeBtn.querySelector('span').textContent = colorName;
-    });
-      
-
-      
-      // Redimensionar
-      window.addEventListener('resize', () => {
-        updateKeyDimensions();
-        resizeWaterfallCanvas();
-      });
-      
-
-      const keyMap = {
-          'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4',
-          'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4',
-          'u': 'Bb4', 'j': 'B4', 'k': 'C5', 'o': 'Db5', 'l': 'D5'
+    function recalcKeyMetrics() {
+      const keys = document.querySelectorAll('.key');
+      // Necesitamos la posición relativa al canvas/pantalla
+      // El canvas empieza en top:0, height: 100% - pianoHeight
+      keys.forEach(k => {
+        const rect = k.getBoundingClientRect();
+        const note = k.dataset.note;
+        keyMetrics[note] = {
+          x: rect.left + (rect.width / 2), // Centro de la tecla
+          w: rect.width,
+          isBlack: k.classList.contains('black')
         };
-      
-      const keysPressed = {};
-      
-      document.addEventListener('keydown', async (e) => {
-        if (keysPressed[e.key]) return; // Evitar repetición
-        
-        await Tone.start();
-        if (keyMap[e.key]) {
-          keysPressed[e.key] = true;
-          noteOn(keyMap[e.key], 'keyboard');
-        }
-      });
-      
-      document.addEventListener('keyup', (e) => {
-        if (keyMap[e.key]) {
-          keysPressed[e.key] = false;
-          noteOff(keyMap[e.key], 'keyboard');
-        }
       });
     }
+
+    // ==========================================
+    // PENTAGRAMA SVG (Lógica Original Restaurada)
+    // ==========================================
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const NOTE_STAFF_OFFSET = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+
+    function createSvgElement(name, attributes) {
+      const el = document.createElementNS(SVG_NS, name);
+      for (let key in attributes) el.setAttribute(key, attributes[key]);
+      return el;
+    }
+
+    function drawStaff(activeNotes) {
+      const svg = els.staffSvg;
+      svg.innerHTML = '';
+      
+      // 1. Dibujar líneas (Igual que antes)
+      for (let i = 0; i < 5; i++) {
+        const y = CONFIG.staffYTop + (i * CONFIG.staffLineGap);
+        const line = createSvgElement('line', {
+          x1: 10, y1: y, x2: 210, y2: y,
+          class: 'staff-line'
+        });
+        svg.appendChild(line);
+      }
+
+      if (activeNotes.length === 0) {
+          drawClef(true, svg); 
+          return;
+      }
+
+      // 2. Determinar Clave (Igual que antes)
+      const midis = activeNotes.map(noteNameToMidi).sort((a, b) => a - b);
+      const lowestMidi = midis[0];
+      const useTreble = lowestMidi >= 60; 
+
+      drawClef(useTreble, svg);
+
+      // 3. Dibujar Notas (MODIFICADO)
+      // Definimos una posición X fija en el centro del contenedor (aprox 110px)
+      const baseX = 100; 
+      
+      // Rastrear si la nota anterior fue desplazada para manejar clusters (ej: Do-Re-Mi)
+      let lastWasShifted = false;
+
+      midis.forEach((midi, index) => {
+        let shiftRight = false;
+        
+        // Detectar intervalos de 2da (choque visual)
+        if (index > 0) {
+          const prevMidi = midis[index - 1];
+          // Si la distancia es de 1 o 2 semitonos
+          if (Math.abs(midi - prevMidi) <= 2) {
+             // Si la anterior NO se movió a la derecha, movemos esta.
+             // Si la anterior SÍ se movió, esta se queda a la izquierda (alternancia)
+             if (!lastWasShifted) {
+                 shiftRight = true;
+             }
+          }
+        }
+        
+        // Si hay conflicto (2da), la movemos 14px a la derecha, si no, se queda en la base
+        const drawX = shiftRight ? baseX + 14 : baseX; 
+        
+        drawSingleNote(midi, drawX, useTreble, svg);
+        
+        // Actualizamos el estado para la siguiente iteración
+        lastWasShifted = shiftRight;
+        
+        // NOTA: Eliminamos la línea 'xPos += 25' para que no avancen horizontalmente
+      });
+    }
+
+    function drawClef(isTreble, svg) {
+        const clef = createSvgElement('text', {
+            x: 10, 
+            y: isTreble ? CONFIG.staffYTop + 34 : CONFIG.staffYTop + 24,
+            class: isTreble ? 'clef' : 'clef bass-clef'
+        });
+        clef.textContent = isTreble ? '𝄞' : '𝄢';
+        svg.appendChild(clef);
+    }
+
+    function drawSingleNote(midi, x, isTreble, svg) {
+        const octave = Math.floor(midi / 12) - 1;
+        const noteIndex = midi % 12;
+        const noteName = NOTE_NAMES[noteIndex];
+        const noteLetter = noteName[0];
+        const hasAccidental = noteName.includes('b') || noteName.includes('#'); // Simplificado
+
+        let refMidi, refSteps;
+        // Calcular posición Y relativa a una nota de referencia
+        if (isTreble) {
+            // B4 (71) está en la línea del medio
+            refMidi = 71; 
+            refSteps = (4 * 7) + NOTE_STAFF_OFFSET['B'];
+        } else {
+            // D3 (50) está en la línea del medio
+            refMidi = 50;
+            refSteps = (3 * 7) + NOTE_STAFF_OFFSET['D'];
+        }
+
+        const noteSteps = (octave * 7) + NOTE_STAFF_OFFSET[noteLetter];
+        const stepsFromRef = noteSteps - refSteps;
+        // Cada paso es medio gap (5px)
+        const yBase = CONFIG.staffYTop + (CONFIG.staffLineGap * 2);
+        const y = yBase - (stepsFromRef * (CONFIG.staffLineGap / 2));
+
+        // Alteraciones
+        if (hasAccidental) {
+            const acc = createSvgElement('text', {
+                x: x - 22, y: y + 5, class: 'note-accidental'
+            });
+            acc.textContent = '♭'; // Usaremos bemol genérico para visualización
+            svg.appendChild(acc);
+        }
+
+        // Cabeza
+        const head = createSvgElement('ellipse', {
+            cx: x, cy: y, rx: 6.5, ry: 5, class: 'note-head'
+        });
+        svg.appendChild(head);
+
+        // Líneas Adicionales (Ledger Lines)
+        // Top Line = staffYTop (F5 en Sol, A3 en Fa)
+        // Bottom Line = staffYTop + 40 (E4 en Sol, G2 en Fa)
+        const topY = CONFIG.staffYTop;
+        const botY = CONFIG.staffYTop + (CONFIG.staffLineGap * 4);
+
+        // Arriba
+        for(let ly = topY - CONFIG.staffLineGap; ly >= y; ly -= CONFIG.staffLineGap) {
+            drawLedgerLine(x, ly, svg);
+        }
+        // Abajo
+        for(let ly = botY + CONFIG.staffLineGap; ly <= y; ly += CONFIG.staffLineGap) {
+            drawLedgerLine(x, ly, svg);
+        }
+    }
+
+    function drawLedgerLine(x, y, svg) {
+        const line = createSvgElement('line', {
+            x1: x - 10, y1: y, x2: x + 10, y2: y, class: 'ledger-line'
+        });
+        svg.appendChild(line);
+    }
+
+
+    // ==========================================
+    // CANVAS & VISUALES
+    // ==========================================
+    function loop() {
+      const ctx = els.ctx;
+      const canvas = els.canvas;
+      const now = Date.now();
+      const dpr = window.devicePixelRatio || 1;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const height = canvas.height / dpr;
+
+      // Limpieza historial
+      state.history = state.history.filter(n => (now - n.releaseTime) < CONFIG.fadeOutTime);
+      
+      // Dibujar Notas
+      [...state.history, ...Object.values(state.activeNotes)].forEach(note => {
+        const isAlive = !note.releaseTime;
+        let y, h;
+        const age = (now - note.startTime) / 1000;
+        
+        if (isAlive) {
+          h = age * CONFIG.pixelsPerSecond;
+          y = height - h;
+        } else {
+          const releaseAge = (now - note.releaseTime) / 1000;
+          const duration = (note.releaseTime - note.startTime) / 1000;
+          h = duration * CONFIG.pixelsPerSecond;
+          y = height - h - (releaseAge * CONFIG.pixelsPerSecond);
+        }
+        
+        const m = keyMetrics[note.id];
+        if (!m) return;
+
+        const x = (m.x * dpr) - ((m.w * dpr) / 2); // Ajustar centro a esquina izq
+        const w = (m.w * dpr);
+
+        const theme = THEMES[state.currentTheme];
+        const opacity = isAlive ? 1 : 1 - ((now - note.releaseTime) / CONFIG.fadeOutTime);
+        const velocityFactor = 0.5 + (note.velocity * 0.5);
+        
+        ctx.fillStyle = note.isBlack 
+          ? theme.main 
+          : hexToRgba(theme.main, opacity * velocityFactor);
+          
+        ctx.shadowBlur = isAlive ? 15 * velocityFactor : 0;
+        ctx.shadowColor = theme.glow;
+        
+        roundRect(ctx, x, y * dpr, w, h * dpr, 4 * dpr);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      updateAndDrawParticles(ctx, dpr);
+      requestAnimationFrame(loop);
+    }
+
+    function updateAndDrawParticles(ctx, dpr) {
+        const theme = THEMES[state.currentTheme];
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+            let p = state.particles[i];
+            p.life -= 0.03;
+            p.x += p.vx * dpr;
+            p.y += p.vy * dpr;
+            p.vy += 0.3;
+            if (p.life <= 0) { state.particles.splice(i, 1); continue; }
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * dpr, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    // ==========================================
+    // CORE ENGINE
+    // ==========================================
+    function triggerNoteOn(noteName, velocity = 0.7) {
+      if (state.activeNotes[noteName]) return;
+
+      if (sampler) sampler.triggerAttack(noteName, Tone.now(), velocity);
+
+      const domKey = document.getElementById(`key-${noteName}`);
+      if (domKey) domKey.classList.add('active');
+      
+      // Crear etiqueta flotante
+      createFloatingLabel(noteName);
+
+      const theme = THEMES[state.currentTheme];
+      document.documentElement.style.setProperty('--primary-color', theme.main);
+      document.documentElement.style.setProperty('--primary-glow', theme.glow);
+
+      state.activeNotes[noteName] = {
+        id: noteName,
+        startTime: Date.now(),
+        velocity: velocity,
+        isBlack: noteName.includes('b') || noteName.includes('#')
+      };
+
+      spawnParticles(noteName, velocity);
+      updateMusicalDisplays();
+    }
+
+    function triggerNoteOff(noteName) {
+      if (!state.activeNotes[noteName]) return;
+
+      if (sampler) sampler.triggerRelease(noteName);
+
+      const domKey = document.getElementById(`key-${noteName}`);
+      if (domKey) domKey.classList.remove('active');
+
+      removeFloatingLabel(noteName);
+
+      const note = state.activeNotes[noteName];
+      note.releaseTime = Date.now();
+      state.history.push(note);
+      
+      delete state.activeNotes[noteName];
+      updateMusicalDisplays();
+    }
+
+    // Etiquetas flotantes sobre la carcasa
+    function createFloatingLabel(noteName) {
+        const m = keyMetrics[noteName];
+        if(!m) return;
+        
+        const lbl = document.createElement('div');
+        lbl.className = 'casing-note-label';
+        lbl.id = `lbl-${noteName}`;
+        lbl.innerText = getNoteNameSimple(noteName);
+        lbl.style.left = `${m.x}px`; // Posición X absoluta calculada
+        els.casing.appendChild(lbl);
+    }
+    
+    function removeFloatingLabel(noteName) {
+        const lbl = document.getElementById(`lbl-${noteName}`);
+        if(lbl) lbl.remove();
+    }
+
+    function spawnParticles(noteId, velocity) {
+      const m = keyMetrics[noteId];
+      if (!m) return;
+      const dpr = window.devicePixelRatio || 1;
+      const count = Math.floor(4 + (velocity * 6));
+      const theme = THEMES[state.currentTheme];
+      // Centro de la tecla en coordenadas de canvas
+      const centerX = (m.x * dpr); 
+      const startY = els.canvas.height;
+
+      for (let i = 0; i < count; i++) {
+        state.particles.push({
+          x: centerX + (Math.random() * m.w * dpr - (m.w * dpr / 2)),
+          y: startY - (Math.random() * 10),
+          vx: (Math.random() - 0.5) * 4,
+          vy: -(Math.random() * 6 + 4),
+          life: 1.0,
+          size: Math.random() * 3 + 1,
+          color: Math.random() > 0.5 ? theme.main : '#ffffff'
+        });
+      }
+    }
+
+    // ==========================================
+    // HELPERS & SETUP
+    // ==========================================
+    function initAudio() {
+      sampler = new Tone.Sampler({
+        urls: { A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3", A7: "A7.mp3", C8: "C8.mp3" },
+        release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/"
+      }).toDestination();
+    }
+
+    function initMIDI() {
+      if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess().then(midi => {
+          for (let input of midi.inputs.values()) { input.onmidimessage = onMIDIMessage; setMidiStatus(input.name); }
+          midi.onstatechange = (e) => { if (e.port.type === 'input' && e.port.state === 'connected') { e.port.onmidimessage = onMIDIMessage; setMidiStatus(e.port.name); } };
+        });
+      }
+    }
+
+    function onMIDIMessage(msg) {
+      const [cmd, note, vel] = msg.data;
+      const command = cmd >> 4;
+      if (command === 9 && vel > 0) triggerNoteOn(midiToNote(note), vel/127);
+      else if (command === 8 || (command === 9 && vel === 0)) triggerNoteOff(midiToNote(note));
+      else if (command === 11 && note === 64) handleSustain(vel > 63);
+    }
+
+    function midiToNote(midi) {
+        const notes = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+        return notes[midi % 12] + (Math.floor(midi / 12) - 1);
+    }
+    
+    function handleSustain(isActive) {
+        state.sustain = isActive;
+        isActive ? els.pedalIndicator.classList.add('active') : els.pedalIndicator.classList.remove('active');
+    }
+
+    function setMidiStatus(name) {
+        document.getElementById('midi-device-name').innerText = name;
+        document.getElementById('midi-info').classList.add('active');
+    }
+
+    function setupUI() {
+      document.getElementById('settings-btn').onclick = () => els.settingsMenu.classList.toggle('open');
+      document.querySelectorAll('.dot').forEach(d => {
+        d.onclick = (e) => {
+          document.querySelectorAll('.dot').forEach(x => x.classList.remove('active'));
+          e.target.classList.add('active');
+          state.currentTheme = e.target.dataset.color;
+        }
+      });
+      document.getElementById('toggle-labels').onchange = (e) => els.keysContainer.classList.toggle('hide-labels', !e.target.checked);
+      document.getElementById('toggle-staff').onchange = (e) => els.staffContainer.classList.toggle('hidden', !e.target.checked);
+    }
+
+    function setupKeyboardInput() {
+        const keyMap = { 'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4', 'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4', 'u': 'Bb4', 'j': 'B4', 'k': 'C5' };
+        document.addEventListener('keydown', async (e) => { if (!e.repeat && keyMap[e.key]) { await Tone.start(); triggerNoteOn(keyMap[e.key], 0.8); } });
+        document.addEventListener('keyup', (e) => { if (keyMap[e.key]) triggerNoteOff(keyMap[e.key]); });
+    }
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      els.canvas.width = els.canvas.clientWidth * dpr;
+      els.canvas.height = els.canvas.clientHeight * dpr;
+    }
+    
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2; if (h < 0) { h = Math.abs(h); y -= h; }
+      ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+
+    // Iniciar
+    init();
   </script>
 </body>
 </html>
