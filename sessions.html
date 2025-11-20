@@ -12,9 +12,9 @@
     
     <style>
         :root {
-            --primary-color: #FF4757; /* Color tipo Superprof (Rojo/Coral) para resaltar */
+            --primary-color: #FF4757;
             --primary-hover: #ff6b81;
-            --secondary-color: #2ed573; /* Verde para precios/éxito */
+            --secondary-color: #2ed573;
             --text-dark: #2f3542;
             --text-light: #747d8c;
             --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
@@ -34,45 +34,7 @@
 
         .container { max-width: 1200px; margin: 0 auto; }
 
-        /* --- HEADER --- */
-        .header { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 20px 30px; 
-            margin-bottom: 30px; 
-            box-shadow: var(--card-shadow); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 20px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .header-brand { display: flex; align-items: center; gap: 15px; }
-        .header-icon { 
-            width: 50px; height: 50px; 
-            background: var(--primary-color); 
-            border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            color: white; font-size: 22px; 
-        }
-        .header-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-        .header-text p { color: var(--text-light); font-size: 14px; }
-
-        .search-container { flex-grow: 1; max-width: 500px; position: relative; }
-        .search-input { 
-            width: 100%; 
-            padding: 14px 20px 14px 45px; 
-            border-radius: 50px; 
-            border: 1px solid #dfe4ea; 
-            background: #f1f2f6;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-        .search-input:focus { outline: none; background: white; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
-        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #a4b0be; }
-
-        /* --- NUEVO BANNER DE SERVICIO (estilo user) --- */
+        /* --- HEADER & BANNER --- */
         .service-banner {
             width: 100%;
             position: relative;
@@ -90,32 +52,26 @@
         }
         .service-banner-text {
             position: absolute;
-            top: 40%; /* Ajustado para dejar espacio al header */
+            top: 40%;
             left: 6%;
-            -ms-transform: translateY(-50%);
-            -webkit-transform: translateY(-50%);
-            -moz-transform: translateY(-50%);
-            -o-transform: translateY(-50%);
             transform: translateY(-50%);
-            z-index: 5; /* Para estar sobre la imagen */
+            z-index: 5;
         }
         .service-banner-text strong {
-            font-family: 'Inter', sans-serif; /* Mantenemos la fuente */
-            font-size: 48px; /* Tamaño adaptado */
+            font-family: 'Inter', sans-serif;
+            font-size: 48px;
             line-height: 1.2;
             font-weight: 800;
             color: #fff;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         .service-banner-text strong span {
-            font-family: 'Inter', sans-serif;
             font-size: 32px;
             font-weight: 400;
             letter-spacing: 1px;
             display: block;
         }
         .service-banner-text p {
-            font-family: 'Inter', sans-serif;
             font-size: 18px;
             line-height: 1.6;
             color: #fff;
@@ -124,20 +80,16 @@
             max-width: 500px;
         }
 
-        /* --- Modificación del HEADER --- */
         .header { 
             position: absolute;
             bottom: 20px;
             left: 20px;
             right: 20px;
-            width: auto; /* Para que se ajuste al left/right */
-            
-            background: rgba(255, 255, 255, 0.9); /* Fondo semi-transparente */
-            backdrop-filter: blur(8px); /* Efecto glass */
-            
-            border-radius: 12px; /* Radio más pequeño */
-            padding: 15px 25px; /* Padding ajustado */
-            margin-bottom: 0; /* Quitar margen */
+            width: auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 15px 25px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
             display: flex; 
             justify-content: space-between; 
@@ -147,12 +99,31 @@
             border: 1px solid rgba(255,255,255,0.2);
             z-index: 10;
         }
-        .header-brand { gap: 12px; }
-        .header-icon { width: 45px; height: 45px; font-size: 20px; }
-        .header-text h1 { font-size: 20px; }
-        .header-text p { font-size: 13px; }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-icon { 
+            width: 45px; height: 45px; 
+            background: var(--primary-color); 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+        }
+        .header-text h1 { font-size: 20px; font-weight: 700; }
+        .header-text p { color: var(--text-light); font-size: 13px; }
 
-        /* --- LAYOUT GRID --- */
+        .search-container { flex-grow: 1; max-width: 500px; position: relative; }
+        .search-input { 
+            width: 100%; 
+            padding: 14px 20px 14px 45px; 
+            border-radius: 50px; 
+            border: 1px solid #dfe4ea; 
+            background: #f1f2f6;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .search-input:focus { outline: none; background: white; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #a4b0be; }
+
+        /* --- LAYOUT --- */
         .main-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
@@ -160,7 +131,6 @@
             align-items: flex-start;
         }
 
-        /* --- SIDEBAR FILTERS --- */
         .filters-panel {
             background: white;
             padding: 25px;
@@ -171,24 +141,21 @@
         }
         .filters-panel h3 { font-size: 18px; margin-bottom: 20px; font-weight: 700; }
         .filter-group { margin-bottom: 25px; }
-        .filter-label { font-weight: 600; font-size: 13px; color: var(--text-dark); display: block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-label { font-weight: 600; font-size: 13px; color: var(--text-dark); display: block; margin-bottom: 10px; text-transform: uppercase; }
         .filter-select { 
             width: 100%; padding: 12px; 
             border: 1px solid #dfe4ea; border-radius: 8px; 
             background: #fff; font-size: 14px; color: var(--text-dark); 
             cursor: pointer;
         }
-        .filter-select:focus { border-color: var(--primary-color); outline: none; }
 
-        /* --- TEACHERS GRID --- */
+        /* --- CARDS --- */
         .teachers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         
-        /* --- TEACHER CARD --- */
         .teacher-card {
             background: white;
             border-radius: 16px;
             box-shadow: var(--card-shadow);
-            overflow: hidden;
             transition: all 0.3s ease;
             border: 1px solid rgba(0,0,0,0.03);
             position: relative;
@@ -197,7 +164,6 @@
         }
         .teacher-card:hover { transform: translateY(-5px); box-shadow: var(--card-hover); }
         
-        /* Encabezado de la tarjeta con foto */
         .card-header {
             padding: 20px;
             display: flex;
@@ -213,10 +179,17 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
         .teacher-basics h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .teacher-specialty {
+    color: #2f3542; /* Usamos el color rojo/rosa para destacar */
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px; /* Espacio antes del rating */
+    display: block;
+}
         .teacher-rating { color: #ffa502; font-size: 13px; font-weight: 600; }
-        .review-count { color: var(--text-light); font-weight: 400; font-size: 12px; }
-
-        /* Cuerpo de la tarjeta */
+        
         .card-body { padding: 20px; flex-grow: 1; }
         .teacher-headline { 
             font-size: 14px; color: var(--text-dark); 
@@ -232,7 +205,6 @@
         }
         .tag.lang { background: #e3f2fd; color: #2196f3; }
 
-        /* Pie de la tarjeta (Precio y Acción) */
         .card-footer {
             padding: 15px 20px;
             background: #fafbfc;
@@ -241,8 +213,7 @@
             align-items: center;
             border-top: 1px solid #f1f2f6;
         }
-        .price-info { display: flex; flex-direction: column; }
-        .price-amount { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .price-amount { font-size: 18px; font-weight: 700; }
         .price-label { font-size: 11px; color: var(--text-light); }
         
         .btn-profile {
@@ -254,11 +225,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
-            font-size: 13px;
         }
         .btn-profile:hover { background: var(--primary-color); color: white; }
-
-        /* --- SUPER TEACHER BADGE --- */
         .super-badge {
             position: absolute; top: 15px; right: 15px;
             background: #fffa65; color: #4b4b4b;
@@ -268,7 +236,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- MODAL (Estilo similar al tuyo) --- */
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
@@ -286,23 +254,69 @@
         }
         .modal-overlay.active .modal-card { transform: translateY(0); }
         
-        /* Modal Layout */
         .modal-grid { display: grid; grid-template-columns: 1fr 300px; }
         .modal-content { padding: 30px; }
         .modal-sidebar { background: #f8f9fa; padding: 30px; border-left: 1px solid #eee; }
 
-        .video-placeholder {
+        /* --- VIDEO --- */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            background: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .video-wrapper iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .no-video-placeholder {
             width: 100%; height: 250px;
-            background: #000; border-radius: 12px;
-            margin-bottom: 20px; position: relative;
+            background: #eee; border-radius: 12px;
+            margin-bottom: 20px;
             display: flex; align-items: center; justify-content: center;
-            color: white; flex-direction: column; gap: 10px; cursor: pointer;
+            color: #888; flex-direction: column; gap: 10px;
         }
-        .play-btn { 
-            width: 60px; height: 60px; background: var(--primary-color); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; box-shadow: 0 0 0 10px rgba(255, 71, 87, 0.3);
+
+        /* --- REDES SOCIALES & CERTIFICACIONES --- */
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
         }
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        /* Colores de marcas */
+        .social-btn.spotify { background: #1DB954; }
+        .social-btn.linkedin { background: #0077b5; }
+        .social-btn.youtube { background: #FF0000; }
+        .social-btn.instagram { background: #C13584; }
+        .social-btn.soundcloud { background: #ff5500; }
+        
+        /* COLOR DORADO PARA CERTIFICACIONES */
+        .social-btn.certificate { 
+            background: #f1c40f; 
+            color: #fff;
+            border: 2px solid #f39c12; /* Borde un poco más oscuro */
+        }
+
 
         .booking-btn {
             width: 100%; background: var(--primary-color); color: white;
@@ -312,80 +326,22 @@
         }
         .booking-btn:hover { background: var(--primary-hover); transform: scale(1.02); }
 
+        /* RESPONSIVE */
         @media (max-width: 768px) {
             .main-layout { grid-template-columns: 1fr; }
-            .filters-panel { display: none; } /* Ocultar filtros en móvil por simplicidad, o hacer colapsables */
+            .filters-panel { display: none; } 
             .modal-grid { grid-template-columns: 1fr; }
             .modal-sidebar { border-left: none; border-top: 1px solid #eee; }
         }
-
-        /* --- Media Queries para el Banner (del ejemplo) --- */
-        @media (min-width: 992px) and (max-width: 1199px) {
-            .service-banner-text strong { font-size: 42px; }
-            .service-banner-text strong span { font-size: 28px; }
-            .service-banner-text p { font-size: 16px; }
-        }
-
         @media only screen and (max-width: 991px) {
-            .service-banner-text strong { font-size: 32px; line-height: 1.3; }
-            .service-banner-text strong span { font-size: 24px; }
-            .service-banner-text p { font-size: 14px; }
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 20px;
-            }
-        }
-        @media only screen and (max-width: 767px) {
-            .service-banner-img {
-                min-height: 350px;
-                object-fit: cover;
-            }
-            .service-banner-text {
-                top: 35%; /* Subimos el texto */
-                left: 4%;
-                right: 4%;
-                width: 92%;
-            }
-             .header {
-                position: relative; /* Lo sacamos del position absolute */
-                width: 95%;
-                margin: -50px auto 0 auto; /* Lo montamos sobre la imagen */
-                bottom: auto;
-                left: auto;
-                right: auto;
-            }
-            .main-layout { margin-top: 20px; } /* Añadimos margen */
+            .service-banner-text strong { font-size: 32px; }
+            .header { flex-direction: column; position: relative; margin: -50px auto 0 auto; bottom: auto; width: 95%; }
         }
         @media only screen and (max-width: 575px) {
-            .service-banner-text strong {
-                background: rgba(0, 0, 0, 0.6);
-                padding: 10px;
-                width: 100%;
-                display: block;
-                border-radius: 8px;
-            }
-            .service-banner-img { min-height: 300px; }
-             .header {
-                width: 100%;
-                margin: 0;
-                border-radius: 0;
-                border: none;
-                box-shadow: var(--card-shadow);
-            }
-            .service-banner { 
-                border-radius: 0; /* Quitamos borde en móvil */
-                margin-bottom: 0;
-            }
-            body { padding: 0; } /* Ajustamos padding del body */
+            .header { width: 100%; margin: 0; border-radius: 0; }
+            .service-banner { border-radius: 0; }
+            body { padding: 0; }
             .main-layout { margin-top: 20px; padding: 0 15px; }
-        }
-        @media only screen and (max-width: 480px) {
-            .service-banner-text strong span { font-size: 20px; }
-            .service-banner-text { left: 4%; }
-            .header { padding: 15px; }
-            .header-brand { flex-direction: column; text-align: center; gap: 8px; }
-            .search-container { width: 100%; }
         }
     </style>
 </head>
@@ -393,25 +349,15 @@
 
     <div class="container">
         
-        <!-- INICIO NUEVA ESTRUCTURA BANNER + HEADER -->
         <section class="service-banner">
-            
-            <!-- Imagen de fondo -->
-            <img src="https://lh3.googleusercontent.com/d/1H9xdzo04g5JNch0ffrFFL0lIm8AlxEJ5" alt="Clases de piano online" class="service-banner-img">
-
-            <!-- Texto del banner (adaptado del ejemplo) -->
+            <img src="https://lh3.googleusercontent.com/d/1HkLlP6R7GHcN0bpuurNEVDq_bctEx8Ht" alt="Clases de piano online" class="service-banner-img">
             <div class="service-banner-text">
                 <strong>
                     <span>Clases 1-a-1</span>
                     Tu Profesor Personal
                 </strong>
-                <p>
-                    Elige un profesor verificado de cualquier parte del mundo. <br>
-                    Conéctate en vivo en nuestra sala virtual.
-                </p>
+                <p>Elige un profesor verificado. Conéctate en vivo.</p>
             </div>
-
-            <!-- Header (movido aquí) -->
             <header class="header">
                 <div class="header-brand">
                     <div class="header-icon"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -426,17 +372,10 @@
                 </div>
             </header>
         </section>
-        <!-- FIN NUEVA ESTRUCTURA -->
-
-
-        <!-- ELIMINADO EL ANTIGUO BANNER DE SERVICIO -->
-
 
         <div class="main-layout">
-            <!-- SIDEBAR FILTERS -->
             <aside class="filters-panel">
                 <h3>Filtrar Resultados</h3>
-                
                 <div class="filter-group">
                     <label class="filter-label">Especialidad</label>
                     <select class="filter-select" ng-model="filters.specialty">
@@ -447,7 +386,6 @@
                         <option value="Niños">Iniciación Niños</option>
                     </select>
                 </div>
-
                 <div class="filter-group">
                     <label class="filter-label">Idioma</label>
                     <select class="filter-select" ng-model="filters.language">
@@ -457,7 +395,6 @@
                         <option value="Francés">Francés</option>
                     </select>
                 </div>
-
                 <div class="filter-group">
                     <label class="filter-label">Precio Máximo (USD)</label>
                     <select class="filter-select" ng-model="filters.priceMax">
@@ -469,33 +406,28 @@
                 </div>
             </aside>
 
-            <!-- TEACHERS GRID -->
             <main class="teachers-grid">
                 <div class="teacher-card" ng-repeat="teacher in teachers | filter:customFilter | orderBy:'price'">
-                    
-                    <div class="super-badge" ng-if="teacher.superProf">
-                        <i class="fas fa-medal"></i> Super Teacher
-                    </div>
-
+                    <div class="super-badge" ng-if="teacher.superProf"><i class="fas fa-medal"></i> Super Teacher</div>
                     <div class="card-header">
                         <img ng-src="{{teacher.photo}}" alt="{{teacher.name}}" class="teacher-avatar">
                         <div class="teacher-basics">
                             <h2>{{teacher.name}}</h2>
+                            
                             <div class="teacher-rating">
                                 <i class="fas fa-star"></i> {{teacher.rating}}
                                 <span class="review-count">({{teacher.reviews}} reseñas)</span>
                             </div>
                         </div>
                     </div>
-
                     <div class="card-body">
+
                         <div class="tags-container">
                             <span class="tag lang" ng-repeat="lang in teacher.languages">{{lang}}</span>
-                            <span class="tag">{{teacher.specialty}}</span>
                         </div>
+                          <span class="teacher-specialty">{{teacher.specialty}}</span>
                         <p class="teacher-headline">{{teacher.headline}}</p>
                     </div>
-
                     <div class="card-footer">
                         <div class="price-info">
                             <span class="price-amount">${{teacher.price}}</span>
@@ -503,7 +435,6 @@
                         </div>
                         <button class="btn-profile" ng-click="openProfile(teacher)">Ver Perfil</button>
                     </div>
-
                 </div>
             </main>
         </div>
@@ -516,15 +447,25 @@
                 
                 <!-- Left Content -->
                 <div class="modal-content">
-                    <div class="video-placeholder">
-                        <div class="play-btn"><i class="fas fa-play"></i></div>
-                        <span>Video de presentación</span>
+                    
+                    <!-- VIDEO -->
+                    <div class="video-wrapper" ng-if="selectedTeacher.videoId">
+                        <iframe 
+                            ng-src="{{getSafeVideoUrl(selectedTeacher.videoId)}}" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    
+                    <div class="no-video-placeholder" ng-if="!selectedTeacher.videoId">
+                        <i class="fas fa-video-slash" style="font-size: 24px;"></i>
+                        <span>Este profesor no ha subido video.</span>
                     </div>
                     
                     <h2 style="margin-bottom: 10px;">Sobre {{selectedTeacher.name}}</h2>
-                    <p style="color: #555; line-height: 1.6;">
-                        {{selectedTeacher.bio}}
-                    </p>
+                    <p style="color: #555; line-height: 1.6;">{{selectedTeacher.bio}}</p>
                     
                     <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Metodología</h3>
                     <div class="tags-container">
@@ -532,6 +473,22 @@
                             <i class="fas fa-check" style="color:var(--secondary-color); margin-right:5px;"></i> {{method}}
                         </span>
                     </div>
+
+                    <!-- REDES SOCIALES & CERTIFICACIONES -->
+                    <div ng-if="selectedTeacher.socials && selectedTeacher.socials.length > 0">
+                        <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Redes Sociales</h3>
+                        <div class="social-buttons">
+                            <a ng-repeat="social in selectedTeacher.socials" 
+                               href="{{social.url}}" 
+                               target="_blank" 
+                               class="social-btn {{social.type}}"
+                               title="{{social.tooltip || ('Ver en ' + social.type)}}">
+                                <!-- Usamos 'fas fa-certificate' si es un certificado, 'fab' si es marca -->
+                                <i ng-class="social.type === 'certificate' ? 'fas fa-file' : 'fab fa-' + social.type"></i>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Right Sidebar (Booking) -->
@@ -543,23 +500,16 @@
                             <i class="fas fa-star"></i> {{selectedTeacher.rating}}
                         </div>
                     </div>
-
                     <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;">
                         <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Tarifa por clase</div>
                         <div style="font-size: 24px; font-weight: 700; color: var(--text-dark);">${{selectedTeacher.price}}</div>
                     </div>
-
                     <div style="font-size: 13px; color: #666; margin-bottom: 20px;">
                         <i class="fas fa-video" style="margin-right: 8px;"></i> Aula Virtual Propia<br>
                         <i class="fas fa-clock" style="margin-right: 8px;"></i> Respuesta en 1h
                     </div>
-
-                    <button class="booking-btn" ng-click="bookClass()">
-                        Reservar Clase
-                    </button>
-                    <button style="width: 100%; background: none; border: none; color: #888; margin-top: 15px; cursor: pointer; font-size: 13px;" ng-click="closeProfile()">
-                        Cerrar ventana
-                    </button>
+                    <button class="booking-btn" ng-click="bookClass()">Reservar Clase</button>
+                    <button style="width: 100%; background: none; border: none; color: #888; margin-top: 15px; cursor: pointer; font-size: 13px;" ng-click="closeProfile()">Cerrar ventana</button>
                 </div>
 
             </div>
@@ -569,94 +519,89 @@
     <script>
         const app = angular.module('teacherApp', []);
 
-        app.controller('teacherCtrl', function($scope) {
+        app.controller('teacherCtrl', function($scope, $sce) {
             
-            // Datos simulados de profesores
+            $scope.getSafeVideoUrl = function(videoId) {
+                const url = 'https://www.youtube.com/embed/' + videoId;
+                return $sce.trustAsResourceUrl(url);
+            };
+
             $scope.teachers = [
-                {
+                  {
                     id: 1,
-                    name: "Elena K.",
-                    photo: "https://i.pravatar.cc/150?img=5",
-                    headline: "Pianista de conservatorio con 10 años de experiencia. Especialista en técnica Rusa y preparación de exámenes.",
-                    bio: "¡Hola! Soy Elena. Me gradué del Conservatorio de Moscú y llevo enseñando piano online más de 5 años. Mi enfoque es técnico pero muy musical. Utilizo el sistema de videollamada de la academia para corregir tu postura y digitación en tiempo real.",
-                    rating: 5.0,
-                    reviews: 42,
-                    price: 45,
-                    languages: ["Español", "Ruso"],
-                    specialty: "Clásico",
-                    superProf: true,
-                    methodology: ["Lectura a primera vista", "Técnica Rusa", "Teoría Musical"]
-                },
-                {
-                    id: 2,
-                    name: "David Ross",
-                    photo: "https://i.pravatar.cc/150?img=11",
-                    headline: "Jazz Piano y Armonía Moderna. Aprende a improvisar desde la primera clase.",
-                    bio: "Si quieres dejar de leer partituras y empezar a crear tu propia música, soy tu profesor. Te enseñaré los secretos del Jazz, voicings y cómo tocar en banda.",
-                    rating: 4.8,
-                    reviews: 18,
-                    price: 30,
-                    languages: ["Inglés", "Español"],
-                    specialty: "Jazz",
-                    superProf: false,
-                    methodology: ["Improvisación", "Real Book", "Oído Musical"]
-                },
-                {
-                    id: 3,
-                    name: "Sarah M.",
-                    photo: "https://i.pravatar.cc/150?img=9",
+                    name: "Andrea Escobar Solis",
+                    photo: "https://lh3.googleusercontent.com/d/1WvsqMiGXbtLo1lrGU9nnbpTJGD__1Cn5",
                     headline: "Iniciación al piano para niños y adultos. Paciente y divertida.",
                     bio: "Me encanta trabajar con principiantes. Uso juegos y metodología Suzuki para que aprender piano no sea aburrido. ¡Hablamos en clase!",
                     rating: 4.9,
-                    reviews: 120,
-                    price: 25,
-                    languages: ["Inglés", "Francés"],
+                    reviews: 10,
+                    price: 100,
+                    languages: ["Inglés", "Español"],
                     specialty: "Niños",
-                    superProf: true,
-                    methodology: ["Suzuki", "Juegos Rítmicos", "Canciones Disney"]
+                    superProf: false,
+                    methodology: ["Suzuki", "Juegos Rítmicos", "Canciones Disney"],
+                    videoId: "bT89XVAU2sw",
+                    socials: [
+                        { type: 'certificate', url: 'https://dev.suzukiassociation.org/people/andrea-escobar/', tooltip: 'Diploma Suzuki' }
+                    ]
                 },
                 {
-                    id: 4,
-                    name: "Carlos Ruiz",
-                    photo: "https://i.pravatar.cc/150?img=3",
-                    headline: "Compositor y pianista. Te ayudo a tocar tus canciones pop favoritas.",
-                    bio: "Enfocado en música moderna, covers y composición. Si quieres tocar Coldplay o Einaudi, reserva una clase conmigo.",
-                    rating: 4.7,
-                    reviews: 8,
-                    price: 20,
-                    languages: ["Español"],
-                    specialty: "Pop",
+                    id: 2,
+                    name: "Noe Samuel Bravo",
+                    photo: "https://lh3.googleusercontent.com/d/1CgqoYiFe0RtjJ1u16oJnHybfW78k734C",
+                    headline: "Compositor de música de piano. Compuse mi primer canción desde los 7 años.",
+                    bio: "Si quieres dejar de leer partituras y empezar a crear tu propia música, soy tu profesor. Te enseñaré los secretos de la creatividad, voicings y cómo sacar todo tu potencial.",
+                    rating: 4.8,
+                    reviews: 18,
+                    price: 100,
+                    languages: ["Inglés", "Español"],
+                    specialty: "Composición",
                     superProf: false,
-                    methodology: ["Acordes", "Acompañamiento", "Producción"]
-                }
+                    methodology: ["Improvisación", "Real Book", "Oído Musical"],
+                    videoId: "AtwQQXbjbEg",
+                    socials: [
+                        { type: 'spotify', url: 'https://open.spotify.com/artist/4B31523rdPUkoMJ8JFrD4I' }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: "Sergio Valenzo",
+                    photo: "https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa",
+                    headline: "Pianista con 10 años de experiencia. Especialista en lectura a primer vista y técnica avanzada",
+                    bio: "¡Hola! Soy Sergio, me preparé para la certificación del examen ABRSM de piano, he participado en recitales en el Conservatorio Nacional de Música. Mi enfoque es téorico pero tambien muy técnico cuando las bases teoricas ya fueron sentadas.",
+                    rating: 5.0,
+                    reviews: 42,
+                    price: 150,
+                    languages: ["Inglés", "Español"],
+                    specialty: "Clásico",
+                    superProf: true,
+                    methodology: ["Lectura a primera vista", "Técnica Avanzada", "Teoría Musical"],
+                    videoId: "50AKzcMPMxU",
+                    socials: [
+                        { type: 'linkedin', url: 'https://www.linkedin.com/in/sergio-valenzo-2635a8359/' },
+                             { type: 'soundcloud', url: 'https://soundcloud.com/mozartacademy' },
+                    ]
+                },
             ];
 
             $scope.filters = { text: '', specialty: '', language: '', priceMax: '' };
             $scope.selectedTeacher = null;
 
-            // Lógica de filtrado
             $scope.customFilter = function(teacher) {
-                // Filtro Texto (Nombre o Headline)
                 const textMatch = !$scope.filters.text || 
                     teacher.name.toLowerCase().includes($scope.filters.text.toLowerCase()) || 
                     teacher.headline.toLowerCase().includes($scope.filters.text.toLowerCase());
                 
-                // Filtro Especialidad
                 const specMatch = !$scope.filters.specialty || teacher.specialty === $scope.filters.specialty;
-                
-                // Filtro Idioma (busca si el idioma seleccionado está en el array del profesor)
                 const langMatch = !$scope.filters.language || teacher.languages.includes($scope.filters.language);
-
-                // Filtro Precio
                 const priceMatch = !$scope.filters.priceMax || teacher.price <= parseInt($scope.filters.priceMax);
 
                 return textMatch && specMatch && langMatch && priceMatch;
             };
 
-            // Modal Actions
             $scope.openProfile = function(teacher) {
                 $scope.selectedTeacher = teacher;
-                document.body.style.overflow = 'hidden'; // Prevenir scroll de fondo
+                document.body.style.overflow = 'hidden';
             };
 
             $scope.closeProfile = function() {
