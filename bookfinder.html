@@ -3,16 +3,37 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Piano Pro - Ultimate</title>
+  <title>Piano Pro - Trainer Mode</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
   <style>
     :root {
       --primary-color: #3498db;
       --primary-glow: rgba(52, 152, 219, 0.6);
-      --bg-color: #f4f4f4; /* Fondo claro original */
-      --panel-bg: rgba(255, 255, 255, 0.9); /* Paneles blancos */
+      --bg-color: #f4f4f4;
+      --panel-bg: rgba(255, 255, 255, 0.95);
       --text-color: #333;
       --staff-stroke: #333;
+      
+      /* Colores del juego */
+      --game-target: #2980b9;
+      --game-correct: #27ae60;
+      --game-wrong: #c0392b;
+      --game-pending: #000;
+      
+      /* Dimensiones Piano */
+      --piano-height: 122px; /* Altura original estándar */
+      --piano-bottom: 0px;   /* Posición desde el fondo */
+      --key-white-height: 90px;
+      --key-black-height: 58px;
+    }
+
+    /* Ajustes Desktop: Subir el piano de posición (sin redimensionar teclas exageradamente) */
+    @media (min-width: 769px) {
+        :root {
+            --piano-height: 145px; 
+            --key-white-height: 100px;
+            --key-black-height: 65px;
+        }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -49,6 +70,14 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      align-items: flex-start; 
+    }
+
+    .right-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
     }
 
     .glass-panel {
@@ -61,8 +90,8 @@
       transition: all 0.3s ease;
     }
 
-    /* Settings Menu */
-    #settings-btn {
+    /* Botones Circulares */
+    .icon-btn {
       background: white;
       border: 1px solid #ddd;
       color: #555;
@@ -70,29 +99,54 @@
       border-radius: 50%;
       cursor: pointer;
       font-size: 20px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    #settings-btn:hover { background: #f9f9f9; }
+    .icon-btn:hover { background: #f9f9f9; transform: scale(1.05); }
+    .icon-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    #settings-menu {
+    /* Menús Flotantes */
+    .floating-menu {
       position: absolute;
-      top: 70px; right: 20px;
-      width: 220px;
+      top: 70px; right: 60px;
+      width: 240px;
       display: none;
       pointer-events: auto;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      z-index: 110;
     }
-    #settings-menu.open { display: flex; }
+    .floating-menu.open { display: flex; animation: fadeIn 0.2s ease-out; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 14px;
     }
+
+    /* Game Specific UI */
+    #game-menu h3 { font-size: 14px; color: var(--primary-color); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    
+    .score-display { 
+        display: flex; justify-content: center; align-items: center; gap: 10px;
+        background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px; margin-bottom: 5px;
+    }
+    .score-number { font-size: 28px; font-weight: bold; color: var(--primary-color); }
+    .score-label { font-size: 12px; color: #666; text-transform: uppercase; }
+    
+    .game-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .option-label { font-size: 12px; font-weight: 600; color: #555; }
+    
+    select.game-select {
+        width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ddd; font-size: 13px; outline: none;
+    }
+
+    .game-btn-start {
+      background: var(--primary-color); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: opacity 0.2s;
+    }
+    .game-btn-start:hover { opacity: 0.9; }
+    .game-btn-stop { background: #e74c3c; display: none; margin-top: 5px;}
 
     /* Botones de Color */
     .color-dots { display: flex; gap: 8px; }
@@ -104,196 +158,136 @@
 
     /* Displays */
     #chord-display {
-      font-size: 28px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-align: center;
-      min-width: 150px;
-      color: #333;
-      font-family: 'SF Pro Display', sans-serif;
+      font-size: 28px; font-weight: 500; letter-spacing: 1px; text-align: center; min-width: 150px; color: #333; font-family: 'SF Pro Display', sans-serif;
     }
 
     #midi-info {
-      font-size: 12px;
-      color: #666;
-      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: #666; display: flex; align-items: center; gap: 6px;
     }
     #midi-info.active { color: #27ae60; font-weight: bold; }
 
-    /* Staff (Pentagrama) - Ajustado para SVG Original */
+    /* Staff (Pentagrama) */
     #staff-container {
-      margin-top: 10px;
-      width: 220px; 
-      height: 150px;
-      overflow: hidden;
-      opacity: 1;
-      transition: opacity 0.3s;
+      margin-top: 10px; 
+      width: 320px; 
+      height: 160px;
+      overflow: hidden; opacity: 1; transition: opacity 0.3s;
     }
     #staff-container.hidden { opacity: 0; pointer-events: none; }
     
-    /* Estilos SVG Pentagrama Originales */
     .staff-line { stroke: #999; stroke-width: 1; }
     .ledger-line { stroke: #888; stroke-width: 1; }
-    .note-head { fill: #333; }
-    .note-accidental { fill: #333; font-family: serif; font-size: 16px; font-weight: bold; }
+    .note-head { fill: #333; transition: transform 0.3s ease-out; } /* Animación suave en notas */
+    .note-stem { stroke: #333; stroke-width: 2; transition: transform 0.3s ease-out; } 
+    .note-accidental { fill: #333; font-family: serif; font-size: 20px; font-weight: bold; transition: transform 0.3s ease-out; }
     .clef { fill: #333; font-family: serif; font-size: 60px; }
-    .bass-clef { font-size: 45px; }
+    .bass-clef { font-size: 50px; }
+
+    /* Estilos para Notas del Juego */
+    .note-head.target { fill: var(--game-target); }
+    .note-stem.target { stroke: var(--game-target); }
+    .note-accidental.target { fill: var(--game-target); }
+    .ledger-line.target { stroke: var(--game-target); }
+
+    .note-head.correct { fill: var(--game-correct); opacity: 0.5; }
+    .note-stem.correct { stroke: var(--game-correct); opacity: 0.5; }
+    .note-accidental.correct { fill: var(--game-correct); opacity: 0.5; }
+    
+    .note-head.wrong { fill: var(--game-wrong); }
+    .note-stem.wrong { stroke: var(--game-wrong); }
+    .note-accidental.wrong { fill: var(--game-wrong); }
+    
+    .note-head.pending { fill: var(--game-pending); }
 
     /* Pedal Indicator */
     #pedal-indicator {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(52, 152, 219, 0.1);
-      color: var(--primary-color);
-      padding: 5px 15px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-      border: 1px solid var(--primary-color);
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(52, 152, 219, 0.1); color: var(--primary-color);
+      padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none; border: 1px solid var(--primary-color);
     }
-    #pedal-indicator.active {
-      opacity: 1;
-      background: var(--primary-color);
-      color: white;
-      box-shadow: 0 0 15px var(--primary-glow);
-    }
+    #pedal-indicator.active { opacity: 1; background: var(--primary-color); color: white; box-shadow: 0 0 15px var(--primary-glow); }
 
     /* --- Canvas & Piano --- */
-    #main-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: #e9e9e9; /* Fondo del canvas */
-    }
-
-    #waterfall-canvas {
-      display: block;
-      width: 100%;
-      height: calc(100% - 122px); /* Ajustado a altura piano original */
+    #main-container { position: relative; width: 100%; height: 100%; background: #e9e9e9; }
+    
+    /* El canvas ocupa el 100% menos la altura del piano y su posición inferior */
+    #waterfall-canvas { 
+        display: block; width: 100%; 
+        height: calc(100% - (var(--piano-height) + var(--piano-bottom))); 
     }
 
     /* Piano Area */
     #piano-wrapper {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 122px;
-      background: #2a2a2a;
-      border-top: 1px solid #333;
-      display: flex;
-      justify-content: center;
-      overflow: hidden; /* Esconde teclas extra si la pantalla es muy pequeña */
+      position: absolute; 
+      bottom: var(--piano-bottom); /* Aquí aplicamos la elevación */
+      left: 0; width: 100%; 
+      height: var(--piano-height);
+      background: #2a2a2a; border-top: 1px solid #333; display: flex; justify-content: center; overflow: hidden;
+      /* Sombra para cuando esté flotando */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     #hit-line {
-      position: absolute;
-      top: 15px;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: rgba(255, 0, 0, 0.7); /* Línea roja clásica de Synthesia */
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-      z-index: 10;
-      pointer-events: none;
+      position: absolute; top: 20px; left: 0; width: 100%; height: 4px;
+      background: rgba(255, 0, 0, 0.7); box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); z-index: 10; pointer-events: none;
     }
     
-    /* Carcasa superior del piano para etiquetas */
     #piano-top-casing {
-        position: absolute;
-        bottom: 122px;
+        position: absolute; 
+        bottom: calc(var(--piano-height) + var(--piano-bottom)); 
         left: 0; width: 100%; height: 20px;
-        background: #333;
-        z-index: 4;
-        display: flex; justify-content: center; /* Para alinear elementos hijos si los hay */
+        background: #333; z-index: 4; display: flex; justify-content: center;
     }
 
-    /* Etiquetas flotantes de notas activas */
     .casing-note-label {
-        position: absolute;
-        top: 10px;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 600;
-        background: rgba(0,0,0,0.6);
-        padding: 2px 6px;
-        border-radius: 4px;
-        pointer-events: none;
-        transform: translateX(-50%);
-        z-index: 20;
+        position: absolute; top: 10px; color: #fff; font-size: 11px; font-weight: 600;
+        background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; pointer-events: none;
+        transform: translateX(-50%); z-index: 20;
     }
 
-    #piano-keys {
-      position: relative;
-      height: 102px;
-      display: flex;
-      justify-content: center;
-      margin-top: 20px; /* Espacio para la carcasa */
-      /* Width automático basado en contenido */
-    }
+    #piano-keys { position: relative; height: 100%; display: flex; justify-content: center; margin-top: 25px; }
 
-    .key {
-      position: relative;
-      float: left;
-      cursor: pointer;
-      transition: all 0.05s;
-      user-select: none;
-    }
+    .key { position: relative; float: left; cursor: pointer; transition: all 0.05s; user-select: none; }
 
-    /* Estilos de Teclas Originales para mantener proporción */
     .key.white {
-      width: 16px; /* Fijo original */
-      height: 90px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-right: 1px solid #e0e0e0;
-      border-radius: 0 0 3px 3px;
-      z-index: 1;
+      width: 24px; 
+      height: var(--key-white-height); 
+      background: #fff; border: 1px solid #ccc; border-right: 1px solid #e0e0e0; border-radius: 0 0 4px 4px; z-index: 1;
     }
-    .key.white.active {
-      background: var(--primary-color) !important;
-      box-shadow: 0 0 15px var(--primary-glow);
-    }
+    .key.white.active { background: var(--primary-color) !important; box-shadow: 0 0 15px var(--primary-glow); }
 
     .key.black {
-      width: 10px; /* Fijo original */
-      height: 58px;
-      background: #333;
-      border: 1px solid #555;
-      margin-left: -5px;
-      margin-right: -5px;
-      z-index: 2;
-      border-radius: 0 0 2px 2px;
+      width: 14px; 
+      height: var(--key-black-height); 
+      background: #333; border: 1px solid #555; margin-left: -7px; margin-right: -7px; z-index: 2; border-radius: 0 0 3px 3px;
     }
-    .key.black.active {
-      background: #2980b9 !important; /* Un tono más oscuro para negras */
+    .key.black.active { background: #2980b9 !important; }
+
+    /* Game Mode Key Styles */
+    body.game-mode .key.white.active.correct { background: var(--game-correct) !important; }
+    body.game-mode .key.black.active.correct { background: var(--game-correct) !important; }
+    body.game-mode .key.white.active.wrong { background: var(--game-wrong) !important; }
+    body.game-mode .key.black.active.wrong { background: var(--game-wrong) !important; }
+
+    /* --- RESPONSIVE ADJUSTMENTS --- */
+    @media (max-width: 1024px) {
+        .key.white { width: 20px; }
+        .key.black { width: 12px; margin-left: -6px; margin-right: -6px; }
     }
 
-    /* Media Queries Originales para proporción */
     @media (max-width: 768px) {
-      .key.white { width: 13px; height: 75px; }
-      .key.black { width: 8px; height: 48px; margin-left: -4px; margin-right: -4px; }
+      .key.white { width: 14px; }
+      .key.black { width: 9px; margin-left: -4.5px; margin-right: -4.5px; }
+      #staff-container { width: 100%; max-width: 280px; } 
     }
     @media (max-width: 500px) {
-      .key.white { width: 11px; height: 65px; }
-      .key.black { width: 7px; height: 42px; margin-left: -3.5px; margin-right: -3.5px; }
+      .key.white { width: 11px; height: 75px; }
+      .key.black { width: 7px; height: 48px; margin-left: -3.5px; margin-right: -3.5px; }
     }
 
-    /* Etiquetas de notas en teclas */
     .key-name {
-      position: absolute;
-      bottom: 5px;
-      width: 100%;
-      text-align: center;
-      font-size: 9px;
-      font-weight: bold;
-      color: #777;
-      pointer-events: none;
+      position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 10px; font-weight: bold; color: #777; pointer-events: none;
     }
     .key.black .key-name { color: #eee; bottom: 3px; font-size: 8px; }
     .hide-labels .key-name { display: none; }
@@ -321,9 +315,12 @@
         </div>
       </div>
 
-      <div class="settings-group">
-        <button id="settings-btn" class="glass-panel"><i class="ri-settings-3-line"></i></button>
-        <div id="settings-menu" class="glass-panel">
+      <div class="right-controls">
+        <!-- Settings Button -->
+        <button id="settings-btn" class="icon-btn"><i class="ri-settings-3-line"></i></button>
+        
+        <!-- Settings Menu -->
+        <div id="settings-menu" class="glass-panel floating-menu">
           <div class="setting-row">
             <span>Color</span>
             <div class="color-dots">
@@ -341,6 +338,32 @@
             <input type="checkbox" id="toggle-staff" checked>
           </div>
         </div>
+
+        <!-- GAME BUTTON -->
+        <button id="game-btn" class="icon-btn"><i class="ri-gamepad-line"></i></button>
+        
+        <!-- GAME MENU -->
+        <div id="game-menu" class="glass-panel floating-menu">
+            <h3>Entrenamiento</h3>
+            
+            <div class="score-display">
+                <span id="score-val" class="score-number">0</span>
+                <span class="score-label">Aciertos</span>
+            </div>
+
+            <div class="game-options">
+                <label class="option-label">Clave Musical</label>
+                <select id="clef-select" class="game-select">
+                    <option value="treble">Clave de Sol (G)</option>
+                    <option value="bass">Clave de Fa (F)</option>
+                    <option value="both">Ambas (Grand Staff)</option>
+                </select>
+            </div>
+
+            <button id="start-game-btn" class="game-btn-start">Comenzar Ronda</button>
+            <button id="stop-game-btn" class="game-btn-start game-btn-stop">Salir</button>
+        </div>
+
       </div>
     </div>
 
@@ -367,13 +390,12 @@
     const CONFIG = {
       pixelsPerSecond: 180, 
       fadeOutTime: 2000,
-      staffYTop: 40,
-      staffLineGap: 10
+      staffYTop: 50, 
+      staffLineGap: 12 
     };
 
     const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
     
-    // Mapa de Acordes Original
     const CHORD_MAP = {
         '0,4,7': { name: 'Major', short: '' },
         '0,3,7': { name: 'Minor', short: 'm' },
@@ -394,11 +416,21 @@
 
     // Estado Global
     let state = {
-      activeNotes: {}, // { id: { startTime, x, w, color, velocity, isBlack } }
+      activeNotes: {},
       history: [],     
-      particles: [],   
+      particles: [],    
       sustain: false,
       currentTheme: 'blue'
+    };
+
+    // Estado del Juego
+    let game = {
+        active: false,
+        roundNotes: [], 
+        currentIndex: 0, 
+        score: 0,
+        currentClef: 'treble', 
+        feedbackNote: null
     };
 
     // Referencias DOM
@@ -411,26 +443,28 @@
       staffContainer: document.getElementById('staff-container'),
       pedalIndicator: document.getElementById('pedal-indicator'),
       settingsMenu: document.getElementById('settings-menu'),
-      casing: document.getElementById('piano-top-casing')
+      gameMenu: document.getElementById('game-menu'),
+      scoreVal: document.getElementById('score-val'),
+      casing: document.getElementById('piano-top-casing'),
+      clefSelect: document.getElementById('clef-select')
     };
 
-    let keyMetrics = {}; // { "C4": { x: 100, w: 20, isBlack: false } }
+    let keyMetrics = {}; 
     let sampler;
 
     // ==========================================
     // INICIALIZACIÓN
     // ==========================================
     async function init() {
-      renderKeys(); // Renderiza teclas HTML
+      renderKeys(); 
       initAudio();
       initMIDI();
       setupUI();
       
-      // Esperar a que el DOM renderice para calcular posiciones
       setTimeout(() => {
         resizeCanvas();
         recalcKeyMetrics();
-        loop(); // Iniciar loop visual
+        loop(); 
       }, 100);
 
       window.addEventListener('resize', () => {
@@ -438,12 +472,131 @@
         recalcKeyMetrics();
       });
       
-      // Inputs de Teclado
       setupKeyboardInput();
     }
 
     // ==========================================
-    // LÓGICA MUSICAL (Acordes e Intervalos)
+    // LÓGICA DEL JUEGO
+    // ==========================================
+    function toggleGameMenu() {
+        els.settingsMenu.classList.remove('open');
+        els.gameMenu.classList.toggle('open');
+        document.getElementById('game-btn').classList.toggle('active');
+    }
+
+    function startGame() {
+        game.active = true;
+        game.score = 0;
+        game.feedbackNote = null;
+        updateScoreDisplay();
+        document.body.classList.add('game-mode');
+        
+        // UI Updates
+        document.getElementById('start-game-btn').style.display = 'none';
+        document.getElementById('stop-game-btn').style.display = 'inline-block';
+        document.getElementById('clef-select').disabled = true; 
+        
+        startRound();
+    }
+
+    function stopGame() {
+        game.active = false;
+        game.roundNotes = [];
+        document.body.classList.remove('game-mode');
+
+        // UI Updates
+        document.getElementById('start-game-btn').style.display = 'inline-block';
+        document.getElementById('stop-game-btn').style.display = 'none';
+        document.getElementById('clef-select').disabled = false;
+        els.chordDisplay.innerText = "---";
+        
+        drawStaff([]);
+    }
+
+    function startRound() {
+        const mode = els.clefSelect.value;
+        const count = 12; // Aumentamos notas para que se note el scroll
+        game.roundNotes = [];
+        game.currentIndex = 0;
+        
+        let roundClef = 'treble';
+        if (mode === 'bass') roundClef = 'bass';
+        else if (mode === 'both') roundClef = Math.random() > 0.5 ? 'treble' : 'bass';
+        
+        game.currentClef = roundClef;
+
+        const scale = ["C", "D", "E", "F", "G", "A", "B"];
+        
+        for (let i = 0; i < count; i++) {
+            let octave;
+            if (roundClef === 'treble') octave = Math.floor(Math.random() * 2) + 4; 
+            else octave = Math.floor(Math.random() * 2) + 2; 
+
+            let note = scale[Math.floor(Math.random() * scale.length)];
+            let noteName = note + octave;
+
+            if (i > 0 && game.roundNotes[i-1].note === noteName) {
+                const idx = scale.indexOf(note);
+                note = scale[(idx + 1) % scale.length];
+                noteName = note + octave;
+            }
+
+            game.roundNotes.push({
+                note: noteName,
+                midi: noteNameToMidi(noteName),
+                id: i
+            });
+        }
+        
+        els.chordDisplay.innerText = "¡Sigue la melodía!";
+        drawStaff([]); 
+    }
+
+    function checkGameInput(noteName) {
+        if (!game.active || game.currentIndex >= game.roundNotes.length) return;
+
+        const targetNote = game.roundNotes[game.currentIndex];
+        const playedMidi = noteNameToMidi(noteName);
+        const targetMidi = targetNote.midi;
+
+        if (playedMidi === targetMidi) {
+            // Acierto
+            game.score++;
+            updateScoreDisplay();
+            game.currentIndex++;
+            game.feedbackNote = null;
+            
+            els.chordDisplay.innerText = "¡Bien!";
+            els.chordDisplay.style.color = "var(--game-correct)";
+            
+            // Redibujar inmediatamente para efecto scroll
+            drawStaff([]);
+
+            if (game.currentIndex >= game.roundNotes.length) {
+                els.chordDisplay.innerText = "¡Ronda Completada!";
+                setTimeout(() => {
+                    els.chordDisplay.style.color = "#333";
+                    startRound();
+                }, 1000);
+            } else {
+                 setTimeout(() => els.chordDisplay.style.color = "#333", 300);
+            }
+
+        } else {
+            // Error
+            game.feedbackNote = noteName;
+            els.chordDisplay.innerText = "¡Ups!";
+            els.chordDisplay.style.color = "var(--game-wrong)";
+            drawStaff([]); 
+        }
+    }
+
+    function updateScoreDisplay() {
+        els.scoreVal.innerText = game.score;
+    }
+
+    // ==========================================
+    // LÓGICA MUSICAL
     // ==========================================
     function noteNameToMidi(noteName) {
       const noteMap = { 'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 
@@ -451,11 +604,10 @@
       const match = noteName.match(/^([A-G]b?)(\d+)$/);
       if (!match) return 0;
       const [, note, octave] = match;
-      // Normalizar sostenidos a bemoles si vienen del input
       let n = note;
-      if(n.includes('#')) { 
-          // Simplificación: Convertir # a b para el mapa
-          // (En una app completa usaríamos lógica de teoría musical más compleja)
+      if (n.includes('#')) { 
+         const mapSharp = {'C#':'Db', 'D#':'Eb', 'F#':'Gb', 'G#':'Ab', 'A#':'Bb'};
+         if(mapSharp[n]) n = mapSharp[n];
       }
       return (parseInt(octave) + 1) * 12 + noteMap[n];
     }
@@ -468,11 +620,9 @@
       const intervals = ['Unison', 'Minor 2nd', 'Major 2nd', 'Minor 3rd', 
       'Major 3rd', 'Perfect 4th', 'Tritone', 'Perfect 5th',
       'Minor 6th', 'Major 6th', 'Minor 7th', 'Major 7th', 'Octave'];
-      
       const midi1 = noteNameToMidi(note1);
       const midi2 = noteNameToMidi(note2);
       const semitones = Math.abs(midi2 - midi1) % 12;
-      
       return intervals[semitones] || 'Interval';
     }
 
@@ -505,9 +655,13 @@
     }
 
     function updateMusicalDisplays() {
+        if (game.active) {
+            drawStaff([]); 
+            return;
+        }
+
         const activeNames = Object.keys(state.activeNotes);
         
-        // 1. Texto (Acorde / Intervalo / Nota)
         let text = '---';
         if (activeNames.length === 1) {
             text = getNoteNameSimple(activeNames[0]);
@@ -518,7 +672,6 @@
         }
         els.chordDisplay.innerText = text;
 
-        // 2. Pentagrama
         drawStaff(activeNames);
     }
 
@@ -530,33 +683,27 @@
       const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
       const blackKeys = { 'C': 'Db', 'D': 'Eb', 'F': 'Gb', 'G': 'Ab', 'A': 'Bb' };
       
-      // Piano de 88 teclas estándar
       for (let octave = 0; octave <= 8; octave++) {
-        const startNote = octave === 0 ? 9 : 0; // Empezar en A0
-        
+        const startNote = octave === 0 ? 9 : 0; 
         for (let i = startNote; i <= 6; i++) {
-          if (octave === 8 && i > 0) break; // Terminar en C8
+          if (octave === 8 && i > 0) break; 
           
           const note = pattern[i % 7];
           const noteName = `${note}${octave}`;
           
-          // Tecla Blanca
           const whiteKey = document.createElement('div');
           whiteKey.className = 'key white';
           whiteKey.id = `key-${noteName}`;
           whiteKey.dataset.note = noteName;
           
-          // Etiqueta
           const label = document.createElement('div');
           label.className = 'key-name';
           label.innerText = noteName;
           whiteKey.appendChild(label);
 
-          // Eventos
           addKeyEvents(whiteKey, noteName);
           els.keysContainer.appendChild(whiteKey);
 
-          // Tecla Negra
           if (blackKeys[note] && !(octave === 8 && note === 'C')) {
             const blackNoteName = `${blackKeys[note]}${octave}`;
             const blackKey = document.createElement('div');
@@ -584,13 +731,11 @@
 
     function recalcKeyMetrics() {
       const keys = document.querySelectorAll('.key');
-      // Necesitamos la posición relativa al canvas/pantalla
-      // El canvas empieza en top:0, height: 100% - pianoHeight
       keys.forEach(k => {
         const rect = k.getBoundingClientRect();
         const note = k.dataset.note;
         keyMetrics[note] = {
-          x: rect.left + (rect.width / 2), // Centro de la tecla
+          x: rect.left + (rect.width / 2), 
           w: rect.width,
           isBlack: k.classList.contains('black')
         };
@@ -598,7 +743,7 @@
     }
 
     // ==========================================
-    // PENTAGRAMA SVG (Lógica Original Restaurada)
+    // PENTAGRAMA SVG (SCROLL DINÁMICO)
     // ==========================================
     const SVG_NS = "http://www.w3.org/2000/svg";
     const NOTE_STAFF_OFFSET = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
@@ -613,132 +758,169 @@
       const svg = els.staffSvg;
       svg.innerHTML = '';
       
-      // 1. Dibujar líneas (Igual que antes)
+      const width = els.staffContainer.clientWidth;
+      
+      // 1. Líneas del pentagrama
       for (let i = 0; i < 5; i++) {
         const y = CONFIG.staffYTop + (i * CONFIG.staffLineGap);
         const line = createSvgElement('line', {
-          x1: 10, y1: y, x2: 210, y2: y,
+          x1: 10, y1: y, x2: width - 10, y2: y,
           class: 'staff-line'
         });
         svg.appendChild(line);
       }
+
+      // --- MODO JUEGO: SCROLL ---
+      if (game.active) {
+          const isTreble = game.currentClef === 'treble';
+          drawClef(isTreble, svg);
+          
+          // Punto focal: Donde se dibuja siempre la nota actual (ej: en el 30% del ancho)
+          const focusX = 100;
+          const spacing = 40; 
+
+          // Dibujar notas relativas al índice actual
+          game.roundNotes.forEach((item, index) => {
+              // Cálculo de desplazamiento
+              // Si index == currentIndex, (index - current) es 0 -> se dibuja en focusX
+              // Si index > currentIndex, es positivo -> se dibuja a la derecha
+              // Si index < currentIndex, es negativo -> se dibuja a la izquierda
+              const relativePos = index - game.currentIndex;
+              const x = focusX + (relativePos * spacing);
+
+              // Solo dibujar si está dentro del área visible aproximada (optimización)
+              if (x > -30 && x < width + 30) {
+                  let status = 'pending';
+                  if (index < game.currentIndex) status = 'correct'; 
+                  else if (index === game.currentIndex) status = 'target';
+                  
+                  drawNoteWithStem(item.midi, x, isTreble, svg, status);
+              }
+          });
+
+          // Dibujar error si existe (sobre la nota actual)
+          if (game.feedbackNote) {
+               const wrongMidi = noteNameToMidi(game.feedbackNote);
+               drawNoteWithStem(wrongMidi, focusX, isTreble, svg, 'wrong', true);
+          }
+          return;
+      }
+      // ----------------------------------
 
       if (activeNotes.length === 0) {
           drawClef(true, svg); 
           return;
       }
 
-      // 2. Determinar Clave (Igual que antes)
       const midis = activeNotes.map(noteNameToMidi).sort((a, b) => a - b);
       const lowestMidi = midis[0];
       const useTreble = lowestMidi >= 60; 
 
       drawClef(useTreble, svg);
 
-      // 3. Dibujar Notas (MODIFICADO)
-      // Definimos una posición X fija en el centro del contenedor (aprox 110px)
       const baseX = 100; 
-      
-      // Rastrear si la nota anterior fue desplazada para manejar clusters (ej: Do-Re-Mi)
       let lastWasShifted = false;
 
       midis.forEach((midi, index) => {
         let shiftRight = false;
-        
-        // Detectar intervalos de 2da (choque visual)
         if (index > 0) {
           const prevMidi = midis[index - 1];
-          // Si la distancia es de 1 o 2 semitonos
           if (Math.abs(midi - prevMidi) <= 2) {
-             // Si la anterior NO se movió a la derecha, movemos esta.
-             // Si la anterior SÍ se movió, esta se queda a la izquierda (alternancia)
-             if (!lastWasShifted) {
-                 shiftRight = true;
-             }
+             if (!lastWasShifted) shiftRight = true;
           }
         }
-        
-        // Si hay conflicto (2da), la movemos 14px a la derecha, si no, se queda en la base
-        const drawX = shiftRight ? baseX + 14 : baseX; 
-        
-        drawSingleNote(midi, drawX, useTreble, svg);
-        
-        // Actualizamos el estado para la siguiente iteración
+        const drawX = shiftRight ? baseX + 16 : baseX; 
+        drawNoteWithStem(midi, drawX, useTreble, svg, '');
         lastWasShifted = shiftRight;
-        
-        // NOTA: Eliminamos la línea 'xPos += 25' para que no avancen horizontalmente
       });
     }
 
     function drawClef(isTreble, svg) {
         const clef = createSvgElement('text', {
             x: 10, 
-            y: isTreble ? CONFIG.staffYTop + 34 : CONFIG.staffYTop + 24,
+            y: isTreble ? CONFIG.staffYTop + 42 : CONFIG.staffYTop + 30,
             class: isTreble ? 'clef' : 'clef bass-clef'
         });
         clef.textContent = isTreble ? '𝄞' : '𝄢';
         svg.appendChild(clef);
     }
 
-    function drawSingleNote(midi, x, isTreble, svg) {
+    function drawNoteWithStem(midi, x, isTreble, svg, type = '', isGhost = false) {
         const octave = Math.floor(midi / 12) - 1;
         const noteIndex = midi % 12;
         const noteName = NOTE_NAMES[noteIndex];
         const noteLetter = noteName[0];
-        const hasAccidental = noteName.includes('b') || noteName.includes('#'); // Simplificado
+        const hasAccidental = noteName.includes('b') || noteName.includes('#');
 
         let refMidi, refSteps;
-        // Calcular posición Y relativa a una nota de referencia
         if (isTreble) {
-            // B4 (71) está en la línea del medio
             refMidi = 71; 
             refSteps = (4 * 7) + NOTE_STAFF_OFFSET['B'];
         } else {
-            // D3 (50) está en la línea del medio
             refMidi = 50;
             refSteps = (3 * 7) + NOTE_STAFF_OFFSET['D'];
         }
 
         const noteSteps = (octave * 7) + NOTE_STAFF_OFFSET[noteLetter];
         const stepsFromRef = noteSteps - refSteps;
-        // Cada paso es medio gap (5px)
+        
         const yBase = CONFIG.staffYTop + (CONFIG.staffLineGap * 2);
-        const y = yBase - (stepsFromRef * (CONFIG.staffLineGap / 2));
+        const stepSize = CONFIG.staffLineGap / 2;
+        const y = yBase - (stepsFromRef * stepSize);
 
-        // Alteraciones
+        const stemHeight = 35;
+        const headRadiusX = 8; 
+        const headRadiusY = 6;
+
+        let stemX, stemY1, stemY2;
+
+        if (stepsFromRef < 0) {
+            stemX = x + headRadiusX - 1;
+            stemY1 = y;
+            stemY2 = y - stemHeight;
+        } else {
+            stemX = x - headRadiusX + 1;
+            stemY1 = y;
+            stemY2 = y + stemHeight;
+        }
+
+        const stem = createSvgElement('line', {
+            x1: stemX, y1: stemY1, x2: stemX, y2: stemY2,
+            class: `note-stem ${type}`
+        });
+        if(isGhost) stem.style.strokeOpacity = 0.5;
+        svg.appendChild(stem);
+
         if (hasAccidental) {
             const acc = createSvgElement('text', {
-                x: x - 22, y: y + 5, class: 'note-accidental'
+                x: x - 26, y: y + 8, class: `note-accidental ${type}`
             });
-            acc.textContent = '♭'; // Usaremos bemol genérico para visualización
+            acc.textContent = '♭'; 
+            if(isGhost) acc.style.fillOpacity = 0.5;
             svg.appendChild(acc);
         }
 
-        // Cabeza
         const head = createSvgElement('ellipse', {
-            cx: x, cy: y, rx: 6.5, ry: 5, class: 'note-head'
+            cx: x, cy: y, rx: headRadiusX, ry: headRadiusY, class: `note-head ${type}`,
+            transform: `rotate(-20, ${x}, ${y})` 
         });
+        if(isGhost) head.style.fillOpacity = 0.5;
         svg.appendChild(head);
 
-        // Líneas Adicionales (Ledger Lines)
-        // Top Line = staffYTop (F5 en Sol, A3 en Fa)
-        // Bottom Line = staffYTop + 40 (E4 en Sol, G2 en Fa)
         const topY = CONFIG.staffYTop;
         const botY = CONFIG.staffYTop + (CONFIG.staffLineGap * 4);
 
-        // Arriba
-        for(let ly = topY - CONFIG.staffLineGap; ly >= y; ly -= CONFIG.staffLineGap) {
-            drawLedgerLine(x, ly, svg);
+        for(let ly = topY - CONFIG.staffLineGap; ly >= y - 2; ly -= CONFIG.staffLineGap) {
+            drawLedgerLine(x, ly, svg, type);
         }
-        // Abajo
-        for(let ly = botY + CONFIG.staffLineGap; ly <= y; ly += CONFIG.staffLineGap) {
-            drawLedgerLine(x, ly, svg);
+        for(let ly = botY + CONFIG.staffLineGap; ly <= y + 2; ly += CONFIG.staffLineGap) {
+            drawLedgerLine(x, ly, svg, type);
         }
     }
 
-    function drawLedgerLine(x, y, svg) {
+    function drawLedgerLine(x, y, svg, type = '') {
         const line = createSvgElement('line', {
-            x1: x - 10, y1: y, x2: x + 10, y2: y, class: 'ledger-line'
+            x1: x - 14, y1: y, x2: x + 14, y2: y, class: `ledger-line ${type}`
         });
         svg.appendChild(line);
     }
@@ -756,10 +938,8 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const height = canvas.height / dpr;
 
-      // Limpieza historial
       state.history = state.history.filter(n => (now - n.releaseTime) < CONFIG.fadeOutTime);
       
-      // Dibujar Notas
       [...state.history, ...Object.values(state.activeNotes)].forEach(note => {
         const isAlive = !note.releaseTime;
         let y, h;
@@ -778,17 +958,25 @@
         const m = keyMetrics[note.id];
         if (!m) return;
 
-        const x = (m.x * dpr) - ((m.w * dpr) / 2); // Ajustar centro a esquina izq
+        const x = (m.x * dpr) - ((m.w * dpr) / 2); 
         const w = (m.w * dpr);
 
         const theme = THEMES[state.currentTheme];
         const opacity = isAlive ? 1 : 1 - ((now - note.releaseTime) / CONFIG.fadeOutTime);
         const velocityFactor = 0.5 + (note.velocity * 0.5);
         
-        ctx.fillStyle = note.isBlack 
-          ? theme.main 
-          : hexToRgba(theme.main, opacity * velocityFactor);
-          
+        let fillColor = note.isBlack ? theme.main : hexToRgba(theme.main, opacity * velocityFactor);
+        
+        if (game.active && game.roundNotes[game.currentIndex]) {
+            const targetMidi = game.roundNotes[game.currentIndex].midi;
+            if (noteNameToMidi(note.id) === targetMidi) {
+                 fillColor = isAlive ? '#27ae60' : hexToRgba('#27ae60', opacity); 
+            } else if (isAlive) {
+                 fillColor = '#c0392b';
+            }
+        }
+
+        ctx.fillStyle = fillColor;
         ctx.shadowBlur = isAlive ? 15 * velocityFactor : 0;
         ctx.shadowColor = theme.glow;
         
@@ -828,9 +1016,20 @@
       if (sampler) sampler.triggerAttack(noteName, Tone.now(), velocity);
 
       const domKey = document.getElementById(`key-${noteName}`);
-      if (domKey) domKey.classList.add('active');
+      if (domKey) {
+          domKey.classList.add('active');
+          
+          if (game.active && game.roundNotes[game.currentIndex]) {
+             const targetMidi = game.roundNotes[game.currentIndex].midi;
+             const currentMidi = noteNameToMidi(noteName);
+             if (currentMidi === targetMidi) {
+                 domKey.classList.add('correct');
+             } else {
+                 domKey.classList.add('wrong');
+             }
+          }
+      }
       
-      // Crear etiqueta flotante
       createFloatingLabel(noteName);
 
       const theme = THEMES[state.currentTheme];
@@ -845,7 +1044,12 @@
       };
 
       spawnParticles(noteName, velocity);
-      updateMusicalDisplays();
+      
+      if (game.active) {
+          checkGameInput(noteName);
+      } else {
+          updateMusicalDisplays();
+      }
     }
 
     function triggerNoteOff(noteName) {
@@ -854,7 +1058,9 @@
       if (sampler) sampler.triggerRelease(noteName);
 
       const domKey = document.getElementById(`key-${noteName}`);
-      if (domKey) domKey.classList.remove('active');
+      if (domKey) {
+          domKey.classList.remove('active', 'correct', 'wrong');
+      }
 
       removeFloatingLabel(noteName);
 
@@ -866,7 +1072,6 @@
       updateMusicalDisplays();
     }
 
-    // Etiquetas flotantes sobre la carcasa
     function createFloatingLabel(noteName) {
         const m = keyMetrics[noteName];
         if(!m) return;
@@ -875,7 +1080,7 @@
         lbl.className = 'casing-note-label';
         lbl.id = `lbl-${noteName}`;
         lbl.innerText = getNoteNameSimple(noteName);
-        lbl.style.left = `${m.x}px`; // Posición X absoluta calculada
+        lbl.style.left = `${m.x}px`; 
         els.casing.appendChild(lbl);
     }
     
@@ -890,7 +1095,6 @@
       const dpr = window.devicePixelRatio || 1;
       const count = Math.floor(4 + (velocity * 6));
       const theme = THEMES[state.currentTheme];
-      // Centro de la tecla en coordenadas de canvas
       const centerX = (m.x * dpr); 
       const startY = els.canvas.height;
 
@@ -951,7 +1155,31 @@
     }
 
     function setupUI() {
-      document.getElementById('settings-btn').onclick = () => els.settingsMenu.classList.toggle('open');
+      // Toggle Menus
+      document.getElementById('settings-btn').onclick = (e) => {
+          e.stopPropagation();
+          els.gameMenu.classList.remove('open');
+          document.getElementById('game-btn').classList.remove('active');
+          els.settingsMenu.classList.toggle('open');
+      };
+      
+      document.getElementById('game-btn').onclick = (e) => {
+          e.stopPropagation();
+          toggleGameMenu();
+      };
+      
+      document.addEventListener('click', (e) => {
+          if (!e.target.closest('.floating-menu') && !e.target.closest('.icon-btn')) {
+              els.settingsMenu.classList.remove('open');
+              els.gameMenu.classList.remove('open');
+              document.getElementById('game-btn').classList.remove('active');
+          }
+      });
+
+      // Controles Juego
+      document.getElementById('start-game-btn').onclick = startGame;
+      document.getElementById('stop-game-btn').onclick = stopGame;
+
       document.querySelectorAll('.dot').forEach(d => {
         d.onclick = (e) => {
           document.querySelectorAll('.dot').forEach(x => x.classList.remove('active'));
@@ -964,7 +1192,10 @@
     }
 
     function setupKeyboardInput() {
-        const keyMap = { 'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4', 'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4', 'u': 'Bb4', 'j': 'B4', 'k': 'C5' };
+        const keyMap = { 
+            'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4', 'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4', 'u': 'Bb4', 'j': 'B4', 
+            'k': 'C5', 'o': 'Db5', 'l': 'D5', 'p': 'Eb5', ';': 'E5'
+        };
         document.addEventListener('keydown', async (e) => { if (!e.repeat && keyMap[e.key]) { await Tone.start(); triggerNoteOn(keyMap[e.key], 0.8); } });
         document.addEventListener('keyup', (e) => { if (keyMap[e.key]) triggerNoteOff(keyMap[e.key]); });
     }
@@ -985,7 +1216,6 @@
       ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
     }
 
-    // Iniciar
     init();
   </script>
 </body>
