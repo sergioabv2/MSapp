@@ -1,0 +1,1380 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula Virtual - Clase de Piano Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    
+    <style>
+        :root {
+            /* Variables Generales Aula */
+            --primary-color: #FF4757;
+            --secondary-color: #2ed573;
+            --bg-light: #f1f2f6;
+            --card-bg: #ffffff;
+            --text-dark: #2f3542;
+            --text-muted: #747d8c;
+            --border-color: #dfe4ea;
+            --danger-color: #ff4757;
+
+            /* Variables Piano Salamander (Integradas) */
+            --piano-bg: #2a2a2a;
+            --piano-height: 122px; /* Altura base móvil */
+            --key-white-height: 90px;
+            --key-black-height: 58px;
+        }
+
+        /* Ajustes Piano Desktop */
+        @media (min-width: 769px) {
+            :root {
+                --piano-height: 150px; 
+                --key-white-height: 100px;
+                --key-black-height: 65px;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            width: 100%;
+            height: 100vh;
+            max-width: 1920px;
+            background: var(--bg-light);
+        }
+
+        /* LEFT SIDE - VIDEO & TOOLS */
+        .video-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* VIDEO AREA */
+        .main-video {
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            flex-grow: 1; /* Ocupa el espacio restante */
+            min-height: 0; /* Importante para flexbox */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .video-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* HEADER OVERLAY */
+        .session-header-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+            display: flex; justify-content: space-between; align-items: flex-start;
+            z-index: 20; pointer-events: none;
+        }
+        
+        .class-info { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+        .class-info img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary-color); object-fit: cover; }
+        .class-details h2 { font-size: 18px; font-weight: 700; line-height: 1.2; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.9),
+        0 0 15px rgba(0, 0, 0, 0.8);
+    -webkit-font-smoothing: antialiased;}
+        .class-details p { font-size: 15px; color: rgba(255,255,255,0.8); text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.9),
+        0 0 15px rgba(0, 0, 0, 0.8);
+    -webkit-font-smoothing: antialiased;}
+
+     
+        
+        /* TIMER ANIMATION */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        .timer {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            padding: 6px 14px; border-radius: 20px;
+            color: white; font-weight: 600; font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.2); pointer-events: auto;
+        }
+        .timer i { color: var(--danger-color); border-radius: 50%; animation: pulse-red 2s infinite; }
+        
+        /* PIP Video */
+        .secondary-video {
+    position: absolute; 
+    top: 20px; 
+    right: 20px; 
+    width: 160px; 
+    height: 120px;
+    
+    /* Fondo base por si la imagen tarda en cargar */
+    background: rgba(0, 0, 0, 0.5); 
+    
+    /* Borde semitransparente tipo "Glass" */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    
+    /* --- AQUÍ ESTÁ LA MAGIA DE LA TRANSPARENCIA --- */
+    opacity: 0.7; /* 70% visible por defecto (efecto fantasma) */
+    backdrop-filter: blur(4px); /* Difumina lo que pasa por detrás */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 10;
+    
+    /* Transición suave para el efecto hover */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estado al pasar el mouse (Hover) */
+.secondary-video:hover {
+    opacity: 1; /* Se vuelve totalmente sólido */
+    transform: scale(1.03); /* Crece un poquito para enfocar atención */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4); /* Sombra más fuerte */
+    border-color: rgba(255, 255, 255, 0.6); /* Borde más brillante */
+    cursor: pointer;
+    z-index: 25; /* Asegura que quede por encima de todo */
+}
+
+.simulated-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Esto es lo que lo hace ver como video real */
+    position: absolute; /* Para que quede detrás de los controles */
+    top: 0;
+    left: 0;
+    z-index: 0; 
+    border-radius: 16px; /* Para respetar el borde del contenedor */
+}
+
+
+.pip-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Mantiene la proporción llenando el recuadro */
+    display: block;    /* Elimina espacios fantasma debajo de la imagen */
+}
+
+        /* CONTROLS BAR */
+       .video-controls {
+    position: absolute; 
+    bottom: 20px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 20px; 
+    border-radius: 50px;
+    display: flex; 
+    gap: 15px; 
+    align-items: center;
+    z-index: 20;
+    transition: background 0.3s ease, border 0.3s ease;
+}
+        
+        .control-btn {
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+             background: var(--danger-color); color: white; font-size: 18px;
+            cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;
+        }
+        .control-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+     .control-btn.is-off {
+    /* Fondo gris semitransparente sólido */
+    background: rgba(0, 0, 0, 0.5) !important; 
+    
+    /* Icono blanco sólido (no gris apagado) */
+    color: #ffffff; 
+    
+    /* Borde sutil para que no se pierdan en el video */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    /* Transición suave */
+    transition: all 0.3s ease;
+}
+.control-btn.mic-active {
+    background: #dc3545; 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: mic-glow 1s ease-in-out infinite alternate;
+}
+.control-btn.mic-active:hover {
+    background-color: #c82333;
+}
+        .end-call-btn { background: var(--danger-color); width: 55px; border-radius: 20px; }
+        .end-call-btn:hover { background: #ff6b81; }
+.control-btn.cam-active {
+    background-color: #1877F2 !important; /* Azul Facebook */
+    border: 1px solid #1877F2;
+    color: white;
+    /* Glow azul sutil estático */
+    box-shadow: 0 0 15px rgba(24, 119, 242, 0.5); 
+}
+
+.control-btn.cam-active:hover {
+    background-color: #166fe5 !important; /* Azul un poco más oscuro al hover */
+    transform: translateY(-2px);
+}
+
+
+@keyframes mic-glow {
+    from {
+        /* Estado contraído: Luz intensa pero contenida */
+        box-shadow: 0 0 5px #dc3545, 
+                    0 0 10px rgba(220, 53, 69, 0.4);
+    }
+    to {
+        /* Estado expandido: 3 capas de luz para máxima potencia */
+        box-shadow: 0 0 10px #dc3545,                /* Núcleo sólido */
+                    0 0 25px rgba(220, 53, 69, 0.8), /* Resplandor medio fuerte */
+                    0 0 40px rgba(220, 53, 69, 0.6); /* Aura exterior lejana */
+    }
+}
+
+        .tools-section {
+        background: transparent;
+        padding: 0;
+        border: none;
+        flex-shrink: 0;
+    }
+
+    #piano-container-bottom {
+        position: relative;
+        width: 100%;
+        /* Quitamos overflow hidden para permitir que las etiquetas salgan si es necesario, 
+           pero el wrapper manejará el scroll interno */
+    }
+
+    #piano-top-casing {
+        position: relative;
+        width: 100%;
+        height: 20px; /* Altura original referencia */
+        background: #333;
+        z-index: 4;
+        display: flex;
+        justify-content: center;
+        border-radius: 4px 4px 0 0;
+    }
+
+    .casing-note-label {
+        position: absolute; top: 10px; /* Posición exacta referencia */
+        color: #fff;
+        font-size: 11px; font-weight: 600;
+        background: rgba(0,0,0,0.6);
+        padding: 2px 6px;
+        border-radius: 4px;
+        pointer-events: none;
+        transform: translateX(-50%);
+        z-index: 20;
+        white-space: nowrap;
+    }
+
+    #piano-wrapper {
+        position: relative;
+        width: 100%;
+        height: var(--piano-height);
+        background: var(--piano-bg);
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: center; /* Centrado en Desktop */
+        overflow-x: auto; /* Scroll solo si no cabe */
+        overflow-y: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* Scrollbar estilizado (Referencia) */
+    #piano-wrapper::-webkit-scrollbar { height: 8px; background: #222; }
+    #piano-wrapper::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+    #hit-line {
+        position: absolute; top: 20px; left: 0; width: 100%; height: 4px;
+        background: rgba(255, 0, 0, 0.7);
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        z-index: 10; pointer-events: none;
+    }
+
+    #piano-keys {
+        position: relative;
+        height: 100%;
+        display: flex;
+        margin-top: 25px; /* Espacio para el hit-line (Referencia) */
+    }
+
+    .key {
+        position: relative;
+        float: left;
+        cursor: pointer;
+        transition: all 0.05s;
+    }
+
+    /* TECLAS BLANCAS (Dimensiones Referencia) */
+    .key.white {
+        width: 24px;
+        height: var(--key-white-height);
+        background: #fff;
+        border: 1px solid #ccc;
+        border-right: 1px solid #e0e0e0;
+        border-radius: 0 0 4px 4px;
+        z-index: 1;
+    }
+    .key.white.active {
+        background: var(--primary-color); /* Usamos el color del tema */
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+    }
+
+    /* TECLAS NEGRAS (Dimensiones Referencia) */
+    .key.black {
+        width: 14px;
+        height: var(--key-black-height);
+        background: #333;
+        border: 1px solid #555;
+        margin-left: -7px; margin-right: -7px; /* Overlap exacto referencia */
+        z-index: 2;
+        border-radius: 0 0 3px 3px;
+    }
+  .key.black.active {
+    background: var(--primary-color) !important;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6) !important; 
+    border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+
+}
+
+    /* RESPONSIVIDAD EXACTA REFERENCIA */
+    @media (max-width: 1024px) {
+        .key.white { width: 20px; }
+        .key.black { width: 12px; margin-left: -6px; margin-right: -6px; }
+    }
+
+    @media (max-width: 768px) {
+        .key.white { width: 14px; }
+        .key.black { width: 9px; margin-left: -4.5px; margin-right: -4.5px; }
+        #piano-wrapper { justify-content: flex-start; } /* Alineación izq en móvil */
+        .right-sidebar { display: none; }
+        .main-container { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 500px) {
+        .key.white { width: 11px; height: 75px; }
+        .key.black { width: 7px; height: 48px; margin-left: -3.5px; margin-right: -3.5px; }
+    }
+
+        /* RIGHT SIDEBAR */
+        .right-sidebar {
+            background: var(--card-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex; flex-direction: column; height: 100%;
+            position: relative; z-index: 30; /* Por encima del piano si se enciman */
+        }
+
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .sidebar-tab {
+            flex: 1; padding: 12px; background: none; border: none; color: var(--text-muted);
+            cursor: pointer; font-weight: 600; font-size: 12px; border-bottom: 3px solid transparent;
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .sidebar-tab i { font-size: 14px; margin-bottom: 2px; }
+        .sidebar-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: rgba(255, 71, 87, 0.05); }
+
+        .sidebar-panel { flex-grow: 1; overflow-y: auto; display: none; flex-direction: column; height: 100%; padding-bottom: 10px; }
+        .sidebar-panel.active { display: flex; }
+
+        /* Metronome Footer */
+        .sidebar-footer { flex-shrink: 0; background: var(--bg-light); border-top: 1px solid var(--border-color); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .metronome-ui { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .metro-info { display: flex; flex-direction: column; }
+        .metro-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .metro-value { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .metro-controls { display: flex; gap: 8px; align-items: center; }
+        .metro-btn-small { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border-color); background: white; cursor: pointer; color: var(--text-muted); font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .metro-play { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--text-dark); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .metro-play.active { background: var(--primary-color); box-shadow: 0 0 10px rgba(255, 71, 87, 0.4); }
+
+        /* CHAT STYLES */
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { display: flex; gap: 8px; animation: fadeIn 0.3s ease; }
+        .message.own { flex-direction: row-reverse; }
+        .message-content { background: #f1f2f6; padding: 8px 12px; border-radius: 12px; border-top-left-radius: 2px; max-width: 85%; font-size: 12px; line-height: 1.4; }
+        .message.own .message-content { background: var(--primary-color); color: white; border-radius: 12px; border-top-right-radius: 2px; }
+        .message-sender { font-size: 10px; font-weight: 600; margin-bottom: 2px; opacity: 0.7; }
+        .message-time { font-size: 9px; margin-top: 3px; opacity: 0.7; text-align: right; }
+        .chat-input-area { padding: 12px; border-top: 1px solid var(--border-color); background: white; display: flex; gap: 8px; }
+        .chat-input { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 20px; outline: none; font-family: inherit; font-size: 12px; }
+        .send-btn { width: 36px; height: 36px; background: var(--primary-color); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 12px; }
+
+        /* TASK & MATERIAL STYLES */
+        .task-list { display: flex; flex-direction: column; }
+        .task-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; font-size: 13px; transition: 0.2s; }
+        .task-item.completed { background-color: #f9f9f9; color: #b2bec3; text-decoration: line-through; }
+        .task-item.current { background-color: white; border-left: 4px solid var(--primary-color); font-weight: 600; color: var(--text-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .materials-list { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .material-item { background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s; }
+        .material-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .material-icon { width: 36px; height: 36px; background: rgba(255, 71, 87, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); font-size: 16px; }
+        .download-btn { background: none; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; cursor: pointer; color: var(--text-muted); font-size: 12px; }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+            .right-sidebar { display: none; }
+        }
+
+        /* STUDENT CAM */
+        .student-cam-wrapper { width: 100%; height: 180px; background: #000; position: relative; flex-shrink: 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+.staff-line { stroke: #999; stroke-width: 1; }
+.ledger-line { stroke: #999; stroke-width: 1; }
+.note-head { fill: #333; }
+.note-stem { stroke: #333; stroke-width: 2; }
+.note-accidental { fill: #333; font-family: serif; font-size: 20px; font-weight: bold; }
+.clef { fill: #333; font-family: serif; font-size: 70px; } /* Ajustado para tamaño pequeño */
+.bass-clef { font-size: 55px; }
+
+.draggable-modal {
+    position: fixed;
+    top: 20%; /* Posición inicial */
+    left: 30%;
+    width: 600px;
+    height: 500px;
+    background: white;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    z-index: 9999; /* Por encima de todo */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    padding: 10px 15px;
+    background: var(--text-dark);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move; /* Indica que se puede arrastrar */
+    user-select: none;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-body {
+    flex-grow: 1;
+    background: #eee;
+    position: relative;
+}
+
+.modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Responsividad para móviles: ocupa toda la pantalla y no es dragable */
+@media (max-width: 700px) {
+    .draggable-modal {
+        width: 95%;
+        height: 80%;
+        top: 10% !important;
+        left: 2.5% !important;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div class="video-section">
+            
+            <div class="main-video">
+                
+                <div class="session-header-overlay">
+                    <div class="class-info">
+                        <img src="https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa" alt="Profesor">
+                        <div class="class-details">
+                            <h2>Sergio Valenzo</h2>
+                            <p>Piano Intermedio • En vivo</p>
+                        </div>
+                    </div>
+                    <div class="timer">
+                        <i class="fas fa-circle" style="font-size: 8px;"></i>
+                        <span id="timer">00:00</span>
+                    </div>
+                </div>
+
+                <div class="video-placeholder">
+                   <img src="https://lh3.googleusercontent.com/d/14Z2nzr2OrqWXu_CtVEc203hy7_eJfwSP=s1000" class="simulated-stream" alt="Video Simulado">
+                </div>
+                
+                <div class="secondary-video">
+                   <div class="video-placeholder" style="height: 100%; justify-content: center;">
+                        <i class="fas fa-user" style="font-size: 24px;"></i>
+                    </div>
+                <!--     <img src="https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa" 
+         class="pip-stream" 
+         alt="Cámara Alumno"> -->
+                </div>
+
+                <div class="video-controls">
+                   <button class="control-btn mic-active" id="micBtn" onclick="toggleMic()" title="Silenciar">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    
+                    <button class="control-btn is-off" id="camBtn" onclick="toggleCamera()" title="Encender Cámara">
+                        <i class="fas fa-video-slash"></i>
+                    </button>
+                    <button class="control-btn end-call-btn" onclick="endClass()" title="Finalizar">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tools-section">
+                <div id="piano-container-bottom">
+                    <div id="piano-top-casing">
+                        </div>
+                    
+                    <div id="piano-wrapper">
+                        <div id="hit-line"></div>
+                        <div id="piano-keys">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <aside class="right-sidebar">
+          <div class="student-cam-wrapper" id="camContainer">
+    <div id="music-visualizer" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff;">
+        <div id="chord-display" style="font-size: 18px; font-weight: 700; color: var(--primary-color); height: 30px; margin-top: 10px;">---</div>
+        <div id="staff-container" style="width: 100%; flex-grow: 1; position: relative;">
+            <svg id="staff-svg" width="100%" height="100%" style="display: block;"></svg>
+        </div>
+    </div>
+
+    <video id="student-video" autoplay playsinline muted style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 10;"></video>
+    
+    <div id="cam-placeholder" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:#000; align-items:center; justify-content:center; flex-direction:column; color:rgba(255,255,255,0.5);">
+        <i class="fas fa-video-slash" style="font-size: 32px;"></i>
+    </div>
+</div>
+
+  <div class="sidebar-footer">
+                <div class="metronome-ui">
+                    <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
+                    <div class="metro-info">
+                        <span class="metro-label">Metrónomo</span>
+                        <span class="metro-value" id="bpmDisplay">60 BPM</span>
+                    </div>
+                    <div class="metro-controls">
+                        <button class="metro-btn-small" onclick="changeBPM(-5)">-5</button>
+                        <button class="metro-play" id="metroBtn" onclick="toggleMetronome()"><i class="fas fa-play"></i></button>
+                        <button class="metro-btn-small" onclick="changeBPM(5)">+5</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="sidebar-tabs">
+                  <button class="sidebar-tab active" onclick="switchSidebarTab('tasks')">
+                    <i class="fas fa-check-square"></i> Tareas
+                </button>
+                 <button class="sidebar-tab" onclick="switchSidebarTab('materials')">
+                    <i class="fas fa-folder"></i> Material
+                </button>
+                <button class="sidebar-tab" onclick="switchSidebarTab('chat')">
+                    <i class="fas fa-comments"></i> Chat
+                </button> 
+            </div>
+
+            <div class="sidebar-panel" id="chatPanel">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <img src="https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--primary-color);">
+                        <div class="message-content">
+                            <div class="message-sender">Sergio</div>
+                            <div>¡Hola! Prueba el nuevo piano, ahora tiene mejor respuesta.</div>
+                            <div class="message-time">10:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Escribe..." onkeypress="handleEnter(event)">
+                    <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+            <div class="sidebar-panel active" id="tasksPanel">
+                <div class="task-list">
+                    <h3 style="padding: 15px 15px 5px 15px; font-size: 16px;">Plan de Clase</h3>
+                    <div class="task-item completed"><i class="fas fa-check-circle"></i> <span>Calentamiento</span></div>
+                    <div class="task-item current"><i class="fas fa-play-circle"></i> <span>Escala Sol Mayor</span></div>
+                    <div class="task-item pending"><i class="far fa-circle"></i> <span>Nocturno Chopin</span></div>
+                </div>
+            </div>
+
+           <div class="sidebar-panel" id="materialsPanel">
+    <div class="materials-list" id="materialsContainer">
+        </div>
+</div>
+
+          
+        </aside>
+    </div>
+
+    <div id="pdfModal" class="draggable-modal" style="display: none;">
+    <div class="modal-header" id="modalHeader">
+        <span><i class="fas fa-file-pdf"></i> Vista Previa</span>
+        <button onclick="closeModal()" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+        <iframe id="previewFrame" src="" allow="fullscreen"></iframe>
+    </div>
+</div>
+
+    <script>
+        // --- CONFIGURACIÓN TONE.JS & SALAMANDER PIANO ---
+        const els = {
+            keysContainer: document.getElementById('piano-keys'),
+            casing: document.getElementById('piano-top-casing'),
+            pianoWrapper: document.getElementById('piano-wrapper')
+        };
+
+        const state = {
+            activeNotes: {},
+            mouseDown: false
+        };
+
+        // Samples de alta calidad
+        const sampler = new Tone.Sampler({
+            urls: {
+                A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", A1: "A1.mp3", 
+                C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", A2: "A2.mp3", C3: "C3.mp3", 
+                "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", 
+                "F#4": "Fs4.mp3", A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", 
+                A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3", 
+                C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3", A7: "A7.mp3", C8: "C8.mp3"
+            },
+            release: 1,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).toDestination();
+
+
+
+
+const VISUALIZER_CONFIG = {
+    staffYTop: 40,
+    staffLineGap: 12, // Aumentado ligeramente para mejor legibilidad
+    noteRadiusX: 8,   // Aumentado (antes ~6)
+    noteRadiusY: 6,   // Aumentado (antes ~4)
+    accidentalGap: 26 // Separación aumentada para el bemol
+};
+
+const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+const CHORD_MAP = {
+    // Tríadas
+    '0,4,7': { name: 'Mayor', short: '' },
+    '0,3,7': { name: 'Menor', short: 'm' },
+    '0,3,6': { name: 'Dism', short: 'dim' },
+    '0,4,8': { name: 'Aum', short: 'aug' },
+    // Séptimas
+    '0,4,7,10': { name: 'Dom 7', short: '7' },
+    '0,4,7,11': { name: 'Maj 7', short: 'maj7' },
+    '0,3,7,10': { name: 'Menor 7', short: 'm7' },
+    '0,3,7,11': { name: 'Menor Maj7', short: 'mM7' },
+    '0,3,6,9':  { name: 'Dism 7', short: 'dim7' },
+    '0,3,6,10': { name: 'Semi Dism', short: 'm7b5' } // Half-diminished
+};
+
+els.chordDisplay = document.getElementById('chord-display');
+els.staffSvg = document.getElementById('staff-svg');
+els.staffContainer = document.getElementById('staff-container');
+els.videoElement = document.getElementById('student-video');
+els.visualizer = document.getElementById('music-visualizer');
+
+
+        const membrane = new Tone.MembraneSynth().toDestination();
+        const modal = document.getElementById("pdfModal");
+const header = document.getElementById("modalHeader");
+const iframe = document.getElementById("previewFrame");
+
+        // --- GENERACIÓN DEL TECLADO ---
+        function renderKeys() {
+            els.keysContainer.innerHTML = '';
+            const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+            const blackKeys = { 'C': 'Db', 'D': 'Eb', 'F': 'Gb', 'G': 'Ab', 'A': 'Bb' };
+            
+            // Generamos rango completo (Octavas 1 a 7)
+            for (let octave = 1; octave <= 7; octave++) {
+                for (let i = 0; i <= 6; i++) {
+                    const note = pattern[i];
+                    const noteName = `${note}${octave}`;
+                    
+                    // Tecla Blanca
+                    const whiteKey = document.createElement('div');
+                    whiteKey.className = 'key white';
+                    whiteKey.id = `key-${noteName}`;
+                    whiteKey.dataset.note = noteName;
+                    
+                    addKeyEvents(whiteKey, noteName);
+                    els.keysContainer.appendChild(whiteKey);
+
+                    // Tecla Negra
+                    if (blackKeys[note]) {
+                        const blackNoteName = `${blackKeys[note]}${octave}`;
+                        const blackKey = document.createElement('div');
+                        blackKey.className = 'key black';
+                        blackKey.id = `key-${blackNoteName}`;
+                        blackKey.dataset.note = blackNoteName;
+                        
+                        addKeyEvents(blackKey, blackNoteName);
+                        els.keysContainer.appendChild(blackKey);
+                    }
+                }
+            }
+        }
+
+        // Eventos de Mouse/Touch para las teclas
+        function addKeyEvents(el, note) {
+            el.addEventListener('mousedown', (e) => {
+                state.mouseDown = true;
+                triggerNoteOn(note);
+            });
+            el.addEventListener('mouseenter', (e) => {
+                if (state.mouseDown) triggerNoteOn(note);
+            });
+            el.addEventListener('mouseup', () => triggerNoteOff(note));
+            el.addEventListener('mouseleave', () => triggerNoteOff(note));
+            
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                triggerNoteOn(note);
+            });
+            el.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                triggerNoteOff(note);
+            });
+        }
+        document.addEventListener('mouseup', () => state.mouseDown = false);
+
+
+        function triggerNoteOn(noteName) {
+            if(Tone.context.state !== 'running') Tone.start();
+            if (state.activeNotes[noteName]) return; 
+            if (sampler) {
+                sampler.triggerAttack(noteName, Tone.now());
+            }
+
+            const domKey = document.getElementById(`key-${noteName}`);
+            if (domKey) {
+                domKey.classList.add('active');
+                createFloatingLabel(noteName, domKey);
+            }
+
+            state.activeNotes[noteName] = true;
+            updateMusicalDisplays();
+        }
+
+        function triggerNoteOff(noteName) {
+            if (!state.activeNotes[noteName]) return;
+
+            if (sampler) sampler.triggerRelease(noteName);
+
+            const domKey = document.getElementById(`key-${noteName}`);
+            if (domKey) domKey.classList.remove('active');
+
+            removeFloatingLabel(noteName);
+            delete state.activeNotes[noteName];
+            updateMusicalDisplays();
+        }
+
+        // Crear etiqueta en la barra superior (Casing)
+        function createFloatingLabel(noteName, keyElement) {
+            // Calculamos posición relativa al scroll
+            const keyRect = keyElement.getBoundingClientRect();
+            const casingRect = els.casing.getBoundingClientRect();
+            
+            // Centro de la tecla relativo al viewport
+            const keyCenterX = keyRect.left + (keyRect.width / 2);
+            
+            // Posición relativa dentro del contenedor Casing
+            const relativeX = keyCenterX - casingRect.left;
+
+            // No crear si sale del rango visible (opcional, pero buena práctica)
+            if (relativeX < 0 || relativeX > casingRect.width) return;
+
+            const lbl = document.createElement('div');
+            lbl.className = 'casing-note-label';
+            lbl.id = `lbl-${noteName}`;
+            // Mostrar solo nota sin octava para limpieza (ej. "C" en vez de "C4")
+            lbl.innerText = noteName.replace(/[0-9]/g, ''); 
+            
+            lbl.style.left = `${relativeX}px`; 
+            els.casing.appendChild(lbl);
+        }
+
+        function removeFloatingLabel(noteName) {
+            const lbl = document.getElementById(`lbl-${noteName}`);
+            if(lbl) lbl.remove();
+        }
+
+        // Mapeo de teclado PC
+        function setupKeyboardInput() {
+            const keyMap = { 
+                'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4', 'f': 'F4', 't': 'Gb4', 
+                'g': 'G4', 'y': 'Ab4', 'h': 'A4', 'u': 'Bb4', 'j': 'B4', 'k': 'C5', 'o': 'Db5', 
+                'l': 'D5', 'p': 'Eb5', ';': 'E5'
+            };
+            
+            document.addEventListener('keydown', (e) => {
+                if (!e.repeat && keyMap[e.key]) triggerNoteOn(keyMap[e.key]);
+            });
+            document.addEventListener('keyup', (e) => {
+                if (keyMap[e.key]) triggerNoteOff(keyMap[e.key]);
+            });
+        }
+
+        // --- INTERFAZ GENERAL ---
+        function switchSidebarTab(tabName) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
+            
+            if(tabName === 'chat') document.getElementById('chatPanel').classList.add('active');
+            if(tabName === 'tasks') document.getElementById('tasksPanel').classList.add('active');
+            if(tabName === 'materials') document.getElementById('materialsPanel').classList.add('active');
+        }
+
+
+let bpm = 60;
+let isMetronomePlaying = false;
+const metronomeAudio = document.getElementById('metronomeAudio');
+const BASE_BPM_SOURCE = 60;
+
+function changeBPM(amount) {
+    bpm = Math.max(40, Math.min(240, bpm + amount));
+    document.getElementById('bpmDisplay').innerText = bpm + " BPM";
+    const newRate = bpm / BASE_BPM_SOURCE;
+    metronomeAudio.playbackRate = newRate;
+}
+
+async function toggleMetronome() {
+    const btn = document.getElementById('metroBtn');
+    const icon = btn.querySelector('i');
+    if(Tone.context.state !== 'running') await Tone.start();
+
+    if (isMetronomePlaying) {
+        // APAGAR
+        metronomeAudio.pause();
+        metronomeAudio.currentTime = 0; 
+        isMetronomePlaying = false;
+        
+        btn.classList.remove('active');
+        icon.className = 'fas fa-play';
+    } else {
+        isMetronomePlaying = true;
+        metronomeAudio.playbackRate = bpm / BASE_BPM_SOURCE;
+        
+        try {
+            await metronomeAudio.play();
+            btn.classList.add('active');
+            icon.className = 'fas fa-pause';
+        } catch (err) {
+            console.error("Error al reproducir audio:", err);
+            isMetronomePlaying = false; 
+        }
+    }
+}
+        function startMetronomeInterval() {
+            const intervalMs = 60000 / bpm;
+            metronomeInterval = setInterval(() => {
+                membrane.triggerAttackRelease("C2", "32n");
+            }, intervalMs);
+        }
+
+        // --- GESTIÓN DE MATERIALES (JSON) ---
+
+// 1. Tu "Base de Datos" de archivos
+const classMaterials = [
+    {
+        id: 1,
+        title: "Partitura Nocturno Op.9",
+        type: "PDF",
+        icon: "fa-file-pdf",
+        url: "https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview" 
+    },
+    {
+        id: 2,
+        title: "Diagrama de Acordes",
+        type: "IMG",
+        icon: "fa-file-image",
+        url: "https://www.youtube.com/embed/3wn33KNLy5M"
+    },
+    {
+        id: 3,
+        title: "Teoría Musical I",
+        type: "WEB",
+        icon: "fa-globe",
+        url: "https://es.wikipedia.org/wiki/Teor%C3%ADa_musical"
+    }
+];
+
+// 2. Función para generar el HTML dinámicamente
+function renderMaterials() {
+    const container = document.getElementById('materialsContainer');
+    container.innerHTML = ''; // Limpiar por seguridad
+
+    classMaterials.forEach(item => {
+        // Creamos el HTML de cada tarjeta
+        const itemHtml = `
+            <div class="material-item">
+                <div class="material-info" style="display:flex; gap:10px; align-items:center;">
+                    <div class="material-icon">
+                        <i class="fas ${item.icon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:600; font-size:13px;">${item.title}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">${item.type}</div>
+                    </div>
+                </div>
+                <button class="download-btn" onclick="openModal('${item.url}')" title="Ver archivo">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                </button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+    });
+}
+
+        // Chat
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const txt = input.value.trim();
+            if(!txt) return;
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const msgHtml = `
+                <div class="message own">
+                    <div class="message-content">
+                        <div>${txt}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                </div>`;
+            
+            container.insertAdjacentHTML('beforeend', msgHtml);
+            container.scrollTop = container.scrollHeight;
+            input.value = '';
+        }
+        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
+
+        // Video Controls (Simulados)
+        let micOn = true; let camOn = false;
+        let localStream = null;
+function toggleMic() {
+    micOn = !micOn;
+    const btn = document.getElementById('micBtn');
+    const icon = btn.querySelector('i');
+
+    if (micOn) {
+        // ENCENDER
+        btn.classList.remove('is-off');
+        btn.classList.add('mic-active'); // Activa el Glow rojo
+        icon.className = 'fas fa-microphone';
+        // Aquí lógica real de audio track enabled = true
+    } else {
+        // APAGAR
+        btn.classList.add('is-off');
+        btn.classList.remove('mic-active'); // Quita el Glow
+        icon.className = 'fas fa-microphone-slash';
+        // Aquí lógica real de audio track enabled = false
+    }
+}
+
+async function toggleCamera() {
+    const btn = document.getElementById('camBtn');
+    const icon = btn.querySelector('i');
+    
+    // CASO: APAGAR CÁMARA
+    if (camOn) {
+        camOn = false;
+        
+        // Detener tracks
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        
+        // UI Video
+        els.videoElement.srcObject = null;
+        els.videoElement.style.display = 'none';
+        els.visualizer.style.display = 'flex'; 
+        
+        // UI BOTÓN (Volver a Gris)
+        btn.classList.remove('cam-active'); // Quita el azul
+        btn.classList.add('is-off');        // Pone el gris
+        icon.className = 'fas fa-video-slash';
+        
+    } else {
+        // CASO: ENCENDER CÁMARA
+        const confirmOn = confirm("¿Encender cámara? Se ocultará el visualizador.");
+        
+        if (confirmOn) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                camOn = true;
+                
+                // UI Video
+                els.videoElement.srcObject = localStream;
+                els.videoElement.style.display = 'block';
+                els.visualizer.style.display = 'none';
+                
+                // UI BOTÓN (Poner Azul Facebook)
+                btn.classList.remove('is-off');    // Quita el gris
+                btn.classList.add('cam-active');   // Pone el azul
+                icon.className = 'fas fa-video';
+                
+            } catch (err) {
+                console.error("Error camara:", err);
+                alert("No se pudo acceder a la cámara.");
+            }
+        }
+    }
+}
+
+
+
+        function endClass() { 
+            if(confirm('¿Finalizar clase?')) location.reload(); 
+        }
+
+        // Timer
+        let totalSeconds = 0;
+        setInterval(() => {
+            totalSeconds++;
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2,'0');
+            const s = (totalSeconds % 60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }, 1000);
+
+        // --- INICIALIZACIÓN ---
+        window.addEventListener('load', () => {
+            renderKeys();
+            setupKeyboardInput();
+            renderMaterials();
+            updateMusicalDisplays();
+
+            setTimeout(() => {
+                const c4Key = document.getElementById('key-C4');
+                if (c4Key) {
+                    c4Key.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+                }
+            }, 100);
+        });
+
+// --- UTILIDADES MUSICALES ---
+function noteNameToMidi(noteName) {
+    const noteMap = { 'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11 };
+    const match = noteName.match(/^([A-G]b?)(\d+)$/);
+    if (!match) return 0;
+    const [, note, octave] = match;
+    let n = note;
+    if (n.includes('#')) { 
+       const mapSharp = {'C#':'Db', 'D#':'Eb', 'F#':'Gb', 'G#':'Ab', 'A#':'Bb'};
+       if(mapSharp[n]) n = mapSharp[n];
+    }
+    return (parseInt(octave) + 1) * 12 + noteMap[n];
+}
+
+function getInterval(note1, note2) {
+    const intervals = ['Unísono', '2da Menor', '2da Mayor', '3ra Menor', '3ra Mayor', '4ta Justa', 'Tritono', '5ta Justa', '6ta Menor', '6ta Mayor', '7ma Menor', '7ma Mayor', 'Octava'];
+    const diff = Math.abs(noteNameToMidi(note2) - noteNameToMidi(note1)) % 12;
+    return intervals[diff] || 'Intervalo';
+}
+
+function getChordName(notes) {
+    if (notes.length < 3) return null;
+
+    // 1. Obtener MIDIs y ordenarlos
+    const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
+    
+    // 2. Identificar el Bajo (nota más grave) y las "Pitch Classes" (0-11) únicas
+    const bassMidi = midis[0];
+    const bassNoteName = NOTE_NAMES[bassMidi % 12];
+    const uniquePCs = [...new Set(midis.map(m => m % 12))]; // Elimina duplicados de octava
+
+    // 3. Algoritmo de Fuerza Bruta para encontrar la Raíz
+    // Probamos cada nota presente como posible candidata a Raíz
+    for (let i = 0; i < uniquePCs.length; i++) {
+        const potentialRoot = uniquePCs[i];
+        
+        // Calcular intervalos relativos a esta posible raíz
+        // (x - root + 12) % 12 normaliza todo a 0, 3, 7, etc.
+        const intervals = uniquePCs
+            .map(pc => (pc - potentialRoot + 12) % 12)
+            .sort((a, b) => a - b)
+            .join(',');
+
+        // 4. ¿Coincide con un patrón conocido?
+        const chordInfo = CHORD_MAP[intervals];
+        if (chordInfo) {
+            const rootName = NOTE_NAMES[potentialRoot];
+            const chordLabel = rootName + chordInfo.short;
+
+            // 5. Detectar Inversión
+            if (potentialRoot !== (bassMidi % 12)) {
+                return `${chordLabel}/${bassNoteName}`; // Ej: C/E
+            } else {
+                return chordLabel; // Posición Fundamental
+            }
+        }
+    }
+    return null; // No es un acorde reconocido
+}
+
+// --- DIBUJADO SVG (STAFF) ---
+function createSvgElement(name, attributes) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (let key in attributes) el.setAttribute(key, attributes[key]);
+    return el;
+}
+
+function updateMusicalDisplays() {
+    // Si la cámara está encendida, quizás no queremos actualizar esto para ahorrar recursos, 
+    // pero el requisito dice "overlay", así que lo dejamos correr.
+    const activeNames = Object.keys(state.activeNotes);
+    
+    // 1. Actualizar Texto de Acorde/Intervalo
+    let text = '---';
+    if (activeNames.length === 1) text = activeNames[0].replace(/[0-9]/g, '');
+    else if (activeNames.length === 2) text = getInterval(activeNames[0], activeNames[1]);
+    else if (activeNames.length >= 3) text = getChordName(activeNames) || 'Acorde desc.';
+    els.chordDisplay.innerText = text;
+
+    // 2. Dibujar Pentagrama
+    drawStaff(activeNames);
+}
+
+function drawStaff(activeNotes) {
+    els.staffSvg.innerHTML = ''; // Limpiar
+    const width = els.staffContainer.clientWidth || 300;
+    
+    // Dibujar 5 líneas
+    for (let i = 0; i < 5; i++) {
+        const y = VISUALIZER_CONFIG.staffYTop + (i * VISUALIZER_CONFIG.staffLineGap);
+        els.staffSvg.appendChild(createSvgElement('line', {
+            x1: 10, y1: y, x2: width - 10, y2: y, class: 'staff-line'
+        }));
+    }
+
+    // Lógica de Claves (Split Point C4)
+    let useTreble = true;
+    if (activeNotes.length > 0) {
+        const midis = activeNotes.map(noteNameToMidi).sort((a,b)=>a-b);
+        // Si la nota más baja es menor que C4 (MIDI 60), usar Fa
+        if (midis[0] < 60) useTreble = false;
+    }
+
+    // Dibujar Clave
+   const clefY = useTreble 
+        ? VISUALIZER_CONFIG.staffYTop + 46  // Ajuste fino para Clave de Sol (65px)
+        : VISUALIZER_CONFIG.staffYTop + 35; // Ajuste fino para Clave de Fa (55px)
+
+    const clefText = createSvgElement('text', {
+        x: 5, // Un poco más a la izquierda para aprovechar espacio
+        y: clefY, 
+        class: useTreble ? 'clef' : 'clef bass-clef'
+    });
+    clefText.textContent = useTreble ? '𝄞' : '𝄢';
+    els.staffSvg.appendChild(clefText);
+
+    // Dibujar Notas
+    if (activeNotes.length === 0) return;
+    
+    const midis = activeNotes.map(noteNameToMidi).sort((a,b) => a - b);
+    const baseX = 80;
+    
+    midis.forEach((midi, index) => {
+        // Desplazamiento simple para acordes (evitar solapamiento)
+        const x = baseX + (index * 35);
+        drawNote(midi, x, useTreble, els.staffSvg);
+    });
+}
+
+function drawNote(midi, x, isTreble, svg) {
+    const octave = Math.floor(midi / 12) - 1;
+    const noteIndex = midi % 12; // 0=C, 1=Db, etc.
+    const noteName = NOTE_NAMES[noteIndex];
+    const diatonicMap = { 
+        'C':0, 'Db':1, 'D':1, 'Eb':2, 'E':2, 'F':3, 'Gb':4, 'G':4, 'Ab':5, 'A':5, 'Bb':6, 'B':6 
+    };
+    const rawLetter = noteName.replace(/[0-9#b]/g, ''); 
+    const myDiatonicIndex = (octave * 7) + diatonicMap[noteName.replace(/[0-9]/g, '')];
+    const refDiatonicIndex = isTreble ? 38 : 26;
+    const stepsFromTop = refDiatonicIndex - myDiatonicIndex;
+    
+    // Cada paso es la mitad del gap entre líneas
+    const stepSize = VISUALIZER_CONFIG.staffLineGap / 2;
+    const y = VISUALIZER_CONFIG.staffYTop + (stepsFromTop * stepSize);
+
+    // --- RENDERIZADO ---
+    
+    // 1. Cabeza de nota (Tamaño aumentado)
+    const head = createSvgElement('ellipse', {
+        cx: x, 
+        cy: y, 
+        rx: VISUALIZER_CONFIG.noteRadiusX, 
+        ry: VISUALIZER_CONFIG.noteRadiusY, 
+        class: 'note-head',
+        transform: `rotate(-20, ${x}, ${y})` // Rotación estética clásica
+    });
+    svg.appendChild(head);
+
+    // 2. Plica (Stem)
+    const stemHeight = 35;
+    const stemDir = stepsFromTop > 4 ? -1 : 1; 
+    
+    // Forzamos plica arriba para simplificar limpieza visual en acordes complejos, 
+    // o puedes usar lógica dinámica:
+    const yStemEnd = y - stemHeight; 
+    
+    svg.appendChild(createSvgElement('line', {
+        x1: x + (VISUALIZER_CONFIG.noteRadiusX - 1), 
+        y1: y, 
+        x2: x + (VISUALIZER_CONFIG.noteRadiusX - 1), 
+        y2: yStemEnd, 
+        class: 'note-stem'
+    }));
+
+    // 3. Alteración (Bemol/Sostenido) con GAP AUMENTADO
+    const hasAccidental = noteName.includes('b') || noteName.includes('#');
+    if (hasAccidental) {
+        const symbol = noteName.includes('#') ? '♯' : '♭';
+        const acc = createSvgElement('text', { 
+            x: x - VISUALIZER_CONFIG.accidentalGap, // Gap corregido
+            y: y + 6, // Ajuste vertical fino para centrar con la nota
+            class: 'note-accidental' 
+        });
+        acc.textContent = symbol;
+        svg.appendChild(acc);
+    }
+
+    const topLimit = 0; 
+    const bottomLimit = 8;
+
+    if (stepsFromTop < topLimit) { // Notas agudas fuera
+        for (let i = -2; i >= stepsFromTop; i -= 2) {
+            drawLedgerLine(x, VISUALIZER_CONFIG.staffYTop + (i * stepSize), svg);
+        }
+    } else if (stepsFromTop > bottomLimit) { // Notas graves fuera (Aquí entraba el conflicto B3/C4)
+        for (let i = 10; i <= stepsFromTop; i += 2) {
+             drawLedgerLine(x, VISUALIZER_CONFIG.staffYTop + (i * stepSize), svg);
+        }
+    }
+}
+
+function drawLedgerLine(x, y, svg) {
+    svg.appendChild(createSvgElement('line', {
+         x1: x - 14, 
+         y1: y, 
+         x2: x + 14, 
+         y2: y, 
+         class: 'ledger-line'
+    }));
+}
+        function openModal(url) {
+    iframe.src = url;
+    modal.style.display = "flex";
+    // Resetear posición si se desea, o mantener la última
+}
+
+function closeModal() {
+    modal.style.display = "none";
+    iframe.src = ""; // Detener carga/video al cerrar
+}
+
+// 2. Lógica de Arrastre (Drag & Drop)
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+header.addEventListener("mousedown", dragStart);
+document.addEventListener("mouseup", dragEnd);
+document.addEventListener("mousemove", drag);
+
+function dragStart(e) {
+    initialX = e.clientX - xOffset;
+    initialY = e.clientY - yOffset;
+
+    // Solo permitir arrastre si el click fue en el header
+    if (e.target === header || e.target.parentNode === header) {
+        isDragging = true;
+    }
+}
+
+function dragEnd(e) {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+}
+
+function drag(e) {
+    if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, modal);
+    }
+}
+
+function setTranslate(xPos, yPos, el) {
+    // Usamos transform para mejor rendimiento
+    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+}
+
+    </script>
+</body>
+</html>
