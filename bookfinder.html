@@ -715,7 +715,11 @@
         </button>
     </div>
 </div>
-        <iframe id="book-viewer-iframe" frameborder="0"></iframe>
+        <iframe 
+    id="book-viewer-iframe" 
+    allow="midi *; midi-sysex *; encrypted-media *" 
+    frameborder="0">
+</iframe>
     </div>
     
     <div id="piano-top-casing"></div>
@@ -1453,10 +1457,30 @@ function initMIDI() {
 function onMIDIMessage(msg) {
   const [cmd, note, vel] = msg.data;
   const command = cmd >> 4;
+  
+  if (command === 9 && vel > 0) triggerNoteOn(midiToNote(note), vel/127);
+  else if (command === 8 || (command === 9 && vel === 0)) triggerNoteOff(midiToNote(note));
+  else if (command === 11 && note === 64) handleSustain(vel > 63);
+
+  const iframe = document.getElementById('book-viewer-iframe');
+  if (iframe && iframe.contentWindow && iframe.src) {
+      iframe.contentWindow.postMessage({
+          type: 'MIDI_EVENT',
+          data: Array.from(msg.data), // Convertimos Uint8Array a Array normal para el transporte
+          timestamp: msg.timeStamp
+      }, '*'); 
+  }
+}
+
+/*
+function onMIDIMessage(msg) {
+  const [cmd, note, vel] = msg.data;
+  const command = cmd >> 4;
   if (command === 9 && vel > 0) triggerNoteOn(midiToNote(note), vel/127);
   else if (command === 8 || (command === 9 && vel === 0)) triggerNoteOff(midiToNote(note));
   else if (command === 11 && note === 64) handleSustain(vel > 63);
 }
+*/
 
 function midiToNote(midi) {
     const notes = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
