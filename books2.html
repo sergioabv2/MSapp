@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Gestor de Partituras Mozart Academy</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -153,21 +153,70 @@
         .stars { color: #ff9700; font-size: 12px; }
         .stars i.far { color: #ccc; }
 
-        /* --- MODAL PDF --- */
-        .pdf-viewer-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: rgba(33, 33, 33, 0.95); z-index: 2000; 
-            display: none; flex-direction: column; 
-        }
-        .pdf-viewer-overlay.active { display: flex; }
-        .xml-viewer-close { 
-            background: none; border: none; position: absolute; top: 15px; right: 25px; 
-            color: black; font-size: 30px; cursor: pointer; z-index: 2001;
-        }
-        .pdf-viewer-overlay iframe { width: 100%; height: 100%; border: none; background: #fff; }
+        /* --- MODAL PDF (Ajustado para iOS/iPhone) --- */
+.pdf-viewer-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    width: 100vw; 
+    height: 100vh; /* Fallback para navegadores viejos */
+    height: 100dvh; /* LA CLAVE: Altura dinámica para móviles modernos */
+    background-color: #000; /* Fondo negro para mejor contraste */
+    z-index: 99999; 
+    display: none; 
+    flex-direction: column; 
+    overflow: hidden; /* Evita scroll en el contenedor padre */
+    -webkit-overflow-scrolling: touch; /* Suavidad en iOS */
+}
+
+.pdf-viewer-overlay.active { 
+    display: flex; 
+}
+
+.xml-viewer-close { 
+    position: absolute; 
+    top: 10px; /* Un poco más abajo para evitar el notch del iPhone */
+    right: 15px; 
+    background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente para que se vea */
+    border: none; 
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: white; 
+    font-size: 20px; 
+    cursor: pointer; 
+    z-index: 100000; /* Siempre encima del iframe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-viewer-overlay iframe { 
+    width: 100%; 
+    height: 100%; 
+    border: none; 
+    background: #fff;
+    flex-grow: 1;
+}
 
         /* Responsiveness */
-        @media (max-width: 1045px) { .books-of { display: none; } }
+        @media (max-width: 900px) { .books-of { display: none; } }
+        @media (max-width: 1150px) and (min-width: 901px) {
+    .books-of {
+        width: 260px; /* Hacemos la barra un poco más delgada */
+        padding-right: 10px;
+    }
+    
+    .popular-books {
+        padding: 0 15px 50px; /* Reducimos padding del grid para ganar espacio */
+    }
+    
+    .book-cards {
+        gap: 20px; /* Reducimos el espacio entre tarjetas */
+    }
+}
         @media (max-width: 725px) { .book-cards { grid-template-columns: 1fr; } .book-types { display: none; } }
         @media (max-width: 480px) { 
             .book-photo { width: 120px; left: 10px; }
@@ -292,7 +341,7 @@
         
         <div class="books-of">
             <div class="week">
-                <div class="author-title">Autores de la Semana</div>
+                <div class="author-title">Recién abiertas</div>
                 <div id="authorsList"></div>
             </div>
 
@@ -2420,31 +2469,35 @@ function renderSidebars() {
 }
 
 function registerAndOpen(title) {
-    const score = scores.find(s => s.title === title);
-    if (!score) return;
+        const score = scores.find(s => s.title === title);
+        if (!score) return;
 
-    // 1. Buscar interacción
-    let interaction = userInteractions.find(i => i.title === title);
-    
-    if (!interaction) {
-        interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
-        userInteractions.push(interaction);
-    } else {
-        interaction.lastOpened = Date.now();
-        if (interaction.progress === 0) interaction.progress = 1;
-        else if (interaction.progress < 100) interaction.progress += 5;
+        // 1. Buscar interacción (Lógica igual...)
+        let interaction = userInteractions.find(i => i.title === title);
+        
+        if (!interaction) {
+            interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
+            userInteractions.push(interaction);
+        } else {
+            interaction.lastOpened = Date.now();
+            if (interaction.progress === 0) interaction.progress = 1;
+            else if (interaction.progress < 100) interaction.progress += 5;
+        }
+
+        // 2. Historial Reciente (Lógica igual...)
+        recentScores = recentScores.filter(s => s.title !== title);
+        recentScores.unshift(score);
+        if (recentScores.length > 10) recentScores.pop();
+        
+        renderRecentCarousel();
+        applyFilterAndRender(false);
+        
+        // --- AQUÍ ESTÁ EL CAMBIO ---
+        // Concatenamos la URL base con el nombre del archivo (score.pdf)
+        const fullUrl = "https://www.mozart-app.com/xml2?file=" + score.pdf;
+        
+        openPdfViewer(fullUrl);
     }
-
-    // 2. Historial Reciente (usamos filter por titulo)
-    recentScores = recentScores.filter(s => s.title !== title);
-    recentScores.unshift(score);
-    if (recentScores.length > 10) recentScores.pop();
-    
-    renderRecentCarousel();
-    applyFilterAndRender(false);
-    
-    openPdfViewer(score.pdf);
-}
 
 function renderBookGrid(data) {
         const grid = document.getElementById('bookGrid');
@@ -2599,18 +2652,22 @@ function applyFilterAndRender(resetPage = true) {
         });
     });
 
-    // 7. FUNCIONES DEL VISOR (Overlay)
+  
     const overlay = document.getElementById('pdfOverlay');
     const iframe = document.getElementById('scoreFrame');
 
     window.openPdfViewer = function(url) {
         iframe.src = url;
         overlay.classList.add('active');
+        // BLOQUEAR SCROLL DEL FONDO
+        document.body.style.overflow = 'hidden'; 
     }
 
     window.closePdfViewer = function() {
         overlay.classList.remove('active');
-        setTimeout(() => { iframe.src = ''; }, 300); // Pequeño delay para limpiar
+        // RESTAURAR SCROLL DEL FONDO
+        document.body.style.overflow = ''; 
+        setTimeout(() => { iframe.src = ''; }, 300);
     }
 
     // --- INICIALIZACIÓN ---
