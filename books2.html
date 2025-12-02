@@ -21,22 +21,39 @@
             --heart-color-active: #ff4b4b;
         }
 
-        * { outline: none; box-sizing: border-box; }
+       * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
         img { max-width: 100%; }
-       html { box-sizing: border-box; -webkit-font-smoothing: antialiased; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;}
-        body { background-color: #fff; font-family: var(--body-font); color: var(--body-color); margin: 0; }
+       html { box-sizing: border-box; -webkit-font-smoothing: antialiased; height: 100vh; overflow: hidden; width: 100%;}
+       body { 
+    background-color: #fff; 
+    font-family: var(--body-font); 
+    color: var(--body-color); 
+    margin: 0; 
+    /* BLOQUEAR EL BODY */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
         .book-store {
-            display: flex;
-            flex-direction: column;
-            max-width: 1400px;
-            min-height: 100vh;
-            background-color: var(--page-bg-color);
-            margin: 0 auto;
-            overflow: visible;
-            box-shadow: 0px 2px 50px 10px rgba(0, 0, 0, 0.21);
-        }
-
+    display: flex;
+    flex-direction: column;
+    max-width: 1400px;
+    /* CAMBIO CLAVE: Altura fija y scroll interno */
+    height: 100%; 
+    width: 100%;
+    overflow-y: auto; /* El scroll ocurre AQUÍ, no en el body */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* Suavidad nativa de iOS */
+    
+    background-color: var(--page-bg-color);
+    margin: 0 auto;
+    position: relative; /* Para contener elementos absolutos */
+}
         /* --- SEARCH BAR --- */
         .search-bar { position: relative; }
         .search-bar input {
@@ -158,17 +175,14 @@
     position: fixed; 
     top: 0; 
     left: 0; 
-    right: 0; 
-    bottom: 0;
-    width: 100vw; 
-    height: 100vh; /* Fallback para navegadores viejos */
-    height: 100dvh; /* LA CLAVE: Altura dinámica para móviles modernos */
-    background-color: #000; /* Fondo negro para mejor contraste */
+    width: 100%; 
+    height: 100%; 
+    background-color: #000; 
     z-index: 99999; 
     display: none; 
     flex-direction: column; 
-    overflow: hidden; /* Evita scroll en el contenedor padre */
-    -webkit-overflow-scrolling: touch; /* Suavidad en iOS */
+    /* Evita que el scroll del overlay mueva la página de atrás */
+    overscroll-behavior: contain; 
 }
 
 .pdf-viewer-overlay.active { 
