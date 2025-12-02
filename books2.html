@@ -1,526 +1,337 @@
 <!DOCTYPE html>
-<html lang="es" ng-app="libraryApp">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca de Piano Simplificada</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Gestor de Partituras Mozart Academy</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
-        /* --- Estilos Esenciales (Copiados de tu original) --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; padding: 20px; }
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 
-        .header { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 24px; 
-            margin-bottom: 24px; 
-            box-shadow: var(--card-shadow); 
-            border: 1px solid #e5e5e7; 
-            display: flex; 
+        :root {
+            --body-bg-color: #e5f4f9;
+            --body-color-light: #8b939c;
+            --body-font: "Roboto", sans-serif;
+            --page-bg-color: #f2f5f7;
+            --body-color: #3d4954;
+            --border-color: #b8bec3;
+            --placeholder: #ccd0d2;
+            --heart-color-active: #ff4b4b;
+        }
+
+        * { outline: none; box-sizing: border-box; }
+        img { max-width: 100%; }
+        html { box-sizing: border-box; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        body { background-color: #fff; font-family: var(--body-font); color: var(--body-color); margin: 0; }
+
+        .book-store {
+            display: flex;
             flex-direction: column;
-            gap: 20px;
+            max-width: 1400px;
+            min-height: 100vh;
+            background-color: var(--page-bg-color);
+            margin: 0 auto;
+            overflow: visible;
+            box-shadow: 0px 2px 50px 10px rgba(0, 0, 0, 0.21);
         }
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+
+        /* --- SEARCH BAR --- */
+        .search-bar { position: relative; }
+        .search-bar input {
+            height: 100%; width: 100%; display: block;
+            background-color: transparent; border: none;
+            font-weight: 600; padding: 0 10px 0 40px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%238b939c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3e%3ccircle cx='11' cy='11' r='8'/%3e%3cpath d='M21 21l-4.35-4.35'/%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-size: 15px; background-position: 15px 50%;
+            color: var(--body-color); font-family: var(--body-font);
         }
-        .header-left { display: flex; align-items: center; gap: 16px; }
-        .header-icon { width: 56px; height: 56px; background: linear-gradient(135deg, #5668E2, #7343D9); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
-        .header-info h1 { font-size: 24px; font-weight: 600; color: #1d1d1f; }
-        .header-info p { color: var(--secondary-text); font-size: 16px; }
-        .search-box { flex-grow: 1; min-width: 250px; position: relative; }
-        .search-input { width: 100%; padding: 12px 16px 12px 44px; border: 1px solid #d1d5db; border-radius: 12px; background: white; font-size: 14px; transition: all 0.2s ease; }
-        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280; }
+        .search-bar input::placeholder { color: var(--placeholder); }
 
-        .filters-container {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .filter-group { flex-grow: 1; }
-        .filter-label { font-weight: 600; color: #374151; font-size: 14px; display: block; margin-bottom: 8px; }
-        .filter-select { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 14px; cursor: pointer; }
-        .search-box { position: relative; min-width: 280px; }
-        .search-input { width: 100%; padding: 12px 16px 12px 44px; border: 1px solid #d1d5db; border-radius: 12px; background: #f8f9fa; font-size: 14px; }
-        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280; }
-        .library-section { margin-bottom: 40px; }
-        .section-title { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
-        .carousel-wrapper { position: relative; }
-        .carousel { display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none;  }
-        .carousel::-webkit-scrollbar { display: none; }
-        .book-card { flex: 0 0 auto; width: 180px; cursor: pointer; transition: transform 0.2s ease; }
-        .book-card:hover { transform: translateY(-4px); }
-        .book-cover { width: 100%; height: 240px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); object-fit: cover; margin-bottom: 12px; }
-        .book-title { font-size: 15px; font-weight: 600; color: #343a40; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .book-level { font-size: 13px; color: #6c757d; }
-        .scroll-btn { position: absolute; top: 50%; transform: translateY(-70%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); border: 1px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; z-index: 3000; opacity: 0; transition: opacity 0.2s ease; display: flex; align-items: center; justify-content: center; }
-        .carousel-wrapper:hover .scroll-btn { opacity: 1; }
-        .scroll-btn.prev { left: -5px; }
-        .scroll-btn.next { right: -5px; }
-        .pdf-viewer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #212121; z-index: 2000; }
-        .xml-viewer-close { background: none; border: none; position: absolute; top: 15px; right: 25px; color: black; font-size: 26px; cursor: pointer; }
-        .pdf-viewer-overlay iframe { width: 100%; height: 100%; border: none; }
-
-
-
-.carousel .book-card {
-    width: 150px; /* Más pequeño que los 180px del grid */
-}
-.carousel .book-cover-wrapper {
-    height: 200px; /* Más bajo que los 240px del grid */
-}
-.carousel .book-title {
-    font-size: 14px;
-}
-.carousel .book-level {
-    font-size: 12px;
+        /* --- CAROUSEL (BOOK SLIDE) --- */
+        .book-slide { width: 100%; margin-bottom: 20px; }
+        /* Restaura el estilo base de la celda */
+.book-cell {
+    position: relative;
+    display: flex;
+    padding: 25px;
+    width: 40%; /* Regresamos al 40% original */
+    height: 250px;
+    margin-right: 1px; /* Margen original */
+    border-radius: 0; /* Quitamos borde redondeado extra si quieres el look pegado original */
 }
 
+/* Lógica para que los colores se repitan cíclicamente (5n+1, 5n+2...) 
+   ya que ahora los favoritos son dinámicos e infinitos */
+.book-cell:nth-child(5n+1) { background-color: #fbadaf; }
+.book-cell:nth-child(5n+2) { background-color: #a4e0eb; }
+.book-cell:nth-child(5n+3) { background-color: #edb9d6; }
+.book-cell:nth-child(5n+4) { background-color: #fdca95; }
+.book-cell:nth-child(5n+5) { background-color: #cbb5e2; }
+
+/* IMPORTANTE: Recuperar las Media Queries de responsividad */
+@media (max-width: 1103px) {
+    .book-cell { width: 60%; }
+}
+@media (max-width: 765px) {
+    .book-cell { width: 80%; }
+}
+@media (max-width: 575px) {
+    .book-cell { width: 100%; }
+}
+
+        .flickity-page-dots { bottom: 10px; }
+        .flickity-viewport { overflow: hidden; } /* Ajuste para que no se desborde */
         
-.section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: color 0.2s ease-in-out;
+        .book-photo {
+            width: 180px; flex-shrink: 0; bottom: -35px; left: 35px;
+            border-radius: 4px; box-shadow: -2px 6px 19px 0px #7f818e;
+            transition: 0.3s ease; cursor: pointer;
+        }
+        .book-photo:hover { transform: scale(1.03); }
+        .book-img { flex-shrink: 0; position: relative; z-index: 10; margin-top: 10px; }
+        
+        .book-content { padding: 0 20px; color: #ffffff; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        .book-title { font-weight: 600; font-size: 24px; margin-bottom: 5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
+        .book-author { font-size: 14px; margin-bottom: 15px; }
+        .book-sum { font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-wrapper { width: 100%; display: flex; flex-grow: 1; margin-top: 20px; overflow: visible; }
+        
+        /* SIDEBAR (Authors & Year Books) */
+        .books-of { width: 320px; display: flex; flex-direction: column; position: sticky; top: 20px; align-self: flex-start; flex-shrink: 0; padding-right: 20px; }
+        .week { padding: 0 30px; }
+        .author-title { padding: 0 0 20px; font-weight: 500; font-size: 15px; }
+        .author { display: flex; align-items: center; margin-bottom: 20px; cursor: pointer; }
+        .author-img { border-radius: 50%; width: 40px; height: 40px; margin-right: 16px; object-fit: cover; }
+        .author-name { font-size: 14px; }
+        
+        .year-book { display: flex; align-items: center; margin-bottom: 20px; }
+        .year-book-img { width: 45px; margin-right: 16px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .year-book-content { display: flex; flex-direction: column; font-size: 14px; }
+        .year-book-name { font-weight: 500; margin-bottom: 4px; }
+        .year-book-author { font-size: 13px; color: var(--body-color-light); }
+
+        /* MAIN CONTENT */
+        .popular-books { flex-grow: 1; padding: 0 30px 50px; }
+        .main-menu { display: flex; align-items: center; white-space: nowrap; padding-bottom: 15px; border-bottom: 1px solid #dcddde; position: sticky; top: 0; background-color: var(--page-bg-color); z-index: 100; padding-top: 10px;}
+        .genre { font-weight: 500; font-size: 15px; margin-right: 20px; }
+        .book-types { margin-left: auto; display: flex; }
+        .book-type { margin-left: 20px; text-decoration: none; color: var(--body-color); font-size: 14px; cursor: pointer; position: relative; transition: 0.2s; }
+        .book-type.active, .book-type:hover { font-weight: bold; }
+        .book-type.active:before { content: ""; position: absolute; width: 100%; height: 2px; bottom: -5px; background-color: #67d4ea; }
+
+        /* --- GRID CARDS --- */
+        .book-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; padding-top: 40px; }
+        .book-card { background-color: #fff; box-shadow: -1px 3px 8px -1px rgba(0, 0, 0, 0.1); border-radius: 4px; display: flex; flex-direction: column; padding: 0 0 20px 20px; position: relative; transition: transform 0.2s; }
+        .book-card:hover { transform: translateY(-3px); }
+
+        .content-wrapper { display: flex; position: relative; border-bottom: 1px solid #ebedef; padding-bottom: 20px; }
+        
+        /* Imagen Clickeable */
+        .book-card-img { width: 140px; margin-top: -25px; border-radius: 3px; box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.2); object-fit: cover; cursor: pointer; transition: 0.3s; height: 200px; }
+        .book-card-img:hover { transform: scale(1.05); box-shadow: 0px 8px 15px 0px rgba(0,0,0,0.3); }
+
+        .card-content { padding: 25px 25px 0 20px; width: 100%; }
+        .book-name { font-weight: 500; font-size: 16px; margin-bottom: 5px; line-height: 1.2; }
+        .book-by { font-size: 13px; color: var(--body-color-light); margin-bottom: 10px; }
+        
+        .card-sum { font-size: 13px; color: var(--body-color-light); line-height: 1.5; margin-top: 10px; }
+        
+        /* Heart Button Logic */
+        .heart-btn {
+            background: none; border: none; cursor: pointer;
+            font-size: 18px; color: #ccc; transition: color 0.2s;
+            position: absolute; top: 10px; right: 10px; z-index: 5;
+        }
+        .heart-btn.active { color: var(--heart-color-active); }
+        .heart-btn:hover { transform: scale(1.1); }
+
+        /* Rating Stars (Static Visuals) */
+        .stars { color: #ff9700; font-size: 12px; }
+        .stars i.far { color: #ccc; }
+
+        /* --- MODAL PDF --- */
+        .pdf-viewer-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(33, 33, 33, 0.95); z-index: 2000; 
+            display: none; flex-direction: column; 
+        }
+        .pdf-viewer-overlay.active { display: flex; }
+        .xml-viewer-close { 
+            background: none; border: none; position: absolute; top: 15px; right: 25px; 
+            color: black; font-size: 30px; cursor: pointer; z-index: 2001;
+        }
+        .pdf-viewer-overlay iframe { width: 100%; height: 100%; border: none; background: #fff; }
+
+        /* Responsiveness */
+        @media (max-width: 1045px) { .books-of { display: none; } }
+        @media (max-width: 725px) { .book-cards { grid-template-columns: 1fr; } .book-types { display: none; } }
+        @media (max-width: 480px) { 
+            .book-photo { width: 120px; left: 10px; }
+        }
+
+
+        /* --- PROGRESO (Barra de avance) --- */
+.progress-wrapper {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+.progress-label {
+    font-size: 12px; font-weight: 500; color: #3d4954; margin-bottom: 5px; display: flex; justify-content: space-between;
+}
+.progress-track {
+    width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+    height: 100%; background-color: #67d4ea; width: 0%; transition: width 0.5s ease;
 }
 
-.section-title:hover {
-    color: #5668E2; /* Un color primario para indicar interacción */
+/* --- ESTILOS ACTIVIDAD RECIENTE (SIDEBAR) --- */
+.activity-item {
+    display: flex; margin-bottom: 20px; align-items: flex-start;
 }
-
-.section-title .fas.fa-chevron-down,
-.section-title .fas.fa-chevron-up {
-    font-size: 16px;
-    color: #6b7280;
-    transition: transform 0.2s ease;
+.activity-img {
+    width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-.section-title .fa-layer-group {
-    margin-right: 10px; /* Añade espacio entre el ícono y el texto */
-    color: #7343D9;     /* Opcional: Dale un color para que destaque */
-    font-size: 20px;    /* Opcional: Ajusta el tamaño si es necesario */
+.activity-info {
+    flex: 1; display: flex; flex-direction: column; font-size: 13px;
 }
+.activity-user { font-weight: 600; color: #EC5800; font-size: 15px}
+.activity-meta { font-size: 11px; color: #8b939c; margin-bottom: 4px; }
+.activity-doc { font-weight: 500;  margin-top: 2px; display: block; text-decoration: none;}
 
-
-.section-header-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* El botón de volver ya tiene margen inferior */
+/* --- PAGINACIÓN --- */
+.pagination-controls {
+    display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 15px; grid-column: 1 / -1;
 }
-
-.view-mode-toggle {
-    display: flex;
-    gap: 8px;
+.page-btn {
+    padding: 8px 16px; background-color: #fff; border: 1px solid #dcddde; border-radius: 20px;
+    cursor: pointer; font-weight: 500; color: var(--body-color); transition: 0.2s;
 }
-.view-mode-toggle .view-btn {
-    background: #f0f2f5;
-    border: 1px solid #d1d5db;
-    padding: 10px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #6b7280;
-    transition: all 0.2s;
-}
-.view-mode-toggle .view-btn:hover {
-    background-color: #e5e7eb;
-}
-.view-mode-toggle .view-btn.active {
-    background-color: #5668E2;
-    color: white;
-    border-color: #5668E2;
-}
+.page-btn:hover:not(:disabled) { background-color: #67d4ea; color: white; border-color: #67d4ea; }
+.page-btn:disabled { opacity: 0.5;}
 
-/* --- 4. Estilos para la VISTA DE LISTA --- */
-.list-view {
-    display: flex;
-    flex-direction: column; /* Apila las tarjetas verticalmente */
-    gap: 1px; /* Crea un efecto de línea divisoria */
-    background-color: #e5e7eb; /* Color de la línea divisoria */
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden; /* Para que el radius afecte a los hijos */
-}
+/* --- CURSOR POINTER PARA FAVORITOS --- */
+.year-book { cursor: pointer; transition: transform 0.2s; }
+.year-book:hover { transform: translateX(5px); }
 
-.list-view .book-card {
-    flex: 1 1 100%; /* Ocupa todo el ancho */
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: white;
-    padding: 12px;
-    border-radius: 0;
-    transition: background-color 0.2s ease;
-}
-.list-view .book-card:hover {
-    transform: none; /* Quitamos el efecto de elevación */
-    background-color: #f8f9fa;
-}
-
-/* Ajustamos la portada para la lista */
-.list-view .book-cover-wrapper {
-    flex: 0 0 60px; /* Ancho fijo y pequeño */
-    height: 80px;
-    margin-bottom: 0;
-}
-.list-view .book-cover {
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-
-.list-view .book-info {
-    display: flex;
-    flex-direction: column; /* Apila el título y el autor */
-    justify-content: center; /* Centra el bloque de texto verticalmente */
-    flex-grow: 1; /* Opcional: asegura que ocupe el espacio */
-}
-
-.list-view .book-grade-label {
-    display: none; 
-}
-
-/* Ajustamos los textos */
-.list-view .book-title {
-    font-size: 16px;
-    font-weight: 500;
-    white-space: normal; 
-    margin-bottom: 2px;
-}
-.list-view .book-level {
-   font-size: 14px;
-    color: #6c757d; /* Un color más suave para el autor */
-    line-height: 1.3;
-}
-
-
-.grid-view {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: flex-start; /* O 'center' si prefieres */
-    padding: 10px 5px;
-}
-
-/* Ajustes a las tarjetas en la vista de grid */
-.grid-view .book-card {
-    flex: 0 0 180px; /* Mantiene el mismo tamaño de tarjeta */
-}
-
-/* Estilo para el nuevo botón de "Volver" */
-.back-button {
-    background: #f0f2f5;
-    border: 1px solid #d1d5db;
-    padding: 10px 18px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 20px; /* Espacio antes del título de la sección */
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.2s;
-}
-.back-button:hover {
-    background-color: #e5e7eb;
-}
-
-
-
-
-
-
-
-
-@media (min-width: 992px) {
-    .desktop-layout-wrapper {
-        display: grid;
-        /* Define 2 columnas: 300px para el sidebar, 1fr (resto) para el contenido */
-        grid-template-columns: 300px 1fr;
-        gap: 24px; /* Espacio entre las columnas */
-        align-items: flex-start; /* Alinea los items arriba */
+/* --- RESPONSIVIDAD MÓVIL (Punto 5) --- */
+@media (max-width: 725px) {
+    /* Contenedor principal del menú */
+    .main-menu {
+        display: flex;
+        flex-wrap: wrap; /* Permite que elementos bajen si es necesario */
+        align-items: center;
+        padding-bottom: 10px;
     }
 
-    .header {
-        position: sticky; /* Lo hace "pegajoso" */
-        top: 20px; /* Se pega a 20px del borde superior */
-        max-height: calc(100vh - 40px); /* Altura máxima (alto de la ventana - padding) */
-        overflow-y: auto; /* Scroll si el contenido es muy largo */
-        margin-bottom: 0; /* Remueve el margen inferior en desktop */
+    /* 1. Título "Genre" */
+    .genre {
+        margin-right: 10px;
+        font-size: 14px;
+        flex-shrink: 0; /* No permitimos que se encoja el texto */
     }
 
-    .library-content {
-        overflow-x: hidden;
+    /* 2. Barra de búsqueda */
+    .search-bar {
+        flex-grow: 1; /* Ocupa todo el espacio disponible en la fila */
+        width: auto;  /* Quitamos el ancho fijo */
+        margin-bottom: 0; /* Sin margen abajo para mantenerse en linea */
+        margin-right: 0;
+    }
+    
+    /* Ajuste visual del input para que no sea enorme en altura */
+    .search-bar input {
+        padding-left: 35px; /* Ajuste del icono */
+        background-position: 10px 50%;
     }
 
-    .header-top {
-        flex-direction: column;
-        align-items: flex-start;
+    /* 3. Pestañas (Book Types) bajan a una nueva fila */
+    .book-types {
+        order: 3; /* Forzamos que vaya al final */
+        width: 100%; /* Ocupa nueva fila completa */
+        margin-left: 0;
+        margin-top: 15px; /* Separación de la fila de arriba */
+        
+        /* Scroll horizontal */
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* La barra de búsqueda ocupa todo el ancho del sidebar */
-    .search-box {
-        width: 100%;
-        min-width: auto; /* Resetea el ancho mínimo */
-    }
-
-    /* Apila los dropdowns de filtros */
-    .filters-container {
-        flex-direction: column;
-        align-items: stretch; /* Estira los filtros al 100% */
-    }
-
-    .filter-group {
-        flex-grow: 1;
+    .book-type {
+        margin-left: 0;
+        margin-right: 20px;
+        flex-shrink: 0;
     }
 }
-
-
-
-
-/* El nuevo contenedor para la imagen y la etiqueta */
-.book-cover-wrapper {
-    position: relative; /* Clave para posicionar la etiqueta 'hija' */
-    /* Mantenemos los estilos que tenía la imagen */
-    width: 100%;
-    height: 240px;
-    margin-bottom: 12px;
-}
-
-/* La imagen ahora debe ajustarse al 100% de su nuevo 'wrapper' */
-.book-cover-wrapper .book-cover {
-    width: 100%;
-    height: 100%;
-    /* Quitamos el margen que ahora tiene el wrapper */
-    margin-bottom: 0; 
-}
-
-/* La nueva etiqueta de grado (similar a tu imagen de ejemplo) */
-.book-grade-label {
-    position: absolute; /* Se posiciona relativo al 'book-cover-wrapper' */
-    bottom: 8px;
-    left: 8px;
-    background-color: rgba(0, 0, 0, 0.75); /* Fondo oscuro semitransparente */
-    color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    z-index: 10; /* Nos aseguramos que esté por encima de la imagen */
-}
-/* --- Estilos para el botón de Favorito --- */
-.fav-button {
-    position: absolute;
-    top: 10px;       /* Un poco de espacio desde el borde */
-    right: 10px;      /* Un poco de espacio desde el borde */
-    width: 32px;
-    height: 32px;
-    border-radius: 50%; /* Círculo */
-    background: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-    border: 1px solid #e9ecef;           /* Borde gris claro */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s ease;
-    color: #374151; /* Color del ícono por defecto (gris oscuro) */
-}
-
-.fav-button:hover {
-    background: white;
-    transform: scale(1.05); /* Pequeño efecto al pasar el mouse */
-}
-
-/* Esta clase se aplica al ícono (<i>) cuando es favorito */
-.fav-button .is-favourite-icon {
-    color: #e53935; /* Corazón rojo */
-}
-
-/* Ajuste para la vista de lista (botón más pequeño) */
-.list-view .fav-button {
-    width: 28px;
-    height: 28px;
-    top: 6px;
-    right: 6px;
-}
-.list-view .fav-button .fa-heart {
-    font-size: 14px;
-}
-
     </style>
 </head>
-<body ng-controller="libraryCtrl">
-    
+<body>
 
-
-    <div class="desktop-layout-wrapper"  ng-hide="showPdfViewer">
-        <div class="header" >
-              <div class="header-top">
-            <div class="header-left">
-                <div class="header-icon"><i class="fas fa-book"></i></div>
-                <div class="header-info">
-                    <h1>Biblioteca</h1>
-                    <p>Encuentra tus libros y piezas de piano</p>
-                </div>
-            </div>
-            <div class="search-box">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Buscar en la biblioteca..." ng-model="searchQuery">
-            </div>
-             </div>
-
-
-            <div class="filters-container">
-              
-            <div class="filter-group">
-                <label class="filter-label" for="difficulty-select">Dificultad</label>
-                <select id="difficulty-select" class="filter-select" ng-model="filters.difficulty">
-                    <option value="">Todos los Grados</option>
-                    <option value="Preparatorio">Preparatorio</option>
-                    <option value="Grado 1">Grado 1</option>
-                    <option value="Grado 2">Grado 2</option>
-                    <option value="Grado 3">Grado 3</option>
-                    <option value="Grado 4">Grado 4</option>
-                    <option value="Grado 5">Grado 5</option>
-                    <option value="Grado 6">Grado 6</option>
-                    <option value="Grado 7">Grado 7</option>
-                    <option value="Grado 8">Grado 8</option>
-                </select>
-            </div>
-
-              <div class="filter-group">
-                <label class="filter-label" for="style-select">Estilo</label>
-                <select id="style-select" class="filter-select" ng-model="filters.style">
-                    <option value="">Todos los estilos</option>
-                    <option value="baroque">Barroco</option>
-                    <option value="classic">Clásico</option>
-                    <option value="romantic">Romanticismo</option>
-                     <option value="postromantic">Post-Romanticismo</option>
-                    <option value="sigloxx">Siglo XX</option>
-                    <option value="jazz">Jazz</option>
-                    <option value="contemporary">Contemporaneo</option>
-                </select>
-            </div>
-          
-        </div>
-         </div>
-
-
-
-      <div class="library-content">
-
-       <div class="section-header-controls" ng-show="selectedSection">
-    <button class="back-button" ng-click="goBack()">
-        <i class="fas fa-arrow-left"></i> Volver a las secciones
+<div class="pdf-viewer-overlay" id="pdfOverlay">  
+    <button class="xml-viewer-close" onclick="closePdfViewer()">
+        <i class="fas fa-times"></i>
     </button>
-    
-    <div class="view-mode-toggle">
-        <button class="view-btn" 
-                ng-class="{'active': viewMode === 'grid'}" 
-                ng-click="setViewMode('grid')">
-            <i class="fas fa-th-large"></i>
-        </button>
-        <button class="view-btn" 
-                ng-class="{'active': viewMode === 'list'}" 
-                ng-click="setViewMode('list')">
-            <i class="fas fa-list"></i>
-        </button>
-    </div>
+    <iframe id="scoreFrame" src="" allow="fullscreen"></iframe>
 </div>
 
-    <div class="library-section" 
-         ng-repeat="section in library"
-         ng-show="(!selectedSection || selectedSection === section) && (section.books | filter: customFilter).length > 0">
+<div class="book-store">
+
+    <div class="book-slide">
+        <div class="main-carousel" id="favoritesCarousel"></div>
+    </div>
+
+    <div class="main-wrapper">
         
-       <h2 class="section-title" ng-click="selectSection(section)">
-    <div> 
-        <i class="fas fa-layer-group"></i>
-        {{ section.title }}
-    </div>
-    <i class="fas" ng-class="{'fa-chevron-up': selectedSection === section, 'fa-chevron-down': selectedSection !== section}"></i>
-</h2>
-        
-        <div class="carousel-wrapper">
-            <div id="carousel-{{$index}}" 
-                 ng-class="{
-                   'carousel': !selectedSection, 
-                   'grid-view': selectedSection && viewMode === 'grid',
-                   'list-view': selectedSection && viewMode === 'list'
-                 }">
-                
-                <div class="book-card" ng-repeat="book in section.books | filter: customFilter"   
-                     ng-click="openPdf(book)">
+        <div class="books-of">
+            <div class="week">
+                <div class="author-title">Autores de la Semana</div>
+                <div id="authorsList"></div>
+            </div>
 
-                <div class="book-cover-wrapper">
-        <img ng-src="{{ book.coverUrl }}" class="book-cover">
-        <button class="fav-button" ng-click="$event.stopPropagation(); toggleFavourite(book)">
-            <i ng-class="{
-                'far fa-heart': !isFavourite(book), 
-                'fas fa-heart is-favourite-icon': isFavourite(book)
-               }"></i>
-        </button>
-
-        <span class="book-grade-label" ng-if="book.difficulty">
-            {{ book.difficulty }}
-        </span>
-    </div>
-
-                 
-<div class="book-info">
-        <div class="book-title">{{ book.title }}</div>
-        <div class="book-level">{{ book.author }}</div>
-    </div>
+            <div class="week year">
+                <div class="author-title">Mis favoritos</div>
+                <div id="yearBooksList"></div>
+            </div>
+        </div>
+      
+        <div class="popular-books">
+            <div class="main-menu">
+                <div class="genre">Explorar por Estilo</div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Buscar partitura..." />
+                </div>
+                <div class="book-types">
+                    <a class="book-type active" data-filter="all">Todos</a>
+                    <a class="book-type" data-filter="favorites">Favoritos</a>
+                    <a class="book-type" data-filter="clásica">Clásica</a>
+                    <a class="book-type" data-filter="jazz">Jazz</a>
+                    <a class="book-type" data-filter="soundtrack">Soundtrack</a>
+                    <a class="book-type" data-filter="pop">Pop</a>
                 </div>
             </div>
-            
-            <button class="scroll-btn prev" ng-click="scrollCarousel('carousel-' + $index, -1)" ng-hide="selectedSection"><i class="fas fa-chevron-left"></i></button>
-            <button class="scroll-btn next" ng-click="scrollCarousel('carousel-' + $index, 1)" ng-hide="selectedSection"><i class="fas fa-chevron-right"></i></button>
+
+            <div class="book-cards" id="bookGrid">
+                </div>
         </div>
     </div>
 </div>
-  </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.pkgd.min.js"></script>
 
-    <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
-        <div>
-            <button class="xml-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
-        </div>
-        <iframe ng-if="showPdfViewer" ng-src="{{pdfUrl}}" frameborder="0" allow="fullscreen"></iframe>
-    </div>
+<script>
+   let currentPage = 1;
+    const itemsPerPage = 4;
 
-    <script>
-        const app = angular.module('libraryApp', []);
-
-        app.controller('libraryCtrl', ['$scope', '$sce', '$http', function($scope, $sce, $http) {
-
-            // --- ESTADO DE LA UI (SIMPLIFICADO) ---
-            $scope.searchQuery = '';
-            $scope.showPdfViewer = false;
-            $scope.pdfUrl = '';
-             $scope.filters = { difficulty: '', style: '' };
-             $scope.selectedSection = null;
-             $scope.sortOrder = '-dateAdded';
-
-             $scope.viewMode = 'list';
-             $scope.recentPieces = [];
-
-
-var allPiecesData = [
+   const scores = [
   {
     "title": "Arabesque No. 1",
     "author": "Debussy",
@@ -2435,184 +2246,381 @@ var allPiecesData = [
 
 ];
 
+   let userInteractions = [
+        // Fíjate que usamos 'title' en lugar de 'scoreId'
+        { title: "Nocturne Op. 9 No. 2", isLiked: true, progress: 45, lastOpened: Date.now() - 100000 },
+        { title: "River Flows in You", isLiked: false, progress: 80, lastOpened: Date.now() - 200000 },
+        { title: "Interstellar Theme", isLiked: true, progress: 0, lastOpened: 0 }
+    ];
 
-        
+   function getInteraction(title) {
+        return userInteractions.find(i => i.title === title) || { title: title, isLiked: false, progress: 0, lastOpened: 0 };
+    }
 
-        var allPieces = allPiecesData.map(function(piece) {
-            return {
-                title: piece.title,
-                author: piece.author,
-                coverUrl: piece.background,
-                pdf: "https://www.mozart-app.com/xml2?file="+piece.pdf,
-                difficulty: piece.difficulty,
-                style: piece.style,
-                tags: piece.tags || [], 
-                dateAdded: piece.dateAdded ? new Date(piece.dateAdded) : null 
-            };
-        });
-
-      
-      var favouritesPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('favourites');
-        });
-        
-
-        var topPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('top');
-        });
-
-      
-         var newPieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('new');
-        });
-
-          var coursePieces = allPieces.filter(function(piece) {
-            return piece.tags.includes('course');
-        });
-      
-
-      
-
-        $scope.library = [
-          { title: 'Recientes', books: $scope.recentPieces },
-          { title: 'Favoritas', books: favouritesPieces },
-             { title: 'Más reproducidas', books: topPieces },   
-                { title: 'Recien agregadas', books: newPieces },  
-                   { title: 'Piezas del curso', books: coursePieces },  
-                  { title: 'Todo el catálogo', books: allPieces }
-        ];
-
- 
-
-
-                $scope.selectSection = function(section) {
-    $scope.selectedSection = section;
-};
-
-$scope.goBack = function() {
-    $scope.selectedSection = null; // 1. Regresa al menú principal de secciones
-    $scope.viewMode = 'list';      // 2. Resetea el modo de vista (como lo tenías)
-    
-    // --- AÑADE ESTO ---
-    $scope.searchQuery = '';             // 3. Limpia el input de búsqueda
-    $scope.filters.difficulty = '';    // 4. Resetea el filtro de dificultad
-    $scope.filters.style = '';         // 5. Resetea el filtro de estilo
-};
-
-    $scope.setViewMode = function(mode) {
-        $scope.viewMode = mode;
-    };
-
-     
- $scope.customFilter = function(book) {
-    
-    // 1. Maneja el 'searchQuery' (Muestra todo si está vacío O filtra si hay texto)
-    var searchMatch = !$scope.searchQuery || book.title.toLowerCase().includes($scope.searchQuery.toLowerCase()) ||
-                     book.author.toLowerCase().includes($scope.searchQuery.toLowerCase());
-    var difficultyMatch = !$scope.filters.difficulty || book.difficulty === $scope.filters.difficulty;
-    var styleMatch = !$scope.filters.style || book.style === $scope.filters.style;
-    return searchMatch && difficultyMatch && styleMatch;
-};    
-
-            // Abre el visor de PDF al hacer clic
-            $scope.openPdf = function(book) {
-                if (!book || !book.pdf) {
-                    alert('No hay un PDF disponible para este libro.');
-                    return;
-                }
-                $scope.addRecent(book);
-                $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
-                $scope.showPdfViewer = true;
-            };
-
-            // Cierra el visor de PDF
-            $scope.closePdfViewer = function() {
-                $scope.showPdfViewer = false;
-                $scope.pdfUrl = ''; 
-            };
-
-
-            $scope.addRecent = function(book) {
-        if (!book) return;
-        const existingIndex = $scope.recentPieces.indexOf(book);
-
-        if (existingIndex > -1) {
-            $scope.recentPieces.splice(existingIndex, 1);
+   const now = Date.now();
+    const MINUTE = 60 * 1000;
+    const HOUR = 60 * MINUTE;
+   const activityData = [
+        { 
+            user: "Sarah J.", 
+            avatar: "https://randomuser.me/api/portraits/women/44.jpg", 
+            timestamp: now - (5 * MINUTE), // Hace 5 minutos
+            doc: "Interstellar Theme", 
+            progress: 30 
+        },
+        { 
+            user: "Mike T.", 
+            avatar: "https://randomuser.me/api/portraits/men/32.jpg", 
+            timestamp: now - (45 * MINUTE), // Hace 45 minutos
+            doc: "Nocturne Op. 9", 
+            progress: 85 
+        },
+        { 
+            user: "Tú", 
+            avatar: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png", 
+            timestamp: now - (2 * HOUR), // Hace 2 horas
+            doc: "River Flows in You", 
+            progress: 12 
         }
-        $scope.recentPieces.unshift(book);
-        const MAX_RECENT = 10;
-        if ($scope.recentPieces.length > MAX_RECENT) {
-            $scope.recentPieces.pop(); 
-        }
-    };
-            
-            // Desplazamiento del carrusel
-            $scope.scrollCarousel = function(elementId, direction) {
-                const carousel = document.getElementById(elementId);
-                if (carousel) {
-                    const scrollAmount = 220 * direction; // Aumenté un poco el scroll
-                    carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                }
-            };
+    ];
 
+    // Helper para calcular "Hace X tiempo"
+    function getTimeAgo(timestamp) {
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        
+        let interval = Math.floor(seconds / 31536000);
+        if (interval > 1) return `Hace ${interval} años`;
+        
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) return `Hace ${interval} meses`;
+        
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) return `Hace ${interval} días`;
+        if (interval === 1) return `Ayer`;
+        
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) return `Hace ${interval} h`;
+        
+        interval = Math.floor(seconds / 60);
+        if (interval >= 1) return `Hace ${interval} min`;
+        
+        return "Hace un momento";
+    }
 
-var allPiecesSection = $scope.library.find(function(sec) {
-            return sec.title === 'Todo el catálogo';
+    // --- VARIABLES GLOBALES ---
+    let flickityInstance = null;
+    let currentFilter = 'all';
+    let recentScores = [];
+
+function renderSidebars() {
+        // A. Actividad Reciente (Igual)
+        const activityContainer = document.getElementById('authorsList');
+        const titleElem = document.querySelector('.week .author-title');
+        if(titleElem) titleElem.innerText = "Recién abiertas";
+        
+        activityContainer.innerHTML = activityData.map(act => `
+           <div class="activity-item">
+                <img src="${act.avatar}" class="activity-img">
+                <div class="activity-info">
+                    <span class="activity-user">${act.user}</span>
+                    <span class="activity-meta">${getTimeAgo(act.timestamp)}</span>
+                    <span class="activity-doc">${act.doc}</span>
+                    <div style="display:flex; align-items:center; margin-top:4px;">
+                        <div class="progress-track" style="height:4px; flex-grow:1; margin-right:8px;">
+                            <div class="progress-fill" style="width: ${act.progress}%"></div>
+                        </div>
+                        <span style="font-size:11px; font-weight:600; color:#3d4954;">${act.progress}%</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // B. MIS FAVORITOS (Actualizado por Título)
+        const yearBooksContainer = document.getElementById('yearBooksList');
+        
+        const likedScores = scores.filter(s => {
+            // Usamos s.title
+            const i = getInteraction(s.title);
+            return i.isLiked;
         });
 
-$scope.isFavourite = function(book) {
-    if (!book || !book.tags) return false;
-    return book.tags.includes('favourites');
-};
-
-// Lógica para añadir/quitar favoritos
-$scope.toggleFavourite = function(book) {
-    if (!book || !book.tags) return;
-    
-    const tagIndex = book.tags.indexOf('favourites');
-    
-    if (tagIndex > -1) {
-        // --- Ya es favorito: Lo quitamos ---
-        book.tags.splice(tagIndex, 1);
-        
-        // Lo quitamos también del array 'favouritesPieces'
-        const favArrayIndex = favouritesPieces.indexOf(book);
-        if (favArrayIndex > -1) {
-            favouritesPieces.splice(favArrayIndex, 1);
-        }
-        
-    } else {
-        // --- No es favorito: Lo añadimos ---
-        book.tags.push('favourites');
-        
-        // Lo añadimos también al array 'favouritesPieces'
-        if (favouritesPieces.indexOf(book) === -1) {
-            // Lo añadimos al principio de la lista
-            favouritesPieces.unshift(book); 
+        if (likedScores.length === 0) {
+            yearBooksContainer.innerHTML = '<div style="font-size:13px; color:#999;">No hay favoritos.</div>';
+        } else {
+            yearBooksContainer.innerHTML = likedScores.map(score => {
+                // Usamos s.title
+                const interaction = getInteraction(score.title);
+                const progressVal = interaction.progress || 0;
+                
+                return `
+                <div class="year-book" onclick="registerAndOpen('${score.title}')">
+                    <img src="${score.background}" alt="" class="year-book-img">
+                    <div class="year-book-content" style="width: 100%;">
+                        <div class="year-book-name">${score.title}</div>
+                        <div class="year-book-author">by ${score.author}</div>
+                        
+                        <div style="display:flex; align-items:center; margin-top:5px;">
+                            <div class="progress-track" style="height:3px; background-color:#e0e0e0; flex-grow:1; margin-right:8px;">
+                                <div class="progress-fill" style="width: ${progressVal}%; background-color: ${progressVal > 0 ? '#ff4b4b' : 'transparent'};"></div>
+                            </div>
+                            <span style="font-size:10px; color:#aaa;">${progressVal}%</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
     }
-};
 
-        $scope.$watchGroup(['searchQuery', 'filters.difficulty', 'filters.style'], function(newValues, oldValues) {
+ function renderRecentCarousel() {
+    const carouselContainer = document.getElementById('favoritesCarousel');
+    
+    // Destruir instancia previa
+    if (flickityInstance) {
+        flickityInstance.destroy();
+    }
+
+    // Si no hay recientes, mostramos un mensaje o sugerencias por defecto
+    if (recentScores.length === 0) {
+        carouselContainer.innerHTML = '<div style="padding:40px; text-align:center; width:100%; color:#8b939c;">Abre una partitura para verla aquí en tu historial reciente.</div>';
+        return;
+    }
+
+    let html = '';
+    recentScores.forEach(score => {
+        // Colores aleatorios para mantener el estilo original
+        const btnColors = ['book-blue', 'book-pink', 'book-yellow', 'book-purple'];
+        const randomColor = btnColors[Math.floor(Math.random() * btnColors.length)];
+
+        html += `
+        <div class="book-cell">
+            <div class="book-img">
+                <img src="${score.background}" class="book-photo" onclick="registerAndOpen('${score.title}')">
+            </div>
+            <div class="book-content">
+                <div class="book-title">${score.title}</div>
+                <div class="book-author">by ${score.author}</div>
+                <div class="rate">
+                    <span class="book-voters" style="margin-left:0; color:white;">${score.difficulty}</span>
+                </div>
+                <div class="book-sum" style="color: white; margin-top:5px;">${score.tags.join(', ')}</div>
+            </div>
+        </div>`;
+    });
+
+    carouselContainer.innerHTML = html;
+
+    // Inicializar Flickity
+    flickityInstance = new Flickity(carouselContainer, {
+        cellAlign: 'left',
+        contain: true,
+        wrapAround: recentScores.length > 2, 
+        pageDots: false, 
+        prevNextButtons: true
+    });
+}
+
+function registerAndOpen(title) {
+    const score = scores.find(s => s.title === title);
+    if (!score) return;
+
+    // 1. Buscar interacción
+    let interaction = userInteractions.find(i => i.title === title);
+    
+    if (!interaction) {
+        interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
+        userInteractions.push(interaction);
+    } else {
+        interaction.lastOpened = Date.now();
+        if (interaction.progress === 0) interaction.progress = 1;
+        else if (interaction.progress < 100) interaction.progress += 5;
+    }
+
+    // 2. Historial Reciente (usamos filter por titulo)
+    recentScores = recentScores.filter(s => s.title !== title);
+    recentScores.unshift(score);
+    if (recentScores.length > 10) recentScores.pop();
+    
+    renderRecentCarousel();
+    applyFilterAndRender(false);
+    
+    openPdfViewer(score.pdf);
+}
+
+function renderBookGrid(data) {
+        const grid = document.getElementById('bookGrid');
+        grid.innerHTML = '';
+        if(data.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #8b939c;">No se encontraron partituras</div>';
+            return;
+        }
+
+        const totalPages = Math.ceil(data.length / itemsPerPage);
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedItems = data.slice(start, end);
+
+        paginatedItems.forEach(score => {
+            // --- CAMBIO AQUÍ: Usamos score.title ---
+            const interaction = getInteraction(score.title); 
+            // ---------------------------------------
+            const isLiked = interaction.isLiked;
+            const progress = interaction.progress;
+
+            const difficultyStr = score.difficulty || '';
+            const grade = parseInt(difficultyStr.replace(/\D/g, '')) || 3;
+            let starsHtml = '';
+            for(let i=1; i<=5; i++) { starsHtml += `<i class="${i <= grade ? 'fas' : 'far'} fa-star"></i>`; }
+
+            const heartClass = isLiked ? 'active' : '';
+            const heartIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+
+            let progressHTML = '';
+            if (progress > 0) {
+                progressHTML = `
+                <div class="progress-wrapper">
+                    <div class="progress-label">
+                        <span>Tu Progreso</span>
+                        <span>${progress}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                </div>`;
+            }
+
+            const cardHTML = `
+            <div class="book-card">
+                <div class="content-wrapper">
+                    <img src="${score.background}" alt="" class="book-card-img" onclick="registerAndOpen('${score.title}')">
+                    <button class="heart-btn ${heartClass}" onclick="toggleLike('${score.title}')">
+                        <i class="${heartIcon}"></i>
+                    </button>
+                    <div class="card-content">
+                        <div class="book-name">${score.title}</div>
+                        <div class="book-by">by ${score.author}</div>
+                        <div class="stars">${starsHtml} <span style="color:#aaa; margin-left:5px;">(${score.difficulty})</span></div>
+                        <div class="card-sum">
+                            Añadido: ${score.dateAdded}<br>
+                            Etiquetas: ${score.tags.join(', ')}
+                        </div>
+                        ${progressHTML}
+                    </div>
+                </div>
+            </div>`;
             
-            // 3. Evita que se ejecute en la carga inicial del controlador
-            if (newValues === oldValues) {
-                return;
-            }
-            var isAnyFilterActive = !!newValues[0] || !!newValues[1] || !!newValues[2];
-            var wasAnyFilterActive = !!oldValues[0] || !!oldValues[1] || !!oldValues[2];
-
-            if (isAnyFilterActive && !wasAnyFilterActive) {
-                if (allPiecesSection) {
-                    $scope.selectSection(allPiecesSection);
-                }
-            } else if (!isAnyFilterActive && wasAnyFilterActive) {
-                $scope.goBack();
-            }
+            grid.innerHTML += cardHTML;
         });
 
+        // ... (código de botones de paginación igual) ...
+        if (totalPages > 1) {
+             grid.innerHTML += `
+            <div class="pagination-controls">
+                <button class="page-btn" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span style="font-size:14px; color:var(--body-color);">Página ${currentPage} de ${totalPages}</span>
+                <button class="page-btn" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>`;
+        }
+    }
 
-        }]);
-    </script>
+   
+   window.changePage = function(direction) {
+    currentPage += direction;
+    
+    // CORRECCIÓN: Pasamos 'false' para decirle que NO reinicie la página a 1
+    applyFilterAndRender(false);
+    
+    // Scroll suave hacia arriba
+    document.querySelector('.popular-books').scrollIntoView({ behavior: 'smooth' });
+}
+
+window.toggleLike = function(title) {
+    const score = scores.find(s => s.title === title);
+    if (!score) return;
+    let interaction = userInteractions.find(i => i.title === title);
+    
+    if (interaction) {
+        interaction.isLiked = !interaction.isLiked;
+    } else {
+        interaction = { title: title, isLiked: true, progress: 0, lastOpened: Date.now() };
+        userInteractions.push(interaction);
+    }
+    
+    // false para no resetear la pagina
+    applyFilterAndRender(false);
+    renderSidebars(); 
+}
+
+function applyFilterAndRender(resetPage = true) { 
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        
+        let filtered = scores.filter(score => {
+            // Pasamos score.title al helper
+            const interaction = getInteraction(score.title);
+
+            const matchesSearch = score.title.toLowerCase().includes(term) || score.author.toLowerCase().includes(term);
+            
+            let matchesType = false;
+            if (currentFilter === 'all') {
+                matchesType = true;
+            } else if (currentFilter === 'favorites') {
+                matchesType = interaction.isLiked === true;
+            } else {
+                matchesType = score.style === currentFilter;
+            }
+
+            return matchesSearch && matchesType;
+        });
+        
+        if (resetPage === true || typeof resetPage === 'object' || typeof resetPage === 'undefined') {
+            currentPage = 1; 
+        }
+        
+        renderBookGrid(filtered);
+    }
+
+    // Listeners de búsqueda
+    document.getElementById('searchInput').addEventListener('keyup', applyFilterAndRender);
+
+    // Listeners de botones de género
+    const genreButtons = document.querySelectorAll('.book-type');
+    genreButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            genreButtons.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentFilter = e.target.getAttribute('data-filter');
+            applyFilterAndRender();
+        });
+    });
+
+    // 7. FUNCIONES DEL VISOR (Overlay)
+    const overlay = document.getElementById('pdfOverlay');
+    const iframe = document.getElementById('scoreFrame');
+
+    window.openPdfViewer = function(url) {
+        iframe.src = url;
+        overlay.classList.add('active');
+    }
+
+    window.closePdfViewer = function() {
+        overlay.classList.remove('active');
+        setTimeout(() => { iframe.src = ''; }, 300); // Pequeño delay para limpiar
+    }
+
+    // --- INICIALIZACIÓN ---
+    $(document).ready(function() {
+        renderSidebars();       // Llenar sidebar
+        renderRecentCarousel();
+        renderBookGrid(scores);    // Llenar grid
+    });
+
+</script>
+
 </body>
 </html>
