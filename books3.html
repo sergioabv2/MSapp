@@ -1,3279 +1,740 @@
-
-<html lang="es" ng-app="libraryApp">
+<!DOCTYPE html>
+<html lang="es" ng-app="dashboardApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca de Piano</title>
+    <title>Tu Aula Virtual - PianoMaster</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/focus-visible@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    :root {
+    --primary-color: #1877F2; /* Azul Facebook/Zoom */
+    --primary-hover: #166fe5;
+    --secondary-color: #2ed573;
+    --bg-light: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-dark: #2f3542;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --danger-color: #ff4757;
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding: 20px;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+body { 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg-light);
+    min-height: 100vh; 
+    color: var(--text-dark);
+}
 
-      
+.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-        /* --- Library Content --- */
-        .library-section {
-            margin-bottom: 40px;
-        }
+/* GRID LAYOUT */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Columna principal ancha, sidebar estrecho */
+    gap: 25px;
+}
 
-       
-        
-        .carousel-wrapper {
-            position: relative;
-        }
+/* CARDS */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--border-color);
+}
 
-        .carousel {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            padding: 10px 5px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
+/* --- ESTILOS DE LA AGENDA (LO IMPORTANTE) --- */
+.section-title {
+    font-size: 18px; 
+    margin-bottom: 20px; 
+    font-weight: 800;
+}
 
-        .carousel::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Estilos para la nueva tarjeta de "Agregar Archivo" */
-.add-new-file-card {
+.agenda-list {
     display: flex;
     flex-direction: column;
+    gap: 12px;
+}
+
+.agenda-item {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0; /* Fondo más claro o distintivo */
-    border: 2px dashed #ccc; /* Borde punteado */
-    color: #6e6e73;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    background: white;
 }
 
-.add-new-file-card:hover {
-    border-color: #5668E2; /* Color de hover similar al primario */
-    background-color: #e8f0fe; /* Fondo al pasar el ratón */
-    color: #5668E2;
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(86, 104, 226, 0.2);
+/* 1. CLASES PASADAS (Gris y Tachado) */
+.agenda-item.past {
+    background: #f1f2f6; /* Gris muy claro */
+    border-color: transparent;
+    color: #a4b0be; /* Texto grisáceo */
+}
+.agenda-item.past h4 {
+    text-decoration: line-through; /* Título tachado */
+    color: #a4b0be;
+}
+.agenda-item.past .date-box {
+    opacity: 0.6; /* Fecha desvanecida */
+}
+.status-finished {
+    font-size: 10px;
+    text-transform: uppercase;
+    background: #dfe4ea;
+    color: #747d8c;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    display: inline-block;
+    margin-top: 4px;
+    text-decoration: none !important;
 }
 
-.add-new-file-card i {
-    font-size: 48px; /* Tamaño grande para el icono de más */
-    margin-bottom: 10px;
-    color: #a0a0a0; /* Color del icono */
-    transition: color 0.2s ease;
+/* 2. PRÓXIMA CLASE (Destacada) */
+.agenda-item.next {
+    background: #ffffff;
+    border: 2px solid var(--primary-color); /* Borde azul */
+    box-shadow: 0 8px 20px rgba(24, 119, 242, 0.15); /* Sombra azulada */
+    transform: scale(1.01); /* Ligeramente más grande */
+    z-index: 2;
+}
+.agenda-item.next h4 {
+    color: var(--primary-color);
+    font-weight: 800;
+}
+.status-next-badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-.add-new-file-card:hover i {
-    color: #5668E2; /* Color del icono al pasar el ratón */
+/* 3. CLASES FUTURAS (Normal) */
+.agenda-item.future:hover {
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+    cursor: pointer;
 }
 
-.add-new-file-card .book-title {
-    font-weight: 600;
-    color: #343a40;
-    text-align: center;
-}
-
-.add-new-file-card .book-level {
-    font-size: 13px;
-    color: #6c757d;
-    text-align: center;
-}
-
-
-        /* --- Book Card --- */
-        .book-card {
-            flex: 0 0 auto;
-            width: 150px;
-            scroll-snap-align: start;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            position: relative;
-        }
-        
-        .book-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .book-cover {
-            width: 100%;
-            height: 200px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            object-fit: cover;
-            border: 1px solid #f0f0f0;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .book-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #343a40;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .book-level {
-            font-size: 13px;
-            color: #6c757d;
-        }
-        
-        /* --- Locked State --- */
-        .locked-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: rgba(30, 30, 30, 0.5);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-            backdrop-filter: blur(2px);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none; /* Allows clicks to go through if needed, but here it's for visual effect */
-        }
-        
-        .book-card.is-locked .book-cover {
-            filter: grayscale(80%);
-        }
-
-        .book-card.is-locked .locked-overlay {
-             opacity: 1;
-        }
-
-        /* --- Scroll Buttons --- */
-        .scroll-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-70%);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #e9ecef;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            color: #343a40;
-            font-size: 16px;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .carousel-wrapper:hover .scroll-btn {
-            opacity: 1;
-        }
-        
-        .scroll-btn:hover {
-            transform: translateY(-70%) scale(1.1);
-        }
-
-        .scroll-btn.prev {
-            left: -20px;
-        }
-        .scroll-btn.next {
-            right: -20px;
-        }
-
-        /* --- Modal Styles --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: #2a2a2e;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            max-width: 800px;
-            width: 90%;
-            display: flex;
-            color: #e0e0e0;
-            overflow: hidden;
-            animation: fadeInScale 0.3s ease-out;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-left {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #1c1c1e;
-        }
-
-        .modal-preview-img {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-
-        .modal-right {
-            width: 350px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #8e8e93;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .modal-close:hover {
-            color: #ffffff;
-        }
-
-        .modal-header-info {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .modal-category {
-            font-size: 13px;
-            color: #a0a0a0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .modal-title {
-            font-size: 26px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .modal-author {
-            font-size: 18px;
-            color: #c0c0c0;
-        }
-
-        .modal-progress-section {
-            margin-bottom: 30px;
-        }
-
-        .modal-progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #444448;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-
-        .modal-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #5668E2, #7343D9);
-            border-radius: 4px;
-            transition: width 0.5s ease-out;
-        }
-
-        .modal-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #a0a0a0;
-        }
-        
-        .modal-stat-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-top: 4px;
-        }
-
-        .modal-actions {
-            display: flex;
-            flex-direction: row;
-             justify-content: space-around;
-   
-        }
-
-        .modal-button {
-            padding: 15px 25px;
-            border-radius: 12px;
-           
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            text-decoration: none; /* Para el tag <a> */
-        }
-
-        .modal-actions .modal-button{ width: 130px; }
-
-        .modal-button.primary {
-            background: linear-gradient(135deg, #5668E2, #7343D9);
-            color: white;
-            box-shadow: 0 4px 15px rgba(86, 104, 226, 0.4);
-        }
-
-        .modal-button.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(86, 104, 226, 0.5);
-        }
-
-        .modal-button.secondary {
-            background: #4a4a4e;
-            color: #e0e0e0;
-        }
-
-        .modal-button.secondary:hover {
-            background: #5e5e62;
-        }
-        
-        /* --- PDF Viewer Styles --- */
-        .pdf-viewer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #212121;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        .pdf-viewer-header {
-            height: 45px;
-            background-color: #333;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            flex-shrink: 0;
-        }
-        
-        .pdf-viewer-header h3 {
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .pdf-viewer-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-          .pdf-viewer-fullscreen {
-            background: none;
-            border: none;
-            color: white;
-            margin-right: 13px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-         .pdf-viewer-fullscreen:hover {
-            color: #d1d1d1;
-        }
-
-         
-        
-        .pdf-viewer-close:hover {
-            color: #d1d1d1;
-        }
-
-        .pdf-viewer-overlay iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .add-file-btn { background-color: #8a2be2; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .add-file-btn:hover { background-color: #7b24c6; }
-
-.modal-content2 {
-            background: #e0e0e0;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            max-width: 500px;
-            width: 90%;
-            color:#2a2a2e;
-            overflow: hidden;
-            animation: fadeInScale 0.3s ease-out;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .upload-modal-content { padding: 25px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .drop-zone { border: 2px dashed #ccc; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; background-color: #f9f9f9; }
-        .drop-zone p { margin: 0; color: #888; }
-        .drop-zone:hover { border-color: #8a2be2; background-color: #f5efff; }
-        .modal-actions-upload { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .locked-modal-content { background-color: #fff; padding: 30px; border-radius: 10px; text-align: center; max-width: 350px; }
-        .locked-modal-content i { font-size: 40px; color: #ffc107; margin-bottom: 15px; }
-        .locked-modal-content p { font-size: 1.1rem; color: #333; margin: 0; }
-        .book-card { position: relative; }
-        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
-        .book-card:hover .delete-btn { opacity: 1; }
-
-     
-
-
-/* --- Nuevos estilos para la sección de progreso --- */
-.progress-display {
+/* Elementos internos de la Agenda */
+.agenda-date {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
 }
-
-.progress-display .modal-progress-bar {
-    flex-grow: 1; /* Hace que la barra ocupe el espacio disponible */
-}
-
-.progress-percentage {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #fff;
-    min-width: 50px; /* Ancho mínimo para alinear */
-    text-align: right;
-}
-
-.exercise-list-header {
-    font-size: 14px;
-    color: #a0a0a0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-}
-
-.exercise-list-container {
-    max-height: 160px; /* Altura máxima antes de mostrar scroll */
-    overflow-y: auto;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    padding: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Estilo para el scrollbar */
-.exercise-list-container::-webkit-scrollbar {
-    width: 6px;
-}
-.exercise-list-container::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 3px;
-}
-.exercise-list-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.exercise-item {
-    padding: 10px 12px;
-    color: #e0e0e0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    transition: background-color 0.2s ease;
-}
-
-.exercise-item:last-child {
-    border-bottom: none;
-}
-
-.exercise-item.completed {
-    color: #888;
-    text-decoration: line-through;
-}
-
-/* Ícono de check para ejercicios completados */
-.exercise-item.completed::before {
-    content: '\f00c'; /* Código de Font Awesome para check */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    color: #28a745; /* Verde */
-    margin-right: 12px;
-    text-decoration: none; /* Evita que el ícono se tache */
-    display: inline-block;
-}
-
- .right-controls {
-  display: flex;
-  gap: 8px;
-  margin-left: auto; /* Empuja todo a la derecha */
-  margin-right: 15px;
-}
-
-.metronome-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bpm-control {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: silver;
-  border-radius: 12px;
-  padding: 4px 8px;
-}
-
-.bpm-buttons {
-  display: flex;
-}
-
-.bpm-btn {
-  background: transparent;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.bpm-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.bpm-label {
-  font-family: 'Roboto Mono', monospace;
-  color: black !important;
-  font-size: 14px;
-  min-width: 50px;
-  text-align: center;
-}
-
-/* Estilos para estados activos */
-.record-btn.active {
-  color: #f44336;
-  animation: pulse 1.5s infinite;
-}
-
-.tool-btn {
-    background: silver;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-}
-
-.tool-btn:hover {
-    background: #f0f0f0;
-}
-
-.tool-btn i {
-    font-size: 16px;
-}
-
-.tool-btn.active-tool {
-    background-color: #b0b0b0; /* Un gris más oscuro que 'silver' (#c0c0c0) */
-    color: #000; /* Ícono y texto más oscuros para mayor énfasis */
-    border-color: #9e9e9e; /* Un borde que coincida */
-    
-    /* La clave: sombra interior para efecto "presionado" */
-    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
-    
-    /* Opcional: Moverlo 1px para abajo para simular la presión */
-    transform: translateY(1px);
-}
-
-.tool-btn.active-tool:hover {
-    background-color: #b0b0b0; /* Mantiene el color de fondo */
-    transform: translateY(1px); /* Mantiene la posición */
-}
-
-.metronome-btn.active {
-  color: #FF9800;
-  animation: pulse 0.5s infinite alternate;
-}
-
-@keyframes pulse {
-  from { opacity: 1; }
-  to { opacity: 0.7; }
-}
-  
-  
-  .record-btn.active {
-  color: #f44336;
-  animation: pulse 1.5s infinite;
-}
-
-
-
-.online-badge-container {
-  position: absolute;
- margin-top: 90px !important;
-  margin-left: 10px !important;
-}
-
-.online-badge {
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: white;
-    padding: 8px 16px;
-    border-radius: 50px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e7eb;
-  width: 130px;
-}
-
-.status-indicator {
-    position: relative;
-    width: 12px;
-    height: 12px;
-}
-
-.status-dot {
-    width: 12px;
-    height: 12px;
-    /* Color rojo principal */
-    background-color: #ef4444; 
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.status-pulse {
-    width: 12px;
-    height: 12px;
-    /* Color rojo para la pulsación */
-    background-color: #f87171; 
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.status-ring {
-    width: 12px;
-    height: 12px;
-    /* Color rojo claro para el anillo */
-    background-color: #fca5a5;
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.status-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin: 0;
-}
-
-@keyframes ping {
-    75%, 100% {
-        transform: scale(2);
-        opacity: 0;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
-/* === ESTILOS DEL MODAL DE GUARDAR GRABACIÓN === */
-.save-recording-modal {
-    max-width: 500px;
-}
-
-.audio-preview-container {
-    margin: 24px 0;
-}
-
-.audio-preview-container audio {
-    width: 100%;
-    border-radius: 8px;
-}
-
-.save-recording-modal .upload-modal-header {
+.date-box {
     text-align: center;
-    margin-bottom: 24px;
-  margin-top: 7px;
-    border-bottom: 1px solid #f1f3f5;
-    padding-bottom: 16px;
+    min-width: 50px;
+    padding-right: 15px;
+    border-right: 1px solid var(--border-color);
 }
-.save-recording-modal .upload-modal-header h2 {
-    font-size: 1.5rem;
-    color: #212529;
-    margin: 0;
-}
-.save-recording-modal .upload-modal-header p {
-    color: #6c757d;
-    margin-top: 4px;
-    margin-bottom: 0;
-    font-size: 1rem;
-}
+.date-day { font-size: 20px; font-weight: 800; line-height: 1; }
+.date-month { font-size: 11px; text-transform: uppercase; font-weight: 600; }
 
-/* Previsualización del audio */
-.audio-preview-container {
-    margin: 20px 0;
-}
-.audio-preview-container audio {
-    width: 100%;
-    border-radius: 8px;
-}
+.class-details h4 { font-size: 15px; margin-bottom: 2px; font-weight: 700; }
+.meta-text { font-size: 13px; color: var(--text-muted); }
 
+/* --- SIDEBAR & MATERIALES --- */
+.sidebar-title { font-size: 15px; margin-bottom: 20px; font-weight: 700; }
 
+.sidebar-card { margin-bottom: 20px; }
 
-/* Formulario */
-.recording-form {
-    margin-top: 24px;
-  padding: 17px;
-}
-.recording-form .form-group {
-    margin-bottom: 18px;
-}
-.recording-form .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #495057;
-    font-size: 0.9rem;
-}
-.recording-form .form-group input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    background: #f8f9fa;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-}
-.recording-form .form-group input:focus {
-    outline: none;
-    border-color: #5668E2;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(86, 104, 226, 0.15);
-}
+/* Lista de Materiales adaptada al sidebar */
+.materials-list { display: flex; flex-direction: column; gap: 10px; }
 
-/* Caja de metadatos (Fecha, Duración) */
-.recording-metadata {
-    display: flex;
-    justify-content: center; /* Centrado si solo hay un elemento */
-    gap: 24px;
-    padding: 14px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    margin-top: 10px;
-    border: 1px solid #e9ecef;
-    color: #495057;
-    font-size: 0.9rem;
-}
-.recording-metadata span {
+.material-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-.recording-metadata i {
-    color: #868e96;
-}
-
-/* Botones de acción (Eliminar, Guardar) */
-.modal-actions-upload {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid #f1f3f5;
-}
- 
-      /* --- Estilos para el Modal de Tareas --- */
-.task-modal-content {
-    padding: 0;
-    max-width: 450px;
-}
-
-.task-modal-header {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #ddd;
-}
-
-.task-modal-header h2 {
-    font-size: 1.2rem;
-    color: #333;
-    margin: 0;
-}
-
-.task-list-container {
     padding: 10px;
-    max-height: 70vh;
-    overflow-y: auto;
+    border-radius: 8px;
+    background: var(--bg-light);
+    transition: 0.2s;
 }
+.material-item:hover { background: #e9ecef; }
 
-.task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.task-item:last-child {
-    border-bottom: none;
-}
-
-.task-info .task-category {
-    font-size: 0.75rem;
-    color: #888;
-    text-transform: uppercase;
-    font-weight: 500;
-}
-
-.task-info .task-title {
-    font-size: 1rem;
-    color: #222;
-    margin: 4px 0 0 0;
-    font-weight: 500;
-}
-
-.task-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.task-btn {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-
-.task-btn:hover {
-    background-color: #e0e0e0;
-}
-
-
-.task-btn.video { color: #c4302b; }
-.task-btn.midi { color: #5668E2; }
-
-.modal-close2 {
-  
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #8e8e93;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .modal-close2:hover {
-            color: gray;
-        }
-
-
-
-
-.video-modal-content {
-    background: black;
-    padding: 0;
-    width: 87%;
-    max-width: 800px; /* Ancho máximo del video */
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-    border: 1px solid #333;
-    border-radius: 12px;
-    overflow: hidden; 
-}
-
-.video-container {
-    position: relative;
-    width: 100%;
-    padding-top: 52%; 
-}
-
-.video-container iframe {
-    position: absolute;
-    top: -15px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.video-close-btn {
-    top: -40px; 
-    right: 0;
-    color: white;
-    font-size: 24px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-}
-
-.task-status-container {
-    flex-grow: 1; /* Ocupa el espacio central */
-    text-align: right;
-
-}
-.task-status {
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-right: 5px;
-    padding: 4px 8px;
-    border-radius: 12px;
-}
-.task-status.completed {
-    background-color: #e4f8e9;
-    color: #28a745;
-}
-.task-status.sent {
-    background-color: #fff0e1;
-    color: #fd9843;
-}
-.task-status i {
-    margin-right: 4px;
-}
-
-.task-title.completed-task {
-    text-decoration: line-through;
-    color: #999; /* Color más claro para indicar que está finalizado */
-}
-
-/* Añade este estilo a tu CSS existente para los estados */
-
-.task-status.failed {
-    background-color: #fdeeee;
+.file-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.file-icon {
+    width: 32px; height: 32px;
+    background: white;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
     color: #e74c3c;
+    flex-shrink: 0;
+}
+.file-details h4 {
+    font-size: 13px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 140px; /* Evita desborde en pantallas chicas */
+}
+.file-details p { font-size: 11px; color: var(--text-muted); }
+
+.download-btn {
+    width: 28px; height: 28px;
+    background: var(--primary-color);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    font-size: 12px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.download-btn:hover { background: var(--primary-hover); }
+
+/* --- OTROS ESTILOS (Header, Botones, Modal) --- */
+.class-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);
+}
+.class-title h2 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
+.class-title p { font-size: 13px; color: var(--text-muted); }
+.status-badge {
+    background: #d1fae5; color: #065f46;
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
 }
 
-.form-select {
+.class-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;
+}
+.info-box {
+    background: var(--bg-light); padding: 15px; border-radius: 12px;
+    display: flex; align-items: center; gap: 12px;
+}
+.info-icon {
+    width: 40px; height: 40px; background: white; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.join-btn {
+    width: 100%; background: var(--primary-color); color: white;
+    border: none; padding: 16px; border-radius: 12px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3); transition: 0.3s;
+}
+.join-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.join-btn:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; transform: none; }
+.security-note { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
+
+/* Perfil Profesor */
+.teacher-profile { text-align: center; }
+.teacher-avatar {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    margin-bottom: 10px; border: 3px solid var(--bg-light);
+}
+.teacher-name { font-weight: 700; margin-bottom: 2px; }
+.teacher-specialty { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
+.teacher-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.action-btn {
+    background: white; border: 1px solid var(--border-color);
+    padding: 10px; border-radius: 8px; color: var(--text-dark);
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.action-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+.action-btn.cancel { color: var(--danger-color); }
+.action-btn.cancel:hover { border-color: var(--danger-color); background: #fff5f5; }
+
+.tech-check-btn {
+    width: 100%; background: white; border: 2px dashed var(--primary-color);
+    color: var(--primary-color); padding: 12px; border-radius: 10px;
+    font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;
+}
+.tech-check-btn:hover { background: #edf2f7; }
+
+/* Modal */
+.tech-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
+}
+.tech-modal.active { opacity: 1; visibility: visible; }
+.tech-content {
+    background: white; width: 400px; padding: 30px; border-radius: 20px;
+    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.mic-visualizer {
+    height: 50px; display: flex; align-items: center; justify-content: center;
+    gap: 4px; margin: 20px 0;
+}
+.mic-bar {
+    width: 6px; height: 10px; background: var(--primary-color); border-radius: 3px;
+    animation: bounce 0.5s ease-in-out infinite;
+}
+@keyframes bounce { 50% { height: 30px; } }
+
+/* Responsive */
+@media (max-width: 850px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .agenda-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .agenda-action { align-self: flex-end; }
+}
+
+
+
+
+
+/* --- BOTÓN SIDEBAR --- */
+.library-btn {
     width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    background: #f8f9fa;
-    font-size: 1rem;
-    -webkit-appearance: none; /* Quita el estilo nativo */
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 16px 12px;
-}
-.form-select:focus {
-    outline: none;
-    border-color: #5668E2;
-    box-shadow: 0 0 0 3px rgba(86, 104, 226, 0.15);
-}
-
-
-
-.midi-modal-container {
-    width: 90%;
-    max-width: 700px;
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    transform: translateY(20px);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-.modal-overlay.show .midi-modal-container {
-    transform: translateY(0);
-}
-.midi-modal-header {
-    padding: 20px 20px 15px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-.midi-modal-title {
-    margin: 0;
-    color: #111827;
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-.midi-modal-user {
-    margin: 0;
-    color: #4b5563;
-    font-size: 0.9rem;
-    font-weight: 400;
-    margin-top: 4px;
-}
-.midi-modal-close {
-    background: none;
-    border: none;
-    color: #9ca3af;
-    font-size: 1.5rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
     cursor: pointer;
-    transition: color 0.2s;
-    line-height: 1;
+    transition: 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.midi-modal-close:hover {
-    color: #111827;
-}
-.midi-modal-body {
-    padding: 25px;
-}
-.midi-player-wrapper {
-    margin-bottom: 20px;
-}
-.midi-visualizer-wrapper {
-    height: 200px;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 15px;
-    position: relative;
-    background-color: #f3f4f6;
-}
-.wave-effect {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, rgba(74, 111, 165, 0.6), transparent);
-    animation: wave 2s linear infinite;
-    opacity: 0.6;
-}
-@keyframes wave {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+.library-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
- #libraryMidiVisualizer {
-          display: flex;
-  justify-content: center;
-  transform: scale(0.5);
+/* --- MODAL DE BIBLIOTECA --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
 }
-
-@media (max-width: 600px){
-    #libraryMidiVisualizer {
-  transform: scale(0.4);
-}
-}
-
-@media (max-width: 470px){
-    #libraryMidiVisualizer {
-  transform: scale(0.3);
-}
-}
-
-#libraryMidiVisualizer {
-    width: 100%;
-    height: 100%;
-}
-
-        /* Estilo para el texto que reemplaza al select */
-.form-display-text {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: #f1f3f5; /* Un gris claro para indicar que no es editable */
-    font-size: 1rem;
-    color: #555;
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
-}
-
-.progress-display2 {
-  padding: 5px 10px;
-color: white;
-  font-family: 'Roboto Mono', monospace;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: nowrap;
-}
-
-.progress-bar-container {
-  flex: 1;
-  min-width: 0;
-  padding-right: 15px;
-}
-
-.time-displays-container {
-  display: flex;
-  gap: 2px;
-}
-
-.time-display {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 60px;
-}
-
-.time-display .label {
-  font-size: 11px;
-  color: #f5f5f5;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-right: -10px;
-}
-
-.time-display .value {
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-
-}
-
-
-.progress-bar {
-
-  overflow: hidden;
-  height: 12px;
-  width: 130px;
-  background: #e0e0e0;
-  border-radius: 4px;
-}
-
-
-.progress-fill {
-    height: 12px;
-    background: gray; /* Green for the filled part */
-    border-radius: 2px;
-    transition: width 0.3s ease;
-    display: block;
-}
-
-
-.modal-actions2 {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: auto;
-        }
-
-
-
-
-
-
-        @media (max-width: 770px) {
-            .modal-content {
-                flex-direction: column;
-                max-width: 400px;
-                height: 570px;
-                overflow-y: auto;
-            }
-            .exercise-list-container{height: 240px !important;}
-            .modal-left{display: none}
-            .pdf-viewer-fullscreen{display: none}
-            .time-display{display: none}
-            .modal-right {
-                width: 100%;
-                padding: 25px;
-            }
-        
-        .scroll-btn { display: none; }
-   }
-
-
-
-
-        @media (max-width: 768px) {
-
-            .carousel-wrapper { margin-left: 0; margin-right: 0; }
-               .exercise-list-container{max-height: 320px !important;}
-        }
-
-          @media (max-width: 558px) {
-            .add-file-btn{display: none}
-             .task-status {display: none !important;}
-             .modal-content {height: 520px !important;}
-            .exercise-list-container{height: 190px !important;}
-            #edit-options{display: none }
-            .nomobile{display: none}
-            .progress-info{ justify-content: flex-end;}
-
-          }
-
-          .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.section-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: #1d1d1f;
-    margin-bottom: 0; /* CAMBIA ESTO A 0 */
-    padding-left: 5px;
-}
-.refresh-btn {
-    background: none;
-    color: #6e6e73; /* Un color más sutil */
-    border: none;
-    border-radius: 50%; /* Lo hacemos circular */
-    width: 40px;
-    height: 40px;
-    font-size: 18px; /* Tamaño del icono */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Centra el icono dentro del botón */
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.refresh-btn:hover {
-    background: #f0f0f0; /* Fondo sutil al pasar el ratón */
-    color: #1d1d1f;
-}
-
-.refresh-btn:disabled {
-    color: #adb5bd; /* Color del icono cuando está deshabilitado */
-    cursor: not-allowed;
-    background: none;
-}
-
-/* --- Nuevo Botón de Cierre Simple --- */
-.pdf-viewer-close-simple {
-    position: absolute;
-    top: 20px;
-    right: 15px;
-    z-index: 2010; /* Asegura que esté sobre el iframe */
-    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-    color: white; /* 'x' blanca (cambia a 'black' si prefieres) */
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-}
-
-.pdf-viewer-close-simple:hover {
-    background: rgba(0, 0, 0, 0.8);
-}
+.modal-overlay.active { opacity: 1; visibility: visible; }
 
 .library-content {
-    width: 100%;
+    background: #f8f9fa; /* Fondo gris muy suave para resaltar los libros blancos */
+    width: 850px; /* Más ancho para el carrusel */
+    max-width: 95%;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative;
 }
 
-/* (Oculto por defecto en móviles) */
-.status-card-column {
-    display: none;
+.library-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
 }
+.library-header h3 { font-size: 20px; font-weight: 800; }
 
-/* ESTILOS DE LA TARJETA DE ESTATUS */
-.status-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-    
-    /* ¡Efecto "Sticky"! La tarjeta se quedará fija 
-       mientras el usuario baja por los caruseles */
-    position: sticky;
-    top: 20px; 
+.close-icon {
+    background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);
 }
+.close-icon:hover { color: var(--danger-color); }
 
-.status-card h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #343a40;
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 10px;
-}
-
-.status-card h4 i {
-    color: #5668E2;
-    margin-right: 8px;
-}
-
-.status-item {
+/* --- CARRUSEL ESTILO APPLE/NETFLIX --- */
+.carousel-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    font-size: 0.95rem;
+    overflow-x: auto; /* Scroll horizontal nativo */
+    gap: 25px;
+    padding: 10px 5px 25px 5px; /* Espacio para las sombras */
+    scroll-behavior: smooth;
+    /* Ocultar scrollbar visual pero mantener funcionalidad */
+    scrollbar-width: thin; 
+    scrollbar-color: #ccc transparent;
 }
 
-.status-item .label {
-    color: #6c757d;
-}
+/* Scrollbar para Webkit (Chrome/Safari) */
+.carousel-wrapper::-webkit-scrollbar { height: 6px; }
+.carousel-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.carousel-wrapper::-webkit-scrollbar-track { background: transparent; }
 
-.status-item .value {
-    font-weight: 600;
-    color: #212529;
-    background: #f8f9fa;
-    padding: 3px 8px;
-    border-radius: 6px;
-}
-
-.status-divider {
-    height: 1px;
-    background: #e9ecef;
-    margin: 20px 0;
-}
-
-.status-footer {
-    font-size: 0.9rem;
-    color: #6c757d;
-    text-align: center;
-    margin: 0;
-}
-
-
-/* --- MEDIA QUERY PARA PANTALLAS DE COMPUTADORA --- */
-
-/* Usamos min-width: 992px. 
-   En pantallas más grandes que 992px, se activan estas reglas.
-   En pantallas más pequeñas, se ignoran. */
-@media (min-width: 992px) {
-    
-    /* (1) Activamos Flexbox en el wrapper */
-    .main-layout-wrapper {
-        display: flex;
-        align-items: flex-start; /* Alinea las columnas arriba */
-        gap: 25px; /* Espacio entre las dos columnas */
-    }
-
-    /* (2) Hacemos que la columna de caruseles crezca */
-    .library-content {
-        flex-grow: 1; /* Ocupa el espacio disponible */
-        min-width: 0; /* Arreglo para que flexbox no se desborde */
-    }
-
-    /* (3) Mostramos y damos tamaño a la tarjeta de estatus */
-    .status-card-column {
-        display: block; /* La hacemos visible */
-        flex-shrink: 0; /* Evita que se encoja */
-        width: 300px;   /* Ancho fijo para la tarjeta */
-    }
-}
-
-
-
-
-/* --- Estilos para el Contenido de Usuario Inactivo (Versión Sales) --- */
-
-/* Ajusta el contenedor principal para que la tarjeta de ventas crezca */
-.inactive-user-content {
-    flex-grow: 1;
-    min-width: 0; /* Arreglo de Flexbox */
-}
-
-/* La tarjeta principal que contiene la oferta */
-.sales-pitch-card {
-    background: #ffffff; /* Fondo blanco tipo Apple */
-    border-radius: 12px;
-    padding: 40px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-    text-align: center;
-}
-
-.sales-header h2 {
-    font-size: 2.2em; /* Título prominente */
-    color: #1d1d1f;
-    margin-bottom: 15px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
-
-.sales-header p {
-    font-size: 1.1em;
-    color: #6e6e73; /* Texto secundario gris */
-    line-height: 1.6;
-    max-width: 600px;
-    margin: 0 auto 30px auto; /* Centrado y con margen inferior */
-}
-
-/* Lista de características */
-.sales-feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 auto;
-    max-width: 450px; /* Centra la lista de features */
-}
-
-.sales-feature-item {
-    display: flex;
-    align-items: center; /* Alinea icono y texto */
-    text-align: left;
-    gap: 20px; /* Espacio entre icono y texto */
-    margin-bottom: 25px;
-}
-
-.sales-feature-icon {
-    flex-shrink: 0;
-    font-size: 2em;
-    color: #1877f2; /* Azul Facebook como acento */
-    width: 50px;
-    text-align: center;
-}
-
-.sales-feature-text h3 {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #343a40;
-    margin-bottom: 4px;
-}
-
-.sales-feature-text p {
-    font-size: 0.95em;
-    color: #6c757d;
-    line-height: 1.5;
-    margin: 0;
-}
-
-.sales-cta-section {
-    margin-top: 40px; /* Espacio antes del botón */
-}
-
-/* Estilos del CTA (ya deberías tenerlos, pero los pongo por si acaso) */
-.cta-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #1877f2; /* Azul Facebook */
-    color: #ffffff;
-    padding: 16px 32px;
-    border-radius: 980px;
-    text-decoration: none;
-    font-size: 1.05em;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: none;
+/* TARJETA DE LIBRO */
+.book-card {
+    min-width: 180px; /* Ancho fijo para mantener uniformidad */
+    max-width: 180px;
+    flex-shrink: 0; /* Evita que se encojan */
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
 
-.cta-button:hover {
-    transform: scale(1.05);
-    background: #1565e0;
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+.book-card:hover {
+    transform: translateY(-8px); /* Efecto de levitación */
 }
-    </style>
-</head>
-<body ng-controller="libraryCtrl">
 
+.book-cover-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Sombra elegante */
+    margin-bottom: 15px;
+    background: white;
+}
 
-<div class="container" ng-hide="showPdfViewer" >
- </div>
-    
-    <div class="main-layout-wrapper">
+.book-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 3/4; /* Proporción libro */
+    object-fit: cover;
+}
 
+/* Efecto hover sobre la imagen */
+.book-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; transition: 0.3s;
+}
+.book-card:hover .book-overlay { opacity: 1; }
+.book-overlay i { color: white; font-size: 30px; }
 
-        <div class="status-card-column">
-                <div class="status-card">
-                    <h4><i class="fas fa-chart-line"></i> Mi Progreso</h4>
-                    
-                    <div class="status-item">
-                        <span class="label">Nivel Actual:</span>
-                        <span class="value">Nivel {{ lvl }}</span>
+/* Tipografía similar a tu imagen */
+.book-info h4 {
+    font-size: 16px; font-weight: 800; color: var(--text-dark);
+    margin-bottom: 4px; line-height: 1.2;
+}
+.book-info p {
+    font-size: 14px; color: var(--text-muted); font-weight: 500;
+}
+</style>
+<body ng-controller="dashboardCtrl">
+
+    <div class="container">
+        <br>
+        <div class="dashboard-grid">
+
+            <div class="main-content">
+                
+                <div class="card">
+                    <div class="class-header">
+                        <div class="class-title">
+                            <h2>{{nextClass.title || 'No hay clases próximas'}}</h2>
+                            <p>Sesión confirmada ID: #88291</p>
+                        </div>
+                        <div class="status-badge">Confirmada</div>
                     </div>
-                    
-                    <div class="status-item">
-                        <span class="label">Lección Actual:</span>
-                        <span class="value">Lección {{ lsn }}</span>
-                    </div>
 
-                    <div class="status-item">
-                        <span class="label">Tareas Aprobadas:</span>
-                        <span class="value">{{ getCompletedTaskCountTotal() }}</span>
-                    </div>
-
-                    <div class="status-divider"></div>
-                    <p class="status-footer">¡Sigue así!</p>
-
-                </div>
-            </div>
-
-
-        <div class="inactive-user-content" ng-if="userStatus !== 'ACTIVO'">
-    
-    <div class="sales-pitch-card">
-        
-        <div class="sales-header">
-            <h2>🎹 Clases One-to-One: El Siguiente Nivel</h2>
-            <p>Tu membresía está inactiva. ¡Reactívala para desbloquear tu biblioteca y acceder a lecciones personalizadas con seguimiento de un profesor real!</p>
-        </div>
-
-        <ul class="sales-feature-list">
-            <li class="sales-feature-item">
-                <div class="sales-feature-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div class="sales-feature-text">
-                    <h3>Atención Personalizada</h3>
-                    <p>Clases one-to-one (presencial o en línea) enfocadas 100% en tu progreso y necesidades.</p>
-                </div>
-            </li>
-            <li class="sales-feature-item">
-                <div class="sales-feature-icon">
-                    <i class="fas fa-laptop"></i>
-                </div>
-                <div class="sales-feature-text">
-                    <h3>Tecnología de Punta</h3>
-                    <p>Plataforma interactiva con WebRTC de alta calidad para clases en línea fluidas y sin retraso.</p>
-                </div>
-            </li>
-            <li class="sales-feature-item">
-                <div class="sales-feature-icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-                <div class="sales-feature-text">
-                    <h3>Seguimiento Real</h3>
-                    <p>Envía tus tareas y grabaciones directamente desde la app y recibe feedback de tu profesor.</p>
-                </div>
-            </li>
-        </ul>
-
-        <div class="sales-cta-section">
-            <a href="#" class="cta-button" onclick="alert('Redirigir a la página de reactivación/contacto')">
-                <i class="fas fa-arrow-circle-right" style="margin-right: 8px;"></i>
-                Ver Planes y Reactivar
-            </a>
-        </div>
-    </div>
-</div>
-
-        <div class="library-content" ng-if="userStatus === 'ACTIVO'">
-            <div class="library-section" ng-repeat="section in library | filter: { books: { title: searchQuery } }">
-               <div class="section-header"> 
-                <h2 class="section-title">{{ section.title }}</h2>
-                 <button class="refresh-btn" ng-if="$first" ng-click="refreshData()" ng-disabled="isRefreshing">
-            <i class="fas" ng-class="{'fa-sync-alt': !isRefreshing, 'fa-spinner fa-spin': isRefreshing}"></i>
-        </button>
-           </div>
-                <div class="carousel-wrapper">
-                    <div class="carousel" id="carousel-{{$index}}">
-                        <div class="book-card" ng-repeat="book in section.books | filter: { title: searchQuery }" 
-                             ng-class="{'is-locked': !isLoaded || book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)}" 
-                             ng-click="showPreview(book, section.title)">
-                            <img ng-src="{{ book.coverUrl }}" alt="{{ book.title }}" class="book-cover">
-                            <div class="book-title">{{ book.title }}</div>
-                            <div class="book-level">{{ book.author }}</div>
-                            <div class="locked-overlay" ng-if="!isLoaded || book.lvl > lvl || (book.lvl == lvl && book.lsn > lsn)" >
-                                <i class="fas fa-lock"></i>
+                    <div class="class-info-grid">
+                        <div class="info-box">
+                            <div class="info-icon"><i class="far fa-calendar-alt"></i></div>
+                            <div class="info-text">
+                                <h4>Fecha</h4>
+                                <p>{{nextClass.dateStr}}</p>
                             </div>
                         </div>
-                        <div class="book-card add-new-file-card" ng-if="section.title === 'Mis Archivos'" ng-click="openUploadModal()">
-                          <i class="fas fa-plus-circle"></i>
-                          <div class="book-title">Nuevo Archivo</div>
-                          <div class="book-level">Sube tu PDF</div>
+                        <div class="info-box">
+                            <div class="info-icon"><i class="far fa-clock"></i></div>
+                            <div class="info-text">
+                                <h4>Hora</h4>
+                                <p>{{nextClass.time}}</p>
+                            </div>
                         </div>
                     </div>
-                    <button class="scroll-btn prev" ng-click="scrollCarousel('carousel-' + $index, -1)"><i class="fas fa-chevron-left"></i></button>
-                    <button class="scroll-btn next" ng-click="scrollCarousel('carousel-' + $index, 1)"><i class="fas fa-chevron-right"></i></button>
+
+                    <button class="join-btn" ng-click="joinClass()" ng-disabled="!canJoin">
+                        <i class="fas fa-video"></i>
+                        {{ canJoin ? 'Conectarse a la Clase' : 'Clase no disponible aún' }}
+                    </button>
+                    
+                    <p class="security-note">
+                        <i class="fas fa-lock"></i> Conexión segura y encriptada
+                    </p>
                 </div>
-            </div>
-        </div>
 
-    </div>
+                <div class="card" style="margin-top: 20px;">
+                    <h3 class="section-title">Tu Trayectoria y Agenda</h3>
+                    
+                    <div class="agenda-list">
+                        <div class="agenda-item" 
+                             ng-repeat="clase in schedule" 
+                             ng-class="clase.status"> <div class="agenda-date">
+                                <div class="date-box">
+                                    <div class="date-day">{{clase.dayNum}}</div>
+                                    <div class="date-month">{{clase.monthStr}}</div>
+                                </div>
+                                <div class="class-details">
+                                    <h4>{{clase.title}}</h4>
+                                    <p class="meta-text">{{clase.time}} • 60 min</p>
+                                    
+                                    <span class="status-finished" ng-if="clase.status === 'past'">Finalizada</span>
+                                </div>
+                            </div>
 
-    <div class="modal-overlay" ng-class="{show: showPreviewModal}" ng-click="closePreviewModal($event)">
-    <div class="modal-content" ng-click="$event.stopPropagation()">
-        
-        <div class="modal-left">
-            <img ng-src="{{ selectedBook.coverUrl }}" alt="{{ selectedBook.title }}" class="modal-preview-img">
-        </div>
+                            <div class="agenda-action">
+                                <span class="status-next-badge" ng-if="clase.status === 'next'">Próxima</span>
+                                <i class="fas fa-chevron-right" style="color: #ccc;" ng-if="clase.status === 'future'"></i>
+                                <i class="fas fa-check-circle" style="color: #a4b0be;" ng-if="clase.status === 'past'"></i>
+                            </div>
 
-        <div class="modal-right">
-            <button class="modal-close" ng-click="closePreviewModal()"><i class="fas fa-times"></i></button>
-            <div class="modal-header-info">
-                <div class="modal-category">{{ selectedCategory }}</div>
-                <h2 class="modal-title">{{ selectedBook.title }}</h2>
-                <p class="modal-author">{{ selectedBook.author }}</p>
-            </div>
-            
-            <div class="modal-progress-section" ng-if="selectedBook.type === 'manual'">
-
-               <div ng-if="lvl > selectedBook.lvl || 
-                             (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))"> 
-                    <div class="progress-display">
-                        <div class="modal-progress-bar">
-                            <div class="modal-progress-fill" style="width: 100%;"></div>
                         </div>
-                        <span class="progress-percentage">100%</span>
                     </div>
-                    <div class="exercise-list-header">Unidad Completada</div>
-                    <div class="exercise-list-container">
-                        <div class="exercise-item completed" ng-repeat="lesson in selectedBook.lessons track by $index">
-                            {{ lesson.task }}
+                </div>
+
+            </div>
+
+            <aside class="sidebar">
+                
+                <div class="card sidebar-card">
+                    <h3 class="sidebar-title">Tu Instructor</h3>
+                    <div class="teacher-profile">
+                        <img ng-src="{{teacher.photo}}" class="teacher-avatar">
+                        <div class="teacher-name">{{teacher.name}}</div>
+                        <div class="teacher-specialty">{{teacher.specialty}}</div>
+                        
+                        <div class="teacher-actions">
+                            <button class="action-btn" ng-click="sendMessage()">
+                                <i class="far fa-comment-dots"></i> Mensaje
+                            </button>
+                            <button class="action-btn cancel" ng-click="cancelClass()">
+                                <i class="far fa-calendar-times"></i> Reagendar
+                            </button>
                         </div>
-                    </div> 
-               
-               </div>
-
-               <div ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))"> 
-                  <div class="progress-display">
-                      <div class="modal-progress-bar">
-                          <div class="modal-progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%'}"></div>
-                      </div>
-                      <span class="progress-percentage">{{ (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) | number:0 }}%</span>
-                  </div>
-                  <div class="exercise-list-header">Lista de Ejercicios ({{getCompletedTaskCountForManual(selectedBook)}}/{{selectedBook.totalExercises}})</div>
-                  <div class="exercise-list-container">
-                      <div class="exercise-item" ng-repeat="lesson in selectedBook.lessons track by $index" ng-class="{'completed': isTaskCompleted(lesson)}">
-                          {{ lesson.task }}
-                      </div>
-                  </div>
-              </div>
-            </div>
-
-            <div  class="modal-actions" ng-if="selectedBook.type == 'manual' ">
-                <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
-                <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary" >Descargar</a>
-            </div>
-
-              <div  class="modal-actions2" ng-if="selectedBook.type != 'manual'">
-                <button class="modal-button primary" ng-click="openPdfViewer(selectedBook)">Abrir</button>
-                <a ng-href="{{selectedBook.pdf}}" download="{{selectedBook.title}}.pdf" class="modal-button secondary" >Descargar</a>
-            </div>
-
-
-        </div>
-    </div>
-</div>
-
-     <div class="modal-overlay" ng-class="{show: showUploadModal}" ng-click="closeUploadModal($event)">
-        <div class="modal-content2 upload-modal-content" ng-click="$event.stopPropagation()">
-            <button class="modal-close" ng-click="closeUploadModal()"><i class="fas fa-times"></i></button>
-            <h2>Agregar nuevo PDF</h2>
-            <div class="form-group">
-                <label for="title">Título</label>
-                <input type="text" id="title" ng-model="newPdf.title" placeholder="Ej: Sonata Claro de Luna">
-            </div>
-            <div class="form-group">
-                <label for="author">Autor</label>
-                <input type="text" id="author" ng-model="newPdf.author" placeholder="Ej: L.V. Beethoven">
-            </div>
-            <div class="form-group">
-                <label for="grade">Grado / Nivel</label>
-                <input type="text" id="grade" ng-model="newPdf.grade" placeholder="Ej: Grado 3">
-            </div>
-            <div class="form-group">
-                <label>Archivo PDF</label>
-                <div class="drop-zone" ng-click="triggerFileInput()">
-                    <p ng-if="!newPdf.fileName">Haz clic o arrastra un archivo PDF aquí</p>
-                    <p ng-if="newPdf.fileName"><i class="fas fa-check-circle"></i> {{ newPdf.fileName }}</p>
+                    </div>
                 </div>
-                <input type="file" id="fileInput" onchange="angular.element(this).scope().onFileSelect(event)" style="display: none;" accept=".pdf">
-            </div>
-            <div class="modal-actions-upload">
-                <button class="modal-button secondary" ng-click="closeUploadModal()">Cancelar</button>
-                <button class="modal-button primary" ng-click="saveNewPdf()">Guardar</button>
-            </div>
-        </div>
-    </div>
 
+                <div class="card sidebar-card">
+                    <h3 class="sidebar-title">Archivos de Clase</h3>
+                    
+                    <div class="materials-list">
+                        <div class="material-item" ng-repeat="file in materials">
+                            <div class="file-info">
+                                <div class="file-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="file-details">
+                                    <h4 title="{{file.name}}">{{file.name}}</h4>
+                                    <p>{{file.size}}</p>
+                                </div>
+                            </div>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
 
-    <div class="modal-overlay" ng-class="{show: showLockedModal}">
-        <div class="locked-modal-content">
-            <i class="fas fa-lock"></i>
-            <p>Este material está bloqueado. <br>¡Sigue avanzando para desbloquearlo!</p>
-        </div>
-    </div>
-    
-   <div class="pdf-viewer-overlay" ng-show="showPdfViewer">  
-        <div class="pdf-viewer-header" ng-if="selectedBook.type === 'manual'">
-            <h3 class="bookTitle">{{ selectedBook.title }}</h3>
-
-        <div class="right-controls">
-            <button class="tool-btn" 
-            ng-click="setActivePanel('edition')"
-          ng-class="{'active-tool': activePanel === 'edition'}" id="edit-options"> 
-           <i class="fa-solid fa-pen-to-square"></i> Edición
-            </button>
-             <button class="tool-btn" 
-             ng-click="setActivePanel('recording')"
-          ng-class="{'active-tool': activePanel === 'recording'}" > 
-           <i class="fa-solid fa-flag"></i> Tareas
-            </button>
-        </div>
-
-         <button class="pdf-viewer-fullscreen" ng-click="toggleFullScreen()">
-        <i class="fa-solid" 
-           ng-class="{'fa-expand': !isFullscreen, 'fa-compress': isFullscreen}"></i>
-       </button>
-
-            <button class="pdf-viewer-close" ng-click="closePdfViewer()"><i class="fas fa-times"></i></button>
-        </div>
-
-        <button class="pdf-viewer-close-simple" 
-            ng-if="selectedBook.type !== 'manual'" 
-            ng-click="closePdfViewer()">
-        <i class="fas fa-times"></i>
-      </button>
-
-
-
-
-     <div class="progress-display2" >
-     
-
-  <div class="progress-info" ng-show="activePanel === 'recording'">
-
-   
- <div class="time-displays-container nomobile" ng-if="lvl > selectedBook.lvl || (lvl === selectedBook.lvl && lsn > (getMaxLsnInBook(selectedBook) || 0))">
-    <div class="progress-bar-container" >
-      <div class="progress-label">Progreso: 100%</div>
-   <div class="progress-bar">
-  <div class="progress-fill" ng-style="{'width': 100 + '%', 'background': getManualColor(selectedBook)}"></div>
+                   <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
+    <button class="library-btn" ng-click="openLibrary()">
+        <i class="fas fa-layer-group"></i> Ver Biblioteca de Unidades
+    </button>
 </div>
-    </div>
- <div class="time-display">
-        <span class="value">{{selectedBook.totalExercises}} / {{selectedBook.totalExercises}}</span>
-        <span class="label">Ejercicios</span>
-  </div>
-  </div>
-
-
- <div class="time-displays-container nomobile" ng-if="lvl < selectedBook.lvl || (lvl === selectedBook.lvl && lsn <= (getMaxLsnInBook(selectedBook) || 0))">
-     <div class="progress-bar-container" >
-      <div class="progress-label">Progreso: {{(getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100)}}%</div>
-   <div class="progress-bar">
-  <div class="progress-fill" ng-style="{width: (getCompletedTaskCountForManual(selectedBook) / selectedBook.totalExercises * 100) + '%', 'background': getManualColor(selectedBook)}"></div>
-</div>
-    </div>
-     <div class="time-display">
-        <span class="value">{{getCompletedTaskCountForManual(selectedBook)}}  /  {{selectedBook.totalExercises}}</span>
-        <span class="label">Ejercicios</span>
-  </div>
-  </div>
-
-
-    <div class="time-displays-container" >
-    <div class="right-controls">
-  <audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
-  <div class="metronome-control">
-  <!--  <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> -->
-
-   
-    <button class="tool-btn record-btn" ng-click="openMidiModal(selectedBook)" ng-if="selectedBook.type !== 'manual' && selectedBook.midi"> 
-   <i class="fa-solid fa-music"></i>
-    </button>
-    <button class="tool-btn record-btn" ng-click="recordWav()" ng-class="{'active': isRecording2}"> 
-   <i class="fa-solid fa-microphone"></i>
-    </button>
-
-     <button class="tool-btn " ng-click="openTaskModal()" ng-if="selectedBook.type === 'manual'"> 
-   <i class="fa-solid fa-clipboard-list"></i>
-    </button>
-    <button class="tool-btn metronome-btn" ng-click="toggleMetronome()" ng-class="{'active': metronomeActive}">
- <!--    <i class="fa-solid fa-stopwatch"></i>  -->
-       <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 16.5px; width: 15.5px">  
-    </button>
-    <div class="bpm-control">
-      <button class="bpm-btn" ng-mousedown="adjustBPM(-1, $event)" ng-touchstart="adjustBPM(-1, $event)">
-        <i class="fa-solid fa-minus"></i>
-      </button>
-      <span class="bpm-label">{{metronomeBPM}} BPM</span>
-      <button class="bpm-btn" ng-mousedown="adjustBPM(1, $event)" ng-touchstart="adjustBPM(1, $event)">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
-  </div>
-</div>
-
-    </div>  
-  </div>
-
-
-
-
-
-
-
-<div class="progress-info" ng-show="activePanel === 'edition'">
-  <div  style="display: flex; align-items: center; gap: 8px; margin-left: 15px;">   
-
-  <button class="tool-btn" 
-        ng-click="setAnnotationMode('stroke')"
-        ng-class="{'active-tool': annotations.mode === 'stroke'}">
-    <i class="fas fa-pencil-alt"></i>
-</button>
-
-
-    <button class="tool-btn" 
-            ng-click="setAnnotationMode('draw')"
-            ng-class="{'active-tool': annotations.mode === 'draw'}">
-        <i class="fas fa-highlighter"></i>
-    </button>
-
-
-    <div class="tool-btn color-picker" 
-         id="color-picker-container" 
-         ng-click="toggleColorPicker($event)"
-         style="position: relative; cursor: pointer;">
-        
-        <div id="color-preview-circle" 
-             ng-style="{'background-color': annotations.currentColor}"
-             style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid #ccc;">
-        </div>
-        
-        <div class="color-options" 
-             ng-show="annotations.colorPickerOpen"
-             ng-click="$event.stopPropagation()" 
-             style="position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; padding: 5px; z-index: 100;">
-            
-            <div ng-repeat="swatch in annotations.swatches track by $index"
-                 ng-click="selectSwatch(swatch, $event)"
-                 ng-style="{'background-color': swatch}"
-                 class="color-swatch"
-                 style="width: 20px; height: 20px; margin: 2px;">
-            </div>
-            
-            <input type="color" 
-                   ng-model="annotations.hexColor" 
-                   ng-change="onCustomColorChange()"
-                   style="width: 30px; padding: 0; border: none;">
-        </div>
-    </div>
-
-       <button class="tool-btn" 
-            ng-click="setAnnotationMode('text')"
-            ng-class="{'active-tool': annotations.mode === 'text'}">
-        <i class="fas fa-comment"></i>
-    </button>
-
-<button class="tool-btn" 
-        ng-click="toggleAnnotationVisibility()"
-        ng-class="{'active-tool': annotations.isVisible}">
-    <i class="fas" ng-class="{'fa-eye': annotations.isVisible, 'fa-eye-slash': !annotations.isVisible}"></i>
-</button>
-
-   <button class="tool-btn" 
-        ng-click="undoLastAnnotation()">
-    <i class="fas fa-undo"></i>
-</button>
-
-    <button class="tool-btn" 
-            ng-click="clearAnnotations()">
-        <i class="fas fa-trash-alt"></i>
-    </button>
-  </div>
-</div>
-
-
-
-
-
-   </div>
-
-
-
-
-
-
-
-
-     <div class="online-badge-container">
-        <div class="online-badge" ng-if="isRecording2">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <div class="status-pulse"></div>
-                <div class="status-ring"></div>
-            </div>
-            <span class="status-text">Grabando...</span>
-        </div>
-      </div>
-
-
-      <div class="modal-overlay" ng-class="{show: showTaskModal}" >
-    <div class="modal-content2 task-modal-content" ng-click="$event.stopPropagation()">
-        <div class="task-modal-header">
-            <h2>Tareas por entregar de esta unidad</h2>
-            <button class="modal-close2" ng-click="closeTaskModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="task-list-container">
-            <div class="task-item" ng-repeat="task in selectedBook.lessons | filter:filterTasksForCurrentManual track by $index">
-              <div class="task-info">
-                  <span class="task-category">Pág. {{task.pag}} - {{task.title}}</span>
-                  <p class="task-title" ng-class="{'completed-task': isTaskCompleted(task)}">{{task.task}}</p>
-              </div>
-              <div class="task-status-container">
-                <span class="task-status completed" ng-if="getTaskOverallStatus(task) === 'completed'">
-                    <i class="fas fa-check-circle"></i> Completado
-                </span>
-                <span class="task-status sent" ng-if="getTaskOverallStatus(task) === 'sent'">
-                    <i class="fas fa-paper-plane"></i> Enviado
-                </span>
-                <span class="task-status failed" ng-if="getTaskOverallStatus(task) === 'fail'">
-                    <i class="fas fa-times-circle"></i> Reintentar
-                </span>
-               </div>
-               <div class="task-actions" ng-if="task.lsn === lsn">
-                    <button class="task-btn video" ng-click="openVideoModal(task.video)" ng-if="task.video">
-                        <i class="fab fa-youtube"></i>
-                    </button>
-                    <button class="task-btn midi" ng-click="openMidiModal(task)" ng-if="task.midi">
-                        <i class="fas fa-music"></i>
-                    </button>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-
-<div class="modal-overlay" ng-class="{show: showVideoModal}" ng-click="closeVideoModal()">
-    <div class="video-modal-content" ng-click="$event.stopPropagation()">
-        <button class="modal-close2 video-close-btn" ng-click="closeVideoModal()"><i class="fas fa-times"></i></button>
-        <div class="video-container">
-            <iframe ng-src="{{currentVideoUrl}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal-overlay" ng-class="{show: isMidiModalVisible}" ng-click="closeMidiModal()">
-    <div class="midi-modal-container" ng-click="$event.stopPropagation()">
-        <div class="midi-modal-header">
-            <div>
-                <h4 class="midi-modal-title">{{ currentMidi.title }}</h4>
-                <p class="midi-modal-user">{{ currentMidi.author }}</p>
-            </div>
-            <button class="midi-modal-close" ng-click="closeMidiModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="midi-modal-body">
-            <div class="midi-player-wrapper">
-                <midi-player id="libraryMidiPlayer" sound-font visualizer="#libraryMidiVisualizer"></midi-player>
-            </div>
-            <div class="midi-visualizer-wrapper">
-                <div class="wave-effect"></div>
-                <midi-visualizer id="libraryMidiVisualizer" type="waterfall"></midi-visualizer>
-            </div>
-        </div>
-    </div>
-</div>
-
-          <div class="modal-overlay" ng-class="{show: showSaveRecordingModal}">
-    <div class="modal-content2 save-recording-modal" ng-click="$event.stopPropagation()">
-        <div class="upload-modal-header">
-            <h2>Previsualizar y Guardar Grabación</h2>
-            <p>Escucha tu grabación y asigna a que ejercicio corresponde antes de enviarla a revisión.</p>
-        </div>
-
-        <div class="audio-preview-container">
-            <audio ng-src="{{recording.url}}" controls controlsList="nodownload"></audio>
-        </div>
-
-        <div class="recording-form">
-           <div class="form-group">
-                <label for="rec-exercise">
-                    {{ selectedBook.type === 'manual' ? 'Selecciona el ejercicio a entregar' : 'Ejercicio a entregar' }}
-                </label>
-
-                <select id="rec-exercise" class="form-select"
-                        ng-if="selectedBook.type === 'manual'"
-                        ng-model="recording.selectedTask"
-                        ng-options="lesson as lesson.task + ' (Pág. ' + lesson.pag + ')' for lesson in selectedBook.lessons | filter:uncompletedFilter">
-                    <option value="">-- Elige una tarea pendiente --</option>
-                </select>
-
-                <div class="form-display-text" ng-if="selectedBook.type !== 'manual'">
-                    {{ selectedBook.title }}
+                <div style="text-align: center; font-size: 13px; color: var(--text-muted);">
+                    ¿Problemas técnicos? <br>
+                    <a href="#" style="color: var(--primary-color); font-weight: 600;">Contactar Soporte</a>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="rec-author">Notas (Opcional)</label>
-                <input type="text" id="rec-author" ng-model="recording.notes" placeholder="Agrega algún comentario adicional">
-            </div>
-            <div class="recording-metadata">
-                <span><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> {{ recording.date | date:'dd/MM/yyyy h:mm a' }}</span>
-              
-            </div>
+
+            </aside>
+        </div>
+    </div>
+
+  <div class="modal-overlay" ng-class="{'active': showLibraryModal}">
+    <div class="library-content">
+        
+        <div class="library-header">
+            <h3><i class="fas fa-book-open"></i> Material Didáctico</h3>
+            <button class="close-icon" ng-click="closeLibrary()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+            Accede a los libros y partituras de niveles anteriores.
+        </p>
+
+     <div class="carousel-wrapper">
+            <a class="book-card" 
+               ng-repeat="book in libraryBooks" 
+               href="{{book.fileUrl}}" 
+               download="{{book.level}} - {{book.unit}}.pdf"> <div class="book-cover-container">
+                    <img ng-src="{{book.cover}}" class="book-img">
+                    <div class="book-overlay">
+                        <i class="fas fa-download"></i>
+                    </div>
+                </div>
+                <div class="book-info">
+                    <h4>{{book.level}}</h4>
+                    <p>{{book.unit}}</p>
+                </div>
+            </a>
+            
         </div>
 
-        <div class="modal-actions-upload">
-            <button class="modal-button secondary danger" ng-click="deleteRecording()">
-                 Eliminar
-            </button>
-            <button class="modal-button primary" ng-click="saveRecording()">
-                 Enviar
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="join-btn" style="padding: 12px; width: auto;" ng-click="closeLibrary()">
+                Cerrar Biblioteca
             </button>
         </div>
+
     </div>
 </div>
 
-
-<canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10;"></canvas>
-
-<input type="text"
-       id="annotation-text-input-field"
-       ng-if="annotations.textInput.active"
-       ng-model="annotations.textInput.value"
-       ng-blur="finalizeTextInput()"
-       ng-keydown="$event.keyCode === 13 && finalizeTextInput()"
-       ng-style="annotations.textInput.style"
-       style="position: absolute; z-index: 10; background: white; border: 1px solid #ccc; font: bold 18px sans-serif; padding: 2px;"
-/>
-
-        <iframe ng-src="{{pdfUrl}}" frameborder="0" allow="fullscreen midi"></iframe>
-    </div>
-
-    <script>
-      const app = angular.module('libraryApp', []);
-
-app.controller('libraryCtrl', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout) {
-
-    // --- ESTADO DE LA UI ---
-    $scope.searchQuery = '';
-    $scope.showPreviewModal = false;
-    $scope.isFullscreen = false;
-    $scope.selectedBook = null;
-    $scope.selectedCategory = '';
-    $scope.showPdfViewer = false;
-    $scope.pdfUrl = '';
-    $scope.isLoaded = false;
-    $scope.userSubmittedRecordings = [];
-    $scope.showUploadModal = false;
-    $scope.showLockedModal = false;
-    $scope.newPdf = {};
-    $scope.userPDFs = [];
-
-    
-    var manualsData = [
-        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF=s400', 'pdf': 'https://drive.google.com/file/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF/preview', 'lvl': 0, lsn: 0, 'totalExercises': 8, 'lessons': [
-            { 'lsn': 1, 'id': 1, 'pag': 4, 'title': 'Ejercicios', 'task': 'Ritmo y métrica', 'video': 'https://www.youtube.com/embed/qh-4OyTcuJw', 'midi': null },
-            { 'lsn': 1, 'id': 2, 'pag': 7, 'title': 'Ejercicios', 'task': 'Posición de Do', 'video': 'https://www.youtube.com/embed/3wn33KNLy5M', 'midi': null },
-            { 'lsn': 1, 'id': 3, 'pag': 9, 'title': 'Pieza', 'task': 'Oda a la Alegría, var2', 'video': 'https://www.youtube.com/embed/bVWXlV8Neic'},
-            { 'lsn': 2, 'id': 1, 'pag': 10, 'title': 'Teoría', 'task': 'El Grand Staff', 'video': 'https://www.youtube.com/embed/HHF95sBbmwQ'},
-            { 'lsn': 2, 'id': 2, 'pag': 13, 'title': 'Pieza', 'task': 'Oda a la Alegría, var3','midi': 'https://storage.googleapis.com/mozartacademy-files/midi/Ode%20to%20Joy.mid' },
-            { 'lsn': 3, 'id': 1, 'pag': 16, 'title': 'Ejercicios', 'task': 'Intervalos de 2da y 3era', 'video': 'https://www.youtube.com/embed/H4x0TPlSoaQ'},
-                 { 'lsn': 3, 'id': 2, 'pag': 17, 'title': 'Pieza', 'task': 'Mountain Climbing'},
-            { 'lsn': 4, 'id': 1, 'pag': 19, 'title': 'Ejercicios', 'task': 'Intervalos de 4ta y 5ta', 'video': 'https://www.youtube.com/embed/M6DCHr2wVh8' },
-            { 'lsn': 4, 'id': 2, 'pag': 20, 'title': 'Teoría', 'task': 'Identificación de intervalos' },
-           
-        ] },
-        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu=s400', 'pdf': 'https://drive.google.com/file/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu/preview', 'lvl': 0, lsn: 5, 'totalExercises': 8, 'lessons': [
-            { 'lsn': 5, 'id': 1, 'pag': 5, 'title': 'Fundamentos', 'task': 'Postura y posición de manos', 'video': 'https://youtube.com/watch?v=example1', 'midi': null },
-            { 'lsn': 5, 'id': 2, 'pag': 7, 'title': 'Fundamentos', 'task': 'Notas en Clave de Sol (Do-Sol)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
-            { 'lsn': 6, 'id': 1, 'pag': 9, 'title': 'Lectura', 'task': 'Notas en Clave de Fa (Do-Fa)', 'video': null, 'midi': 'https://storage.googleapis.com/mozartacademy-files/midi/rach.mid' },
-            { 'lsn': 6, 'id': 2, 'pag': 12, 'title': 'Lectura', 'task': 'Ejercicios de 5 dedos', 'video': 'https://youtube.com/watch?v=example4', 'midi': null },
-            { 'lsn': 7, 'id': 1, 'pag': 15, 'title': 'Ritmo', 'task': 'Figuras: redonda y blanca', 'video': null, 'midi': null },
-            { 'lsn': 7, 'id': 2, 'pag': 18, 'title': 'Repertorio', 'task': 'Oda a la Alegría (Simplificada)', 'midi': 'https://site.com/midi3.mid' },
-            { 'lsn': 7, 'id': 3, 'pag': 20, 'title': 'Repertorio', 'task': 'Ligaduras de expresión', 'video': null, 'midi': null },
-            { 'lsn': 8, 'id': 1, 'pag': 22, 'title': 'Teoría', 'task': 'El pentagrama y las claves', 'video': 'https://youtube.com/watch?v=example6', 'midi': null }
-        ] },
-        {'title': 'Nivel Preparatorio','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis=s400', 'pdf': 'https://drive.google.com/file/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis/preview', 'lvl': 0, lsn: 9, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-        {'title': 'Nivel 1','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY=s400', 'pdf': 'https://drive.google.com/file/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY/preview', 'lvl': 1, lsn: 0, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-        {'title': 'Nivel 1','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE=s400', 'pdf': 'https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview', 'lvl': 1, lsn: 4, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-        {'title': 'Nivel 1','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q=s400', 'pdf': 'https://drive.google.com/file/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q/preview', 'lvl': 1, lsn: 7, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-        {'title': 'Nivel 2','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK=s400', 'pdf': 'https://drive.google.com/file/d/1Ms7bmUV955rU5IzdgN4mcLhAe7KJYWWK/preview', 'lvl': 2, lsn: 0, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-            "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ]},
-        {'title': 'Nivel 2','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ=s400', 'pdf': 'https://drive.google.com/file/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ/preview', 'lvl': 2, lsn: 4, 'totalExercises': 8, 'lessons': [
-            "Introducción al Teclado", "Postura y Posición de Manos", "Notas Negras y Blancas",
-           "Ejercicios de 5 Dedos (Do-Sol)", "Figuras Rítmicas Básicas", "Clave de Sol (Notas Do-Mi)",
-            "Clave de Fa (Notas Do-La)", "Pequeña Melodía a Dos Manos"
-        ] },
-        {'title': 'Nivel 2','subtitle': 'Unidad 3','background': 'https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw=s400', 'pdf': 'https://drive.google.com/file/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw/preview', 'lvl': 2, lsn: 7, 'totalExercises': 30},
-        {'title': 'Nivel 3','subtitle': 'Unidad 1','background': 'https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif=s400', 'pdf': 'https://drive.google.com/file/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif/preview', 'lvl': 3, lsn: 0, 'totalExercises': 38},
-        {'title': 'Nivel 3','subtitle': 'Unidad 2','background': 'https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs=s400', 'pdf': 'https://drive.google.com/file/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs/preview', 'lvl': 3, lsn: 4, 'totalExercises': 35},
-    ];
-
-    var piecesData = [
-        { "title": "Ode to Joy - var3", "subtitle": "L.V. Beethoven", "background": "https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej=s400", "pdf": "https://www.mozart-app.com/xml2?file=Ode to Joy.musicxml", "lvl": 0, "lsn": 0, "grade": "Preparatory"},
-        { "title": "Trumpet Voluntary", "subtitle": "Jeremiah Clarke", "background": "https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd=s400", "pdf": "https://drive.google.com/file/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd/preview", "lvl": 0, "lsn": 6, "grade": "Preparatory"},
-        { "title": "Old German Dance", "subtitle": "Michael Praetorius", "background": "https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4=s400", "pdf": "https://drive.google.com/file/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4/preview", "lvl": 0, "lsn": 7, "grade": "Preparatory"},
-        { "title": "Waltz", "subtitle": "Carl Czerny", "background": "https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh=s400", "pdf": "https://drive.google.com/file/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh/preview", "lvl": 0, "lsn": 9, "grade": "Preparatory"},
-        { "title": "Sonatina", "subtitle": "C.H. Wilton", "background": "https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P=s400", "pdf": "https://drive.google.com/file/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P/preview", "lvl": 0, "lsn": 12, "grade": "Preparatory"},
-        { "title": "March I", "subtitle": "D. Gottlob Türk", "background": "https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi=s400", "pdf": "https://drive.google.com/file/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi/preview", "lvl": 1, "lsn": 2, "grade": "Preparatory"},
-        { "title": "Minuet", "subtitle": "A. Reinagle", "background": "https://lh3.googleusercontent.com/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf=s400", "pdf": "https://drive.google.com/file/d/1Y2pG3Y3gf8_Y7RGBtBCb3wCHcYDCz2Mf/preview", "lvl": 1, "lsn": 3, "grade": "Preparatory"},
-        { "title": "Sonatina in C", "subtitle": "Cornelius Gurlitt", "background": "https://lh3.googleusercontent.com/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM=s400", "pdf": "https://drive.google.com/file/d/1zUDSm_eKBu830fBpJg_l3pKHswkmV0RM/preview", "lvl": 1, "lsn": 5, "grade": "Grade 1"},
-        { "title": "The Old Windmill", "subtitle": "Dunhill", "background": "https://lh3.googleusercontent.com/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt=s400", "pdf": "https://drive.google.com/file/d/1rUCg7oSJgi4sTyMwlYaxdTdQjiB-peYt/preview", "lvl": 1, "lsn": 6, "grade": "Grade 1"},
-        { "title": "Allemande", "subtitle": "J.H. Schein", "background": "https://lh3.googleusercontent.com/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn=s400", "pdf": "https://drive.google.com/file/d/1m27dxSoHVEsMSplzIc2QYi_Ettm9LZhn/preview", "lvl": 2, "lsn": 1, "grade": "Grade 1"},
-        { "title": "Aria in F", "subtitle": "J.S. Bach", "background": "https://lh3.googleusercontent.com/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU=s400", "pdf": "https://drive.google.com/file/d/1gW1tqwKgzmn-UZAmbK4ElCrJ8oRdN3yU/preview", "lvl": 2, "lsn": 3, "grade": "Grade 1"},
-        { "title": "Sonatina in C", "subtitle": "Frank Lynes", "background": "https://lh3.googleusercontent.com/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12=s400", "pdf": "https://drive.google.com/file/d/13kGxg8iUnBphTYoIotCalNkcJgcW_T12/preview", "lvl": 2, "lsn": 7, "grade": "Grade 2"},
-        { "title": "Gigue in G", "subtitle": "G. P. Telemann", "background": "https://lh3.googleusercontent.com/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ=s400", "pdf": "https://drive.google.com/file/d/1r1b7hkZU9jOb_Q37DMQmIYbdyqKovNjZ/preview", "lvl": 2, "lsn": 9, "grade": "Grade 2"}
-    ];
-
-
-
-
-
-
-
-    // --- TRANSFORMACIÓN DE DATOS ---
-    var manuals = manualsData.map(function(manual) {
-        return {
-            title: manual.title,
-            level: manual.title,
-            author: manual.subtitle,
-            coverUrl: manual.background,
-            pdf: manual.pdf,
-            lvl: manual.lvl,
-            lsn: manual.lsn,
-            lessons: manual.lessons,
-            totalExercises: manual.totalExercises,
-            totalTime: manual.totalTime,
-            type: 'manual'
-        };
-    });
-
-    var pieces = piecesData.map(function(piece) {
-        return {
-            title: piece.title,
-            level: piece.grade,
-            author: piece.subtitle,
-            coverUrl: piece.background,
-            pdf: piece.pdf,
-            lvl: piece.lvl,
-            lsn: piece.lsn,
-            midi: piece.midi,
-            type: 'piece'
-        };
-    });
-
-    // --- ESTRUCTURA INICIAL DE LA BIBLIOTECA ---
-    $scope.library = [
-        { title: 'Fundamentos del Piano', books: manuals },
-        { title: 'Repertorio Formativo', books: pieces },
-        { title: 'Mis Archivos', books: $scope.userPDFs }
-    ];
-
-    // --- NUEVAS VARIABLES PARA EL BOTÓN DE RECARGA ---
-    $scope.isRefreshing = false;
-    let refreshTimeoutPromise;
-
-    // --- FUNCIÓN PARA CARGAR/RECARGAR DATOS DEL USUARIO ---
-    function fetchUserData() {
-        if ($scope.isRefreshing) {
-            console.log("Ya se está recargando la información.");
-            return;
-        }
-
-        $scope.isRefreshing = true;
-        $scope.showLockedModal = false;
-
-        const requestData = {
-            action: "getUserData",
-           token: localStorage.getItem('MStoken')
-        };
-
-        const config = {
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            timeout: 10000 // Timeout para la solicitud HTTP (10 segundos)
-        };
-
-        refreshTimeoutPromise = $timeout(function() {
-            if ($scope.isRefreshing) {
-                $scope.isRefreshing = false;
-                alert("La recarga de datos ha tardado demasiado. Por favor, inténtalo de nuevo.");
-            }
-        }, 10000);
-
-        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-            .then(function(response) {
-                $timeout.cancel(refreshTimeoutPromise);
-                $scope.userStatus = response.data.status
-                const repertoire = JSON.parse(response.data.repertoire);
-                const stage = JSON.parse(response.data.stage);
-
-                // Reconstruir $scope.library con los datos actualizados
-                $scope.library = [
-                    { title: 'Fundamentos del Piano', books: manuals },
-                    { title: 'Repertorio Formativo', books: pieces },
-                    { title: 'Mis Archivos', books: $scope.userPDFs }
-                ];
-                $scope.library = $scope.library.concat(repertoire);
-
-                $scope.lvl = stage.lvl;
-                $scope.lsn = stage.lsn;
-                $scope.userSubmittedRecordings = stage.exes || [];
-                $scope.isLoaded = true;
-                console.log("Datos recargados exitosamente.");
-            })
-            .catch(function(error) {
-                $timeout.cancel(refreshTimeoutPromise);
-            })
-            .finally(function() {
-                $scope.isRefreshing = false;
-            });
-    }
-
-    // --- LLAMADA INICIAL PARA CARGAR DATOS ---
-    fetchUserData();
-
-    // --- FUNCIÓN ng-click PARA EL BOTÓN DE RECARGA ---
-    $scope.refreshData = function() {
-        fetchUserData();
-    };
-
-
-      $scope.activePanel = ''; 
-$scope.setActivePanel = function(panel) {
- $scope.activePanel = ($scope.activePanel === panel) ? '' : panel;
-};
-
-$scope.toggleFullScreen = function() {
-    if (!document.fullscreenElement) {
-        // Entrar a pantalla completa
-        document.documentElement.requestFullscreen();
-    } else {
-        // Salir de pantalla completa
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    }
-};
-
-
-
-
-    $scope.formatTime = function(seconds) {
-        if (isNaN(seconds) || seconds < 0) return "0:00";
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return minutes + ":" + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
-    };
-
-    $scope.scrollCarousel = function(elementId, direction) {
-        const carousel = document.getElementById(elementId);
-        if (carousel) {
-            const scrollAmount = 200 * direction;
-            carousel.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    };
-
-    $scope.showTaskModal = false;
-    $scope.openTaskModal = function() { $scope.showTaskModal = true; };
-    $scope.closeTaskModal = function() { $scope.showTaskModal = false; };
-
-    $scope.showVideoModal = false;
-    $scope.currentVideoUrl = '';
-
-    $scope.openVideoModal = function(videoUrl) {
-        if (!videoUrl) return;
-        const embedUrl = videoUrl.replace("watch?v=", "embed/");
-        $scope.currentVideoUrl = $sce.trustAsResourceUrl(embedUrl);
-        $scope.showVideoModal = true;
-    };
-
-    $scope.closeVideoModal = function() {
-        $scope.showVideoModal = false;
-        $scope.currentVideoUrl = '';
-    };
-
-   
-
-    $scope.showPreview = function(book, categoryTitle) {
-        if (book.isUserUploaded) {
-            $scope.selectedBook = book;
-            $scope.selectedCategory = categoryTitle;
-            $scope.showPreviewModal = true;
-            return;
-        }
-        var isLocked = !$scope.isLoaded || book.lvl > $scope.lvl || (book.lvl === $scope.lvl && book.lsn > $scope.lsn);
-        if (isLocked) {
-            $scope.showLockedModal = true;
-            $timeout(function() {
-                $scope.showLockedModal = false;
-            }, 3000);
-            return;
-        }
-        $scope.selectedBook = book;
-        $scope.selectedCategory = categoryTitle;
-        $scope.showPreviewModal = true;
-    };
-
-    $scope.closePreviewModal = function(event) {
-        if (event && event.target !== event.currentTarget) {
-            return;
-        }
-        $scope.showPreviewModal = false;
-    };
-
-  /*  $scope.openPdfViewer = function(book) {
-        if (!book || !book.pdf) {
-            alert('No hay un PDF disponible para este libro.');
-            return;
-        }
-        if (!$scope.metronomeAudio) {
-            $scope.metronomeAudio = document.getElementById('metronomeAudio');
-        }
-        $scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
-        $scope.showPreviewModal = false;
-        $scope.showPdfViewer = true;
-    };*/
-
-
-    $scope.getCompletedTaskCountTotal = function() {
-        if (!$scope.userSubmittedRecordings || $scope.userSubmittedRecordings.length === 0) {
-            return 0;
-        }
-        
-        // Filtra el arreglo 'exes' (userSubmittedRecordings) 
-        // y cuenta solo los que tienen status 'completed'
-        const completedTasks = $scope.userSubmittedRecordings.filter(function(task) {
-            return task.status === 'completed';
-        });
-        
-        return completedTasks.length;
-    };
-
-
-    $scope.openPdfViewer = function(book) {
-
-$scope.pdfUrl = $sce.trustAsResourceUrl(book.pdf);
-$scope.showPreviewModal = false;
-$scope.showPdfViewer = true;
-
-if (!$scope.metronomeAudio) {
-            $scope.metronomeAudio = document.getElementById('metronomeAudio');
-        }
-        
-        // Resetea el modo al abrir
-        $scope.annotations.mode = 'none';
-        
-        // Usa $timeout para esperar a que el DOM (ng-show) se renderice
-        $timeout(function() {
-            // Solo inicializa los listeners UNA VEZ
-            if (!canvasInitialized) {
-                const canvas = document.getElementById('annotation-canvas');
-                const iframe = document.querySelector('.pdf-viewer-overlay iframe');
-
-                if (!canvas || !iframe) {
-                    console.error("No se pudo inicializar el canvas de anotaciones.");
-                    return;
-                }
-                
-                // Guarda las referencias en $scope
-                $scope.annotations._canvas = canvas;
-                $scope.annotations._ctx = canvas.getContext('2d');
-                $scope.annotations._iframe = iframe;
-                
-                // Agrega los listeners
-                canvas.addEventListener('mousedown', onCanvasMouseDown);
-                canvas.addEventListener('mousemove', onCanvasMouseMove);
-                canvas.addEventListener('mouseup', onCanvasMouseUp);
-                canvas.addEventListener('mouseout', onCanvasMouseUp); // Importante
-                canvas.addEventListener('click', onCanvasClick);
-                
-                // Listener para redibujar si la ventana cambia
-                window.addEventListener('resize', redrawAllAnnotations);
-                
-                document.addEventListener('click', function(e) {
-                    const picker = document.getElementById('color-picker-container');
-                    if (picker && !picker.contains(e.target) && $scope.annotations.colorPickerOpen) {
-                        $scope.$apply(function() {
-                            $scope.annotations.colorPickerOpen = false;
-                        });
-                    }
-                });
-
-
-                document.addEventListener('fullscreenchange', function() {
-                    $scope.$apply(function() {
-                        $scope.isFullscreen = !!document.fullscreenElement;
-                        });
-                    });
-
-                canvasInitialized = true;
-            }
-            
-            // Redibuja siempre que se abra el visor
-            redrawAllAnnotations();
-            updateCanvasCursor();
-
-        }, 0); // 0ms de espera
-};
-
-    $scope.closePdfViewer = function() {
-        $scope.showPdfViewer = false;
-        $scope.pdfUrl = '';
-    };
-
-    $scope.metronomeActive = false;
-    $scope.metronomeBPM = 60;
-    $scope.baseBPM = 60;
-
-    function bpmToPlaybackRate(bpm) {
-        return bpm / $scope.baseBPM;
-    }
-
-    $scope.toggleMetronome = function() {
-        $scope.metronomeActive = !$scope.metronomeActive;
-        if ($scope.metronomeActive) {
-            $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-            $scope.metronomeAudio.currentTime = 0;
-            $scope.metronomeAudio.play().catch(e => console.error("Error al reproducir:", e));
-        } else {
-            $scope.metronomeAudio.pause();
-            $scope.metronomeAudio.currentTime = 0;
-        }
-    };
-
-    function clearBPMTimers() {
-        clearTimeout($scope.bpmTimeout);
-        clearInterval($scope.bpmInterval);
-    }
-
-    $scope.adjustBPM = function(change, event) {
-        $scope.metronomeBPM = Math.max(40, Math.min($scope.metronomeBPM + change, 240));
-        if ($scope.metronomeActive) {
-            $scope.metronomeAudio.playbackRate = bpmToPlaybackRate($scope.metronomeBPM);
-        }
-        if (event) {
-            const button = event.target;
-            button.addEventListener('mouseup', clearBPMTimers);
-            button.addEventListener('mouseleave', clearBPMTimers);
-            button.addEventListener('touchend', clearBPMTimers);
-            $scope.bpmTimeout = setTimeout(() => {
-                $scope.bpmInterval = setInterval(() => {
-                    $scope.adjustBPM(change);
-                    $scope.$apply();
-                }, 100);
-            }, 500);
-        }
-    };
-
-    let mediaRecorder;
-    let audioChunks2 = [];
-    let audioContext2;
-    let animationId;
-    $scope.showSaveRecordingModal = false;
-    $scope.recording = {};
-
-    const constraints = {
-        audio: {
-            noiseSuppression: true,
-            autoGainControl: true,
-            echoCancellation: true
-        }
-    };
-
-    async function startRecordingAndOscilloscope() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks2 = [];
-            mediaRecorder.ondataavailable = event => {
-                audioChunks2.push(event.data);
-            };
-            mediaRecorder.onstop = () => {
-                cancelAnimationFrame(animationId);
-                if (audioChunks2.length === 0) return;
-                const audioBlob = new Blob(audioChunks2, { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const tempAudio = document.createElement('audio');
-                tempAudio.src = audioUrl;
-                tempAudio.onloadedmetadata = () => {
-                    $scope.$apply(() => {
-                        const duration = tempAudio.duration;
-                        const minutes = Math.floor(duration / 60);
-                        const seconds = Math.floor(duration % 60);
-                        $scope.recording = {
-                            url: $sce.trustAsResourceUrl(audioUrl),
-                            blob: audioBlob,
-                            name: "Grabación " + new Date().toLocaleTimeString(),
-                            author: "",
-                            date: new Date(),
-                            duration: `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-                        };
-                        $scope.showSaveRecordingModal = true;
-                    });
-                };
-            };
-            audioContext = new(window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-            analyser.fftSize = 2048;
-            mediaRecorder.start();
-        } catch (err) {
-            console.error('Error al acceder al micrófono:', err);
-        }
-    }
-
-    $scope.recordWav = function() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            $scope.isRecording2 = false;
-        } else {
-            startRecordingAndOscilloscope();
-            $scope.isRecording2 = true;
-        }
-    };
-
-    $scope.closeSaveModal = function() {
-        if ($scope.recording && $scope.recording.url) {
-            URL.revokeObjectURL($scope.recording.url.toString());
-        }
-        $scope.showSaveRecordingModal = false;
-        $scope.recording = {};
-    };
-
-    $scope.isMidiModalVisible = false;
-    $scope.currentMidi = {};
-    let midiPlayer = null;
-    let midiVisualizer = null;
-
-    $scope.openMidiModal = function(sourceObject) {
-        if (!sourceObject || !sourceObject.midi) return;
-        $scope.currentMidi = {
-            title: sourceObject.task || sourceObject.title,
-            author: sourceObject.author || ''
-        };
-        $scope.isMidiModalVisible = true;
-        $timeout(function() {
-            if (!midiPlayer) {
-                midiPlayer = document.getElementById('libraryMidiPlayer');
-                midiVisualizer = document.getElementById('libraryMidiVisualizer');
-            }
-            midiPlayer.src = sourceObject.midi;
-            midiVisualizer.src = sourceObject.midi;
-        });
-    };
-
-    $scope.closeMidiModal = function() {
-        if ($scope.isMidiModalVisible && midiPlayer) {
-            midiPlayer.stop();
-            midiPlayer.src = "";
-            if (midiVisualizer) {
-                midiVisualizer.src = "";
-            }
-        }
-        $scope.isMidiModalVisible = false;
-        $scope.currentMidi = {};
-    };
-
-    $scope.getCompletedTaskCountForManual = function(manual) {
-        if (!manual || !manual.lessons) return 0;
-        return manual.lessons.filter(lesson => $scope.isTaskCompleted(lesson)).length;
-    };
-
-    $scope.getManualColor = function(manual) {
-        if (manual.lvl == 0) { return '#F44336' }
-        else if (manual.lvl == 1) { return '#9024dc' }
-        else if (manual.lvl == 2) { return '#1894cc' }
-        else if (manual.lvl == 3) { return '#489454' }
-        else if (manual.lvl == 4) { return '#fa9223' }
-        else if (manual.lvl == 5) { return '#485cb4' }
-    };
-
-    $scope.getMaxLsnInBook = function(book) {
-        if (!book || !book.lessons || book.lessons.length === 0) return 0;
-        return Math.max(...book.lessons.map(l => l.lsn));
-    };
-
-    $scope.filterTasksForCurrentManual = function(task) {
-        if ($scope.selectedBook.lvl < $scope.lvl) {
-            return true;
-        }
-        if ($scope.selectedBook.lvl === $scope.lvl) {
-            return task.lsn <= $scope.lsn;
-        }
-        return false;
-    };
-
-    $scope.sentTasks = [];
-
-    $scope.isTaskCompleted = function(task) {
-        if (task.lsn < $scope.lsn) {
-            return true;
-        }
-        if (task.lsn === $scope.lsn) {
-            const userRecording = $scope.userSubmittedRecordings.find(rec =>
-                rec.id === task.id && rec.lsn === task.lsn
-            );
-            return userRecording && userRecording.status === 'completed';
-        }
-        return false;
-    };
-
-    $scope.getTaskOverallStatus = function(task) {
-        if ($scope.isTaskCompleted(task)) {
-            return 'completed';
-        }
-        if (task.lsn === $scope.lsn) {
-            const userRecording = $scope.userSubmittedRecordings.find(rec =>
-                rec.id === task.id && rec.lsn === task.lsn
-            );
-            if (userRecording) {
-                return userRecording.status;
-            }
-        }
-        return null;
-    };
-
-    $scope.uncompletedFilter = function(lesson) {
-        if (lesson.lsn !== $scope.lsn) {
-            return false;
-        }
-        const overallStatus = $scope.getTaskOverallStatus(lesson);
-        return overallStatus !== 'completed' && overallStatus !== 'sent';
-    };
-
- $scope.saveRecording = function() {
-    if (!$scope.recording.selectedTask) {
-        alert("Por favor, selecciona el ejercicio que estás entregando.");
-        return;
-    }
-    
-    // Muestra un indicador de carga (opcional, pero recomendado)
-    $scope.isUploading = true; 
-    
-    const submittedTask = $scope.recording.selectedTask;
-    
-    // Usar FileReader para convertir el Blob a Base64
-    const reader = new FileReader();
-    reader.readAsDataURL($scope.recording.blob); 
-    
-    reader.onloadend = function() {
-        const base64AudioData = reader.result; // Aquí está la cadena Base64
-        
-        const requestData = {
-            action: "newAudio",
-             token: localStorage.getItem('MStoken'),
-         //   token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF",
-            audioBase64: base64AudioData, // Enviamos la cadena Base64
-            task: submittedTask, // Enviamos el objeto completo de la tarea
-            notes: $scope.recording.notes || "",
-            date: $scope.recording.date.toISOString()
-        };
-
-        const config = {
-            headers: { "Content-Type": "text/plain;charset=utf-8" }
-        };
-
-        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-            .then(function(response) {
-                if (response.data.status === "success") {
-                    // Actualiza la UI localmente para que el usuario vea el cambio al instante
-                    const userRecordingEntry = {
-                        lsn: submittedTask.lsn,
-                        id: submittedTask.id,
-                        audio: response.data.audioUrl, // URL devuelta por el servidor
-                        status: 'sent',
-                        notes: requestData.notes,
-                        date: requestData.date,
-                    };
-                    $scope.userSubmittedRecordings.push(userRecordingEntry);
-                    alert("¡Grabación enviada con éxito!");
-                } else {
-                    alert("Hubo un error al enviar tu grabación: " + response.data.message);
-                }
-            })
-            .catch(function(error) {
-                console.error("Error al enviar la grabación:", error);
-                alert("Error de conexión al enviar la grabación. Inténtalo de nuevo.");
-            })
-            .finally(function() {
-                // Oculta el indicador de carga y cierra el modal
-                $scope.isUploading = false; 
-                $scope.closeSaveModal();
-            });
-    };
-};
-
-    $scope.deleteRecording = function() {
-        $scope.closeSaveModal();
-    };
-
-
-
-
-
-$scope.annotations = {
-    mode: 'none', 
-    isDrawing: false,
-    colorPickerOpen: false,
-    isVisible: true,
-    
-    // Datos de dibujo
-    currentColor: 'rgba(255, 223, 89, 0.4)',
-    hexColor: '#FFDF59',
-    strokeColor: 'rgba(231, 76, 60, 1.0)',
-    swatches: [
-        'rgba(255, 223, 89, 0.4)', // Amarillo
-        'rgba(255, 159, 243, 0.4)', // Rosa
-        'rgba(168, 255, 220, 0.4)', // Verde
-        'rgba(149, 218, 255, 0.4)'  // Azul
-    ],
-    
-    // Datos guardados
-    annotations: [],
-    textAnnotations: [],
-    strokeAnnotations: [],
-    undoStack: [],
-
-    textInput: {
-        active: false,
-        value: '',
-        style: {} // Se llenará con ng-style
-    },
-
-    // Variables de dibujo temporal
-    _temp: { startX: 0, startY: 0, currentStroke: null },
-    
-    // Referencias al DOM (las llenaremos después)
-    _canvas: null,
-    _ctx: null,
-    _iframe: null
-}
-
-
-
-
-$scope.toggleAnnotationVisibility = function() {
-    $scope.annotations.isVisible = !$scope.annotations.isVisible;
-    redrawAllAnnotations();
-};
-
-$scope.setAnnotationMode = function(newMode) {
-    if ($scope.annotations.mode === newMode) {
-        newMode = 'none'; // Tocar el mismo botón lo desactiva
-    }
-    $scope.annotations.mode = newMode;
-    $scope.annotations.textInput.active = false; // Oculta el input de texto
-    
-    // Actualiza el cursor del canvas
-    updateCanvasCursor(); 
-};
-
-$scope.toggleColorPicker = function($event) {
-    $event.stopPropagation();
-    $scope.annotations.colorPickerOpen = !$scope.annotations.colorPickerOpen;
-};
-
-$scope.selectSwatch = function(color, $event) {
-    $event.stopPropagation();
-    $scope.annotations.currentColor = color;
-    // (Opcional) Sincronizar el input 'hex' si puedes
-    $scope.annotations.colorPickerOpen = false;
-};
-
-// Se llama cuando el input[type=color] cambia
-$scope.onCustomColorChange = function() {
-    const hex = $scope.annotations.hexColor;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    $scope.annotations.currentColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
-    $scope.annotations.strokeColor = `rgba(${r}, ${g}, ${b}, 1.0)`;
-};
-
-$scope.closeColorPicker = function() {
-    $scope.annotations.colorPickerOpen = false;
-};
-
-$scope.clearAnnotations = function() {
-    if (confirm('¿Deseas borrar todas las anotaciones?')) {
-        $scope.annotations.annotations = [];
-        $scope.annotations.textAnnotations = [];
-        $scope.annotations.strokeAnnotations = [];
-        $scope.annotations.undoStack = []; // <-- AÑADE ESTA LÍNEA
-        redrawAllAnnotations();
-    }
-};
-
-$scope.undoLastAnnotation = function() {
-    // 1. Saca la última acción del historial
-    const lastAction = $scope.annotations.undoStack.pop();
-    if (!lastAction) return; // No hay nada que deshacer
-
-    let targetArray;
-
-    // 2. Determina de qué arreglo debemos borrarla
-    if (lastAction.type === 'draw') {
-        targetArray = $scope.annotations.annotations;
-    } else if (lastAction.type === 'stroke') {
-        targetArray = $scope.annotations.strokeAnnotations;
-    } else if (lastAction.type === 'text') {
-        targetArray = $scope.annotations.textAnnotations;
-    }
-
-    // 3. Busca y elimina la anotación específica de su arreglo
-    if (targetArray) {
-        const index = targetArray.indexOf(lastAction.data);
-        if (index > -1) {
-            targetArray.splice(index, 1);
-        }
-    }
-
-    // 4. Vuelve a dibujar todo
-    redrawAllAnnotations();
-};
-
-$scope.finalizeTextInput = function() {
-const input = $scope.annotations.textInput;
-if (input.active && input.value.trim()) {
-const normalizedX = input.x_norm;
-const normalizedY = input.y_norm;
-
-const newText = {
-        text: input.value,
-        x: normalizedX, 
-        y: normalizedY, 
-        color: 'rgba(231, 76, 60, 1.0)',
-        font: 'bold 18px sans-serif'
-    };
-    $scope.annotations.textAnnotations.push(newText);
-    $scope.annotations.undoStack.push({ type: 'text', data: newText });
-redrawAllAnnotations();
-}
-input.active = false; 
-input.value = '';
-};
-
-
-
-
-
-
-let canvasInitialized = false;
-
-function updateCanvasCursor() {
-    if (!$scope.annotations._canvas) return;
-    const canvas = $scope.annotations._canvas;
-    
-    switch ($scope.annotations.mode) {
-        case 'draw':
-            canvas.style.pointerEvents = 'auto';
-            canvas.style.cursor = 'crosshair';
-            break;
-        case 'stroke':
-            canvas.style.pointerEvents = 'auto';
-            canvas.style.cursor = 'crosshair'; 
-            break;
-        case 'text':
-            canvas.style.pointerEvents = 'auto';
-            canvas.style.cursor = 'text';
-            break;
-        case 'erase':
-            canvas.style.pointerEvents = 'auto';
-            canvas.style.cursor = 'pointer';
-            break;
-        default: // 'none'
-            canvas.style.pointerEvents = 'none';
-            canvas.style.cursor = 'default';
-    }
-}
-
-function redrawAllAnnotations() {
-    const canvas = $scope.annotations._canvas;
-    const ctx = $scope.annotations._ctx;
-    const iframe = $scope.annotations._iframe;
-    
-    if (!canvas || !ctx || !iframe) return;
-    
-    const rect = iframe.getBoundingClientRect();
-
-    // Sincroniza el canvas con el iframe
-    canvas.style.top = rect.top + 'px';
-    canvas.style.left = rect.left + 'px';
-    if (canvas.width !== rect.width || canvas.height !== rect.height) {
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-    }
-    
-    // Limpia
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (!$scope.annotations.isVisible) {
-    return; 
-    }
-
-    // Dibuja rectángulos (leídos desde $scope)
-    $scope.annotations.annotations.forEach(rect => {
-        ctx.fillStyle = rect.color;
-        ctx.fillRect(
-            rect.x * canvas.width,
-            rect.y * canvas.height,
-            rect.width * canvas.width,
-            rect.height * canvas.height
-        );
-    });
-
-    // Dibuja textos (leídos desde $scope)
-    $scope.annotations.textAnnotations.forEach(text => {
-        ctx.fillStyle = text.color;
-        ctx.font = text.font;
-        ctx.textBaseline = 'top';
-        ctx.fillText(
-            text.text,
-            text.x * canvas.width,
-            text.y * canvas.height
-        );
-    });
-
-    $scope.annotations.strokeAnnotations.forEach(stroke => {
-        if (!stroke.points || stroke.points.length === 0) return;
-
-        ctx.beginPath();
-        
-        // Mueve al primer punto (convertido a píxeles)
-        const firstPoint = stroke.points[0];
-        ctx.moveTo(firstPoint.x * canvas.width, firstPoint.y * canvas.height);
-        
-        // Dibuja líneas al resto de los puntos
-        stroke.points.forEach(point => {
-            ctx.lineTo(point.x * canvas.width, point.y * canvas.height);
-        });
-        
-        // Aplica el estilo y dibuja
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.width;
-        ctx.stroke();
-        ctx.closePath();
-    });   
-}
-
-// --- Listeners del Canvas (requieren $scope.$apply) ---
-
-function onCanvasMouseDown(e) {
-    const mode = $scope.annotations.mode;
-    if (mode !== 'draw' && mode !== 'stroke') return;
-
-    $scope.annotations.isDrawing = true;
-    const rect = $scope.annotations._canvas.getBoundingClientRect();
-    const x_norm = (e.clientX - rect.left) / rect.width;
-    const y_norm = (e.clientY - rect.top) / rect.height;
-
-    if (mode === 'draw') {
-        // Lógica de rectángulo (existente)
-        $scope.annotations._temp.startX = x_norm;
-        $scope.annotations._temp.startY = y_norm;
-
-    } else if (mode === 'stroke') {
-        // Lógica de trazo (NUEVA)
-        $scope.annotations._temp.currentStroke = { 
-            color: $scope.annotations.strokeColor, 
-            width: 2, 
-            points: [{x: x_norm, y: y_norm}] // Guarda el primer punto normalizado
-        };
-        
-        // Empieza a dibujar en el canvas (en píxeles)
-        const ctx = $scope.annotations._ctx;
-        ctx.beginPath();
-        ctx.moveTo(x_norm * rect.width, y_norm * rect.height);
-        ctx.strokeStyle = $scope.annotations.strokeColor;
-        ctx.lineWidth = 2;
-    }
-}
-
-function onCanvasMouseMove(e) {
-    if (!$scope.annotations.isDrawing) return;
-
-    const mode = $scope.annotations.mode;
-    const rect = $scope.annotations._canvas.getBoundingClientRect();
-    const x_norm = (e.clientX - rect.left) / rect.width;
-    const y_norm = (e.clientY - rect.top) / rect.height;
-    
-    if (mode === 'draw') {
-        // Lógica de rectángulo (existente)
-        redrawAllAnnotations(); 
-        const ctx = $scope.annotations._ctx;
-        const temp = $scope.annotations._temp;
-        const width = (x_norm - temp.startX) * rect.width;
-        const height = (y_norm - temp.startY) * rect.height;
-        ctx.fillStyle = $scope.annotations.currentColor;
-        ctx.fillRect(temp.startX * rect.width, temp.startY * rect.height, width, height);
-
-    } else if (mode === 'stroke') {
-        // Lógica de trazo (NUEVA)
-        // Guarda el punto normalizado
-        $scope.annotations._temp.currentStroke.points.push({x: x_norm, y: y_norm});
-        
-        // Dibuja el segmento (en píxeles)
-        const ctx = $scope.annotations._ctx;
-        ctx.lineTo(x_norm * rect.width, y_norm * rect.height);
-        ctx.stroke();
-    }
-}
-
-function onCanvasMouseUp(e) {
-    if (!$scope.annotations.isDrawing) return;
-    
-    const mode = $scope.annotations.mode;
-    $scope.annotations.isDrawing = false;
-    
-    if (mode === 'draw') {
-        // Lógica de rectángulo (existente)
-        const rect = $scope.annotations._canvas.getBoundingClientRect();
-        const temp = $scope.annotations._temp;
-        const endX = (e.clientX - rect.left) / rect.width;
-        const endY = (e.clientY - rect.top) / rect.height;
-
-        const finalX = Math.min(temp.startX, endX);
-        const finalY = Math.min(temp.startY, endY);
-        const finalWidth = Math.abs(temp.startX - endX);
-        const finalHeight = Math.abs(temp.startY - endY);
-
-        if (finalWidth > 0.01 && finalHeight > 0.01) {
-            $scope.$apply(function() {
-               const newRect = {
-            x: finalX, y: finalY, width: finalWidth, height: finalHeight,
-            color: $scope.annotations.currentColor
-        };
-        $scope.annotations.annotations.push(newRect);
-        $scope.annotations.undoStack.push({ type: 'draw', data: newRect });
-            });
-        }
-        redrawAllAnnotations();
-
-        $scope.$apply(function() {
-                    // Llamamos a la función que ya se encarga de cambiar el modo
-                    // y actualizar el cursor.
-                    $scope.setAnnotationMode('none');
-                });
-
-    } else if (mode === 'stroke') {
-        // Lógica de trazo (NUEVA)
-        const ctx = $scope.annotations._ctx;
-        ctx.closePath(); // Cierra el trazo actual
-        
-        const currentStroke = $scope.annotations._temp.currentStroke;
-        $scope.$apply(function() {
-            $scope.annotations.strokeAnnotations.push(currentStroke);
-           $scope.annotations.undoStack.push({ type: 'stroke', data: currentStroke });
-        });
-        
-        $scope.annotations._temp.currentStroke = null;
-    }
-}
-
-function onCanvasClick(e) {
-    const mode = $scope.annotations.mode;
-    if (mode === 'text') {
-        handleCanvasClickForText(e);
-    } else if (mode === 'erase') {
-        handleCanvasClickForEraser(e);
-    }
-}
-
-function handleCanvasClickForText(e) {
-    // ¡¡IMPORTANTE!! Usamos $apply
-    $scope.$apply(function() {
-        // Obtenemos la posición relativa al wrapper (el overlay)
-        const wrapperRect = document.querySelector('.pdf-viewer-overlay').getBoundingClientRect();
-        const canvasRect = $scope.annotations._canvas.getBoundingClientRect();
-        
-        const x = e.clientX - wrapperRect.left;
-        const y = e.clientY - wrapperRect.top;
-
-        // Posición del <input> (en píxeles)
-        $scope.annotations.textInput.style = {
-            'left': (e.clientX - wrapperRect.left) + 'px',
-            'top': (e.clientY - wrapperRect.top) + 'px'
-        };
-        
-        // Posición normalizada (0-1) para guardar
-        $scope.annotations.textInput.x_norm = (e.clientX - canvasRect.left) / canvasRect.width;
-        $scope.annotations.textInput.y_norm = (e.clientY - canvasRect.top) / canvasRect.height;
-
-        $scope.annotations.textInput.value = '';
-        $scope.annotations.textInput.active = true;
-    });
-
-    // Enfoca el input después de que Angular lo cree
-    $timeout(function() {
-        const inputField = document.getElementById('annotation-text-input-field');
-        if (inputField) {
-            inputField.focus();
-        }
-    }, 0);
-}
-
-function handleCanvasClickForEraser(e) {
-    const canvas = $scope.annotations._canvas;
-    const rect = canvas.getBoundingClientRect();
-    const clickX = (e.clientX - rect.left) / rect.width;
-    const clickY = (e.clientY - rect.top) / rect.height;
-    let somethingWasDeleted = false;
-
-    // ... (Tu lógica de borrado es la misma, solo que lee de $scope) ...
-    
-    // Itera en reversa para los rectángulos
-    for (let i = $scope.annotations.annotations.length - 1; i >= 0; i--) {
-        const annotation = $scope.annotations.annotations[i];
-        if (clickX >= annotation.x && clickX <= annotation.x + annotation.width &&
-            clickY >= annotation.y && clickY <= annotation.y + annotation.height) {
-            $scope.annotations.annotations.splice(i, 1);
-            somethingWasDeleted = true;
-            break;
-        }
-    }
-
-    // Itera en reversa para los textos
-    if (!somethingWasDeleted) {
-        for (let i = $scope.annotations.textAnnotations.length - 1; i >= 0; i--) {
-            const text = $scope.annotations.textAnnotations[i];
-            const textWidthApprox = (text.text.length * 8) / rect.width;
-            const textHeightApprox = 20 / rect.height;
-
-            if (clickX >= text.x && clickX <= text.x + textWidthApprox &&
-                clickY >= text.y && clickY <= text.y + textHeightApprox) {
-                $scope.annotations.textAnnotations.splice(i, 1);
-                somethingWasDeleted = true;
-                break;
-            }
-        }
-    }
-
-
-    if (!somethingWasDeleted) {
-        for (let i = $scope.annotations.strokeAnnotations.length - 1; i >= 0; i--) {
-            const stroke = $scope.annotations.strokeAnnotations[i];
-            
-            // Comprueba si el clic está cerca de CUALQUIER punto del trazo
-            const isNear = stroke.points.some(point => {
-                const pixelX = point.x * rect.width;
-                const pixelY = point.y * rect.height;
-                const clickPixelX = clickX * rect.width;
-                const clickPixelY = clickY * rect.height;
-                
-                // Distancia de 10px para borrar
-                const distance = Math.sqrt(Math.pow(pixelX - clickPixelX, 2) + Math.pow(pixelY - clickPixelY, 2));
-                return distance < 10; 
-            });
-
-            if (isNear) {
-                $scope.annotations.strokeAnnotations.splice(i, 1);
-                somethingWasDeleted = true;
-                break;
-            }
-        }
-    }
-
-    if (somethingWasDeleted) {
-        $scope.$apply();
-        redrawAllAnnotations();
-    }
-}
-
-
-
-}]);
-    </script>
+    <script src="app.js"></script>
 </body>
-</html>      
+<script>
+    const app = angular.module('dashboardApp', []);
+
+app.controller('dashboardCtrl', function($scope, $interval) {
+    
+    // --- DATOS DEL PROFESOR ---
+    $scope.teacher = {
+        name: "Noe Samuel Bravo",
+        photo: "https://ui-avatars.com/api/?name=Noe+Bravo&background=0D8ABC&color=fff", 
+        specialty: "Piano Jazz & Armonía"
+    };
+
+    // --- MATERIALES (Ahora en Sidebar) ---
+    $scope.materials = [
+        { name: "Hanon Ejercicios 1-20.pdf", size: "1.2 MB" },
+        { name: "Autumn Leaves - Lead Sheet.pdf", size: "0.5 MB" },
+        { name: "Escalas Pentatónicas.pdf", size: "0.8 MB" }
+    ];
+
+    $scope.libraryBooks = [
+        { 
+            level: "Nivel Preparatorio", 
+            unit: "Unidad 1", 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+1" 
+        },
+        { 
+            level: "Nivel Preparatorio", 
+            unit: "Unidad 2", 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+2" 
+        },
+        { 
+            level: "Nivel Preparatorio", 
+            unit: "Unidad 3", 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+3" 
+        },
+        { 
+            level: "Nivel 1", 
+            unit: "Unidad 1", 
+            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of\nPiano+Book\nLevel+1+Unit+1" 
+        },
+        { 
+            level: "Nivel 1", 
+            unit: "Unidad 2", 
+            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of\nPiano+Book\nLevel+1+Unit+2" 
+        }
+    ];
+
+    $scope.showLibraryModal = false;
+
+    $scope.openLibrary = function() {
+        $scope.showLibraryModal = true;
+    };
+
+    $scope.closeLibrary = function() {
+        $scope.showLibraryModal = false;
+    };
+
+    // --- GENERACIÓN DE FECHAS DINÁMICAS (Para demostración) ---
+    // Usamos 'new Date()' para que siempre veas una clase pasada, una hoy/mañana y futuras
+    const hoy = new Date();
+    
+    // 1. Clase Pasada (Hace 2 días)
+    const fechaPasada = new Date(hoy); 
+    fechaPasada.setDate(hoy.getDate() - 2);
+
+    // 2. Próxima Clase (Mañana) -> Esta será detectada como "Next"
+    const fechaProxima = new Date(hoy); 
+    fechaProxima.setDate(hoy.getDate() + 1);
+
+    // 3. Futura (En 8 días)
+    const fechaFutura1 = new Date(hoy); 
+    fechaFutura1.setDate(hoy.getDate() + 8);
+
+    // 4. Futura Lejana (En 15 días)
+    const fechaFutura2 = new Date(hoy); 
+    fechaFutura2.setDate(hoy.getDate() + 15);
+
+    // Datos crudos de la agenda
+    const rawSchedule = [
+        { title: "Fundamentos: Escalas Mayores", date: fechaPasada, time: "18:00" },
+        { title: "Acordes e Inversiones (Nivel 2)", date: fechaProxima, time: "18:00" },
+        { title: "Introducción a la Improvisación", date: fechaFutura1, time: "17:00" },
+        { title: "Análisis de Standards de Jazz", date: fechaFutura2, time: "19:00" }
+    ];
+
+    $scope.schedule = [];
+    $scope.nextClass = {}; // Objeto para la tarjeta principal
+    $scope.canJoin = true; // Habilitado para demo
+
+    // --- LÓGICA PRINCIPAL: PROCESAR AGENDA ---
+    function processAgenda() {
+        const now = new Date();
+        let foundNext = false; // Bandera para encontrar la PRIMERA futura
+        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+
+        // 1. Ordenar fechas cronológicamente
+        const sorted = rawSchedule.sort((a, b) => a.date - b.date);
+
+        // 2. Mapear y asignar estados
+        $scope.schedule = sorted.map(function(item) {
+            let status = '';
+            
+            // Formateo de fecha para mostrar
+            item.dayNum = item.date.getDate();
+            item.monthStr = months[item.date.getMonth()];
+            item.dateStr = `${item.dayNum} de ${months[item.date.getMonth()]}`; // Texto largo
+
+            // Determinación de estado
+            if (item.date < now) {
+                // Si la fecha es menor a hoy -> PASADA
+                status = 'past';
+            } else if (!foundNext) {
+                // Si es mayor a hoy y es la primera que encontramos -> PRÓXIMA
+                status = 'next';
+                foundNext = true; 
+                
+                // Actualizamos la Tarjeta Principal con estos datos
+                $scope.nextClass = {
+                    title: item.title,
+                    dateStr: "Jueves, " + item.dayNum + " " + item.monthStr, // Formato ejemplo
+                    time: item.time
+                };
+            } else {
+                // Si es mayor a hoy pero ya encontramos la próxima -> FUTURA
+                status = 'future';
+            }
+
+            item.status = status; // 'past', 'next' o 'future'
+            return item;
+        });
+    }
+
+    // Ejecutar lógica al inicio
+    processAgenda();
+
+    // --- FUNCIONES INTERACTIVAS ---
+    $scope.joinClass = function() {
+        alert("Iniciando conexión segura a la sala de video...");
+    };
+
+    $scope.sendMessage = function() {
+        alert("Abriendo chat directo con " + $scope.teacher.name);
+    };
+
+    $scope.cancelClass = function() {
+        if(confirm("¿Estás seguro de reagendar? Esta acción notificará al instructor.")) {
+            alert("Solicitud enviada.");
+        }
+    };
+
+    // --- MODAL DE TECH CHECK ---
+    $scope.showTechModal = false;
+    $scope.openTechCheck = function() { $scope.showTechModal = true; };
+    $scope.closeTechCheck = function() { $scope.showTechModal = false; };
+
+});
+</script>
+</html>
