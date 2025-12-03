@@ -7,12 +7,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <style>
-    :root {
-    --primary-color: #1877F2; /* Azul Facebook/Zoom */
-    --primary-hover: #166fe5;
+:root {
+    --primary-color: #FF4757;
     --secondary-color: #2ed573;
     --bg-light: #f8f9fa;
     --card-bg: #ffffff;
@@ -20,6 +21,10 @@
     --text-muted: #6c757d;
     --border-color: #dee2e6;
     --danger-color: #ff4757;
+    --piano-bg: #2a2a2a;
+    --piano-height: 150px;
+    --key-white-height: 100px;
+    --key-black-height: 65px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,14 +38,13 @@ body {
 
 .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-/* GRID LAYOUT */
+/* ==================== DASHBOARD STYLES ==================== */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Columna principal ancha, sidebar estrecho */
+    grid-template-columns: 2fr 1fr;
     gap: 25px;
 }
 
-/* CARDS */
 .card {
     background: var(--card-bg);
     border-radius: 16px;
@@ -49,13 +53,13 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* --- ESTILOS DE LA AGENDA (LO IMPORTANTE) --- */
 .section-title {
     font-size: 18px; 
     margin-bottom: 20px; 
     font-weight: 800;
 }
 
+/* AGENDA STYLES */
 .agenda-list {
     display: flex;
     flex-direction: column;
@@ -73,19 +77,21 @@ body {
     background: white;
 }
 
-/* 1. CLASES PASADAS (Gris y Tachado) */
 .agenda-item.past {
-    background: #f1f2f6; /* Gris muy claro */
+    background: #f1f2f6;
     border-color: transparent;
-    color: #a4b0be; /* Texto grisáceo */
-}
-.agenda-item.past h4 {
-    text-decoration: line-through; /* Título tachado */
     color: #a4b0be;
 }
-.agenda-item.past .date-box {
-    opacity: 0.6; /* Fecha desvanecida */
+
+.agenda-item.past h4 {
+    text-decoration: line-through;
+    color: #a4b0be;
 }
+
+.agenda-item.past .date-box {
+    opacity: 0.6;
+}
+
 .status-finished {
     font-size: 10px;
     text-transform: uppercase;
@@ -99,18 +105,19 @@ body {
     text-decoration: none !important;
 }
 
-/* 2. PRÓXIMA CLASE (Destacada) */
 .agenda-item.next {
     background: #ffffff;
-    border: 2px solid var(--primary-color); /* Borde azul */
-    box-shadow: 0 8px 20px rgba(24, 119, 242, 0.15); /* Sombra azulada */
-    transform: scale(1.01); /* Ligeramente más grande */
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 8px 20px rgba(255, 71, 87, 0.15);
+    transform: scale(1.01);
     z-index: 2;
 }
+
 .agenda-item.next h4 {
     color: var(--primary-color);
     font-weight: 800;
 }
+
 .status-next-badge {
     background: var(--primary-color);
     color: white;
@@ -121,37 +128,35 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* 3. CLASES FUTURAS (Normal) */
 .agenda-item.future:hover {
     border-color: var(--primary-color);
     transform: translateX(5px);
     cursor: pointer;
 }
 
-/* Elementos internos de la Agenda */
 .agenda-date {
     display: flex;
     align-items: center;
     gap: 15px;
 }
+
 .date-box {
     text-align: center;
     min-width: 50px;
     padding-right: 15px;
     border-right: 1px solid var(--border-color);
 }
+
 .date-day { font-size: 20px; font-weight: 800; line-height: 1; }
 .date-month { font-size: 11px; text-transform: uppercase; font-weight: 600; }
 
 .class-details h4 { font-size: 15px; margin-bottom: 2px; font-weight: 700; }
 .meta-text { font-size: 13px; color: var(--text-muted); }
 
-/* --- SIDEBAR & MATERIALES --- */
+/* SIDEBAR */
 .sidebar-title { font-size: 15px; margin-bottom: 20px; font-weight: 700; }
-
 .sidebar-card { margin-bottom: 20px; }
 
-/* Lista de Materiales adaptada al sidebar */
 .materials-list { display: flex; flex-direction: column; gap: 10px; }
 
 .material-item {
@@ -163,9 +168,11 @@ body {
     background: var(--bg-light);
     transition: 0.2s;
 }
+
 .material-item:hover { background: #e9ecef; }
 
 .file-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+
 .file-icon {
     width: 32px; height: 32px;
     background: white;
@@ -174,11 +181,13 @@ body {
     color: #e74c3c;
     flex-shrink: 0;
 }
+
 .file-details h4 {
     font-size: 13px; font-weight: 600;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    max-width: 140px; /* Evita desborde en pantallas chicas */
+    max-width: 140px;
 }
+
 .file-details p { font-size: 11px; color: var(--text-muted); }
 
 .download-btn {
@@ -190,16 +199,21 @@ body {
     font-size: 12px;
     text-decoration: none;
     flex-shrink: 0;
+    border: none;
+    cursor: pointer;
 }
-.download-btn:hover { background: var(--primary-hover); }
 
-/* --- OTROS ESTILOS (Header, Botones, Modal) --- */
+.download-btn:hover { background: #ff6b81; }
+
+/* CLASS HEADER */
 .class-header {
     display: flex; justify-content: space-between; align-items: flex-start;
     margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);
 }
+
 .class-title h2 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
 .class-title p { font-size: 13px; color: var(--text-muted); }
+
 .status-badge {
     background: #d1fae5; color: #065f46;
     padding: 6px 12px; border-radius: 20px;
@@ -209,10 +223,12 @@ body {
 .class-info-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;
 }
+
 .info-box {
     background: var(--bg-light); padding: 15px; border-radius: 12px;
     display: flex; align-items: center; gap: 12px;
 }
+
 .info-icon {
     width: 40px; height: 40px; background: white; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
@@ -224,20 +240,25 @@ body {
     border: none; padding: 16px; border-radius: 12px;
     font-size: 16px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3); transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); transition: 0.3s;
 }
-.join-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+.join-btn:hover { background: #ff6b81; transform: translateY(-2px); }
 .join-btn:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; transform: none; }
+
 .security-note { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
 
-/* Perfil Profesor */
+/* TEACHER PROFILE */
 .teacher-profile { text-align: center; }
+
 .teacher-avatar {
     width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
     margin-bottom: 10px; border: 3px solid var(--bg-light);
 }
+
 .teacher-name { font-weight: 700; margin-bottom: 2px; }
 .teacher-specialty { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
+
 .teacher-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 .action-btn {
@@ -246,51 +267,12 @@ body {
     font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;
     display: flex; flex-direction: column; align-items: center; gap: 5px;
 }
+
 .action-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 .action-btn.cancel { color: var(--danger-color); }
 .action-btn.cancel:hover { border-color: var(--danger-color); background: #fff5f5; }
 
-.tech-check-btn {
-    width: 100%; background: white; border: 2px dashed var(--primary-color);
-    color: var(--primary-color); padding: 12px; border-radius: 10px;
-    font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;
-}
-.tech-check-btn:hover { background: #edf2f7; }
-
-/* Modal */
-.tech-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
-}
-.tech-modal.active { opacity: 1; visibility: visible; }
-.tech-content {
-    background: white; width: 400px; padding: 30px; border-radius: 20px;
-    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-}
-.mic-visualizer {
-    height: 50px; display: flex; align-items: center; justify-content: center;
-    gap: 4px; margin: 20px 0;
-}
-.mic-bar {
-    width: 6px; height: 10px; background: var(--primary-color); border-radius: 3px;
-    animation: bounce 0.5s ease-in-out infinite;
-}
-@keyframes bounce { 50% { height: 30px; } }
-
-/* Responsive */
-@media (max-width: 850px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
-    .agenda-item { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .agenda-action { align-self: flex-end; }
-}
-
-
-
-
-
-/* --- BOTÓN SIDEBAR --- */
+/* LIBRARY BUTTON */
 .library-btn {
     width: 100%;
     background: white;
@@ -305,6 +287,7 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
+
 .library-btn:hover {
     border-color: var(--primary-color);
     color: var(--primary-color);
@@ -312,18 +295,19 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
-/* --- MODAL DE BIBLIOTECA --- */
+/* MODAL BIBLIOTECA */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
     display: flex; justify-content: center; align-items: center;
     opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
 }
+
 .modal-overlay.active { opacity: 1; visibility: visible; }
 
 .library-content {
-    background: #f8f9fa; /* Fondo gris muy suave para resaltar los libros blancos */
-    width: 850px; /* Más ancho para el carrusel */
+    background: #f8f9fa;
+    width: 850px;
     max-width: 95%;
     padding: 30px;
     border-radius: 20px;
@@ -335,48 +319,46 @@ body {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 10px;
 }
+
 .library-header h3 { font-size: 20px; font-weight: 800; }
 
 .close-icon {
     background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);
 }
+
 .close-icon:hover { color: var(--danger-color); }
 
-/* --- CARRUSEL ESTILO APPLE/NETFLIX --- */
+/* CAROUSEL */
 .carousel-wrapper {
     display: flex;
-    overflow-x: auto; /* Scroll horizontal nativo */
+    overflow-x: auto;
     gap: 25px;
-    padding: 10px 5px 25px 5px; /* Espacio para las sombras */
+    padding: 10px 5px 25px 5px;
     scroll-behavior: smooth;
-    /* Ocultar scrollbar visual pero mantener funcionalidad */
     scrollbar-width: thin; 
     scrollbar-color: #ccc transparent;
 }
 
-/* Scrollbar para Webkit (Chrome/Safari) */
 .carousel-wrapper::-webkit-scrollbar { height: 6px; }
 .carousel-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 .carousel-wrapper::-webkit-scrollbar-track { background: transparent; }
 
-/* TARJETA DE LIBRO */
 .book-card {
-    min-width: 180px; /* Ancho fijo para mantener uniformidad */
+    min-width: 180px;
     max-width: 180px;
-    flex-shrink: 0; /* Evita que se encojan */
+    flex-shrink: 0;
     cursor: pointer;
     transition: transform 0.3s ease;
+    text-decoration: none;
 }
 
-.book-card:hover {
-    transform: translateY(-8px); /* Efecto de levitación */
-}
+.book-card:hover { transform: translateY(-8px); }
 
 .book-cover-container {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Sombra elegante */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     margin-bottom: 15px;
     background: white;
 }
@@ -385,32 +367,405 @@ body {
     width: 100%;
     height: auto;
     display: block;
-    aspect-ratio: 3/4; /* Proporción libro */
+    aspect-ratio: 3/4;
     object-fit: cover;
 }
 
-/* Efecto hover sobre la imagen */
 .book-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.4);
     display: flex; justify-content: center; align-items: center;
     opacity: 0; transition: 0.3s;
 }
+
 .book-card:hover .book-overlay { opacity: 1; }
 .book-overlay i { color: white; font-size: 30px; }
 
-/* Tipografía similar a tu imagen */
 .book-info h4 {
     font-size: 16px; font-weight: 800; color: var(--text-dark);
     margin-bottom: 4px; line-height: 1.2;
 }
+
 .book-info p {
     font-size: 14px; color: var(--text-muted); font-weight: 500;
+}
+
+/* ==================== LIVE SESSION STYLES ==================== */
+.live-wrapper {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 999;
+    background: #000;
+    font-family: 'Inter', sans-serif;
+}
+
+.live-session-container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    height: 100%;
+    width: 100%;
+}
+
+.live-stage-area {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* ← CRÍTICO: forzar altura total */
+    max-height: 100vh; /* ← Evita overflow */
+    background: #000;
+    position: relative;
+    overflow: hidden; /* ← Oculta excedentes */
+}
+
+.live-main-video {
+    flex-grow: 1;
+    min-height: 0;
+    
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* HEADER OVERLAY */
+.live-overlay-header {
+    position: absolute; top: 0; left: 0; width: 100%;
+    padding: 20px;
+background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+display: flex; justify-content: space-between; align-items: flex-start;
+z-index: 20; pointer-events: none;
+}.live-class-meta { display: flex; align-items: center; gap: 15px; pointer-events: auto; }
+.live-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary-color); }.live-text h2 {
+color: white; font-size: 18px;
+text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+margin: 0;
+}.live-text p { color: #ddd; font-size: 14px; margin: 0; }.live-timer {
+background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+padding: 5px 15px; border-radius: 20px; color: white;
+border: 1px solid rgba(255,255,255,0.2); pointer-events: auto;
+font-family: monospace; font-size: 16px;
+}/* PIP VIDEO */
+.live-pip-video {
+position: absolute; top: 80px; right: 20px;
+width: 160px; height: 120px;
+background: rgba(0,0,0,0.6);
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 12px;
+z-index: 30;
+overflow: hidden;
+backdrop-filter: blur(4px);
+transition: 0.3s;
+opacity: 0.7;
+}.live-pip-video:hover {
+opacity: 1;
+transform: scale(1.05);
+border-color: white;
+box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}/* CONTROLS */
+.live-controls-dock {
+position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+background: rgba(20,20,20,0.8); backdrop-filter: blur(10px);
+padding: 10px 25px; border-radius: 50px;
+display: flex; gap: 15px; border: 1px solid rgba(255,255,255,0.1);
+z-index: 40;
+}.live-btn {
+width: 50px; height: 50px; border-radius: 50%; border: none;
+font-size: 20px; cursor: pointer; color: white;
+background: rgba(0, 0, 0, 0.5);
+transition: 0.2s;
+display: flex; align-items: center; justify-content: center;
+}.live-btn:hover { background: #555; transform: translateY(-3px); }.live-btn.active-mic {
+background: #dc3545;
+box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+}.live-btn.active-cam {
+background: #1877F2;
+box-shadow: 0 0 15px rgba(24, 119, 242, 0.5);
+}.live-btn.hangup {
+background: var(--danger-color);
+width: 60px;
+border-radius: 30px;
+}/* PIANO AREA */
+.live-piano-area {
+height: var(--piano-height);
+background: var(--piano-bg);
+position: relative;
+border-top: 1px solid #444;
+z-index: 35;
+flex-shrink: 0;
+}#piano-top-casing {
+position: relative;
+width: 100%;
+height: 20px;
+background: #333;
+z-index: 4;
+display: flex;
+justify-content: center;
+border-radius: 4px 4px 0 0;
+}.casing-note-label {
+position: absolute;
+top: 10px;
+color: #fff;
+font-size: 11px;
+font-weight: 600;
+background: rgba(0,0,0,0.6);
+padding: 2px 6px;
+border-radius: 4px;
+pointer-events: none;
+transform: translateX(-50%);
+z-index: 20;
+white-space: nowrap;
+}#piano-wrapper-live {
+position: relative;
+width: 100%;
+height: calc(var(--piano-height) - 20px);
+display: flex;
+justify-content: center;
+overflow-x: auto;
+overflow-y: hidden;
+}#piano-wrapper-live::-webkit-scrollbar { height: 8px; background: #222; }
+#piano-wrapper-live::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }#hit-line {
+position: absolute;
+top: 5px;
+left: 0;
+width: 100%;
+height: 4px;
+background: rgba(255, 0, 0, 0.7);
+box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+z-index: 10;
+pointer-events: none;
+}#piano-keys-container {
+position: relative;
+display: flex;
+margin-top: 10px;
+height: 100%;
+}.key {
+position: relative;
+float: left;
+cursor: pointer;
+transition: all 0.05s;
+}.key.white {
+width: 24px;
+height: var(--key-white-height);
+background: #fff;
+border: 1px solid #ccc;
+border-right: 1px solid #e0e0e0;
+border-radius: 0 0 4px 4px;
+z-index: 1;
+}.key.white.active {
+background: var(--primary-color);
+box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+transform: translateY(2px);
+}.key.black {
+width: 14px;
+height: var(--key-black-height);
+background: #333;
+border: 1px solid #555;
+margin-left: -7px;
+margin-right: -7px;
+z-index: 2;
+border-radius: 0 0 3px 3px;
+}.key.black.active {
+background: var(--primary-color) !important;
+box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+border: 1px solid rgba(255, 255, 255, 0.6) !important;
+border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+}/* SIDEBAR */
+.live-sidebar {
+background: white;
+border-left: 1px solid #ddd;
+display: flex;
+flex-direction: column;
+z-index: 50;
+}.live-visualizer-box {
+height: 180px;
+background: #fff;
+border-bottom: 1px solid #eee;
+position: relative;
+display: flex;
+flex-direction: column;
+}.chord-toast {
+position: absolute;
+top: 10px;
+left: 0;
+width: 100%;
+text-align: center;
+color: var(--primary-color);
+font-weight: 800;
+font-size: 20px;
+z-index: 10;
+}#staff-container {
+flex: 1;
+width: 100%;
+position: relative;
+}/* TABS */
+.live-tabs {
+display: flex;
+border-bottom: 1px solid #eee;
+flex-shrink: 0;
+}.live-tab {
+flex: 1;
+padding: 15px;
+border: none;
+background: #f9f9f9;
+cursor: pointer;
+font-weight: 600;
+color: #888;
+transition: 0.2s;
+}.live-tab.active {
+background: white;
+color: var(--primary-color);
+border-bottom: 3px solid var(--primary-color);
+}.live-panel-content {
+flex: 1;
+overflow-y: auto;
+padding: 0;
+display: flex;
+flex-direction: column;
+}/* CHAT */
+.live-chat-list {
+flex: 1;
+padding: 15px;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}.live-msg {
+display: flex;
+gap: 10px;
+font-size: 13px;
+}.live-msg.me {
+flex-direction: row-reverse;
+}.live-msg-bubble {
+background: #f1f2f6;
+padding: 10px;
+border-radius: 12px;
+max-width: 80%;
+}.live-msg.me .live-msg-bubble {
+background: var(--primary-color);
+color: white;
+}.live-chat-input {
+padding: 15px;
+border-top: 1px solid #eee;
+display: flex;
+gap: 10px;
+flex-shrink: 0;
+}.live-input {
+flex: 1;
+padding: 10px;
+border-radius: 20px;
+border: 1px solid #ddd;
+outline: none;
+}.send-btn {
+width: 36px;
+height: 36px;
+background: var(--primary-color);
+color: white;
+border: none;
+border-radius: 50%;
+cursor: pointer;
+font-size: 12px;
+}/* MATERIALS */
+.live-mat-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 15px;
+border-bottom: 1px solid #f5f5f5;
+transition: 0.2s;
+}.live-mat-item:hover {
+background: #f9f9f9;
+}/* FOOTER METRONOMO */
+.live-footer {
+padding: 15px;
+border-top: 1px solid #eee;
+background: #fcfcfc;
+flex-shrink: 0;
+}.metro-control-box {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: white;
+border: 1px solid #ddd;
+padding: 8px 15px;
+border-radius: 10px;
+}.metro-btn-small {
+width: 28px;
+height: 28px;
+border-radius: 6px;
+border: 1px solid var(--border-color);
+background: white;
+cursor: pointer;
+color: var(--text-muted);
+font-size: 12px;
+}.metro-play {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+border: none;
+background: var(--text-dark);
+color: white;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: 0.2s;
+}.metro-play.active {
+background: var(--primary-color);
+box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}/* SVG VISUALIZER */
+.staff-line { stroke: #999; stroke-width: 1; }
+.ledger-line { stroke: #999; stroke-width: 1; }
+.note-head { fill: #333; }
+.note-stem { stroke: #333; stroke-width: 2; }
+.note-accidental { fill: #333; font-family: serif; font-size: 20px; font-weight: bold; }
+.clef { fill: #333; font-family: serif; font-size: 60px; }
+.bass-clef { font-size: 55px; }/* MODAL DRAGGABLE */
+.live-modal {
+position: absolute;
+top: 10%;
+left: 10%;
+width: 600px;
+height: 500px;
+background: white;
+border-radius: 8px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+display: flex;
+flex-direction: column;
+z-index: 1000;
+overflow: hidden;
+}.live-modal-header {
+background: #333;
+color: white;
+padding: 10px 15px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+cursor: move;
+user-select: none;
+}/* RESPONSIVE */
+@media (max-width: 900px) {
+.dashboard-grid { grid-template-columns: 1fr; }
+.live-session-container { grid-template-columns: 1fr; }
+.live-sidebar { display: none; }
+.live-pip-video { width: 100px; height: 75px; top: 60px; }
+.key.white { width: 18px; }
+.key.black { width: 10px; margin: 0 -5px; }
+}@media (max-width: 768px) {
+.key.white { width: 14px; }
+.key.black { width: 9px; margin-left: -4.5px; margin-right: -4.5px; }
+}@media (max-width: 500px) {
+.key.white { width: 11px; height: 75px; }
+.key.black { width: 7px; height: 48px; margin-left: -3.5px; margin-right: -3.5px; }
+.live-modal { width: 95%; height: 80%; top: 10% !important; left: 2.5% !important; }
 }
 </style>
 <body ng-controller="dashboardCtrl">
 
-    <div class="container">
+    <!-- DASHBOARD VIEW -->
+    <div class="container" ng-show="currentView === 'dashboard'">
         <br>
         <div class="dashboard-grid">
 
@@ -458,7 +813,8 @@ body {
                     <div class="agenda-list">
                         <div class="agenda-item" 
                              ng-repeat="clase in schedule" 
-                             ng-class="clase.status"> <div class="agenda-date">
+                             ng-class="clase.status">
+                            <div class="agenda-date">
                                 <div class="date-box">
                                     <div class="date-day">{{clase.dayNum}}</div>
                                     <div class="date-month">{{clase.monthStr}}</div>
@@ -466,17 +822,14 @@ body {
                                 <div class="class-details">
                                     <h4>{{clase.title}}</h4>
                                     <p class="meta-text">{{clase.time}} • 60 min</p>
-                                    
-                                    <span class="status-finished" ng-if="clase.status === 'past'">Finalizada</span>
                                 </div>
                             </div>
 
                             <div class="agenda-action">
                                 <span class="status-next-badge" ng-if="clase.status === 'next'">Próxima</span>
                                 <i class="fas fa-chevron-right" style="color: #ccc;" ng-if="clase.status === 'future'"></i>
-                                <i class="fas fa-check-circle" style="color: #a4b0be;" ng-if="clase.status === 'past'"></i>
+                                <span class="status-finished" ng-if="clase.status === 'past'">Finalizada</span>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -523,11 +876,11 @@ body {
                         </div>
                     </div>
 
-                   <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
-    <button class="library-btn" ng-click="openLibrary()">
-        <i class="fas fa-layer-group"></i> Ver Biblioteca de Unidades
-    </button>
-</div>
+                    <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
+                        <button class="library-btn" ng-click="openLibrary()">
+                            <i class="fas fa-layer-group"></i> Ver Biblioteca de Unidades
+                        </button>
+                    </div>
                 </div>
 
                 <div style="text-align: center; font-size: 13px; color: var(--text-muted);">
@@ -539,60 +892,206 @@ body {
         </div>
     </div>
 
-  <div class="modal-overlay" ng-class="{'active': showLibraryModal}">
-    <div class="library-content">
+    <!-- LIVE SESSION VIEW -->
+    <div class="live-wrapper" ng-show="currentView === 'live'">
         
-        <div class="library-header">
-            <h3><i class="fas fa-book-open"></i> Material Didáctico</h3>
-            <button class="close-icon" ng-click="closeLibrary()"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <p style="color: var(--text-muted); margin-bottom: 20px;">
-            Accede a los libros y partituras de niveles anteriores.
-        </p>
-
-     <div class="carousel-wrapper">
-            <a class="book-card" 
-               ng-repeat="book in libraryBooks" 
-               href="{{book.fileUrl}}" 
-               download="{{book.level}} - {{book.unit}}.pdf"> <div class="book-cover-container">
-                    <img ng-src="{{book.cover}}" class="book-img">
-                    <div class="book-overlay">
-                        <i class="fas fa-download"></i>
+        <div class="live-session-container">
+            
+            <div class="live-stage-area">
+                
+                <div class="live-overlay-header">
+                    <div class="live-class-meta">
+                        <img ng-src="{{teacher.photo}}" class="live-avatar">
+                        <div class="live-text">
+                            <h2>{{teacher.name}}</h2>
+                            <p>{{nextClass.title}} • En Vivo</p>
+                        </div>
+                    </div>
+                    <div class="live-timer">
+                        <i class="fas fa-circle" style="color: red; font-size: 10px;"></i>
+                        {{liveTimerDisplay}}
                     </div>
                 </div>
-                <div class="book-info">
-                    <h4>{{book.level}}</h4>
-                    <p>{{book.unit}}</p>
+
+                <div class="live-main-video">
+                    <img src="https://lh3.googleusercontent.com/d/14Z2nzr2OrqWXu_CtVEc203hy7_eJfwSP=s1000" 
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    
+                    <div class="live-pip-video" id="pipContainer">
+                        <video id="student-video" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
+                        <div ng-show="!camOn" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white;">
+                            <i class="fas fa-video-slash" style="font-size: 24px;"></i>
+                        </div>
+                    </div>
+
+                    <div class="live-controls-dock">
+                        <button class="live-btn" ng-class="{'active-mic': micOn}" ng-click="toggleMic()">
+                            <i class="fas" ng-class="micOn ? 'fa-microphone' : 'fa-microphone-slash'"></i>
+                        </button>
+                        <button class="live-btn" ng-class="{'active-cam': camOn}" ng-click="toggleCam()">
+                            <i class="fas" ng-class="camOn ? 'fa-video' : 'fa-video-slash'"></i>
+                        </button>
+                        <button class="live-btn hangup" ng-click="leaveClass()">
+                            <i class="fas fa-phone-slash"></i>
+                        </button>
+                    </div>
                 </div>
-            </a>
-            
+
+                <div class="live-piano-area">
+                    <div id="piano-top-casing"></div>
+                    <div id="piano-wrapper-live">
+                        <div id="hit-line"></div>
+                        <div id="piano-keys-container"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <aside class="live-sidebar">
+                
+                <div class="live-visualizer-box">
+                    <div class="chord-toast">{{detectedChord}}</div>
+                    <div id="staff-container" style="flex:1; width:100%;">
+                        <svg id="staff-svg" width="100%" height="100%"></svg>
+                    </div>
+                </div>
+
+                <div class="live-tabs">
+                    <button class="live-tab" ng-class="{'active': activeTab=='chat'}" ng-click="activeTab='chat'">Chat</button>
+                    <button class="live-tab" ng-class="{'active': activeTab=='materials'}" ng-click="activeTab='materials'">Material</button>
+                </div>
+
+                <div class="live-panel-content" ng-show="activeTab=='chat'">
+                    <div class="live-chat-list" id="chatList">
+                        <div class="live-msg" ng-repeat="msg in chatMessages" ng-class="{'me': msg.isMe}">
+                            <img ng-if="!msg.isMe" ng-src="{{teacher.photo}}" style="width: 25px; height: 25px; border-radius: 50%;">
+                            <div class="live-msg-bubble">
+                                <strong>{{msg.sender}}</strong><br>
+                                {{msg.text}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="live-chat-input">
+                        <input type="text" class="live-input" placeholder="Escribe algo..." ng-model="chatInput" ng-keypress="checkEnter($event)">
+                        <button class="send-btn" ng-click="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+
+                <div class="live-panel-content" ng-show="activeTab=='materials'">
+                    <div class="live-mat-item" ng-repeat="mat in liveMaterials">
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <i class="fas {{mat.icon}}" style="color:var(--primary-color);"></i>
+                            <div>
+                                <div style="font-weight:700; font-size:13px;">{{mat.title}}</div>
+                                <div style="font-size:11px; color:#888;">{{mat.type}}</div>
+                            </div>
+                        </div>
+                        <button class="download-btn" ng-click="openPdf(mat.url)"><i class="fas fa-external-link-alt"></i></button>
+                    </div>
+                </div>
+
+                <div class="live-footer">
+                    <div class="metro-control-box">
+                        <div style="font-size: 11px; font-weight: 700; color:#888;">METRÓNOMO</div>
+                        <div style="font-weight: 800; font-size: 18px;">{{bpm}} BPM</div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="metro-btn-small" ng-click="changeBpm(-5)">-5</button>
+                            <button class="metro-play" ng-click="toggleMetronome()" ng-class="{'active': isMetroPlaying}">
+                                <i class="fas" ng-class="isMetroPlaying ? 'fa-pause' : 'fa-play'"></i>
+                            </button>
+                            <button class="metro-btn-small" ng-click="changeBpm(5)">+5</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
         </div>
 
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="join-btn" style="padding: 12px; width: auto;" ng-click="closeLibrary()">
-                Cerrar Biblioteca
-            </button>
+        <!-- MODAL DRAGGABLE PDF -->
+        <div class="live-modal" ng-show="showPdfModal" id="draggableModal">
+            <div class="live-modal-header" id="modalHeader">
+                <span><i class="fas fa-file-alt"></i> Visualizador de Material</span>
+                <button ng-click="closePdfModal()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">&times;</button>
+            </div>
+            <div style="flex:1; background:#eee;">
+                <iframe id="pdfIframe" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
         </div>
 
     </div>
-</div>
+
+    <!-- MODAL BIBLIOTECA -->
+    <div class="modal-overlay" ng-class="{'active': showLibraryModal}">
+        <div class="library-content">
+            
+            <div class="library-header">
+                <h3><i class="fas fa-book-open"></i> Material Didáctico</h3>
+                <button class="close-icon" ng-click="closeLibrary()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Accede a los libros y partituras de niveles anteriores.
+            </p>
+
+            <div class="carousel-wrapper">
+                <a class="book-card" 
+                   ng-repeat="book in libraryBooks" 
+                   href="{{book.fileUrl}}" 
+                   download="{{book.level}} - {{book.unit}}.pdf">
+                    <div class="book-cover-container">
+                        <img ng-src="{{book.cover}}" class="book-img">
+                        <div class="book-overlay">
+                            <i class="fas fa-download"></i>
+                        </div>
+                    </div>
+                    <div class="book-info">
+                        <h4>{{book.level}}</h4>
+                        <p>{{book.unit}}</p>
+                    </div>
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="join-btn" style="padding: 12px; width: auto;" ng-click="closeLibrary()">
+                    Cerrar Biblioteca
+                </button>
+            </div>
+
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
-<script>
-    const app = angular.module('dashboardApp', []);
 
-app.controller('dashboardCtrl', function($scope, $interval) {
+<script>
+const app = angular.module('dashboardApp', []);
+
+app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
+
+    // ==================== STATE VARIABLES ====================
+    $scope.schedule = [];
+    $scope.nextClass = {};
+    $scope.canJoin = true;
+    $scope.currentView = 'dashboard'; // 'dashboard' o 'live'
+    $scope.activeTab = 'chat';
+    $scope.micOn = false;
+    $scope.camOn = false;
+    $scope.bpm = 60;
+    $scope.isMetroPlaying = false;
+    $scope.liveTimerDisplay = "00:00";
+    $scope.detectedChord = "---";
+    $scope.chatInput = "";
+    $scope.showPdfModal = false;
+    $scope.pdfUrl = "";
+    $scope.showLibraryModal = false;
     
-    // --- DATOS DEL PROFESOR ---
+    // ==================== DATA ====================
     $scope.teacher = {
-        name: "Noe Samuel Bravo",
-        photo: "https://ui-avatars.com/api/?name=Noe+Bravo&background=0D8ABC&color=fff", 
+        name: "Sergio Valenzo",
+        photo: "https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa",
         specialty: "Piano Jazz & Armonía"
     };
 
-    // --- MATERIALES (Ahora en Sidebar) ---
     $scope.materials = [
         { name: "Hanon Ejercicios 1-20.pdf", size: "1.2 MB" },
         { name: "Autumn Leaves - Lead Sheet.pdf", size: "0.5 MB" },
@@ -603,32 +1102,118 @@ app.controller('dashboardCtrl', function($scope, $interval) {
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 1", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+1" 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+1",
+            fileUrl: "#"
         },
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 2", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+2" 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+2",
+            fileUrl: "#"
         },
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 3", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of\nPiano+Book\nPrep+Unit+3" 
+            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+3",
+            fileUrl: "#"
         },
         { 
             level: "Nivel 1", 
             unit: "Unidad 1", 
-            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of\nPiano+Book\nLevel+1+Unit+1" 
+            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of%0APiano+Book%0ALevel+1+Unit+1",
+            fileUrl: "#"
         },
         { 
             level: "Nivel 1", 
             unit: "Unidad 2", 
-            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of\nPiano+Book\nLevel+1+Unit+2" 
+            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of%0APiano+Book%0ALevel+1+Unit+2",
+            fileUrl: "#"
         }
     ];
 
-    $scope.showLibraryModal = false;
+    $scope.liveMaterials = [
+        { 
+            title: "Partitura Nocturno Op.9", 
+            type: "PDF", 
+            icon: "fa-file-pdf", 
+            url: "https://drive.google.com/file/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE/preview"
+        },
+        { 
+            title: "Diagrama de Acordes", 
+            type: "IMG", 
+            icon: "fa-file-image", 
+            url: "https://www.youtube.com/embed/3wn33KNLy5M"
+        },
+        { 
+            title: "Teoría Musical I", 
+            type: "WEB", 
+            icon: "fa-globe", 
+            url: "https://es.wikipedia.org/wiki/Teor%C3%ADa_musical"
+        }
+    ];
 
+    $scope.chatMessages = [
+        { sender: "Profesor", text: "¡Hola! Prueba el nuevo piano interactivo.", isMe: false }
+    ];
+
+    // ==================== AGENDA LOGIC ====================
+    function processAgenda() {
+        const hoy = new Date();
+        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+        
+        const fechaPasada = new Date(hoy);
+        fechaPasada.setDate(hoy.getDate() - 2);
+
+        const fechaProxima = new Date(hoy);
+        fechaProxima.setDate(hoy.getDate() + 1);
+
+        const fechaFutura1 = new Date(hoy);
+        fechaFutura1.setDate(hoy.getDate() + 8);
+
+        const fechaFutura2 = new Date(hoy);
+        fechaFutura2.setDate(hoy.getDate() + 15);
+
+        const rawSchedule = [
+            { title: "Fundamentos: Escalas Mayores", date: fechaPasada, time: "18:00" },
+            { title: "Acordes e Inversiones (Nivel 2)", date: fechaProxima, time: "18:00" },
+            { title: "Introducción a la Improvisación", date: fechaFutura1, time: "17:00" },
+            { title: "Análisis de Standards de Jazz", date: fechaFutura2, time: "19:00" }
+        ];
+
+        const now = new Date();
+        let foundNext = false;
+        const sorted = rawSchedule.sort((a, b) => a.date - b.date);
+
+        $scope.schedule = sorted.map(function(item) {
+            let status = '';
+            
+            item.dayNum = item.date.getDate();
+            item.monthStr = months[item.date.getMonth()];
+            item.dateStr = `${item.dayNum} de ${months[item.date.getMonth()]}`;
+
+            if (item.date < now) {
+                status = 'past';
+            } else if (!foundNext) {
+                status = 'next';
+                foundNext = true;
+                
+                $scope.nextClass = {
+                    title: item.title,
+                    dateStr: "Jueves, " + item.dayNum + " " + item.monthStr,
+                    time: item.time
+                };
+            } else {
+                status = 'future';
+            }
+
+            item.status = status;
+            return item;
+        });
+    }
+
+    processAgenda();
+
+    // ==================== LIBRARY MODAL ====================
     $scope.openLibrary = function() {
         $scope.showLibraryModal = true;
     };
@@ -637,104 +1222,621 @@ app.controller('dashboardCtrl', function($scope, $interval) {
         $scope.showLibraryModal = false;
     };
 
-    // --- GENERACIÓN DE FECHAS DINÁMICAS (Para demostración) ---
-    // Usamos 'new Date()' para que siempre veas una clase pasada, una hoy/mañana y futuras
-    const hoy = new Date();
-    
-    // 1. Clase Pasada (Hace 2 días)
-    const fechaPasada = new Date(hoy); 
-    fechaPasada.setDate(hoy.getDate() - 2);
-
-    // 2. Próxima Clase (Mañana) -> Esta será detectada como "Next"
-    const fechaProxima = new Date(hoy); 
-    fechaProxima.setDate(hoy.getDate() + 1);
-
-    // 3. Futura (En 8 días)
-    const fechaFutura1 = new Date(hoy); 
-    fechaFutura1.setDate(hoy.getDate() + 8);
-
-    // 4. Futura Lejana (En 15 días)
-    const fechaFutura2 = new Date(hoy); 
-    fechaFutura2.setDate(hoy.getDate() + 15);
-
-    // Datos crudos de la agenda
-    const rawSchedule = [
-        { title: "Fundamentos: Escalas Mayores", date: fechaPasada, time: "18:00" },
-        { title: "Acordes e Inversiones (Nivel 2)", date: fechaProxima, time: "18:00" },
-        { title: "Introducción a la Improvisación", date: fechaFutura1, time: "17:00" },
-        { title: "Análisis de Standards de Jazz", date: fechaFutura2, time: "19:00" }
-    ];
-
-    $scope.schedule = [];
-    $scope.nextClass = {}; // Objeto para la tarjeta principal
-    $scope.canJoin = true; // Habilitado para demo
-
-    // --- LÓGICA PRINCIPAL: PROCESAR AGENDA ---
-    function processAgenda() {
-        const now = new Date();
-        let foundNext = false; // Bandera para encontrar la PRIMERA futura
-        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-
-        // 1. Ordenar fechas cronológicamente
-        const sorted = rawSchedule.sort((a, b) => a.date - b.date);
-
-        // 2. Mapear y asignar estados
-        $scope.schedule = sorted.map(function(item) {
-            let status = '';
-            
-            // Formateo de fecha para mostrar
-            item.dayNum = item.date.getDate();
-            item.monthStr = months[item.date.getMonth()];
-            item.dateStr = `${item.dayNum} de ${months[item.date.getMonth()]}`; // Texto largo
-
-            // Determinación de estado
-            if (item.date < now) {
-                // Si la fecha es menor a hoy -> PASADA
-                status = 'past';
-            } else if (!foundNext) {
-                // Si es mayor a hoy y es la primera que encontramos -> PRÓXIMA
-                status = 'next';
-                foundNext = true; 
-                
-                // Actualizamos la Tarjeta Principal con estos datos
-                $scope.nextClass = {
-                    title: item.title,
-                    dateStr: "Jueves, " + item.dayNum + " " + item.monthStr, // Formato ejemplo
-                    time: item.time
-                };
-            } else {
-                // Si es mayor a hoy pero ya encontramos la próxima -> FUTURA
-                status = 'future';
-            }
-
-            item.status = status; // 'past', 'next' o 'future'
-            return item;
-        });
-    }
-
-    // Ejecutar lógica al inicio
-    processAgenda();
-
-    // --- FUNCIONES INTERACTIVAS ---
+    // ==================== JOIN CLASS ====================
     $scope.joinClass = function() {
-        alert("Iniciando conexión segura a la sala de video...");
+        $scope.currentView = 'live';
+        $timeout(function() {
+            initLiveEnvironment();
+            startLiveTimer();
+            setupDraggableModal();
+        }, 100);
     };
 
-    $scope.sendMessage = function() {
-        alert("Abriendo chat directo con " + $scope.teacher.name);
-    };
-
-    $scope.cancelClass = function() {
-        if(confirm("¿Estás seguro de reagendar? Esta acción notificará al instructor.")) {
-            alert("Solicitud enviada.");
+    $scope.leaveClass = function() {
+        if(confirm("¿Salir de la clase?")) {
+            stopMetronome();
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            if(liveInterval) {
+                $interval.cancel(liveInterval);
+            }
+            $scope.currentView = 'dashboard';
+            $scope.camOn = false;
+            $scope.micOn = false;
         }
     };
 
-    // --- MODAL DE TECH CHECK ---
-    $scope.showTechModal = false;
-    $scope.openTechCheck = function() { $scope.showTechModal = true; };
-    $scope.closeTechCheck = function() { $scope.showTechModal = false; };
+    // ==================== CHAT ====================
+    $scope.sendChatMessage = function() {
+        if(!$scope.chatInput || !$scope.chatInput.trim()) return;
+        $scope.chatMessages.push({ 
+            sender: "Tú", 
+            text: $scope.chatInput, 
+            isMe: true 
+        });
+        $scope.chatInput = "";
+        
+        $timeout(() => {
+            const list = document.getElementById('chatList');
+            if(list) list.scrollTop = list.scrollHeight;
+        }, 50);
+    };
 
-});
+    $scope.checkEnter = function(e) {
+        if(e.which === 13) {
+            $scope.sendChatMessage();
+        }
+    };
+
+    // ==================== PDF MODAL ====================
+    $scope.openPdf = function(url) {
+        $scope.pdfUrl = url;
+        $scope.showPdfModal = true;
+        
+        $timeout(() => {
+            const iframe = document.getElementById('pdfIframe');
+            if(iframe) {
+                iframe.src = url;
+            }
+        }, 50);
+    };
+
+    $scope.closePdfModal = function() {
+        $scope.showPdfModal = false;
+        const iframe = document.getElementById('pdfIframe');
+        if(iframe) {
+            iframe.src = "";
+        }
+    };
+
+    $scope.trustSrc = function(src) {
+        return $sce.trustAsResourceUrl(src);
+    };
+
+    // ==================== CAMERA & MIC ====================
+    let localStream = null;
+
+    $scope.toggleCam = async function() {
+        const videoEl = document.getElementById('student-video');
+        if(!$scope.camOn) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoEl.srcObject = localStream;
+                videoEl.style.display = 'block';
+                $scope.camOn = true;
+                $scope.$apply();
+            } catch(e) {
+                alert("Error al acceder a la cámara: " + e.message);
+            }
+        } else {
+            if(localStream) {
+                localStream.getTracks().forEach(t => t.stop());
+            }
+            videoEl.style.display = 'none';
+            videoEl.srcObject = null;
+            $scope.camOn = false;
+        }
+    };
+
+    $scope.toggleMic = function() {
+        $scope.micOn = !$scope.micOn;
+    };
+
+    // ==================== METRONOME ====================
+    let metronomeAudio = null;
+    const BASE_BPM = 60;
+
+    $scope.toggleMetronome = async function() {
+        await Tone.start();
+        
+        if(!metronomeAudio) {
+            metronomeAudio = document.createElement('audio');
+            metronomeAudio.src = "https://dashboard.mozartacademy.mx/media/metronom.mp3";
+            metronomeAudio.loop = true;
+        }
+
+        if($scope.isMetroPlaying) {
+            metronomeAudio.pause();
+            metronomeAudio.currentTime = 0;
+            $scope.isMetroPlaying = false;
+        } else {
+            metronomeAudio.playbackRate = $scope.bpm / BASE_BPM;
+            try {
+                await metronomeAudio.play();
+                $scope.isMetroPlaying = true;
+            } catch(err) {
+                console.error("Error reproduciendo metrónomo:", err);
+            }
+        }
+    };
+
+    $scope.changeBpm = function(val) {
+        $scope.bpm += val;
+        if($scope.bpm < 40) $scope.bpm = 40;
+        if($scope.bpm > 200) $scope.bpm = 200;
+        
+        if(metronomeAudio) {
+            metronomeAudio.playbackRate = $scope.bpm / BASE_BPM;
+        }
+    };
+
+    function stopMetronome() {
+        if(metronomeAudio) {
+            metronomeAudio.pause();
+            metronomeAudio.currentTime = 0;
+        }
+        $scope.isMetroPlaying = false;
+    }
+
+    // ==================== LIVE TIMER ====================
+    let liveInterval;
+    function startLiveTimer() {
+        let sec = 0;
+        liveInterval = $interval(() => {
+            sec++;
+            let m = Math.floor(sec/60).toString().padStart(2,'0');
+            let s = (sec%60).toString().padStart(2,'0');
+            $scope.liveTimerDisplay = `${m}:${s}`;
+        }, 1000);
+    }
+
+    // ==================== PIANO & VISUALIZER ====================
+    let sampler = null;
+    let activeNotes = {};
+
+    const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+    
+    const CHORD_MAP = {
+        '0,4,7': { name: 'Mayor', short: '' },
+        '0,3,7': { name: 'Menor', short: 'm' },
+        '0,3,6': { name: 'Dism', short: 'dim' },
+        '0,4,8': { name: 'Aum', short: 'aug' },
+        '0,4,7,10': { name: 'Dom 7', short: '7' },
+        '0,4,7,11': { name: 'Maj 7', short: 'maj7' },
+        '0,3,7,10': { name: 'Menor 7', short: 'm7' },
+        '0,3,7,11': { name: 'Menor Maj7', short: 'mM7' },
+        '0,3,6,9': { name: 'Dism 7', short: 'dim7' },
+        '0,3,6,10': { name: 'Semi Dism', short: 'm7b5' }
+    };
+
+    const VISUALIZER_CONFIG = {
+        staffYTop: 40,
+        staffLineGap: 12,
+        noteRadiusX: 8,
+        noteRadiusY: 6,
+        accidentalGap: 26
+    };
+
+    function initLiveEnvironment() {
+        console.log("Inicializando Piano y Sampler...");
+        
+        // Crear Sampler
+        sampler = new Tone.Sampler({
+            urls: {
+                A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", A1: "A1.mp3",
+                C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", A2: "A2.mp3", C3: "C3.mp3",
+                "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3",
+                "F#4": "Fs4.mp3", A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+                A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3",
+                C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3", A7: "A7.mp3", C8: "C8.mp3"
+            },
+            release: 1,
+            baseUrl: "https://tonejs.github.io/audio/salamander/"
+        }).toDestination();
+
+        renderPianoKeys();
+        setupKeyboardInput();
+    }
+
+    function renderPianoKeys() {
+        const container = document.getElementById('piano-keys-container');
+        if(!container) return;
+        
+        container.innerHTML = '';
+        
+        const pattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        const blackKeys = { 'C': 'Db', 'D': 'Eb', 'F': 'Gb', 'G': 'Ab', 'A': 'Bb' };
+      
+      for (let octave = 1; octave <= 7; octave++) {
+                for (let i = 0; i <= 6; i++) {
+                    const note = pattern[i];
+                    const noteName = `${note}${octave}`;
+                    
+                    // Tecla Blanca
+                    const whiteKey = document.createElement('div');
+                    whiteKey.className = 'key white';
+                    whiteKey.id = `key-${noteName}`;
+                    whiteKey.dataset.note = noteName;
+                    
+                    addKeyEvents(whiteKey, noteName);
+                    container.appendChild(whiteKey);
+
+                    // Tecla Negra
+                    if (blackKeys[note]) {
+                        const blackNoteName = `${blackKeys[note]}${octave}`;
+                        const blackKey = document.createElement('div');
+                        blackKey.className = 'key black';
+                        blackKey.id = `key-${blackNoteName}`;
+                        blackKey.dataset.note = blackNoteName;
+                        
+                        addKeyEvents(blackKey, blackNoteName);
+                        container.appendChild(blackKey);
+                    }
+                }
+            }
+    }
+// Continuación del código JS (después de renderPianoKeys)
+
+    function addKeyEvents(el, note) {
+        let mouseIsDown = false;
+        
+        el.addEventListener('mousedown', (e) => {
+            mouseIsDown = true;
+            triggerNoteOn(note);
+        });
+        
+        el.addEventListener('mouseenter', (e) => {
+            if (mouseIsDown) triggerNoteOn(note);
+        });
+        
+        el.addEventListener('mouseup', () => {
+            triggerNoteOff(note);
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            triggerNoteOff(note);
+        });
+        
+        el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            triggerNoteOn(note);
+        });
+        
+        el.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            triggerNoteOff(note);
+        });
+    }
+
+    function triggerNoteOn(noteName) {
+        if (Tone.context.state !== 'running') Tone.start();
+        if (activeNotes[noteName]) return;
+        
+        if (sampler) {
+            sampler.triggerAttack(noteName, Tone.now());
+        }
+
+        const domKey = document.getElementById(`key-${noteName}`);
+        if (domKey) {
+            domKey.classList.add('active');
+            createFloatingLabel(noteName, domKey);
+        }
+
+        activeNotes[noteName] = true;
+        updateMusicalDisplays();
+    }
+
+    function triggerNoteOff(noteName) {
+        if (!activeNotes[noteName]) return;
+
+        if (sampler) sampler.triggerRelease(noteName);
+
+        const domKey = document.getElementById(`key-${noteName}`);
+        if (domKey) domKey.classList.remove('active');
+
+        removeFloatingLabel(noteName);
+        delete activeNotes[noteName];
+        updateMusicalDisplays();
+    }
+
+    function createFloatingLabel(noteName, keyElement) {
+        const casing = document.getElementById('piano-top-casing');
+        if (!casing) return;
+
+        const keyRect = keyElement.getBoundingClientRect();
+        const casingRect = casing.getBoundingClientRect();
+        const keyCenterX = keyRect.left + (keyRect.width / 2);
+        const relativeX = keyCenterX - casingRect.left;
+
+        if (relativeX < 0 || relativeX > casingRect.width) return;
+
+        const lbl = document.createElement('div');
+        lbl.className = 'casing-note-label';
+        lbl.id = `lbl-${noteName}`;
+        lbl.innerText = noteName.replace(/[0-9]/g, '');
+        lbl.style.left = `${relativeX}px`;
+        casing.appendChild(lbl);
+    }
+
+    function removeFloatingLabel(noteName) {
+        const lbl = document.getElementById(`lbl-${noteName}`);
+        if (lbl) lbl.remove();
+    }
+
+    function setupKeyboardInput() {
+        const keyMap = {
+            'a': 'C4', 'w': 'Db4', 's': 'D4', 'e': 'Eb4', 'd': 'E4',
+            'f': 'F4', 't': 'Gb4', 'g': 'G4', 'y': 'Ab4', 'h': 'A4',
+            'u': 'Bb4', 'j': 'B4', 'k': 'C5', 'o': 'Db5', 'l': 'D5',
+            'p': 'Eb5', ';': 'E5'
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (!e.repeat && keyMap[e.key]) {
+                triggerNoteOn(keyMap[e.key]);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (keyMap[e.key]) {
+                triggerNoteOff(keyMap[e.key]);
+            }
+        });
+    }
+
+    // ==================== MUSICAL ANALYSIS ====================
+    function noteNameToMidi(noteName) {
+        const noteMap = {
+            'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5,
+            'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11
+        };
+        const match = noteName.match(/^([A-G]b?)(\d+)$/);
+        if (!match) return 0;
+        const [, note, octave] = match;
+        let n = note;
+        if (n.includes('#')) {
+            const mapSharp = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb' };
+            if (mapSharp[n]) n = mapSharp[n];
+        }
+        return (parseInt(octave) + 1) * 12 + noteMap[n];
+    }
+
+    function getInterval(note1, note2) {
+        const intervals = [
+            'Unísono', '2da Menor', '2da Mayor', '3ra Menor', '3ra Mayor',
+            '4ta Justa', 'Tritono', '5ta Justa', '6ta Menor', '6ta Mayor',
+            '7ma Menor', '7ma Mayor', 'Octava'
+        ];
+        const diff = Math.abs(noteNameToMidi(note2) - noteNameToMidi(note1)) % 12;
+        return intervals[diff] || 'Intervalo';
+    }
+
+    function getChordName(notes) {
+        if (notes.length < 3) return null;
+
+        const midis = notes.map(noteNameToMidi).sort((a, b) => a - b);
+        const bassMidi = midis[0];
+        const bassNoteName = NOTE_NAMES[bassMidi % 12];
+        const uniquePCs = [...new Set(midis.map(m => m % 12))];
+
+        for (let i = 0; i < uniquePCs.length; i++) {
+            const potentialRoot = uniquePCs[i];
+            const intervals = uniquePCs
+                .map(pc => (pc - potentialRoot + 12) % 12)
+                .sort((a, b) => a - b)
+                .join(',');
+
+            const chordInfo = CHORD_MAP[intervals];
+            if (chordInfo) {
+                const rootName = NOTE_NAMES[potentialRoot];
+                const chordLabel = rootName + chordInfo.short;
+
+                if (potentialRoot !== (bassMidi % 12)) {
+                    return `${chordLabel}/${bassNoteName}`;
+                } else {
+                    return chordLabel;
+                }
+            }
+        }
+        return null;
+    }
+
+    function updateMusicalDisplays() {
+        const activeNames = Object.keys(activeNotes);
+
+        let text = '---';
+        if (activeNames.length === 1) {
+            text = activeNames[0].replace(/[0-9]/g, '');
+        } else if (activeNames.length === 2) {
+            text = getInterval(activeNames[0], activeNames[1]);
+        } else if (activeNames.length >= 3) {
+            text = getChordName(activeNames) || 'Acorde desc.';
+        }
+
+        $scope.detectedChord = text;
+        $scope.$apply();
+        drawStaff(activeNames);
+    }
+
+    // ==================== SVG STAFF DRAWING ====================
+    function createSvgElement(name, attributes) {
+        const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+        for (let key in attributes) el.setAttribute(key, attributes[key]);
+        return el;
+    }
+
+    function drawStaff(activeNotes) {
+        const svg = document.getElementById('staff-svg');
+        if (!svg) return;
+
+        svg.innerHTML = '';
+        const container = document.getElementById('staff-container');
+        const width = container ? container.clientWidth : 300;
+
+        // Dibujar 5 líneas del pentagrama
+        for (let i = 0; i < 5; i++) {
+            const y = VISUALIZER_CONFIG.staffYTop + (i * VISUALIZER_CONFIG.staffLineGap);
+            svg.appendChild(createSvgElement('line', {
+                x1: 10, y1: y, x2: width - 10, y2: y, class: 'staff-line'
+            }));
+        }
+
+        // Determinar clave (Sol/Fa)
+        let useTreble = true;
+        if (activeNotes.length > 0) {
+            const midis = activeNotes.map(noteNameToMidi).sort((a, b) => a - b);
+            if (midis[0] < 60) useTreble = false;
+        }
+
+        // Dibujar clave
+        const clefY = useTreble
+            ? VISUALIZER_CONFIG.staffYTop + 46
+            : VISUALIZER_CONFIG.staffYTop + 35;
+
+        const clefText = createSvgElement('text', {
+            x: 5,
+            y: clefY,
+            class: useTreble ? 'clef' : 'clef bass-clef'
+        });
+        clefText.textContent = useTreble ? '𝄞' : '𝄢';
+        svg.appendChild(clefText);
+
+        // Dibujar notas
+        if (activeNotes.length === 0) return;
+
+        const midis = activeNotes.map(noteNameToMidi).sort((a, b) => a - b);
+        const baseX = 80;
+
+        midis.forEach((midi, index) => {
+            const x = baseX + (index * 35);
+            drawNote(midi, x, useTreble, svg);
+        });
+    }
+
+    function drawNote(midi, x, isTreble, svg) {
+        const octave = Math.floor(midi / 12) - 1;
+        const noteIndex = midi % 12;
+        const noteName = NOTE_NAMES[noteIndex];
+        const diatonicMap = {
+            'C': 0, 'Db': 1, 'D': 1, 'Eb': 2, 'E': 2, 'F': 3,
+            'Gb': 4, 'G': 4, 'Ab': 5, 'A': 5, 'Bb': 6, 'B': 6
+        };
+
+        const myDiatonicIndex = (octave * 7) + diatonicMap[noteName.replace(/[0-9]/g, '')];
+        const refDiatonicIndex = isTreble ? 38 : 26;
+        const stepsFromTop = refDiatonicIndex - myDiatonicIndex;
+
+        const stepSize = VISUALIZER_CONFIG.staffLineGap / 2;
+        const y = VISUALIZER_CONFIG.staffYTop + (stepsFromTop * stepSize);
+
+        // Cabeza de nota
+        const head = createSvgElement('ellipse', {
+            cx: x,
+            cy: y,
+            rx: VISUALIZER_CONFIG.noteRadiusX,
+            ry: VISUALIZER_CONFIG.noteRadiusY,
+            class: 'note-head',
+            transform: `rotate(-20, ${x}, ${y})`
+        });
+        svg.appendChild(head);
+
+        // Plica
+        const stemHeight = 35;
+        const yStemEnd = y - stemHeight;
+
+        svg.appendChild(createSvgElement('line', {
+            x1: x + (VISUALIZER_CONFIG.noteRadiusX - 1),
+            y1: y,
+            x2: x + (VISUALIZER_CONFIG.noteRadiusX - 1),
+            y2: yStemEnd,
+            class: 'note-stem'
+        }));
+
+        // Alteración (bemol/sostenido)
+        const hasAccidental = noteName.includes('b') || noteName.includes('#');
+        if (hasAccidental) {
+            const symbol = noteName.includes('#') ? '♯' : '♭';
+            const acc = createSvgElement('text', {
+                x: x - VISUALIZER_CONFIG.accidentalGap,
+                y: y + 6,
+                class: 'note-accidental'
+            });
+            acc.textContent = symbol;
+            svg.appendChild(acc);
+        }
+
+        // Líneas adicionales
+        const topLimit = 0;
+        const bottomLimit = 8;
+
+        if (stepsFromTop < topLimit) {
+            for (let i = -2; i >= stepsFromTop; i -= 2) {
+                drawLedgerLine(x, VISUALIZER_CONFIG.staffYTop + (i * stepSize), svg);
+            }
+        } else if (stepsFromTop > bottomLimit) {
+            for (let i = 10; i <= stepsFromTop; i += 2) {
+                drawLedgerLine(x, VISUALIZER_CONFIG.staffYTop + (i * stepSize), svg);
+            }
+        }
+    }
+
+    function drawLedgerLine(x, y, svg) {
+        svg.appendChild(createSvgElement('line', {
+            x1: x - 14,
+            y1: y,
+            x2: x + 14,
+            y2: y,
+            class: 'ledger-line'
+        }));
+    }
+
+    // ==================== DRAGGABLE MODAL ====================
+    function setupDraggableModal() {
+        const modal = document.getElementById('draggableModal');
+        const header = document.getElementById('modalHeader');
+        
+        if (!modal || !header) return;
+
+        let isDragging = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0, yOffset = 0;
+
+        header.addEventListener('mousedown', dragStart);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('mousemove', drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === header || e.target.parentNode === header) {
+                isDragging = true;
+            }
+        }
+
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                modal.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+            }
+        }
+    }
+
+    // ==================== DUMMY ACTIONS ====================
+    $scope.sendMessage = function() {
+        alert("Función de mensajería próximamente");
+    };
+
+    $scope.cancelClass = function() {
+        if (confirm("¿Deseas reagendar esta clase?")) {
+            alert("Redirigiendo al calendario...");
+        }
+    };
+
+}); // FIN DEL CONTROLADOR
 </script>
 </html>
