@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -235,16 +238,69 @@ body {
     color: var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.led-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.led-red {
+    background-color: #dc3545; /* Rojo */
+    box-shadow: 0 0 5px #dc3545;
+}
+
+.led-green {
+    background-color: #28a745; /* Verde */
+    box-shadow: 0 0 5px #28a745;
+}
+
+.led-orange-blink {
+    background-color: #fd7e14; /* Naranja */
+    box-shadow: 0 0 5px #fd7e14;
+    animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.status-text h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.status-text small {
+    color: #666;
+    font-size: 12px;
+}
+
 .join-btn {
     width: 100%; background: var(--primary-color); color: white;
     border: none; padding: 16px; border-radius: 12px;
     font-size: 16px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 10px;
     box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); transition: 0.3s;
+    transition: background-color 0.3s;
 }
 
 .join-btn:hover { background: #ff6b81; transform: translateY(-2px); }
 .join-btn:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.btn-blue { background-color: #007bff; color: white; } /* Normal */
+.btn-orange { background-color: #fd7e14; color: white; cursor: wait; } /* Conectando */
+.btn-red { background-color: #dc3545; color: white; }
 
 .security-note { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
 
@@ -773,10 +829,22 @@ user-select: none;
                 
                 <div class="card">
                     <div class="class-header">
-                        <div class="class-title">
-                            <h2>{{nextClass.title || 'No hay clases próximas'}}</h2>
-                            <p>Sesión confirmada ID: #88291</p>
-                        </div>
+                            <div class="class-title">
+                                <div class="status-container">
+                                    <span class="led-dot" 
+                                          ng-class="{
+                                              'led-red': connectionStatus === 'idle' || connectionStatus === 'failed',
+                                              'led-orange-blink': connectionStatus === 'connecting',
+                                              'led-green': connectionStatus === 'connected'
+                                          }">
+                                    </span>
+                                    
+                                    <div class="status-text">
+                                        <h4>{{ getStatusTitle() }}</h4>
+                                        <small>{{ getStatusSubtitle() }}</small>
+                                    </div>
+                                </div>
+                            </div>
                         <div class="status-badge">Confirmada</div>
                     </div>
 
@@ -797,10 +865,23 @@ user-select: none;
                         </div>
                     </div>
 
-                    <button class="join-btn" ng-click="joinClass()" ng-disabled="!canJoin">
-                        <i class="fas fa-video"></i>
-                        {{ canJoin ? 'Conectarse a la Clase' : 'Clase no disponible aún' }}
-                    </button>
+<div class="controls-area">
+    <button class="join-btn"
+            ng-click="joinClass()"
+            ng-disabled="connectionStatus === 'connecting' || connectionStatus === 'connected'"
+            ng-class="{
+                'btn-blue': connectionStatus === 'idle' || connectionStatus === 'ended',
+                'btn-orange': connectionStatus === 'connecting',
+                'btn-red': connectionStatus === 'failed'
+            }">
+        
+        <span ng-if="connectionStatus === 'idle'">Conectarse a la clase</span>
+        <span ng-if="connectionStatus === 'connecting'">Solicitando acceso...</span>
+        <span ng-if="connectionStatus === 'failed'">Sin respuesta (Recargando)</span>
+        <span ng-if="connectionStatus === 'connected'">Conectado</span>
+        <span ng-if="connectionStatus === 'ended'">Volver a conectarse</span>
+    </button>
+</div>
                     
                     <p class="security-note">
                         <i class="fas fa-lock"></i> Conexión segura y encriptada
@@ -839,7 +920,7 @@ user-select: none;
             <aside class="sidebar">
                 
                 <div class="card sidebar-card">
-                    <h3 class="sidebar-title">Tu Instructor</h3>
+                    <h3 class="sidebar-title">Tu Profesor</h3>
                     <div class="teacher-profile">
                         <img ng-src="{{teacher.photo}}" class="teacher-avatar">
                         <div class="teacher-name">{{teacher.name}}</div>
@@ -914,10 +995,15 @@ user-select: none;
                 </div>
 
                 <div class="live-main-video">
-                    <img src="https://lh3.googleusercontent.com/d/14Z2nzr2OrqWXu_CtVEc203hy7_eJfwSP=s1000" 
+                    <img ng-show="!remoteStreamActive" src="https://lh3.googleusercontent.com/d/14Z2nzr2OrqWXu_CtVEc203hy7_eJfwSP=s1000" 
                          style="width: 100%; height: 100%; object-fit: cover;">
                     
-                    <div class="live-pip-video" id="pipContainer">
+                    <video id="remote-video" autoplay playsinline 
+                           ng-show="remoteStreamActive"
+                           style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+                    </video>
+                    
+           <div class="live-pip-video" id="pipContainer">
                         <video id="student-video" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
                         <div ng-show="!camOn" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white;">
                             <i class="fas fa-video-slash" style="font-size: 24px;"></i>
@@ -1084,12 +1170,42 @@ app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
     $scope.showPdfModal = false;
     $scope.pdfUrl = "";
     $scope.showLibraryModal = false;
+
+    $scope.remoteStreamActive = false;
+let peer = null;
+let db = null;
+let room = "piano-class"; // Sala fija o dinámica según tu lógica
+let myId = "alumno-" + Math.floor(Math.random() * 10000);
+let rtcLocalStream = null;
+let usersRef, signalsRef;
+
+$scope.connectionStatus = 'idle'; 
+    $scope.remoteStreamActive = false;
+    var connectionTimeoutPromise;
+    var TIMEOUT_LIMIT = 30000;
+
+
+const fb_config = {
+    apiKey: "AIzaSyCiYZ-_3zXQCu6DIkOd_HRGLCS3s6bIYiE", // Reemplazar con tus propias credenciales si es necesario
+    authDomain: "jcubic-webrtc.firebaseapp.com",
+    databaseURL: "https://jcubic-webrtc.firebaseio.com",
+    projectId: "jcubic-webrtc",
+    storageBucket: "jcubic-webrtc.appspot.com",
+    messagingSenderId: "530153588319"
+};
+
+// Configuración ICE (STUN/TURN)
+const iceServers = [
+    { urls: "stun:stun.relay.metered.ca:80" },
+    { urls: "turn:a.relay.metered.ca:80", username: "fad444a63bcf5c8176a3e139", credential: "MQm2u8W0l1TCVMm0" },
+    { urls: "turn:a.relay.metered.ca:443", username: "fad444a63bcf5c8176a3e139", credential: "MQm2u8W0l1TCVMm0" }
+];
     
     // ==================== DATA ====================
     $scope.teacher = {
         name: "Sergio Valenzo",
         photo: "https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa",
-        specialty: "Piano Jazz & Armonía"
+        specialty: "Piano Clásico y Teoría Musical"
     };
 
     $scope.materials = [
@@ -1213,6 +1329,25 @@ app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
 
     processAgenda();
 
+
+
+    function initFirebase() {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(fb_config);
+    }
+    db = firebase.database();
+    usersRef = db.ref(room + '/users');
+    signalsRef = db.ref(room + '/signals');
+
+    // Limpieza al desconectar
+    usersRef.child(myId).onDisconnect().remove();
+}
+
+// Llamar al inicio
+initFirebase();
+
+
+
     // ==================== LIBRARY MODAL ====================
     $scope.openLibrary = function() {
         $scope.showLibraryModal = true;
@@ -1222,47 +1357,201 @@ app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
         $scope.showLibraryModal = false;
     };
 
-    // ==================== JOIN CLASS ====================
-    $scope.joinClass = function() {
-        $scope.currentView = 'live';
-        $timeout(function() {
-            initLiveEnvironment();
-            startLiveTimer();
-            setupDraggableModal();
-        }, 100);
-    };
 
-    $scope.leaveClass = function() {
-        if(confirm("¿Salir de la clase?")) {
-            stopMetronome();
-            if(localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            if(liveInterval) {
-                $interval.cancel(liveInterval);
-            }
-            $scope.currentView = 'dashboard';
-            $scope.camOn = false;
-            $scope.micOn = false;
+$scope.joinClass = function() {
+    if ($scope.connectionStatus === 'connecting' || $scope.connectionStatus === 'connected') return;
+    $scope.connectionStatus = 'connecting';
+    connectionTimeoutPromise = $timeout(function() {
+        handleConnectionTimeout();
+    }, TIMEOUT_LIMIT);
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then((stream) => {
+            rtcLocalStream = stream;
+            $scope.micOn = true; 
+            usersRef.child(myId).set({ 
+                id: myId, 
+                role: "user", 
+                name: "Alumno Web" 
+            });
+            listenForSignals();
+            if (!$scope.$$phase) $scope.$apply();
+        })
+        .catch(err => {
+            console.error("Error mic:", err);
+            alert("Se requiere micrófono para la clase.");
+            $timeout.cancel(connectionTimeoutPromise);
+            $scope.connectionStatus = 'failed';
+            if (!$scope.$$phase) $scope.$apply();
+        });
+};
+
+
+$scope.onProfessorAccepted = function() {
+    if (connectionTimeoutPromise) $timeout.cancel(connectionTimeoutPromise);
+    $scope.connectionStatus = 'connected';
+    $scope.remoteStreamActive = true; 
+    $scope.currentView = 'live';
+    
+    $timeout(function() {
+        initLiveEnvironment();    // Carga el piano y sonidos
+        startLiveTimer();         // Inicia el contador
+        setupDraggableModal();    // Activa el modal arrastrable
+    }, 100);
+};
+
+    function handleConnectionTimeout() {
+        $scope.connectionStatus = 'failed'; 
+        alert("El profesor no aceptó la conexión a tiempo. Recargando...");
+        
+        $window.location.reload();
+    }
+
+    // Helpers para la vista
+    $scope.getStatusTitle = function() {
+        switch($scope.connectionStatus) {
+            case 'idle': return 'Desconectado';
+            case 'connecting': return 'Estableciendo conexión...';
+            case 'connected': return 'En Vivo';
+            case 'failed': return 'Error de conexión';
+                case 'ended': return 'Clase Finalizada';
+            default: return 'Desconectado';
         }
     };
 
-    // ==================== CHAT ====================
-    $scope.sendChatMessage = function() {
-        if(!$scope.chatInput || !$scope.chatInput.trim()) return;
-        $scope.chatMessages.push({ 
-            sender: "Tú", 
-            text: $scope.chatInput, 
-            isMe: true 
-        });
-        $scope.chatInput = "";
-        
-        $timeout(() => {
-            const list = document.getElementById('chatList');
-            if(list) list.scrollTop = list.scrollHeight;
-        }, 50);
+    $scope.getStatusSubtitle = function() {
+        switch($scope.connectionStatus) {
+            case 'idle': return 'No conectado a ninguna clase';
+            case 'connecting': return 'Esperando al profesor...';
+            case 'connected': return 'Clase en curso';
+            case 'failed': return 'Tiempo de espera agotado';
+                case 'ended': return 'Has desconectado de la sesión';
+            default: return '';
+        }
     };
+
+function startPeer(initiator, remoteId) {
+    peer = new SimplePeer({ 
+        initiator: initiator, 
+        stream: rtcLocalStream,
+        config: { iceServers: iceServers }
+    });
+
+    // 1. Enviar señal (handshake)
+    peer.on("signal", data => {
+        signalsRef.push({ from: myId, to: remoteId, data: data });
+    });
+
+    // 2. Recibir Stream del Profesor (Video/Audio)
+    peer.on("stream", stream => {
+        console.log("Stream recibido del profesor");
+        const remoteVideo = document.getElementById('remote-video');
+        if (remoteVideo) {
+            remoteVideo.srcObject = stream;
+            $scope.remoteStreamActive = true;
+            $scope.$apply();
+        }
+        $scope.onProfessorAccepted();
+        // Forzamos la actualización de la vista en Angular
+        //if (!$scope.$$phase) $scope.$apply();
+    });
+
+    // 3. Recibir Datos (Chat)
+    peer.on("data", data => {
+        const msgData = JSON.parse(data.toString());
+        if (msgData.type === 'chat') {
+            $scope.chatMessages.push({ 
+                sender: "Profesor", 
+                text: msgData.text, 
+                isMe: false 
+            });
+            $scope.$apply();
+            scrollToChatBottom();
+        }
+    });
+
+    peer.on("error", err => console.error("WebRTC Error:", err));
+
+    peer.on("close", () => {
+         $scope.remoteStreamActive = false;
+         $scope.$apply();
+    });
+}
+
+function listenForSignals() {
+    signalsRef.on("child_added", snap => {
+        const signal = snap.val();
+        if (signal.to === myId) {
+            if (!peer) {
+                // Si recibimos señal y no tenemos peer, iniciamos como respuesta (false)
+                startPeer(false, signal.from);
+            }
+            try {
+                peer.signal(signal.data);
+            } catch(e) { console.error(e); }
+        }
+    });
+}
+  
+
+$scope.leaveClass = function() {
+    if(confirm("¿Salir de la clase?")) {
+        stopMetronome();
+
+        // Limpieza WebRTC
+        if (peer) { peer.destroy(); peer = null; }
+        if (rtcLocalStream) {
+            rtcLocalStream.getTracks().forEach(t => t.stop());
+            rtcLocalStream = null;
+        }
+        if (usersRef) usersRef.child(myId).remove();
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        if(liveInterval) $interval.cancel(liveInterval);
+
+        // --- CAMBIOS AQUÍ ---
+        $scope.remoteStreamActive = false;
+        $scope.currentView = 'dashboard';
+        $scope.camOn = false;
+        $scope.micOn = false;
+
+        // ESTABLECEMOS EL ESTADO A 'ENDED'
+        $scope.connectionStatus = 'ended'; 
+    }
+};
+
+    // ==================== CHAT ====================
+$scope.sendChatMessage = function() {
+    if(!$scope.chatInput || !$scope.chatInput.trim()) return;
+
+    const text = $scope.chatInput;
+
+    // 1. Mostrar localmente
+    $scope.chatMessages.push({ 
+        sender: "Tú", 
+        text: text, 
+        isMe: true 
+    });
+
+    // 2. Enviar por WebRTC si existe conexión
+    if (peer) {
+        try {
+            const payload = JSON.stringify({ type: 'chat', text: text });
+            peer.send(payload);
+        } catch(e) { console.log("No conectado aun"); }
+    }
+
+    $scope.chatInput = "";
+    scrollToChatBottom();
+};
+
+function scrollToChatBottom() {
+    $timeout(() => {
+        const list = document.getElementById('chatList');
+        if(list) list.scrollTop = list.scrollHeight;
+    }, 50);
+}
 
     $scope.checkEnter = function(e) {
         if(e.which === 13) {
@@ -1320,9 +1609,14 @@ app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
         }
     };
 
-    $scope.toggleMic = function() {
-        $scope.micOn = !$scope.micOn;
-    };
+   $scope.toggleMic = function() {
+    $scope.micOn = !$scope.micOn;
+    // Lógica WebRTC Real
+    if (rtcLocalStream) {
+        const audioTrack = rtcLocalStream.getAudioTracks()[0];
+        if (audioTrack) audioTrack.enabled = $scope.micOn;
+    }
+};
 
     // ==================== METRONOME ====================
     let metronomeAudio = null;
