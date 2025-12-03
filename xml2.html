@@ -176,7 +176,7 @@
   overflow: hidden;
   box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
   border-top: 1px solid #e0e0e0;
-  height: 200px;
+  height: 160px;
   z-index: 100;
 }
 
@@ -1588,6 +1588,11 @@ display: flex;
     transition: all 0.5s ease;
 }
 
+#metronome-btn.active {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 5px #3498db);
+  transform: scale(1.1);
+}
   </style>
 </head>
 <body>
@@ -1650,7 +1655,10 @@ display: flex;
    <div id="secondary-top-bar">
     <div class="tool-group">
  <div id="zoom-controls">
-      <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px;">
+    <img id="metronome-btn" src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" 
+     style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px; cursor: pointer; opacity: 0.6; transition: all 0.2s;">
+
+<audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
          <div class="speed-display">
         <span class="zoom-display" id="speed-bpm">120 BPM</span>
    </div>
@@ -1822,6 +1830,10 @@ const progressValueSpan = document.getElementById('progress-value');
 const welcomeBanner = document.getElementById('welcome-banner');
 const welcomeBannerClose = document.getElementById('welcome-banner-close');
 const WELCOME_BANNER_SHOWN_KEY = 'welcomeBannerShown';
+
+const metronomeBtn = document.getElementById('metronome-btn');
+const metronomeAudio = document.getElementById('metronomeAudio');
+let isMetronomeOn = false;
 
 const startTutorialBtn = document.getElementById('start-tutorial-btn');
 const tutorialOverlay = document.getElementById('tutorial-overlay');
@@ -2242,7 +2254,7 @@ function createNoteFlashPiano(noteName, hand) {
   const fileId = urlParams.get('file'); 
   if (fileId) {
 
-    const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
+   const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
   } else {
@@ -2315,8 +2327,8 @@ function createNoteFlashPiano(noteName, hand) {
         osmd.EngravingRules.StaffDistance = 3.5;
         osmd.EngravingRules.StaffLineWidth = 0.08;
         osmd.EngravingRules.NoteHeadWidth = 1.0;
-        osmd.zoom = 0.8;
-        currentZoom = 0.8;
+        osmd.zoom = 1.1;
+        currentZoom = 1.1;
       }
       
       updateZoomDisplay();
@@ -2693,6 +2705,43 @@ function scheduleNotesOnTransport() {
 }
 
 
+function toggleMetronome() {
+    if (isMetronomeOn) {
+        // Apagar
+        metronomeAudio.pause();
+        metronomeAudio.currentTime = 0; // Reiniciar al principio del golpe
+        metronomeBtn.classList.remove('active');
+        isMetronomeOn = false;
+    } else {
+        // Encender
+        updateMetronomeSpeed(); // Asegurar velocidad correcta antes de sonar
+        
+        // Manejo de promesa para evitar errores de autoplay en navegadores
+        const playPromise = metronomeAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // Reproducción iniciada con éxito
+            }).catch(error => {
+                console.error("Error al iniciar metrónomo:", error);
+            });
+        }
+        
+        metronomeBtn.classList.add('active');
+        isMetronomeOn = true;
+    }
+}
+
+// 3. Función para calcular la velocidad (playbackRate)
+function updateMetronomeSpeed() {
+    if (!metronomeAudio) return;
+
+    // Fórmula: (Tempo de la canción * Multiplicador de velocidad) / 60
+    // Ejemplo: (120 BPM * 1.0) / 60 = 2.0 playbackRate
+    const currentTotalBPM = globalTempo * playbackRate;
+    metronomeAudio.playbackRate = currentTotalBPM / 60;
+    
+    console.log(`Metrónomo ajustado a: ${currentTotalBPM} BPM (Rate: ${metronomeAudio.playbackRate})`);
+}
 
 
 
@@ -3028,6 +3077,10 @@ function updateSpeed(newRate) {
     
     // Limitar la velocidad entre 0.25x y 2.0x
     playbackRate = Math.max(0.25, Math.min(2.0, newRate));
+
+    if (isMetronomeOn) {
+        updateMetronomeSpeed();
+    }
     
     // Actualizar la interfaz
     const currentBPM = Math.round(globalTempo * playbackRate);
@@ -3048,6 +3101,8 @@ speedUpBtn.addEventListener('click', () => {
 speedDownBtn.addEventListener('click', () => {
     updateSpeed(playbackRate - speedStep);
 });
+
+metronomeBtn.addEventListener('click', toggleMetronome);
  
       pianoBtn.addEventListener('click', () => {
         togglePianoView();
@@ -4644,4 +4699,4 @@ function hideModal() {
 
   </script>
 </body>
-</html>       
+</html>        
