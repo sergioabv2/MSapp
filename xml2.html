@@ -6,6 +6,29 @@
   <title>Reproductor MusicXML</title>
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
   <style>
+
+    :root {
+  --primary-color: #3498db;
+  --primary-glow: rgba(52, 152, 219, 0.6);
+  
+  /* Dimensiones Piano - AÑADE ESTAS */
+  --piano-height: 122px;
+  --piano-bottom: 0px;
+  --key-white-height: 90px;
+  --key-black-height: 58px;
+}
+
+/* Media query para pantallas más grandes */
+@media (min-width: 769px) {
+    :root {
+        --piano-height: 125px; 
+        --piano-height2: 110px; 
+        --key-white-height: 90px;
+        --key-black-height: 58px;
+    }
+}
+
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -148,7 +171,7 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  background: #2a2a2a;
+
   padding: 12px 0;
   overflow: hidden;
   box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
@@ -163,12 +186,11 @@
   top: 60px;
   bottom: auto;
   padding: 0 0 12px 0;
+  background: transparent !important;
 }
 
 
-#piano-container.waterfall-only .hit-line-piano {
-  bottom: 102px;
-}
+
 
 #piano-container.waterfall-only #waterfall-canvas {
   height: calc(100% - 102px) !important; 
@@ -177,79 +199,173 @@
 
 /* Estado 2: Solo piano (sin waterfall) */
 #piano-container.piano-only {
-  height: 102px;
+  height: 112px;
 }
 
-#piano-container.piano-only #waterfall-canvas,
-#piano-container.piano-only .hit-line-piano {
+#piano-container.piano-only #waterfall-canvas{
   display: none;
 }
     
   
-    
- #piano-keys {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  padding: 0 10px;
-  z-index: 2;
-  height: 102px;
+/* REEMPLAZA los estilos de #piano-wrapper y #piano-keys */
+#piano-wrapper {
+  position: absolute; 
+  bottom: var(--piano-bottom);
+  left: 0; 
+  width: 100%; 
+  height: var(--piano-height2) ;
+  background: #2a2a2a; 
+  border-top: 1px solid #333; 
+  display: flex; 
+  justify-content: center; 
+  align-items: flex-end; /* Alinea el piano al fondo */
+  overflow: hidden;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.3); /* Sombra hacia arriba */
+  padding-bottom: 5px; /* Espacio para que el piano no toque el borde */
 }
-    
-    .key {
-      border: 1px solid #ddd;
-      position: relative;
-      transition: all 0.05s;
-    }
-    
-    .key.white {
-      width: 16px;
-      height: 90px;
-      background: #fff;
-      border-right: 1px solid #e0e0e0;
-    }
-    
-    .key.black {
-      width: 10px;
-      height: 58px;
-      background: #1a1a1a;
-      margin-left: -5px;
-      margin-right: -5px;
-      z-index: 2;
-    }
-    
-    .key.active-treble {
-  background: #3498db !important; /* Azul para la mano derecha (treble) */
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
+
+#piano-keys { 
+  position: relative; 
+  height: var(--key-white-height); /* Usa la altura de teclas blancas */
+  display: flex; 
+  justify-content: center; 
+  z-index: 3;
+}
+
+/* REEMPLAZA los estilos de .key */
+.key { 
+  position: relative; 
+  float: left; 
+  cursor: pointer; 
+  transition: all 0.05s ease; 
+  user-select: none; 
+}
+
+.key.white {
+  width: 24px; 
+  height: var(--key-white-height); 
+  background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%); /* Gradiente sutil */
+  border: 1px solid #ccc; 
+  border-right: 1px solid #e0e0e0; 
+  border-radius: 0 0 4px 4px; 
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra para profundidad */
+}
+
+
+.key.white.active { 
+  background: var(--primary-color) !important; 
+  box-shadow: 0 0 20px var(--primary-glow), inset 0 2px 4px rgba(0,0,0,0.2); 
+  transform: translateY(2px); /* Efecto de presión */
+}
+
+.key.black {
+  width: 14px; 
+  height: var(--key-black-height); 
+  background: #333; border: 1px solid #555; margin-left: -7px; margin-right: -7px; z-index: 2; border-radius: 0 0 3px 3px;
+}
+
+.key.black.active { 
+  background: #2980b9 !important; 
+  box-shadow: 0 0 15px rgba(41, 128, 185, 0.8), inset 0 2px 4px rgba(0,0,0,0.3);
+  transform: translateY(2px);
+}
+
+/* AÑADE estos nuevos estilos para el casing superior del piano */
+#piano-top-casing {
+  position: absolute; 
+  bottom: calc(var(--piano-height) + var(--piano-bottom) - 25px); 
+  left: 0; 
+  width: 100%; 
+  height: 15px; /* Aumentado ligeramente */
+  background: linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 100%);
+  z-index: 4; 
+  display: flex; 
+  justify-content: center;
+  border-top: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.casing-note-label {
+  position: absolute; 
+  top: 6px; /* Ajustado para mejor centrado */
+  color: #fff; 
+  font-size: 11px; 
+  font-weight: 600;
+  background: rgba(52, 152, 219, 0.8); /* Color del tema */
+  padding: 2px 8px; 
+  border-radius: 12px; /* Más redondeado */
+  pointer-events: none;
+  transform: translateX(-50%); 
+  z-index: 20;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
+}
+
+
+
+/* Estilos para el modo aprendizaje - Manos separadas */
+.key.active-treble {
+  background: #3498db !important; /* Azul para mano derecha (treble) */
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.8), inset 0 2px 4px rgba(0,0,0,0.2) !important;
+
 }
 
 .key.active-bass {
-  background: #de9e37 !important; /* Verde para la mano izquierda (bass) */
-  box-shadow: 0 0 8px rgba(222, 158, 55, 0.6) !important;
-}
-    
+  background: #de9e37 !important; /* Naranja para mano izquierda (bass) */
+  box-shadow: 0 0 20px rgba(222, 158, 55, 0.8), inset 0 2px 4px rgba(0,0,0,0.2) !important;
 
+}
+
+/* Para teclas negras en modo aprendizaje */
+.key.black.active-treble {
+  background: #2980b9 !important; /* Azul más oscuro para teclas negras */
+  box-shadow: 0 0 15px rgba(41, 128, 185, 0.8), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+.key.black.active-bass {
+  background: #b45309 !important; /* Naranja más oscuro para teclas negras */
+  box-shadow: 0 0 15px rgba(180, 83, 9, 0.8), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+/* Animación de pulso para las teclas en modo aprendizaje */
 @keyframes keyPulse {
   0% { 
-    filter: brightness(1.5);
-    transform: translateY(0);
+    filter: brightness(1);
+    transform: translateY(2px);
   }
   50% {
-    filter: brightness(2);
-    transform: translateY(2px);
+    filter: brightness(1.2);
+    transform: translateY(1px);
   }
   100% { 
     filter: brightness(1);
-    transform: translateY(0);
+    transform: translateY(2px);
   }
 }
 
 .key.active-treble,
 .key.active-bass {
   animation: keyPulse 0.15s ease-out;
+}
+
+.key.midi-active {
+  background-color: #d5d5d5 !important; /* Gris más oscuro */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3) !important;
+  
+}
+
+.key.white.midi-active {
+  background-color: #d0d0d0 !important;
+  filter: brightness(0.9);
+  transform: translateY(2px);
+}
+
+.key.black.midi-active {
+  background-color: #444444 !important; /* Negro más claro */
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5) !important;
+  filter: brightness(1.3);
+  transform: translateY(1px);
 }
 
 #waterfall-canvas {
@@ -261,18 +377,26 @@
   height: calc(100% - 102px);
   pointer-events: none;
   z-index: 1;
+  background-color: transparent !important;
   transition: height 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@media (min-width: 769px) {
+  #waterfall-canvas {
+    left: 49%;
+  }
 }
 
 .hit-line-piano {
   position: absolute;
-  bottom: 102px;
+  height: 4px !important;
+  bottom: 96px;
   left: 0;
   right: 0;
   height: 2px;
-  background: rgba(255, 0, 0, 1);
-  box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
-  z-index: 3;
+  background: rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+  z-index: 30;
   pointer-events: none;
 }
 
@@ -1456,6 +1580,13 @@ display: flex;
     position: relative;
 }
 
+.fog-overlay {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.85); /* Blanco al 85% = Niebla */
+    z-index: 10; /* Encima de la partitura (notas y líneas) */
+    pointer-events: none; /* Permitir clicks si fuera necesario */
+    transition: all 0.5s ease;
+}
 
   </style>
 </head>
@@ -1497,7 +1628,7 @@ display: flex;
 <button id="midi-learn-btn" class="btn midi-learn-highlight" data-tooltip="Conecta tu teclado MIDI para practicar">
   <i class="ri-graduation-cap-line"></i>
   <span class="btn-label">Aprender</span>
-  <span class="new-badge">NUEVO</span>
+ 
 </button>
     </div>
 
@@ -1507,9 +1638,7 @@ display: flex;
         <i class="ri-settings-3-line"></i>
       </button>
 
-          <button id="piano-btn" class="btn" >
-       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
-      </button>
+         
 
      
       <div id="close-btn-placeholder"></div>
@@ -1536,9 +1665,12 @@ display: flex;
         <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
     <i class="ri-font-size"></i> 
   </button>
-          <button id="cursor-btn" class="btn" >
+   <button id="piano-btn" class="btn" >
+       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
+      </button>
+    <!--      <button id="cursor-btn" class="btn" >
    <i class="ri-layout-left-2-line"></i>
-    </button>
+    </button> -->
   
          <div class="speed-group">
             <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
@@ -1600,11 +1732,18 @@ display: flex;
  
 <div id="midi-status-legend"></div>
 
-  <div id="piano-container">
+ <div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
-  <div class="hit-line-piano"></div>
-    <div id="piano-keys"></div>
-  </div>
+    <div class="hit-line-piano"></div>
+    
+    <!-- NUEVO: Agregar el casing superior -->
+    <div id="piano-top-casing"></div>
+    
+    <!-- NUEVO: Agregar wrapper para la línea de hit -->
+    <div id="piano-wrapper">
+        <div id="piano-keys"></div>
+    </div>
+</div>
 
 
   <div id="midi-modal" class="modal-overlay" style="display: none;">
@@ -1663,7 +1802,7 @@ const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
 const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
 
-const cursorBtn = document.getElementById('cursor-btn');
+//const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
 const midiModal = document.getElementById('midi-modal');
 const modalMessage = document.getElementById('modal-message');
@@ -1695,6 +1834,10 @@ const tutorialMidiAlert = document.getElementById('tutorial-midi-alert');
 let tutorialAlertTimeout = null;
 let currentTutorialStep = 0;
 let tutorialSteps = [];
+
+let unlockedMeasureCount = 4; 
+const MEASURES_PER_CHUNK = 4;
+let errorsInCurrentChunk = 0;
 
 tutorialSteps = [
     {
@@ -1762,6 +1905,8 @@ let isLoopMode = false;
     let currentZoom = 1.0;
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
+
+    
 
 
     let isIntelligentPracticeMode = false;
@@ -1926,14 +2071,12 @@ function drawWaterfall() {
   
   const dpr = window.devicePixelRatio || 1;
   waterfallCtx.clearRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
-  waterfallCtx.fillStyle = '#2a2a2a';
-  waterfallCtx.fillRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
   
   const canvasHeight = waterfallCanvas.height / dpr;
   const totalWhiteKeys = 52;
   const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
-  const offset = whiteKeyWidth === 16 ? -16 : -12; // -16 para full, -12 para reducido
-const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
+  const offset = whiteKeyWidth === 16 ? -16 : -12;
+  const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
   
   // Patrón corregido empezando desde A
   const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1]; // A A# B C C# D D# E F F# G G#
@@ -1958,14 +2101,18 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
       const keyX = pianoStartX + getKeyXPosition(midiNote);
       const height = Math.max(1, noteStartY - noteEndY);
       
-      waterfallCtx.shadowBlur = 40 * dpr;
+      // Calcular opacidad: notas cerca del piano (Y alto) = opacas, notas arriba (Y bajo) = transparentes
+      // noteStartY es la posición INFERIOR de la nota (cerca del piano cuando es alto)
+      const opacityFactor = Math.max(0.15, Math.min(1, noteStartY / canvasHeight));
+      
+      waterfallCtx.shadowBlur = 40 * dpr * opacityFactor;
       
       if (note.hand === 'treble') {
-        waterfallCtx.shadowColor = '#60a5fa';
-        waterfallCtx.fillStyle = '#60a5fa';
+        waterfallCtx.shadowColor = `rgba(36, 113, 163, ${opacityFactor})`; // Azul oscuro
+        waterfallCtx.fillStyle = `rgba(36, 113, 163, ${opacityFactor})`;
       } else {
-        waterfallCtx.shadowColor = '#de9e37';
-        waterfallCtx.fillStyle = '#de9e37';
+        waterfallCtx.shadowColor = `rgba(214, 137, 16, ${opacityFactor})`; // Naranja oscuro
+        waterfallCtx.fillStyle = `rgba(214, 137, 16, ${opacityFactor})`;
       }
       
       waterfallCtx.fillRect(
@@ -1997,14 +2144,17 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
       const keyX = pianoStartX + getKeyXPosition(midiNote);
       const height = Math.max(1, noteStartY - noteEndY);
       
-      waterfallCtx.shadowBlur = 30 * dpr;
+      // Calcular opacidad: notas cerca del piano (Y alto) = opacas, notas arriba (Y bajo) = transparentes
+      const opacityFactor = Math.max(0.15, Math.min(1, noteStartY / canvasHeight));
+      
+      waterfallCtx.shadowBlur = 30 * dpr * opacityFactor;
       
       if (note.hand === 'treble') {
-        waterfallCtx.shadowColor = '#3b82f6';
-        waterfallCtx.fillStyle = '#3b82f6';
+        waterfallCtx.shadowColor = `rgba(26, 84, 144, ${opacityFactor})`; // Azul muy oscuro
+        waterfallCtx.fillStyle = `rgba(26, 84, 144, ${opacityFactor})`;
       } else {
-        waterfallCtx.shadowColor = '#b45309';
-        waterfallCtx.fillStyle = '#b45309';
+        waterfallCtx.shadowColor = `rgba(168, 111, 10, ${opacityFactor})`; // Naranja muy oscuro
+        waterfallCtx.fillStyle = `rgba(168, 111, 10, ${opacityFactor})`;
       }
       
       waterfallCtx.fillRect(
@@ -2018,6 +2168,7 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
   
   waterfallCtx.shadowBlur = 0;
 }
+
 
 function animateWaterfall() {
     
@@ -2116,9 +2267,9 @@ function createNoteFlashPiano(noteName, hand) {
           drawingParameters: "width",
           drawMeasureNumbers: false,
           cursorsOptions: [{ 
-            type: 1, 
-            color: "rgba(52,152,219,0.8)", 
-            alpha: 0.8, 
+            type: 3, 
+            color: "rgba(52, 152, 219, 0.45)", 
+            alpha: 0.45, 
             follow: true 
           }]
         });
@@ -2940,7 +3091,7 @@ window.addEventListener('resize', () => {
   }
 });
       
- cursorBtn.addEventListener('click', toggleCursorType);
+ //cursorBtn.addEventListener('click', toggleCursorType);
   fullscreenBtn.addEventListener('click', toggleFullScreen);
 
   // Opcional pero recomendado: Actualiza el ícono si el usuario sale con la tecla ESC
@@ -3095,32 +3246,35 @@ function toggleKeyNames() {
 }
 
 function togglePianoView() {
-    // Ciclo: full -> waterfall-only -> piano-only -> full
+    // Ciclo: full <-> waterfall-only (Eliminado piano-only)
     if (pianoViewMode === 'full') {
+        // Cambiar a Waterfall Only
         pianoViewMode = 'waterfall-only';
+        
         pianoContainer.classList.remove('piano-only');
         pianoContainer.classList.add('waterfall-only');
-        document.getElementById('sheet-music-wrapper').style.display = 'none';
+        
+
         pianoBtn.style.backgroundColor = '#e0e0e0';
-    } else if (pianoViewMode === 'waterfall-only') {
-        pianoViewMode = 'piano-only';
-        pianoContainer.classList.remove('waterfall-only');
-        pianoContainer.classList.add('piano-only');
-        document.getElementById('sheet-music-wrapper').style.display = 'block';
-        pianoBtn.style.backgroundColor = '#d0d0d0';
+        
     } else {
+        // Volver a Full View
         pianoViewMode = 'full';
+        
+        pianoContainer.classList.remove('waterfall-only');
         pianoContainer.classList.remove('piano-only');
+        
+        // Mostrar partitura
         document.getElementById('sheet-music-wrapper').style.display = 'block';
+        
+        // Quitar fondo del botón
         pianoBtn.style.backgroundColor = 'transparent';
     }
-    
-    // NUEVO: Recalcular el tamaño del canvas y pixelsPerSecond
+
     setTimeout(() => {
         resizeWaterfallCanvas();
     }, 100);
-    
-    console.log('Piano View Mode:', pianoViewMode);
+
 }
 // Función para mostrar nombres en las teclas blancas
 function showKeyNamesOnPiano() {
@@ -3216,11 +3370,9 @@ function toggleCursorType() {
 
   // Cambia el color del botón para dar feedback visual
   if (newType === 3) {
-    cursorBtn.style.color = '#3498db'; 
      osmd.cursor.cursorOptions.alpha = 0.45;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
   } else {
-    cursorBtn.style.color = '#1a1a1a'; 
     osmd.cursor.cursorOptions.alpha =0.8;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
   }
@@ -3355,106 +3507,143 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
-  activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
-  activeHighlightTimeouts.forEach(clearTimeout);
-  activeHighlightTimeouts.length = 0;
-  expectedNotes.clear();
+    // 1. Limpieza visual estándar
+    const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+    activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
+    activeHighlightTimeouts.forEach(clearTimeout);
+    activeHighlightTimeouts.length = 0;
+    expectedNotes.clear();
 
-  if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 3) {
-    nextTutorialStep(); 
-  }
-
-
-  if (isLoopMode && loopMeasureEnd !== -1) {
-    if (currentLearningIndex < parsedNotes.length) {
-      const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-      const endTime = loopMeasureEnd + 1 < measureStartTimes.length 
-        ? measureStartTimes[loopMeasureEnd + 1] 
-        : totalDuration;
-      if (nextNoteTime >= endTime) {
-        console.log('🔄 Loop completado, reiniciando desde compás', loopMeasureStart + 1);
-        jumpToMeasureInLearnMode(loopMeasureStart);
+    // 2. Validación de Fin de Pieza
+    if (currentLearningIndex >= parsedNotes.length) {
+        showSuccessModal("¡Felicidades, has completado la pieza!");
+        showConfetti(200);
+        toggleMidiLearnMode();
         return;
-      }
-    }
-  }
-
-  if (currentLearningIndex >= parsedNotes.length) {
-    if (isLoopMode) {
-      console.log('🔄 Final de pieza alcanzado, reiniciando loop desde compás', loopMeasureStart + 1);
-      jumpToMeasureInLearnMode(loopMeasureStart);
-      return;
-    } else {
-      showSuccessModal("¡Felicidades, has completado la pieza!");
-      showConfetti(200);
-      toggleMidiLearnMode();
-      return;
-    }
-  }
-
-  let notesInStep = [];
-  let foundValidStep = false;
-  const TIME_TOLERANCE = 0.001;
-
-  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
-    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    notesInStep = [];
-    
-    while (currentLearningIndex < parsedNotes.length && 
-           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
-      notesInStep.push(parsedNotes[currentLearningIndex]);
-      currentLearningIndex++;
     }
 
-    const filteredNotes = notesInStep.filter(note => 
-      !note.isRest &&
-      !note.isTiedContinuation &&
-      (handFilterMode === 'both' || 
-      (handFilterMode === 'right' && note.hand === 'treble') ||
-      (handFilterMode === 'left' && note.hand === 'bass'))
-    );
-
-    if (filteredNotes.length > 0) {
-      foundValidStep = true;
-      notesInStep = filteredNotes;
-      
-      osmd.cursor.next();
-      
-      const uniquePitches = new Set();
-      
-      notesInStep.forEach(note => {
-        const normalizedNote = normalizeNote(note.pitch);
+    // --- LÓGICA DE NIEBLA Y CHECKPOINTS ---
+    if (isMidiLearnMode && parsedNotes[currentLearningIndex]) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
         
-        if (!uniquePitches.has(normalizedNote)) {
-          uniquePitches.add(normalizedNote);
-          expectedNotes.add(normalizedNote);
-          highlightKeyInstant(note.pitch, note.hand);
+        // Calcular en qué compás está la SIGUIENTE nota
+        let nextNoteMeasureIndex = 0;
+        for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+            if (nextNoteTime >= measureStartTimes[i] - 0.001) {
+                nextNoteMeasureIndex = i;
+                break;
+            }
         }
-      });
-      
-      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
-    } else {
-      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
-      osmd.cursor.next();
-    }
-  }
 
-  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
-    if (isLoopMode) {
-      console.log('🔄 Final alcanzado, reiniciando loop');
-      jumpToMeasureInLearnMode(loopMeasureStart);
-    } else {
-      showSuccessModal("¡Felicidades, has completado la pieza!");
-      showConfetti(200);
-      toggleMidiLearnMode();
+        // ¿Estamos intentando cruzar la frontera hacia la zona bloqueada?
+        if (nextNoteMeasureIndex >= unlockedMeasureCount) {
+            
+            // --- MOMENTO DE LA VERDAD ---
+            if (errorsInCurrentChunk > 0) {
+                // CASO: HUBO ERRORES -> REINICIAR BLOQUE
+                const startOfCurrentBlock = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+                
+                console.log(`⛔ Bloque fallido (${errorsInCurrentChunk} errores). Regresando a compás ${startOfCurrentBlock + 1}`);
+                
+                showModal(`⚠️ <strong>Repetir Sección</strong><br>Tuviste ${errorsInCurrentChunk} errores.<br>Vuelve a intentarlo.`, 2000);
+                
+                // 1. Resetear contador de errores
+                errorsInCurrentChunk = 0;
+                
+                // 2. Regresar al inicio de los 4 compases actuales
+                jumpToMeasureInLearnMode(startOfCurrentBlock);
+                
+                // 3. Salir de la función para no avanzar cursor hacia la zona prohibida
+                return; 
+                
+            } else {
+                // CASO: PERFECTO -> DESBLOQUEAR SIGUIENTE
+                const oldLimit = unlockedMeasureCount;
+                unlockedMeasureCount += MEASURES_PER_CHUNK;
+                
+                // Visual: Quitar opacidad a los nuevos compases
+                setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
+                
+                // Resetear errores para el nuevo bloque
+                errorsInCurrentChunk = 0;
+                
+                showModal(`✨ ¡Sección Superada!<br>Siguientes 4 compases desbloqueados.`, 1500);
+            }
+        }
     }
-    return;
-  }
-  
-  updateMeasureSelectDisplay();
-  updatePracticeProgress();
+    // ----------------------------------------
+
+    // 3. Lógica estándar para avanzar el cursor (solo se ejecuta si no hubo return arriba)
+    let notesInStep = [];
+    let foundValidStep = false;
+    const TIME_TOLERANCE = 0.001;
+
+    while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+        notesInStep = [];
+        
+        while (currentLearningIndex < parsedNotes.length && 
+               Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+            notesInStep.push(parsedNotes[currentLearningIndex]);
+            currentLearningIndex++;
+        }
+
+        const filteredNotes = notesInStep.filter(note => 
+            !note.isRest &&
+            !note.isTiedContinuation &&
+            (handFilterMode === 'both' || 
+            (handFilterMode === 'right' && note.hand === 'treble') ||
+            (handFilterMode === 'left' && note.hand === 'bass'))
+        );
+
+        if (filteredNotes.length > 0) {
+            foundValidStep = true;
+            osmd.cursor.next();
+            
+            const uniquePitches = new Set();
+            filteredNotes.forEach(note => { // Usamos filteredNotes aquí para iluminar solo las de la mano correcta
+                 const normalizedNote = normalizeNote(note.pitch);
+                 if (!uniquePitches.has(normalizedNote)) {
+                    uniquePitches.add(normalizedNote);
+                    expectedNotes.add(normalizedNote);
+                    highlightKeyInstant(note.pitch, note.hand);
+                 }
+            });
+        } else {
+            osmd.cursor.next();
+        }
+    }
+
+    if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+         showSuccessModal("¡Felicidades, has completado la pieza!");
+         showConfetti(200);
+         toggleMidiLearnMode();
+    }
+    
+    updateMeasureSelectDisplay();
+    updatePracticeProgress();
 }
+
+function updateStaffFogOverlay() {
+    // Borrar niebla anterior
+    const oldFogs = document.querySelectorAll('.fog-overlay');
+    oldFogs.forEach(el => el.remove());
+
+    if (!osmd || !osmd.graphic) return;
+
+    const containerRect = osmdContainer.getBoundingClientRect();
+
+    for (let i = unlockedMeasureCount; i < osmd.graphic.measureList.length; i++) {
+        const measures = osmd.graphic.measureList[i];
+        if (!measures) continue;
+        const bbox = measures[0].boundingBox; 
+        const positionAndShape = measures[0].PositionAndShape;
+        const absX = positionAndShape.AbsolutePosition.x * 10; // Escala aprox OSMD (suelen ser unidades * 10)
+        const width = positionAndShape.Size.width * 10;
+        const absY = positionAndShape.AbsolutePosition.y * 10;
+    }
+}
+
 
     function setStatus(text) { 
       statusDiv.textContent = text;
@@ -3495,6 +3684,52 @@ function showConfetti(count = 100) {
   }
 }
 
+function setRangeOpacity(startMeasureIndex, endMeasureIndex, opacity) {
+    if (!osmd || !osmd.graphic) return;
+
+    // Recorremos los compases solicitados
+    for (let i = startMeasureIndex; i < endMeasureIndex; i++) {
+        // Validación de límites
+        if (i >= osmd.graphic.measureList.length) break;
+
+        const measures = osmd.graphic.measureList[i];
+        if (!measures) continue;
+
+        // Recorremos los pentagramas del compás
+        for (let staffIndex = 0; staffIndex < measures.length; staffIndex++) {
+            const staffEntry = measures[staffIndex].staffEntries;
+            
+            // Recorremos las entradas
+            for (let j = 0; j < staffEntry.length; j++) {
+                const voiceEntries = staffEntry[j].graphicalVoiceEntries;
+                
+                for (let v = 0; v < voiceEntries.length; v++) {
+                    // AQUÍ ESTÁ LA CORRECCIÓN: Definimos 'notes' dentro del bucle correcto
+                    const notes = voiceEntries[v].notes;
+                    
+                    for (let n = 0; n < notes.length; n++) {
+                        const svgElement = notes[n].getSVGGElement();
+                        if (svgElement) {
+                            svgElement.style.opacity = opacity;
+                            // Opcional: transición suave
+                            // svgElement.style.transition = "opacity 0.3s"; 
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function initFogOfWar() {
+    // 1. Asegurar que los primeros 4 compases sean visibles (Opacidad 1)
+    setRangeOpacity(0, unlockedMeasureCount, 1);
+    
+    // 2. Ocultar (bajar opacidad) todo lo demás hasta el final de la pieza
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15); // 0.15 es muy tenue
+}
+
 function toggleMidiLearnMode() {
     if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
         showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
@@ -3506,6 +3741,11 @@ function toggleMidiLearnMode() {
     stopPlayback(); 
 
     if (isMidiLearnMode) {
+      unlockedMeasureCount = MEASURES_PER_CHUNK; 
+        setTimeout(() => {
+             initFogOfWar();
+        }, 100);
+
         midiLearnBtn.style.background = '#e0e0e0';
         midiLearnBtn.classList.remove('pulse-animation');
         playBtn.disabled = true;
@@ -3513,7 +3753,7 @@ function toggleMidiLearnMode() {
         currentLearningIndex = 0;
         osmd.cursor.show();
 
-        cursorBtn.style.color = '#3498db';
+
         Object.assign(osmd.cursor.cursorOptions, {
             type: 5,
             alpha: 0.7,
@@ -3533,6 +3773,8 @@ function toggleMidiLearnMode() {
         }
         
     } else {
+      const totalMeasures = osmd.sheet.SourceMeasures.length;
+        setRangeOpacity(0, totalMeasures, 1);
     midiLearnBtn.style.background = 'none';
     playBtn.disabled = false;
     progressBar.disabled = false;
@@ -3540,7 +3782,7 @@ function toggleMidiLearnMode() {
     osmd.cursor.reset();
     osmd.cursor.hide();
     
-    cursorBtn.style.color = '#1a1a1a';
+
     Object.assign(osmd.cursor.cursorOptions, {
         type: 1,
         alpha: 0.8,
@@ -3970,6 +4212,9 @@ if (isIntelligentPracticeMode && isMidiLearnMode) {
                         prepareFirstLearningStep();
                     }
                 }
+            }else {
+                errorsInCurrentChunk++; 
+                highlightError(pitchName); 
             }
         }
     } else if (command === 128 || (command === 144 && velocity === 0)) {
@@ -3977,6 +4222,20 @@ if (isIntelligentPracticeMode && isMidiLearnMode) {
         unhighlightMidiKey(pitchName);
     }
 }
+
+
+function highlightError(noteName) {
+    const noteId = normalizeNote(noteName);
+    const el = document.getElementById(noteId);
+    if (el) {
+        el.style.backgroundColor = '#ffcccc'; // Rojo suave
+        setTimeout(() => {
+             el.style.backgroundColor = ''; 
+             // Restaurar clase si era blanca o negra
+        }, 300);
+    }
+}
+
 /*
 function onMIDIMessage(event) {
     const command = event.data[0];
@@ -4385,4 +4644,4 @@ function hideModal() {
 
   </script>
 </body>
-</html>    
+</html>       
