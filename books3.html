@@ -1424,7 +1424,7 @@ $scope.onProfessorAccepted = function() {
             case 'connecting': return 'Esperando al profesor...';
             case 'connected': return 'Clase en curso';
             case 'failed': return 'Tiempo de espera agotado';
-                case 'ended': return 'Has desconectado de la sesión';
+                case 'ended': return 'Has sido desconectado de la sesión';
             default: return '';
         }
     };
@@ -1473,6 +1473,7 @@ function startPeer(initiator, remoteId) {
 
     peer.on("close", () => {
          $scope.remoteStreamActive = false;
+         cleanupSession();
          $scope.$apply();
     });
 }
@@ -1495,31 +1496,49 @@ function listenForSignals() {
 
 $scope.leaveClass = function() {
     if(confirm("¿Salir de la clase?")) {
-        stopMetronome();
-
-        // Limpieza WebRTC
-        if (peer) { peer.destroy(); peer = null; }
-        if (rtcLocalStream) {
-            rtcLocalStream.getTracks().forEach(t => t.stop());
-            rtcLocalStream = null;
-        }
-        if (usersRef) usersRef.child(myId).remove();
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        if(liveInterval) $interval.cancel(liveInterval);
-
-        // --- CAMBIOS AQUÍ ---
-        $scope.remoteStreamActive = false;
-        $scope.currentView = 'dashboard';
-        $scope.camOn = false;
-        $scope.micOn = false;
-
-        // ESTABLECEMOS EL ESTADO A 'ENDED'
-        $scope.connectionStatus = 'ended'; 
+        cleanupSession(); 
     }
 };
+
+
+
+function cleanupSession() {
+    stopMetronome();
+
+    // 1. Destruir WebRTC y limpiar Peer
+    if (peer) { 
+        peer.destroy(); 
+        peer = null; 
+    }
+
+    // 2. Detener stream local (Microfono/Camara para transmisión)
+    if (rtcLocalStream) {
+        rtcLocalStream.getTracks().forEach(t => t.stop());
+        rtcLocalStream = null;
+    }
+
+    // 3. Eliminar usuario de Firebase
+    if (usersRef) usersRef.child(myId).remove();
+
+    // 4. Detener cámara local (PIP) si estaba prendida
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+
+    // 5. Detener timers
+    if (liveInterval) $interval.cancel(liveInterval);
+
+    // 6. Resetear variables de estado UI
+    $scope.remoteStreamActive = false;
+    $scope.currentView = 'dashboard';
+    $scope.camOn = false;
+    $scope.micOn = false;
+
+    // 7. Establecer estado final
+    $scope.connectionStatus = 'ended';
+    if (!$scope.$$phase) $scope.$apply();
+}
 
     // ==================== CHAT ====================
 $scope.sendChatMessage = function() {
