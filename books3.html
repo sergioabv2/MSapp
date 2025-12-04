@@ -939,8 +939,15 @@ user-select: none;
 
                 <div class="card sidebar-card">
                     <h3 class="sidebar-title">Archivos de Clase</h3>
+
+                      <div >
+                        <button class="library-btn" ng-click="openLibrary()">
+                            <i class="fas fa-layer-group"></i> Ver Biblioteca de Unidades
+                        </button>
+                    </div>
                     
-                    <div class="materials-list">
+                    <div class="materials-list" style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
+                         <h3 class="sidebar-title">Archivos complementarios</h3>
                         <div class="material-item" ng-repeat="file in materials">
                             <div class="file-info">
                                 <div class="file-icon">
@@ -957,11 +964,7 @@ user-select: none;
                         </div>
                     </div>
 
-                    <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
-                        <button class="library-btn" ng-click="openLibrary()">
-                            <i class="fas fa-layer-group"></i> Ver Biblioteca de Unidades
-                        </button>
-                    </div>
+                  
                 </div>
 
                 <div style="text-align: center; font-size: 13px; color: var(--text-muted);">
@@ -1178,6 +1181,8 @@ let room = "piano-class"; // Sala fija o dinámica según tu lógica
 let myId = "alumno-" + Math.floor(Math.random() * 10000);
 let rtcLocalStream = null;
 let usersRef, signalsRef;
+let midiAccess = null;
+let midiInput = null;
 
 $scope.connectionStatus = 'idle'; 
     $scope.remoteStreamActive = false;
@@ -1209,41 +1214,76 @@ const iceServers = [
     };
 
     $scope.materials = [
-        { name: "Hanon Ejercicios 1-20.pdf", size: "1.2 MB" },
-        { name: "Autumn Leaves - Lead Sheet.pdf", size: "0.5 MB" },
-        { name: "Escalas Pentatónicas.pdf", size: "0.8 MB" }
+         { name: "Mikrokosmos Vol1 - Bartok", size: "0.5 MB" },
+        { name: "Lectura de las Claves - Dandelot.pdf", size: "1.2 MB" },
     ];
 
     $scope.libraryBooks = [
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 1", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+1",
-            fileUrl: "#"
+            cover: "https://lh3.googleusercontent.com/d/1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id=1rFNza9NDinXOb0OOG3pTEYx8IYWygNKF"
         },
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 2", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+2",
-            fileUrl: "#"
+            cover: "https://lh3.googleusercontent.com/d/15qT2ccd4PkQC82qc-ig831qaqQo5gzbu=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id=15qT2ccd4PkQC82qc-ig831qaqQo5gzbu"
         },
         { 
             level: "Nivel Preparatorio", 
             unit: "Unidad 3", 
-            cover: "https://placehold.co/300x400/A56969/FFFFFF?text=Essentials+of%0APiano+Book%0APrep+Unit+3",
-            fileUrl: "#"
+            cover: "https://lh3.googleusercontent.com/d/1VVBfT4V3nfwekluTQcyepmm4-5XIFxis=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
         },
         { 
             level: "Nivel 1", 
             unit: "Unidad 1", 
-            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of%0APiano+Book%0ALevel+1+Unit+1",
-            fileUrl: "#"
+            cover: "https://lh3.googleusercontent.com/d/1sHsaDQvii8ApRIkpsN5h0e9yyRYg5tvY=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
         },
         { 
             level: "Nivel 1", 
             unit: "Unidad 2", 
-            cover: "https://placehold.co/300x400/6A5ACD/FFFFFF?text=Essentials+of%0APiano+Book%0ALevel+1+Unit+2",
-            fileUrl: "#"
+            cover: "https://lh3.googleusercontent.com/d/12FwPz8DZqkRoeulbvXTzbMtcbQ4nE_xE=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 1", 
+            unit: "Unidad 3", 
+            cover: "https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 2", 
+            unit: "Unidad 1", 
+            cover: "https://lh3.googleusercontent.com/d/1tU1TzeczlheibtMLqucEYYpgvzkZ-48Q=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 2", 
+            unit: "Unidad 2", 
+            cover: "https://lh3.googleusercontent.com/d/1AfEgtD_m-bSWmmZJXaxujlfTc6ehSDBJ=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 2", 
+            unit: "Unidad 3", 
+            cover: "https://lh3.googleusercontent.com/d/1FHx4_pSIiA04oDAFhT4NM15D56unpRpw=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 3", 
+            unit: "Unidad 1", 
+            cover: "https://lh3.googleusercontent.com/d/1P0azVqQgJKBr6B7rJQlCQIFfAELWUiif=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
+        },
+        { 
+            level: "Nivel 3", 
+            unit: "Unidad 2", 
+            cover: "https://lh3.googleusercontent.com/d/1i-4cAu9BGFDN7kzoMFQAMKjp2vGzkKCs=s300",
+            fileUrl: "https://drive.google.com/uc?export=download&id="
         }
     ];
 
@@ -1290,10 +1330,10 @@ const iceServers = [
         fechaFutura2.setDate(hoy.getDate() + 15);
 
         const rawSchedule = [
-            { title: "Fundamentos: Escalas Mayores", date: fechaPasada, time: "18:00" },
-            { title: "Acordes e Inversiones (Nivel 2)", date: fechaProxima, time: "18:00" },
-            { title: "Introducción a la Improvisación", date: fechaFutura1, time: "17:00" },
-            { title: "Análisis de Standards de Jazz", date: fechaFutura2, time: "19:00" }
+            { title: "Clase 1", date: fechaPasada, time: "21:00" },
+            { title: "Clase 2", date: fechaProxima, time: "21:00" },
+            { title: "Clase 3", date: fechaFutura1, time: "21:00" },
+            { title: "Clase 4", date: fechaFutura2, time: "21:00" }
         ];
 
         const now = new Date();
@@ -1467,7 +1507,19 @@ function startPeer(initiator, remoteId) {
             $scope.$apply();
             scrollToChatBottom();
         }
+
+        else if (msgData.type === 'midi') {
+        handleIncomingMIDI(msgData);
+        }
     });
+
+    function handleIncomingMIDI(midiData) {
+    if (midiData.action === 'noteOn') {
+        triggerNoteOn(midiData.note);
+    } else if (midiData.action === 'noteOff') {
+        triggerNoteOff(midiData.note);
+    }
+}
 
     peer.on("error", err => console.error("WebRTC Error:", err));
 
@@ -1722,26 +1774,27 @@ function scrollToChatBottom() {
         accidentalGap: 26
     };
 
-    function initLiveEnvironment() {
-        console.log("Inicializando Piano y Sampler...");
-        
-        // Crear Sampler
-        sampler = new Tone.Sampler({
-            urls: {
-                A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", A1: "A1.mp3",
-                C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", A2: "A2.mp3", C3: "C3.mp3",
-                "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3",
-                "F#4": "Fs4.mp3", A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
-                A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3",
-                C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3", A7: "A7.mp3", C8: "C8.mp3"
-            },
-            release: 1,
-            baseUrl: "https://tonejs.github.io/audio/salamander/"
-        }).toDestination();
+  function initLiveEnvironment() {
+    console.log("Inicializando Piano y Sampler...");
+    
+    // Crear Sampler
+    sampler = new Tone.Sampler({
+        urls: {
+            A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3", A1: "A1.mp3",
+            C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3", A2: "A2.mp3", C3: "C3.mp3",
+            "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3",
+            "F#4": "Fs4.mp3", A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+            A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3",
+            C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3", A7: "A7.mp3", C8: "C8.mp3"
+        },
+        release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/"
+    }).toDestination();
 
-        renderPianoKeys();
-        setupKeyboardInput();
-    }
+    renderPianoKeys();
+    setupKeyboardInput();
+    initMIDI();
+}
 
     function renderPianoKeys() {
         const container = document.getElementById('piano-keys-container');
@@ -2094,6 +2147,66 @@ function scrollToChatBottom() {
             class: 'ledger-line'
         }));
     }
+
+    async function initMIDI() {
+    if (navigator.requestMIDIAccess) {
+        try {
+            midiAccess = await navigator.requestMIDIAccess();
+            console.log('✅ MIDI Acceso concedido');
+            
+            // Listar dispositivos MIDI conectados
+            const inputs = midiAccess.inputs.values();
+            for (let input of inputs) {
+                console.log(`🎹 Dispositivo MIDI: ${input.name}`);
+                midiInput = input;
+                midiInput.onmidimessage = handleMIDIMessage;
+            }
+
+            if (!midiInput) {
+                console.warn('⚠️ No se detectó ningún piano MIDI conectado');
+            }
+
+            // Detectar cuando se conecta/desconecta un dispositivo
+            midiAccess.onstatechange = (e) => {
+                console.log(`🔌 Estado MIDI: ${e.port.name} - ${e.port.state}`);
+                if (e.port.type === 'input' && e.port.state === 'connected') {
+                    midiInput = e.port;
+                    midiInput.onmidimessage = handleMIDIMessage;
+                }
+            };
+
+        } catch (err) {
+            console.error('❌ Error al acceder a MIDI:', err);
+            alert('Tu navegador no pudo acceder al piano MIDI. Verifica permisos.');
+        }
+    } else {
+        alert('Tu navegador no soporta Web MIDI API. Usa Chrome o Edge.');
+    }
+}
+
+
+function handleMIDIMessage(message) {
+    const [command, note, velocity] = message.data;
+    
+    if (command === 144 && velocity > 0) {
+        // Tecla presionada
+        const noteName = midiNoteToName(note);
+        triggerNoteOn(noteName);
+        
+    } else if (command === 128 || (command === 144 && velocity === 0)) {
+        // Tecla liberada
+        const noteName = midiNoteToName(note);
+        triggerNoteOff(noteName);
+    }
+}
+
+
+function midiNoteToName(midiNote) {
+    const noteNames = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    const octave = Math.floor(midiNote / 12) - 1;
+    const noteName = noteNames[midiNote % 12];
+    return `${noteName}${octave}`;
+}
 
     // ==================== DRAGGABLE MODAL ====================
     function setupDraggableModal() {
