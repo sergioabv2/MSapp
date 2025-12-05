@@ -1155,7 +1155,7 @@ user-select: none;
 <script>
 const app = angular.module('dashboardApp', []);
 
-app.controller('dashboardCtrl', function($scope, $interval, $timeout, $sce) {
+app.controller('dashboardCtrl', function($scope, $http, $interval, $timeout, $sce) {
 
     // ==================== STATE VARIABLES ====================
     $scope.schedule = [];
@@ -1397,7 +1397,23 @@ initFirebase();
         $scope.showLibraryModal = false;
     };
 
+  const requestData = {
+            action: "getUserData",
+          // token: localStorage.getItem('MStoken')
+            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+        };
 
+        const config = {
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+        };
+
+ $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+            .then(function(response) {
+                $scope.userName = response.data.name
+            })
+    
 $scope.joinClass = function() {
     if ($scope.connectionStatus === 'connecting' || $scope.connectionStatus === 'connected') return;
     $scope.connectionStatus = 'connecting';
