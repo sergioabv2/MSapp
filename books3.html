@@ -1397,10 +1397,13 @@ initFirebase();
         $scope.showLibraryModal = false;
     };
 
+
+ 
+
   const requestData = {
             action: "getUserData",
-          // token: localStorage.getItem('MStoken')
-            token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+           token: localStorage.getItem('MStoken')
+          //  token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
         };
 
         const config = {
@@ -1413,7 +1416,10 @@ initFirebase();
             .then(function(response) {
                 $scope.userName = response.data.name
             })
-    
+           
+           
+
+
 $scope.joinClass = function() {
     if ($scope.connectionStatus === 'connecting' || $scope.connectionStatus === 'connected') return;
     $scope.connectionStatus = 'connecting';
@@ -1427,7 +1433,7 @@ $scope.joinClass = function() {
             usersRef.child(myId).set({ 
                 id: myId, 
                 role: "user", 
-                name: "Alumno Web" 
+                name: $scope.userName
             });
             listenForSignals();
             if (!$scope.$$phase) $scope.$apply();
