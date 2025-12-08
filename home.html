@@ -33,7 +33,7 @@
             --dodger-blue-dark: hsl(205, 100%, 40%);
             --jet: hsl(0, 0%, 20%);
             
-            --ff-rubik: "Rubik", sans-serif;
+
             --ff-dm-sans: "DM Sans", sans-serif; /* Nueva fuente para el hero */
             
             --fs-1: 28px;
@@ -64,7 +64,7 @@
         ion-icon { --ionicon-stroke-width: 25px; }
         :focus { outline-offset: 4px; }
         
-        html { font-family: var(--ff-rubik); scroll-behavior: smooth; }
+        html { font-family: var(--ff-dm-sans); scroll-behavior: smooth; }
         body { background: var(--white); color: var(--sonic-silver); line-height: 1.6; overflow-x: hidden; }
         
         ::-webkit-scrollbar { width: 10px; }
@@ -582,7 +582,7 @@
         .composers-section { padding: var(--section-padding); }
         .composers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
         .composer-card {
-            position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+            position: relative;  height: 140px; width: 120px; border-radius: 6px; overflow: hidden;
             box-shadow: 0 4px 15px hsla(0, 0%, 0%, .1); transition: var(--transition); cursor: pointer;
         }
         .composer-card:hover { transform: scale(1.03); }
@@ -596,37 +596,7 @@
         }
         .composers-content li::before { content: '•'; color: var(--dodger-blue); font-weight: bold; position: absolute; left: 0; }
 
-        /* CAROUSEL */
-        .carousel-section { background: var(--cultured); padding: var(--section-padding); }
-        .carousel-section .section-title { margin-bottom: 30px; }
-        .carousel-wrapper { position: relative; }
-        .carousel {
-            display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px 20px;
-            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-        }
-        .carousel::-webkit-scrollbar { display: none; }
-        .book-card { flex: 0 0 auto; width: 180px; scroll-snap-align: start; cursor: pointer; transition: var(--transition); }
-        .book-card:hover { transform: translateY(-8px); }
-        .book-cover {
-            width: 100%; height: 240px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            object-fit: cover; margin-bottom: 15px;
-        }
-        .book-title {
-            font-size: 16px; font-weight: var(--fw-600); color: var(--gunmetal);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px;
-        }
-        .book-author { font-size: 14px; color: var(--sonic-silver); }
-        .scroll-btn {
-            position: absolute; top: 40%; transform: translateY(-50%); width: 45px; height: 45px;
-            border-radius: 50%; background: var(--white); border: 1px solid var(--light-gray);
-            box-shadow: 0 4px 12px hsla(0,0,0,.1); color: var(--gunmetal); font-size: 20px;
-            cursor: pointer; z-index: 10; opacity: 0; transition: var(--transition);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .carousel-wrapper:hover .scroll-btn { opacity: 1; }
-        .scroll-btn:hover { background: var(--dodger-blue); color: var(--white); border-color: var(--dodger-blue); }
-        .scroll-btn.prev { left: -25px; }
-        .scroll-btn.next { right: -25px; }
+      
 
         /* CATEGORIES & TABS */
         .categories { padding: var(--section-padding); }
@@ -706,15 +676,16 @@
         .testimonial-author { display: flex; align-items: center; gap: 15px; }
 
         /* FOOTER */
-        .footer-top { padding: 60px 0; background: #f8f9fa; border-top: 1px solid #eaeaea; }
-        .footer-logo { font-size: 22px; font-weight: var(--fw-700); color: var(--oxford-blue); margin-bottom: 15px; }
+        .footer-top { padding: 60px 0; background: var(--oxford-blue); border-top: 1px solid #eaeaea; }
+        .footer-logo { font-size: 22px; font-weight: var(--fw-700); color: white; margin-bottom: 15px; }
         .footer-link-box { display: grid; gap: 40px; }
         .footer-list li { margin-bottom: 12px; }
-        .footer-list h4 { margin-bottom: 20px; color: var(--oxford-blue); font-weight: 700; }
+        .footer-list h4 { margin-bottom: 20px; color: white; font-weight: 700; }
         .footer-link { color: var(--sonic-silver); font-size: 15px; }
         .footer-link:hover { color: var(--dodger-blue); }
-        .footer-bottom { padding: 25px 0; background: #f8f9fa; border-top: 1px solid #eaeaea; }
+        .footer-bottom { padding: 25px 0; background: var(--oxford-blue); border-top: 1px solid #eaeaea; }
         .social-list { display: flex; justify-content: center; gap: 25px; }
+        .social-link {color: white; font-size: 20px}
 
         /* MODAL & UTILS */
         .go-top-btn {
@@ -920,32 +891,7 @@
             </div>
         </section>
 
-        <!-- COMPOSERS SECTION -->
-        <section class="composers-section">
-            <div class="container">
-                <div class="composers-content">
-                    
-                    <div class="composers-grid-wrapper">
-                        <div class="composers-grid" id="composers-grid-dynamic">
-                            <!-- JS Injected content -->
-                        </div>
-                    </div>
-
-                    <div> 
-                        <p class="section-subtitle">Catálogo Extenso</p>
-                        <h2 class="h2">Miles de partituras con acompañamientos profesionales</h2>
-                        <p class="section-text">Disfruta de nuestro creciente catálogo de acompañamientos musicales de alta calidad para todos los niveles y géneros.</p>
-                        <ul>
-                            <li>Repertorio de todos los géneros musicales</li>
-                            <li>Clásicos adaptados para cada nivel</li>
-                            <li>Piezas educativas y de técnica</li>
-                            <li>Bandas sonoras, Pop, Jazz y más</li>
-                        </ul>
-                        <button class="btn btn-primary" style="margin-top: 25px;">Explorar el catálogo</button>
-                    </div>
-                </div>
-            </div>
-        </section>
+     
 
       
 
@@ -978,7 +924,7 @@
                                 <div class="level-info">
                                     <h3 class="h4">Nivel Preparatorio</h3>
                                     <p>Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.</p>
-                                    <span class="level-time"><ion-icon name="time-outline"></ion-icon> ~5 horas</span>
+                               
                                 </div>
                                 <div class="level-progress">
                                     <div class="progress-bar">
@@ -991,7 +937,7 @@
                                 <div class="level-info">
                                     <h3 class="h4">Nivel 1</h3>
                                     <p>Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.</p>
-                                    <span class="level-time"><ion-icon name="time-outline"></ion-icon> ~4 horas</span>
+                                
                                 </div>
                                 <div class="level-progress">
                                     <div class="progress-bar">
@@ -1077,6 +1023,35 @@
             </div>
         </section>
 
+
+
+           <!-- COMPOSERS SECTION -->
+        <section class="composers-section">
+            <div class="container">
+                <div class="composers-content">
+                    
+                    <div class="composers-grid-wrapper">
+                        <div class="composers-grid" id="composers-grid-dynamic">
+                            <!-- JS Injected content -->
+                        </div>
+                    </div>
+
+                    <div> 
+                        <p class="section-subtitle">Catálogo Extenso</p>
+                        <h2 class="h2">Miles de partituras con acompañamientos profesionales</h2>
+                        <p class="section-text">Disfruta de nuestro creciente catálogo de acompañamientos musicales de alta calidad para todos los niveles y géneros.</p>
+                        <ul>
+                            <li>Repertorio de todos los géneros musicales</li>
+                            <li>Clásicos adaptados para cada nivel</li>
+                            <li>Piezas educativas y de técnica</li>
+                            <li>Bandas sonoras, Pop, Jazz y más</li>
+                        </ul>
+                        <button class="btn btn-primary" style="margin-top: 25px;">Explorar el catálogo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- TESTIMONIALS -->
         <section class="testimonials" id="testimonios">
             <div class="container">
@@ -1139,52 +1114,7 @@
             </div>
         </section>
 
-       <!-- CAROUSEL SECTION -->
-        <section class="carousel-section" id="repertorio">
-            <div class="container">
-                <h2 class="h2 section-title" style="text-align: center;">Repertorio Destacado</h2>
-                <div class="carousel-wrapper">
-                    <div class="carousel" id="repertorio-carousel">
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/1Ad2scs9x1sxc_mx8L35NVUFk_0vj6hej" alt="Clair de Lune" class="book-cover">
-                            <div class="book-title">Clair de Lune</div>
-                            <div class="book-author">C. Debussy</div>
-                        </div>
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/1CR1bbjDnL3wzmeb0AM6hkt6D4G8VunTd" alt="Für Elise" class="book-cover">
-                            <div class="book-title">Für Elise</div>
-                            <div class="book-author">L. v. Beethoven</div>
-                        </div>
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/1JWJdVevaq7Oj2k4IxQ-2Zi7MP123vM_4" alt="Nuvole Bianche" class="book-cover">
-                            <div class="book-title">Nuvole Bianche</div>
-                            <div class="book-author">L. Einaudi</div>
-                        </div>
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/18-2Gfm_kZSGnSMe-dadCUnWlypbwxMsh" alt="Preludio" class="book-cover">
-                            <div class="book-title">Preludio en Do Mayor</div>
-                            <div class="book-author">J.S. Bach</div>
-                        </div>
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/12In24V0ux173hjL_Q1zA6zvyUq57J38P" alt="Nocturne" class="book-cover">
-                            <div class="book-title">Nocturne Op.9 No.2</div>
-                            <div class="book-author">F. Chopin</div>
-                        </div>
-                        <div class="book-card">
-                            <img src="https://lh3.googleusercontent.com/d/1AIV_VAPNh_dFbsJH6VRbyx6GcDQEffSi" alt="River Flows" class="book-cover">
-                            <div class="book-title">River Flows In You</div>
-                            <div class="book-author">Yiruma</div>
-                        </div>
-                    </div>
-                    <button class="scroll-btn prev" onclick="scrollCarousel('repertorio-carousel', -1)">
-                        <ion-icon name="chevron-back"></ion-icon>
-                    </button>
-                    <button class="scroll-btn next" onclick="scrollCarousel('repertorio-carousel', 1)">
-                        <ion-icon name="chevron-forward"></ion-icon>
-                    </button>
-                </div>
-            </div>
-        </section>
+
     </main>
 
     <!-- FOOTER -->
