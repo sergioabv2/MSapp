@@ -1084,19 +1084,25 @@ async function toggleCamera() {
         }, 1000);
 
         // --- INICIALIZACIÓN ---
-        window.addEventListener('load', () => {
-            renderKeys();
-            setupKeyboardInput();
-            renderMaterials();
-            updateMusicalDisplays();
+       // --- INICIALIZACIÓN ---
+window.addEventListener('load', () => {
+    renderKeys();
+    setupKeyboardInput();
+    renderMaterials();
+    updateMusicalDisplays();
 
-            setTimeout(() => {
-                const c4Key = document.getElementById('key-C4');
-                if (c4Key) {
-                    c4Key.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
-                }
-            }, 100);
-        });
+    // Centrar el piano en C4 SIN mover la página principal
+    setTimeout(() => {
+        const c4Key = document.getElementById('key-C4');
+        const wrapper = document.getElementById('piano-wrapper');
+        
+        if (c4Key && wrapper) {
+            // Calculamos la posición para centrar el scroll interno
+            const centerPos = c4Key.offsetLeft - (wrapper.clientWidth / 2) + (c4Key.clientWidth / 2);
+            wrapper.scrollLeft = centerPos;
+        }
+    }, 100);
+});
 
 // --- UTILIDADES MUSICALES ---
 function noteNameToMidi(noteName) {
