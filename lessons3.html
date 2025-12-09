@@ -882,6 +882,72 @@ body {
     font-weight: 600;
 }
 
+
+/* Wrapper para apilar la barra lateral verticalmente */
+.sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espacio entre los cuadros */
+}
+
+/* Reutilizamos estilos base de pending-tasks para mantener consistencia */
+.practice-card {
+    background-color: var(--main-content-bg);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.practice-card h4 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.practice-card p {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* Botón Vistoso */
+.btn-shiny {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-shiny:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    filter: brightness(110%);
+}
+
+.btn-shiny i {
+    font-size: 1.2rem;
+}
+
+/* ACTUALIZACIÓN RESPONSIVE: Aseguramos que el wrapper se oculte en móviles */
+@media (max-width: 900px) {
+    .sidebar-wrapper {
+        display: none;
+    }
+}
+
 /* ========== QUIZ ========== */
 .quiz-options { 
     display: flex; 
@@ -1101,6 +1167,10 @@ body {
     <div id="levelSelector" ng-show="currentView === 'levelSelector'">
         <div class="level-container">
 
+
+
+<div class="sidebar-wrapper">
+
 <div class="pending-tasks" >
     <h4>Tareas Pendientes</h4>
     <ul ng-if="pendingTasks.length > 0">
@@ -1116,6 +1186,17 @@ body {
         <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
         <p style="margin-top: 10px;">¡No tienes tareas pendientes!</p>
     </div>
+</div>
+
+
+<div class="practice-card">
+            <h4>Práctica libre</h4>
+            <p>Explora el teclado sin límites o practica tus canciones favoritas.</p>
+            <button class="btn-shiny" onclick="window.location.href='https://www.mozart-app.com/main#/menu/finder'">
+                <i class="ri-piano-line"></i> Empezar
+            </button>
+        </div>
+
 </div>
       
       <div class="loader-overlay" ng-show="isLoading">
