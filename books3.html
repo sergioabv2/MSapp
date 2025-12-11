@@ -1540,16 +1540,26 @@ function startPeer(initiator, remoteId) {
 
     // 2. Recibir Stream del Profesor (Video/Audio)
     peer.on("stream", stream => {
-        console.log("Stream recibido del profesor");
+        $timeout(() => {
         const remoteVideo = document.getElementById('remote-video');
         if (remoteVideo) {
             remoteVideo.srcObject = stream;
+            
+            // ✅ NUEVO: Verificar tracks recibidos
+            const videoTracks = stream.getVideoTracks();
+            const audioTracks = stream.getAudioTracks();
+            
+            console.log(`📹 Video tracks: ${videoTracks.length}`);
+            console.log(`🎤 Audio tracks: ${audioTracks.length}`);
+            
+            remoteVideo.play().catch(err => {
+                console.error("Error reproduciendo video:", err);
+            });
+            
             $scope.remoteStreamActive = true;
-            $scope.$apply();
         }
         $scope.onProfessorAccepted();
-        // Forzamos la actualización de la vista en Angular
-        //if (!$scope.$$phase) $scope.$apply();
+    }, 100);
     });
 
     // 3. Recibir Datos (Chat)
