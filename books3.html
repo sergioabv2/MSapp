@@ -1527,100 +1527,89 @@ $scope.onProfessorAccepted = function() {
     };
 
 function startPeer(initiator, remoteId) {
+    console.log("Iniciando conexión Peer. Initiator:", initiator);
+
     peer = new SimplePeer({ 
         initiator: initiator, 
         stream: rtcLocalStream,
         config: { iceServers: iceServers }
     });
 
-    // 1. Enviar señal (handshake)
+    // 1. Enviar señal (handshake) a Firebase
     peer.on("signal", data => {
         signalsRef.push({ from: myId, to: remoteId, data });
     });
 
-    // ✅ NUEVO: Escuchar evento 'track' para manejar tracks individuales
-    peer.on("track", (track, stream) => {
-        console.log(`🔊 Track recibido: ${track.kind}`);
-        
-        $timeout(() => {
-            const remoteVideo = document.getElementById('remote-video');
-            if (remoteVideo) {
-                // Si ya hay un stream, solo agregar el track
-                if (remoteVideo.srcObject) {
-                    remoteVideo.srcObject.addTrack(track);
-                    console.log(`✅ Track ${track.kind} agregado al stream existente`);
-                } else {
-                    // Primera vez, asignar el stream completo
-                    remoteVideo.srcObject = stream;
-                    console.log(`✅ Stream inicial asignado con track ${track.kind}`);
-                }
-                
-                // Reproducir si está pausado
-                if (remoteVideo.paused) {
-                    remoteVideo.play().catch(err => {
-                        console.error("Error reproduciendo:", err);
-                    });
-                }
-                
-                $scope.remoteStreamActive = true;
-            }
-        }, 50);
-    });
-
-    // 2. Recibir Stream del Profesor (Video/Audio) - MANTENER PARA COMPATIBILIDAD
+    // 2. Recibir Stream del Profesor (Audio y Video combinados)
+    // OPTIMIZACIÓN: Usamos solo 'stream' para evitar conflictos con 'track'
     peer.on("stream", stream => {
         console.log("📹 Stream completo recibido del profesor");
         
         $timeout(() => {
             const remoteVideo = document.getElementById('remote-video');
-            if (remoteVideo && !remoteVideo.srcObject) {
+            
+            // Verificamos si el elemento existe y si es un stream nuevo
+            if (remoteVideo && remoteVideo.srcObject !== stream) {
                 remoteVideo.srcObject = stream;
                 
-                const videoTracks = stream.getVideoTracks();
+                // --- Diagnóstico de Audio ---
                 const audioTracks = stream.getAudioTracks();
-                
+                const videoTracks = stream.getVideoTracks();
+
+                if (audioTracks.length > 0) {
+                    console.log(`🔊 Pista de audio detectada: ${audioTracks[0].label}`);
+                    console.log(`   Enabled: ${audioTracks[0].enabled}, Muted: ${audioTracks[0].muted}`);
+                    audioTracks[0].enabled = true; // Aseguramos que esté activo
+                } else {
+                    console.warn("🔇 ALERTA: El stream recibido NO contiene pistas de audio.");
+                }
+
                 console.log(`📊 Video tracks: ${videoTracks.length}`);
-                console.log(`📊 Audio tracks: ${audioTracks.length}`);
                 
+                // Intentar reproducir (manejo de políticas de autoplay)
                 remoteVideo.play().catch(err => {
-                    console.error("Error reproduciendo video:", err);
+                    console.error("⚠️ El navegador bloqueó el autoplay del video/audio:", err);
                 });
                 
                 $scope.remoteStreamActive = true;
             }
             
+            // Notificamos a la UI que la conexión fue exitosa
             $scope.onProfessorAccepted();
         }, 100);
     });
 
-    // 3. Recibir Datos (Chat)
+    // 3. Recibir Datos (Chat y MIDI)
     peer.on("data", data => {
-        const msgData = JSON.parse(data.toString());
-        if (msgData.type === 'chat') {
-            $scope.chatMessages.push({ 
-                sender: "Profesor", 
-                text: msgData.text, 
-                isMe: false 
-            });
-            $scope.$apply();
-            scrollToChatBottom();
-        }
-        else if (msgData.type === 'midi') {
-            handleIncomingMIDI(msgData);
+        try {
+            const msgData = JSON.parse(data.toString());
+            
+            if (msgData.type === 'chat') {
+                $scope.chatMessages.push({ 
+                    sender: "Profesor", 
+                    text: msgData.text, 
+                    isMe: false 
+                });
+                $scope.$apply();
+                scrollToChatBottom();
+            }
+            else if (msgData.type === 'midi') {
+                handleIncomingMIDI(msgData);
+            }
+        } catch (err) {
+            console.error("Error procesando data channel:", err);
         }
     });
 
-    function handleIncomingMIDI(midiData) {
-        if (midiData.action === 'noteOn') {
-            triggerNoteOn(midiData.note);
-        } else if (midiData.action === 'noteOff') {
-            triggerNoteOff(midiData.note);
-        }
-    }
+    // 4. Manejo de Errores
+    peer.on("error", err => {
+        console.error("❌ WebRTC Error crítico:", err);
+        // Opcional: Podrías manejar reconexión aquí si el error es 'ERR_CONNECTION_RESET'
+    });
 
-    peer.on("error", err => console.error("WebRTC Error:", err));
-
+    // 5. Cierre de conexión
     peer.on("close", () => {
+        console.log("Conexión cerrada por el peer remoto");
         $scope.remoteStreamActive = false;
         cleanupSession();
         $scope.$apply();
