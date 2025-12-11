@@ -1538,28 +1538,30 @@ function startPeer(initiator, remoteId) {
         signalsRef.push({ from: myId, to: remoteId, data });
     });
 
-    // ✅ NUEVO: Escuchar evento 'track' para manejar tracks individuales
+    // ✅ CRÍTICO: Escuchar evento 'track' para tracks que llegan después
     peer.on("track", (track, stream) => {
-        console.log(`🔊 Track recibido: ${track.kind}`);
+        console.log(`🔊 Nuevo track recibido: ${track.kind}`);
         
         $timeout(() => {
             const remoteVideo = document.getElementById('remote-video');
             if (remoteVideo) {
-                // Si ya hay un stream, solo agregar el track
+                // Si ya hay un stream, agregar el nuevo track
                 if (remoteVideo.srcObject) {
-                    remoteVideo.srcObject.addTrack(track);
-                    console.log(`✅ Track ${track.kind} agregado al stream existente`);
+                    // Crear nuevo MediaStream con todos los tracks
+                    const existingTracks = remoteVideo.srcObject.getTracks();
+                    const allTracks = [...existingTracks, track];
+                    const newStream = new MediaStream(allTracks);
+                    remoteVideo.srcObject = newStream;
+                    console.log(`✅ Track ${track.kind} agregado. Total tracks: ${newStream.getTracks().length}`);
                 } else {
-                    // Primera vez, asignar el stream completo
+                    // Primera vez, asignar stream inicial
                     remoteVideo.srcObject = stream;
-                    console.log(`✅ Stream inicial asignado con track ${track.kind}`);
+                    console.log(`✅ Stream inicial con track ${track.kind}`);
                 }
                 
-                // Reproducir si está pausado
+                // Asegurar reproducción
                 if (remoteVideo.paused) {
-                    remoteVideo.play().catch(err => {
-                        console.error("Error reproduciendo:", err);
-                    });
+                    remoteVideo.play().catch(err => console.error("Error play:", err));
                 }
                 
                 $scope.remoteStreamActive = true;
@@ -1567,33 +1569,22 @@ function startPeer(initiator, remoteId) {
         }, 50);
     });
 
-    // 2. Recibir Stream del Profesor (Video/Audio) - MANTENER PARA COMPATIBILIDAD
+    // 2. Mantener evento 'stream' para compatibilidad inicial
     peer.on("stream", stream => {
-        console.log("📹 Stream completo recibido del profesor");
+        console.log("📹 Stream inicial recibido");
         
         $timeout(() => {
             const remoteVideo = document.getElementById('remote-video');
             if (remoteVideo && !remoteVideo.srcObject) {
                 remoteVideo.srcObject = stream;
-                
-                const videoTracks = stream.getVideoTracks();
-                const audioTracks = stream.getAudioTracks();
-                
-                console.log(`📊 Video tracks: ${videoTracks.length}`);
-                console.log(`📊 Audio tracks: ${audioTracks.length}`);
-                
-                remoteVideo.play().catch(err => {
-                    console.error("Error reproduciendo video:", err);
-                });
-                
+                remoteVideo.play().catch(err => console.error("Error play:", err));
                 $scope.remoteStreamActive = true;
             }
-            
             $scope.onProfessorAccepted();
         }, 100);
     });
 
-    // 3. Recibir Datos (Chat)
+    // 3. Recibir Datos (Chat + MIDI)
     peer.on("data", data => {
         const msgData = JSON.parse(data.toString());
         if (msgData.type === 'chat') {
