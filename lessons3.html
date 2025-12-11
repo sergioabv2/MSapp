@@ -58,6 +58,8 @@ body {
     align-items: center;
     margin-bottom: 100px;
     padding: 120px 0 0 0;
+    position: relative;
+    z-index: 2;
 }
 
 .level-container {
@@ -67,6 +69,11 @@ body {
     max-width: 1200px;
     width: 100%;
     padding: 20px;
+    position: relative;
+    /* ESTA ES LA CLAVE: Empujamos el contenido hacia abajo para revelar el banner */
+    padding-top: 220px; 
+    padding-bottom: 60px;
+    z-index: 2;
 }
 
 .level-header {
@@ -790,18 +797,81 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 10;
     width: 100%;
-    height: 110px;
+    height: 300px; /* REDUCIDO: De 450px a 300px */
     overflow: hidden;
     will-change: transform, opacity;
+    z-index: 1;
 }
 
 .banner-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: brightness(0.85); /* Un poco oscuro para resaltar texto */
+}
+
+
+.banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+}
+
+.banner-text {
+    position: absolute;
+    top: 40%; /* Subimos un poco el texto */
+    left: 6%;
+    transform: translateY(-50%);
+    z-index: 5;
+    color: white;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+
+.banner-text h1 {
+    font-size: 2.5rem; /* REDUCIDO: De 3.5rem a 2.5rem */
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.banner-text .subtitle {
+    font-size: 1.2rem; /* REDUCIDO */
+    font-weight: 400;
     display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.banner-text p {
+    font-size: 1rem;
+    max-width: 450px;
+    display: none; /* OPCIONAL: Ocultar descripción en móviles o si queda muy apretado */
+}
+
+/* 3. HEADER FLOTANTE (ESTILO VIDRIO) */
+.floating-header {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.header-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 24px;
 }
 
 .pending-tasks {
@@ -990,6 +1060,7 @@ body {
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
+    
     .pending-tasks {
         display: none; 
     }
@@ -998,10 +1069,12 @@ body {
         grid-template-columns: 1fr;
         gap: 0;
         padding: 10px;
+        padding-top: 200px; 
     }
 }
 
 @media (max-width: 800px) {
+  
     .levels-grid { 
         grid-template-columns: 1fr; 
         padding: 30px 20px; 
@@ -1082,9 +1155,7 @@ body {
         transform: scale(0.92);
     }
 
-    .level-container {
-        padding: 1px; 
-    }
+  
 
     .levels-grid {
         padding: 10px 10px;
@@ -1098,12 +1169,15 @@ body {
     .player-header {
         justify-content: space-between;
     }
+    .banner-text h1 { font-size: 2rem; }
+    .banner-text .subtitle { font-size: 1.25rem; }
+    .floating-header { padding: 15px; }
 }
 
 
 /* ========== LOADER DE CARGA (Estilo Level-Card) ========== */
 .loader-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -1161,8 +1235,33 @@ body {
 <body ng-controller="PianoController">
 
     <div class="banner-header" ng-show="currentView === 'levelSelector'">
-        <img src="https://lh3.googleusercontent.com/d/1vn_w1YjLx9qaEkuQ6bfRNoYvLCvK_l-Z" class="banner-image">
+    <img src="https://lh3.googleusercontent.com/d/172NBqADTbyzw-YGNQNjWDSxL2FoJoxN0" class="banner-image">
+    
+    <div class="banner-overlay"></div>
+    
+    <div class="banner-text">
+        <h1>
+            <span class="subtitle">Tu Camino Musical</span>
+            Classroom
+        </h1>
+        <p>
+            Domina el piano paso a paso con nuestro método estructurado.
+            Desde lo básico hasta nivel avanzado.
+        </p>
     </div>
+
+    <div class="floating-header">
+        <div class="header-brand">
+       
+            <div class="header-text">
+                <h1>Tus Niveles</h1>
+                <p>Selecciona un nivel para comenzar</p>
+            </div>
+        </div>
+    </div>
+    
+    
+</div>
     
     <div id="levelSelector" ng-show="currentView === 'levelSelector'">
         <div class="level-container">
