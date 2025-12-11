@@ -1461,7 +1461,7 @@ $scope.joinClass = function() {
     connectionTimeoutPromise = $timeout(function() {
         handleConnectionTimeout();
     }, TIMEOUT_LIMIT);
-    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
         .then((stream) => {
             rtcLocalStream = stream;
             $scope.micOn = true; 
@@ -1540,16 +1540,17 @@ function startPeer(initiator, remoteId) {
 
     // 2. Recibir Stream del Profesor (Video/Audio)
     peer.on("stream", stream => {
-        console.log("Stream recibido del profesor");
+         $timeout(() => {
         const remoteVideo = document.getElementById('remote-video');
         if (remoteVideo) {
             remoteVideo.srcObject = stream;
+            remoteVideo.play().catch(err => {
+                console.error("Error reproduciendo video:", err);
+            });
             $scope.remoteStreamActive = true;
-            $scope.$apply();
         }
         $scope.onProfessorAccepted();
-        // Forzamos la actualización de la vista en Angular
-        //if (!$scope.$$phase) $scope.$apply();
+    }, 100);
     });
 
     // 3. Recibir Datos (Chat)
