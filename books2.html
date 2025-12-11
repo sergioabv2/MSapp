@@ -355,7 +355,7 @@
         
         <div class="books-of">
             <div class="week">
-                <div class="author-title">Recién abiertas</div>
+                <div class="author-title">Últimos usuarios</div>
                 <div id="authorsList"></div>
             </div>
 
@@ -363,6 +363,13 @@
                 <div class="author-title">Mis favoritos</div>
                 <div id="yearBooksList"></div>
             </div>
+
+            <div class="week year">
+                <div class="author-title">Últimas abiertas</div>
+                <div id="recentSidebarList"></div>
+            </div>
+
+
         </div>
       
         <div class="popular-books">
@@ -2434,26 +2441,27 @@ function renderSidebars() {
         }
     }
 
- function renderRecentCarousel() {
+function renderPopularCarousel() {
     const carouselContainer = document.getElementById('favoritesCarousel');
     
-    // Destruir instancia previa
+    // Destruir instancia previa si existe
     if (flickityInstance) {
         flickityInstance.destroy();
     }
 
-    // Si no hay recientes, mostramos un mensaje o sugerencias por defecto
-    if (recentScores.length === 0) {
-        carouselContainer.innerHTML = '<div style="padding:40px; text-align:center; width:100%; color:#8b939c;">Abre una partitura para verla aquí en tu historial reciente.</div>';
-        return;
+    // 1. FILTRAR LAS POPULARES (Tag "top" y limitamos a 5)
+    // Si no hay suficientes con tag "top", tomamos las primeras 5 del array general
+    let popularScores = scores.filter(s => s.tags.includes('top')).slice(0, 5);
+    
+    if (popularScores.length === 0) {
+        popularScores = scores.slice(0, 5);
     }
 
     let html = '';
-    recentScores.forEach(score => {
-        // Colores aleatorios para mantener el estilo original
-        const btnColors = ['book-blue', 'book-pink', 'book-yellow', 'book-purple'];
-        const randomColor = btnColors[Math.floor(Math.random() * btnColors.length)];
-
+    popularScores.forEach((score, index) => {
+        // Lógica de colores (mantenemos tu estilo visual)
+        // Nota: CSS nth-child se encarga de los colores de fondo en .book-cell
+        
         html += `
         <div class="book-cell">
             <div class="book-img">
@@ -2465,53 +2473,87 @@ function renderSidebars() {
                 <div class="rate">
                     <span class="book-voters" style="margin-left:0; color:white;">${score.difficulty}</span>
                 </div>
-                <div class="book-sum" style="color: white; margin-top:5px;">${score.tags.join(', ')}</div>
+                <div class="book-sum" style="color: white; margin-top:5px;">Popular • ${score.style}</div>
             </div>
         </div>`;
     });
 
     carouselContainer.innerHTML = html;
 
-    // Inicializar Flickity
+    // 2. INICIALIZAR FLICKITY CON AUTOPLAY
     flickityInstance = new Flickity(carouselContainer, {
         cellAlign: 'left',
         contain: true,
-        wrapAround: recentScores.length > 2, 
-        pageDots: false, 
-        prevNextButtons: true
+        wrapAround: true,      // Infinito
+        pageDots: true,        // Puntos de navegación
+        prevNextButtons: true,
+        autoPlay: 3000,        // CAMBIO: Slide automático cada 3000ms (3 segundos)
+        pauseAutoPlayOnHover: true // Se pausa si pasas el mouse por encima
     });
 }
 
-function registerAndOpen(title) {
-        const score = scores.find(s => s.title === title);
-        if (!score) return;
 
-        // 1. Buscar interacción (Lógica igual...)
-        let interaction = userInteractions.find(i => i.title === title);
-        
-        if (!interaction) {
-            interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
-            userInteractions.push(interaction);
-        } else {
-            interaction.lastOpened = Date.now();
-            if (interaction.progress === 0) interaction.progress = 1;
-            else if (interaction.progress < 100) interaction.progress += 5;
-        }
-
-        // 2. Historial Reciente (Lógica igual...)
-        recentScores = recentScores.filter(s => s.title !== title);
-        recentScores.unshift(score);
-        if (recentScores.length > 10) recentScores.pop();
-        
-        renderRecentCarousel();
-        applyFilterAndRender(false);
-        
-        // --- AQUÍ ESTÁ EL CAMBIO ---
-        // Concatenamos la URL base con el nombre del archivo (score.pdf)
-        const fullUrl = "https://www.mozart-app.com/xml3?file=" + score.pdf;
-        
-        openPdfViewer(fullUrl);
+function renderRecentSidebar() {
+    const recentContainer = document.getElementById('recentSidebarList');
+    
+    if (recentScores.length === 0) {
+        recentContainer.innerHTML = '<div style="font-size:13px; color:#999; padding-left:10px;">Sin actividad reciente.</div>';
+        return;
     }
+
+    // Usamos el mismo HTML que usas para "Mis Favoritos" (class="year-book")
+    recentContainer.innerHTML = recentScores.map(score => {
+        // Buscamos si tiene progreso guardado
+        const interaction = getInteraction(score.title);
+        const progressVal = interaction.progress || 0;
+
+        return `
+        <div class="year-book" onclick="registerAndOpen('${score.title}')">
+            <img src="${score.background}" alt="" class="year-book-img">
+            <div class="year-book-content" style="width: 100%;">
+                <div class="year-book-name">${score.title}</div>
+                <div class="year-book-author">by ${score.author}</div>
+                
+                <div style="display:flex; align-items:center; margin-top:5px;">
+                    <div class="progress-track" style="height:3px; background-color:#e0e0e0; flex-grow:1; margin-right:8px;">
+                        <div class="progress-fill" style="width: ${progressVal}%; background-color: #67d4ea;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function registerAndOpen(title) {
+    const score = scores.find(s => s.title === title);
+    if (!score) return;
+
+    // 1. Buscar/Crear interacción
+    let interaction = userInteractions.find(i => i.title === title);
+    
+    if (!interaction) {
+        interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
+        userInteractions.push(interaction);
+    } else {
+        interaction.lastOpened = Date.now();
+        if (interaction.progress === 0) interaction.progress = 1;
+        else if (interaction.progress < 100) interaction.progress += 5;
+    }
+
+    // 2. Historial Reciente (Actualizamos el array global)
+    recentScores = recentScores.filter(s => s.title !== title);
+    recentScores.unshift(score);
+    if (recentScores.length > 5) recentScores.pop(); // Guardamos solo las ultimas 5
+    
+    // --- CAMBIO CLAVE: Renderizamos el Sidebar, NO el Carrusel ---
+    renderRecentSidebar(); 
+    
+    // Refrescamos el grid para ver el cambio de progreso si estamos en la vista
+    applyFilterAndRender(false);
+    
+    const fullUrl = "https://www.mozart-app.com/xml3?file=" + score.pdf;
+    openPdfViewer(fullUrl);
+}
 
 function renderBookGrid(data) {
         const grid = document.getElementById('bookGrid');
@@ -2684,12 +2726,12 @@ function applyFilterAndRender(resetPage = true) {
         setTimeout(() => { iframe.src = ''; }, 300);
     }
 
-    // --- INICIALIZACIÓN ---
     $(document).ready(function() {
-        renderSidebars();       // Llenar sidebar
-        renderRecentCarousel();
-        renderBookGrid(scores);    // Llenar grid
-    });
+    renderSidebars();       // Llena actividad y favoritos
+    renderRecentSidebar();  // Llena el nuevo bloque de recientes (estará vacío al inicio)
+    renderPopularCarousel(); // CAMBIO: Llena el carousel con las Populares
+    renderBookGrid(scores); // Llena el grid principal
+});
 
 </script>
 
