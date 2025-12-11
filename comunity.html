@@ -3,919 +3,743 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feed estilo LinkedIn</title>
-<!-- Remix Icons & Fonts -->
+<title>Mozart Blog</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Scripts (Originales) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-
-<!-- BeerCSS (Opcional, mantenido por compatibilidad aunque el diseño custom predomina) -->
-<link href="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.css" rel="stylesheet" />
-<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.9.6/dist/cdn/beer.min.js"></script>
-
-<style>
-    /* --- LinkedIn Style Variables & Reset --- */
-    :root {
-        --bg-color: #F3F2EF;
-        --card-bg: #FFFFFF;
-        --text-main: #191919;
-        --text-sub: #666666;
-        --link-color: #0a66c2;
-        --border-color: #e0dfdc;
-        --hover-color: rgba(0, 0, 0, 0.08);
-        --input-bg: #EDF3F8; /* Light blueish tint for active input or white */
-        --font-stack: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
-    }
-
-    body {
-        background-color: var(--bg-color) !important;
-        font-family: var(--font-stack);
-        color: var(--text-main);
-        margin: 0;
-        padding-top: 20px; /* Space for nonexistent navbar */
-    }
-
-    /* --- Layout --- */
-    .main-container {
-        max-width: 1128px;
-        margin: 0 auto;
-        padding: 0 24px;
-        display: grid;
-        grid-template-columns: 225px 1fr 300px; /* 3 Column Layout like LinkedIn */
-        gap: 24px;
-        align-items: start;
-    }
-
-    /* --- Card Common Styles --- */
-    .card {
-        background: var(--card-bg);
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.04); /* Subtle shadow */
-        margin-bottom: 16px;
-        overflow: hidden;
-    }
-
-    /* --- Left Sidebar (Profile & Navigation) --- */
-    .sidebar-left {
-        grid-column: 1;
-    }
-
-    .profile-card {
-        text-align: center;
-        position: relative;
-    }
-
-    .profile-bg {
-        height: 60px;
-        background: #A0B4B7; /* Fallback color */
-        background: linear-gradient(to bottom, #A0B4B7, #bfd3d6);
-    }
-
-    .profile-img-wrapper {
-        margin-top: -38px;
-        margin-bottom: 12px;
-    }
-
-    .profile-img-wrapper img {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        object-fit: cover;
-    }
-
-    .profile-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--text-main);
-        margin-bottom: 4px;
-        cursor: pointer;
-    }
-    
-    .profile-name:hover {
-        text-decoration: underline;
-    }
-
-    .profile-headline {
-        font-size: 12px;
-        color: var(--text-sub);
-        margin-bottom: 16px;
-        padding: 0 12px;
-    }
-
-    .profile-stats {
-        border-top: 1px solid var(--border-color);
-        padding: 12px 0;
-        text-align: left;
-    }
-
-    .stat-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 4px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-sub);
-        cursor: pointer;
-    }
-
-    .stat-row:hover {
-        background-color: var(--hover-color);
-    }
-
-    .stat-val {
-        color: var(--link-color);
-    }
-
-    /* Navigation List */
-    .nav-card {
-        padding: 8px 0;
-    }
-
-    .nav-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-main);
-        margin: 8px 12px;
-    }
-
-    .filter-option {
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-sub);
-        cursor: pointer;
-        transition: all 0.2s;
-        border-left: 3px solid transparent;
-    }
-
-    .filter-option:hover {
-        background-color: var(--hover-color);
-        color: var(--text-main);
-    }
-
-    .filter-option.active {
-        border-left-color: var(--link-color);
-        color: var(--text-main);
-        background-color: rgba(10, 102, 194, 0.1); /* Light blue hover */
-    }
-
-    .filter-option i {
-        margin-right: 10px;
-        font-size: 16px;
-        width: 20px;
-        text-align: center;
-    }
-
-    /* --- Center Feed --- */
-    .feed-container {
-        grid-column: 2;
-    }
-
-    /* Create Post Input Area */
-    .create-post-card {
-        padding: 12px 16px;
-    }
-
-    .create-post-top {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 8px;
-    }
-
-    .create-post-top img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .create-post-input {
-        flex: 1;
-        border: 1px solid var(--border-color);
-        border-radius: 35px;
-        padding: 14px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-sub);
-        background-color: #fff;
-        cursor: pointer;
-        transition: background 0.2s;
-        outline: none;
-    }
-
-    .create-post-input:hover {
-        background-color: var(--hover-color);
-    }
-
-    .create-post-actions {
-        display: flex;
-        justify-content: space-between;
-        padding-top: 4px;
-    }
-
-    .media-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 8px;
-        border-radius: 4px;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        color: var(--text-sub);
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .media-btn:hover {
-        background-color: var(--hover-color);
-    }
-
-    /* Feed Post Card */
-    .post-card {
-        padding: 0; /* Content handles padding */
-    }
-
-    .post-header {
-        display: flex;
-        gap: 12px;
-        padding: 12px 16px 8px;
-    }
-
-    .post-header img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .post-meta {
-        flex: 1;
-    }
-
-    .post-username {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-main);
-        text-decoration: none;
-        display: block;
-    }
-
-    .post-username:hover {
-        color: var(--link-color);
-        text-decoration: underline;
-    }
-
-    .post-desc {
-        font-size: 12px;
-        color: var(--text-sub);
-        display: block;
-        line-height: 1.3;
-    }
-
-    .post-time {
-        font-size: 12px;
-        color: var(--text-sub);
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .post-content-text {
-        padding: 0 16px 8px;
-        font-size: 14px;
-        color: var(--text-main);
-        line-height: 1.5;
-    }
-
-    .post-image {
-        width: 100%;
-        display: block;
-        cursor: pointer;
-        border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    /* Post Stats Bar */
-    .post-stats {
-        padding: 8px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 12px;
-        color: var(--text-sub);
-    }
-
-    .stats-left img {
-        width: 16px;
-        height: 16px;
-        vertical-align: middle;
-        margin-right: 4px;
-    }
-
-    .stats-right span {
-        margin-left: 8px;
-        cursor: pointer;
-    }
-    
-    .stats-right span:hover {
-        color: var(--link-color);
-        text-decoration: underline;
-    }
-
-    /* Action Buttons (Like, Comment, etc) */
-    .post-actions {
-        display: flex;
-        justify-content: space-around; /* Distribute evenly like LinkedIn */
-        padding: 4px 8px;
-    }
-
-    .action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 8px;
-        border-radius: 4px;
-        border: none;
-        background: transparent;
-        color: var(--text-sub);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        flex: 1; /* Grow to fill space */
-        transition: background 0.2s;
-    }
-
-    .action-btn:hover {
-        background-color: var(--hover-color);
-    }
-
-    .action-btn i {
-        font-size: 20px;
-    }
-
-    .action-btn.liked {
-        color: var(--link-color); /* Blue when liked */
-    }
-
-    .action-btn.liked i {
-        font-weight: normal; /* Remix icon toggle style if needed */
-    }
-
-    /* --- Right Sidebar (News/Extras) --- */
-    .sidebar-right {
-        grid-column: 3;
-    }
-    
-    .news-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .news-item {
-        padding: 8px 16px;
-        cursor: pointer;
-    }
-
-    .news-item:hover {
-        background-color: var(--hover-color);
-    }
-
-    .news-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-main);
-        margin-bottom: 4px;
-        display: block;
-    }
-
-    .news-meta {
-        font-size: 12px;
-        color: var(--text-sub);
-    }
-
-    /* --- Comments --- */
-    .comments-section {
-        background: #F9FAFB;
-        padding: 12px 16px;
-        border-top: 1px solid var(--border-color);
-    }
-
-    .comment-input-wrapper {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-    }
-
-    .comment-input-wrapper img {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-    }
-
-    .comment-input {
-        flex: 1;
-        border: 1px solid var(--border-color);
-        border-radius: 20px;
-        padding: 8px 12px;
-        font-size: 14px;
-        outline: none;
-    }
-
-    .comment-item {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    .comment-item img {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .comment-bubble {
-        background: #F2F2F2;
-        border-radius: 0 8px 8px 8px;
-        padding: 8px 12px;
-        flex: 1;
-    }
-
-    .comment-author {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-main);
-    }
-
-    .comment-text {
-        font-size: 13px;
-        color: var(--text-main);
-        margin-top: 2px;
-    }
-
-    /* Polls */
-    .poll-container {
-        padding: 0 16px 16px;
-    }
-    .poll-option {
-        border: 1px solid var(--link-color);
-        border-radius: 4px;
-        padding: 8px;
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--link-color);
-        text-align: center;
-        cursor: pointer;
-        background: #fff;
-        position: relative;
-        overflow: hidden;
-    }
-    .poll-option:hover {
-        background: rgba(10, 102, 194, 0.1);
-    }
-    .poll-option.voted {
-        background: #F3F2EF;
-        color: var(--text-main);
-        border-color: var(--border-color);
-        text-align: left;
-    }
-    .poll-bar {
-        position: absolute;
-        top: 0; left: 0; bottom: 0;
-        background: rgba(0,0,0,0.05);
-        z-index: 0;
-    }
-    .poll-option-content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        justify-content: space-between;
-    }
-
-
-    /* Load More */
-    .load-more-btn {
-        width: 100%;
-        padding: 10px;
-        background: #fff;
-        border: 1px solid var(--border-color);
-        border-radius: 20px;
-        color: var(--text-sub);
-        font-weight: 600;
-        font-size: 14px;
-        cursor: pointer;
-        margin: 16px 0;
-        transition: 0.2s;
-    }
-    .load-more-btn:hover {
-        background: var(--hover-color);
-    }
-
-    /* Loader */
-    .loader-wrapper {
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-    }
-    .loader {
-        width: 30px;
-        height: 30px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid var(--link-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Dialog/Modal */
-    dialog {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        padding: 0;
-        max-width: 600px;
-        width: 100%;
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-        .main-container {
-            grid-template-columns: 225px 1fr; /* Hide right column */
-        }
-        .sidebar-right {
-            display: none;
-        }
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            padding: 0 10px;
-        }
-        .sidebar-left {
-            width: 100%;
-        }
-    }
-</style>
 </head>
+<style>
+    /* --- Variables & Reset --- */
+:root {
+    --primary-color: #7c3aed; /* Púrpura Mozart */
+    --primary-light: #f5f3ff;
+    --border-color: #e5e7eb;
+    --text-main: #111827;
+    --text-sub: #6b7280;
+    --bg-body: #ffffff;
+    --alert-bg: #fef2f2;
+    --alert-text: #b91c1c;
+    --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
 
+body {
+    background-color: var(--bg-body);
+    font-family: var(--font-stack);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    /* Sin padding-top porque va embedido */
+}
+
+/* --- 1. Alert Banner (Barra Roja Superior) --- */
+.alert-banner {
+    background-color: var(--alert-bg);
+    color: var(--alert-text);
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #fecaca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.alert-link {
+    color: var(--alert-text);
+    font-weight: 700;
+    text-decoration: underline;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* --- 2. Hero Header (Imagen de Fondo) --- */
+.hero-wrapper {
+    position: relative;
+    height: 240px;
+    background: #1f2937; /* Fallback */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 5%;
+    margin-bottom: 40px;
+}
+
+.hero-subtitle {
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.hero-title {
+    color: white;
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* --- 3. Contenedor Principal (Lista) --- */
+.content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px 60px 20px;
+}
+
+/* Filtros / Buscador estilo "Database" */
+.search-bar-wrapper {
+    margin-bottom: 24px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Redondeado suave */
+    font-size: 16px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.filters-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.filter-pill {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-sub);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.filter-pill:hover {
+    background: #f3f4f6;
+    color: var(--text-main);
+}
+
+.filter-pill.active {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* --- 4. LIST ROW ITEMS (El cambio principal) --- */
+.story-row {
+    display: flex;
+    flex-direction: column; /* Estructura interna vertical, pero el card es horizontal visualmente si se expande */
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Efecto hover estilo Starter Story (borde azul/púrpura) */
+.story-row:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Layout interno del Row */
+.row-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.row-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%; /* Circular */
+    object-fit: cover;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.row-main-content {
+    flex: 1;
+}
+
+.row-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.row-excerpt {
+    font-size: 15px;
+    color: var(--text-sub);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Stats Footer dentro del Row */
+.row-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.stat-group {
+    display: flex;
+    gap: 15px;
+}
+
+.stat-item span {
+    color: var(--text-sub);
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+.read-by {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-sub);
+    font-weight: 400;
+}
+
+/* Botón flotante para crear (FAB) */
+.fab-create {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    cursor: pointer;
+    font-size: 24px;
+    border: none;
+    z-index: 100;
+    transition: transform 0.2s;
+}
+.fab-create:hover { transform: scale(1.05); }
+
+/* --- Modal de Lectura (Overlay) --- */
+.reader-modal {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background-color: #ffffff; /* Blanco sólido, no rgba */
+    z-index: 2147483647; /* El z-index máximo permitido en CSS para tapar todo */
+    overflow-y: auto;
+    padding: 0; /* Quitamos padding del contenedor para que el header ocupe todo */
+}
+
+.reader-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 20px 100px 20px; /* Padding interno */
+    background: #fff;
+    min-height: 100vh;
+}
+.reader-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+
+.comments-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 2px solid #e7e9ee;
+}
+
+.comments-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.comments-count {
+    font-weight: 700;
+    font-size: 18px;
+    color: #2a2e2e;
+}
+
+.comments-login-btn {
+    font-weight: 700;
+    font-size: 14px;
+    color: #687a86;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Input Box Area */
+.comment-input-area {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.comment-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    background: #7c3aed; /* Tu color morado */
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px; /* Cuadrado redondeado como Disqus */
+    flex-shrink: 0;
+}
+
+.comment-box-wrapper {
+    flex: 1;
+}
+
+.comment-textarea {
+    width: 100%;
+    border: 2px solid #dbdfe4;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 16px;
+    color: #2a2e2e;
+    min-height: 100px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.comment-textarea:focus {
+    border-color: #7c3aed;
+}
+
+/* Fila de iconos de "Log in with" */
+.login-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.login-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #687a86;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.social-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Action Bar (Heart, Share, Sort) */
+.comments-toolbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e7e9ee;
+}
+
+.toolbar-item {
+    font-weight: 600;
+    font-size: 14px;
+    color: #656c7a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.sort-dropdown {
+    margin-left: auto;
+    font-weight: 600;
+    font-size: 14px;
+    color: #2a2e2e;
+    cursor: pointer;
+}
+
+/* Lista de Comentarios */
+.comment-node {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.node-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%; /* Disqus usa circular en los items */
+    object-fit: cover;
+}
+
+.node-content {
+    flex: 1;
+}
+
+.node-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.node-author {
+    font-weight: 700;
+    font-size: 15px;
+    color: #2a2e2e; /* Tu púrpura */
+}
+
+.node-time {
+    font-size: 13px;
+    color: #656c7a;
+    font-weight: 400;
+}
+
+.node-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #2a2e2e;
+    margin-bottom: 8px;
+}
+
+.node-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.node-action-link {
+    font-weight: 600;
+    font-size: 13px;
+    color: #656c7a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.node-action-link:hover {
+    color: #7c3aed;
+}
+
+.vote-divider {
+    color: #dbdfe4;
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .hero-title { font-size: 32px; }
+    .hero-wrapper { height: 200px; }
+    .row-stats { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .read-by { display: none; } /* Ocultar avatares de "leído por" en móvil para limpiar */
+}
+</style>
 <body ng-controller="postController">
 
-  <div class="main-container">
-    
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar-left" >
+    <div class="alert-banner">
+        <span>Ya iniciaste sesión, pero no tienes acceso a la experiencia completa.</span>
+        <span class="alert-link" onclick="alert('Funcionalidad Premium')">Actualiza tu cuenta &rarr;</span>
+    </div>
+
+    <div class="hero-wrapper">
+        <div class="hero-subtitle">Esperiencias de aprendizaje</div>
+        <h1 class="hero-title">Blog</h1>
+    </div>
+
+    <div class="content-container" ng-if="!selectedPostForComments">
         
-        <!-- Profile Card Widget -->
-        <div class="card profile-card">
-            <div class="profile-bg"></div>
-            <div class="profile-img-wrapper">
-                <img ng-src="{{userImg}}" alt="User">
-            </div>
-            <div class="profile-name">{{user}}</div>
-            <div class="profile-headline">Estudiante | Entusiasta de la Tecnología</div>
-            
-            <div class="profile-stats">
-                <div class="stat-row">
-                    <span>Contactos</span>
-                    <span class="stat-val">87</span>
-                </div>
-                <div class="stat-row">
-                    <span>Visualizaciones del perfil</span>
-                    <span class="stat-val">12</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Navigation / Communities -->
-        <div class="card nav-card" ng-if="!selectedPostForComments">
-            <div class="nav-title">Recientes</div>
-            <div class="filter-option" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">
-                <i class="ri-hashtag"></i> <span>Inicio</span>
-            </div>
-            <div class="filter-option" ng-class="{'active': filter === 'request'}" ng-click="filterPosts('request')">
-                <i class="ri-music-2-line"></i> <span>Música</span>
-            </div>
-            <div class="filter-option" ng-class="{'active': filter === 'event'}" ng-click="filterPosts('event')">
-                <i class="ri-calendar-event-fill"></i> <span>Eventos</span>
-            </div>
-            <div class="filter-option" ng-class="{'active': filter === 'composition'}" ng-click="filterPosts('composition')">
-                <i class="ri-pencil-ruler-2-line"></i> <span>Composición</span>
-            </div>
-            <div class="filter-option" ng-class="{'active': filter === 'biomechanics'}" ng-click="filterPosts('biomechanics')">
-                <i class="ri-body-scan-line"></i> <span>Biomecánica</span>
-            </div>
-        </div>
-
-        <!-- User Actions -->
-        <div class="card nav-card" ng-if="!selectedPostForComments">
-             <div class="nav-title">Gestionar</div>
-             <div class="filter-option" ng-class="{'active': filter === 'user'}" ng-click="filterPosts('user')">
-                <i class="ri-user-settings-line"></i> <span>Mis Publicaciones</span>
-            </div>
-            <div class="filter-option" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">
-                <i class="ri-bookmark-fill"></i> <span>Guardados</span>
-            </div>
-        </div>
-
-    </aside>
-
-    <!-- CENTER FEED -->
-    <main class="feed-container">
-
-      <!-- Create Post Widget -->
-      <div class="card create-post-card" ng-if="!selectedPostForComments">
-        <div class="create-post-top">
-            <img ng-src="{{userImg}}" />
-            <input class="create-post-input" placeholder="Crear una publicación" ng-model="newText2" ng-keyup="$event.keyCode == 13 && newPost(newText2)" />
-        </div>
-        <div class="create-post-actions">
-            <!-- Image Button maps to existing functionality -->
-            <button class="media-btn" ng-click="openImagePostDialog()" style="color: #378fe9;">
-                <i class="ri-image-fill" style="font-size: 20px;"></i> Foto
-            </button>
-            
-            <!-- Visual Only buttons to match LinkedIn Look -->
-            <button class="media-btn" style="color: #5f9b41; cursor: default;">
-                <i class="ri-video-fill" style="font-size: 20px;"></i> Vídeo
-            </button>
-            <button class="media-btn" style="color: #c37d16; cursor: default;">
-                <i class="ri-calendar-event-fill" style="font-size: 20px;"></i> Evento
-            </button>
-            <button class="media-btn" style="color: #e16745; cursor: default;">
-                <i class="ri-survey-fill" style="font-size: 20px;"></i> Encuesta
-            </button>
-
-            <!-- Hidden Submit for text input (Pressing Enter works) or small button -->
-            <button ng-if="newText2" ng-click="newPost(newText2)" style="background:#0a66c2; color:white; border:none; padding: 6px 12px; border-radius: 16px; cursor:pointer;">Publicar</button>
-        </div>
-      </div>
-
-      <!-- Back Button (When detailed view) -->
-      <div ng-if="selectedPostForComments" style="margin-bottom: 16px;">
-        <button style="background:none; border:none; cursor:pointer; font-weight:600; color:#666; display:flex; align-items:center; gap:8px;" ng-click="backToFeed()">
-          <i class="ri-arrow-left-line"></i> Volver al feed
-        </button>
-      </div>
-
-      <!-- Loader -->
-      <div class="loader-wrapper" ng-if="userDataLoaded">
-        <div class="loader"></div>
-      </div>
-
-      <!-- Post List -->
-      <div ng-if="!selectedPostForComments">
-        <div class="card post-card" ng-repeat="post in filteredData.slice(0, itemsPerPage)">
-          
-            <!-- Header -->
-            <div class="post-header">
-                <img ng-src="{{post.photo}}" />
-                <div class="post-meta">
-                    <a href="#" class="post-username">{{post.user}}</a>
-                    <span class="post-desc">Usuario de la comunidad</span>
-                    <div class="post-time">
-                        <span>{{calculateTimeAgo(post.date)}}</span> • <i class="ri-earth-fill" style="font-size: 14px;"></i>
-                    </div>
-                </div>
-                <!-- "..." menu (visual) -->
-                <i class="ri-more-fill" style="font-size:20px; color:#666; cursor:pointer;"></i>
-            </div>
-
-            <!-- Content -->
-            <div class="post-content">
-                <!-- Text Post -->
-                <div ng-if="post.media == 'text'">
-                    <div style="padding: 0 16px 8px; font-weight:600;" ng-if="post.header">{{post.header}}</div>
-                    <div class="post-content-text">{{post.content}}</div>
-                </div>
-
-                <!-- Image Post -->
-                <div ng-if="post.media == 'img'">
-                    <div style="padding: 0 16px 8px; font-weight:600;" ng-if="post.header">{{post.header}}</div>
-                    <img class="post-image" ng-src="{{post.content}}" ng-click="openComments(post)" />
-                </div>
-
-                <!-- Poll Post -->
-                <div ng-if="post.media == 'poll'">
-                    <div style="padding: 0 16px 8px; font-weight:600;">{{post.content}}</div>
-                    <div class="poll-container">
-                        <div class="poll-option" ng-repeat="opt in post.likes" ng-click="addVote(post, opt, $index)" ng-class="{'voted': post.userHasVoted}">
-                            <div class="poll-bar" ng-if="post.userHasVoted" ng-style="{'width': calculatePercentage(post, opt) + '%'}"></div>
-                            <div class="poll-option-content">
-                                <span>{{opt.name}} <i ng-if="opt.votedByCurrentUser" class="ri-checkbox-circle-fill"></i></span>
-                                <span ng-if="post.userHasVoted">{{calculatePercentage(post, opt)}}%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color:#666; margin-top:8px;" ng-if="post.userHasVoted">
-                            {{getTotalVotes(post)}} votos totales
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Bar (Likes/Comments Count) -->
-            <div class="post-stats" ng-if="post.media != 'poll'">
-                <div class="stats-left" ng-if="post.likes.length > 0">
-                    <i class="ri-thumb-up-fill" style="color: #1485BD;"></i>
-                    <i class="ri-heart-fill" style="color: #d93c3c;"></i>
-                    <span>{{post.likes.length}}</span>
-                </div>
-                <div class="stats-left" ng-if="post.likes.length === 0">
-                    Sé el primero en recomendar esto
-                </div>
-                <div class="stats-right">
-                    <span>{{post.comments.length}} comentarios</span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="post-actions" ng-if="post.media != 'poll'">
-                <button class="action-btn" ng-class="{'liked': isPostLiked(post)}" ng-click="newLike($index, post)">
-                    <i ng-class="isPostLiked(post) ? 'ri-thumb-up-fill' : 'ri-thumb-up-line'"></i>
-                    <span>Recomendar</span>
-                </button>
-                
-                <button class="action-btn" ng-click="openComments(post)">
-                    <i class="ri-chat-3-line"></i>
-                    <span>Comentar</span>
-                </button>
-                
-               
-
-                <button class="action-btn" ng-class="{'liked': isPostSaved(post)}" ng-click="toggleSave(post)">
-                    <i ng-class="isPostSaved(post) ? 'ri-bookmark-fill' : 'ri-bookmark-line'"></i>
-                    <span>{{isPostSaved(post) ? 'Guardado' : 'Guardar'}}</span>
-                </button>
-            </div>
-        </div>
-
-        <button class="load-more-btn" ng-click="loadMorePosts()" ng-if="itemsPerPage < filteredData.length">
-          Mostrar más resultados
-        </button>
-      </div>
-
-      <!-- Detailed Post View with Comments -->
-      <div ng-if="selectedPostForComments">
-        <div class="card post-card">
-            <!-- Same structure as feed card -->
-            <div class="post-header">
-                <img ng-src="{{selectedPostForComments.photo}}" />
-                <div class="post-meta">
-                    <a href="#" class="post-username">{{selectedPostForComments.user}}</a>
-                    <span class="post-time">{{calculateTimeAgo(selectedPostForComments.date)}}</span>
-                </div>
-            </div>
-            <div class="post-content">
-                <div ng-if="selectedPostForComments.media == 'text'" style="padding:16px;">{{selectedPostForComments.content}}</div>
-                <div ng-if="selectedPostForComments.media == 'img'">
-                    <div style="padding:16px;" ng-if="selectedPostForComments.header">{{selectedPostForComments.header}}</div>
-                    <img class="post-image" ng-src="{{selectedPostForComments.content}}" />
-                </div>
-            </div>
-            
-            <!-- Comments Section (Always Visible in Detail View) -->
-            <div class="comments-section">
-                <div class="comment-input-wrapper">
-                    <img ng-src="{{userImg}}" />
-                    <input type="text" class="comment-input" placeholder="Añadir un comentario..." ng-model="newCommentText" ng-keyup="$event.keyCode == 13 && addComment(newCommentText)" />
-                </div>
-                
-                <div ng-if="selectedPostForComments.comments.length > 0">
-                    <div class="comment-item" ng-repeat="comment in selectedPostForComments.comments">
-                        <img ng-src="{{comment.photo}}" />
-                        <div class="comment-bubble">
-                            <div class="comment-author">{{comment.user}}</div>
-                            <div class="comment-text">{{comment.comment}}</div>
-                        </div>
-                    </div>
-                </div>
-                 <div ng-if="selectedPostForComments.comments.length === 0" style="text-align: center; color: #666; font-size: 13px; padding: 10px;">
-                   No hay comentarios todavía.
-                 </div>
-            </div>
-        </div>
-      </div>
-
-    </main>
-
-    <!-- RIGHT SIDEBAR (News/Games - Static Visuals to match LinkedIn) -->
-   <aside class="sidebar-right" >
-    <div class="card">
-        <div class="news-header">
-            <span>Tendencias de la comunidad</span>
-            <i class="ri-information-fill" style="font-size: 14px; color: #666;" title="Basado en tu red"></i>
+        <div class="search-bar-wrapper">
+            <input type="text" class="search-input" placeholder="Buscar lección, historia o tip..." ng-model="searchText">
         </div>
         
-        <div ng-if="sidebarPosts.length === 0" style="padding: 16px; text-align:center; font-size:12px; color:#666;">
-            Cargando tendencias...
+        <div style="font-size:14px; color:#666; margin-bottom:10px;">
+            Mostrando {{filteredData.length}} historias
         </div>
 
-        <div class="news-item" ng-repeat="item in sidebarPosts" ng-click="openComments(item)">
-            <div class="news-title">
-                <span style="color:#0a66c2; font-size:16px; line-height:0;">•</span> 
-                {{ getSidebarPreview(item) }}
+        <div class="filters-row">
+            <div class="filter-pill" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">Todo</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'tips'}" ng-click="filterPosts('tips')">Tips</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'history'}" ng-click="filterPosts('history')">Historias</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'theory'}" ng-click="filterPosts('theory')">Teoría</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">Guardados</div>
+        </div>
+
+        <div class="story-list">
+            <div ng-if="userDataLoaded" style="text-align:center; padding:40px; color:#666;">
+                <i class="ri-loader-4-line ri-spin" style="font-size:24px;"></i> Cargando base de datos...
             </div>
-            <div class="news-meta">
-                {{ calculateTimeAgo(item.date) }} • Por {{ item.user }}
-            </div>
-        </div>
 
-        <div style="padding: 12px 16px; font-size: 14px; font-weight: 600; color: #666; cursor:pointer;" ng-click="loadMoreSidebar()">
-            Mostrar más <i class="ri-arrow-down-s-line"></i>
-        </div>
-    </div>
+            <div class="story-row" ng-repeat="post in filteredData | filter:searchText | limitTo: itemsPerPage" ng-click="openComments(post)">
+                
+                <div class="row-header">
+                    <img ng-src="{{post.photo}}" class="row-avatar">
+                    
+                    <div class="row-main-content">
+                        <div class="row-title">
+                            {{post.header || 'Nueva publicación'}}
+                        </div>
+                        
+                        <div class="row-excerpt">
+                            {{post.content}}
+                        </div>
+                    </div>
+                </div>
 
-    <div class="card">
-        <div class="news-header" style="justify-content: flex-end; padding-bottom:0;">
-            <span style="font-size: 12px; color: #666;">Publicidad</span>
-        </div>
-        <div style="padding: 20px; text-align: center;">
-            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Sigue aprendiendo con Mozart Academy</div>
-            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px;">
-                <img ng-src="{{userImg}}" style="width: 50px; height: 50px; border-radius: 50%; object-fit:cover;">
-                <div style="width: 50px; height: 50px; background: #eee; border-radius: 4px; display:flex; align-items:center; justify-content:center;">
-                     <i class="ri-building-2-line" style="font-size: 24px; color: #666;"></i>
+                <div class="row-stats">
+                    <div class="stat-group">
+                        <div class="stat-item" style="color:var(--text-main);">
+                            {{post.media === 'img' ? 'Visual' : (post.media === 'poll' ? 'Encuesta' : 'Lectura')}}
+                            <span>• {{calculateTimeAgo(post.date)}}</span>
+                        </div>
+                        <div class="stat-item" style="color:var(--text-main);">
+                            {{post.likes.length}}
+                            <span>Recomendaciones</span>
+                        </div>
+                    </div>
+
+                    <div class="read-by">
+                        <div style="display:flex; margin-right:8px;">
+                            <div style="width:20px; height:20px; background:#ddd; border-radius:50%; border:1px solid white;"></div>
+                            <div style="width:20px; height:20px; background:#ccc; border-radius:50%; border:1px solid white; margin-left:-8px;"></div>
+                            <div style="width:20px; height:20px; background:#bbb; border-radius:50%; border:1px solid white; margin-left:-8px;"></div>
+                        </div>
+                        Leído por {{ 120 + post.likes.length }} estudiantes
+                    </div>
                 </div>
             </div>
-            <div style="font-size: 14px; margin-bottom: 12px;">{{user}}, reactiva tu carrera Premium.</div>
-            <button style="border: 1px solid #0a66c2; color: #0a66c2; background: transparent; padding: 6px 16px; border-radius: 16px; font-weight: 600; cursor: pointer;">Seguir</button>
         </div>
+
+        <div style="text-align:center; margin-top:30px;" ng-if="filteredData.length > itemsPerPage">
+            <button style="background:white; border:1px solid #ddd; padding:10px 20px; border-radius:20px; cursor:pointer; font-weight:600; color:#555;" ng-click="loadMorePosts()">
+                Cargar más resultados
+            </button>
+        </div>
+
     </div>
-</aside>
 
-  </div>
+    <button class="fab-create" ng-click="openImagePostDialog()">
+        <i class="ri-add-line"></i>
+    </button>
 
-  <!-- Modal Upload Image (Reused functionality) -->
-  <dialog id="dialog-post">
-    <div style="padding: 24px; background: #fff;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom:16px; border-bottom:1px solid #eee;">
-           <h3 style="margin:0; font-size: 20px; font-weight: 400;">Editar foto</h3>
-           <button onclick="ui('#dialog-post')" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
-      </div>
-      
-      <div style="margin-bottom: 16px;">
-        <textarea ng-model="newImagePost.header" placeholder="¿De qué quieres hablar?" style="width: 100%; border: none; font-size: 16px; min-height: 80px; font-family: inherit; outline: none; resize: none;"></textarea>
-      </div>
-      
-      <img ng-if="imagePreview" ng-src="{{imagePreview}}" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; margin-bottom: 16px; background: #f3f2ef;" />
-      
-      <input type="file" id="imageUpload" accept="image/*" onchange="angular.element(this).scope().handleFileSelect(this.files)" style="display: none;">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-          <button onclick="document.getElementById('imageUpload').click()" style="color: #0a66c2; background: transparent; border: 1px solid #0a66c2; padding: 6px 12px; border-radius: 16px; font-weight: 600; cursor: pointer;">
-             Seleccionar imagen
-          </button>
+  <div class="reader-modal" ng-if="selectedPostForComments">
+    <div class="reader-container">
+        
+        <button style="background:none; border:none; font-weight:600; cursor:pointer; margin-bottom:30px; color:#666; display:flex; align-items:center; gap:5px; font-size:15px;" ng-click="backToFeed()">
+            <i class="ri-arrow-left-line"></i> Volver a Classroom
+        </button>
 
-          <div style="display: flex; gap: 12px;">
-            <button onclick="ui('#dialog-post')" style="background: transparent; border: none; color: #666; font-weight: 600; cursor: pointer;">Cancelar</button>
-            <button ng-click="createImagePost()" ng-disabled="!imagePreview || !newImagePost.header" style="background: #0a66c2; color: white; border: none; padding: 6px 16px; border-radius: 16px; font-weight: 600; cursor: pointer;" ng-style="{'opacity': (!imagePreview || !newImagePost.header) ? '0.5' : '1'}">Publicar</button>
-          </div>
-      </div>
-    </div>
-  </dialog>
+        <h1 style="font-size:40px; font-weight:800; line-height:1.1; margin-bottom:15px; color:#111; letter-spacing: -0.5px;">
+            {{selectedPostForComments.header || 'Publicación sin título'}}
+        </h1>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:40px; font-size:15px; color:#555; padding-bottom:20px; border-bottom:1px solid #eee;">
+            <img ng-src="{{selectedPostForComments.photo}}" style="width:44px; height:44px; border-radius:50%; border:1px solid #eee;">
+            <div>
+                <div style="font-weight:700; color:#222;">{{selectedPostForComments.user}}</div>
+                <div style="color:#666; font-size:13px;">Publicado {{calculateTimeAgo(selectedPostForComments.date)}}</div>
+            </div>
+        </div>
+
+        <img ng-if="selectedPostForComments.media == 'img'" ng-src="{{selectedPostForComments.content}}" style="width:100%; border-radius:8px; margin-bottom:40px; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+
+        <div style="font-size:19px; line-height:1.8; color:#2a2e2e; margin-bottom:60px; font-family: 'Georgia', serif;">
+            {{selectedPostForComments.content}}
+        </div>
+
+        <div ng-if="selectedPostForComments.media == 'poll'" style="background:#f9fafb; padding:25px; border-radius:8px; border:1px solid #e5e7eb; margin-bottom:40px;">
+            <div style="font-weight:700; margin-bottom:15px; font-size:18px;">Resultados de la encuesta</div>
+            <div ng-repeat="opt in selectedPostForComments.likes" 
+                 style="padding:15px; background:white; border:1px solid #ddd; margin-bottom:10px; border-radius:6px; cursor:pointer; display:flex; justify-content:space-between;"
+                 ng-click="addVote(selectedPostForComments, opt, $index)">
+                <span>{{opt.name}}</span>
+                <span style="font-weight:600; color:var(--primary-color)">{{opt.users.length}} votos</span>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            
+            <div class="comments-header-row">
+                <div class="comments-count">{{selectedPostForComments.comments.length}} Comentarios</div>
+                <div class="comments-login-btn">
+                    <span style="width:24px; height:24px; background:#687a86; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px;">1</span>
+                    Login <i class="ri-arrow-down-s-fill"></i>
+                </div>
+            </div>
+
+            <div class="comment-input-area">
+                <div class="comment-avatar-placeholder">
+                    {{user.charAt(0)}}
+                </div>
+                <div class="comment-box-wrapper">
+                    <textarea class="comment-textarea" placeholder="Únete a la discusión..." ng-model="newCommentText"></textarea>
+                    
+                    <div class="login-options">
+                        <span class="login-label">Inicia sesión con</span>
+                        <div class="social-circle" style="background:#2E9FFF"><i class="ri-discuss-fill"></i></div> <div class="social-circle" style="background:#4267B2"><i class="ri-facebook-fill"></i></div>
+                        <div class="social-circle" style="background:#1DA1F2"><i class="ri-twitter-x-fill"></i></div>
+                        <div class="social-circle" style="background:#DB4437"><i class="ri-google-fill"></i></div>
+                    </div>
+
+                    <div style="text-align:right; margin-top:10px;" ng-if="newCommentText">
+                        <button ng-click="addComment(newCommentText)" style="background:var(--primary-color); color:white; border:none; padding:10px 24px; font-weight:700; border-radius:4px; cursor:pointer;">
+                            Publicar <i class="ri-arrow-right-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comments-toolbar">
+                <div class="toolbar-item">
+                    <i ng-class="isPostLiked(selectedPostForComments) ? 'ri-heart-fill' : 'ri-heart-line'" 
+                       style="font-size:18px; color: {{isPostLiked(selectedPostForComments) ? '#e0245e' : '#656c7a'}}"
+                       ng-click="newLike(0, selectedPostForComments)"></i> 
+                    {{selectedPostForComments.likes.length}}
+                </div>
+                <div class="toolbar-item">
+                    <i class="ri-share-forward-line" style="font-size:18px;"></i> Compartir
+                </div>
+                <div class="sort-dropdown">
+                    Mejores <i class="ri-arrow-down-s-line"></i>
+                </div>
+            </div>
+
+            <div class="comments-list">
+                <div ng-if="selectedPostForComments.comments.length === 0" style="text-align:center; padding:30px; color:#999;">
+                    Sé el primero en comentar.
+                </div>
+
+                <div class="comment-node" ng-repeat="comment in selectedPostForComments.comments">
+                    <div class="node-avatar">
+                        <img ng-src="{{comment.photo}}">
+                    </div>
+                    <div class="node-content">
+                        <div class="node-header">
+                            <span class="node-author">{{comment.user}}</span>
+                            <i class="ri-user-star-fill" style="color:var(--primary-color); font-size:12px;" title="Estudiante Premium"></i>
+                            <span class="node-time">hace un momento</span>
+                        </div>
+                        <div class="node-text">
+                            {{comment.comment}}
+                        </div>
+                        <div class="node-actions">
+                            <div class="node-action-link"><i class="ri-arrow-up-s-line" style="font-size:18px;"></i> 0</div>
+                            <span class="vote-divider">|</span>
+                            <div class="node-action-link"><i class="ri-arrow-down-s-line" style="font-size:18px;"></i> 0</div>
+                            <div class="node-action-link">Responder</div>
+                            <div class="node-action-link">Compartir</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> </div>
+</div>
+
+    <dialog id="dialog-post" style="border:none; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); padding:0; width:100%; max-width:500px;">
+        <div style="padding:20px;">
+            <h3 style="margin-top:0;">Crear nueva historia</h3>
+            <input ng-model="newImagePost.header" placeholder="Título atractivo..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; font-weight:600;">
+            <textarea ng-model="newImagePost.content" placeholder="Escribe el contenido..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; min-height:100px; resize:vertical;"></textarea>
+            
+            <img ng-if="imagePreview" ng-src="{{imagePreview}}" style="width:100%; height:150px; object-fit:cover; margin-top:10px; border-radius:6px;">
+            <input type="file" id="imageUpload" accept="image/*" onchange="angular.element(this).scope().handleFileSelect(this.files)" style="display: none;">
+
+            <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                <button onclick="document.getElementById('imageUpload').click()" style="background:#f3f4f6; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">📷 Foto</button>
+                <div>
+                    <button onclick="document.getElementById('dialog-post').close()" style="background:none; border:none; color:#666; cursor:pointer; margin-right:10px;">Cancelar</button>
+                    <button ng-click="createImagePost()" style="background:var(--primary-color); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Publicar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+</body>
 
 <script>
-// --- JAVASCRIPT ORIGINAL INTACTO ---
-var app = angular.module('postApp', []);
+    var app = angular.module('postApp', []);
+
 app.controller('postController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+  
+  // --- Configuración Inicial ---
   $scope.userDataLoaded = true;
   $scope.data = [];
   $scope.filteredData = [];
-  $scope.itemsPerPage = 6;
+  $scope.itemsPerPage = 10; // Lista larga
   $scope.filter = 'all';
-  $scope.user = "Anónimo";
-  $scope.userImg = "https://lh3.googleusercontent.com/d/1h0PAuatp8mguH19cso6wh19mjMVa0K5V";
-
-  $scope.sidebarPosts = []; 
-  $scope.sidebarLimit = 5;
+  $scope.user = "Invitado"; 
+  $scope.userImg = "https://ui-avatars.com/api/?name=Invitado&background=random"; 
 
   var config = {
     headers: { "Content-Type": "text/plain;charset=utf-8" }
   };
 
+  // --- Carga de Datos (Google Sheets) ---
   $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', 
     {action: "getPosts"}, config)
     .then(function (response) {
       $scope.data = shuffleArray(response.data);
-      $scope.updateSidebar();
       $scope.filterPosts('all');
       $scope.userDataLoaded = false;
+      
+      // Chequeo de votos
       $scope.data.forEach(post => {
         if (post.media === 'poll') {
           post.userHasVoted = post.likes.some(opt => opt.users.includes($scope.user));
@@ -923,48 +747,20 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       });
     });
 
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', 
-    {action: "getUserData", token: localStorage.getItem('MStoken')}, config)
-    .then(function (response) {
-      $scope.user = response.data.name.split(' ').slice(0, 2).join(' ');
-      $scope.userImg = response.data.photo;
-    });
+  // --- Carga de Usuario ---
+  var token = localStorage.getItem('MStoken');
+  if(token){
+      $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', 
+        {action: "getUserData", token: token}, config)
+        .then(function (response) {
+          if(response.data && response.data.name) {
+              $scope.user = response.data.name.split(' ').slice(0, 2).join(' ');
+              $scope.userImg = response.data.photo;
+          }
+        });
+  }
 
-    $scope.updateSidebar = function() {
-      $scope.sidebarPosts = $scope.data.slice(0, $scope.sidebarLimit);
-  };
-
-  // Cargar más items en el sidebar
-  $scope.loadMoreSidebar = function() {
-      $scope.sidebarLimit += 5;
-      $scope.updateSidebar();
-  };
-
-  // Obtener un texto corto para la previsualización
-  $scope.getSidebarPreview = function(post) {
-      // Si tiene header (título), úsalo
-      if (post.header && post.header.length > 0) {
-          return post.header.length > 35 ? post.header.substring(0, 35) + '...' : post.header;
-      }
-      
-      // Si es texto, recórtalo
-      if (post.media === 'text') {
-          return post.content.length > 35 ? post.content.substring(0, 35) + '...' : post.content;
-      }
-      
-      // Si es imagen sin header
-      if (post.media === 'img') {
-          return "Nueva fotografía compartida";
-      }
-
-      // Si es encuesta
-      if (post.media === 'poll') {
-          return "Nueva encuesta: " + post.content;
-      }
-
-      return "Publicación de la comunidad";
-  };
-
+  // --- Utilidades ---
   function shuffleArray(array) {
     const shuffled = array.slice();
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -974,100 +770,54 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     return shuffled;
   }
 
+  $scope.calculateTimeAgo = function (alertDate) {
+    const alertDateObj = new Date(alertDate);
+    const today = new Date();
+    const timeDiff = Math.abs(today - alertDateObj);
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    if (days === 0) return "Hoy";
+    if (days === 1) return "Ayer";
+    if (days > 30) return "Hace +1 mes";
+    return `hace ${days} d`;
+  };
+
+  // --- Filtros ---
   $scope.filterPosts = function (type) {
     $scope.filter = type;
     if (type === 'all') {
       $scope.filteredData = $scope.data;
-    } else if (type === 'user') {
-      $scope.filteredData = $scope.data.filter(post => post.user === $scope.user);
     } else if (type === 'saved') {
       $scope.filteredData = $scope.data.filter(post => $scope.isPostSaved(post));
     } else {
-      $scope.filteredData = $scope.data.filter(post => post.branch === type);
+      // Filtrado simple por texto en el contenido si no hay categoría explícita
+      $scope.filteredData = $scope.data.filter(post => {
+          return JSON.stringify(post).toLowerCase().includes(type);
+      });
     }
-    $scope.itemsPerPage = 6;
+    $scope.itemsPerPage = 10;
   };
 
   $scope.loadMorePosts = function () {
     $scope.itemsPerPage += 5;
   };
 
+  // --- Modal de Lectura ---
   $scope.selectedPostForComments = null;
 
-  $scope.openComments = function (post) {
+
+
+$scope.openComments = function (post) {
     $scope.selectedPostForComments = post;
-    window.scrollTo(0, 0);
-  };
+    document.body.style.overflow = 'hidden'; // Bloquea el scroll de la lista de atrás
+};
 
-  $scope.backToFeed = function () {
+$scope.backToFeed = function () {
     $scope.selectedPostForComments = null;
-  };
+    document.body.style.overflow = ''; // Restaura el scroll
+};
 
-  $scope.addComment = function (commentText) {
-    if (!$scope.selectedPostForComments || !commentText) return;
-
-    var newComment = {
-      user: $scope.user,
-      photo: $scope.userImg,
-      comment: commentText
-    };
-
-    if (!$scope.selectedPostForComments.comments) {
-      $scope.selectedPostForComments.comments = [];
-    }
-    $scope.selectedPostForComments.comments.push(newComment);
-    $scope.newCommentText = '';
-  };
-
-  $scope.calculatePercentage = function (post, option) {
-    const totalVotes = post.likes.reduce((sum, opt) => sum + opt.users.length, 0);
-    if (totalVotes === 0) return 0;
-    return Math.round((option.users.length / totalVotes) * 100);
-  };
-
-  $scope.getTotalVotes = function (post) {
-    return post.likes.reduce((sum, opt) => sum + opt.users.length, 0);
-  };
-
-  $scope.addVote = function (post, option, index) {
-    if (post.userHasVoted) return;
-    option.users.push($scope.user);
-    option.votedByCurrentUser = true;
-    post.userHasVoted = true;
-  };
-
-  $scope.newPost = function (data) {
-    if (!data) return;
-    var post = {
-      user: $scope.user,
-      type: "text",
-      photo: $scope.userImg,
-      url: data,
-      date: new Date(),
-      likes: [],
-      comments: [],
-      saved: []
-    };
-    $scope.data.unshift(post);
-    $scope.filterPosts($scope.filter);
-    $scope.newText2 = "";
-  };
-
-  $scope.newLike = function (index, post) {
-    if (!post.likes) post.likes = [];
-    const userLikeIndex = post.likes.findIndex(like => like.user === $scope.user);
-    if (userLikeIndex === -1) {
-      post.likes.push({ user: $scope.user });
-    } else {
-      post.likes.splice(userLikeIndex, 1);
-    }
-  };
-
-  $scope.isPostLiked = function(post) {
-    if (!post || !post.likes) return false;
-    return post.likes.some(like => like.user === $scope.user);
-  };
-
+  // --- Acciones (Guardar, Comentar, Votar) ---
+  // Nota: Estas funciones son 'client-side only' por ahora (no guardan en sheet)
   $scope.isPostSaved = function(post) {
     if (!post.saved) return false;
     return post.saved.some(s => s.user === $scope.user);
@@ -1083,26 +833,33 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     }
   };
 
-  $scope.calculateTimeAgo = function (alertDate) {
-    const alertDateObj = new Date(alertDate);
-    const today = new Date();
-    const timeDiff = Math.abs(today - alertDateObj);
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    if (days > 0) return `hace ${days} d`; // Shortened like LinkedIn
-    if (hours > 0) return `hace ${hours} h`;
-    return `hace ${minutes} m`;
+  $scope.addComment = function (commentText) {
+    if (!$scope.selectedPostForComments || !commentText) return;
+    var newComment = {
+      user: $scope.user,
+      photo: $scope.userImg,
+      comment: commentText
+    };
+    if (!$scope.selectedPostForComments.comments) $scope.selectedPostForComments.comments = [];
+    $scope.selectedPostForComments.comments.push(newComment);
+    $scope.newCommentText = '';
   };
 
-  $scope.newImagePost = { header: '' };
+  $scope.addVote = function (post, option, index) {
+    if (post.userHasVoted) return;
+    option.users.push($scope.user);
+    post.userHasVoted = true;
+  };
+
+  // --- Crear Post (Lógica nueva con Header/Content) ---
+  $scope.newImagePost = { header: '', content: '' };
   $scope.imagePreview = null;
 
   $scope.openImagePostDialog = function() {
-    $scope.newImagePost = { header: '' };
+    $scope.newImagePost = { header: '', content: '' };
     $scope.imagePreview = null;
     document.getElementById('imageUpload').value = null;
-    ui('#dialog-post');
+    document.getElementById('dialog-post').showModal();
   };
 
   $scope.handleFileSelect = function(files) {
@@ -1118,42 +875,36 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
   };
 
   $scope.createImagePost = function() {
-    if (!$scope.imagePreview || !$scope.newImagePost.header) {
-      alert("Por favor, selecciona una imagen y añade una descripción.");
+    if (!$scope.newImagePost.header && !$scope.newImagePost.content) {
+      alert("Escribe algo para publicar.");
       return;
     }
 
     var post = {
       user: $scope.user,
-      type: "img",
-      media: "img", // Ensure compatibility
+      type: $scope.imagePreview ? "img" : "text",
+      media: $scope.imagePreview ? "img" : "text",
       photo: $scope.userImg,
-      header: $scope.newImagePost.header,
-      content: $scope.imagePreview, // Changed from url to content for consistency with new HTML
+      header: $scope.newImagePost.header || 'Sin título',
+      // Si hay imagen, la ponemos en content para que el HTML la detecte como src
+      // Si no, ponemos el texto
+      content: $scope.imagePreview ? $scope.imagePreview : $scope.newImagePost.content,
       date: new Date().toISOString(),
       likes: [],
-      comments: [{
-        user: $scope.user,
-        photo: $scope.userImg,
-        comment: $scope.newImagePost.header
-      }],
+      comments: [],
       saved: []
     };
 
-    $scope.data.unshift(post);
-    $scope.filterPosts($scope.filter || 'all');
-    ui('#dialog-post');
-  };
-}]);
+    // Si es imagen con texto, podemos meter el texto en comments o adaptar el objeto post
+    // Para simplificar, si es img, el texto se pierde visualmente en lista (se ve la foto) 
+    // pero podriamos guardarlo en una propiedad extra si quisieras.
 
-// Tiny helper for modal if beercss is not fully controlling it via pure CSS
-function ui(selector) {
-    const el = document.querySelector(selector);
-    if(el) {
-        if(el.hasAttribute('open')) el.close();
-        else el.showModal();
-    }
-}
+    $scope.data.unshift(post);
+    $scope.filterPosts($scope.filter);
+    document.getElementById('dialog-post').close();
+  };
+
+}]);
 </script>
-</body>
 </html>
+
