@@ -1169,6 +1169,42 @@ body {
     z-index: 100;
 }
 
+/* Loader discreto en el banner */
+.banner-loader {
+    position: absolute;
+    bottom: 25px;  /* Pegado abajo */
+    right: 30px;   /* Pegado a la derecha */
+    z-index: 10;
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    /* Estilo visual sutil */
+    background: rgba(255, 255, 255, 0.5); /* Fondo semitransparente */
+    backdrop-filter: blur(5px);           /* Efecto borroso elegante */
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    
+    /* Tipografía */
+    color: #4b5563; /* Gris oscuro */
+    font-size: 0.85rem;
+    font-weight: 600;
+    
+    /* Transición suave al aparecer/desaparecer */
+    transition: opacity 0.3s ease;
+}
+
+/* Animación de rotación (asegúrate de mantenerla) */
+@keyframes ri-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.ri-spin {
+    animation: ri-spin 1s linear infinite;
+}
+
 
 .loader-content {
     background: white;
@@ -1213,7 +1249,7 @@ body {
     </style>
 <body ng-controller="PianoController">
 
-    <div class="banner-header" ng-show="currentView === 'levelSelector'">
+<div class="banner-header" ng-show="currentView === 'levelSelector'">
     <img src="https://lh3.googleusercontent.com/d/172NBqADTbyzw-YGNQNjWDSxL2FoJoxN0" class="banner-image">
     
     <div class="banner-overlay"></div>
@@ -1223,16 +1259,15 @@ body {
             <span class="subtitle">Tu Camino Musical</span>
             Classroom
         </h1>
-        <p>
-            Domina el piano paso a paso con nuestro método estructurado.
-            Desde lo básico hasta nivel avanzado.
-        </p>
+        </div>
+
+    <div class="banner-loader" ng-show="isLoading">
+        <i class="ri-loader-4-line ri-spin"></i>
+        <span>Actualizando...</span>
     </div>
-
-
-    
-    
 </div>
+
+
     
     <div id="levelSelector" ng-show="currentView === 'levelSelector'">
         <div class="level-container">
@@ -1269,13 +1304,8 @@ body {
 
 </div>
       
-      <div class="loader-overlay" ng-show="isLoading">
-        <div class="loader-content">
-            <i class="ri-loader-4-line ri-spin"></i>
-            <p>Cargando...</p>
-        </div>
-    </div>
-            <div class="levels-grid" ng-class="{'blur-content': isLoading}">
+     
+            <div class="levels-grid" >
                 <div class="level-card" ng-repeat="level in levels" 
                     ng-click="selectLevel(level)"
                     ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}">
@@ -2545,7 +2575,7 @@ function completeLesson() {
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-MX';
             utterance.rate = 1.1;
-            speechSynthesis.speak(utterance);
+          //  speechSynthesis.speak(utterance);
         }
     }
     
