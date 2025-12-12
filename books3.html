@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu Aula Virtual - PianoMaster</title>
+    <title>Aula Virtual</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -37,6 +37,81 @@ body {
     background: var(--bg-light);
     min-height: 100vh; 
     color: var(--text-dark);
+}
+
+
+/* ==================== HIGH KEY BANNER ==================== */
+.banner-header {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background-color: #fff;
+    margin-bottom: 0; /* Pegado al contenido */
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+   
+}
+
+.banner-overlay {
+    position: absolute;
+    inset: 0;
+    /* GRADIENTE BLANCO: Inunda la imagen de luz */
+    background:linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6))
+}
+
+.banner-text {
+    position: absolute;
+    top: 50%;
+    left: 6%; /* Alineado a la izquierda como el dashboard */
+    transform: translateY(-50%);
+    z-index: 5;
+    /* TEXTO OSCURO: Para contrastar con el fondo blanco */
+    color: white; 
+    text-shadow: none;
+}
+
+.banner-text h1 {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
+}
+
+.banner-text .subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* LOADER DISCRETO (Abajo a la derecha) */
+.banner-loader {
+    position: absolute;
+    bottom: 25px;
+    right: 30px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Efecto cristal blanco */
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    color: rgba(255,255,255,0.8);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
@@ -847,7 +922,27 @@ user-select: none;
 </style>
 <body ng-controller="dashboardCtrl">
 
-    <!-- DASHBOARD VIEW -->
+   
+   <div class="banner-header" ng-show="currentView === 'dashboard'">
+        <img src="https://lh3.googleusercontent.com/d/172NBqADTbyzw-YGNQNjWDSxL2FoJoxN0" class="banner-image">
+        
+        <div class="banner-overlay"></div>
+        
+        <div class="banner-text">
+            <h1>
+                  
+                <span class="subtitle">Aula Virtual</span>
+              Sesiones
+            </h1>
+           
+        </div>
+
+        <div class="banner-loader" ng-show="connectionStatus === 'connecting'">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <span>Conectando...</span>
+        </div>
+    </div>
+
     <div class="container" ng-show="currentView === 'dashboard'">
         <br>
         <div class="dashboard-grid">
