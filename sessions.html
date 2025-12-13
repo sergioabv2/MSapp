@@ -1,1001 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Technology/048</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Piano desde cero - Preview del Curso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Global Styles */
-        :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #6b8cae;
-            --accent-color: #ff7e5f;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --text-color: #333;
-            --text-light: #6c757d;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #17a2b8;
-            --border-radius: 5px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: #f5f7fa;
-        }
-
-        a {
-            text-decoration: none;
-            color: var(--primary-color);
-            transition: var(--transition);
-        }
-
-        a:hover {
-            color: var(--accent-color);
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Buttons Standard */
-        .btn-download {
-            background-color: var(--success-color);
-            color: white;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-download:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-        }
-
-        .btn-back {
-            background-color: var(--text-light);
-            color: white;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-        }
-
-        .btn-back:hover {
-            background-color: #5a6268;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: white;
-            box-shadow: var(--box-shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 15px 0;
-        }
-
-        nav ul {
-            display: flex;
-            justify-content: center;
-        }
-
-        nav ul li {
-            margin: 0 10px;
-        }
-
-        nav ul li a {
-            padding: 10px 15px;
-            font-weight: 600;
-            color: var(--text-color);
-            border-radius: var(--border-radius);
-        }
-
-        nav ul li a:hover {
-            color: var(--primary-color);
-            background-color: rgba(74, 111, 165, 0.1);
-        }
-
-        nav ul li a.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* Main Content Styles */
-        main {
-            padding: 30px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* ---------------------------------------------------- */
-        /* NUEVOS ESTILOS: ENROLL CARD (BANNER PRINCIPAL)       */
-        /* ---------------------------------------------------- */
-        .enroll-card {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 2px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .enroll-content {
-            flex: 1;
-            padding-right: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .enroll-content h2 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .enroll-content p {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .enroll-divider {
-            height: 1px;
-            background-color: #e0e0e0;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .btn-enroll {
-            background: linear-gradient(to bottom, #005eb8, #004494);
-            color: white;
-            border: 1px solid #003366;
-            padding: 12px 20px;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            width: 100%;
-            max-width: 300px;
-            font-weight: normal;
-            transition: background 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .btn-enroll:hover {
-            background: linear-gradient(to bottom, #004494, #003366);
-        }
-
-        .enroll-image {
-            flex: 0 0 350px;
-            height: 200px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            padding: 4px;
-            background: #fff;
-        }
-
-        .enroll-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ---------------------------------------------------- */
-        /* NUEVOS ESTILOS: CHAPTER CARDS (THEORY NOTES)         */
-        /* ---------------------------------------------------- */
-        .chapters-container {
-            display: flex;
-            flex-direction: column; /* Lista vertical */
-            gap: 20px;
-            max-width: 100%;
-            margin-bottom: 30px;
-        }
-
-        .chapter-card {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            overflow: hidden;
-            cursor: default;
-        }
-
-        .chapter-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            border-color: #d0d0d0;
-        }
-
-        .chapter-info {
-            flex: 1;
-            padding: 20px 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .chapter-info h3 {
-            font-size: 1.4rem;
-            color: #333;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .chapter-info p {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .chapter-divider {
-            height: 1px;
-            background-color: #eee;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-
-        .btn-start-chapter {
-            display: inline-block;
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            padding: 8px 20px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: fit-content;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-start-chapter:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .chapter-thumbnail {
-            width: 220px;
-            height: 160px;
-            flex-shrink: 0;
-            background-color: #f0f0f0;
-            position: relative;
-            border-left: 1px solid #eee;
-        }
-
-        .chapter-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .chapter-card:hover .chapter-thumbnail img {
-            transform: scale(1.05);
-        }
-
-        .chapter-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        .chapter-content.hidden {
-            display: none;
-        }
-
-        /* ---------------------------------------------------- */
-        /* GENERAL CONTENT BOX & OTHERS                         */
-        /* ---------------------------------------------------- */
-        .content-box {
-            background-color: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            margin-bottom: 30px;
-        }
-
-        .content-box h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .content-box ol, .content-box ul {
-            margin-left: 20px;
-            margin-bottom: 20px;
-        }
-
-        /* Lab Manual Styles */
-        .lab-exercises {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .exercise {
-            background-color: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-        }
-
-        .exercise:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .exercise-details {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-
-        /* References Styles */
-        .references-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .reference-card {
-            background-color: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            text-align: center;
-            display: block; /* Asegurar bloque para enlace */
-            color: var(--text-color);
-        }
-        
-        .reference-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            color: var(--primary-color);
-        }
-
-        .reference-card i {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        /* Footer Styles */
-        footer {
-            background-color: var(--dark-color);
-            color: white;
-            padding: 40px 0 0;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            padding: 0 20px 30px;
-        }
-
-        .footer-section h4 {
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: var(--light-color);
-        }
-
-        .footer-section ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-section ul li a {
-            color: #adb5bd;
-        }
-
-        .footer-section ul li a:hover {
-            color: white;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .social-icons a {
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding: 15px 0;
-            background-color: rgba(0, 0, 0, 0.1);
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            /* Enroll Card Responsive */
-            .enroll-card {
-                flex-direction: column-reverse;
-                text-align: center;
-            }
-            .enroll-content { padding-right: 0; width: 100%; }
-            .enroll-image { width: 100%; flex: auto; margin-bottom: 20px; height: auto; }
-            .btn-enroll { max-width: 100%; }
-
-            /* Chapter Card Responsive */
-            .chapter-card {
-                flex-direction: column-reverse;
-                align-items: stretch;
-            }
-            .chapter-thumbnail {
-                width: 100%;
-                height: 180px;
-                border-left: none;
-                border-bottom: 1px solid #eee;
-            }
-            .btn-start-chapter {
-                width: 100%;
-                text-align: center;
-            }
-
-            /* Nav & Others */
-            nav ul { flex-direction: column; align-items: center; }
-            nav ul li { margin: 5px 0; }
-        }
-
-
-        /* --- ESTILOS PARA EL ACORDEÓN (Theory Notes) --- */
-.module-syllabus {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-    width: 100%;
-}
-
-.module-syllabus ul {
-    list-style-type: none; /* Quitamos bullets por defecto */
-    padding: 20px 25px;
-    margin: 0;
-}
-
-.module-syllabus li {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    color: #555;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-}
-
-.module-syllabus li i {
-    color: var(--primary-color);
-    margin-right: 10px;
-    font-size: 0.8rem;
-}
-
-.module-syllabus li:last-child {
-    border-bottom: none;
-}
-
-/* Modificación para que la tarjeta se adapte al expandirse */
-.chapter-card {
-    flex-wrap: wrap; /* Permite que el contenido baje */
-    height: auto; /* Altura automática */
-}
-
-/* Icono del botón que rotará */
-.btn-toggle-syllabus i {
-    transition: transform 0.3s ease;
-    margin-left: 8px;
-}
-
-.btn-toggle-syllabus.active i {
-    transform: rotate(180deg);
-}
-
-
-/* --- ESTILOS PARA EL IFRAME (Lab Manual) --- */
-.video-responsive-container {
-    position: relative;
-    padding-bottom: 56.25%; /* Ratio 16:9 */
-    height: 0;
-    overflow: hidden;
-    max-width: 100%;
-    background: #000;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-.video-responsive-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-
-/* --- CALENDAR ESTILO MINIMALISTA (Rejilla Bloques) --- */
-
-.syllabus-calendar {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    color: #444;
-}
-
-.syllabus-calendar .year-title {
-    text-align: center;
-    color: #5d7c7b; /* Tono del teal de la imagen */
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-/* Grid contenedor de los meses */
-.calendar-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px; /* Espacio entre calendarios */
-    padding: 20px 0;
-    list-style: none;
-}
-
-/* Tarjeta de cada Mes */
-.calendar-month {
-    width: 260px; /* Ancho fijo para mantener la estética de la imagen */
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border-radius: 2px;
-    overflow: hidden;
-    padding-bottom: 10px;
-    transition: transform 0.3s ease;
-}
-
-.calendar-month:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-/* BARRA SUPERIOR (Binding) - El estilo café con agujeros */
-.month-binding {
-    height: 18px;
-    background-color: #dcbfa3; /* Color exacto de la imagen (Beige/Tan) */
-    position: relative;
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-/* Los dos agujeritos blancos */
-.month-binding::before,
-.month-binding::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    background-color: #fff;
-    border-radius: 50%;
-    transform: translateY(-50%);
-}
-
-.month-binding::before { left: 25%; }
-.month-binding::after { right: 25%; }
-
-/* Título del Mes */
-.calendar-month h1 {
-    text-align: center;
-    font-size: 1.1rem;
-    color: #555;
-    margin: 5px 0 10px 0;
-    font-weight: 700;
-    text-transform: capitalize;
-}
-
-/* Línea separadora estilo barra de progreso que se ve en la imagen */
-.month-divider {
-    height: 4px;
-    background-color: #aebaba; /* Gris verdoso suave */
-    width: 90%;
-    margin: 0 auto 10px auto;
-    border-radius: 2px;
-}
-
-/* Tabla de días */
-.calendar-table {
-    width: 90%;
-    margin: 0 auto;
-    border-collapse: separate; 
-    border-spacing: 4px; /* Espacio blanco entre cuadritos */
-}
-
-/* Celdas de días (Bloques) */
-.calendar-table td {
-    height: 22px;
-    width: 14.28%; /* 100% / 7 días */
-    background-color: #e5e7e9; /* Gris claro (días normales) */
-    vertical-align: middle;
-    text-align: center;
-    font-size: 0; /* Ocultamos el número visualmente para que se vea solo el bloque (opcional) */
-    border-radius: 1px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    position: relative;
-}
-
-/* Si quieres ver los números pequeños dentro del bloque, comenta la línea 'font-size: 0' de arriba y usa esto: */
-.calendar-table td {
-    font-size: 10px;
-    color: transparent; /* Oculto por defecto para parecerse a la imagen */
-}
-.calendar-table td:hover {
-    color: #999;
-}
-
-/* Celdas vacías (no se pintan) */
-.calendar-table td.empty {
-    background-color: transparent;
-    pointer-events: none;
-}
-
-/* ESTILO DE EVENTO (El bloque verde azulado) */
-.calendar-table td.has-event {
-    background-color: #5f7d7d; /* Teal oscuro */
-    color: transparent;
-}
-
-.calendar-table td.has-event:hover {
-    background-color: #4a6363;
-}
-
-/* Tooltip simple para ver qué es el evento */
-.calendar-table td.has-event::after {
-    content: attr(data-title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    z-index: 10;
-    margin-bottom: 5px;
-}
-
-.calendar-table td.has-event:hover::after {
-    opacity: 1;
-}
-
-/* --- ESTILOS DEL MODAL (ZOOM) --- */
-
-.modal-overlay {
-    display: none; /* Oculto por defecto */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente oscuro */
-    backdrop-filter: blur(5px); /* Efecto borroso elegante */
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-overlay.show {
-    display: flex; /* Mostrar con Flexbox para centrar */
-    animation: fadeIn 0.3s;
-}
-
-.modal-content {
-    position: relative;
-    /* No le damos fondo blanco al contenedor, usaremos el del calendario */
-    padding: 0;
-    border-radius: 4px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    transform: scale(0.8);
-    transition: transform 0.3s;
-}
-
-.modal-overlay.show .modal-content {
-    transform: scale(1);
-}
-
-.close-modal {
-    position: absolute;
-    top: -30px;
-    right: -10px;
-    color: white;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s;
-}
-
-.close-modal:hover {
-    color: #ccc;
-}
-
-/* --- ESTILOS ESPECÍFICOS PARA EL MES DENTRO DEL MODAL --- */
-
-/* Hacemos la tarjeta mucho más grande */
-.expanded-month {
-    width: 500px !important; /* Ancho grande */
-    height: auto !important;
-    padding: 15px;
-    cursor: default; /* Ya no es clickeable */
-    pointer-events: auto;
-}
-
-.expanded-month h1 {
-    font-size: 2rem !important; /* Título gigante */
-    margin-bottom: 10px !important;
-}
-
-.expanded-month .month-binding {
-    height: 30px !important; /* Barra superior más gruesa */
-    margin-bottom: 15px;
-}
-.expanded-month .month-binding::before, 
-.expanded-month .month-binding::after {
-    width: 20px; height: 20px; /* Agujeros más grandes */
-}
-
-.expanded-month .calendar-table {
-    border-spacing: 8px !important; /* Más espacio entre celdas */
-}
-
-.expanded-month td {
-    height: 45px !important; /* Celdas más altas */
-    font-size: 1rem !important; /* MOSTRAR NÚMEROS GRANDES */
-    color: #555 !important; /* Color visible */
-    font-weight: bold;
-    border-radius: 4px;
-    vertical-align: top !important; /* Alinear número arriba */
-    padding: 4px;
-    text-align: left !important;
-}
-
-/* Mostrar el nombre del evento dentro de la celda en el modal */
-.expanded-month td.has-event {
-    position: relative;
-}
-
-.expanded-month td.has-event::before {
-    content: attr(data-full-title); /* Usamos un atributo nuevo para el texto */
-    display: block;
-    font-size: 0.65rem;
-    font-weight: normal;
-    margin-top: 2px;
-    line-height: 1.2;
-    color: rgba(255,255,255,0.9);
-}
-
-/* Ocultar el tooltip hover en el modal porque ya mostramos el texto */
-.expanded-month td.has-event:hover::after {
-    display: none;
-}
-
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-}
-
-/* Responsive para el modal */
-@media (max-width: 600px) {
-    .expanded-month { width: 95vw !important; }
-    .close-modal { right: 10px; top: -50px; }
-}
+        /* El CSS irá en la PARTE 2 */
     </style>
 </head>
 <body>
 
-    <header>
+    <!-- ==================== BANNER SUPERIOR (Idéntico al Aula Virtual) ==================== -->
+    <div class="banner-header">
+        <img src="https://lh3.googleusercontent.com/d/172NBqADTbyzw-YGNQNjWDSxL2FoJoxN0" class="banner-image" alt="Piano Banner">
+        
+        <div class="banner-overlay"></div>
+        
+        <div class="banner-text">
+            <span class="subtitle">Curso en Línea</span>
+            <h1>Piano desde cero</h1>
+        </div>
+    </div>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <header class="main-header">
         <nav>
             <ul>
                 <li><a href="#" class="active" data-page="home">Inicio</a></li>
                 <li><a href="#" data-page="syllabus">Calendario</a></li>
                 <li><a href="#" data-page="theory">Temario</a></li>
                 <li><a href="#" data-page="lab">Plataforma</a></li>
-                <li><a href="#" data-page="references">References</a></li>
+                <li><a href="#" data-page="references">Referencias</a></li>
             </ul>
         </nav>
     </header>
 
-    <main>
-        
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="container">
+
+        <!-- TARJETA DE INSCRIPCIÓN -->
         <div class="enroll-card">
             <div class="enroll-content">
                 <h2>Piano desde cero - Nivel básico 1</h2>
-                <p>Curso de piano en línea</p>
+                <p>Aprende piano de forma profesional con clases en vivo y material exclusivo</p>
                 <div class="enroll-divider"></div>
-                <button class="btn-enroll">Inscríbete ahora</button>
+                <button class="btn-enroll">
+                    <i class="fas fa-credit-card"></i>
+                    Inscríbete ahora
+                </button>
             </div>
             <div class="enroll-image">
-                <img src="https://lh3.googleusercontent.com/d/1VwQQgnU5xE1Q2f2D-7NvflxjAwl0k__a=s500" >
+                <img src="https://lh3.googleusercontent.com/d/1VwQQgnU5xE1Q2f2D-7NvflxjAwl0k__a=s500" alt="Piano Course">
             </div>
         </div>
 
+        <!-- ==================== HOME PAGE ==================== -->
         <section id="home" class="page active">
             <div class="content-box">
-                <h3>Welcome</h3>
-                <p>Welcome to the official course portal for Web Technology/048. Use the navigation menu to access course materials, theory notes, lab exercises, and references.</p>
+                <h3><i class="fas fa-home"></i> Bienvenido</h3>
+                <p>Explora el programa completo del curso de piano. Usa el menú de navegación para acceder a los diferentes módulos, calendario de clases y material de estudio.</p>
             </div>
         </section>
 
-<section id="syllabus" class="page">
-    <div class="syllabus-calendar">
-        <h1 class="year-title">2025 Syllabus</h1>
-        <div class="calendar-grid" id="calendar-root"></div>
-    </div>
-    <div id="calendar-modal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        
-        <div id="modal-calendar-container" class="calendar-month expanded-month">
-            </div>
-    </div>
-</div>
-</section>
-
-       <section id="theory" class="page">
-    <h2>Theory Notes</h2>
-    
-    <div class="chapters-container">
-        <div class="chapter-card">
-            <div class="chapter-info">
-                <h3>Chapter 1: Introduction to Web Technologies</h3>
-                <p>History, evolution, and fundamental concepts of the web including HTTP protocols and client-server architecture.</p>
-                <div class="chapter-divider"></div>
-                <button class="btn-start-chapter btn-toggle-syllabus">
-                    Ver Temario <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="chapter-thumbnail">
-                <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80" alt="Web Intro">
+        <!-- ==================== CALENDARIO ==================== -->
+        <section id="syllabus" class="page">
+            <div class="content-box">
+                <h3><i class="far fa-calendar-alt"></i> Calendario del Curso 2025</h3>
             </div>
             
-            <div class="module-syllabus">
-                <ul>
-                    <li><i class="fas fa-play-circle"></i> 1.1 History of the WWW</li>
-                    <li><i class="fas fa-play-circle"></i> 1.2 Client-Server Architecture</li>
-                    <li><i class="fas fa-play-circle"></i> 1.3 HTTP Methods (GET, POST)</li>
-                    <li><i class="fas fa-file-code"></i> 1.4 Web Browsers Engines</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="chapter-card">
-            <div class="chapter-info">
-                <h3>Chapter 2: HTML5 Fundamentals</h3>
-                <p>Master the structure of the web. Learn semantic markup, forms, and the latest HTML5 elements.</p>
-                <div class="chapter-divider"></div>
-                <button class="btn-start-chapter btn-toggle-syllabus">
-                    Ver Temario <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="chapter-thumbnail">
-                <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=400&q=80" alt="HTML5 Code">
+            <div class="syllabus-calendar">
+                <div class="calendar-grid" id="calendar-root"></div>
             </div>
 
-             <div class="module-syllabus">
-                <ul>
-                    <li><i class="fas fa-play-circle"></i> 2.1 Document Structure (DOM)</li>
-                    <li><i class="fas fa-play-circle"></i> 2.2 Semantic Tags</li>
-                    <li><i class="fas fa-play-circle"></i> 2.3 Forms & Validations</li>
-                    <li><i class="fas fa-file-alt"></i> 2.4 SEO Basics with HTML</li>
-                </ul>
+            <!-- MODAL ZOOM CALENDARIO -->
+            <div id="calendar-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <div id="modal-calendar-container" class="calendar-month expanded-month"></div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        </div>
-</section>
-
-       <section id="lab" class="page">
-    <h2>Video Sessions Platform</h2>
-    <div class="content-box">
-        <h3>Live Classes & Recordings</h3>
-        <p style="margin-bottom: 20px;">Accede a nuestra plataforma de video sesiones directamente desde aquí.</p>
-        
-        <div class="video-responsive-container">
-            <iframe 
-                src="https://www.mozart-app.com/sessions2" 
-                title="Video Platform Preview" 
-                allowfullscreen>
-            </iframe>
-        </div>
-        
-    </div>
-</section>
-
-        <section id="references" class="page">
-            <h2>Reference Websites</h2>
+        <!-- ==================== TEMARIO (THEORY NOTES) ==================== -->
+        <section id="theory" class="page">
             <div class="content-box">
+                <h3><i class="fas fa-book-open"></i> Contenido del Curso</h3>
+                <p>Explora los capítulos y temas que aprenderás a lo largo del programa</p>
+            </div>
+            
+            <div class="chapters-container">
+                <!-- CAPÍTULO 1 -->
+                <div class="chapter-card">
+                    <div class="chapter-info">
+                        <h3>Capítulo 1: Introducción al Piano</h3>
+                        <p>Conoce el instrumento, postura correcta, y los primeros ejercicios de digitación</p>
+                        <div class="chapter-divider"></div>
+                        <button class="btn-toggle-syllabus">
+                            Ver Temario <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="chapter-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=400&q=80" alt="Piano Keys">
+                    </div>
+                    
+                    <div class="module-syllabus">
+                        <ul>
+                            <li><i class="fas fa-play-circle"></i> 1.1 Historia del Piano</li>
+                            <li><i class="fas fa-play-circle"></i> 1.2 Postura y Técnica</li>
+                            <li><i class="fas fa-play-circle"></i> 1.3 Las Octavas y el Teclado</li>
+                            <li><i class="fas fa-file-code"></i> 1.4 Primeros Ejercicios</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- CAPÍTULO 2 -->
+                <div class="chapter-card">
+                    <div class="chapter-info">
+                        <h3>Capítulo 2: Lectura Musical Básica</h3>
+                        <p>Aprende a leer partituras, el pentagrama, claves y figuras rítmicas</p>
+                        <div class="chapter-divider"></div>
+                        <button class="btn-toggle-syllabus">
+                            Ver Temario <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="chapter-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Sheet Music">
+                    </div>
+
+                    <div class="module-syllabus">
+                        <ul>
+                            <li><i class="fas fa-play-circle"></i> 2.1 El Pentagrama</li>
+                            <li><i class="fas fa-play-circle"></i> 2.2 Clave de Sol y Fa</li>
+                            <li><i class="fas fa-play-circle"></i> 2.3 Figuras Rítmicas</li>
+                            <li><i class="fas fa-file-alt"></i> 2.4 Ejercicios de Lectura</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PLATAFORMA DE VIDEO ==================== -->
+        <section id="lab" class="page">
+            <div class="content-box">
+                <h3><i class="fas fa-play-circle"></i> Plataforma de Video Sesiones</h3>
+                <p style="margin-bottom: 20px;">Accede a las clases grabadas y sesiones en vivo</p>
+                
+                <div class="video-responsive-container">
+                    <iframe 
+                        src="https://www.mozart-app.com/sessions2" 
+                        title="Video Platform Preview" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== REFERENCIAS ==================== -->
+        <section id="references" class="page">
+            <div class="content-box">
+                <h3><i class="fas fa-link"></i> Recursos y Referencias</h3>
+                <p style="margin-bottom: 20px;">Sitios web recomendados para complementar tu aprendizaje</p>
+                
                 <div class="references-grid">
-                    <a href="https://developer.mozilla.org" target="_blank" class="reference-card">
-                        <i class="fab fa-firefox"></i>
-                        <h3>MDN Web Docs</h3>
-                        <p>Comprehensive resource</p>
+                    <a href="https://www.musictheory.net" target="_blank" class="reference-card">
+                        <i class="fas fa-music"></i>
+                        <h4>Music Theory</h4>
+                        <p>Teoría musical interactiva</p>
                     </a>
-                    <a href="https://www.w3schools.com" target="_blank" class="reference-card">
-                        <i class="fas fa-code"></i>
-                        <h3>W3Schools</h3>
-                        <p>Tutorials and references</p>
+                    <a href="https://www.teoria.com" target="_blank" class="reference-card">
+                        <i class="fas fa-book"></i>
+                        <h4>Teoria.com</h4>
+                        <p>Ejercicios y tutoriales</p>
                     </a>
-                    <a href="https://stackoverflow.com" target="_blank" class="reference-card">
-                        <i class="fab fa-stack-overflow"></i>
-                        <h3>Stack Overflow</h3>
-                        <p>Q&A community</p>
+                    <a href="https://imslp.org" target="_blank" class="reference-card">
+                        <i class="fas fa-file-music"></i>
+                        <h4>IMSLP</h4>
+                        <p>Partituras gratuitas</p>
                     </a>
-                    <a href="https://github.com" target="_blank" class="reference-card">
-                        <i class="fab fa-github"></i>
-                        <h3>GitHub</h3>
-                        <p>Code hosting</p>
+                    <a href="https://www.youtube.com/@PianoTutorials" target="_blank" class="reference-card">
+                        <i class="fab fa-youtube"></i>
+                        <h4>YouTube</h4>
+                        <h4>Tutoriales en video</h4>
                     </a>
                 </div>
             </div>
@@ -1003,244 +190,38 @@
 
     </main>
 
+    <!-- ==================== FOOTER ==================== -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h4>About WT/048</h4>
-                <p>A comprehensive resource for web technology students and enthusiasts.</p>
+                <h4>Sobre el Curso</h4>
+                <p>Programa profesional de piano con clases en vivo y material exclusivo</p>
             </div>
             <div class="footer-section">
-                <h4>Quick Links</h4>
+                <h4>Enlaces Rápidos</h4>
                 <ul>
-                    <li><a href="#" data-page="home">Home</a></li>
-                    <li><a href="#" data-page="syllabus">Syllabus</a></li>
-                    <li><a href="#" data-page="theory">Theory Notes</a></li>
+                    <li><a href="#" data-page="home">Inicio</a></li>
+                    <li><a href="#" data-page="syllabus">Calendario</a></li>
+                    <li><a href="#" data-page="theory">Temario</a></li>
                 </ul>
             </div>
             <div class="footer-section">
-                <h4>Contact</h4>
-                <p>Email: info@wt048.edu</p>
+                <h4>Contacto</h4>
+                <p>Email: info@mozart-academy.com</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 Web Technology/048. All rights reserved.</p>
+            <p>&copy; 2025 Mozart Academy. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // 1. Navigation Logic
-            const navLinks = document.querySelectorAll('nav a');
-            const pages = document.querySelectorAll('.page');
-            
-            // Add click event for Footer Links as well
-            const footerLinks = document.querySelectorAll('.footer-section a[data-page]');
-            const allNavLinks = [...navLinks, ...footerLinks];
-
-            allNavLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.getAttribute('data-page');
-                    
-                    // Update active nav link (only for top nav)
-                    navLinks.forEach(navLink => {
-                        if(navLink.getAttribute('data-page') === pageId){
-                            navLink.classList.add('active');
-                        } else {
-                            navLink.classList.remove('active');
-                        }
-                    });
-                    
-                    // Show selected page
-                    pages.forEach(page => {
-                        page.classList.remove('active');
-                        if (page.id === pageId) {
-                            page.classList.add('active');
-                        }
-                    });
-                    
-                    // Scroll to top
-                    window.scrollTo(0, 0);
-                });
-            });
-
-           // 2. Chapter Card Accordion Logic
-const accordions = document.querySelectorAll('.btn-toggle-syllabus');
-
-accordions.forEach(acc => {
-    acc.addEventListener('click', function() {
-        // Alternar clase activa en el botón (para rotar la flecha)
-        this.classList.toggle('active');
-
-        // Encontrar el contenedor del temario (que es hermano del padre o está cerca)
-        // Estructura: chapter-card > module-syllabus
-        const card = this.closest('.chapter-card');
-        const panel = card.querySelector('.module-syllabus');
-
-        if (panel.style.maxHeight) {
-            // Si está abierto, ciérralo
-            panel.style.maxHeight = null;
-        } else {
-            // Si está cerrado, ábrelo calculando la altura del contenido
-            panel.style.maxHeight = panel.scrollHeight + "px";
-        }
-    });
-});
-
-
-
-// --- LÓGICA DE CALENDARIO CON MODAL ---
-
-    const syllabusData = {
-        "0-15": "Inicio del Curso",
-        "0-25": "Entrega Tarea 1", 
-        "1-14": "Valentine's Day", 
-        "1-17": "Maha Shivratri",
-        "2-05": "Examen CSS",     
-        "2-28": "Vacaciones",
-        "3-15": "Inicio JS",      
-        "3-10": "Entrega Lab 4",
-        "4-01": "Día del Trabajo", 
-        "5-15": "Examen Medio",    
-        "6-20": "Proyecto Final", 
-        "7-10": "Graduación"       
-    };
-
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const calendarRoot = document.getElementById('calendar-root');
-    const modal = document.getElementById('calendar-modal');
-    const modalContainer = document.getElementById('modal-calendar-container');
-    const closeModalBtn = document.querySelector('.close-modal');
-
-    function generateBlockCalendar(year) {
-        let html = '';
-
-        monthNames.forEach((name, monthIndex) => {
-            const firstDay = new Date(year, monthIndex, 1).getDay(); 
-            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
-            // Agregamos data-month-index para identificar qué mes es al hacer clic
-            html += `
-            <div class="calendar-month" onclick="openModal(${monthIndex}, ${year})">
-                <div class="month-binding"></div>
-                <h1>${name}</h1>
-                <div class="month-divider"></div>
-                <table class="calendar-table">
-                    <thead style="display:none;"> <tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr>`;
-
-            let dayCount = 0;
-            for (let i = 0; i < firstDay; i++) {
-                html += `<td class="empty"></td>`;
-                dayCount++;
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                if (dayCount % 7 === 0 && dayCount !== 0) html += `</tr><tr>`;
-
-                const eventKey = `${monthIndex}-${day}`;
-                const eventName = syllabusData[eventKey];
-                const activeClass = eventName ? 'has-event' : '';
-                // Guardamos el nombre del evento en data-full-title para usarlo en el modal
-                const eventTitleAttr = eventName ? `data-full-title="${eventName}"` : '';
-                // Tooltip simple para la vista mini
-                const tooltipAttr = eventName ? `data-title="${day}: ${eventName}"` : '';
-
-                html += `<td class="${activeClass}" ${eventTitleAttr} ${tooltipAttr}>${day}</td>`;
-                dayCount++;
-            }
-
-            while (dayCount % 7 !== 0) {
-                html += `<td class="empty"></td>`;
-                dayCount++;
-            }
-
-            html += `</tr></tbody></table></div>`;
-        });
-
-        calendarRoot.innerHTML = html;
-    }
-
-    // --- FUNCIONES DEL MODAL ---
-
-    // Esta función se llama al hacer clic en un mes de la rejilla
-    window.openModal = function(monthIndex, year) {
-        // 1. Regeneramos SOLO el mes seleccionado pero con la clase "expanded-month"
-        //    Podríamos clonar el HTML, pero regenerarlo nos permite añadir headers de días visibles.
-        
-        const name = monthNames[monthIndex];
-        const firstDay = new Date(year, monthIndex, 1).getDay();
-        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-        
-        let modalHtml = `
-            <div class="month-binding"></div>
-            <h1>${name}</h1>
-            
-            <table class="calendar-table">
-                <thead>
-                    <tr style="color: #666; font-weight:bold;">
-                        <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>`;
-
-        let dayCount = 0;
-        for (let i = 0; i < firstDay; i++) {
-            modalHtml += `<td class="empty"></td>`;
-            dayCount++;
-        }
-
-        for (let day = 1; day <= daysInMonth; day++) {
-            if (dayCount % 7 === 0 && dayCount !== 0) modalHtml += `</tr><tr>`;
-
-            const eventKey = `${monthIndex}-${day}`;
-            const eventName = syllabusData[eventKey];
-            const activeClass = eventName ? 'has-event' : '';
-            const eventTitleAttr = eventName ? `data-full-title="${eventName}"` : '';
-
-            modalHtml += `<td class="${activeClass}" ${eventTitleAttr}>${day}</td>`;
-            dayCount++;
-        }
-
-        while (dayCount % 7 !== 0) {
-            modalHtml += `<td class="empty"></td>`;
-            dayCount++;
-        }
-        
-        modalHtml += `</tr></tbody></table>`;
-
-        // 2. Inyectar HTML en el contenedor del modal
-        modalContainer.innerHTML = modalHtml;
-
-        // 3. Mostrar modal
-        modal.classList.add('show');
-    };
-
-    // Cerrar modal
-    closeModalBtn.onclick = function() {
-        modal.classList.remove('show');
-    }
-
-    // Cerrar al hacer clic fuera
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.classList.remove('show');
-        }
-    }
-
-    // Inicializar
-    generateBlockCalendar(2025);
-
-    
-        });
+        /* El JavaScript irá en la PARTE 3 */
     </script>
 </body>
 </html>
