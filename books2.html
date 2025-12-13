@@ -5,335 +5,592 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Gestor de Partituras Mozart Academy</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.2/flickity.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap");
 
+        /* ==================== VARIABLES (Mozart Academy Theme) ==================== */
         :root {
-            --body-bg-color: #e5f4f9;
-            --body-color-light: #8b939c;
-            --body-font: "Roboto", sans-serif;
-            --page-bg-color: #f2f5f7;
-            --body-color: #3d4954;
-            --border-color: #b8bec3;
-            --placeholder: #ccd0d2;
-            --heart-color-active: #ff4b4b;
+            --primary-color: #FF4757;
+            --primary-hover: #ff6b81;
+            --secondary-color: #2ed573;
+            --bg-light: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-dark: #2f3542;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --heart-color-active: #FF4757;
         }
 
-       * { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-}
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         img { max-width: 100%; }
-       html { box-sizing: border-box; -webkit-font-smoothing: antialiased; height: 100vh; overflow: hidden; width: 100%;}
-       body { 
-    background-color: #fff; 
-    font-family: var(--body-font); 
-    color: var(--body-color); 
-    margin: 0; 
-    /* BLOQUEAR EL BODY */
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
+        html { box-sizing: border-box; -webkit-font-smoothing: antialiased; height: 100vh; overflow: hidden; width: 100%;}
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark); 
+            margin: 0; 
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
         .book-store {
-    display: flex;
-    flex-direction: column;
-    max-width: 1400px;
-    /* CAMBIO CLAVE: Altura fija y scroll interno */
-    height: 100%; 
-    width: 100%;
-    overflow-y: auto; /* El scroll ocurre AQUÍ, no en el body */
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch; /* Suavidad nativa de iOS */
-    
-    background-color: var(--page-bg-color);
-    margin: 0 auto;
-    position: relative; /* Para contener elementos absolutos */
-}
-        /* --- SEARCH BAR --- */
-        .search-bar { position: relative; }
-        .search-bar input {
-            height: 100%; width: 100%; display: block;
-            background-color: transparent; border: none;
-            font-weight: 600; padding: 0 10px 0 40px;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%238b939c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3e%3ccircle cx='11' cy='11' r='8'/%3e%3cpath d='M21 21l-4.35-4.35'/%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-size: 15px; background-position: 15px 50%;
-            color: var(--body-color); font-family: var(--body-font);
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            height: 100%; 
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            background-color: var(--bg-light);
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
         }
-        .search-bar input::placeholder { color: var(--placeholder); }
 
-        /* --- CAROUSEL (BOOK SLIDE) --- */
-        .book-slide { width: 100%; margin-bottom: 20px; }
-        /* Restaura el estilo base de la celda */
-.book-cell {
-    position: relative;
-    display: flex;
-    padding: 25px;
-    width: 40%; /* Regresamos al 40% original */
-    height: 250px;
-    margin-right: 1px; /* Margen original */
-    border-radius: 0; /* Quitamos borde redondeado extra si quieres el look pegado original */
-}
+        /* --- SEARCH BAR (Nuevo estilo) --- */
+        .search-bar { position: relative; flex-grow: 1; max-width: 400px; }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #f1f2f6;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: 0.3s;
+            color: var(--text-dark);
+        }
+        .search-bar input:focus {
+            background: white;
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+        .search-bar .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
 
-/* Lógica para que los colores se repitan cíclicamente (5n+1, 5n+2...) 
-   ya que ahora los favoritos son dinámicos e infinitos */
-.book-cell:nth-child(5n+1) { background-color: #fbadaf; }
-.book-cell:nth-child(5n+2) { background-color: #a4e0eb; }
-.book-cell:nth-child(5n+3) { background-color: #edb9d6; }
-.book-cell:nth-child(5n+4) { background-color: #fdca95; }
-.book-cell:nth-child(5n+5) { background-color: #cbb5e2; }
+        /* --- CAROUSEL BANNER (Destacado) --- */
+       .book-slide { width: 100%; margin-bottom: 20px; }
+        
+        .book-cell {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 35px 30px;
+            width: 40%;
+            height: 280px;
+            margin-right: 1px;
+            border-radius: 0;
+            background-size: cover;
+            background-position: center;
+        }
 
-/* IMPORTANTE: Recuperar las Media Queries de responsividad */
-@media (max-width: 1103px) {
-    .book-cell { width: 60%; }
-}
-@media (max-width: 765px) {
-    .book-cell { width: 80%; }
-}
-@media (max-width: 575px) {
-    .book-cell { width: 100%; }
-}
+        .book-cell:nth-child(5n+1) { background: linear-gradient(135deg, #FF4757 0%, #ff6b81 100%); }
+        .book-cell:nth-child(5n+2) { background: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%); }
+        .book-cell:nth-child(5n+3) { background: linear-gradient(135deg, #a55eea 0%, #d1b3ff 100%); }
+        .book-cell:nth-child(5n+4) { background: linear-gradient(135deg, #ffa502 0%, #ffbe57 100%); }
+        .book-cell:nth-child(5n+5) { background: linear-gradient(135deg, #3742fa 0%, #70a1ff 100%); }
 
-        .flickity-page-dots { bottom: 10px; }
-        .flickity-viewport { overflow: hidden; } /* Ajuste para que no se desborde */
+        @media (max-width: 1103px) { .book-cell { width: 65%; } }
+        @media (max-width: 765px) { .book-cell { width: 85%; padding: 25px 20px; } }
+        @media (max-width: 575px) { .book-cell { width: 100%; height: 240px; } }
+
+        .flickity-page-dots { 
+            bottom: 15px; 
+        }
+        .flickity-page-dots .dot { 
+            background: rgba(255,255,255,0.4); 
+            width: 10px;
+            height: 10px;
+            margin: 0 6px;
+        }
+        .flickity-page-dots .dot.is-selected { 
+            background: white; 
+            transform: scale(1.3);
+        }
+        .flickity-viewport { overflow: hidden; }
+        
+        .flickity-button {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+        .flickity-button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .flickity-button .flickity-button-icon {
+            fill: white;
+        }
         
         .book-photo {
-            width: 180px; flex-shrink: 0; bottom: -35px; left: 35px;
-            border-radius: 4px; box-shadow: -2px 6px 19px 0px #7f818e;
-            transition: 0.3s ease; cursor: pointer;
+            width: 180px; 
+            height: 240px;
+            flex-shrink: 0;
+            border-radius: 5px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            transition: 0.3s ease; 
+            cursor: pointer;
+            object-fit: cover;
         }
-        .book-photo:hover { transform: scale(1.03); }
-        .book-img { flex-shrink: 0; position: relative; z-index: 10; margin-top: 10px; }
+        .book-photo:hover { 
+            transform: scale(1.08) translateY(-5px); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .book-img { 
+            flex-shrink: 0; 
+            position: relative; 
+            z-index: 10; 
+            margin-right: 25px;
+        }
         
-        .book-content { padding: 0 20px; color: #ffffff; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
-        .book-title { font-weight: 600; font-size: 24px; margin-bottom: 5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
-        .book-author { font-size: 14px; margin-bottom: 15px; }
-        .book-sum { font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .book-content { 
+            flex: 1;
+            padding: 0 20px; 
+            color: #ffffff; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        .book-title { 
+            font-weight: 800; 
+            font-size: 28px; 
+            margin-bottom: 8px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            line-height: 1.2;
+        }
+        .book-author { 
+            font-size: 16px; 
+            margin-bottom: 12px; 
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        .book-sum { 
+            font-size: 14px; 
+            line-height: 1.5; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            opacity: 0.9;
+        }
+        .rate {
+            margin-top: 10px;
+        }
+        .book-voters {
+            background: rgba(255,255,255,0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
 
         /* --- MAIN LAYOUT --- */
-        .main-wrapper { width: 100%; display: flex; flex-grow: 1; margin-top: 20px; overflow: visible; }
+        .main-wrapper { width: 100%; display: grid; grid-template-columns: 1fr 300px; gap: 25px; flex-grow: 1; margin-top: 20px; overflow: visible; }
         
-        /* SIDEBAR (Authors & Year Books) */
-        .books-of { width: 320px; display: flex; flex-direction: column; position: sticky; top: 20px; align-self: flex-start; flex-shrink: 0; padding-right: 20px; }
-        .week { padding: 0 30px; }
-        .author-title { padding: 0 0 20px; font-weight: 500; font-size: 15px; }
-        .author { display: flex; align-items: center; margin-bottom: 20px; cursor: pointer; }
-        .author-img { border-radius: 50%; width: 40px; height: 40px; margin-right: 16px; object-fit: cover; }
-        .author-name { font-size: 14px; }
+        /* ==================== SIDEBAR (Nuevo estilo Mozart Academy) ==================== */
+        .books-of { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px;
+            position: sticky; 
+            top: 20px; 
+            align-self: flex-start; 
+        }
         
-        .year-book { display: flex; align-items: center; margin-bottom: 20px; }
-        .year-book-img { width: 45px; margin-right: 16px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .year-book-content { display: flex; flex-direction: column; font-size: 14px; }
-        .year-book-name { font-weight: 500; margin-bottom: 4px; }
-        .year-book-author { font-size: 13px; color: var(--body-color-light); }
+        .week { 
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        
+        .author-title { 
+            padding: 0 0 15px; 
+            font-weight: 700; 
+            font-size: 14px; 
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .author { display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; transition: 0.2s; }
+        .author:hover { transform: translateX(5px); }
+        .author-img { border-radius: 50%; width: 40px; height: 40px; margin-right: 12px; object-fit: cover; border: 2px solid var(--border-color); }
+        .author-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        
+        .year-book { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            padding: 10px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .year-book:hover { background: #eee; transform: translateX(5px); }
+        .year-book-img { width: 45px; height: 60px; margin-right: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover; }
+        .year-book-content { display: flex; flex-direction: column; font-size: 13px; flex: 1; }
+        .year-book-name { font-weight: 600; margin-bottom: 3px; color: var(--text-dark); line-height: 1.2; }
+        .year-book-author { font-size: 11px; color: var(--text-muted); }
 
-        /* MAIN CONTENT */
-        .popular-books { flex-grow: 1; padding: 0 30px 50px; }
-        .main-menu { display: flex; align-items: center; white-space: nowrap; padding-bottom: 15px; border-bottom: 1px solid #dcddde; position: sticky; top: 0; background-color: var(--page-bg-color); z-index: 100; padding-top: 10px;}
-        .genre { font-weight: 500; font-size: 15px; margin-right: 20px; }
-        .book-types { margin-left: auto; display: flex; }
-        .book-type { margin-left: 20px; text-decoration: none; color: var(--body-color); font-size: 14px; cursor: pointer; position: relative; transition: 0.2s; }
-        .book-type.active, .book-type:hover { font-weight: bold; }
-        .book-type.active:before { content: ""; position: absolute; width: 100%; height: 2px; bottom: -5px; background-color: #67d4ea; }
-
-        /* --- GRID CARDS --- */
-        .book-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; padding-top: 40px; }
-        .book-card { background-color: #fff; box-shadow: -1px 3px 8px -1px rgba(0, 0, 0, 0.1); border-radius: 4px; display: flex; flex-direction: column; padding: 0 0 20px 20px; position: relative; transition: transform 0.2s; }
-        .book-card:hover { transform: translateY(-3px); }
-
-        .content-wrapper { display: flex; position: relative; border-bottom: 1px solid #ebedef; padding-bottom: 20px; }
+        /* ==================== MAIN CONTENT (Nuevo estilo) ==================== */
+        .popular-books { 
+            flex-grow: 1; 
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
         
-        /* Imagen Clickeable */
-        .book-card-img { width: 140px; margin-top: -25px; border-radius: 3px; box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.2); object-fit: cover; cursor: pointer; transition: 0.3s; height: 200px; }
-        .book-card-img:hover { transform: scale(1.05); box-shadow: 0px 8px 15px 0px rgba(0,0,0,0.3); }
+        .main-menu { 
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap;
+            gap: 15px;
+            padding-bottom: 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            
+            top: 0; 
+            background-color: var(--card-bg); 
+            z-index: 100; 
+            padding-top: 5px;
+        }
+        
+        .genre { font-weight: 700; font-size: 16px; color: var(--text-dark); }
+        
+        .book-types { display: flex; gap: 5px; flex-wrap: wrap; }
+        .book-type { 
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .book-type:hover { background: #f1f2f6; }
+        .book-type.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
 
-        .card-content { padding: 25px 25px 0 20px; width: 100%; }
-        .book-name { font-weight: 500; font-size: 16px; margin-bottom: 5px; line-height: 1.2; }
-        .book-by { font-size: 13px; color: var(--body-color-light); margin-bottom: 10px; }
+        /* ==================== GRID CARDS (Nuevo estilo Mozart Academy) ==================== */
+        .book-cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            padding-top: 25px; 
+        }
         
-        .card-sum { font-size: 13px; color: var(--body-color-light); line-height: 1.5; margin-top: 10px; }
+        .book-card { 
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .book-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper { 
+            display: flex; 
+            flex-direction: column;
+            position: relative; 
+        }
         
-        /* Heart Button Logic */
+        /* Imagen de portada estilo nuevo */
+        .book-card-img { 
+            width: 100%; 
+            height: 140px;
+            border-radius: 0;
+            box-shadow: none;
+            object-fit: cover; 
+            cursor: pointer; 
+            transition: 0.3s;
+            margin: 0;
+        }
+        .book-card-img:hover { opacity: 0.9; }
+
+        .card-content { 
+            padding: 15px; 
+            width: 100%; 
+        }
+        .book-name { 
+            font-weight: 700; 
+            font-size: 14px; 
+            margin-bottom: 4px; 
+            line-height: 1.3;
+            color: var(--text-dark);
+        }
+        .book-by { 
+            font-size: 12px; 
+            color: var(--text-muted); 
+            margin-bottom: 10px; 
+        }
+        
+        .card-sum { 
+            display: none; /* Ocultamos para el nuevo diseño limpio */
+        }
+        
+        /* Heart Button (Nuevo estilo) */
         .heart-btn {
-            background: none; border: none; cursor: pointer;
-            font-size: 18px; color: #ccc; transition: color 0.2s;
-            position: absolute; top: 10px; right: 10px; z-index: 5;
+            background: rgba(255,255,255,0.9); 
+            border: none; 
+            cursor: pointer;
+            font-size: 14px; 
+            color: #ccc; 
+            transition: all 0.2s;
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            z-index: 5;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .heart-btn.active { color: var(--heart-color-active); }
-        .heart-btn:hover { transform: scale(1.1); }
+        .heart-btn:hover { transform: scale(1.1); background: white; }
 
-        /* Rating Stars (Static Visuals) */
-        .stars { color: #ff9700; font-size: 12px; }
-        .stars i.far { color: #ccc; }
+        /* Rating Stars / Tags */
+        .stars { 
+            display: flex; 
+            gap: 5px; 
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .stars .score-tag {
+            font-size: 10px; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            background: #f1f2f6; 
+            color: var(--text-muted); 
+            font-weight: 600;
+        }
+        .stars i { display: none; } /* Ocultamos estrellas, usamos tags */
 
         /* --- MODAL PDF (Ajustado para iOS/iPhone) --- */
-.pdf-viewer-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: #000; 
-    z-index: 99999; 
-    display: none; 
-    flex-direction: column; 
-    /* Evita que el scroll del overlay mueva la página de atrás */
-    overscroll-behavior: contain; 
-}
-
-.pdf-viewer-overlay.active { 
-    display: flex; 
-}
-
-.xml-viewer-close { 
-    position: absolute; 
-    top: 10px; /* Un poco más abajo para evitar el notch del iPhone */
-    right: 15px; 
-    background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente para que se vea */
-    border: none; 
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    color: white; 
-    font-size: 20px; 
-    cursor: pointer; 
-    z-index: 100000; /* Siempre encima del iframe */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pdf-viewer-overlay iframe { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-    background: #fff;
-    flex-grow: 1;
-}
-
-        /* Responsiveness */
-        @media (max-width: 900px) { .books-of { display: none; } }
-        @media (max-width: 1150px) and (min-width: 901px) {
-    .books-of {
-        width: 260px; /* Hacemos la barra un poco más delgada */
-        padding-right: 10px;
-    }
-    
-    .popular-books {
-        padding: 0 15px 50px; /* Reducimos padding del grid para ganar espacio */
-    }
-    
-    .book-cards {
-        gap: 20px; /* Reducimos el espacio entre tarjetas */
-    }
-}
-        @media (max-width: 725px) { .book-cards { grid-template-columns: 1fr; } .book-types { display: none; } }
-        @media (max-width: 480px) { 
-            .book-photo { width: 120px; left: 10px; }
+        .pdf-viewer-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: #000; 
+            z-index: 99999; 
+            display: none; 
+            flex-direction: column; 
+            overscroll-behavior: contain; 
         }
 
+        .pdf-viewer-overlay.active { display: flex; }
 
-        /* --- PROGRESO (Barra de avance) --- */
-.progress-wrapper {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #f0f0f0;
-}
-.progress-label {
-    font-size: 12px; font-weight: 500; color: #3d4954; margin-bottom: 5px; display: flex; justify-content: space-between;
-}
-.progress-track {
-    width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; overflow: hidden;
-}
-.progress-fill {
-    height: 100%; background-color: #67d4ea; width: 0%; transition: width 0.5s ease;
-}
+        .xml-viewer-close { 
+            position: absolute; 
+            top: 15px;
+            right: 15px; 
+            background: rgba(0, 0, 0, 0.6);
+            border: none; 
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: white; 
+            font-size: 18px; 
+            cursor: pointer; 
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .xml-viewer-close:hover { background: rgba(0,0,0,0.8); }
 
-/* --- ESTILOS ACTIVIDAD RECIENTE (SIDEBAR) --- */
-.activity-item {
-    display: flex; margin-bottom: 20px; align-items: flex-start;
-}
-.activity-img {
-    width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.activity-info {
-    flex: 1; display: flex; flex-direction: column; font-size: 13px;
-}
-.activity-user { font-weight: 600; color: #EC5800; font-size: 15px}
-.activity-meta { font-size: 11px; color: #8b939c; margin-bottom: 4px; }
-.activity-doc { font-weight: 500;  margin-top: 2px; display: block; text-decoration: none;}
+        .pdf-viewer-overlay iframe { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            background: #fff;
+            flex-grow: 1;
+        }
 
-/* --- PAGINACIÓN --- */
-.pagination-controls {
-    display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 15px; grid-column: 1 / -1;
-}
-.page-btn {
-    padding: 8px 16px; background-color: #fff; border: 1px solid #dcddde; border-radius: 20px;
-    cursor: pointer; font-weight: 500; color: var(--body-color); transition: 0.2s;
-}
-.page-btn:hover:not(:disabled) { background-color: #67d4ea; color: white; border-color: #67d4ea; }
-.page-btn:disabled { opacity: 0.5;}
-
-/* --- CURSOR POINTER PARA FAVORITOS --- */
-.year-book { cursor: pointer; transition: transform 0.2s; }
-.year-book:hover { transform: translateX(5px); }
-
-/* --- RESPONSIVIDAD MÓVIL (Punto 5) --- */
-@media (max-width: 725px) {
-    /* Contenedor principal del menú */
-    .main-menu {
-        display: flex;
-        flex-wrap: wrap; /* Permite que elementos bajen si es necesario */
-        align-items: center;
-        padding-bottom: 10px;
-    }
-
-    /* 1. Título "Genre" */
-    .genre {
-        margin-right: 10px;
-        font-size: 14px;
-        flex-shrink: 0; /* No permitimos que se encoja el texto */
-    }
-
-    /* 2. Barra de búsqueda */
-    .search-bar {
-        flex-grow: 1; /* Ocupa todo el espacio disponible en la fila */
-        width: auto;  /* Quitamos el ancho fijo */
-        margin-bottom: 0; /* Sin margen abajo para mantenerse en linea */
-        margin-right: 0;
-    }
-    
-    /* Ajuste visual del input para que no sea enorme en altura */
-    .search-bar input {
-        padding-left: 35px; /* Ajuste del icono */
-        background-position: 10px 50%;
-    }
-
-    /* 3. Pestañas (Book Types) bajan a una nueva fila */
-    .book-types {
-        order: 3; /* Forzamos que vaya al final */
-        width: 100%; /* Ocupa nueva fila completa */
-        margin-left: 0;
-        margin-top: 15px; /* Separación de la fila de arriba */
+        /* ==================== RESPONSIVENESS ==================== */
+        @media (max-width: 900px) { 
+            .main-wrapper { grid-template-columns: 1fr; }
+            .books-of { 
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+                position: relative;
+                top: 0;
+            }
+        }
         
-        /* Scroll horizontal */
-        display: flex;
-        overflow-x: auto;
-        padding-bottom: 5px;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-    }
+        @media (max-width: 725px) { 
+            .book-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; } 
+            .book-card-img { height: 100px; }
+            .card-content { padding: 10px; }
+            .book-name { font-size: 12px; }
+            .book-by { font-size: 10px; margin-bottom: 5px; }
+            .popular-books { padding: 15px; }
+            
+            .book-types { 
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                flex-wrap: nowrap;
+            }
+            .book-type { flex-shrink: 0; }
+        }
+        
+        @media (max-width: 480px) { 
+            .book-photo { width: 120px; height: 160px; }
+            .book-store { padding: 10px; }
+            .book-cell { 
+                height: 220px; 
+                padding: 20px 15px;
+                flex-direction: column;
+                text-align: center;
+            }
+            .book-img {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .book-title { font-size: 20px; }
+            .book-author { font-size: 14px; }
+            .book-sum { display: none; }
+        }
 
-    .book-type {
-        margin-left: 0;
-        margin-right: 20px;
-        flex-shrink: 0;
-    }
-}
+        /* --- PROGRESO (Barra de avance - Nuevo estilo) --- */
+        .progress-wrapper {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .progress-label {
+            font-size: 10px; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            margin-bottom: 4px; 
+            display: flex; 
+            justify-content: space-between;
+        }
+        .progress-track {
+            width: 100%; 
+            height: 4px; 
+            background-color: #e9ecef; 
+            border-radius: 2px; 
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; 
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover)); 
+            width: 0%; 
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        /* --- ESTILOS ACTIVIDAD RECIENTE (SIDEBAR - Nuevo estilo) --- */
+        .activity-item {
+            display: flex; 
+            margin-bottom: 15px; 
+            align-items: flex-start;
+            padding: 10px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+        .activity-item:hover { background: #eee; }
+        .activity-img {
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin-right: 10px; 
+            border: 2px solid white; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .activity-info {
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            font-size: 12px;
+        }
+        .activity-user { 
+            font-weight: 700; 
+            color: var(--primary-color); 
+            font-size: 13px;
+        }
+        .activity-meta { 
+            font-size: 10px; 
+            color: var(--text-muted); 
+            margin-bottom: 3px; 
+        }
+        .activity-doc { 
+            font-weight: 600;  
+            margin-top: 2px; 
+            display: block; 
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        /* --- PAGINACIÓN (Nuevo estilo) --- */
+        .pagination-controls {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-top: 25px; 
+            gap: 12px; 
+            grid-column: 1 / -1;
+        }
+        .page-btn {
+            padding: 10px 20px; 
+            background-color: white; 
+            border: 1px solid var(--border-color); 
+            border-radius: 25px;
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px;
+            color: var(--text-dark); 
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .page-btn:hover:not(:disabled) { 
+            background: var(--primary-color); 
+            color: white; 
+            border-color: var(--primary-color); 
+        }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -352,31 +609,13 @@
     </div>
 
     <div class="main-wrapper">
-        
-        <div class="books-of">
-            <div class="week">
-                <div class="author-title">Últimos usuarios</div>
-                <div id="authorsList"></div>
-            </div>
-
-            <div class="week year">
-                <div class="author-title">Mis favoritos</div>
-                <div id="yearBooksList"></div>
-            </div>
-
-            <div class="week year">
-                <div class="author-title">Últimas abiertas</div>
-                <div id="recentSidebarList"></div>
-            </div>
-
-
-        </div>
-      
+        <!-- Contenido Principal (Izquierda) -->
         <div class="popular-books">
             <div class="main-menu">
                 <div class="genre">Explorar por Estilo</div>
                 <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Buscar partitura..." />
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por título, compositor..." />
                 </div>
                 <div class="book-types">
                     <a class="book-type active" data-filter="all">Todos</a>
@@ -391,6 +630,26 @@
             <div class="book-cards" id="bookGrid">
                 </div>
         </div>
+
+        <!-- Sidebar (Derecha) -->
+        <aside class="books-of">
+            <div class="week">
+                <div class="author-title">Actividad Reciente</div>
+                <div id="authorsList"></div>
+            </div>
+
+             <div class="week">
+                <div class="author-title">Recién Abiertas</div>
+                <div id="recentSidebarList"></div>
+            </div>
+
+            <div class="week">
+                <div class="author-title">Mis Favoritos</div>
+                <div id="yearBooksList"></div>
+            </div>
+
+           
+        </aside>
     </div>
 </div>
 
@@ -2281,7 +2540,7 @@
     "author": "C.P.E. Bach",
     "background": "https://lh3.googleusercontent.com/d/1ypONNgyH0qsgpD7pmlSaDSLPt8pw709B=s400",
     "pdf": "bach-march-in-d-major-bwv-anh-122.musicxml",
-    "dateAdded": "2S025-11-05",
+    "dateAdded": "2025-11-05",
     "style": "baroque",
     "tags": []
   },
@@ -2383,10 +2642,8 @@
     let recentScores = [];
 
 function renderSidebars() {
-        // A. Actividad Reciente (Igual)
+        // A. Actividad Reciente
         const activityContainer = document.getElementById('authorsList');
-        const titleElem = document.querySelector('.week .author-title');
-        if(titleElem) titleElem.innerText = "Recién abiertas";
         
         activityContainer.innerHTML = activityData.map(act => `
            <div class="activity-item">
@@ -2571,26 +2828,23 @@ function renderBookGrid(data) {
         const paginatedItems = data.slice(start, end);
 
         paginatedItems.forEach(score => {
-            // --- CAMBIO AQUÍ: Usamos score.title ---
             const interaction = getInteraction(score.title); 
-            // ---------------------------------------
             const isLiked = interaction.isLiked;
             const progress = interaction.progress;
 
-            const difficultyStr = score.difficulty || '';
-            const grade = parseInt(difficultyStr.replace(/\D/g, '')) || 3;
-            let starsHtml = '';
-            for(let i=1; i<=5; i++) { starsHtml += `<i class="${i <= grade ? 'fas' : 'far'} fa-star"></i>`; }
-
             const heartClass = isLiked ? 'active' : '';
             const heartIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+
+            // Tags para dificultad y estilo
+            const difficultyTag = score.difficulty ? `<span class="score-tag">${score.difficulty}</span>` : '';
+            const styleTag = score.style ? `<span class="score-tag" style="text-transform: capitalize;">${score.style}</span>` : '';
 
             let progressHTML = '';
             if (progress > 0) {
                 progressHTML = `
                 <div class="progress-wrapper">
                     <div class="progress-label">
-                        <span>Tu Progreso</span>
+                        <span>Progreso</span>
                         <span>${progress}%</span>
                     </div>
                     <div class="progress-track">
@@ -2603,16 +2857,15 @@ function renderBookGrid(data) {
             <div class="book-card">
                 <div class="content-wrapper">
                     <img src="${score.background}" alt="" class="book-card-img" onclick="registerAndOpen('${score.title}')">
-                    <button class="heart-btn ${heartClass}" onclick="toggleLike('${score.title}')">
+                    <button class="heart-btn ${heartClass}" onclick="event.stopPropagation(); toggleLike('${score.title}')">
                         <i class="${heartIcon}"></i>
                     </button>
                     <div class="card-content">
                         <div class="book-name">${score.title}</div>
-                        <div class="book-by">by ${score.author}</div>
-                        <div class="stars">${starsHtml} <span style="color:#aaa; margin-left:5px;">(${score.difficulty})</span></div>
-                        <div class="card-sum">
-                            Añadido: ${score.dateAdded}<br>
-                            Etiquetas: ${score.tags.join(', ')}
+                        <div class="book-by">${score.author}</div>
+                        <div class="stars">
+                            ${difficultyTag}
+                            ${styleTag}
                         </div>
                         ${progressHTML}
                     </div>
