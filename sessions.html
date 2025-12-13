@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ==================== VARIABLES DEL DASHBOARD ==================== */
+        /* ==================== VARIABLES ==================== */
         :root {
-            --primary-color: #FF4757;
-            --secondary-color: #2ed573;
+            --primary-color: #FF4757; /* Nivel 1 */
+            --level2-color: #3742fa;  /* Nivel 2 */
+            --level3-color: #ffa502;  /* Nivel 3 */
             --bg-light: #f8f9fa;
             --card-bg: #ffffff;
             --text-dark: #2f3542;
             --text-muted: #6c757d;
             --border-color: #dee2e6;
-            --danger-color: #ff4757;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,60 +30,52 @@
             overflow-x: hidden;
         }
 
-       /* ==================== BANNER (IDÉNTICO AL DASHBOARD) ==================== */
+       /* ==================== BANNER ==================== */
         .banner-header {
             position: relative;
             width: 100%;
-            height: 240px; /* Altura idéntica al dashboard */
+            height: 240px;
             overflow: hidden;
             background-color: #fff;
-            margin-bottom: 0;
         }
 
         .banner-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Eliminamos background-image de aquí, usaremos <img> en el HTML */
         }
 
         .banner-overlay {
             position: absolute;
             inset: 0;
-            /* Gradiente idéntico al dashboard */
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
         }
 
         .banner-text {
             position: absolute;
             top: 50%;
-            left: 6%; /* Alineación izquierda idéntica al dashboard */
+            left: 6%;
             transform: translateY(-50%);
             z-index: 5;
             color: white; 
-            text-shadow: none;
-            /* Quitamos width: 100% y text-align: center */
         }
 
         .banner-text h1 {
-            font-size: 38px; /* Tamaño idéntico */
+            font-size: 38px;
             font-weight: 800;
             line-height: 1.2;
             margin-bottom: 5px;
             letter-spacing: -1px;
         }
 
-        /* El estilo del subtitle cambia ligeramente porque ahora va DENTRO del h1 */
         .banner-text .subtitle {
             font-size: 12px;
-            color: rgba(255,255,255,0.8); /* Color original del dashboard */
+            color: rgba(255,255,255,0.8);
             font-weight: 700;
             display: block;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            background: none; /* Quitamos el fondo blanco que puse para ventas */
-            padding: 0;
         }
 
         /* ==================== LAYOUT & CARDS ==================== */
@@ -94,6 +86,8 @@
             grid-template-columns: 2fr 1fr;
             gap: 25px;
         }
+
+        .col-span-full { grid-column: 1 / -1; }
 
         .card {
             background: var(--card-bg);
@@ -115,69 +109,110 @@
             gap: 10px;
         }
         
-        .section-title i { color: var(--primary-color); }
+        .section-title i { color: var(--text-dark); opacity: 0.7; }
 
-        /* ==================== ENROLL CARD (SIDEBAR) ==================== */
-        .enroll-price {
-            font-size: 36px;
-            font-weight: 800;
+        /* ==================== TABS SYSTEM (NUEVO) ==================== */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f1f2f6;
+            padding: 5px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: white;
             color: var(--text-dark);
-            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Colores específicos para tabs activas */
+        .tab-btn.active[data-target="lvl1"] { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        .tab-btn.active[data-target="lvl2"] { color: var(--level2-color); border-bottom: 2px solid var(--level2-color); }
+        .tab-btn.active[data-target="lvl3"] { color: var(--level3-color); border-bottom: 2px solid var(--level3-color); }
+
+        .level-description {
+            display: none; /* Oculto por defecto */
+            animation: fadeIn 0.4s ease;
+        }
+        .level-description.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== CONTENIDO DINÁMICO (TEMARIO) ==================== */
+        .course-syllabus-block {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .course-syllabus-block.active { display: block; }
+
+
+        /* ==================== INSTRUCTOR ROW ==================== */
+        .instructor-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .enroll-price span {
-            font-size: 14px;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-decoration: line-through;
+        .prof-info { display: flex; align-items: center; gap: 15px; }
+        .prof-img {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
         }
 
+        .prof-details h4 { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+        .prof-details span { font-size: 13px; color: var(--text-muted); }
+
+        /* ==================== BOTONES ==================== */
         .join-btn {
-            width: 100%; 
-            background: var(--primary-color); 
             color: white;
             border: none; 
-            padding: 16px; 
+            padding: 14px 24px; 
             border-radius: 12px;
             font-size: 16px; 
             font-weight: 700; 
             cursor: pointer;
-            display: flex; 
+            display: inline-flex; 
             align-items: center; 
             justify-content: center; 
             gap: 10px;
-            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); 
             transition: 0.3s;
             text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
+        
+        .join-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        .join-btn:hover { 
-            background: #ff6b81; 
-            transform: translateY(-2px); 
-        }
+        /* Clases de color para botones dinámicos */
+        .btn-lvl1 { background: var(--primary-color); }
+        .btn-lvl2 { background: var(--level2-color); }
+        .btn-lvl3 { background: var(--level3-color); }
 
-        .feature-list {
-            margin-top: 20px;
-            list-style: none;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            color: var(--text-dark);
-        }
-
-        .feature-item i {
-            color: var(--secondary-color); /* Verde para checks */
-        }
-
-        /* ==================== ACORDEON (TEMARIO) RE-ESTILIZADO ==================== */
+        /* ==================== ACORDEON ==================== */
         .chapter-card {
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -185,7 +220,6 @@
             overflow: hidden;
             background: white;
         }
-
         .chapter-header {
             padding: 20px;
             display: flex;
@@ -194,123 +228,44 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .chapter-header:hover { background: #fcfcfc; }
-
         .chapter-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
         .chapter-info p { font-size: 13px; color: var(--text-muted); }
-
         .btn-toggle {
-            width: 30px; height: 30px;
-            border-radius: 50%;
-            background: #f1f2f6;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-dark);
-            transition: 0.3s;
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #f1f2f6; display: flex; align-items: center; justify-content: center;
         }
-
         .chapter-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            background: #f8f9fa;
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease-out; background: #f8f9fa;
         }
-
-        .chapter-content ul {
-            list-style: none;
-            padding: 15px 20px;
-        }
-
+        .chapter-content ul { list-style: none; padding: 15px 20px; }
         .chapter-content li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #555;
-            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px;
+            color: #555; display: flex; align-items: center; gap: 10px;
         }
-        
         .chapter-content li:last-child { border-bottom: none; }
-        .chapter-content li i { color: var(--primary-color); font-size: 12px; }
 
-        /* ==================== CALENDARIO MINIMALISTA (ESTILO ANILLADO) ==================== */
-        .calendar-wrapper {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
+        /* ==================== SIDEBAR ==================== */
+        .enroll-price {
+            font-size: 32px; font-weight: 800; color: var(--text-dark);
+            margin: 5px 0 15px 0; display: flex; align-items: center; gap: 10px;
         }
+        .enroll-price span {
+            font-size: 14px; color: var(--text-muted);
+            font-weight: 500; text-decoration: line-through;
+        }
+        .sidebar-list { list-style: none; margin-top: 15px; }
+        .sidebar-list li { margin-bottom: 10px; font-size: 14px; display: flex; gap: 10px; color: var(--text-dark);}
 
-        .calendar-month {
-            width: 100%;
-            max-width: 300px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            padding-bottom: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .month-binding {
-            height: 20px;
-            background-color: #f1f2f6; /* Gris suave en lugar de beige */
-            position: relative;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            border-radius: 8px 8px 0 0;
-        }
-
-        .month-binding::before, .month-binding::after {
-            content: ''; position: absolute; top: 50%;
-            width: 8px; height: 8px; background-color: #fff;
-            border-radius: 50%; transform: translateY(-50%);
-            border: 1px solid #ddd;
-        }
-        .month-binding::before { left: 25%; }
-        .month-binding::after { right: 25%; }
-
-        .calendar-month h4 {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-        }
-
-        .calendar-grid-view {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            padding: 0 15px;
-        }
-
-        .cal-day {
-            height: 25px;
-            background: #eee;
-            border-radius: 3px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0; /* Ocultar números para vista minimalista */
-        }
-        
-        .cal-day.active {
-            background: var(--primary-color); /* Rojo del dashboard */
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cal-day.active:hover::after {
-            content: attr(data-tooltip);
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: #333; color: white; padding: 4px 8px;
-            font-size: 10px; border-radius: 4px; white-space: nowrap;
-            pointer-events: none; margin-bottom: 5px; z-index: 10;
-        }
-
-        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 900px) {
             .dashboard-grid { grid-template-columns: 1fr; }
-            .banner-text h1 { font-size: 32px; }
-            .enroll-card-container { order: -1; } /* Poner venta primero en móvil */
+            .tabs-container { width: 100%; overflow-x: auto; }
+            .tab-btn { flex: 1; white-space: nowrap;}
+            .instructor-row { flex-direction: column; text-align: center; }
+            .prof-info { flex-direction: column; }
+            .join-btn { width: 100%; }
+            .enroll-card-container { order: -1; }
         }
     </style>
 </head>
@@ -318,139 +273,172 @@
 
    <div class="banner-header">
         <img src="https://lh3.googleusercontent.com/d/172NBqADTbyzw-YGNQNjWDSxL2FoJoxN0" class="banner-image">
-        
         <div class="banner-overlay"></div>
-        
         <div class="banner-text">
             <h1>
                 <span class="subtitle">Curso Online</span>
-                Piano desde Cero - Nivel 1
+                Piano desde Cero
             </h1>
-            </div>
+        </div>
     </div>
 
     <div class="container">
         <div class="dashboard-grid">
             
-            <div class="course-content">
+            <div class="card col-span-full">
+                <h3 class="section-title"><i class="fas fa-layer-group"></i> Selecciona tu nivel de aprendizaje</h3>
                 
-                <div class="card">
-                    <h3 class="section-title"><i class="fas fa-star"></i> Lo que aprenderás</h3>
-                    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 15px;">
-                        Este curso está diseñado para llevarte de la mano desde no saber nada hasta tocar melodías completas con ambas manos. Usaremos nuestra tecnología de aula virtual interactiva para acelerar tu aprendizaje.
+                <div class="tabs-container">
+                    <button class="tab-btn active" data-target="lvl1" onclick="switchLevel('lvl1')">Nivel 1: Iniciación</button>
+                    <button class="tab-btn" data-target="lvl2" onclick="switchLevel('lvl2')">Nivel 2: Intermedio</button>
+                    <button class="tab-btn" data-target="lvl3" onclick="switchLevel('lvl3')">Nivel 3: Avanzado</button>
+                </div>
+
+                <div id="desc-lvl1" class="level-description active">
+                    <p style="color: var(--text-muted); line-height: 1.6;">
+                        <strong>Objetivo:</strong> Este nivel es para quien nunca ha tocado el piano. Aprenderás desde la postura correcta hasta tocar melodías simples con ambas manos usando partituras básicas.
                     </p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="feature-item"><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Lectura de pentagrama</div>
-                        <div class="feature-item"><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Independencia de manos</div>
-                        <div class="feature-item"><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Acordes básicos</div>
-                        <div class="feature-item"><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Ritmo y métrica</div>
+                    <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 13px; color: var(--primary-color); background: #fff0f1; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Independencia de manos
+                        </span>
+                        <span style="font-size: 13px; color: var(--primary-color); background: #fff0f1; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Lectura Clave de Sol
+                        </span>
                     </div>
                 </div>
 
-                <h3 class="section-title"><i class="fas fa-list-ul"></i> Temario del Curso</h3>
-                
-                <div class="chapter-card">
-                    <div class="chapter-header" onclick="toggleChapter(this)">
-                        <div class="chapter-info">
-                            <h3>Módulo 1: Introducción al Piano</h3>
-                            <p>Postura, numeración de dedos y teclas blancas.</p>
-                        </div>
-                        <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="chapter-content">
-                        <ul>
-                            <li><i class="fas fa-play-circle"></i> 1.1 Historia del instrumento</li>
-                            <li><i class="fas fa-play-circle"></i> 1.2 Postura correcta y relajación</li>
-                            <li><i class="fas fa-file-alt"></i> 1.3 Ejercicios de digitación</li>
-                        </ul>
+                <div id="desc-lvl2" class="level-description">
+                    <p style="color: var(--text-muted); line-height: 1.6;">
+                        <strong>Objetivo:</strong> Para alumnos que ya conocen las notas. Nos enfocaremos en acordes complejos, inversiones y ritmos sincopados. Empezaremos a ver teoría de la armonía.
+                    </p>
+                    <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 13px; color: var(--level2-color); background: #eef0ff; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Acordes de 7ma
+                        </span>
+                        <span style="font-size: 13px; color: var(--level2-color); background: #eef0ff; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Escalas Mayores
+                        </span>
                     </div>
                 </div>
 
-                <div class="chapter-card">
-                    <div class="chapter-header" onclick="toggleChapter(this)">
-                        <div class="chapter-info">
-                            <h3>Módulo 2: Ritmo y Melodía</h3>
-                            <p>Figuras rítmicas y primeras lecturas.</p>
-                        </div>
-                        <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
-                    </div>
-                    <div class="chapter-content">
-                        <ul>
-                            <li><i class="fas fa-play-circle"></i> 2.1 Negras, Blancas y Redondas</li>
-                            <li><i class="fas fa-music"></i> 2.2 Lectura en Clave de Sol</li>
-                            <li><i class="fas fa-laptop"></i> 2.3 Práctica interactiva en vivo</li>
-                        </ul>
+                <div id="desc-lvl3" class="level-description">
+                    <p style="color: var(--text-muted); line-height: 1.6;">
+                        <strong>Objetivo:</strong> Perfeccionamiento técnico y expresividad. Abordaremos piezas de repertorio clásico y jazz, improvisación y lectura a primera vista avanzada.
+                    </p>
+                    <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 13px; color: var(--level3-color); background: #fff8e1; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Improvisación Jazz
+                        </span>
+                        <span style="font-size: 13px; color: var(--level3-color); background: #fff8e1; padding: 5px 10px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> Repertorio Chopin
+                        </span>
                     </div>
                 </div>
+            </div>
 
-                <h3 class="section-title" style="margin-top: 30px;"><i class="far fa-calendar-alt"></i> Calendario de Clases</h3>
-                <div class="card" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-                    <div class="calendar-wrapper">
-                        <div class="calendar-month">
-                            <div class="month-binding"></div>
-                            <h4>Enero 2026</h4>
-                            <div class="calendar-grid-view">
-                                <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day active" data-tooltip="Inicio de Curso"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day active" data-tooltip="Clase En Vivo 1"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day active" data-tooltip="Entrega Tarea"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div>
+            <div class="course-content">
+                <div class="card">
+                    <h3 class="section-title"><i class="fas fa-list-ul"></i> Plan de Estudios</h3>
+                    
+                    <div id="syllabus-lvl1" class="course-syllabus-block active">
+                        <div class="chapter-card">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <div class="chapter-info"><h3>Nivel 1.1: Fundamentos</h3><p>El teclado y el cuerpo.</p></div>
+                                <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                            <div class="chapter-content">
+                                <ul><li><i class="fas fa-play" style="color:var(--primary-color)"></i> Postura</li><li><i class="fas fa-play" style="color:var(--primary-color)"></i> Dedos</li></ul>
                             </div>
                         </div>
-                        <div class="calendar-month">
-                            <div class="month-binding"></div>
-                            <h4>Febrero 2026</h4>
-                            <div class="calendar-grid-view">
-                                <div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day active" data-tooltip="Examen Parcial"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day active" data-tooltip="Fin de Curso"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div>
-                                <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
+                        <div class="chapter-card">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <div class="chapter-info"><h3>Nivel 1.2: Primeras Notas</h3><p>Lectura básica.</p></div>
+                                <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                            <div class="chapter-content">
+                                <ul><li><i class="fas fa-play" style="color:var(--primary-color)"></i> Do Central</li><li><i class="fas fa-play" style="color:var(--primary-color)"></i> Pentagrama</li></ul>
                             </div>
                         </div>
+                        <div class="instructor-row">
+                            <div class="prof-info">
+                                <img src="https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa" class="prof-img">
+                                <div class="prof-details"><h4>Prof. Sergio Valenzo</h4><span>Fundamentos</span></div>
+                            </div>
+                            <a href="#" class="join-btn btn-lvl1">Inscribirme - Nivel 1 <i class="fas fa-arrow-right"></i></a>
+                        </div>
                     </div>
-                </div>
 
+                    <div id="syllabus-lvl2" class="course-syllabus-block">
+                        <div class="chapter-card">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <div class="chapter-info"><h3>Nivel 2.1: Armonía</h3><p>Construcción de acordes.</p></div>
+                                <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                            <div class="chapter-content">
+                                <ul><li><i class="fas fa-play" style="color:var(--level2-color)"></i> Triadas Mayores</li><li><i class="fas fa-play" style="color:var(--level2-color)"></i> Inversiones</li></ul>
+                            </div>
+                        </div>
+                        <div class="chapter-card">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <div class="chapter-info"><h3>Nivel 2.2: Escalas</h3><p>Agilidad en dedos.</p></div>
+                                <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                            <div class="chapter-content">
+                                <ul><li><i class="fas fa-play" style="color:var(--level2-color)"></i> Escala de Do y Sol</li><li><i class="fas fa-play" style="color:var(--level2-color)"></i> Cruce de pulgar</li></ul>
+                            </div>
+                        </div>
+                        <div class="instructor-row">
+                            <div class="prof-info">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="prof-img"> <div class="prof-details"><h4>Profa. Elena Keys</h4><span>Especialista Técnica</span></div>
+                            </div>
+                            <a href="#" class="join-btn btn-lvl2">Inscribirme - Nivel 2 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div id="syllabus-lvl3" class="course-syllabus-block">
+                        <div class="chapter-card">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <div class="chapter-info"><h3>Nivel 3.1: Jazz & Blues</h3><p>Improvisación.</p></div>
+                                <div class="btn-toggle"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                            <div class="chapter-content">
+                                <ul><li><i class="fas fa-play" style="color:var(--level3-color)"></i> Escala de Blues</li><li><i class="fas fa-play" style="color:var(--level3-color)"></i> Swing Feel</li></ul>
+                            </div>
+                        </div>
+                         <div class="instructor-row">
+                            <div class="prof-info">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="prof-img"> <div class="prof-details"><h4>Mtro. David Jazz</h4><span>Solista Internacional</span></div>
+                            </div>
+                            <a href="#" class="join-btn btn-lvl3">Inscribirme - Nivel 3 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <aside class="enroll-card-container">
-                <div class="card" style="position: sticky; top: 20px; border-top: 4px solid var(--primary-color);">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <img src="https://lh3.googleusercontent.com/d/1RC8nhgSOHeSVQnTqeL6DVHlT4WQ67uBa" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid #f8f9fa;">
-                        <div style="font-weight: 700; font-size: 16px;">Prof. Sergio Valenzo</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">Instructor Certificado</div>
-                    </div>
-
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-
-                    <div style="margin-bottom: 5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 12px;">Precio del Curso</div>
-                    <div class="enroll-price">
+                <div class="card" style="position: sticky; top: 20px; border-top: 4px solid var(--border-color);" id="sidebar-card">
+                    
+                    <div style="margin-bottom: 5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 12px;">Estás viendo:</div>
+                    <div id="sidebar-title" style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">Nivel 1: Iniciación</div>
+                    
+                    <div class="enroll-price" id="sidebar-price">
                         $499 MXN <span>$899</span>
                     </div>
 
-                    <a href="#" class="join-btn" onclick="alert('Redirigiendo a pasarela de pago...')">
-                        Inscribirme Ahora <i class="fas fa-arrow-right"></i>
-                    </a>
-
-                    <ul class="feature-list">
-                        <li class="feature-item"><i class="fas fa-video"></i> 12 Sesiones en Vivo</li>
-                        <li class="feature-item"><i class="fas fa-book"></i> Acceso a Biblioteca PDF</li>
-                        <li class="feature-item"><i class="fas fa-certificate"></i> Certificado Digital</li>
-                        <li class="feature-item"><i class="fas fa-infinity"></i> Acceso de por vida</li>
+                    <ul class="sidebar-list">
+                        <li><i class="fas fa-video" style="color: var(--text-muted);"></i> Clases en Vivo</li>
+                        <li><i class="fas fa-book" style="color: var(--text-muted);"></i> Material PDF</li>
+                        <li><i class="fas fa-certificate" style="color: var(--text-muted);"></i> Certificado</li>
                     </ul>
 
-                    <div style="background: #e1f5fe; padding: 10px; border-radius: 8px; font-size: 12px; color: #0277bd; display: flex; gap: 8px; margin-top: 20px;">
-                        <i class="fas fa-shield-alt" style="font-size: 16px;"></i>
-                        <div>
-                            <strong>Garantía de 7 días.</strong><br>Si no te gusta, te devolvemos tu dinero.
-                        </div>
-                    </div>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
 
+                    <div style="background: #e1f5fe; padding: 12px; border-radius: 8px; font-size: 12px; color: #0277bd; display: flex; gap: 8px;">
+                        <i class="fas fa-shield-alt" style="font-size: 16px;"></i>
+                        <div><strong>Garantía Total.</strong><br>Si no es tu nivel, te cambiamos sin costo.</div>
+                    </div>
                 </div>
             </aside>
 
@@ -458,11 +446,41 @@
     </div>
 
     <script>
-        // Script simple para el acordeón
+        // Datos para actualizar el Sidebar según el nivel
+        const levelData = {
+            'lvl1': { title: 'Nivel 1: Iniciación', price: '$499 MXN', oldPrice: '$899', color: '#FF4757' },
+            'lvl2': { title: 'Nivel 2: Intermedio', price: '$699 MXN', oldPrice: '$1100', color: '#3742fa' },
+            'lvl3': { title: 'Nivel 3: Avanzado', price: '$899 MXN', oldPrice: '$1500', color: '#ffa502' }
+        };
+
+        function switchLevel(levelId) {
+            // 1. Actualizar Pestañas
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-target="${levelId}"]`).classList.add('active');
+
+            // 2. Actualizar Descripciones (Lo que aprenderás)
+            document.querySelectorAll('.level-description').forEach(div => div.classList.remove('active'));
+            document.getElementById(`desc-${levelId}`).classList.add('active');
+
+            // 3. Actualizar Temarios (Course Content)
+            document.querySelectorAll('.course-syllabus-block').forEach(div => div.classList.remove('active'));
+            document.getElementById(`syllabus-${levelId}`).classList.add('active');
+
+            // 4. Actualizar Sidebar (Visual feedback)
+            const data = levelData[levelId];
+            const sidebar = document.getElementById('sidebar-card');
+            
+            document.getElementById('sidebar-title').innerText = data.title;
+            document.getElementById('sidebar-price').innerHTML = `${data.price} <span>${data.oldPrice}</span>`;
+            
+            // Cambiar el borde superior del sidebar al color del nivel
+            sidebar.style.borderTopColor = data.color;
+        }
+
+        // Acordeón Simple
         function toggleChapter(header) {
             const content = header.nextElementSibling;
             const icon = header.querySelector('.fa-chevron-down');
-            
             if (content.style.maxHeight) {
                 content.style.maxHeight = null;
                 icon.style.transform = "rotate(0deg)";
