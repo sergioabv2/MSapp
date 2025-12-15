@@ -211,6 +211,245 @@
     h2 { font-size: 1.5rem; }
     .navigation-footer { grid-template-columns: 1fr; }
   }
+
+
+  /* --- Botón Flotante (FAB) Contenedor --- */
+  .fab-container {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem; /* Izquierda */
+    z-index: 100;
+    display: flex;
+    flex-direction: column-reverse; /* Las opciones salen hacia arriba */
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* El botón principal (Trigger) */
+  .fab-main {
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: var(--text-main);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background-color 0.3s;
+  }
+
+  .fab-main:hover {
+    background-color: black;
+    transform: scale(1.05);
+  }
+
+  /* Animación del icono principal al abrir */
+  .fab-container.open .fab-main {
+    transform: rotate(45deg); /* Gira a una X */
+  }
+
+  /* --- Botones de Acción (Ocultos por defecto) --- */
+  .fab-action {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    border: 1px solid var(--nav-border);
+    background-color: white;
+    color: var(--text-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Estado inicial: invisible y desplazado hacia abajo */
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Estado cuando está activo (Lápiz activado) */
+  .fab-action.active-tool {
+    background-color: var(--text-main);
+    color: white;
+    border-color: var(--text-main);
+  }
+
+  /* Animación de apertura (Cascada) */
+  .fab-container.open .fab-action {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+  }
+
+  /* Retrasos para efecto escalonado al abrir hacia arriba */
+  .fab-container.open .fab-action:nth-child(2) { transition-delay: 0.05s; } /* Ojo */
+  .fab-container.open .fab-action:nth-child(3) { transition-delay: 0.1s; }  /* Color */
+  .fab-container.open .fab-action:nth-child(4) { transition-delay: 0.15s; } /* Lápiz */
+
+  /* Estilos específicos para el input de color */
+  .color-wrapper {
+    overflow: hidden;
+    padding: 0;
+  }
+  
+  #colorPicker {
+    -webkit-appearance: none;
+    border: none;
+    width: 150%; 
+    height: 150%;
+    margin: -25%; /* Truco para llenar el botón circular */
+    cursor: pointer;
+  }
+  
+  /* Estilos de resaltado manual (igual que antes) */
+  .user-highlight {
+    background-color: var(--highlight-color, #fde68a);
+    cursor: pointer;
+  }
+  body.hide-highlights .user-highlight {
+    background-color: transparent !important;
+  }
+
+  /* --- Tooltip de Eliminar (Basura) --- */
+  #deleteTooltip {
+    position: absolute;
+    background-color: #1f2937; /* Gris muy oscuro */
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 1000;
+    display: none; /* Oculto por defecto */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translate(-50%, -100%); /* Centrado horizontal, sube para estar encima */
+    margin-top: -8px; /* Un poco de aire */
+    transition: opacity 0.2s;
+  }
+
+  /* La flechita hacia abajo del tooltip */
+  #deleteTooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1f2937 transparent transparent transparent;
+  }
+
+  #deleteTooltip:hover {
+    background-color: #ef4444; /* Rojo al pasar el mouse */
+  }
+  #deleteTooltip:hover::after {
+    border-top-color: #ef4444;
+  }
+
+  /* --- 1. Estilos de Texto Estilizado (Como en la imagen) --- */
+  
+  /* Negritas más fuertes y oscuras */
+  strong {
+    font-weight: 700; /* Extra bold */
+    color: #111827;   /* Negro casi puro */
+  }
+
+  /* El estilo "badge" tipo código (fondo gris, texto rojo) */
+  .code-badge {
+    background-color: #f3f4f6; /* Gris muy claro */
+    color: #ef4444;            /* Rojo suave */
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace; /* Fuente monoespaciada */
+    font-size: 0.9em;          /* Un poco más pequeño para armonía */
+    padding: 2px 6px;          /* Espacio interno */
+    border-radius: 6px;        /* Bordes redondeados */
+    border: 1px solid #e5e7eb; /* Borde sutil */
+    vertical-align: middle;
+    font-weight: 500;
+  }
+
+  /* --- 2. Imágenes Interactivas --- */
+  
+  /* Contenedor para asegurar el centrado y márgenes */
+  .image-container {
+    width: 100%;
+    margin: 3rem 0; /* Espacio vertical generoso */
+    display: flex;
+    justify-content: center;
+    position: relative; /* Necesario para el z-index */
+  }
+
+  .interactive-img {
+    width: 100%;       /* Ocupa todo el ancho del contenedor */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Sombra suave inicial */
+    
+    /* La magia de la interacción */
+    cursor: zoom-in;   /* El cursor de "lupa con +" */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+    transform-origin: center center;
+    z-index: 10;
+  }
+
+  /* Estado "Agrandado" */
+  .interactive-img.zoomed {
+    transform: scale(1.15); /* Crece un 15% */
+    cursor: zoom-out;       /* Cursor de "lupa con -" */
+    z-index: 50;            /* Se pone por encima del texto */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Sombra profunda al levantar */
+  }
+
+  /* Pequeño ajuste para móviles para que no se salga de pantalla */
+  @media (max-width: 600px) {
+    .interactive-img.zoomed {
+      transform: scale(1.05); /* Zoom más sutil en celular */
+    }
+  }
+
+  /* --- 3. Listas Estilizadas (Enumeración y Definición) --- */
+  .styled-list {
+    list-style: none; /* Quitamos las viñetas por defecto */
+    padding-left: 0;
+    margin: 2rem 0;
+  }
+
+  .styled-list li {
+    position: relative;
+    padding-left: 1.5rem; /* Espacio para la bolita azul */
+    margin-bottom: 1.25rem; /* Espacio entre items */
+    color: var(--text-secondary);
+  }
+
+  /* La viñeta azul personalizada */
+  .styled-list li::before {
+    margin-top: 7px;
+    content: "•";          /* El carácter de punto */
+    color: #4f46e5;        /* Azul índigo moderno (tipo Notion/Tailwind) */
+    font-weight: bold;
+    font-size: 1.5rem;     /* Tamaño de la viñeta */
+    position: absolute;
+    left: 0;
+    top: -5px;             /* Ajuste fino para alinear con la primera línea */
+    line-height: 1;
+  }
+
+  /* --- 4. Bloque de Énfasis (Línea Vertical Azul) --- */
+  .emphasis-block {
+    border-left: 4px solid #4f46e5; /* La línea gruesa azul */
+    padding-left: 1.5rem;           /* Aire entre la línea y el texto */
+    margin: 2.5rem 0;               /* Separación vertical generosa */
+    font-size: 1.05rem;             /* Ligeramente más grande para destacar */
+    color: var(--text-main);
+  }
+  
+  /* Ajuste para que los párrafos dentro del bloque no tengan margen extra abajo si es el último */
+  .emphasis-block p:last-child {
+    margin-bottom: 0;
+  }
 </style>
 </head>
 <body>
@@ -221,7 +460,17 @@
   
   <p>Una frase musical es una unidad melódica y rítmica completa en sí misma, comparable a una oración en el lenguaje hablado. Se construye típicamente sobre un patrón de pregunta y respuesta, conocido como antecedente y consecuente, y suele abarcar una duración de dos, cuatro u ocho compases. La dirección melódica, los puntos de reposo (cadencias) y el diseño rítmico son clave para definir su carácter y límites.</p>
 
-  <p>Identificar el final de una frase es fundamental para la interpretación. La cadencia —el equivalente musical a la puntuación— puede ser conclusiva (cadencia perfecta, como un punto final) o suspensiva (cadencia imperfecta o semicadencia, como una coma). <span class="scroll-highlight">Escuchar la respiración natural de la línea melódica</span> es el primer paso para el análisis fraseológico.</p>
+ <p>Una frase musical es una unidad melódica completa, comparable a una oración en el lenguaje hablado. Para dominarla, primero asegúrate de entender el <strong>ritmo armónico</strong>.</p>
+  
+  <p>Tus estudiantes deberían iniciar sesión en <span class="code-badge">aula.tuescuela.com</span>, punto. Si los envías a una URL genérica, pierdes la identidad de tu marca. Esto es lo que llamamos la <strong>prueba de fuego</strong> de la profesionalidad.</p>
+
+  <div class="image-container">
+    <img src="https://lh3.googleusercontent.com/d/15XlhDsprrJJrf-UYt70n8a5fu9UIcVMR=s600" 
+         alt="Partitura musical detallada" 
+         class="interactive-img">
+  </div>
+
+  <p>Identificar el final de una frase es fundamental. La cadencia puede ser conclusiva o suspensiva. <span class="scroll-highlight">Escuchar la respiración natural de la línea melódica</span> es el primer paso.</p>
 
   <p>La articulación y el fraseo en la ejecución dependen de este análisis. Un legato suave puede unir notas dentro de una misma idea, mientras que un ligero descanso o un cambio dinámico (como un decrescendo) pueden marcar el final de una frase. <span class="scroll-highlight">La estructura formal básica, la textura y las indicaciones del compositor</span> son guías esenciales.</p>
 
@@ -239,21 +488,69 @@
   
   <p>La práctica del análisis y la escucha activa desarrollan esta habilidad. Aislar la línea melódica principal, cantarla para sentir sus puntos de reposo naturales y marcar las cadencias en la partitura son ejercicios fundamentales. <span class="scroll-highlight">La repetición exacta sin variación es menos frecuente que la repetición con modificación</span>.</p>
 
-  <p>En la música polifónica (como una fuga de Bach), el concepto se multiplica, ya que cada voz contiene su propio discurso fraseológico independiente pero entrelazado. El reto del intérprete es proyectar la claridad de cada línea individual sin perder la cohesión del conjunto. <span class="scroll-highlight">El estudio por voces separadas es, por tanto, un método indispensable</span>.</p>
-
-  <p>En resumen, la frase es la unidad básica de la narración musical. Su correcta identificación y delineación a través de la dinámica, la articulación y el ritmo respiratorio es lo que transforma una sucesión de notas en un discurso comunicativo y expresivo. <span class="scroll-highlight">Dominar el fraseo es dominar el arte de decir algo con la música</span>.</p>
-
-
-  <div class="navigation-footer">
-    <a href="#" class="nav-card">
-      <span class="nav-label">← Anterior</span>
-      <span class="nav-title">0.2. El Ritmo y la Métrica</span>
-    </a>
-    <a href="#" class="nav-card next">
-      <span class="nav-label">Siguiente →</span>
-      <span class="nav-title">0.4. Introducción a la Armonía</span>
-    </a>
+<div class="emphasis-block">
+    <p>
+      <strong>¿Qué es una Frase Musical?</strong>
+    </p>
+    <p>
+      Es la unidad estructural con sentido musical completo más pequeña. Es comparable a una <strong>oración gramatical</strong> en el lenguaje hablado: tiene un inicio claro, un desarrollo direccional y un punto de llegada o conclusión.
+    </p>
+    <p>
+      Sin el fraseo adecuado, la música suena mecánica, como un robot leyendo un texto sin signos de puntuación.
+    </p>
   </div>
+
+  <p>Para identificar una frase en una partitura (y diferenciarla de un simple motivo o semifrase), debemos buscar ciertos rasgos característicos que le dan su identidad:</p>
+
+  <ul class="styled-list">
+    <li>
+      <strong>Extensión (La Cuadratura):</strong> En la música occidental tradicional, la frase estándar suele tener una longitud de <strong>4 compases</strong> (frase corta) u <strong>8 compases</strong> (frase larga). Esta simetría es lo que el oído espera naturalmente.
+    </li>
+    <li>
+      <strong>El Punto de Reposo (Cadencia):</strong> Es el requisito más técnico. Toda frase <em>debe</em> terminar en una cadencia armónica. Si no hay una sensación de pausa (ya sea conclusiva como un punto final, o suspensiva como una coma), la frase no ha terminado.
+    </li>
+    <li>
+      <strong>Diseño Melódico (Contorno):</strong> Una frase suele tener una "forma" dibujable, a menudo como un arco: comienza en reposo, sube hacia un punto de tensión máxima (clímax) y desciende hacia la relajación.
+    </li>
+    <li>
+      <strong>Relación Antecedente-Consecuente:</strong> A menudo, las frases funcionan en pares de "Pregunta y Respuesta". Los primeros compases plantean una duda (terminan en tensión/dominante) y los siguientes la resuelven (terminan en reposo/tónica).
+    </li>
+  </ul>
+
+
+
+  <div class="fab-container" id="fabContainer">
+  
+  <button class="fab-main" id="fabTrigger" title="Herramientas de lectura">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  </button>
+
+  <button id="toggleVisibility" class="fab-action" title="Ocultar/Mostrar notas">
+    <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  </button>
+
+  <div class="fab-action color-wrapper" title="Color de resaltado">
+    <input type="color" id="colorPicker" value="#fde68a">
+  </div>
+
+  <button id="toggleHighlightMode" class="fab-action" title="Activar modo subrayado">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    </svg>
+  </button>
+
+</div>
+
+<div id="deleteTooltip" title="Eliminar subrayado">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+</div>
 
 </main>
 
@@ -261,20 +558,166 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <script>
-  // Registramos el plugin
-  gsap.registerPlugin(ScrollTrigger);
+  // Variables de Estado
+  let isHighlightMode = false;
+  let currentColor = '#fde68a';
+  let areHighlightsVisible = true;
+  let isMenuOpen = false;
+  let targetHighlight = null; // Guardará referencia al span que queremos borrar
 
-  // Seleccionamos todos los elementos con la clase .scroll-highlight
-  gsap.utils.toArray(".scroll-highlight").forEach((target) => {
-    ScrollTrigger.create({
-      trigger: target,
-      // 'start' define cuándo se activa: "cuando el top del elemento llegue al 85% de la altura de la ventana"
-      start: "top 85%", 
-      // Añade la clase 'active' que dispara la transición CSS
-      toggleClass: "active",
-      // 'once: true' hace que solo se anime la primera vez que pasas, para no distraer si subes y bajas
-      once: true 
+  // Elementos DOM
+  const fabContainer = document.getElementById('fabContainer');
+  const fabTrigger = document.getElementById('fabTrigger');
+  const btnToggleMode = document.getElementById('toggleHighlightMode');
+  const btnVisibility = document.getElementById('toggleVisibility');
+  const colorInput = document.getElementById('colorPicker');
+  const contentArea = document.querySelector('main');
+  
+  // Nuevo elemento DOM: El tooltip de basura
+  const deleteTooltip = document.getElementById('deleteTooltip');
+
+  // --- Funciones Auxiliares ---
+
+  // Ocultar la basura
+  function hideDeleteTooltip() {
+    deleteTooltip.style.display = 'none';
+    targetHighlight = null;
+  }
+
+  // Mostrar la basura encima de un elemento
+  function showDeleteTooltip(element) {
+    targetHighlight = element;
+    
+    // Obtenemos coordenadas del subrayado
+    const rect = element.getBoundingClientRect();
+    
+    // Calculamos posición (considerando el scroll de la página)
+    // Left: Centro del elemento. Top: Parte superior del elemento.
+    const scrollX = window.scrollX || window.pageXOffset;
+    const scrollY = window.scrollY || window.pageYOffset;
+
+    deleteTooltip.style.left = (rect.left + rect.width / 2 + scrollX) + 'px';
+    deleteTooltip.style.top = (rect.top + scrollY) + 'px';
+    deleteTooltip.style.display = 'block';
+  }
+
+  // --- Event Listeners ---
+
+  // 1. Abrir / Cerrar Menú Flotante
+  fabTrigger.addEventListener('click', () => {
+    isMenuOpen = !isMenuOpen;
+    fabContainer.classList.toggle('open');
+  });
+
+  // 2. Activar Modo Subrayado
+  btnToggleMode.addEventListener('click', () => {
+    isHighlightMode = !isHighlightMode;
+    btnToggleMode.classList.toggle('active-tool');
+    document.body.style.cursor = isHighlightMode ? 'text' : 'default';
+    if (!isHighlightMode) window.getSelection().removeAllRanges();
+    hideDeleteTooltip(); // Ocultar basura si cambiamos modo
+  });
+
+  // 3. Color
+  colorInput.addEventListener('input', (e) => currentColor = e.target.value);
+
+  // 4. Visibilidad
+  btnVisibility.addEventListener('click', () => {
+    areHighlightsVisible = !areHighlightsVisible;
+    document.body.classList.toggle('hide-highlights');
+    hideDeleteTooltip(); // Ocultar basura si ocultamos marcas
+    
+    // Cambiar icono
+    const eyePath = areHighlightsVisible 
+      ? '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
+      : '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+    document.getElementById('eyeIcon').innerHTML = eyePath;
+  });
+
+  // 5. CLICK GLOBAL: Maneja creación de subrayados Y detección de clics para borrar
+  document.addEventListener('mouseup', (e) => {
+    
+    // A) Si hacemos click en el botón de basura
+    if (deleteTooltip.contains(e.target) && targetHighlight) {
+      // "Desenvolver" el texto (borrar el span pero dejar el texto)
+      const parent = targetHighlight.parentNode;
+      while (targetHighlight.firstChild) {
+        parent.insertBefore(targetHighlight.firstChild, targetHighlight);
+      }
+      parent.removeChild(targetHighlight);
+      hideDeleteTooltip();
+      return; // Terminamos aquí
+    }
+
+    // B) Si hacemos click en un subrayado existente
+    if (e.target.classList.contains('user-highlight')) {
+      // Solo mostramos la basura si NO estamos seleccionando texto activamente
+      if (window.getSelection().toString().length === 0) {
+        showDeleteTooltip(e.target);
+        return;
+      }
+    } else {
+      // Si clickeamos en cualquier otro lado (texto normal o blanco), ocultar basura
+      hideDeleteTooltip();
+    }
+
+    // C) Crear NUEVO subrayado (Lógica original)
+    if (!isHighlightMode || !areHighlightsVisible) return;
+    
+    const selection = window.getSelection();
+    if (selection.toString().length > 0) {
+      const range = selection.getRangeAt(0);
+      
+      // Validación de zona segura
+      if (!contentArea.contains(range.commonAncestorContainer) && range.commonAncestorContainer !== contentArea) return; 
+
+      // Evitar subrayar sobre subrayado (anidamiento complejo)
+      // Si la selección ya contiene un user-highlight, cancelamos para evitar romper el HTML
+      if (range.cloneContents().querySelector('.user-highlight')) {
+        console.warn("No se permite subrayar sobre otro subrayado.");
+        return;
+      }
+
+      const span = document.createElement('span');
+      span.className = 'user-highlight';
+      span.style.setProperty('--highlight-color', currentColor);
+
+      try {
+        range.surroundContents(span);
+        selection.removeAllRanges();
+      } catch (e) {
+        console.warn("Selección inválida a través de bloques.");
+      }
+    }
+  });
+
+
+  const images = document.querySelectorAll('.interactive-img');
+
+  images.forEach(img => {
+    img.addEventListener('click', (e) => {
+      // Evitamos que este click active otras cosas (como cerrar menús)
+      e.stopPropagation(); 
+      
+      // Alternar la clase 'zoomed'
+      img.classList.toggle('zoomed');
+      
+      // Opcional: Si hago click en una, cerrar las otras si estuvieran abiertas
+      images.forEach(otherImg => {
+        if (otherImg !== img) {
+          otherImg.classList.remove('zoomed');
+        }
+      });
     });
+  });
+
+  // Cerrar la imagen si hago click fuera de ella (en cualquier parte del documento)
+  document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('interactive-img')) {
+      images.forEach(img => {
+        img.classList.remove('zoomed');
+      });
+    }
   });
 </script>
 
