@@ -25,6 +25,12 @@
             --radius-sm: 8px;
             --font-sans: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+
+            --app-purple: #8B5CF6;
+    --app-purple-light: #f3f0ff;
+    --app-green: #2ed573;
+    --app-red: #FF4757;
+    --app-red-light: #fff0f1;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,7 +152,7 @@
         .level-number {
             width: 48px;
             height: 48px;
-            background: #dfe4ea; /* Fondo Negro */
+           background: linear-gradient(135deg, var(--app-purple), #7c3aed);
             color: white;
             border-radius: 8px;
             display: flex;
@@ -156,6 +162,7 @@
             font-weight: 700;
             font-family: var(--font-mono);
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
         }
 
         .level-info { flex: 1; }
@@ -182,8 +189,8 @@
             gap: 15px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-primary);
-            background: #f1f3f5;
+            color: var(--app-purple);
+            background: var(--app-purple-light);
             padding: 6px 12px;
             border-radius: 6px;
             font-family: var(--font-mono);
@@ -194,7 +201,7 @@
             margin-top: 20px;
             border-top: 1px dashed var(--border);
             padding-top: 15px;
-
+            color: #FF4757;
         }
 
         .preview-item {
@@ -202,12 +209,12 @@
             align-items: center;
             gap: 10px;
             font-size: 13px;
-            color: #FF4757;
+            color: var(--text-primary);
             margin-bottom: 8px;
             font-weight: 500;
         }
         
-        .preview-item i { color: var(--text-secondary); }
+        .preview-item i { color: var(--app-green); }
         .preview-item.locked { color: var(--text-secondary); opacity: 0.7; }
 
         /* Icono de bloqueo */
@@ -236,22 +243,23 @@
         .plan-price {
             text-align: center;
             padding: 20px 0;
-            background: #f8f9fa;
+           background: var(--app-red-light);
             border-radius: 8px;
             margin: 15px 0;
         }
+        .plan-price span { color: var(--app-red); }
 
         .price-text {
             font-size: 36px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--app-red);
             letter-spacing: -1px;
         }
 
         /* Botón negro sólido */
         .join-btn {
             width: 100%; 
-            background: var(--text-primary); 
+            background: var(--app-red);
             color: white;
             border: none; 
             padding: 16px; 
@@ -265,12 +273,12 @@
             gap: 10px;
             transition: 0.2s;
             text-decoration: none;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
         }
         .join-btn:hover { 
-            transform: translateY(-2px); 
-            background: #000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+    transform: translateY(-2px); 
+    background: #ff6b81; 
+}
 
         .sidebar-list { list-style: none; margin-top: 20px; }
         .sidebar-list li { 
@@ -278,6 +286,11 @@
             display: flex; align-items: flex-start; gap: 10px; 
             color: var(--text-secondary);
         }
+
+        .sidebar-list li i {
+    color: var(--app-green); /* Verde */
+    font-size: 18px;
+}
 
         /* ==================== RESPONSIVE ==================== */
       /* ==================== RESPONSIVE ==================== */
@@ -335,7 +348,7 @@
                     
                     <div class="card" onclick="triggerLogin('Prep')">
                         <div class="card-content">
-                            <div class="level-number" style="background: #FF4757;">P</div>
+                            <div class="level-number">P</div>
                             <div class="level-info">
                                 <div class="level-title">Nivel Preparatorio</div>
                                 <p class="level-description">Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples con seguimiento MIDI.</p>
@@ -423,21 +436,21 @@
 
                     <ul class="sidebar-list">
                         <li>
-                            <i class="ri-checkbox-circle-fill" style="color: var(--text-primary);"></i>
+                            <i class="ri-checkbox-circle-fill" ></i>
                             <div><strong>Seguimiento de Progreso</strong><br>Data persistence en Firestore.</div>
                         </li>
                         <li>
-                            <i class="ri-checkbox-circle-fill" style="color: var(--text-primary);"></i>
+                            <i class="ri-checkbox-circle-fill" ></i>
                             <div><strong>Feedback Interactivo</strong><br>Análisis de latencia < 50ms.</div>
                         </li>
                         <li>
-                            <i class="ri-checkbox-circle-fill" style="color: var(--text-primary);"></i>
+                            <i class="ri-checkbox-circle-fill" ></i>
                             <div><strong>Material Descargable</strong><br>PDFs y XMLs.</div>
                         </li>
                     </ul>
 
                     <div style="margin-top: 20px; font-size: 12px; text-align: center; color: var(--text-secondary);">
-                        ¿Ya eres alumno? <a href="#" style="color: var(--text-primary); font-weight: 700; text-decoration: none;">Inicia Sesión</a>
+                        ¿Ya eres alumno? <a href="#" style="color: var(--app-red); font-weight: 700; text-decoration: none;">Inicia Sesión</a>
                     </div>
                 </div>
             </aside>
