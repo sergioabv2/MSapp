@@ -4,40 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="https://lh3.googleusercontent.com/d/1CWImzia2Z8LdK-VxeMKK22oa7387Ktwj" type="image/x-icon">
-    <title>Mozart Plus+</title>
+    <title>Mozart Plus+ | Iniciar Sesión</title>
     
     <meta name="google-signin-client_id" content="613538890545-o4p4ft7oji6uhimgh0inqn5l5cgv1gnm.apps.googleusercontent.com">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Karla:wght@400;500&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-     <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json">
 
     <style>
-        /* --- General Styles & Variables --- */
+        /* --- VARIABLES (Tema Piano Quest Pro) --- */
         :root {
-            --primary-color: #6a5af9;
-            --secondary-color: #d55ffd;
-            --background-color: #f4f7f6;
-            --text-color: #2c3e50;
-            --card-background: #ffffff;
-            --input-border: #e0e0e0;
-            --input-focus-border: #6a5af9;
+            --bg-body: #f8f9fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --radius-lg: 12px;
+            --radius-sm: 6px;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Input overrides */
+            --input-bg: #ffffff;
+            --input-border: #e5e7eb;
+            --input-focus: #1a1a1a; /* Negro al enfocar */
         }
 
         body {
-            font-family: 'Karla', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-sans);
             font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
         .container-fluid, .row {
@@ -45,372 +57,300 @@
             min-height: 700px;
         }
 
-        /* --- Intro Section (Left Panel) --- */
+        /* --- Intro Section (Panel Izquierdo) --- */
         .intro-section {
-
             background-size: cover;
             background-position: center;
-            padding: 50px 70px;
+            padding: 60px 80px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
             color: #ffffff;
+        }
+        
+        /* Overlay oscuro para texto blanco */
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* Degradado oscuro para que el texto resalte */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+            z-index: 1;
+        }
+        
+        .brand-wrapper, .intro-content-wrapper {
+            position: relative;
+            z-index: 2;
         }
 
         .intro-section .brand-wrapper h1 {
-            font-size: 24px;
-            font-weight: 700;
+               font-family: 'Poppins', sans-serif !important;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            color: #fff;
         }
-
-        .intro-content-wrapper {
-            max-width: 450px;
-        }
+       
 
         .intro-title {
-            font-size: 2.8rem;
-            font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-size: 3.5rem;
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         .intro-text {
             font-size: 1.1rem;
-            margin-top: 1rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            font-weight: 400;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .btn-read-more {
-            background: var(--card-background);
-            color: var(--primary-color);
-            font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 50px;
-            text-transform: uppercase;
+            background: #ffffff;
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            text-transform: none;
             font-size: 14px;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: transform 0.2s;
+            border: 1px solid #fff;
+            width: fit-content;
         }
         .btn-read-more:hover {
-            background: transparent;
-            color: var(--card-background);
-            border-color: var(--card-background);
             transform: translateY(-2px);
+            background: transparent;
+            color: #fff;
+            text-decoration: none;
         }
 
-        /* --- Form Section (Right Panel) --- */
+        /* --- Form Section (Panel Derecho) --- */
         .form-section {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--background-color);
+            background-color: var(--bg-body);
         }
 
         .login-card {
             width: 100%;
-            max-width: 420px;
-            background-color: var(--card-background);
+            max-width: 400px;
+            background-color: var(--surface);
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
         
         .form-section-content {
-            display: none; /* Hidden by default, JS will show */
-            animation: fadeIn 0.5s ease-out;
+            display: none; /* Se maneja con JS */
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .logo-img {
-            max-width: 100px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
             margin: 0 auto 20px auto;
             display: block;
+            border-radius: 12px;
         }
 
         .form-title {
             text-align: center;
             font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
         }
         
-        /* Form Inputs */
-        .form-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
+        /* Inputs Estilo Minimalista */
+        .form-group { margin-bottom: 20px; position: relative; }
+        
         .form-control, .custom-select {
-            height: 50px;
+            height: 48px;
             border: 1px solid var(--input-border);
-            border-radius: 8px;
-            padding: 0 20px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background-color: #fdfdfd;
+            border-radius: var(--radius-sm);
+            padding: 0 16px 0 40px;
+            font-size: 14px;
+            color: var(--text-primary);
+            background-color: var(--surface);
+            transition: all 0.2s ease;
         }
+        
         .form-control:focus, .custom-select:focus {
             outline: none;
-            border-color: var(--input-focus-border);
-            box-shadow: 0 0 0 3px rgba(106, 90, 249, 0.15);
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 1px var(--text-primary);
         }
 
         .form-group .form-icon {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 15px;
-            color: #aaa;
+            top: 50%; transform: translateY(-50%);
+            left: 12px;
+            color: var(--text-secondary);
             font-size: 18px;
         }
-        .form-group input {
-            padding-left: 45px;
-        }
-        .input-group input {
-             padding-left: 20px;
-        }
+        .input-group input { padding-left: 20px; }
 
-        /* Buttons */
+        /* --- BUTTONS --- */
         .login-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+            margin-bottom: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn-email, #sign {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .login-btn-email:hover, #sign:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-secondary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: var(--surface);
+        }
+
+        /* Botón Primario (Negro Sólido) */
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-body);
+            border: 1px solid var(--text-primary);
         }
         
-        .btn-primary {
-            background-image: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
         .btn-primary:hover {
-            box-shadow: 0 5px 15px rgba(106, 90, 249, 0.4);
-            transform: translateY(-2px);
+            background: #000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .back-btn {
-            background-color: #e9ecef;
-            color: #555;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
         }
         .back-btn:hover {
-            background-color: #dee2e6;
+            color: var(--text-primary);
+            background: var(--bg-body);
         }
 
-        /* Login Options */
-        #sign, .login-btn-email {
-            border: 1px solid var(--input-border);
-            background-color: var(--card-background);
-            color: var(--text-color);
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: none;
-        }
-        #sign:hover, .login-btn-email:hover {
-            background-color: #f8f9fa;
-        }
-        .login-btn-icon {
-            font-size: 20px;
-            margin-right: 10px;
-        }
-        .ri-whatsapp-fill {
-            color: #25d366;
-        }
+        .login-btn-icon { font-size: 18px; margin-right: 8px; }
+        .ri-whatsapp-fill { color: #25d366; } 
 
         /* Links */
         .signup-link {
             text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
         }
         .signup-link a {
-            color: var(--primary-color);
+            color: var(--text-primary);
             text-decoration: none;
             font-weight: 600;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
         }
+        .signup-link a:hover { border-bottom-color: var(--text-primary); }
 
-        /* Footer */
+        /* Footer Links */
         .footer-link {
             text-align: center;
             margin-top: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
         }
         .footer-link a {
-            color: #888;
-            font-size: 13px;
+            color: var(--text-secondary);
+            font-size: 12px;
             margin: 0 10px;
             text-decoration: none;
+            font-family: var(--font-mono);
         }
+        .footer-link a:hover { color: var(--text-primary); }
 
-   .showbox {
-  display: flex;
-    justify-content: center;
-    align-items: center;
- 
-}
-
-
-.loader {
-  position: relative;
-  margin: 0px auto;
-  width: 100px;
-}
-.loader:before {
-  content: "";
-  display: block;
-  padding-top: 100%;
-}
-
-.circular {
-  -webkit-animation: rotate 2s linear infinite;
-          animation: rotate 2s linear infinite;
-  height: 100%;
-  transform-origin: center center;
-  width: 100px;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-}
-
-.path {
-  stroke-dasharray: 1, 200;
-  stroke-dashoffset: 0;
-  -webkit-animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
-          animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
-  stroke-linecap: round;
-}
-
-@-webkit-keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-@-webkit-keyframes dash {
-  0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -35px;
-  }
-  100% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -124px;
-  }
-}
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -35px;
-  }
-  100% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -124px;
-  }
-}
-@-webkit-keyframes color {
-  100%, 0% {
-    stroke: #d62d20;
-  }
-  40% {
-    stroke: #0057e7;
-  }
-  66% {
-    stroke: #008744;
-  }
-  80%, 90% {
-    stroke: #ffa700;
-  }
-}
-@keyframes color {
-  100%, 0% {
-    stroke: #d62d20;
-  }
-  40% {
-    stroke: #0057e7;
-  }
-  66% {
-    stroke: #008744;
-  }
-  80%, 90% {
-    stroke: #ffa700;
-  }
-}
-
-
-  .mobile-download-section {
-            display: none; /* Oculto por defecto en desktop */
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-           
-        }
-
-        .download-divider {
-            font-size: 14px;
-            color: #888;
-            margin-top: 15px;
-            font-weight: 500;
-           border-top: 1px solid #e0e0e0;
-        }
-
-        .btn-download-app {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 700; /* Énfasis */
-            text-decoration: none !important;
-            color: #ffffff;
-            background-color: orange; /* Énfasis */
+        /* Alerts */
+        .alert {
+            border-radius: var(--radius-sm);
+            font-size: 13px;
             border: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 10px orange; /* Sombra para "pop" */
         }
-        
-        .btn-download-app i {
-            font-size: 20px;
-            margin-right: 10px;
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .alert-info {
+            background-color: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
         }
 
+        /* Loader */
+        .showbox { display: flex; justify-content: center; align-items: center; margin: 20px 0; }
+        .loader { position: relative; margin: 0px auto; width: 50px; } /* Ajuste de tamaño */
+        .loader:before { content: ""; display: block; padding-top: 100%; }
+        .circular { animation: rotate 2s linear infinite; height: 100%; transform-origin: center center; width: 100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; }
+        .path { stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: dash 1.5s ease-in-out infinite; stroke: var(--text-primary); stroke-linecap: round; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        @keyframes dash { 
+            0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 
+            50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; } 
+            100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; } 
+        }
 
+        /* Mobile Download & Responsive */
+        .mobile-download-section { display: none; text-align: center; margin-top: 25px; padding-top: 20px; }
+        .btn-download-app {
+            display: flex; align-items: center; justify-content: center; width: 100%;
+            padding: 12px; font-size: 15px; font-weight: 600; text-decoration: none !important;
+            color: #fff; background-color: var(--text-primary); /* Negro ahora */
+            border-radius: var(--radius-sm); transition: all 0.3s ease;
+        }
+        .download-divider {
+            font-size: 13px; color: var(--text-secondary);
+            margin-top: 20px; margin-bottom: 20px;
+            display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .download-divider::before, .download-divider::after {
+            content: ""; flex: 1; border-bottom: 1px solid var(--border);
+        }
+        .download-divider::before { margin-right: 10px; }
+        .download-divider::after { margin-left: 10px; }
 
         @media (max-width: 991px) {
             .intro-section { display: none; }
-            .form-section { padding: 30px; }
-            .login-card { padding: 30px; }
+            .form-section { padding: 20px; background: #fff; }
+            .login-card { padding: 0; box-shadow: none; border: none; }
             .row { min-height: auto; height: auto; }
-             .mobile-download-section {display: block;}
+            .mobile-download-section { display: block; }
         }
-
-
-
     </style>
 </head>
 <body>
@@ -432,7 +372,7 @@
             <div class="login-card">
                 
                 <div id="login-options" class="form-section-content">
-                    <img src="https://lh3.googleusercontent.com/d/1CWImzia2Z8LdK-VxeMKK22oa7387Ktwj" class="logo-img">
+                    <img src="https://lh3.googleusercontent.com/d/1TxanAOdc5RxLFzOLqMOPTX1_sz_uEDnS=s400" class="logo-img">
                     <h4 class="form-title">Inicia sesión</h4>
 
                      <div class="preloader showbox" style="display: none">
@@ -440,33 +380,31 @@
                             <svg class="circular" viewbox="25 25 50 50">
                               <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
                             </svg>
-                         
                           </div>
                       </div> 
 
                     <div class="buttons-container">
-
                          <div class="mobile-download-section">  
-                         <button class="btn-download-app" onclick="installApp()">   
-                                  <i class="ri-google-play-fill"></i>
-                                  Descargar App
-                          </button>
-                               <p class="download-divider">o inicia sesión</p>
-                          </div>
-
+                             <button class="btn-download-app" onclick="installApp()">   
+                                  <i class="ri-google-play-fill" style="margin-right: 10px;"></i> Descargar App
+                             </button>
+                             <p class="download-divider">o inicia sesión</p>
+                         </div>
 
                         <div id="g_id_onload" data-client_id="613538890545-o4p4ft7oji6uhimgh0inqn5l5cgv1gnm.apps.googleusercontent.com" data-context="signup" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="true"></div>
                         <div id="sign" class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="338" onclick="showLoader()"></div>
-                        <button class="login-btn login-btn-email" onclick="showMailLogin()" style="margin-top: 15px;"><i class="ri-mail-line login-btn-icon"></i> Acceder con email</button>
-                        <button class="login-btn login-btn-email" onclick="showWhatsappLogin()"><i class="ri-whatsapp-fill login-btn-icon"></i> Acceder con WhatsApp</button>
+                        
+                        <button class="login-btn login-btn-email" onclick="showMailLogin()" style="margin-top: 15px;">
+                            <i class="ri-mail-line login-btn-icon"></i> Acceder con email
+                        </button>
+                        <button class="login-btn login-btn-email" onclick="showWhatsappLogin()">
+                            <i class="ri-whatsapp-fill login-btn-icon"></i> Acceder con WhatsApp
+                        </button>
 
                          <div class="signup-link">
-                        <p>¿No tienes cuenta? <a href="#" onclick="showSignupForm()">Regístrate</a></p>
+                            <p>¿No tienes cuenta? <a href="#" onclick="showSignupForm()">Regístrate</a></p>
+                        </div>
                     </div>
-
-                    </div>
-
-                   
                 </div>
 
                 <section id="whatsapp-login" class="form-section-content">
@@ -502,7 +440,7 @@
                     <div class="form-group">
                         <i class="ri-mail-line form-icon"></i>
                         <input type="email" id="email-login" class="form-control" placeholder="Ingresa tu email">
-                     </div>
+                      </div>
                     <div class="form-group">
                         <i class="ri-lock-password-line form-icon"></i>
                         <input type="password" id="password-login" class="form-control" placeholder="Ingresa tu password">
@@ -548,22 +486,19 @@
     </div>
 </div>
 
-
-
 <div class="modal fade" id="iosInstallModal" tabindex="-1" role="dialog" aria-labelledby="iosModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
+    <div class="modal-content" style="border-radius: 12px; border:none;">
       <div class="modal-header">
-        <h5 class="modal-title" id="iosModalLabel">Instalar en iOS</h5>
+        <h5 class="modal-title" id="iosModalLabel" style="font-weight: 600;">Instalar en iOS</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+          <span aria-hidden="true">×</span>
         </button>
       </div>
       <div class="modal-body text-center">
         <p>Para instalar la app en tu iPhone o iPad:</p>
         <p class="mb-2">1. Presiona el ícono de <strong>Compartir <i class="ri-share-2-line" style="vertical-align: middle; font-size: 1.2rem;"></i></strong> en la barra de Safari.</p>
         <p class="mb-3">2. Desliza hacia arriba y selecciona <br><strong>"Agregar a inicio <i class="ri-add-box-line" style="vertical-align: middle; font-size: 1.2rem;"></i>"</strong> .</p>
-     
       </div>
     </div>
   </div>
@@ -591,7 +526,7 @@
     function showSignupForm() { showSection('signupform'); }
     function showLoginOptions() { showSection('login-options'); }
 
-    // El resto de tus funciones JS originales van aquí...
+    // --- LÓGICA DE LOGIN ORIGINAL ---
     function handleCredentialResponse(response) {
       const responsePayload = decodeJwtResponse(response.credential);
       var name = responsePayload.name;
@@ -759,85 +694,79 @@
     }
 
     $(window).on('load', function() {
-      // Inicializar mostrando solo la primera vista
       showLoginOptions();
-
       var storedToken = localStorage.getItem('MStoken');
       if (storedToken) {
-        // Redireccionar si ya existe un token
         window.location.href = 'https://www.mozart-app.com/main'
       }
     });
 
-
+    // --- SCRIPT FONDO ACTUALIZADO (DARK GRADIENT) ---
     $(function() {
-        // 1. Define tu lista de imágenes de fondo.
-         var images = [
+        var images = [
             'https://lh3.googleusercontent.com/d/1XUHZMWjkiD1dBveaoEYSTY_Zd7lOi63t',
             'https://lh3.googleusercontent.com/d/1574yKLK-x78N7AYfRtLRpUVv7ihC3dui=s1000',
             'https://lh3.googleusercontent.com/d/1PoQXBg8DCvKCAXx0l-kwciDR_XMyyytg',
         ];
 
-        // 2. Elige una imagen aleatoria.
         var randomIndex = Math.floor(Math.random() * images.length);
         var randomImage = images[randomIndex];
+        
+        // APLICANDO EL DEGRADADO OSCURO (Estilo Landing Page)
         $('.intro-section').css('background-image', 
-            'linear-gradient(to top, rgba(10, 10, 20, 0.6), rgba(50, 30, 70, 0.4)), url(' + randomImage + ')'
+            'linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url(' + randomImage + ')'
         );
+        
         if (window.matchMedia('(max-width: 891px)').matches) {
             $('#sign').attr('data-width', '300');
         }
     });
 
-
-
+    // --- PWA LOGIC ---
     let deferredPrompt;
-const isAndroid = /Android/i.test(navigator.userAgent);
-const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-// Registrar el Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(function (registration) {
-    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-  }, function (err) {
-    console.log('ServiceWorker registration failed: ', err);
-  });
-}
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(function (registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function (err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    }
 
-if ('setAppBadge' in navigator) {
-  navigator.setAppBadge(5).catch((err) => {
-    console.error('Error al establecer la insignia:', err);
-  });
-} 
+    if ('setAppBadge' in navigator) {
+      navigator.setAppBadge(5).catch((err) => {
+        console.error('Error al establecer la insignia:', err);
+      });
+    } 
 
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-  $scope.isMobile = false; 
-}
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      // App instalada
+    }
 
-// Manejar el evento 'beforeinstallprompt'
-window.addEventListener('beforeinstallprompt', (e) => {
-  if (isAndroid) {
-    e.preventDefault();
-    deferredPrompt = e;
-  }
-});
-
-// Función para agregar a la pantalla de inicio
-function installApp() {
-  if (isAndroid && deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the A2HS prompt');
-      } else {
-        console.log('User dismissed the A2HS prompt');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      if (isAndroid) {
+        e.preventDefault();
+        deferredPrompt = e;
       }
-      deferredPrompt = null;
     });
-  } else if (isIOS) {
-    $('#iosInstallModal').modal('show');
-  }
-};
+
+    function installApp() {
+      if (isAndroid && deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        $('#iosInstallModal').modal('show');
+      }
+    };
 
 </script>
 
