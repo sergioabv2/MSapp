@@ -502,10 +502,10 @@ body {
 
         <div class="filters-row">
             <div class="filter-pill" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">Todo</div>
-            <div class="filter-pill" ng-class="{'active': filter === 'tips'}" ng-click="filterPosts('tips')">Tips</div>
-            <div class="filter-pill" ng-class="{'active': filter === 'history'}" ng-click="filterPosts('history')">Historias</div>
-            <div class="filter-pill" ng-class="{'active': filter === 'theory'}" ng-click="filterPosts('theory')">Teoría</div>
-            <div class="filter-pill" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">Guardados</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'tip'}" ng-click="filterPosts('tip')">Tips</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'story'}" ng-click="filterPosts('story')">Anécdotas</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'article'}" ng-click="filterPosts('article')">Artículos</div>
+            <div class="filter-pill" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">Favoritos</div>
         </div>
 
           <div class="search-bar-wrapper">
@@ -537,7 +537,7 @@ body {
                 <div class="row-stats">
                     <div class="stat-group">
                         <div class="stat-item" style="color:var(--text-main);">
-                            {{post.media === 'img' ? 'Visual' : (post.media === 'poll' ? 'Encuesta' : 'Lectura')}}
+                            {{post.category}}
                             <span>• {{calculateTimeAgo(post.date)}}</span>
                         </div>
                         <div class="stat-item" style="color:var(--text-main);">
@@ -572,7 +572,7 @@ body {
     <div class="reader-container">
         
         <button style="background:none; border:none; font-weight:600; cursor:pointer; margin-bottom:30px; color:#666; display:flex; align-items:center; gap:5px; font-size:15px;" ng-click="backToFeed()">
-            <i class="ri-arrow-left-line"></i> Volver a Classroom
+            <i class="ri-arrow-left-line"></i> Volver 
         </button>
 
         <h1 style="font-size:40px; font-weight:800; line-height:1.1; margin-bottom:15px; color:#111; letter-spacing: -0.5px;">
@@ -587,21 +587,13 @@ body {
             </div>
         </div>
 
-        <img ng-if="selectedPostForComments.media == 'img'" ng-src="{{selectedPostForComments.content}}" style="width:100%; border-radius:8px; margin-bottom:40px; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+        <img ng-if="selectedPostForComments.media == 'img'" ng-src="{{selectedPostForComments.photo}}" style="width:100%; border-radius:8px; margin-bottom:40px; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
 
-        <div style="font-size:19px; line-height:1.8; color:#2a2e2e; margin-bottom:60px; font-family: 'Georgia', serif;">
+        <div style="font-size:19px; line-height:1.8; color:#2a2e2e; margin-bottom:60px;">
             {{selectedPostForComments.content}}
         </div>
 
-        <div ng-if="selectedPostForComments.media == 'poll'" style="background:#f9fafb; padding:25px; border-radius:8px; border:1px solid #e5e7eb; margin-bottom:40px;">
-            <div style="font-weight:700; margin-bottom:15px; font-size:18px;">Resultados de la encuesta</div>
-            <div ng-repeat="opt in selectedPostForComments.likes" 
-                 style="padding:15px; background:white; border:1px solid #ddd; margin-bottom:10px; border-radius:6px; cursor:pointer; display:flex; justify-content:space-between;"
-                 ng-click="addVote(selectedPostForComments, opt, $index)">
-                <span>{{opt.name}}</span>
-                <span style="font-weight:600; color:var(--primary-color)">{{opt.users.length}} votos</span>
-            </div>
-        </div>
+       
 
         <div class="comments-section">
             
@@ -700,25 +692,83 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
   $scope.user = "Invitado"; 
   $scope.userImg = "https://ui-avatars.com/api/?name=Invitado&background=random"; 
 
+   var mockData = [
+    {
+      header: "Tip: Cómo mejorar la lectura a primera vista",
+      content: "La clave está en no mirar las manos y anticipar los compases. Un ejercicio muy útil es leer un compás por delante de lo que estás tocando. Aquí les dejo un ejemplo práctico con partituras simples.",
+      photo: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=150&q=80",
+      category: "tip",
+      user: "Prof. Mozart",
+      date: "2023-10-25T10:00:00",
+      media: "img",
+      likes: ["user1", "user2", "user3", "user4"], // Array de usuarios para conteo normal
+      comments: [
+        { user: "Ana García", photo: "https://i.pravatar.cc/150?u=a", comment: "¡Excelente consejo! Me ha ayudado mucho." },
+        { user: "Carlos M.", photo: "https://i.pravatar.cc/150?u=c", comment: "¿Algún libro que recomiende para esto?" }
+      ]
+    },
+ 
+    {
+      header: "Anécdota: Como vencí el miedo a presentarme en un escenario",
+      content: "Recuerda mantener la espalda recta y los hombros relajados. La tensión en los hombros es la causa número uno de fatiga al practicar escalas.",
+      category: "story",
+      photo: "https://lh3.googleusercontent.com/d/1646Kq_drvK1Oz0H1LvCkerIzQZxhqqMS",
+      user: "Pedro García",
+      date: "2023-11-01T08:00:00",
+      media: "img",
+      likes: ["user2", "user3", "user4", "user5", "user6"],
+      comments: []
+    },
+    {
+      "header": "La frase musical: Unidad de sentido",
+      "category": "article",
+      // CONTENIDO HTML PURO PARA EL DISEÑO
+      "content": `
+        <p>Una frase musical es una unidad melódica y rítmica completa en sí misma, comparable a una oración en el lenguaje hablado. Se construye típicamente sobre un patrón de pregunta y respuesta, conocido como antecedente y consecuente.</p>
+        
+        <div class="info-box">
+            <i class="ri-alert-fill info-box-icon"></i>
+            <div class="info-box-content">
+                <span class="info-box-title">Nota Importante</span>
+                La comprensión de la frase precede y determina la expresión musical efectiva. Sin análisis previo, la ejecución carecerá de discurso coherente.
+            </div>
+        </div>
+
+        <h2>La práctica del análisis</h2>
+        <p>La práctica del análisis y la escucha activa desarrollan esta habilidad. Aislar la línea melódica principal, cantarla para sentir sus puntos de reposo naturales y marcar las cadencias en la partitura son ejercicios fundamentales.</p>
+
+        <div class="emphasis-block">
+            "La repetición exacta sin variación es menos frecuente que la repetición con modificación."
+        </div>
+
+        <p>Para identificar una frase en una partitura, busca estos rasgos:</p>
+        <ul class="styled-list">
+            <li><strong>Extensión:</strong> Generalmente 4 u 8 compases.</li>
+            <li><strong>Punto de Reposo:</strong> Debe terminar en una cadencia armónica.</li>
+            <li><strong>Diseño Melódico:</strong> Suele tener forma de arco (tensión y relajación).</li>
+        </ul>
+      `,
+      "media": "text",
+      "date": new Date().toISOString(),
+      "user": "Prof. Alejandro",
+      "photo": "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+      "likes": ["User1"], 
+      "comments": [],
+      "saved": []
+    },
+  ];
+
   var config = {
     headers: { "Content-Type": "text/plain;charset=utf-8" }
   };
 
-  // --- Carga de Datos (Google Sheets) ---
-  $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', 
-    {action: "getPosts"}, config)
-    .then(function (response) {
-      $scope.data = shuffleArray(response.data);
+   $timeout(function() {
+      $scope.data = shuffleArray(mockData);
       $scope.filterPosts('all');
       $scope.userDataLoaded = false;
       
-      // Chequeo de votos
-      $scope.data.forEach(post => {
-        if (post.media === 'poll') {
-          post.userHasVoted = post.likes.some(opt => opt.users.includes($scope.user));
-        }
-      });
-    });
+    
+  }, 100); 
 
   // --- Carga de Usuario ---
   var token = localStorage.getItem('MStoken');
@@ -755,17 +805,15 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
   };
 
   // --- Filtros ---
-  $scope.filterPosts = function (type) {
+ $scope.filterPosts = function (type) {
     $scope.filter = type;
     if (type === 'all') {
       $scope.filteredData = $scope.data;
     } else if (type === 'saved') {
       $scope.filteredData = $scope.data.filter(post => $scope.isPostSaved(post));
     } else {
-      // Filtrado simple por texto en el contenido si no hay categoría explícita
-      $scope.filteredData = $scope.data.filter(post => {
-          return JSON.stringify(post).toLowerCase().includes(type);
-      });
+      // Filtrar por la propiedad 'category'
+      $scope.filteredData = $scope.data.filter(post => post.category === type);
     }
     $scope.itemsPerPage = 10;
   };
@@ -818,11 +866,6 @@ $scope.backToFeed = function () {
     $scope.newCommentText = '';
   };
 
-  $scope.addVote = function (post, option, index) {
-    if (post.userHasVoted) return;
-    option.users.push($scope.user);
-    post.userHasVoted = true;
-  };
 
 
 
