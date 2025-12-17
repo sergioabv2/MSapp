@@ -6,7 +6,7 @@
     <title>Piano Quest Pro</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="styles.css">
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 
     <style>
@@ -27,6 +27,8 @@
     --modal-bg: rgba(0,0,0,0.5);
     --modal-content-bg: #ffffff;
     --medium-gray: #adb5bd;
+    --accent-red: #FF4757;
+    --font-mono: 'JetBrains Mono', monospace;
 }
 
 * { 
@@ -808,14 +810,17 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+   object-position: center 40%;
 }
 
 
 .banner-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+   background: linear-gradient(to bottom, 
+                rgba(248, 249, 250, 0.35) 0%, 
+                rgba(248, 249, 250, 0.25) 50%, 
+                rgba(248, 249, 250, 1) 100%);
 }
 
 .banner-text {
@@ -824,8 +829,8 @@ body {
     left: 6%;
     transform: translateY(-50%);
     z-index: 5;
-    color: white;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+    color: #1a1a1a;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.1); 
 }
 
 .banner-text h1 {
@@ -836,8 +841,9 @@ body {
 }
 
 .banner-text .subtitle {
+  font-family: var(--font-mono);
     font-size: 12px; /* REDUCIDO */
-    color: rgba(255,255,255,0.8);
+   color: var(--accent-red);
     font-weight: 600;
     display: block;
     margin-bottom: 8px;
@@ -845,11 +851,7 @@ body {
     letter-spacing: 1px;
 }
 
-.banner-text p {
-    font-size: 1rem;
-    max-width: 450px;
-    display: none; /* OPCIONAL: Ocultar descripción en móviles o si queda muy apretado */
-}
+
 
 
 
@@ -1148,8 +1150,19 @@ body {
     .player-header {
         justify-content: space-between;
     }
-    .banner-text h1 { font-size: 2rem; }
-    .banner-text .subtitle { font-size: 1.25rem; }
+     .banner-text {
+                left: 20px;
+                right: 20px; /* Usamos left/right para centrarlo y dar margen */
+                max-width: 100%;
+                /* Opcional: si el texto queda muy abajo en móvil, ajusta este translateY */
+                /* transform: translateY(-40%); */
+            }
+
+            /* 3. Reducimos el tamaño del H1 para que no sea gigante en el celular */
+            .banner-text h1 {
+                font-size: 32px;
+            }
+
     .floating-header { padding: 15px; }
 }
 
@@ -1259,6 +1272,9 @@ body {
             <span class="subtitle">Lecciones de Piano</span>
             Classroom
         </h1>
+         <p style="color: #596275; margin-top: 10px; font-weight: 500;">
+                Sistema de aprendizaje secuencial. 
+            </p>
         </div>
 
     <div class="banner-loader" ng-show="isLoading">
