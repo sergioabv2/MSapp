@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <style>
     /* --- Variables & Reset --- */
@@ -24,7 +25,8 @@
 }
 
 body {
-    background-color: var(--bg-body);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+     transition: background-color 0.3s, color 0.3s;
     font-family: var(--font-stack);
     color: var(--text-main);
     margin: 0;
@@ -41,7 +43,10 @@ body {
     position: relative;
     height: 240px;
     background: #1f2937; /* Fallback */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://lh3.googleusercontent.com/d/15FbOHaYX6jPjCkgfaayMDU3cPpbEM0W3=s700');
+    background-image: linear-gradient(to bottom, 
+                rgba(248, 249, 250, 0.35) 0%, 
+                rgba(248, 249, 250, 0.25) 50%, 
+                rgba(248, 249, 250, 1) 100%), url('https://lh3.googleusercontent.com/d/15FbOHaYX6jPjCkgfaayMDU3cPpbEM0W3=s700');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -52,7 +57,8 @@ body {
 }
 
 .hero-subtitle {
-    color: rgba(255,255,255,0.8);
+    color: #FF4757;
+    font-family: 'JetBrains Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 12px;
@@ -61,7 +67,8 @@ body {
 }
 
 .hero-title {
-    color: white;
+    color: #1a1a1a;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.1); 
     font-size: 42px;
     font-weight: 800;
     margin: 0;
@@ -131,7 +138,7 @@ body {
     display: flex;
     flex-direction: column; /* Estructura interna vertical, pero el card es horizontal visualmente si se expande */
     background: white;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     padding: 24px;
     margin-bottom: 16px;
@@ -143,6 +150,7 @@ body {
 /* Efecto hover estilo Starter Story (borde azul/púrpura) */
 .story-row:hover {
     border-color: var(--primary-color);
+    background-color: #F8F9FF;
     box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08);
     transform: translateY(-1px);
 }
@@ -478,16 +486,16 @@ body {
     
 
     <div class="hero-wrapper">
-        <div class="hero-subtitle">Esperiencias de aprendizaje</div>
+        <div class="hero-subtitle">Experiencias de aprendizaje</div>
         <h1 class="hero-title">Blog</h1>
+          <p style="color: #596275; margin-top: 10px; font-weight: 500;">
+                Sistema de aprendizaje secuencial. 
+            </p>
     </div>
 
     <div class="content-container" ng-if="!selectedPostForComments">
         
-        <div class="search-bar-wrapper">
-            <input type="text" class="search-input" placeholder="Buscar lección, historia o tip..." ng-model="searchText">
-        </div>
-        
+      
         <div style="font-size:14px; color:#666; margin-bottom:10px;">
             Mostrando {{filteredData.length}} historias
         </div>
@@ -499,6 +507,11 @@ body {
             <div class="filter-pill" ng-class="{'active': filter === 'theory'}" ng-click="filterPosts('theory')">Teoría</div>
             <div class="filter-pill" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">Guardados</div>
         </div>
+
+          <div class="search-bar-wrapper">
+            <input type="text" class="search-input" placeholder="Buscar lección, historia o tip..." ng-model="searchText">
+        </div>
+        
 
         <div class="story-list">
             <div ng-if="userDataLoaded" style="text-align:center; padding:40px; color:#666;">
@@ -553,9 +566,7 @@ body {
 
     </div>
 
-    <button class="fab-create" ng-click="openImagePostDialog()">
-        <i class="ri-add-line"></i>
-    </button>
+ 
 
   <div class="reader-modal" ng-if="selectedPostForComments">
     <div class="reader-container">
@@ -671,24 +682,7 @@ body {
         </div> </div>
 </div>
 
-    <dialog id="dialog-post" style="border:none; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); padding:0; width:100%; max-width:500px;">
-        <div style="padding:20px;">
-            <h3 style="margin-top:0;">Crear nueva historia</h3>
-            <input ng-model="newImagePost.header" placeholder="Título atractivo..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; font-weight:600;">
-            <textarea ng-model="newImagePost.content" placeholder="Escribe el contenido..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; min-height:100px; resize:vertical;"></textarea>
-            
-            <img ng-if="imagePreview" ng-src="{{imagePreview}}" style="width:100%; height:150px; object-fit:cover; margin-top:10px; border-radius:6px;">
-            <input type="file" id="imageUpload" accept="image/*" onchange="angular.element(this).scope().handleFileSelect(this.files)" style="display: none;">
-
-            <div style="display:flex; justify-content:space-between; margin-top:20px;">
-                <button onclick="document.getElementById('imageUpload').click()" style="background:#f3f4f6; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">📷 Foto</button>
-                <div>
-                    <button onclick="document.getElementById('dialog-post').close()" style="background:none; border:none; color:#666; cursor:pointer; margin-right:10px;">Cancelar</button>
-                    <button ng-click="createImagePost()" style="background:var(--primary-color); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Publicar</button>
-                </div>
-            </div>
-        </div>
-    </dialog>
+   
 
 </body>
 
@@ -830,58 +824,8 @@ $scope.backToFeed = function () {
     post.userHasVoted = true;
   };
 
-  // --- Crear Post (Lógica nueva con Header/Content) ---
-  $scope.newImagePost = { header: '', content: '' };
-  $scope.imagePreview = null;
 
-  $scope.openImagePostDialog = function() {
-    $scope.newImagePost = { header: '', content: '' };
-    $scope.imagePreview = null;
-    document.getElementById('imageUpload').value = null;
-    document.getElementById('dialog-post').showModal();
-  };
 
-  $scope.handleFileSelect = function(files) {
-    if (files && files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $scope.$apply(function() {
-          $scope.imagePreview = e.target.result;
-        });
-      };
-      reader.readAsDataURL(files[0]);
-    }
-  };
-
-  $scope.createImagePost = function() {
-    if (!$scope.newImagePost.header && !$scope.newImagePost.content) {
-      alert("Escribe algo para publicar.");
-      return;
-    }
-
-    var post = {
-      user: $scope.user,
-      type: $scope.imagePreview ? "img" : "text",
-      media: $scope.imagePreview ? "img" : "text",
-      photo: $scope.userImg,
-      header: $scope.newImagePost.header || 'Sin título',
-      // Si hay imagen, la ponemos en content para que el HTML la detecte como src
-      // Si no, ponemos el texto
-      content: $scope.imagePreview ? $scope.imagePreview : $scope.newImagePost.content,
-      date: new Date().toISOString(),
-      likes: [],
-      comments: [],
-      saved: []
-    };
-
-    // Si es imagen con texto, podemos meter el texto en comments o adaptar el objeto post
-    // Para simplificar, si es img, el texto se pierde visualmente en lista (se ve la foto) 
-    // pero podriamos guardarlo en una propiedad extra si quisieras.
-
-    $scope.data.unshift(post);
-    $scope.filterPosts($scope.filter);
-    document.getElementById('dialog-post').close();
-  };
 
 }]);
 </script>
