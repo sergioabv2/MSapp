@@ -2367,6 +2367,8 @@ function updateMidiStatusLegend(deviceName = null) {
     */
 
     function initSampler() {
+        Tone.context.lookAhead = 0;
+
       sampler = new Tone.Sampler({
         urls: { 
           "C1": "C1.mp3",
@@ -2395,7 +2397,7 @@ function updateMidiStatusLegend(deviceName = null) {
           "A6": "A6.mp3",
           "C7": "C7.mp3",
         },
-        attack: 0.01,    // Ataque casi instantáneo (como piano real)
+        attack: 0.0,    // Ataque casi instantáneo (como piano real)
         decay: 0.2,      // Caída rápida inicial 
         sustain: 0.3,    // Nivel de sostenido (30% del volumen máximo)
         release: 3.5, 
@@ -4248,17 +4250,22 @@ if (isIntelligentPracticeMode && isMidiLearnMode) {
         updatePracticeAccuracy();
     }
     
-    return; // No ejecutar la lógica normal
+    return; 
 }
-        
-        // LÓGICA NORMAL DE LEARNING MODE
+
         if (isMidiLearnMode && expectedNotes.size > 0) {
             const normalizedMidiNote = normalizeNote(pitchName);
             
             if (expectedNotes.has(normalizedMidiNote)) {
-                sampler.triggerAttackRelease(pitchName, '8n');
+                if(sampler && sampler.loaded) {
+                    sampler.triggerAttackRelease(pitchName, '8n', Tone.now());
+                }
+                requestAnimationFrame(() => {
+                    highlightMidiKey(pitchName); 
+                    createNoteFlashPiano(pitchName, 'treble'); 
+                });
+
                 expectedNotes.delete(normalizedMidiNote);
-                createNoteFlashPiano(pitchName, 'treble');
                 
                 if (expectedNotes.size === 0) {
                     if (currentLearningIndex > 0) {
