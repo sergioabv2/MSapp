@@ -85,18 +85,57 @@
         /* --- CAROUSEL BANNER (Destacado) --- */
        .book-slide { width: 100%; margin-bottom: 20px; }
         
+/* --- Estilo mejorado para la celda con imagen de fondo --- */
 .book-cell {
     position: relative;
+    width: 45%; 
+    height: 300px;
+    margin-right: 20px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
-    padding: 20px 40px;
-    width: 40%;         /* CAMBIO: Muestra 2.5 elementos */
-    height: 240px;
-    margin-right: 0;
-    border-radius: 0;
-    background-size: cover;
-    background-position: center;
-    background: linear-gradient(135deg, #F2F2F2 0%, #E5E4E2 100%); 
+    padding: 0 30px;
+    overflow: hidden;
+    background-size: cover;      /* La imagen cubre toda la celda */
+    background-position: center; /* Centramos la imagen */
+    border: 1px solid rgba(255,255,255,0.1);
+    z-index: 1;
+}
+
+/* Capa oscura para que el texto resalte sobre cualquier imagen */
+.book-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+   
+  background: linear-gradient(to bottom, 
+                rgba(248, 249, 250, 0.95) 0%, 
+                rgba(248, 249, 250, 0.5) 50%, 
+                rgba(248, 249, 250, 1) 100%);
+     backdrop-filter: blur(2px);  
+    z-index: 0;
+}
+
+/* Aseguramos que el contenido esté por encima de la capa oscura */
+.book-img, .book-content {
+    position: relative;
+    z-index: 2;
+}
+
+.book-title {
+   color: #1a1a1a;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.book-author {
+
+    color: var(--primary-color); /* Tu rojo de Mozart Academy */
+    font-weight: 700 !important;
 }
 
 /* Ajustes responsivos */
@@ -197,17 +236,31 @@
         }
         .book-voters {
             background: rgba(0,0,0,0.15);
-            padding: 6px 14px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             backdrop-filter: blur(10px);
+        }
+
+        .openSheet{
+            padding: 10px 20px; 
+            background-color: white; 
+            border: 1px solid var(--border-color); 
+            border-radius: 7px;
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px;
+            color: var(--text-dark); 
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top:15px; width:fit-content; background:var(--primary-color); color:white; border:none;
         }
 
         /* --- MAIN LAYOUT --- */
       .main-wrapper { 
     width: 100%; 
-    max-width: 1200px;  /* Aquí ponemos el límite de ancho */
+    
     margin: 20px auto;  /* Auto para centrarlo horizontalmente */
     padding: 0 20px;    /* Recuperamos el margen lateral para el contenido */
     display: grid; 
@@ -410,9 +463,8 @@
             color: var(--text-muted); 
             font-weight: 600;
         }
-        .stars i { display: none; } /* Ocultamos estrellas, usamos tags */
+        .stars i { display: none; } 
 
-        /* --- MODAL PDF (Ajustado para iOS/iPhone) --- */
         .pdf-viewer-overlay { 
             position: fixed; 
             top: 0; 
@@ -458,6 +510,7 @@
 
         /* ==================== RESPONSIVENESS ==================== */
         @media (max-width: 900px) { 
+            .hidemobile{display: none}
             .main-wrapper { grid-template-columns: 1fr; }
             .books-of { 
                 display: grid;
@@ -470,76 +523,134 @@
         }
         
         @media (max-width: 750px) { 
-            .book-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; } 
+
+         .book-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
             .book-card-img { height: 100px; }
             .card-content { padding: 10px; }
             .book-name { font-size: 12px; }
             .book-by { font-size: 10px; margin-bottom: 5px; }
             .popular-books { padding: 15px; }
+            .main-wrapper {
+        max-width: 100%;
+        margin: 10px 0;
+        padding: 0 15px;
+    }
             
-            
-            .book-types { 
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                flex-wrap: nowrap;
-            }
-            .book-type { flex-shrink: 0; }
-        }
-        
+      .book-types {
+        display: flex;
+        flex-wrap: wrap; /* Permitimos que salten de línea */
+        gap: 6px;
+        overflow: visible;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-        /* --- AJUSTES PARA MÓVILES (Pantallas < 600px) --- */
+    .book-type {
+        flex: 0 0 auto;
+        padding: 6px 12px; /* Más compactos */
+        font-size: 11px; /* Texto más pequeño */
+        border-radius: 16px;
+        white-space: nowrap;
+    }
+    
+  }      
+
+/* --- AJUSTES PARA MÓVILES (Pantallas < 500px) --- */
 @media (max-width: 500px) {
+    /* Ajuste del wrapper principal */
+    .main-wrapper {
+        padding: 0 10px;
+        margin: 5px 0;
+    }
+    
+    /* Ajuste del carrusel */
+    .book-slide {
+        margin-bottom: 15px;
+        padding: 0;
+    }
     
     .book-cell { 
         width: 100%; 
-        /* FORZAMOS FILA: Imagen a la izquierda, texto a la derecha */
+        height: auto;
+        min-height: 200px;
         flex-direction: row; 
-        align-items: center; /* Centrado verticalmente */
-        text-align: left;    /* Texto alineado a la izquierda */
-        padding: 10px 50px;  /* Menos padding para aprovechar espacio */
+        align-items: center;
+        text-align: left;
+        padding: 15px;  
+        margin-right: 10px;
     }
 
-    /* Reducimos la imagen en móvil para dejar espacio al texto */
     .book-photo {
-        width: 100px;       /* Más estrecha */
-        height: 130px;     /* Más baja (la mitad del contenedor) */
-        margin-right: 5px; /* Espacio entre imagen y texto */
-        margin-bottom: 0;   /* Quitamos margen inferior si tenía */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Sombra más suave */
+        width: 90px;
+        height: 120px;
+        margin-right: 7px;
+        margin-left: 30px;
+        margin-bottom: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
-    /* Ajustamos tamaños de fuente para móvil */
+    .book-img {
+        margin-right: 12px;
+    }
+
     .book-content {
-        padding: 0; /* Quitamos padding extra del contenedor de texto */
-        min-width: 0; /* Truco para que el texto no desborde en flex */
+        padding: 0;
+        min-width: 0;
+        flex: 1;
     }
 
     .book-title {
-        font-size: 19px; /* Título un poco más chico */
+        font-size: 16px;
         margin-bottom: 4px;
+        line-height: 1.2;
     }
 
     .book-author {
-        font-size: 14px;
-        margin-bottom: 8px;
+        font-size: 13px;
+        margin-bottom: 6px;
     }
 
-    /* IMPORTANTE: Volvemos a mostrar el resumen, pero limitado */
     .book-sum {
-        display: -webkit-box;    /* Reactivamos el display */
-        font-size: 12px;
-        line-height: 1.3;
-        -webkit-line-clamp: 3;   /* Solo mostramos 3 líneas máximo */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        white-space: normal;     /* Asegura que el texto fluya */
+        display: none; /* Ocultamos en móvil para evitar overflow */
     }
     
-    /* Ajustamos el botón de dificultad/rating */
     .book-voters {
-        font-size: 11px;
-        padding: 4px 10px;
+        font-size: 10px;
+        padding: 3px 8px;
     }
+
+    .openSheet {
+        padding: 8px 12px; 
+        font-size: 11px;
+        margin-top: 10px;
+    }
+
+    /* Ajustes del contenido principal */
+    .popular-books {
+        padding: 12px;
+    }
+
+    .main-menu {
+        gap: 10px;
+        padding-bottom: 15px;
+    }
+
+
+
+    .genre {
+        font-size: 14px;
+    }
+
+    .search-bar {
+        max-width: 100%;
+    }
+
+    .search-bar input {
+        font-size: 13px;
+        padding: 10px 12px 10px 38px;
+    }
+   
 }
        
 
@@ -685,7 +796,7 @@
 
         <!-- Sidebar (Derecha) -->
         <aside class="books-of">
-            <div class="week">
+            <div class="week hidemobile">
                 <div class="author-title">Actividad Reciente</div>
                 <div id="authorsList"></div>
             </div>
@@ -712,7 +823,7 @@
    let currentPage = 1;
     const itemsPerPage = 4;
 
-   const scores = [
+ const scores = [
   {
     "title": "Arabesque No. 1",
     "author": "Debussy",
@@ -2753,51 +2864,45 @@ function renderSidebars() {
 function renderPopularCarousel() {
     const carouselContainer = document.getElementById('favoritesCarousel');
     
-    // Destruir instancia previa si existe
-    if (flickityInstance) {
-        flickityInstance.destroy();
-    }
+    if (flickityInstance) flickityInstance.destroy();
 
-    // 1. FILTRAR LAS POPULARES (Tag "top" y limitamos a 5)
-    // Si no hay suficientes con tag "top", tomamos las primeras 5 del array general
-    let popularScores = scores.filter(s => s.tags.includes('top')).slice(0, 5);
-    
-    if (popularScores.length === 0) {
-        popularScores = scores.slice(0, 5);
-    }
+    // Filtramos las populares o las primeras 6
+    let popularScores = scores.filter(s => s.tags.includes('top')).slice(0, 6);
+    if (popularScores.length === 0) popularScores = scores.slice(0, 6);
 
     let html = '';
-    popularScores.forEach((score, index) => {
-        // Lógica de colores (mantenemos tu estilo visual)
-        // Nota: CSS nth-child se encarga de los colores de fondo en .book-cell
-        
+    popularScores.forEach((score) => {
+        // Inyectamos la imagen de fondo directamente en el style del div
         html += `
-        <div class="book-cell">
+        <div class="book-cell" style="background-image: url('${score.background}')">
             <div class="book-img">
                 <img src="${score.background}" class="book-photo" onclick="registerAndOpen('${score.title}')">
             </div>
             <div class="book-content">
                 <div class="book-title">${score.title}</div>
-                <div class="book-author">by ${score.author}</div>
+                <div class="book-author">${score.author}</div>
                 <div class="rate">
-                    <span class="book-voters" style="margin-left:0; color:black;">${score.difficulty}</span>
+                    <span class="book-voters">${score.difficulty || 'Grado 1'}</span>
                 </div>
-                <div class="book-sum" style="color: black; margin-top:10px;">Popular • ${score.style}</div>
+              
+                <button class="openSheet" 
+                        onclick="registerAndOpen('${score.title}')">
+                    <i class="fas fa-play"></i> Abrir Partitura
+                </button>
             </div>
         </div>`;
     });
 
     carouselContainer.innerHTML = html;
 
-    // 2. INICIALIZAR FLICKITY CON AUTOPLAY
+    // Reinicializar Flickity
     flickityInstance = new Flickity(carouselContainer, {
-        cellAlign: 'left',
+        cellAlign: 'center',
         contain: true,
-        wrapAround: true,      // Infinito
-        pageDots: true,        // Puntos de navegación
+        wrapAround: true,
+        pageDots: true,
         prevNextButtons: true,
-        autoPlay: 3000,        // CAMBIO: Slide automático cada 3000ms (3 segundos)
-        pauseAutoPlayOnHover: true // Se pausa si pasas el mouse por encima
+        autoPlay: 4000
     });
 }
 
