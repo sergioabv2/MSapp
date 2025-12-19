@@ -1875,6 +1875,13 @@ let isLoopMode = false;
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
 
+let audioContext = null;
+let analyser = null;
+let microphoneStream = null;
+let micInterval = null;
+let lastMicNote = null;
+let lastMicTime = 0;
+const MIC_THRESHOLD = 0.03;
     
 
 
@@ -3764,33 +3771,50 @@ function initFogOfWar() {
 }
 
 function toggleMidiLearnMode() {
-    if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
-        showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
-        initMidiInput();
-        return; 
-    }
-
     isMidiLearnMode = !isMidiLearnMode;
     stopPlayback(); 
 
     if (isMidiLearnMode) {
-      if (isPieceCompleted) {
+        // --- SELECCIÓN DE FUENTE DE ENTRADA ---
+        let hasMidi = false;
+        if (midiAccess && midiAccess.inputs.size > 0) {
+            hasMidi = true;
+        }
+
+        if (hasMidi) {
+            console.log("🎹 Usando entrada MIDI");
+            updateMidiStatusLegend("Teclado MIDI");
+        } else {
+            console.log("🎤 No se detectó MIDI, activando Micrófono...");
+            updateMidiStatusLegend("Micrófono Activo");
+            startMicrophoneListener();
+        }
+        // --------------------------------------
+
+        if (isPieceCompleted) {
             unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
         } else {
             unlockedMeasureCount = MEASURES_PER_CHUNK; 
         }
-      populateMeasureSelector();
+        
+        populateMeasureSelector(); 
+
         setTimeout(() => {
              initFogOfWar();
         }, 100);
 
         midiLearnBtn.style.background = '#e0e0e0';
         midiLearnBtn.classList.remove('pulse-animation');
+        
+        // Cambiamos el icono según si es midi o micro (opcional, visual)
+        if (!hasMidi) {
+            midiLearnBtn.innerHTML = '<i class="ri-mic-line"></i> <span class="btn-label">Escuchando</span>';
+        }
+
         playBtn.disabled = true;
         progressBar.disabled = true;
         currentLearningIndex = 0;
         osmd.cursor.show();
-
 
         Object.assign(osmd.cursor.cursorOptions, {
             type: 5,
@@ -3811,30 +3835,38 @@ function toggleMidiLearnMode() {
         }
         
     } else {
-      const totalMeasures = osmd.sheet.SourceMeasures.length;
-      populateMeasureSelector();
+        // --- LIMPIEZA AL SALIR ---
+        stopMicrophoneListener(); // Aseguramos apagar el micro
+        
+        // Restaurar botón original
+        midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
+        updateMidiStatusLegend(null); // Ocultar leyenda
+        // -------------------------
+
+        const totalMeasures = osmd.sheet.SourceMeasures.length;
         setRangeOpacity(0, totalMeasures, 1);
-    midiLearnBtn.style.background = 'none';
-    playBtn.disabled = false;
-    progressBar.disabled = false;
-    clearAllHighlights(); 
-    osmd.cursor.reset();
-    osmd.cursor.hide();
+        
+        midiLearnBtn.style.background = 'none';
+        playBtn.disabled = false;
+        progressBar.disabled = false;
+        clearAllHighlights(); 
+        osmd.cursor.reset();
+        osmd.cursor.hide();
     
-
-    Object.assign(osmd.cursor.cursorOptions, {
-        type: 1,
-        alpha: 0.8,
-        color: "rgba(52, 152, 219, 0.8)"
-    });
-
-    secondaryTopBar2.classList.remove('is-visible');
-    handFilterMode = 'both';
-    updateStaffOpacity('both'); 
-    rightHandOnlyBtn.style.background = 'none';
-    leftHandOnlyBtn.style.background = 'none';
-    populateMeasureSelector();
-}
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 1,
+            alpha: 0.8,
+            color: "rgba(52, 152, 219, 0.8)"
+        });
+    
+        secondaryTopBar2.classList.remove('is-visible');
+        handFilterMode = 'both';
+        updateStaffOpacity('both'); 
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        
+        populateMeasureSelector();
+    }
 }
 
 
@@ -4191,88 +4223,195 @@ function onMIDIMessage(event) {
 
     if (command === 144 && velocity > 0) {
         const pitchName = midiNoteToPitchName(note);
-        highlightMidiKey(pitchName);
-        
+        processInputNote(pitchName);
 
-if (isIntelligentPracticeMode && isMidiLearnMode) {
-    if (practiceStartTime === null) {
-        practiceStartTime = Date.now();
-    }
-    
-    const normalizedNote = normalizeNote(pitchName);
-    
-    // Verificar si la nota está en las esperadas del modo normal
-    if (expectedNotes.has(normalizedNote)) {
-        // Usar la lógica normal del modo aprendizaje
-        sampler.triggerAttackRelease(pitchName, '8n');
-        expectedNotes.delete(normalizedNote);
-        createNoteFlashPiano(pitchName, 'treble');
-        practiceCorrectNotes++;
-        
-        console.log(`✓ Correcta: ${normalizedNote}, Quedan: ${expectedNotes.size}`);
-        
-        // Cuando se completan todas las notas del paso actual
-        if (expectedNotes.size === 0) {
-            // Avanzar normalmente
-            if (currentLearningIndex > 0) {
-                advanceLearningStep();
-            } else {
-                prepareFirstLearningStep();
-            }
-            
-            // Verificar si completó el rango de compases de esta fase
-            checkPracticePhaseCompletion();
-        }
-        
-        // Actualizar progreso en tiempo real
-        updatePracticeAccuracy();
-    } else {
-        // Nota incorrecta
-        practiceErrors++;
-        console.log(`✗ Error: Nota ${normalizedNote} incorrecta. Total errores: ${practiceErrors}`);
-        updatePracticeAccuracy();
-    }
-    
-    return; 
-}
-
-        if (isMidiLearnMode && expectedNotes.size > 0) {
-            const normalizedMidiNote = normalizeNote(pitchName);
-            
-            if (expectedNotes.has(normalizedMidiNote)) {
-                if(sampler && sampler.loaded) {
-                    sampler.triggerAttackRelease(pitchName, '8n', Tone.now());
-                }
-                requestAnimationFrame(() => {
-                    highlightMidiKey(pitchName); 
-                    createNoteFlashPiano(pitchName, 'treble'); 
-                });
-
-                if (tutorialOverlay.classList.contains('is-visible')) {
-                    const currentStepData = tutorialSteps[currentTutorialStep];
-                    if (currentStepData && currentStepData.targetAction === 'play-correct-note') {
-                            nextTutorialStep();
-                    }
-                }
-
-                expectedNotes.delete(normalizedMidiNote);
-                
-                if (expectedNotes.size === 0) {
-                    if (currentLearningIndex > 0) {
-                        advanceLearningStep();
-                    } else {
-                        prepareFirstLearningStep();
-                    }
-                }
-            }else {
-                errorsInCurrentChunk++; 
-                highlightError(pitchName); 
-            }
-        }
     } else if (command === 128 || (command === 144 && velocity === 0)) {
         const pitchName = midiNoteToPitchName(note);
         unhighlightMidiKey(pitchName);
     }
+}
+
+
+
+function processInputNote(noteName) {
+    if (!isMidiLearnMode) return;
+    highlightMidiKey(noteName);
+    if (isIntelligentPracticeMode) {
+        if (practiceStartTime === null) practiceStartTime = Date.now();
+        
+        const normalizedNote = normalizeNote(noteName);
+        
+        if (expectedNotes.has(normalizedNote)) {
+            sampler.triggerAttackRelease(noteName, '8n');
+            expectedNotes.delete(normalizedNote);
+            createNoteFlashPiano(noteName, 'treble'); // Ojo: asume treble visualmente por ahora
+            practiceCorrectNotes++;
+            
+            if (expectedNotes.size === 0) {
+                if (currentLearningIndex > 0) advanceLearningStep();
+                else prepareFirstLearningStep();
+                checkPracticePhaseCompletion();
+            }
+            updatePracticeAccuracy();
+        } else {
+            practiceErrors++;
+            highlightError(noteName);
+            updatePracticeAccuracy();
+        }
+        return;
+    }
+    if (expectedNotes.size > 0) {
+        const normalizedNote = normalizeNote(noteName);
+
+        if (expectedNotes.has(normalizedNote)) {
+            if(sampler && sampler.loaded) {
+                 sampler.triggerAttackRelease(noteName, '8n', Tone.now());
+            }
+            createNoteFlashPiano(noteName, 'treble'); 
+            if (tutorialOverlay.classList.contains('is-visible')) {
+                const currentStepData = tutorialSteps[currentTutorialStep];
+                if (currentStepData && currentStepData.targetAction === 'play-correct-note') {
+                    nextTutorialStep();
+                }
+            }
+
+            expectedNotes.delete(normalizedNote);
+            if (expectedNotes.size === 0) {
+                if (currentLearningIndex > 0) {
+                    advanceLearningStep();
+                } else {
+                    prepareFirstLearningStep();
+                }
+            }
+        } else {
+            if (unlockedMeasureCount < osmd.sheet.SourceMeasures.length) { // Solo cuenta errores si no es modo libre
+                 errorsInCurrentChunk++;
+            }
+            highlightError(noteName);
+        }
+    }
+}
+
+
+
+// Algoritmo de autocorrelación para detectar pitch
+function autoCorrelate(buf, sampleRate) {
+    let SIZE = buf.length;
+    let rms = 0;
+
+    for (let i = 0; i < SIZE; i++) {
+        const val = buf[i];
+        rms += val * val;
+    }
+    rms = Math.sqrt(rms / SIZE);
+
+    // Si el volumen es muy bajo, ignoramos (silencio)
+    if (rms < MIC_THRESHOLD) return -1;
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    buf = buf.slice(r1, r2);
+    SIZE = buf.length;
+
+    let c = new Array(SIZE).fill(0);
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE - i; j++) {
+            c[i] = c[i] + buf[j] * buf[j + i];
+        }
+    }
+
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < SIZE; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+    let T0 = maxpos;
+
+    return sampleRate / T0;
+}
+
+// Convertir Frecuencia a Nota (Ej: 440Hz -> A4)
+function getNoteFromFrequency(frequency) {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    const midi = Math.round(pitchNum);
+    const noteName = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return noteName + octave;
+}
+
+// Iniciar Escucha del Micrófono
+async function startMicrophoneListener() {
+    if (audioContext) return; // Ya está activo
+
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphoneStream = stream;
+        
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+
+        const bufferLength = analyser.fftSize;
+        const buffer = new Float32Array(bufferLength);
+
+        console.log("🎤 Micrófono activado para detección de notas");
+        setStatus("Modo Micrófono Activo");
+
+        // Loop de detección (aprox 60 veces por segundo)
+        micInterval = setInterval(() => {
+            if (!isMidiLearnMode) return;
+
+            analyser.getFloatTimeDomainData(buffer);
+            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (frequency !== -1) {
+                const noteName = getNoteFromFrequency(frequency);
+                
+                // Debouncing simple: evitar disparar la misma nota mil veces en 100ms
+                const now = Date.now();
+                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
+                    // console.log(`🎤 Nota detectada: ${noteName} (${Math.round(frequency)}Hz)`);
+                    processInputNote(noteName); // <--- ENVIAMOS AL CEREBRO CENTRAL
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    
+                    // Efecto visual de "soltar tecla" después de un momento
+                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                }
+            }
+        }, 50);
+
+    } catch (err) {
+        console.error("Error al acceder al micrófono:", err);
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
+    }
+}
+
+function stopMicrophoneListener() {
+    if (micInterval) clearInterval(micInterval);
+    if (microphoneStream) {
+        microphoneStream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+    audioContext = null;
+    analyser = null;
+    micInterval = null;
+    console.log("🎤 Micrófono desactivado");
 }
 
 
