@@ -1157,96 +1157,7 @@ display: flex;
     display: none !important;
 }
 
-/* Banner de bienvenida minimalista */
-.welcome-banner {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  color: #1a1a1a;
-  padding: 18px 24px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 1500;
-  display: none;
-  align-items: center;
-  gap: 16px;
-  max-width: 90%;
-  animation: slideDown 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-.welcome-banner.show {
-  display: flex;
-}
-
-.welcome-banner-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-  color: #1a1a1a;
-  background: #f5f5f5;
-  width: 52px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.welcome-banner-content {
-  flex: 1;
-}
-
-.welcome-banner-title {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: #1a1a1a;
-  letter-spacing: -0.2px;
-}
-
-.welcome-banner-text {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-.welcome-banner-close {
-  background: #1a1a1a;
-  border: none;
-  color: white;
-  padding: 8px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
-.welcome-banner-close:hover {
-  background: #2a2a2a;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.welcome-banner-close:active {
-  transform: translateY(0);
-}
 
 /* Badge "NUEVO" minimalista */
 .new-badge {
@@ -1337,25 +1248,7 @@ display: flex;
     display: none;
   }
   
-  .welcome-banner {
-    padding: 14px 18px;
-    gap: 12px;
-    max-width: 95%;
-  }
   
-  .welcome-banner-icon {
-    font-size: 26px;
-    width: 44px;
-    height: 44px;
-  }
-  
-  .welcome-banner-title {
-    font-size: 14px;
-  }
-  
-  .welcome-banner-text {
-    font-size: 12px;
-  }
   
   .modal-content {
     padding: 24px 28px;
@@ -1363,16 +1256,7 @@ display: flex;
   }
 }
 
-@media (max-width: 500px) {
-  .welcome-banner {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .welcome-banner-close {
-    width: 100%;
-  }
-}
+
 
 
 .tutorial-parent-highlight {
@@ -1503,6 +1387,22 @@ display: flex;
     padding: 5px;
 }
 
+/* Si decides dejar el texto "Tutorial" dentro del botón */
+#start-tutorial-btn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: #666;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
 /* Clase para resaltar el elemento del tutorial actual */
 .tutorial-highlight {
     position: relative;
@@ -1593,33 +1493,47 @@ display: flex;
   filter: drop-shadow(0 0 5px #3498db);
   transform: scale(1.1);
 }
+
+
+/* Estilos para el Toast de Éxito */
+.success-toast {
+    position: fixed;
+    top: -80px; /* Oculto arriba inicialmente */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #27ae60; /* Verde éxito */
+    padding: 12px 24px;
+    border-radius: 50px; /* Forma de píldora */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 1px solid #d4edda;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote suave */
+    pointer-events: none; /* IMPORTANTE: Permite hacer clic a través de él para no cortar el flujo */
+}
+
+.success-toast.show {
+    top: 90px; /* Baja a una posición visible debajo del top-bar */
+}
+
+.success-toast i {
+    font-size: 18px;
+}
   </style>
 </head>
 <body>
 
   <div id="top-bar">
 
-<div id="welcome-banner" class="welcome-banner">
-  <div class="welcome-banner-icon">
-    <i class="ri-graduation-cap-line"></i>
-  </div>
-  <div class="welcome-banner-content">
-    <div class="welcome-banner-title">Modo Aprendizaje</div>
-    <div class="welcome-banner-text">
-      Conecta tu teclado MIDI y practica nota por nota siguiendo las indicaciones visuales.
-    </div>
-  </div>
-  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-left: 10px;">
-  <button class="welcome-banner-close" id="start-tutorial-btn">Tutorial</button>
-  <button class="welcome-banner-close" id="welcome-banner-close" style="background-color: #666;">Cerrar</button>
-  </div>
 
-  <div id="tutorial-midi-alert" class="tutorial-alert-banner">
-        <i class="ri-error-warning-line"></i>
-        <span>Conecta tu piano por MIDI para iniciar el tutorial</span>
-    </div>
 
-</div>
+
+
 
     <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
@@ -1638,7 +1552,7 @@ display: flex;
     </div>
 
     <div class="controls-group">
-    
+      <button  id="start-tutorial-btn">Tutorial</button>
         <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
         <i class="ri-settings-3-line"></i>
       </button>
@@ -1670,6 +1584,7 @@ display: flex;
     </div>
   
      <div class="tool-group">
+       
         <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
     <i class="ri-font-size"></i> 
   </button>
@@ -1707,6 +1622,9 @@ display: flex;
     </div>
   
      <div class="tool-group">
+        <button id="restart-chunk-btn" class="btn" title="Reiniciar estos 4 compases">
+            <i class="ri-skip-back-line"></i>
+        </button>
         <div id="practice-progress" class="practice-progress-display">
           <span id="progress-label">Progreso:</span>
           <span id="progress-value">0%</span>
@@ -1783,6 +1701,13 @@ display: flex;
   </div>
 </div>
 
+<div id="success-toast" class="success-toast">
+    <i class="ri-checkbox-circle-line"></i>
+    <span id="success-toast-message">¡Sección Superada!</span>
+</div>
+
+<div id="tutorial-phantom-target" style="position: absolute; pointer-events: none; z-index: 2900;"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
@@ -1809,6 +1734,7 @@ const measureSelect = document.getElementById('measure-select');
 const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
 const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
+const restartChunkBtn = document.getElementById('restart-chunk-btn');
 
 //const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -1826,10 +1752,8 @@ const successModalMessage = document.getElementById('success-modal-message');
 const successModalCloseBtn = document.getElementById('success-modal-close-btn');
 const practiceProgressDisplay = document.getElementById('practice-progress');
 const progressValueSpan = document.getElementById('progress-value');
+let isPieceCompleted = false;
 
-const welcomeBanner = document.getElementById('welcome-banner');
-const welcomeBannerClose = document.getElementById('welcome-banner-close');
-const WELCOME_BANNER_SHOWN_KEY = 'welcomeBannerShown';
 
 const metronomeBtn = document.getElementById('metronome-btn');
 const metronomeAudio = document.getElementById('metronomeAudio');
@@ -1872,7 +1796,7 @@ tutorialSteps = [
         targetAction: 'click-right-hand'
     },
     {
-        elementId: 'piano-keys', // NUEVO PASO
+        elementId: 'piano-keys',
         title: '¡Prueba el Piano!',
         text: 'Ahora <strong>toca en tu teclado MIDI la nota que se muestra en azul</strong> para avanzar. Así es como funciona el modo aprendizaje.',
         requiresClick: true,
@@ -1882,6 +1806,39 @@ tutorialSteps = [
         elementId: 'practice-progress',
         title: 'Progreso de Práctica',
         text: 'Esta barra muestra <strong>cuánto has completado</strong> de la pieza nota por nota mientras estás en "Modo Aprendizaje".'
+    },
+    {
+        elementId: 'tutorial-phantom-target', 
+        title: 'Desbloqueo por Secciones',
+
+        placement: 'bottom',
+        text: 'Debes tocar los <strong>4 compases resaltados con AMBAS MANOS</strong> correctamente. Si lo logras sin errores, desbloquearás 4 siguientes compases y así sucesivamente.',
+        onShow: () => {
+            const container = document.getElementById('osmd-container');
+            const phantom = document.getElementById('tutorial-phantom-target');
+            
+            if (container && phantom) {
+                const rect = container.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                phantom.style.top = (rect.top + scrollTop) + 'px';
+                phantom.style.left = (rect.left + scrollLeft) + 'px';
+                phantom.style.width = rect.width + 'px';
+                phantom.style.height = '280px'; 
+            }
+
+            if (handFilterMode !== 'both') {
+                handFilterMode = 'both';
+                
+                const rhBtn = document.getElementById('right-hand-only-btn');
+                const lhBtn = document.getElementById('left-hand-only-btn');
+                if(rhBtn) { rhBtn.style.background = 'none'; rhBtn.style.color = '#1a1a1a'; }
+                if(lhBtn) { lhBtn.style.background = 'none'; lhBtn.style.color = '#1a1a1a'; }
+
+                updateStaffOpacity('both');
+                reloadCurrentStepWithHandFilter();
+            }
+        }
     },
     {
         elementId: 'measure-select',
@@ -1947,12 +1904,7 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
 
-function checkFirstTimeUser() {
-    setTimeout(() => {
-      welcomeBanner.classList.add('show');
-      midiLearnBtn.classList.add('pulse-animation');
-    }, 2000);
-}
+
 
 function initWaterfallCanvas() {
   waterfallCanvas = document.getElementById('waterfall-canvas');
@@ -2007,8 +1959,6 @@ function updateKeyDimensions() {
   if (blackKey) {
     blackKeyWidth = blackKey.offsetWidth;
   }
-  
-  console.log(`Tamaños actualizados: white=${whiteKeyWidth}px, black=${blackKeyWidth}px`);
 }
 
 function getKeyXPosition(midiNote) {
@@ -2112,9 +2062,6 @@ function drawWaterfall() {
     if (noteEndY < canvasHeight && noteStartY > 0) {
       const keyX = pianoStartX + getKeyXPosition(midiNote);
       const height = Math.max(1, noteStartY - noteEndY);
-      
-      // Calcular opacidad: notas cerca del piano (Y alto) = opacas, notas arriba (Y bajo) = transparentes
-      // noteStartY es la posición INFERIOR de la nota (cerca del piano cuando es alto)
       const opacityFactor = Math.max(0.15, Math.min(1, noteStartY / canvasHeight));
       
       waterfallCtx.shadowBlur = 40 * dpr * opacityFactor;
@@ -2254,7 +2201,7 @@ function createNoteFlashPiano(noteName, hand) {
   const fileId = urlParams.get('file'); 
   if (fileId) {
 
-   const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
+    const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
   } else {
@@ -2262,7 +2209,6 @@ function createNoteFlashPiano(noteName, hand) {
     playBtn.disabled = true; 
   }
 
-  checkFirstTimeUser();
 
 });
 
@@ -2750,7 +2696,6 @@ function updateMetronomeSpeed() {
 function startTutorial() {
     currentTutorialStep = 0;
     
-    welcomeBanner.classList.remove('show');
     secondaryTopBar2.classList.add('is-visible');
     
     // Oculta el modal (quita .show) antes de mostrar el overlay
@@ -2824,6 +2769,10 @@ function showTutorialStep(stepIndex) {
     const step = tutorialSteps[stepIndex];
     if (!step) return;
 
+    if (step.onShow) {
+        step.onShow();
+    }
+
     // 3. Resaltar el nuevo elemento
     const element = document.getElementById(step.elementId);
     if (!element) {
@@ -2877,13 +2826,17 @@ function showTutorialStep(stepIndex) {
 
         let modalTop = rect.bottom + gap;
         let isModalAbove = false;
-        
-        // MODIFICADO: Para el piano, siempre poner el modal arriba
-        if (step.elementId === 'piano-keys' || modalTop + modalHeight > window.innerHeight - 10) {
-            modalTop = rect.top - modalHeight - gap;
-            isModalAbove = true;
-            modal.classList.add('arrow-bottom');
-        }
+const shouldGoUp = (step.placement === 'top') || 
+                   (step.elementId === 'piano-keys') || 
+                   (step.placement !== 'bottom' && (modalTop + modalHeight > window.innerHeight - 10));
+
+if (shouldGoUp) {
+    modalTop = rect.top - modalHeight - gap;
+    isModalAbove = true;
+    modal.classList.add('arrow-bottom');
+} else {
+    modal.classList.remove('arrow-bottom');
+}
         
         let modalLeft = rect.left + (rect.width / 2) - (modalWidth / 2);
 
@@ -3104,6 +3057,8 @@ speedDownBtn.addEventListener('click', () => {
     updateSpeed(playbackRate - speedStep);
 });
 
+restartChunkBtn.addEventListener('click', restartCurrentChunk);
+
 metronomeBtn.addEventListener('click', toggleMetronome);
  
       pianoBtn.addEventListener('click', () => {
@@ -3123,11 +3078,6 @@ metronomeBtn.addEventListener('click', toggleMetronome);
 
       successModalCloseBtn.addEventListener('click', hideSuccessModal);
 
-      welcomeBannerClose.addEventListener('click', () => {
-    welcomeBanner.classList.remove('show');
-    midiLearnBtn.classList.remove('pulse-animation');
-    localStorage.setItem(WELCOME_BANNER_SHOWN_KEY, 'true');
-  });
 
  
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
@@ -3264,19 +3214,21 @@ cancelLoopBtn.addEventListener('click', () => {
     }
 
 
-
 function updateMeasureUntilOptions(startIndex) {
-    const measureCount = osmd.sheet.SourceMeasures.length;
-    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    if (!osmd || !osmd.sheet) return;
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    const limit = isMidiLearnMode ? Math.min(unlockedMeasureCount, totalMeasures) : totalMeasures;
     
-    // Solo mostrar compases posteriores al seleccionado
-    for (let i = startIndex + 1; i < measureCount; i++) {
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    for (let i = startIndex + 1; i < limit; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Compás ${i + 1}`;
         measureUntil.appendChild(option);
     }
 }
+
 
 // NUEVA FUNCIÓN: Desactivar modo loop
 function deactivateLoopMode() {
@@ -3400,21 +3352,27 @@ function getAngloSaxonNoteName(noteId) {
 }
 
 function populateMeasureSelector() {
-    const measureCount = osmd.sheet.SourceMeasures.length;
-    measureSelect.innerHTML = '';
-    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    if (!osmd || !osmd.sheet) return;
 
-    for (let i = 0; i < measureCount; i++) {
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    measureSelect.innerHTML = '';
+    const limit = isMidiLearnMode ? Math.min(unlockedMeasureCount, totalMeasures) : totalMeasures;
+
+    for (let i = 0; i < limit; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Compás ${i + 1}`;
         measureSelect.appendChild(option);
-        
-        const option2 = document.createElement('option');
-        option2.value = i;
-        option2.textContent = `Compás ${i + 1}`;
-        measureUntil.appendChild(option2);
     }
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+}
+
+function restartCurrentChunk() {
+    if (!isMidiLearnMode) return;
+    let targetMeasureIndex = unlockedMeasureCount - MEASURES_PER_CHUNK;
+    if (targetMeasureIndex < 0) targetMeasureIndex = 0;
+    errorsInCurrentChunk = 0;
+    jumpToMeasureInLearnMode(targetMeasureIndex);
 }
 
 
@@ -3571,10 +3529,16 @@ function advanceLearningStep() {
     activeHighlightTimeouts.length = 0;
     expectedNotes.clear();
 
-    // 2. Validación de Fin de Pieza
+    
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
     if (currentLearningIndex >= parsedNotes.length) {
-        showSuccessModal("¡Felicidades, has completado la pieza!");
-        showConfetti(200);
+        if (!isPieceCompleted) {
+            showSuccessModal("🎉 ¡Felicidades! Has completado la pieza.<br>Has desbloqueado el <strong>Modo Libre</strong>.");
+            showConfetti(300);
+            isPieceCompleted = true;
+            unlockedMeasureCount = totalMeasures;
+        }
         toggleMidiLearnMode();
         return;
     }
@@ -3592,41 +3556,36 @@ function advanceLearningStep() {
             }
         }
 
-        // ¿Estamos intentando cruzar la frontera hacia la zona bloqueada?
+      if (unlockedMeasureCount < totalMeasures) {
         if (nextNoteMeasureIndex >= unlockedMeasureCount) {
             
-            // --- MOMENTO DE LA VERDAD ---
-            if (errorsInCurrentChunk > 0) {
-                // CASO: HUBO ERRORES -> REINICIAR BLOQUE
+            if (handFilterMode !== 'both') {
                 const startOfCurrentBlock = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-                
-                console.log(`⛔ Bloque fallido (${errorsInCurrentChunk} errores). Regresando a compás ${startOfCurrentBlock + 1}`);
-                
-                showModal(`⚠️ <strong>Repetir Sección</strong><br>Tuviste ${errorsInCurrentChunk} errores.<br>Vuelve a intentarlo.`, 2000);
-                
-                // 1. Resetear contador de errores
-                errorsInCurrentChunk = 0;
-                
-                // 2. Regresar al inicio de los 4 compases actuales
+                errorsInCurrentChunk = 0; 
                 jumpToMeasureInLearnMode(startOfCurrentBlock);
-                
-                // 3. Salir de la función para no avanzar cursor hacia la zona prohibida
+                return; 
+            }
+
+
+            if (errorsInCurrentChunk > 0) {
+                const startOfCurrentBlock = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+                showModal(`⚠️ <strong>Repetir Sección</strong><br><br>
+                           Tuviste <strong>${errorsInCurrentChunk} errores</strong>.<br>
+                           Debes repetirlo para avanzar.`, 0);
+                errorsInCurrentChunk = 0;
+                jumpToMeasureInLearnMode(startOfCurrentBlock);
                 return; 
                 
-            } else {
-                // CASO: PERFECTO -> DESBLOQUEAR SIGUIENTE
+            }else {
                 const oldLimit = unlockedMeasureCount;
                 unlockedMeasureCount += MEASURES_PER_CHUNK;
-                
-                // Visual: Quitar opacidad a los nuevos compases
                 setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
-                
-                // Resetear errores para el nuevo bloque
+                populateMeasureSelector(); 
                 errorsInCurrentChunk = 0;
-                
-                showModal(`✨ ¡Sección Superada!<br>Siguientes 4 compases desbloqueados.`, 1500);
+                showSuccessToast(`¡Sección Superada!`);
             }
         }
+      }
     }
     // ----------------------------------------
 
@@ -3637,8 +3596,8 @@ function advanceLearningStep() {
 
     while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
         const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-        notesInStep = [];
-        
+
+        notesInStep = [];      
         while (currentLearningIndex < parsedNotes.length && 
                Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
             notesInStep.push(parsedNotes[currentLearningIndex]);
@@ -3658,7 +3617,7 @@ function advanceLearningStep() {
             osmd.cursor.next();
             
             const uniquePitches = new Set();
-            filteredNotes.forEach(note => { // Usamos filteredNotes aquí para iluminar solo las de la mano correcta
+            filteredNotes.forEach(note => { 
                  const normalizedNote = normalizeNote(note.pitch);
                  if (!uniquePitches.has(normalizedNote)) {
                     uniquePitches.add(normalizedNote);
@@ -3679,6 +3638,20 @@ function advanceLearningStep() {
     
     updateMeasureSelectDisplay();
     updatePracticeProgress();
+}
+
+
+function showSuccessToast(message) {
+    const toast = document.getElementById('success-toast');
+    const msgSpan = document.getElementById('success-toast-message');
+    
+    if (toast && msgSpan) {
+        msgSpan.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
 }
 
 function updateStaffFogOverlay() {
@@ -3766,11 +3739,14 @@ function setRangeOpacity(startMeasureIndex, endMeasureIndex, opacity) {
                     
                     for (let n = 0; n < notes.length; n++) {
                         const svgElement = notes[n].getSVGGElement();
-                        if (svgElement) {
-                            svgElement.style.opacity = opacity;
-                            // Opcional: transición suave
-                            // svgElement.style.transition = "opacity 0.3s"; 
-                        }
+                        if (opacity < 1) {
+                                svgElement.style.filter = "blur(2px) grayscale(100%)";
+                                svgElement.style.opacity = "0.3"; // Un poco más visible pero borroso
+                            } else {
+                                svgElement.style.filter = "none";
+                                svgElement.style.opacity = "1";
+                            }
+                        svgElement.style.transition = "all 0.5s ease";
                     }
                 }
             }
@@ -3798,7 +3774,12 @@ function toggleMidiLearnMode() {
     stopPlayback(); 
 
     if (isMidiLearnMode) {
-      unlockedMeasureCount = MEASURES_PER_CHUNK; 
+      if (isPieceCompleted) {
+            unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
+        } else {
+            unlockedMeasureCount = MEASURES_PER_CHUNK; 
+        }
+      populateMeasureSelector();
         setTimeout(() => {
              initFogOfWar();
         }, 100);
@@ -3826,11 +3807,12 @@ function toggleMidiLearnMode() {
         measureSelect.value = 0;
 
         if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 0) {
-            nextTutorialStep(); // Avanzar automáticamente al paso 1
+            nextTutorialStep(); 
         }
         
     } else {
       const totalMeasures = osmd.sheet.SourceMeasures.length;
+      populateMeasureSelector();
         setRangeOpacity(0, totalMeasures, 1);
     midiLearnBtn.style.background = 'none';
     playBtn.disabled = false;
@@ -3851,6 +3833,7 @@ function toggleMidiLearnMode() {
     updateStaffOpacity('both'); 
     rightHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.background = 'none';
+    populateMeasureSelector();
 }
 }
 
@@ -4264,6 +4247,13 @@ if (isIntelligentPracticeMode && isMidiLearnMode) {
                     highlightMidiKey(pitchName); 
                     createNoteFlashPiano(pitchName, 'treble'); 
                 });
+
+                if (tutorialOverlay.classList.contains('is-visible')) {
+                    const currentStepData = tutorialSteps[currentTutorialStep];
+                    if (currentStepData && currentStepData.targetAction === 'play-correct-note') {
+                            nextTutorialStep();
+                    }
+                }
 
                 expectedNotes.delete(normalizedMidiNote);
                 
