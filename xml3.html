@@ -1710,7 +1710,6 @@ display: flex;
 
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
-  <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
 
   <script>
     const playBtn = document.getElementById('play-btn');
@@ -1876,14 +1875,14 @@ let isLoopMode = false;
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
 
-
+let audioContext = null;
+let analyser = null;
+let microphoneStream = null;
+let micInterval = null;
+let lastMicNote = null;
+let lastMicTime = 0;
+const MIC_THRESHOLD = 0.03;
  let currentInputSource = 'none';   
-
- let pitch;
-let audioContext;
-let micStream;
-let isListening = false;
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
 
 
     let isIntelligentPracticeMode = false;
@@ -2208,6 +2207,7 @@ function createNoteFlashPiano(noteName, hand) {
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
+
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
@@ -4296,86 +4296,124 @@ function processInputNote(noteName) {
 
 
 
+// Algoritmo de autocorrelación para detectar pitch
+function autoCorrelate(buf, sampleRate) {
+    let SIZE = buf.length;
+    let rms = 0;
+
+    for (let i = 0; i < SIZE; i++) {
+        const val = buf[i];
+        rms += val * val;
+    }
+    rms = Math.sqrt(rms / SIZE);
+
+    // Si el volumen es muy bajo, ignoramos (silencio)
+    if (rms < MIC_THRESHOLD) return -1;
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    buf = buf.slice(r1, r2);
+    SIZE = buf.length;
+
+    let c = new Array(SIZE).fill(0);
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE - i; j++) {
+            c[i] = c[i] + buf[j] * buf[j + i];
+        }
+    }
+
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < SIZE; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+    let T0 = maxpos;
+
+    return sampleRate / T0;
+}
+
+// Convertir Frecuencia a Nota (Ej: 440Hz -> A4)
+function getNoteFromFrequency(frequency) {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    const midi = Math.round(pitchNum);
+    const noteName = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return noteName + octave;
+}
+
+// Iniciar Escucha del Micrófono
 async function startMicrophoneListener() {
-    if (isListening) return;
+    if (audioContext) return; // Ya está activo
 
     try {
-        setStatus("Cargando modelo de IA para el piano...");
-        
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphoneStream = stream;
         
-        // Obtenemos el stream del micrófono
-        micStream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: false,
-                autoGainControl: false,
-                noiseSuppression: false 
-            } 
-        });
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
 
-        // Inicializamos ML5 con el modelo CREPE
-        pitch = ml5.pitchDetection(MODEL_URL, audioContext, micStream, modelLoaded);
-        
-    } catch (err) {
-        console.error("Error micrófono:", err);
-        showModal("⚠️ Error al acceder al micrófono.");
-    }
-}
+        const bufferLength = analyser.fftSize;
+        const buffer = new Float32Array(bufferLength);
 
-function modelLoaded() {
-    console.log("🧠 Modelo CREPE cargado correctamente");
-    setStatus("Escuchando piano...");
-    isListening = true;
-    getPitch(); // Iniciar el loop de detección
-}
+        console.log("🎤 Micrófono activado para detección de notas");
+        setStatus("Modo Micrófono Activo");
 
-function getPitch() {
-    if (!isMidiLearnMode || !isListening) return;
+        // Loop de detección (aprox 60 veces por segundo)
+        micInterval = setInterval(() => {
+            if (!isMidiLearnMode) return;
 
-    pitch.getPitch((err, frequency) => {
-        if (frequency) {
-            // El modelo CREPE nos da la frecuencia exacta
-            const midiNum = freqToMidi(frequency);
-            const noteName = midiToPitchName(midiNum);
-            
-            // Validamos confianza/estabilidad (simple debouncing)
-            // Si la nota es diferente a la última o ha pasado tiempo suficiente
-            const now = Date.now();
-            if (noteName !== lastMicNote || (now - lastMicTime > 150)) {
+            analyser.getFloatTimeDomainData(buffer);
+            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (frequency !== -1) {
+                const noteName = getNoteFromFrequency(frequency);
                 
-                // ENVIAR AL CEREBRO CENTRAL
-                processInputNote(noteName);
-                
-                lastMicNote = noteName;
-                lastMicTime = now;
-                
-                // Soltar la tecla visualmente después de un momento
-                setTimeout(() => unhighlightMidiKey(noteName), 200);
+                // Debouncing simple: evitar disparar la misma nota mil veces en 100ms
+                const now = Date.now();
+                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
+                    // console.log(`🎤 Nota detectada: ${noteName} (${Math.round(frequency)}Hz)`);
+                    processInputNote(noteName); // <--- ENVIAMOS AL CEREBRO CENTRAL
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    
+                    // Efecto visual de "soltar tecla" después de un momento
+                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                }
             }
-        }
-        
-        // Loop recursivo (ML5 lo maneja optimizado)
-        if (isMidiLearnMode && isListening) {
-            getPitch();
-        }
-    });
+        }, 50);
+
+    } catch (err) {
+        console.error("Error al acceder al micrófono:", err);
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
+    }
 }
 
 function stopMicrophoneListener() {
-    isListening = false;
-    if (micStream) {
-        micStream.getTracks().forEach(track => track.stop());
+    if (micInterval) clearInterval(micInterval);
+    if (microphoneStream) {
+        microphoneStream.getTracks().forEach(track => track.stop());
     }
-    if (audioContext && audioContext.state !== 'closed') {
+    if (audioContext) {
         audioContext.close();
     }
     audioContext = null;
-    pitch = null;
+    analyser = null;
+    micInterval = null;
     console.log("🎤 Micrófono desactivado");
-}
-
-function freqToMidi(f) {
-    return Math.round(69 + 12 * Math.log2(f / 440));
 }
 
 
