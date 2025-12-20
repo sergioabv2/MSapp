@@ -1908,7 +1908,7 @@ let isMidiLearnMode = false;
 let midiAccess = null;
 let expectedNotes = new Set(); // Almacenará las notas que esperamos que el usuario toque
 let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
-
+let currentInputSource = 'none';
 
 
 
@@ -3782,11 +3782,11 @@ function toggleMidiLearnMode() {
         }
 
         if (hasMidi) {
-            console.log("🎹 Usando entrada MIDI");
             updateMidiStatusLegend("Teclado MIDI");
+            currentInputSource = 'midi'; 
         } else {
-            console.log("🎤 No se detectó MIDI, activando Micrófono...");
             updateMidiStatusLegend("Micrófono Activo");
+            currentInputSource = 'mic';  
             startMicrophoneListener();
         }
         // --------------------------------------
@@ -3835,7 +3835,7 @@ function toggleMidiLearnMode() {
         }
         
     } else {
-        // --- LIMPIEZA AL SALIR ---
+        currentInputSource = 'none';
         stopMicrophoneListener(); // Aseguramos apagar el micro
         
         // Restaurar botón original
@@ -4242,7 +4242,9 @@ function processInputNote(noteName) {
         const normalizedNote = normalizeNote(noteName);
         
         if (expectedNotes.has(normalizedNote)) {
-            sampler.triggerAttackRelease(noteName, '8n');
+            if (currentInputSource === 'midi') {
+                sampler.triggerAttackRelease(noteName, '8n');
+            }
             expectedNotes.delete(normalizedNote);
             createNoteFlashPiano(noteName, 'treble'); // Ojo: asume treble visualmente por ahora
             practiceCorrectNotes++;
@@ -4264,7 +4266,7 @@ function processInputNote(noteName) {
         const normalizedNote = normalizeNote(noteName);
 
         if (expectedNotes.has(normalizedNote)) {
-            if(sampler && sampler.loaded) {
+            if(currentInputSource === 'midi' && sampler && sampler.loaded) {
                  sampler.triggerAttackRelease(noteName, '8n', Tone.now());
             }
             createNoteFlashPiano(noteName, 'treble'); 
@@ -4351,25 +4353,37 @@ function getNoteFromFrequency(frequency) {
 
 // Iniciar Escucha del Micrófono
 async function startMicrophoneListener() {
-    if (audioContext) return; // Ya está activo
+    if (audioContext) return; 
 
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: false,
+                autoGainControl: false,
+                noiseSuppression: false 
+                // Desactivamos procesos automáticos para tener el audio crudo del piano
+            } 
+        });
         microphoneStream = stream;
         
         const source = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
+        analyser.fftSize = 4096; 
+        const lowPassFilter = audioContext.createBiquadFilter();
+        lowPassFilter.type = "lowpass";
+        lowPassFilter.frequency.value = 2000; // Corte en 2kHz (Suficiente para piano hasta C6)
+        
+        // Conexión: Micrófono -> Filtro -> Analizador
+        source.connect(lowPassFilter);
+        lowPassFilter.connect(analyser);
 
         const bufferLength = analyser.fftSize;
         const buffer = new Float32Array(bufferLength);
 
-        console.log("🎤 Micrófono activado para detección de notas");
+        console.log("🎤 Micrófono activado con filtro LowPass (Mejor precisión en graves)");
         setStatus("Modo Micrófono Activo");
 
-        // Loop de detección (aprox 60 veces por segundo)
         micInterval = setInterval(() => {
             if (!isMidiLearnMode) return;
 
@@ -4379,24 +4393,21 @@ async function startMicrophoneListener() {
             if (frequency !== -1) {
                 const noteName = getNoteFromFrequency(frequency);
                 
-                // Debouncing simple: evitar disparar la misma nota mil veces en 100ms
                 const now = Date.now();
-                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
-                    // console.log(`🎤 Nota detectada: ${noteName} (${Math.round(frequency)}Hz)`);
-                    processInputNote(noteName); // <--- ENVIAMOS AL CEREBRO CENTRAL
+                // Debounce un poco más rápido para captar mejor
+                if (noteName !== lastMicNote || (now - lastMicTime > 150)) {
+                    processInputNote(noteName); 
                     
                     lastMicNote = noteName;
                     lastMicTime = now;
-                    
-                    // Efecto visual de "soltar tecla" después de un momento
                     setTimeout(() => unhighlightMidiKey(noteName), 200);
                 }
             }
-        }, 50);
+        }, 50); 
 
     } catch (err) {
         console.error("Error al acceder al micrófono:", err);
-        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
+        showModal("⚠️ No se pudo acceder al micrófono.");
     }
 }
 
