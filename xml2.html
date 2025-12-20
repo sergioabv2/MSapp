@@ -893,18 +893,24 @@ display: flex;
   bottom: 165px; 
   left: 10px;
   z-index: 550;
-  background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
+  background-color: rgba(26, 26, 26, 0.92); /* Fondo oscuro mejorado */
   color: #fafafa;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(52, 152, 219, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   font-size: 13px;
   font-weight: 500;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 200px;
   
   /* Oculto por defecto */
   opacity: 0;
@@ -921,6 +927,13 @@ display: flex;
 #midi-status-legend i {
   font-size: 16px;
   color: #3498db; /* Ícono azul */
+  margin-right: 4px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 /* En desktop, no hay controles de velocidad, 
@@ -1882,6 +1895,14 @@ let micInterval = null;
 let lastMicNote = null;
 let lastMicTime = 0;
 const MIC_THRESHOLD = 0.03;
+
+// MEJORAS: Variables para detección mejorada con micrófono
+let noteHistory = []; // Historial de notas para suavizado
+const NOTE_HISTORY_SIZE = 5; // Cantidad de detecciones para promediar
+let lastRMS = 0; // Para detección de onset
+let dynamicThreshold = 0.03; // Umbral que se adapta al ambiente
+let frequencyHistory = []; // Para suavizado de frecuencia
+const FREQ_HISTORY_SIZE = 3;
     
 
 
@@ -2287,9 +2308,28 @@ function createNoteFlashPiano(noteName, hand) {
       updateZoomDisplay();
     }
 
-function updateMidiStatusLegend(deviceName = null) {
+function updateMidiStatusLegend(deviceName = null, micDetails = null) {
   if (deviceName) {
-    midiStatusLegend.innerHTML = `<i class="ri-plug-line"></i> ${deviceName} Conectado`;
+    let html = `<i class="ri-plug-line"></i> ${deviceName}`;
+    
+    // Si es micrófono, mostrar detalles adicionales
+    if (deviceName.includes("Micrófono") && micDetails) {
+      html += `<br><span style="font-size: 11px; opacity: 0.8;">`;
+      if (micDetails.note) {
+        html += `Nota: ${micDetails.note}`;
+      }
+      if (micDetails.frequency) {
+        html += ` (${micDetails.frequency} Hz)`;
+      }
+      if (micDetails.volume !== undefined) {
+        // Indicador de volumen visual
+        const volumeBars = Math.min(5, Math.floor(micDetails.volume * 50));
+        html += ` | Vol: ${'▮'.repeat(volumeBars)}${'▯'.repeat(5 - volumeBars)}`;
+      }
+      html += `</span>`;
+    }
+    
+    midiStatusLegend.innerHTML = html;
     midiStatusLegend.classList.add('is-visible');
   } else {
     midiStatusLegend.classList.remove('is-visible');
@@ -4296,7 +4336,136 @@ function processInputNote(noteName) {
 
 
 
-// Algoritmo de autocorrelación para detectar pitch
+// ========== ALGORITMOS MEJORADOS DE DETECCIÓN DE PITCH ==========
+
+// Algoritmo YIN mejorado - Más preciso que autocorrelación básica
+// Basado en: "YIN, a fundamental frequency estimator for speech and music" (de Cheveigné & Kawahara, 2002)
+function yinPitchDetection(buffer, sampleRate) {
+    const threshold = 0.15; // Umbral de confianza (más bajo = más estricto)
+    const bufferSize = buffer.length;
+    
+    // Calcular RMS para detección de volumen
+    let rms = 0;
+    for (let i = 0; i < bufferSize; i++) {
+        rms += buffer[i] * buffer[i];
+    }
+    rms = Math.sqrt(rms / bufferSize);
+    
+    // Actualizar umbral dinámico basado en el ambiente
+    dynamicThreshold = dynamicThreshold * 0.95 + rms * 0.05;
+    
+    // Si el volumen es muy bajo, ignorar
+    if (rms < Math.max(dynamicThreshold * 0.5, 0.01)) return -1;
+    
+    // Paso 1: Calcular la función de diferencia
+    const yinBuffer = new Float32Array(bufferSize / 2);
+    yinBuffer[0] = 1;
+    
+    for (let tau = 1; tau < bufferSize / 2; tau++) {
+        let sum = 0;
+        for (let i = 0; i < bufferSize / 2; i++) {
+            const delta = buffer[i] - buffer[i + tau];
+            sum += delta * delta;
+        }
+        yinBuffer[tau] = sum;
+    }
+    
+    // Paso 2: Calcular la función de diferencia acumulativa normalizada
+    let runningSum = 0;
+    yinBuffer[0] = 1;
+    
+    for (let tau = 1; tau < bufferSize / 2; tau++) {
+        runningSum += yinBuffer[tau];
+        yinBuffer[tau] *= tau / runningSum;
+    }
+    
+    // Paso 3: Encontrar el mínimo absoluto
+    let tauEstimate = -1;
+    let minValue = 1;
+    
+    // Buscar entre 27.5 Hz (A0) y 4186 Hz (C8) - rango del piano
+    const minTau = Math.floor(sampleRate / 4186);
+    const maxTau = Math.floor(sampleRate / 27.5);
+    
+    for (let tau = minTau; tau < Math.min(maxTau, bufferSize / 2); tau++) {
+        if (yinBuffer[tau] < threshold) {
+            // Buscar el mínimo local
+            while (tau + 1 < bufferSize / 2 && yinBuffer[tau + 1] < yinBuffer[tau]) {
+                tau++;
+            }
+            
+            if (yinBuffer[tau] < minValue) {
+                minValue = yinBuffer[tau];
+                tauEstimate = tau;
+            }
+        }
+    }
+    
+    if (tauEstimate === -1) {
+        // Si no encontramos con threshold bajo, buscar el mínimo absoluto
+        for (let tau = minTau; tau < Math.min(maxTau, bufferSize / 2); tau++) {
+            if (yinBuffer[tau] < minValue) {
+                minValue = yinBuffer[tau];
+                tauEstimate = tau;
+            }
+        }
+    }
+    
+    if (tauEstimate === -1 || minValue > 0.5) return -1;
+    
+    // Paso 4: Interpolación parabólica para mejorar precisión
+    let betterTau = tauEstimate;
+    if (tauEstimate > 0 && tauEstimate < bufferSize / 2 - 1) {
+        const s0 = yinBuffer[tauEstimate - 1];
+        const s1 = yinBuffer[tauEstimate];
+        const s2 = yinBuffer[tauEstimate + 1];
+        betterTau = tauEstimate + (s2 - s0) / (2 * (2 * s1 - s2 - s0));
+    }
+    
+    return sampleRate / betterTau;
+}
+
+// Función para detectar onset (inicio de nota) basado en cambios de energía
+function detectOnset(currentRMS) {
+    const onsetThreshold = 1.5; // La energía debe aumentar 50% para considerar onset
+    const isOnset = currentRMS > lastRMS * onsetThreshold && currentRMS > dynamicThreshold;
+    lastRMS = currentRMS;
+    return isOnset;
+}
+
+// Suavizar la frecuencia detectada usando un promedio móvil
+function smoothFrequency(frequency) {
+    frequencyHistory.push(frequency);
+    if (frequencyHistory.length > FREQ_HISTORY_SIZE) {
+        frequencyHistory.shift();
+    }
+    
+    // Calcular la mediana en lugar del promedio (más robusto ante outliers)
+    const sorted = [...frequencyHistory].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+}
+
+// Filtrar armónicos - detecta si la frecuencia es un armónico de una frecuencia más baja
+function filterHarmonics(frequency, previousFrequency) {
+    if (!previousFrequency || previousFrequency === -1) return frequency;
+    
+    // Verificar si la frecuencia actual es un armónico (2x, 3x, 4x) de la anterior
+    const ratios = [2, 3, 4, 1/2, 1/3, 1/4];
+    const tolerance = 0.03; // 3% de tolerancia
+    
+    for (const ratio of ratios) {
+        const expectedFreq = previousFrequency * ratio;
+        if (Math.abs(frequency - expectedFreq) / expectedFreq < tolerance) {
+            // Es un armónico, devolver la fundamental
+            return ratio > 1 ? previousFrequency : frequency / (1 / ratio);
+        }
+    }
+    
+    return frequency;
+}
+
+// Función de autocorrelación básica (backup) - mantener por compatibilidad
 function autoCorrelate(buf, sampleRate) {
     let SIZE = buf.length;
     let rms = 0;
@@ -4341,17 +4510,73 @@ function autoCorrelate(buf, sampleRate) {
     return sampleRate / T0;
 }
 
-// Convertir Frecuencia a Nota (Ej: 440Hz -> A4)
+// Convertir Frecuencia a Nota (Ej: 440Hz -> A4) - VERSIÓN MEJORADA
 function getNoteFromFrequency(frequency) {
     const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    
+    // Calcular el número MIDI con mayor precisión
+    const pitchNum = 12 * (Math.log2(frequency / 440)) + 69;
     const midi = Math.round(pitchNum);
+    
+    // Validar rango de piano (A0 = 21 a C8 = 108)
+    if (midi < 21 || midi > 108) {
+        return null; // Fuera del rango del piano
+    }
+    
+    // Calcular qué tan lejos está de la nota más cercana (en cents)
+    const cents = (pitchNum - midi) * 100;
+    
+    // Si está muy desafinado (más de 35 cents), considerar inválido
+    if (Math.abs(cents) > 35) {
+        return null;
+    }
+    
     const noteName = noteNames[midi % 12];
     const octave = Math.floor(midi / 12) - 1;
-    return noteName + octave;
+    
+    return {
+        name: noteName + octave,
+        midi: midi,
+        frequency: frequency,
+        cents: cents.toFixed(1) // Cuántos cents de desviación
+    };
 }
 
-// Iniciar Escucha del Micrófono
+// Función para suavizar las detecciones de notas usando historial
+function smoothNoteDetection(noteData) {
+    if (!noteData) return null;
+    
+    noteHistory.push(noteData.name);
+    if (noteHistory.length > NOTE_HISTORY_SIZE) {
+        noteHistory.shift();
+    }
+    
+    // Contar frecuencias de cada nota en el historial
+    const noteCounts = {};
+    noteHistory.forEach(note => {
+        noteCounts[note] = (noteCounts[note] || 0) + 1;
+    });
+    
+    // Encontrar la nota más común
+    let mostCommonNote = null;
+    let maxCount = 0;
+    for (const note in noteCounts) {
+        if (noteCounts[note] > maxCount) {
+            maxCount = noteCounts[note];
+            mostCommonNote = note;
+        }
+    }
+    
+    // Solo devolver la nota si aparece en al menos 60% del historial
+    const threshold = Math.ceil(NOTE_HISTORY_SIZE * 0.6);
+    if (maxCount >= threshold) {
+        return mostCommonNote;
+    }
+    
+    return null;
+}
+
+// Iniciar Escucha del Micrófono - VERSIÓN MEJORADA
 async function startMicrophoneListener() {
     if (audioContext) return; 
 
@@ -4361,53 +4586,128 @@ async function startMicrophoneListener() {
             audio: {
                 echoCancellation: false,
                 autoGainControl: false,
-                noiseSuppression: false 
-                // Desactivamos procesos automáticos para tener el audio crudo del piano
+                noiseSuppression: false,
+                sampleRate: 48000 // Mejor calidad de muestreo
             } 
         });
         microphoneStream = stream;
         
         const source = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 4096; 
+        
+        // MEJORA: FFT más grande para mejor resolución en frecuencias graves
+        analyser.fftSize = 8192; // Aumentado de 4096 a 8192 para mejor precisión
+        analyser.smoothingTimeConstant = 0.3; // Suavizado moderado
+        
+        // Filtro pasa-bajo para eliminar ruido agudo
         const lowPassFilter = audioContext.createBiquadFilter();
         lowPassFilter.type = "lowpass";
-        lowPassFilter.frequency.value = 2000; // Corte en 2kHz (Suficiente para piano hasta C6)
+        lowPassFilter.frequency.value = 4200; // Aumentado a 4.2kHz para captar todo el rango del piano (C8 = 4186 Hz)
+        lowPassFilter.Q.value = 0.7; // Q factor moderado
         
-        // Conexión: Micrófono -> Filtro -> Analizador
-        source.connect(lowPassFilter);
+        // MEJORA: Filtro pasa-alto para eliminar ruido de baja frecuencia
+        const highPassFilter = audioContext.createBiquadFilter();
+        highPassFilter.type = "highpass";
+        highPassFilter.frequency.value = 25; // Filtrar frecuencias por debajo de A0 (27.5 Hz)
+        highPassFilter.Q.value = 0.7;
+        
+        // Conexión mejorada: Micrófono -> Pasa-alto -> Pasa-bajo -> Analizador
+        source.connect(highPassFilter);
+        highPassFilter.connect(lowPassFilter);
         lowPassFilter.connect(analyser);
 
         const bufferLength = analyser.fftSize;
         const buffer = new Float32Array(bufferLength);
+        
+        // Resetear variables de detección
+        noteHistory = [];
+        frequencyHistory = [];
+        lastRMS = 0;
+        dynamicThreshold = 0.03;
+        let lastDetectedFrequency = -1;
 
-        console.log("🎤 Micrófono activado con filtro LowPass (Mejor precisión en graves)");
-        setStatus("Modo Micrófono Activo");
+        console.log("🎤 Micrófono activado con detección mejorada (YIN Algorithm + Filtros)");
+        console.log(`   - FFT Size: ${analyser.fftSize}`);
+        console.log(`   - Sample Rate: ${audioContext.sampleRate} Hz`);
+        console.log(`   - Filtro Pasa-Alto: 25 Hz`);
+        console.log(`   - Filtro Pasa-Bajo: 4200 Hz`);
+        setStatus("Modo Micrófono Activo (Detección Mejorada)");
 
+        // MEJORA: Intervalo más rápido para mejor respuesta
         micInterval = setInterval(() => {
             if (!isMidiLearnMode) return;
 
             analyser.getFloatTimeDomainData(buffer);
-            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+            
+            // Calcular RMS para detección de volumen
+            let rms = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                rms += buffer[i] * buffer[i];
+            }
+            rms = Math.sqrt(rms / bufferLength);
+            
+            // Actualizar indicador de volumen en tiempo real
+            if (Math.random() < 0.1) { // Actualizar solo 10% del tiempo para no saturar
+                updateMidiStatusLegend("Micrófono Activo", {
+                    volume: rms,
+                    note: lastMicNote || "...",
+                    frequency: lastDetectedFrequency > 0 ? lastDetectedFrequency.toFixed(1) : "---"
+                });
+            }
+            
+            // MEJORA: Usar algoritmo YIN en lugar de autocorrelación básica
+            let frequency = yinPitchDetection(buffer, audioContext.sampleRate);
 
-            if (frequency !== -1) {
-                const noteName = getNoteFromFrequency(frequency);
+            if (frequency !== -1 && frequency > 20 && frequency < 5000) {
+                // Filtrar armónicos
+                frequency = filterHarmonics(frequency, lastDetectedFrequency);
                 
-                const now = Date.now();
-                // Debounce un poco más rápido para captar mejor
-                if (noteName !== lastMicNote || (now - lastMicTime > 150)) {
-                    processInputNote(noteName); 
+                // Suavizar la frecuencia
+                const smoothedFrequency = smoothFrequency(frequency);
+                
+                // Convertir a nota
+                const noteData = getNoteFromFrequency(smoothedFrequency);
+                
+                if (noteData) {
+                    // Suavizar la detección de nota con historial
+                    const stableNote = smoothNoteDetection(noteData);
                     
-                    lastMicNote = noteName;
-                    lastMicTime = now;
-                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                    const now = Date.now();
+                    const isNewOnset = detectOnset(rms);
+                    
+                    // Procesar la nota si:
+                    // 1. Es estable (aparece consistentemente en el historial)
+                    // 2. Es diferente a la última nota O hubo un onset nuevo O pasó suficiente tiempo
+                    if (stableNote && (
+                        stableNote !== lastMicNote || 
+                        isNewOnset || 
+                        (now - lastMicTime > 200)
+                    )) {
+                        // Mostrar información de debug en consola
+                        console.log(`🎹 Nota detectada: ${stableNote} (${smoothedFrequency.toFixed(1)} Hz, ${noteData.cents} cents)`);
+                        
+                        // Actualizar indicador con la nota detectada
+                        updateMidiStatusLegend("Micrófono Activo", {
+                            volume: rms,
+                            note: stableNote,
+                            frequency: smoothedFrequency.toFixed(1)
+                        });
+                        
+                        processInputNote(stableNote);
+                        
+                        lastMicNote = stableNote;
+                        lastMicTime = now;
+                        lastDetectedFrequency = frequency;
+                        
+                        setTimeout(() => unhighlightMidiKey(stableNote), 250);
+                    }
                 }
             }
-        }, 50); 
+        }, 30); // 30ms = ~33 detecciones por segundo (mejorado desde 50ms)
 
     } catch (err) {
         console.error("Error al acceder al micrófono:", err);
-        showModal("⚠️ No se pudo acceder al micrófono.");
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
     }
 }
 
@@ -4419,10 +4719,22 @@ function stopMicrophoneListener() {
     if (audioContext) {
         audioContext.close();
     }
+    
+    // Limpiar variables
     audioContext = null;
     analyser = null;
     micInterval = null;
-    console.log("🎤 Micrófono desactivado");
+    microphoneStream = null;
+    
+    // Limpiar variables de detección mejorada
+    noteHistory = [];
+    frequencyHistory = [];
+    lastRMS = 0;
+    dynamicThreshold = 0.03;
+    lastMicNote = null;
+    lastMicTime = 0;
+    
+    console.log("🎤 Micrófono desactivado y recursos liberados");
 }
 
 
