@@ -1918,16 +1918,7 @@ const MIC_THRESHOLD = 0.03; // Ajusta según sensibilidad
  let currentInputSource = 'none';   
 
 
-    let isIntelligentPracticeMode = false;
-let currentPracticePhase = 'inactive'; // 'inactive', 'right-hand', 'left-hand', 'both-hands', 'consolidation'
-let currentPracticeMeasureSet = 0; // Conjunto de 4 compases actual (0, 1, 2...)
-let practiceAttemptNotes = []; // Notas tocadas en el intento actual
-let practiceStartTime = null;
-let practiceErrors = 0;
-let practiceCorrectNotes = 0;
-let accuracyThreshold = 70; 
-
-
+  
 let waterfallCanvas, waterfallCtx;
 let waterfallAnimationId;
 let pixelsPerSecond = 100;
@@ -4493,17 +4484,27 @@ function onMIDIFailure() {
 
 
 function onMIDIMessage(event) {
-    const command = event.data[0];
+    const command = event.data[0] & 0xf0; 
     const note = event.data[1];
     const velocity = event.data.length > 2 ? event.data[2] : 0;
+    const pitchName = midiNoteToPitchName(note);
 
     if (command === 144 && velocity > 0) {
-        const pitchName = midiNoteToPitchName(note);
-        processInputNote(pitchName);
+        if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
+            sampler.triggerAttack(pitchName, undefined, velocity / 127); 
+        }
+        requestAnimationFrame(() => {
+            processInputNote(pitchName);
+        });
 
     } else if (command === 128 || (command === 144 && velocity === 0)) {
-        const pitchName = midiNoteToPitchName(note);
-        unhighlightMidiKey(pitchName);
+        if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
+            sampler.triggerRelease(pitchName);
+        }
+        
+        requestAnimationFrame(() => {
+            unhighlightMidiKey(pitchName);
+        });
     }
 }
 
@@ -4512,39 +4513,11 @@ function onMIDIMessage(event) {
 function processInputNote(noteName) {
     if (!isMidiLearnMode) return;
     highlightMidiKey(noteName);
-    if (isIntelligentPracticeMode) {
-        if (practiceStartTime === null) practiceStartTime = Date.now();
-        
-        const normalizedNote = normalizeNote(noteName);
-        
-        if (expectedNotes.has(normalizedNote)) {
-            if (currentInputSource === 'midi') {
-                sampler.triggerAttackRelease(noteName, '8n');
-            }
-            expectedNotes.delete(normalizedNote);
-            createNoteFlashPiano(noteName, 'treble'); // Ojo: asume treble visualmente por ahora
-            practiceCorrectNotes++;
-            
-            if (expectedNotes.size === 0) {
-                if (currentLearningIndex > 0) advanceLearningStep();
-                else prepareFirstLearningStep();
-                checkPracticePhaseCompletion();
-            }
-            updatePracticeAccuracy();
-        } else {
-            practiceErrors++;
-            highlightError(noteName);
-            updatePracticeAccuracy();
-        }
-        return;
-    }
+
     if (expectedNotes.size > 0) {
         const normalizedNote = normalizeNote(noteName);
 
         if (expectedNotes.has(normalizedNote)) {
-            if(currentInputSource === 'midi' && sampler && sampler.loaded) {
-                 sampler.triggerAttackRelease(noteName, '8n', Tone.now());
-            }
             createNoteFlashPiano(noteName, 'treble'); 
             if (tutorialOverlay.classList.contains('is-visible')) {
                 const currentStepData = tutorialSteps[currentTutorialStep];
@@ -4649,316 +4622,10 @@ function unhighlightMidiKey(noteName) {
 
 
 
-//MODO INTELIGENTE
-function toggleIntelligentPracticeMode() {
-    if (!isMidiLearnMode) {
-        showModal("⚠️ Debes activar el Modo Aprendizaje MIDI primero.");
-        return;
-    }
-    
-    if (!midiAccess || midiAccess.inputs.size === 0) {
-        showModal("🎹 No se detectó ningún teclado MIDI conectado.");
-        return;
-    }
-    
-    isIntelligentPracticeMode = !isIntelligentPracticeMode;
-    
-    if (isIntelligentPracticeMode) {
-        aiPracticeBtn.style.background = '#e0e0e0';
-        aiPracticeBtn.style.borderColor = '#3498db';
-        startIntelligentPractice();
-    } else {
-        aiPracticeBtn.style.background = 'none';
-        aiPracticeBtn.style.borderColor = 'transparent';
-        stopIntelligentPractice();
-    }
-}
-
-function startIntelligentPractice() {
-    currentPracticePhase = 'right-hand';
-    currentPracticeMeasureSet = 0;
-    practiceErrors = 0;
-    practiceCorrectNotes = 0;
-    
-    // Saltar al primer compás
-    jumpToMeasureInLearnMode(0);
-    
-    // Iniciar con mano derecha
-    handFilterMode = 'right';
-    updateHandButtons();
-    updateStaffOpacity('right');
-    
-    showModal(`🎹 Práctica Inteligente Iniciada<br><br>
-               Toca los compases 1-4 con la MANO DERECHA.<br><br>
-               El sistema medirá tu precisión y velocidad.`);
-    
-    preparePracticePhase();
-}
-
-function stopIntelligentPractice() {
-    isIntelligentPracticeMode = false;
-    currentPracticePhase = 'inactive';
-    handFilterMode = 'both';
-    updateHandButtons();
-    updateStaffOpacity('both');
-    progressValueSpan.textContent = '0%';
-}
-
-function updatePracticeAccuracy() {
-    const totalNotes = practiceCorrectNotes + practiceErrors;
-    const currentAccuracy = totalNotes > 0 ? 
-        ((practiceCorrectNotes / totalNotes) * 100).toFixed(0) : 100;
-    progressValueSpan.textContent = `${currentAccuracy}%`;
-}
-
-function checkPracticePhaseCompletion() {
-    // Determinar el rango de compases de la fase actual
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    const endTime = measureStartTimes[endMeasure];
-    
-    // Verificar si llegamos al final del rango
-    if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
-        const currentTime = parsedNotes[currentLearningIndex - 1].startSec;
-        
-        // Si ya pasamos el tiempo final del rango, evaluar
-        if (currentTime >= endTime - 0.01) {
-            console.log('✅ Rango de compases completado, evaluando...');
-            setTimeout(() => {
-                evaluatePracticeAttempt();
-            }, 500);
-        }
-    }
-}
-
-function preparePracticePhase() {
-    practiceAttemptNotes = [];
-    practiceStartTime = null;
-    practiceErrors = 0;
-    practiceCorrectNotes = 0;
-    
-    // Determinar el rango de compases a practicar
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    // Saltar al compás de inicio usando la función existente
-    jumpToMeasureInLearnMode(startMeasure);
-    
-    console.log(`Fase: ${currentPracticePhase}, Compases: ${startMeasure + 1}-${endMeasure}, 
-                 Filtro de mano: ${handFilterMode}`);
-}
-
-function areEnharmonicEquivalents(note1, note2) {
-    if (note1 === note2) return true;
-    const midi1 = pitchToMidiNumber(note1);
-    const midi2 = pitchToMidiNumber(note2);
-    
-    return midi1 === midi2;
-}
-
-function updateHandButtons() {
-    if (handFilterMode === 'right') {
-        rightHandOnlyBtn.style.background = '#e0e0e0';
-        rightHandOnlyBtn.style.color = '#3498db';
-        leftHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.color = '#1a1a1a';
-    } else if (handFilterMode === 'left') {
-        leftHandOnlyBtn.style.background = '#e0e0e0';
-        leftHandOnlyBtn.style.color = '#3498db';
-        rightHandOnlyBtn.style.background = 'none';
-        rightHandOnlyBtn.style.color = '#1a1a1a';
-    } else {
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-        rightHandOnlyBtn.style.color = '#1a1a1a';
-        leftHandOnlyBtn.style.color = '#1a1a1a';
-    }
-}
-
-function evaluatePracticeAttempt() {
-    // Contar las notas esperadas en el rango completado
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    const startTime = measureStartTimes[startMeasure];
-    const endTime = measureStartTimes[endMeasure];
-    
-    // Contar notas esperadas según el filtro de mano
-    const totalExpectedNotes = parsedNotes.filter(note => {
-        return note.startSec >= startTime && 
-               note.startSec < endTime && 
-               !note.isRest && 
-               !note.isTiedContinuation &&
-               ((currentPracticePhase === 'right-hand' && note.hand === 'treble') ||
-                (currentPracticePhase === 'left-hand' && note.hand === 'bass') ||
-                (currentPracticePhase === 'both-hands') ||
-                (currentPracticePhase === 'consolidation'));
-    }).length;
-    
-    if (totalExpectedNotes === 0) {
-        console.warn("No hay notas esperadas para evaluar");
-        advancePracticePhase();
-        return;
-    }
-    
-    const accuracy = ((practiceCorrectNotes / totalExpectedNotes) * 100).toFixed(0);
-    const totalTime = (Date.now() - practiceStartTime) / 1000;
-    const avgTimePerNote = (totalTime / totalExpectedNotes).toFixed(2);
-    
-    progressValueSpan.textContent = `${accuracy}%`;
-    
-    // Mostrar resultados
-    let message = `📊 <strong>Resultados:</strong><br><br>
-                   Precisión: <strong>${accuracy}%</strong><br>
-                   Notas correctas: ${practiceCorrectNotes}/${totalExpectedNotes}<br>
-                   Errores: ${practiceErrors}<br>
-                   Tiempo total: ${totalTime.toFixed(1)}s<br>
-                   Tiempo promedio: ${avgTimePerNote}s/nota<br><br>`;
-    
-    if (parseInt(accuracy) >= accuracyThreshold) {
-        message += '✅ <strong>¡Excelente!</strong> Pasando a la siguiente fase...';
-        showModal(message);
-        setTimeout(() => {
-            hideModal();
-            setTimeout(() => {
-                advancePracticePhase();
-            }, 500);
-        }, 3000);
-    } else {
-        message += `❌ Necesitas al menos <strong>${accuracyThreshold}%</strong> de precisión.<br>
-                    Inténtalo de nuevo.`;
-        showModal(message);
-        setTimeout(() => {
-            hideModal();
-            setTimeout(() => {
-                preparePracticePhase();
-            }, 500);
-        }, 3000);
-    }
-}
-
-function advancePracticePhase() {
-    const startMeasure = currentPracticeMeasureSet * 4;
-    const endMeasure = Math.min(startMeasure + 4, measureStartTimes.length);
-    const measureRange = `${startMeasure + 1}-${endMeasure}`;
-    
-    if (currentPracticePhase === 'right-hand') {
-        currentPracticePhase = 'left-hand';
-        handFilterMode = 'left';
-        updateHandButtons();
-        updateStaffOpacity('left');
-        showModal(`🎹 <strong>Fase 2:</strong><br><br>Ahora practica los compases <strong>${measureRange}</strong><br>con la <strong>MANO IZQUIERDA</strong>.`);
-        setTimeout(() => {
-            hideModal();
-            preparePracticePhase();
-        }, 3000);
-        
-    } else if (currentPracticePhase === 'left-hand') {
-        currentPracticePhase = 'both-hands';
-        handFilterMode = 'both';
-        updateHandButtons();
-        updateStaffOpacity('both');
-        showModal(`🎹 <strong>Fase 3:</strong><br><br>¡Perfecto! Ahora toca los compases <strong>${measureRange}</strong><br>con <strong>AMBAS MANOS</strong>.`);
-        setTimeout(() => {
-            hideModal();
-            preparePracticePhase();
-        }, 3000);
-        
-    } else if (currentPracticePhase === 'both-hands') {
-        const nextSetStart = (currentPracticeMeasureSet + 1) * 4;
-        
-        if (nextSetStart < measureStartTimes.length - 1) {
-            currentPracticeMeasureSet++;
-            currentPracticePhase = 'right-hand';
-            handFilterMode = 'right';
-            updateHandButtons();
-            updateStaffOpacity('right');
-            
-            const newRange = `${nextSetStart + 1}-${Math.min(nextSetStart + 4, measureStartTimes.length)}`;
-            showModal(`🎹 <strong>¡Excelente progreso!</strong><br><br>
-                       Ahora practica los compases <strong>${newRange}</strong><br>
-                       con la <strong>MANO DERECHA</strong>.`);
-            setTimeout(() => {
-                hideModal();
-                preparePracticePhase();
-            }, 3000);
-            
-        } else {
-            startConsolidationPhase();
-        }
-    } else if (currentPracticePhase === 'consolidation') {
-        // Completó la consolidación
-        showSuccessModal("🎉 ¡Felicidades!<br><br>Has completado toda la práctica inteligente.<br>¡Excelente trabajo!");
-        showConfetti(300);
-        setTimeout(() => {
-            stopIntelligentPractice();
-        }, 3000);
-    }
-}
-
-function startConsolidationPhase() {
-    currentPracticePhase = 'consolidation';
-    handFilterMode = 'both';
-    updateHandButtons();
-    updateStaffOpacity('both');
-    
-    const totalMeasures = currentPracticeMeasureSet * 4 + 4;
-    showModal(`🎉 ¡Fase de Consolidación!<br><br>
-               Toca los compases 1-${totalMeasures}<br>
-               con AMBAS MANOS de forma continua.`);
-    
-    jumpToMeasureInLearnMode(0);
-    preparePracticePhase();
-}
 
 
 
 
-
-
-
-function prepareNextExpectedNotes() {
-    expectedNotes.clear();
-    if (currentLearningIndex >= parsedNotes.length) {
-        console.log("¡Felicidades, terminaste la pieza!");
-        toggleMidiLearnMode(); // Desactiva el modo al final
-        return;
-    }
-
-    // Obtenemos el tiempo de la siguiente nota
-    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    
-    // Buscamos todas las notas que suenan en ESE MISMO MOMENTO (acordes)
-    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
-        expectedNotes.add(parsedNotes[currentLearningIndex].pitch);
-        currentLearningIndex++;
-    }
-    
-    // Opcional: Muestra en la consola qué notas se esperan
-    console.log("Esperando notas:", Array.from(expectedNotes));
-}
 
 function midiNoteToPitchName(midiNote) {
     const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
