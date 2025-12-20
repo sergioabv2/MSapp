@@ -1878,23 +1878,11 @@ let isLoopMode = false;
 let audioContext = null;
 let analyser = null;
 let microphoneStream = null;
+let micInterval = null;
 let lastMicNote = null;
 let lastMicTime = 0;
-
-// ============ Configuración de Detección por Micrófono ============
-const MIC_CONFIG = {
-    volumeThreshold: 0.015,    // Umbral de volumen mínimo para detectar sonido
-    confirmationCount: 3,      // Detecciones consecutivas para confirmar nota
-    debounceMs: 100,           // Tiempo mínimo entre notas diferentes
-    minFrequency: 27.5,        // A0 - Nota más grave del piano
-    maxFrequency: 4200         // C8 - Nota más aguda del piano
-};
-
-let micDetectionCount = 0;
-let micLastDetectedNote = null;
-let micIsListening = false;
-let waitForNoteRelease = false;
-    
+const MIC_THRESHOLD = 0.03;
+ let currentInputSource = 'none';   
 
 
     let isIntelligentPracticeMode = false;
@@ -1920,7 +1908,7 @@ let isMidiLearnMode = false;
 let midiAccess = null;
 let expectedNotes = new Set(); // Almacenará las notas que esperamos que el usuario toque
 let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
-let currentInputSource = 'none';
+
 
 
 
@@ -3848,7 +3836,7 @@ function toggleMidiLearnMode() {
         
     } else {
         currentInputSource = 'none';
-        stopMicrophoneListener(); // Aseguramos apagar el micro
+        stopMicrophoneListener(); 
         
         // Restaurar botón original
         midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
@@ -4308,211 +4296,106 @@ function processInputNote(noteName) {
 
 
 
-// ============ DETECCIÓN DE PITCH POR AUTOCORRELACIÓN (Optimizado para Piano) ============
-
-// Calcular volumen RMS del buffer de audio
-function getVolume(buffer) {
-    let sum = 0;
-    for (let i = 0; i < buffer.length; i++) {
-        sum += buffer[i] * buffer[i];
-    }
-    return Math.sqrt(sum / buffer.length);
-}
-
-// Algoritmo de autocorrelación optimizado para detección de pitch
-function autoCorrelate(buffer, sampleRate) {
-    const SIZE = buffer.length;
+// Algoritmo de autocorrelación para detectar pitch
+function autoCorrelate(buf, sampleRate) {
+    let SIZE = buf.length;
     let rms = 0;
-    
+
     for (let i = 0; i < SIZE; i++) {
-        rms += buffer[i] * buffer[i];
+        const val = buf[i];
+        rms += val * val;
     }
     rms = Math.sqrt(rms / SIZE);
-    
-    // Si el volumen es muy bajo, ignoramos (silencio)
-    if (rms < MIC_CONFIG.volumeThreshold) return null;
 
-    // Recortar señal para mejorar precisión
-    let r1 = 0, r2 = SIZE - 1;
-    const threshold = 0.2;
-    
+    // Si el volumen es muy bajo, ignoramos (silencio)
+    if (rms < MIC_THRESHOLD) return -1;
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) {
-        if (Math.abs(buffer[i]) < threshold) { 
-            r1 = i; 
-            break; 
-        }
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
     }
     for (let i = 1; i < SIZE / 2; i++) {
-        if (Math.abs(buffer[SIZE - i]) < threshold) { 
-            r2 = SIZE - i; 
-            break; 
+        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    buf = buf.slice(r1, r2);
+    SIZE = buf.length;
+
+    let c = new Array(SIZE).fill(0);
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE - i; j++) {
+            c[i] = c[i] + buf[j] * buf[j + i];
         }
     }
 
-    const trimmedBuffer = buffer.slice(r1, r2);
-    const newSize = trimmedBuffer.length;
-    
-    if (newSize < 10) return null;
-
-    // Autocorrelación
-    const c = new Array(newSize).fill(0);
-    for (let i = 0; i < newSize; i++) {
-        for (let j = 0; j < newSize - i; j++) {
-            c[i] += trimmedBuffer[j] * trimmedBuffer[j + i];
-        }
-    }
-
-    // Encontrar el primer valle
-    let d = 0;
-    while (d < newSize - 1 && c[d] > c[d + 1]) d++;
-    
-    // Encontrar el máximo después del valle
+    let d = 0; while (c[d] > c[d + 1]) d++;
     let maxval = -1, maxpos = -1;
-    for (let i = d; i < newSize; i++) {
+    for (let i = d; i < SIZE; i++) {
         if (c[i] > maxval) {
             maxval = c[i];
             maxpos = i;
         }
     }
+    let T0 = maxpos;
 
-    if (maxpos <= 0) return null;
-    
-    const frequency = sampleRate / maxpos;
-    
-    // Validar rango de frecuencias del piano
-    if (frequency < MIC_CONFIG.minFrequency || frequency > MIC_CONFIG.maxFrequency) {
-        return null;
-    }
-    
-    return frequency;
+    return sampleRate / T0;
 }
 
-// Convertir frecuencia a nombre de nota MIDI
-function frequencyToNoteName(frequency) {
-    if (!frequency) return null;
-    
+// Convertir Frecuencia a Nota (Ej: 440Hz -> A4)
+function getNoteFromFrequency(frequency) {
     const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const midi = Math.round(69 + 12 * Math.log2(frequency / 440));
-    
-    // Validar rango del piano (A0=21 a C8=108)
-    if (midi < 21 || midi > 108) return null;
-    
+    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    const midi = Math.round(pitchNum);
     const noteName = noteNames[midi % 12];
     const octave = Math.floor(midi / 12) - 1;
-    
     return noteName + octave;
-}
-
-// Loop principal de detección de pitch (usa requestAnimationFrame)
-function detectPitchLoop() {
-    if (!micIsListening || !isMidiLearnMode) return;
-    
-    const buffer = new Float32Array(analyser.fftSize);
-    analyser.getFloatTimeDomainData(buffer);
-    
-    // Verificar si hay sonido
-    const volume = getVolume(buffer);
-    
-    if (volume < MIC_CONFIG.volumeThreshold) {
-        // Silencio - resetear estado para permitir nueva nota
-        if (waitForNoteRelease) {
-            waitForNoteRelease = false;
-            micDetectionCount = 0;
-        }
-        requestAnimationFrame(detectPitchLoop);
-        return;
-    }
-    
-    // Detectar frecuencia
-    const frequency = autoCorrelate(buffer, audioContext.sampleRate);
-    
-    if (frequency) {
-        const noteName = frequencyToNoteName(frequency);
-        
-        if (noteName) {
-            const now = Date.now();
-            
-            // Sistema de confirmación por conteo (evita falsos positivos)
-            if (noteName === micLastDetectedNote) {
-                micDetectionCount++;
-            } else {
-                micLastDetectedNote = noteName;
-                micDetectionCount = 1;
-                waitForNoteRelease = false;
-            }
-            
-            // Solo procesar si tenemos suficientes detecciones consecutivas
-            if (micDetectionCount >= MIC_CONFIG.confirmationCount && !waitForNoteRelease) {
-                // Verificar debounce para notas diferentes
-                const timeSinceLastNote = now - lastMicTime;
-                
-                if (noteName !== lastMicNote || timeSinceLastNote > MIC_CONFIG.debounceMs) {
-                    console.log(`🎤 Nota detectada: ${noteName} (${frequency.toFixed(1)} Hz)`);
-                    
-                    // Unhighlight nota anterior
-                    if (lastMicNote && lastMicNote !== noteName) {
-                        unhighlightMidiKey(lastMicNote);
-                    }
-                    
-                    // Procesar la nota
-                    processInputNote(noteName);
-                    
-                    lastMicNote = noteName;
-                    lastMicTime = now;
-                    waitForNoteRelease = true;
-                    
-                    // Auto-unhighlight después de un tiempo
-                    setTimeout(() => {
-                        unhighlightMidiKey(noteName);
-                    }, 250);
-                }
-            }
-        }
-    }
-    
-    // Continuar el loop
-    requestAnimationFrame(detectPitchLoop);
 }
 
 // Iniciar Escucha del Micrófono
 async function startMicrophoneListener() {
-    if (micIsListening) return;
-    
+    if (audioContext) return; // Ya está activo
+
     try {
-        console.log("🎤 Iniciando micrófono...");
-        
-        // Crear AudioContext
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Obtener stream del micrófono con configuración óptima para piano
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: false,
-                autoGainControl: false,
-                noiseSuppression: false
-            } 
-        });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         microphoneStream = stream;
         
-        // Crear analizador con configuración optimizada
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;  // Más pequeño = más rápido
-        
-        // Crear source y conectar
         const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
         source.connect(analyser);
-        
-        // Iniciar loop de detección
-        micIsListening = true;
-        micDetectionCount = 0;
-        micLastDetectedNote = null;
-        waitForNoteRelease = false;
-        
-        console.log("✅ Micrófono activado - Detección por autocorrelación");
-        setStatus("🎤 Micrófono Activo");
-        
-        detectPitchLoop();
-        
+
+        const bufferLength = analyser.fftSize;
+        const buffer = new Float32Array(bufferLength);
+
+        console.log("🎤 Micrófono activado para detección de notas");
+        setStatus("Modo Micrófono Activo");
+
+        // Loop de detección (aprox 60 veces por segundo)
+        micInterval = setInterval(() => {
+            if (!isMidiLearnMode) return;
+
+            analyser.getFloatTimeDomainData(buffer);
+            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (frequency !== -1) {
+                const noteName = getNoteFromFrequency(frequency);
+                
+                // Debouncing simple: evitar disparar la misma nota mil veces en 100ms
+                const now = Date.now();
+                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
+                    // console.log(`🎤 Nota detectada: ${noteName} (${Math.round(frequency)}Hz)`);
+                    processInputNote(noteName); // <--- ENVIAMOS AL CEREBRO CENTRAL
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    
+                    // Efecto visual de "soltar tecla" después de un momento
+                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                }
+            }
+        }, 50);
+
     } catch (err) {
         console.error("Error al acceder al micrófono:", err);
         showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
@@ -4520,29 +4403,16 @@ async function startMicrophoneListener() {
 }
 
 function stopMicrophoneListener() {
-    // Detener loop de detección
-    micIsListening = false;
-    
-    // Detener stream del micrófono
+    if (micInterval) clearInterval(micInterval);
     if (microphoneStream) {
         microphoneStream.getTracks().forEach(track => track.stop());
-        microphoneStream = null;
     }
-    
-    // Cerrar AudioContext
     if (audioContext) {
         audioContext.close();
-        audioContext = null;
     }
-    
-    // Resetear variables de estado
+    audioContext = null;
     analyser = null;
-    lastMicNote = null;
-    lastMicTime = 0;
-    micDetectionCount = 0;
-    micLastDetectedNote = null;
-    waitForNoteRelease = false;
-    
+    micInterval = null;
     console.log("🎤 Micrófono desactivado");
 }
 
