@@ -4443,20 +4443,18 @@ function initMidiInput() {
 
 
 
-function onMIDISuccess(access) {
+ffunction onMIDISuccess(access) {
     midiAccess = access;
-    
-    // 1. Chequeo inicial al cargar la página
+    for (var input of midiAccess.inputs.values()) {
+        input.onmidimessage = onMIDIMessage;
+    }
     checkMidiConnectionStatus();
-
-    // Listener para cuando conectas/desconectas cables
     midiAccess.onstatechange = (event) => {
         const port = event.port;
         if (port.type !== 'input') return;
-
-        console.log(`MIDI Estado: ${port.state} (${port.name})`);
-        
-        // 2. Re-evaluar estado cada vez que algo cambia
+        if (port.state === 'connected') {
+             port.onmidimessage = onMIDIMessage;
+        }
         checkMidiConnectionStatus();
     };
 }
