@@ -20,6 +20,7 @@
       flex-direction: column; 
       height: 100vh; 
       overflow: hidden; 
+      overscroll-behavior: contain;
     }
     
     /* 1. Contenedor Principal */
@@ -33,6 +34,7 @@
         background-color: #fff;
         position: relative;
         margin-bottom: -50px;
+        overscroll-behavior: contain;
     }
 
     /* 2. Contenedor OSMD */
@@ -311,7 +313,9 @@
 
     // --- CONTROLES UI ---
 
-    playBtn.addEventListener('click', async () => {
+    playBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      playBtn.blur();
         await Tone.start();
         if (Tone.Transport.state === 'started') {
             pausePlayback();
