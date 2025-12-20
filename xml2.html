@@ -1710,8 +1710,6 @@ display: flex;
 
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
-  <!-- ml5.js para detección de pitch con CREPE (modelo de deep learning optimizado para instrumentos) -->
-  <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
 
   <script>
     const playBtn = document.getElementById('play-btn');
@@ -1880,33 +1878,22 @@ let isLoopMode = false;
 let audioContext = null;
 let analyser = null;
 let microphoneStream = null;
-let micInterval = null;
 let lastMicNote = null;
 let lastMicTime = 0;
-const MIC_THRESHOLD = 0.03;
 
-// ============ CREPE / ml5 Pitch Detection ============
-let pitchDetector = null;
-let crepeReady = false;
-let previousPitch = null;
-let previousConfidence = 0;
-let noteOnsetTime = 0;
-let isNoteActive = false;
-
-// Configuración optimizada para piano
-const CREPE_CONFIG = {
-    minConfidence: 0.85,      // Confianza mínima (CREPE es muy preciso)
-    minFrequency: 27.5,       // A0 - Nota más grave del piano
-    maxFrequency: 4186,       // C8 - Nota más aguda del piano  
-    onsetThreshold: 0.15,     // Umbral de detección de onset (ataque)
-    releaseThreshold: 0.05,   // Umbral para detectar release
-    debounceMs: 120,          // Tiempo mínimo entre notas (evita duplicados)
-    stabilityFrames: 2,       // Frames consecutivos para confirmar nota
-    octaveCorrection: true    // Corrección de errores de octava comunes
+// ============ Configuración de Detección por Micrófono ============
+const MIC_CONFIG = {
+    volumeThreshold: 0.015,    // Umbral de volumen mínimo para detectar sonido
+    confirmationCount: 3,      // Detecciones consecutivas para confirmar nota
+    debounceMs: 100,           // Tiempo mínimo entre notas diferentes
+    minFrequency: 27.5,        // A0 - Nota más grave del piano
+    maxFrequency: 4200         // C8 - Nota más aguda del piano
 };
 
-let stabilityCounter = 0;
-let lastStablePitch = null;
+let micDetectionCount = 0;
+let micLastDetectedNote = null;
+let micIsListening = false;
+let waitForNoteRelease = false;
     
 
 
@@ -4321,172 +4308,178 @@ function processInputNote(noteName) {
 
 
 
-// ============ DETECCIÓN DE PITCH CON CREPE (ml5.js) ============
-// CREPE es un modelo de deep learning de Google, optimizado para instrumentos musicales
+// ============ DETECCIÓN DE PITCH POR AUTOCORRELACIÓN (Optimizado para Piano) ============
 
-// Convertir Frecuencia a Nota con corrección de octava para piano
-function frequencyToNoteName(frequency) {
-    if (!frequency || frequency < CREPE_CONFIG.minFrequency || frequency > CREPE_CONFIG.maxFrequency) {
+// Calcular volumen RMS del buffer de audio
+function getVolume(buffer) {
+    let sum = 0;
+    for (let i = 0; i < buffer.length; i++) {
+        sum += buffer[i] * buffer[i];
+    }
+    return Math.sqrt(sum / buffer.length);
+}
+
+// Algoritmo de autocorrelación optimizado para detección de pitch
+function autoCorrelate(buffer, sampleRate) {
+    const SIZE = buffer.length;
+    let rms = 0;
+    
+    for (let i = 0; i < SIZE; i++) {
+        rms += buffer[i] * buffer[i];
+    }
+    rms = Math.sqrt(rms / SIZE);
+    
+    // Si el volumen es muy bajo, ignoramos (silencio)
+    if (rms < MIC_CONFIG.volumeThreshold) return null;
+
+    // Recortar señal para mejorar precisión
+    let r1 = 0, r2 = SIZE - 1;
+    const threshold = 0.2;
+    
+    for (let i = 0; i < SIZE / 2; i++) {
+        if (Math.abs(buffer[i]) < threshold) { 
+            r1 = i; 
+            break; 
+        }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+        if (Math.abs(buffer[SIZE - i]) < threshold) { 
+            r2 = SIZE - i; 
+            break; 
+        }
+    }
+
+    const trimmedBuffer = buffer.slice(r1, r2);
+    const newSize = trimmedBuffer.length;
+    
+    if (newSize < 10) return null;
+
+    // Autocorrelación
+    const c = new Array(newSize).fill(0);
+    for (let i = 0; i < newSize; i++) {
+        for (let j = 0; j < newSize - i; j++) {
+            c[i] += trimmedBuffer[j] * trimmedBuffer[j + i];
+        }
+    }
+
+    // Encontrar el primer valle
+    let d = 0;
+    while (d < newSize - 1 && c[d] > c[d + 1]) d++;
+    
+    // Encontrar el máximo después del valle
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < newSize; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+
+    if (maxpos <= 0) return null;
+    
+    const frequency = sampleRate / maxpos;
+    
+    // Validar rango de frecuencias del piano
+    if (frequency < MIC_CONFIG.minFrequency || frequency > MIC_CONFIG.maxFrequency) {
         return null;
     }
     
+    return frequency;
+}
+
+// Convertir frecuencia a nombre de nota MIDI
+function frequencyToNoteName(frequency) {
+    if (!frequency) return null;
+    
     const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const midiNumber = 12 * (Math.log2(frequency / 440)) + 69;
-    const roundedMidi = Math.round(midiNumber);
+    const midi = Math.round(69 + 12 * Math.log2(frequency / 440));
     
-    // Limitar al rango del piano (A0=21 a C8=108)
-    if (roundedMidi < 21 || roundedMidi > 108) return null;
+    // Validar rango del piano (A0=21 a C8=108)
+    if (midi < 21 || midi > 108) return null;
     
-    const noteName = noteNames[roundedMidi % 12];
-    const octave = Math.floor(roundedMidi / 12) - 1;
+    const noteName = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
     
-    return {
-        name: noteName + octave,
-        midi: roundedMidi,
-        cents: Math.round((midiNumber - roundedMidi) * 100) // Desviación en cents
-    };
+    return noteName + octave;
 }
 
-// Corrección de errores de octava comunes en piano
-function correctOctaveErrors(currentNote, previousNote, expectedNotes) {
-    if (!CREPE_CONFIG.octaveCorrection || !previousNote || !expectedNotes.size) {
-        return currentNote;
-    }
+// Loop principal de detección de pitch (usa requestAnimationFrame)
+function detectPitchLoop() {
+    if (!micIsListening || !isMidiLearnMode) return;
     
-    const currentNoteName = currentNote.name;
-    const baseName = currentNoteName.replace(/\d+$/, '');
-    const currentOctave = parseInt(currentNoteName.match(/\d+$/)[0]);
+    const buffer = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buffer);
     
-    // Verificar si una octava arriba o abajo está en las notas esperadas
-    const octaveUp = baseName + (currentOctave + 1);
-    const octaveDown = baseName + (currentOctave - 1);
+    // Verificar si hay sonido
+    const volume = getVolume(buffer);
     
-    const normalizedCurrent = normalizeNote(currentNoteName);
-    const normalizedUp = normalizeNote(octaveUp);
-    const normalizedDown = normalizeNote(octaveDown);
-    
-    // Si la nota actual no está esperada pero una octava sí, corregir
-    if (!expectedNotes.has(normalizedCurrent)) {
-        if (expectedNotes.has(normalizedUp)) {
-            console.log(`🎹 Corrección de octava: ${currentNoteName} → ${octaveUp}`);
-            return { ...currentNote, name: octaveUp, midi: currentNote.midi + 12 };
+    if (volume < MIC_CONFIG.volumeThreshold) {
+        // Silencio - resetear estado para permitir nueva nota
+        if (waitForNoteRelease) {
+            waitForNoteRelease = false;
+            micDetectionCount = 0;
         }
-        if (expectedNotes.has(normalizedDown)) {
-            console.log(`🎹 Corrección de octava: ${currentNoteName} → ${octaveDown}`);
-            return { ...currentNote, name: octaveDown, midi: currentNote.midi - 12 };
-        }
-    }
-    
-    return currentNote;
-}
-
-// Calcular RMS del buffer de audio para onset detection
-function calculateRMS(analyserNode) {
-    const bufferLength = analyserNode.fftSize;
-    const buffer = new Float32Array(bufferLength);
-    analyserNode.getFloatTimeDomainData(buffer);
-    
-    let sum = 0;
-    for (let i = 0; i < bufferLength; i++) {
-        sum += buffer[i] * buffer[i];
-    }
-    return Math.sqrt(sum / bufferLength);
-}
-
-// Callback cuando CREPE detecta un pitch
-function handlePitchDetection(error, frequency) {
-    if (error) {
-        console.error("Error en CREPE:", error);
+        requestAnimationFrame(detectPitchLoop);
         return;
     }
     
-    if (!isMidiLearnMode || !crepeReady) return;
+    // Detectar frecuencia
+    const frequency = autoCorrelate(buffer, audioContext.sampleRate);
     
-    const now = Date.now();
-    
-    // Obtener nivel de audio para onset detection
-    const rms = analyser ? calculateRMS(analyser) : 0;
-    
-    // Detectar si hay sonido significativo
-    const hasSound = rms > CREPE_CONFIG.onsetThreshold;
-    const isSilence = rms < CREPE_CONFIG.releaseThreshold;
-    
-    // Si hay silencio, resetear estado
-    if (isSilence) {
-        if (isNoteActive && lastMicNote) {
-            unhighlightMidiKey(lastMicNote);
+    if (frequency) {
+        const noteName = frequencyToNoteName(frequency);
+        
+        if (noteName) {
+            const now = Date.now();
+            
+            // Sistema de confirmación por conteo (evita falsos positivos)
+            if (noteName === micLastDetectedNote) {
+                micDetectionCount++;
+            } else {
+                micLastDetectedNote = noteName;
+                micDetectionCount = 1;
+                waitForNoteRelease = false;
+            }
+            
+            // Solo procesar si tenemos suficientes detecciones consecutivas
+            if (micDetectionCount >= MIC_CONFIG.confirmationCount && !waitForNoteRelease) {
+                // Verificar debounce para notas diferentes
+                const timeSinceLastNote = now - lastMicTime;
+                
+                if (noteName !== lastMicNote || timeSinceLastNote > MIC_CONFIG.debounceMs) {
+                    console.log(`🎤 Nota detectada: ${noteName} (${frequency.toFixed(1)} Hz)`);
+                    
+                    // Unhighlight nota anterior
+                    if (lastMicNote && lastMicNote !== noteName) {
+                        unhighlightMidiKey(lastMicNote);
+                    }
+                    
+                    // Procesar la nota
+                    processInputNote(noteName);
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    waitForNoteRelease = true;
+                    
+                    // Auto-unhighlight después de un tiempo
+                    setTimeout(() => {
+                        unhighlightMidiKey(noteName);
+                    }, 250);
+                }
+            }
         }
-        isNoteActive = false;
-        stabilityCounter = 0;
-        lastStablePitch = null;
-        return;
     }
     
-    // Si no hay sonido suficiente para onset, ignorar
-    if (!hasSound && !isNoteActive) return;
-    
-    // Verificar que CREPE detectó una frecuencia
-    if (!frequency || frequency < CREPE_CONFIG.minFrequency) return;
-    
-    // Convertir frecuencia a nota
-    const noteInfo = frequencyToNoteName(frequency);
-    if (!noteInfo) return;
-    
-    // Estabilidad: requerir múltiples detecciones consistentes
-    if (lastStablePitch === noteInfo.name) {
-        stabilityCounter++;
-    } else {
-        stabilityCounter = 1;
-        lastStablePitch = noteInfo.name;
-    }
-    
-    // No procesar hasta tener suficientes frames estables
-    if (stabilityCounter < CREPE_CONFIG.stabilityFrames) return;
-    
-    // Corrección de octava basada en notas esperadas
-    const correctedNote = correctOctaveErrors(noteInfo, previousPitch, expectedNotes);
-    const noteName = correctedNote.name;
-    
-    // Debounce para evitar detecciones duplicadas
-    const timeSinceLastNote = now - lastMicTime;
-    const isSameNote = noteName === lastMicNote;
-    
-    if (isSameNote && timeSinceLastNote < CREPE_CONFIG.debounceMs) {
-        return;
-    }
-    
-    // Nueva nota detectada
-    console.log(`🎹 CREPE detectó: ${noteName} (${frequency.toFixed(1)}Hz, RMS: ${rms.toFixed(3)})`);
-    
-    // Unhighlight nota anterior si es diferente
-    if (lastMicNote && lastMicNote !== noteName) {
-        unhighlightMidiKey(lastMicNote);
-    }
-    
-    // Procesar la nueva nota
-    processInputNote(noteName);
-    
-    // Actualizar estado
-    lastMicNote = noteName;
-    lastMicTime = now;
-    isNoteActive = true;
-    previousPitch = correctedNote;
-    
-    // Auto-release después de un tiempo
-    setTimeout(() => {
-        if (lastMicNote === noteName) {
-            unhighlightMidiKey(noteName);
-        }
-    }, 300);
+    // Continuar el loop
+    requestAnimationFrame(detectPitchLoop);
 }
 
-// Iniciar Escucha del Micrófono con CREPE
+// Iniciar Escucha del Micrófono
 async function startMicrophoneListener() {
-    if (audioContext || crepeReady) return; 
-
+    if (micIsListening) return;
+    
     try {
-        console.log("🎤 Inicializando micrófono con modelo CREPE...");
-        setStatus("Cargando modelo de detección...");
+        console.log("🎤 Iniciando micrófono...");
         
         // Crear AudioContext
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -4496,185 +4489,39 @@ async function startMicrophoneListener() {
             audio: {
                 echoCancellation: false,
                 autoGainControl: false,
-                noiseSuppression: false,
-                channelCount: 1,
-                sampleRate: 44100  // Sample rate óptimo para CREPE
-            } 
-        });
-        microphoneStream = stream;
-        
-        // Crear nodos de audio
-        const source = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        analyser.smoothingTimeConstant = 0.3;
-        
-        // Filtro para mejorar detección en rango de piano
-        const highPassFilter = audioContext.createBiquadFilter();
-        highPassFilter.type = "highpass";
-        highPassFilter.frequency.value = 25; // Corte bajo en 25Hz (debajo de A0)
-        
-        const lowPassFilter = audioContext.createBiquadFilter();
-        lowPassFilter.type = "lowpass";
-        lowPassFilter.frequency.value = 5000; // Corte alto (fundamental + primeros armónicos)
-        
-        // Conexión: Micrófono -> HighPass -> LowPass -> Analizador
-        source.connect(highPassFilter);
-        highPassFilter.connect(lowPassFilter);
-        lowPassFilter.connect(analyser);
-        
-        // Inicializar CREPE con ml5.js
-        setStatus("Cargando modelo CREPE...");
-        
-        pitchDetector = ml5.pitchDetection(
-            'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/',
-            audioContext,
-            microphoneStream,
-            () => {
-                crepeReady = true;
-                console.log("✅ Modelo CREPE cargado exitosamente");
-                setStatus("🎹 Micrófono CREPE Activo");
-                
-                // Iniciar loop de detección
-                detectPitchLoop();
-            }
-        );
-
-    } catch (err) {
-        console.error("Error al inicializar micrófono/CREPE:", err);
-        
-        // Fallback a autocorrelación si CREPE falla
-        console.log("⚠️ Intentando fallback a autocorrelación...");
-        startMicrophoneListenerFallback();
-    }
-}
-
-// Loop de detección de pitch
-function detectPitchLoop() {
-    if (!crepeReady || !pitchDetector) return;
-    
-    pitchDetector.getPitch((error, frequency) => {
-        handlePitchDetection(error, frequency);
-        
-        // Continuar el loop si el modo está activo
-        if (isMidiLearnMode && crepeReady) {
-            requestAnimationFrame(detectPitchLoop);
-        }
-    });
-}
-
-// Fallback: Autocorrelación (backup si CREPE no carga)
-function autoCorrelate(buf, sampleRate) {
-    let SIZE = buf.length;
-    let rms = 0;
-
-    for (let i = 0; i < SIZE; i++) {
-        const val = buf[i];
-        rms += val * val;
-    }
-    rms = Math.sqrt(rms / SIZE);
-
-    if (rms < MIC_THRESHOLD) return -1;
-
-    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-    for (let i = 0; i < SIZE / 2; i++) {
-        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-    }
-    for (let i = 1; i < SIZE / 2; i++) {
-        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-    }
-
-    buf = buf.slice(r1, r2);
-    SIZE = buf.length;
-
-    let c = new Array(SIZE).fill(0);
-    for (let i = 0; i < SIZE; i++) {
-        for (let j = 0; j < SIZE - i; j++) {
-            c[i] = c[i] + buf[j] * buf[j + i];
-        }
-    }
-
-    let d = 0; while (c[d] > c[d + 1]) d++;
-    let maxval = -1, maxpos = -1;
-    for (let i = d; i < SIZE; i++) {
-        if (c[i] > maxval) {
-            maxval = c[i];
-            maxpos = i;
-        }
-    }
-    let T0 = maxpos;
-
-    return sampleRate / T0;
-}
-
-// Fallback de micrófono sin CREPE
-async function startMicrophoneListenerFallback() {
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: false,
-                autoGainControl: false,
                 noiseSuppression: false
             } 
         });
         microphoneStream = stream;
         
-        const source = audioContext.createMediaStreamSource(stream);
+        // Crear analizador con configuración optimizada
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 4096; 
+        analyser.fftSize = 2048;  // Más pequeño = más rápido
         
-        const lowPassFilter = audioContext.createBiquadFilter();
-        lowPassFilter.type = "lowpass";
-        lowPassFilter.frequency.value = 2000;
+        // Crear source y conectar
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
         
-        source.connect(lowPassFilter);
-        lowPassFilter.connect(analyser);
-
-        const bufferLength = analyser.fftSize;
-        const buffer = new Float32Array(bufferLength);
-
-        console.log("🎤 Micrófono activado (modo fallback - autocorrelación)");
-        setStatus("Micrófono Activo (Básico)");
-
-        micInterval = setInterval(() => {
-            if (!isMidiLearnMode) return;
-
-            analyser.getFloatTimeDomainData(buffer);
-            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
-
-            if (frequency !== -1 && frequency > 27 && frequency < 4200) {
-                const noteInfo = frequencyToNoteName(frequency);
-                if (!noteInfo) return;
-                
-                const noteName = noteInfo.name;
-                const now = Date.now();
-                
-                if (noteName !== lastMicNote || (now - lastMicTime > 150)) {
-                    processInputNote(noteName); 
-                    lastMicNote = noteName;
-                    lastMicTime = now;
-                    setTimeout(() => unhighlightMidiKey(noteName), 200);
-                }
-            }
-        }, 50); 
-
+        // Iniciar loop de detección
+        micIsListening = true;
+        micDetectionCount = 0;
+        micLastDetectedNote = null;
+        waitForNoteRelease = false;
+        
+        console.log("✅ Micrófono activado - Detección por autocorrelación");
+        setStatus("🎤 Micrófono Activo");
+        
+        detectPitchLoop();
+        
     } catch (err) {
-        console.error("Error al acceder al micrófono (fallback):", err);
-        showModal("⚠️ No se pudo acceder al micrófono.");
+        console.error("Error al acceder al micrófono:", err);
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
     }
 }
 
 function stopMicrophoneListener() {
-    // Detener interval de fallback si existe
-    if (micInterval) {
-        clearInterval(micInterval);
-        micInterval = null;
-    }
-    
-    // Detener CREPE
-    crepeReady = false;
-    pitchDetector = null;
+    // Detener loop de detección
+    micIsListening = false;
     
     // Detener stream del micrófono
     if (microphoneStream) {
@@ -4692,13 +4539,11 @@ function stopMicrophoneListener() {
     analyser = null;
     lastMicNote = null;
     lastMicTime = 0;
-    previousPitch = null;
-    previousConfidence = 0;
-    isNoteActive = false;
-    stabilityCounter = 0;
-    lastStablePitch = null;
+    micDetectionCount = 0;
+    micLastDetectedNote = null;
+    waitForNoteRelease = false;
     
-    console.log("🎤 Micrófono y CREPE desactivados");
+    console.log("🎤 Micrófono desactivado");
 }
 
 
