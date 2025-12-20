@@ -746,7 +746,13 @@ display: flex;
         transform: scale(0.75);
         transform-origin: top center;
       }
+  #start-tutorial-btn{
+    display: none !important;
+  }
 
+  #metronome-btn{
+    display: none !important;
+  }
 
     #progress-label,
     #fullscreen-btn,
@@ -1576,7 +1582,7 @@ display: flex;
     </div>
 
     <div class="controls-group">
-      <button  id="start-tutorial-btn">Tutorial</button>
+      <button  id="start-tutorial-btn" style="display: none;">Tutorial</button>
         <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
         <i class="ri-settings-3-line"></i>
       </button>
@@ -4439,37 +4445,46 @@ function initMidiInput() {
 
 function onMIDISuccess(access) {
     midiAccess = access;
-    let connectedInputs = new Map();
+    
+    // 1. Chequeo inicial al cargar la página
+    checkMidiConnectionStatus();
 
-    const handlePortChange = (port) => {
-        if (port.type !== 'input') return; // Ignoramos puertos de salida
+    // Listener para cuando conectas/desconectas cables
+    midiAccess.onstatechange = (event) => {
+        const port = event.port;
+        if (port.type !== 'input') return;
 
-        if (port.state === 'connected') {
-            console.log(`MIDI Conectado: ${port.name}`);
-            port.onmidimessage = onMIDIMessage; // Asigna el listener
-            connectedInputs.set(port.id, port);
-            midiLearnBtn.classList.add('pulse-animation');
-        } else if (port.state === 'disconnected') {
-            console.log(`MIDI Desconectado: ${port.name}`);
-            connectedInputs.delete(port.id); 
-            midiLearnBtn.classList.remove('pulse-animation');
-        }
-
-        if (connectedInputs.size > 0) {
-            const firstDeviceName = connectedInputs.values().next().value.name;
-            updateMidiStatusLegend(firstDeviceName);
-        } else {
-            updateMidiStatusLegend(null);
-        }
+        console.log(`MIDI Estado: ${port.state} (${port.name})`);
+        
+        // 2. Re-evaluar estado cada vez que algo cambia
+        checkMidiConnectionStatus();
     };
+}
 
-    // Asigna el listener para futuros cambios (conectar/desconectar)
-    midiAccess.onstatechange = (event) => handlePortChange(event.port);
+// Nueva función auxiliar para manejar la lógica de conexión
+function checkMidiConnectionStatus() {
+    // A. Control del Botón Tutorial
+    const tutorialBtn = document.getElementById('start-tutorial-btn');
+    
+    // Si hay al menos 1 entrada conectada Y activa
+    if (midiAccess.inputs.size > 0) {
+        if (tutorialBtn) tutorialBtn.style.display = 'inline-block'; // O 'block' o 'flex' segun tu diseño
+        
+        // Actualizar leyenda (opcional, toma el primero)
+        const firstInput = midiAccess.inputs.values().next().value;
+        if (firstInput) updateMidiStatusLegend(firstInput.name);
 
-    // Escaneo inicial de dispositivos YA conectados al cargar la página
-    const inputs = midiAccess.inputs.values();
-    for (const input of inputs) {
-        handlePortChange(input); // Usa la misma lógica
+    } else {
+        if (tutorialBtn) tutorialBtn.style.display = 'none';
+        updateMidiStatusLegend(null);
+
+        // B. Lógica de AUTO-SALIDA
+        // Si no hay teclados y estamos en modo aprendizaje, salir inmediatamente.
+        if (isMidiLearnMode) {
+            console.log("MIDI desconectado: Saliendo de modo aprendizaje...");
+            showWarningToast("⚠️ MIDI desconectado. Saliendo del modo aprendizaje.");
+            toggleMidiLearnMode(); // Esto apaga el modo
+        }
     }
 }
 
