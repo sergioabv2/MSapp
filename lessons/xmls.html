@@ -128,8 +128,21 @@
   <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
+ <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
   <script>
-    // Elementos DOM
+    /* --- FIX NUCLEAR PARA EL SCROLL --- */
+    // Sobrescribimos el comportamiento nativo de scrollIntoView
+    // Esto evita que OSMD o el navegador muevan la página padre al avanzar el cursor
+    const nativeScroll = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = function() {
+        // Solo permitimos el scroll si es dentro de nuestro contenedor wrapper
+        // Si el navegador intenta scrollear la ventana entera, lo bloqueamos.
+        return; 
+    };
+    /* ---------------------------------- */
+
     const playBtn = document.getElementById('play-btn');
     const stopBtn = document.getElementById('stop-btn');
     const playIcon = document.getElementById('play-icon');
@@ -141,7 +154,6 @@
     const speedDownBtn = document.getElementById('speed-down');
     const sheetWrapper = document.getElementById('sheet-wrapper');
 
-    // Variables Globales
     let osmd = null;
     let sampler = null;
     let audioPart = null;
@@ -203,10 +215,7 @@
         const text = await response.text();
         
         await osmd.load(text);
-        
-        // Ajuste de Zoom un poco más agresivo para pantallas pequeñas
         osmd.zoom = 0.8; 
-        
         await osmd.render();
         
         parseMusicXML(text);
@@ -214,7 +223,7 @@
         
         playBtn.disabled = false;
         stopBtn.disabled = false;
-        setStatus('Ode to Joy');
+        setStatus('Listo');
         updateBpmDisplay();
 
       } catch (err) {
@@ -307,15 +316,34 @@
         visualPart = new Tone.Part((time) => {
             Tone.Draw.schedule(() => {
                 osmd.cursor.next();
+                
+                // SCROLL MANUAL DE LA PARTITURA
+                // Como deshabilitamos scrollIntoView, lo hacemos nosotros a mano
+                // Solo movemos el wrapper interno
+                const cursorElement = document.querySelector("#cursorImg-0");
+                if (cursorElement && sheetWrapper) {
+                    // Calculamos la posición del cursor relativo al wrapper
+                    const cursorLeft = cursorElement.getBoundingClientRect().left;
+                    const wrapperLeft = sheetWrapper.getBoundingClientRect().left;
+                    const relativePos = cursorLeft - wrapperLeft;
+                    
+                    // Si el cursor pasa de la mitad de la pantalla, scrolleamos
+                    if (relativePos > sheetWrapper.clientWidth / 2) {
+                        sheetWrapper.scrollBy({ left: 150, behavior: 'smooth' });
+                    }
+                }
             }, time);
         }, visualEvents).start(0);
     }
 
-    // --- CONTROLES UI ---
+    // --- FIX CRÍTICO: PREVENIR FOCUS AL DAR CLICK ---
+    // Usamos 'mousedown' porque ocurre ANTES que el focus y el click
+    playBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Esto evita que el botón reciba el foco
+    });
 
-    playBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      playBtn.blur();
+    playBtn.addEventListener('click', async () => {
+        // Ya no necesitamos blur() aquí si usamos mousedown preventDefault
         await Tone.start();
         if (Tone.Transport.state === 'started') {
             pausePlayback();
@@ -324,6 +352,7 @@
         }
     });
 
+    stopBtn.addEventListener('mousedown', (e) => e.preventDefault());
     stopBtn.addEventListener('click', () => {
         stopPlayback();
     });
@@ -353,7 +382,11 @@
         statusDiv.textContent = text;
     }
     
+    // Evitar foco también en los botones de velocidad
+    speedUpBtn.addEventListener('mousedown', (e) => e.preventDefault());
     speedUpBtn.addEventListener('click', () => changeSpeed(0.1));
+    
+    speedDownBtn.addEventListener('mousedown', (e) => e.preventDefault());
     speedDownBtn.addEventListener('click', () => changeSpeed(-0.1));
 
     function changeSpeed(delta) {
