@@ -1524,6 +1524,28 @@ display: flex;
 .success-toast i {
     font-size: 18px;
 }
+
+/* Estilo para el toast en modo alerta */
+.success-toast.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+.success-toast.warning i {
+    color: #856404;
+}
+#mic-btn.active {
+  color: #e74c3c; /* Rojo */
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
   </style>
 </head>
 <body>
@@ -1547,7 +1569,9 @@ display: flex;
 <button id="midi-learn-btn" class="btn midi-learn-highlight" data-tooltip="Conecta tu teclado MIDI para practicar">
   <i class="ri-graduation-cap-line"></i>
   <span class="btn-label">Aprender</span>
- 
+</button>
+<button id="mic-btn" class="btn" title="Activar Micrófono">
+  <i class="ri-mic-line"></i>
 </button>
     </div>
 
@@ -1875,13 +1899,16 @@ let isLoopMode = false;
     let isMobile = window.innerWidth <= 768;
     let pianoViewMode = 'full'; 
 
+
+const micBtn = document.getElementById('mic-btn');
+let isMicActive = false;
 let audioContext = null;
 let analyser = null;
 let microphoneStream = null;
 let micInterval = null;
 let lastMicNote = null;
 let lastMicTime = 0;
-const MIC_THRESHOLD = 0.03;
+const MIC_THRESHOLD = 0.03; // Ajusta según sensibilidad
  let currentInputSource = 'none';   
 
 
@@ -2207,7 +2234,6 @@ function createNoteFlashPiano(noteName, hand) {
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
-
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
@@ -3064,6 +3090,8 @@ speedDownBtn.addEventListener('click', () => {
     updateSpeed(playbackRate - speedStep);
 });
 
+micBtn.addEventListener('click', toggleMicMode);
+
 restartChunkBtn.addEventListener('click', restartCurrentChunk);
 
 metronomeBtn.addEventListener('click', toggleMetronome);
@@ -3648,6 +3676,220 @@ function advanceLearningStep() {
 }
 
 
+
+// --- FUNCIONES DE AUDIO / MICRÓFONO ---
+
+// 1. Algoritmo de Autocorrelación (Detectar Pitch)
+function autoCorrelate(buf, sampleRate) {
+    let SIZE = buf.length;
+    let rms = 0;
+
+    for (let i = 0; i < SIZE; i++) {
+        const val = buf[i];
+        rms += val * val;
+    }
+    rms = Math.sqrt(rms / SIZE);
+
+    if (rms < MIC_THRESHOLD) return -1; // Silencio
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    buf = buf.slice(r1, r2);
+    SIZE = buf.length;
+
+    let c = new Array(SIZE).fill(0);
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE - i; j++) {
+            c[i] = c[i] + buf[j] * buf[j + i];
+        }
+    }
+
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < SIZE; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+    let T0 = maxpos;
+
+    return sampleRate / T0;
+}
+
+
+function getNoteFromFrequency(frequency) {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    const midi = Math.round(pitchNum);
+    const noteName = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return noteName + octave;
+}
+
+// 3. Iniciar Escucha
+async function startMicrophoneListener() {
+    if (audioContext) return; 
+
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphoneStream = stream;
+        
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+
+        const bufferLength = analyser.fftSize;
+        const buffer = new Float32Array(bufferLength);
+
+        console.log("🎤 Micrófono activado");
+        
+        micInterval = setInterval(() => {
+            if (!isMicActive) return;
+
+            analyser.getFloatTimeDomainData(buffer);
+            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (frequency !== -1) {
+                const noteName = getNoteFromFrequency(frequency);
+                
+                // Debounce para evitar rebotes rápidos
+                const now = Date.now();
+                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
+                    
+                    // AQUÍ ESTÁ LA MAGIA: Enviamos la nota al sistema central
+                    processInputNote(noteName); 
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    
+                    // Efecto visual de soltar la tecla
+                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                }
+            }
+        }, 50); // Muestreo cada 50ms
+
+    } catch (err) {
+        console.error("Error micrófono:", err);
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica permisos.");
+        toggleMicMode(); // Apagar si falló
+    }
+}
+
+// 4. Detener Escucha
+function stopMicrophoneListener() {
+    if (micInterval) clearInterval(micInterval);
+    if (microphoneStream) {
+        microphoneStream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+    audioContext = null;
+    analyser = null;
+    micInterval = null;
+}
+
+
+function toggleMicMode() {
+    isMicActive = !isMicActive;
+
+    if (isMicActive) {
+        // 1. Activar estado visual del botón
+        micBtn.classList.add('active');
+        
+        // 2. Si estaba reproduciendo, detener
+        stopPlayback();
+
+        // 3. Configurar variables de "Modo Aprendizaje Libre"
+        // Necesitamos isMidiLearnMode en true para que processInputNote funcione
+        isMidiLearnMode = true; 
+        currentInputSource = 'mic';
+        
+        // Desbloquear TOTALMENTE la pieza (Modo Libre)
+        const totalMeasures = osmd.sheet.SourceMeasures.length;
+        unlockedMeasureCount = totalMeasures; 
+        
+        // Quitar la niebla (Fog of War) completamente
+        setRangeOpacity(0, totalMeasures, 1);
+        
+        // 4. Configurar el Cursor para modo espera (Azul)
+        currentLearningIndex = 0;
+        osmd.cursor.show();
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 5,
+            alpha: 0.7,
+            color: "rgba(52, 152, 219, 0.7)"
+        });
+
+        // 5. MANEJO DE LA INTERFAZ (UI)
+        // Mostrar la barra secundaria
+        secondaryTopBar2.classList.add('is-visible');
+        
+        // --- AQUÍ ESTÁ EL CAMBIO SOLICITADO ---
+        // Ocultar específicamente el progreso y el botón de reiniciar chunk
+        if (practiceProgressDisplay) practiceProgressDisplay.style.display = 'none';
+        if (restartChunkBtn) restartChunkBtn.style.display = 'none';
+        
+        // Asegurarse que el selector de compás sí se vea y se actualice
+        populateMeasureSelector();
+        measureSelect.value = 0;
+
+        // 6. Preparar el sistema para escuchar la primera nota
+        // Resetear filtros de mano a 'ambas' por defecto en modo micrófono
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        
+        prepareFirstLearningStep();
+        
+        // 7. Iniciar el listener del micrófono
+        startMicrophoneListener();
+        updateMidiStatusLegend("Micrófono Activo");
+
+    } else {
+        // APAGAR MODO
+        micBtn.classList.remove('active');
+        stopMicrophoneListener();
+        
+        // Desactivar variables lógicas
+        isMidiLearnMode = false;
+        
+        if (currentInputSource === 'mic') {
+            currentInputSource = 'none';
+            updateMidiStatusLegend(null);
+        }
+
+        // Ocultar la barra secundaria
+        secondaryTopBar2.classList.remove('is-visible');
+
+        // RESTAURAR LA UI (Importante para cuando vuelvas a usar MIDI normal)
+        // Esperamos un poco a que termine la animación de cierre para restaurar el display
+        setTimeout(() => {
+            if (practiceProgressDisplay) practiceProgressDisplay.style.display = 'flex'; // O el display que tuviera originalmente
+            if (restartChunkBtn) restartChunkBtn.style.display = 'inline-flex';
+        }, 300);
+        
+        // Restaurar cursor normal y controles
+        osmd.cursor.reset();
+        osmd.cursor.hide();
+        playBtn.disabled = false;
+        progressBar.disabled = false;
+        
+        // Restaurar opacidad visual si es necesario (opcional)
+        setRangeOpacity(0, osmd.sheet.SourceMeasures.length, 1);
+    }
+}
+
+
 function showSuccessToast(message) {
     const toast = document.getElementById('success-toast');
     const msgSpan = document.getElementById('success-toast-message');
@@ -3658,6 +3900,33 @@ function showSuccessToast(message) {
         setTimeout(() => {
             toast.classList.remove('show');
         }, 2500);
+    }
+}
+
+function showWarningToast(message) {
+    const toast = document.getElementById('success-toast');
+    const msgSpan = document.getElementById('success-toast-message');
+    const icon = toast.querySelector('i');
+    
+    if (toast && msgSpan) {
+        // Guardar clase original del icono
+        const originalIconClass = icon.className;
+        
+        // Cambiar estilos a warning
+        toast.classList.add('warning');
+        icon.className = 'ri-alert-line'; // Cambia el icono a alerta
+        msgSpan.textContent = message;
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            // Esperar a que termine la animación para restaurar estilos
+            setTimeout(() => {
+                toast.classList.remove('warning');
+                icon.className = originalIconClass; // Restaurar icono original
+            }, 500);
+        }, 3000);
     }
 }
 
@@ -3771,77 +4040,14 @@ function initFogOfWar() {
 }
 
 function toggleMidiLearnMode() {
-    isMidiLearnMode = !isMidiLearnMode;
-    stopPlayback(); 
-
+    // Si ya está activo, lo desactivamos (comportamiento toggle normal)
     if (isMidiLearnMode) {
-        // --- SELECCIÓN DE FUENTE DE ENTRADA ---
-        let hasMidi = false;
-        if (midiAccess && midiAccess.inputs.size > 0) {
-            hasMidi = true;
-        }
-
-        if (hasMidi) {
-            updateMidiStatusLegend("Teclado MIDI");
-            currentInputSource = 'midi'; 
-        } else {
-            updateMidiStatusLegend("Micrófono Activo");
-            currentInputSource = 'mic';  
-            startMicrophoneListener();
-        }
-        // --------------------------------------
-
-        if (isPieceCompleted) {
-            unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
-        } else {
-            unlockedMeasureCount = MEASURES_PER_CHUNK; 
-        }
-        
-        populateMeasureSelector(); 
-
-        setTimeout(() => {
-             initFogOfWar();
-        }, 100);
-
-        midiLearnBtn.style.background = '#e0e0e0';
-        midiLearnBtn.classList.remove('pulse-animation');
-        
-        // Cambiamos el icono según si es midi o micro (opcional, visual)
-        if (!hasMidi) {
-            midiLearnBtn.innerHTML = '<i class="ri-mic-line"></i> <span class="btn-label">Escuchando</span>';
-        }
-
-        playBtn.disabled = true;
-        progressBar.disabled = true;
-        currentLearningIndex = 0;
-        osmd.cursor.show();
-
-        Object.assign(osmd.cursor.cursorOptions, {
-            type: 5,
-            alpha: 0.7,
-            color: "rgba(52, 152, 219, 0.7)"
-        });
-        
-        handFilterMode = 'both';
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-        secondaryTopBar2.classList.add('is-visible');
-
-        prepareFirstLearningStep(); 
-        measureSelect.value = 0;
-
-        if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 0) {
-            nextTutorialStep(); 
-        }
-        
-    } else {
+        isMidiLearnMode = false;
         currentInputSource = 'none';
-        stopMicrophoneListener(); 
         
         // Restaurar botón original
         midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
-        updateMidiStatusLegend(null); // Ocultar leyenda
-        // -------------------------
+        updateMidiStatusLegend(null); 
 
         const totalMeasures = osmd.sheet.SourceMeasures.length;
         setRangeOpacity(0, totalMeasures, 1);
@@ -3866,6 +4072,66 @@ function toggleMidiLearnMode() {
         leftHandOnlyBtn.style.background = 'none';
         
         populateMeasureSelector();
+        return; // Salimos de la función
+    }
+
+    // --- INTENTO DE ACTIVACIÓN ---
+    
+    // 1. Verificación estricta de MIDI
+    let hasMidi = false;
+    if (midiAccess && midiAccess.inputs.size > 0) {
+        hasMidi = true;
+    }
+
+    // 2. Si NO hay MIDI, mostramos alerta y cancelamos
+    if (!hasMidi) {
+        showWarningToast("⚠️ Conecta tu teclado MIDI para practicar");
+        return; 
+    }
+
+    // 3. Si hay MIDI, procedemos a activar el modo
+    isMidiLearnMode = true;
+    stopPlayback(); 
+
+    updateMidiStatusLegend("Teclado MIDI");
+    currentInputSource = 'midi'; 
+
+    if (isPieceCompleted) {
+        unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
+    } else {
+        unlockedMeasureCount = MEASURES_PER_CHUNK; 
+    }
+    
+    populateMeasureSelector(); 
+
+    setTimeout(() => {
+            initFogOfWar();
+    }, 100);
+
+    midiLearnBtn.style.background = '#e0e0e0';
+    midiLearnBtn.classList.remove('pulse-animation');
+    
+    playBtn.disabled = true;
+    progressBar.disabled = true;
+    currentLearningIndex = 0;
+    osmd.cursor.show();
+
+    Object.assign(osmd.cursor.cursorOptions, {
+        type: 5,
+        alpha: 0.7,
+        color: "rgba(52, 152, 219, 0.7)"
+    });
+    
+    handFilterMode = 'both';
+    rightHandOnlyBtn.style.background = 'none';
+    leftHandOnlyBtn.style.background = 'none';
+    secondaryTopBar2.classList.add('is-visible');
+
+    prepareFirstLearningStep(); 
+    measureSelect.value = 0;
+
+    if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 0) {
+        nextTutorialStep(); 
     }
 }
 
@@ -4296,125 +4562,6 @@ function processInputNote(noteName) {
 
 
 
-// Algoritmo de autocorrelación para detectar pitch
-function autoCorrelate(buf, sampleRate) {
-    let SIZE = buf.length;
-    let rms = 0;
-
-    for (let i = 0; i < SIZE; i++) {
-        const val = buf[i];
-        rms += val * val;
-    }
-    rms = Math.sqrt(rms / SIZE);
-
-    // Si el volumen es muy bajo, ignoramos (silencio)
-    if (rms < MIC_THRESHOLD) return -1;
-
-    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-    for (let i = 0; i < SIZE / 2; i++) {
-        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-    }
-    for (let i = 1; i < SIZE / 2; i++) {
-        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-    }
-
-    buf = buf.slice(r1, r2);
-    SIZE = buf.length;
-
-    let c = new Array(SIZE).fill(0);
-    for (let i = 0; i < SIZE; i++) {
-        for (let j = 0; j < SIZE - i; j++) {
-            c[i] = c[i] + buf[j] * buf[j + i];
-        }
-    }
-
-    let d = 0; while (c[d] > c[d + 1]) d++;
-    let maxval = -1, maxpos = -1;
-    for (let i = d; i < SIZE; i++) {
-        if (c[i] > maxval) {
-            maxval = c[i];
-            maxpos = i;
-        }
-    }
-    let T0 = maxpos;
-
-    return sampleRate / T0;
-}
-
-// Convertir Frecuencia a Nota (Ej: 440Hz -> A4)
-function getNoteFromFrequency(frequency) {
-    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
-    const midi = Math.round(pitchNum);
-    const noteName = noteNames[midi % 12];
-    const octave = Math.floor(midi / 12) - 1;
-    return noteName + octave;
-}
-
-// Iniciar Escucha del Micrófono
-async function startMicrophoneListener() {
-    if (audioContext) return; // Ya está activo
-
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        microphoneStream = stream;
-        
-        const source = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
-
-        const bufferLength = analyser.fftSize;
-        const buffer = new Float32Array(bufferLength);
-
-        console.log("🎤 Micrófono activado para detección de notas");
-        setStatus("Modo Micrófono Activo");
-
-        // Loop de detección (aprox 60 veces por segundo)
-        micInterval = setInterval(() => {
-            if (!isMidiLearnMode) return;
-
-            analyser.getFloatTimeDomainData(buffer);
-            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
-
-            if (frequency !== -1) {
-                const noteName = getNoteFromFrequency(frequency);
-                
-                // Debouncing simple: evitar disparar la misma nota mil veces en 100ms
-                const now = Date.now();
-                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
-                    // console.log(`🎤 Nota detectada: ${noteName} (${Math.round(frequency)}Hz)`);
-                    processInputNote(noteName); // <--- ENVIAMOS AL CEREBRO CENTRAL
-                    
-                    lastMicNote = noteName;
-                    lastMicTime = now;
-                    
-                    // Efecto visual de "soltar tecla" después de un momento
-                    setTimeout(() => unhighlightMidiKey(noteName), 200);
-                }
-            }
-        }, 50);
-
-    } catch (err) {
-        console.error("Error al acceder al micrófono:", err);
-        showModal("⚠️ No se pudo acceder al micrófono. Verifica los permisos.");
-    }
-}
-
-function stopMicrophoneListener() {
-    if (micInterval) clearInterval(micInterval);
-    if (microphoneStream) {
-        microphoneStream.getTracks().forEach(track => track.stop());
-    }
-    if (audioContext) {
-        audioContext.close();
-    }
-    audioContext = null;
-    analyser = null;
-    micInterval = null;
-    console.log("🎤 Micrófono desactivado");
-}
 
 
 function highlightError(noteName) {
@@ -4837,4 +4984,4 @@ function hideModal() {
 
   </script>
 </body>
-</html>        
+</html>         
