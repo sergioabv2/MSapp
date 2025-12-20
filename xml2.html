@@ -4443,7 +4443,7 @@ function initMidiInput() {
 
 
 
-ffunction onMIDISuccess(access) {
+function onMIDISuccess(access) {
     midiAccess = access;
     for (var input of midiAccess.inputs.values()) {
         input.onmidimessage = onMIDIMessage;
@@ -4475,9 +4475,6 @@ function checkMidiConnectionStatus() {
     } else {
         if (tutorialBtn) tutorialBtn.style.display = 'none';
         updateMidiStatusLegend(null);
-
-        // B. Lógica de AUTO-SALIDA
-        // Si no hay teclados y estamos en modo aprendizaje, salir inmediatamente.
         if (isMidiLearnMode) {
             console.log("MIDI desconectado: Saliendo de modo aprendizaje...");
             showWarningToast("⚠️ MIDI desconectado. Saliendo del modo aprendizaje.");
