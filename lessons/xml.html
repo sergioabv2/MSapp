@@ -257,10 +257,10 @@
 /* AÑADE estos nuevos estilos para el casing superior del piano */
 #piano-top-casing {
   position: absolute; 
-  bottom: calc(var(--piano-height) + var(--piano-bottom) - 25px); 
+  bottom: auto !important;
   left: 0; 
   width: 100%; 
-  height: 15px; /* Aumentado ligeramente */
+  height: 10px; /* Aumentado ligeramente */
   background: linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 100%);
   z-index: 4; 
   display: flex; 
@@ -357,11 +357,11 @@
 
 .hit-line-piano {
   position: absolute;
-  height: 4px !important;
+  height: 2px !important;
   bottom: 96px;
   left: 0;
   right: 0;
-  height: 2px;
+
   background: rgba(255, 0, 0, 0.7);
   box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
   z-index: 30;
@@ -569,7 +569,7 @@ display: flex;
   background-color: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
  padding: 0px 15px;
- top: 60px;
+ top: 40px;
    position: sticky ;
    z-index: 999;
      align-items: center; 
@@ -775,9 +775,9 @@ display: flex;
 
 #midi-status-legend {
   position: fixed;
-  height: 35px;
-  top: 8px; 
-  right: 65px;
+  /* Lo ponemos encima de los controles de velocidad móviles */
+  bottom: 110px; 
+  right: 10px;
   z-index: 550;
   background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
   color: #fafafa;
@@ -809,13 +809,6 @@ display: flex;
   color: #3498db; /* Ícono azul */
 }
 
-/* En desktop, no hay controles de velocidad, 
-   así que podemos bajar la leyenda */
-@media (min-width: 501px) {
-  #midi-status-legend {
-    bottom: 120px; /* Justo sobre el piano */
-  }
-}
 
 
 #right-hand-only-btn.active,
