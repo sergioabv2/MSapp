@@ -450,6 +450,40 @@
   .emphasis-block p:last-child {
     margin-bottom: 0;
   }
+
+
+  /* --- Estilos para el Embed de Partitura --- */
+
+.embed-container {
+  width: 100%;
+  /* Altura fija calculada: 
+     50px (topbar) + 40px (toolbar) + 150px (partitura) + 112px (piano) + espacio extra 
+  */
+  height: 330px; 
+  margin: 3rem 0; /* Espaciado vertical igual que tenías en la imagen */
+  
+  /* Estética del contenedor */
+  background-color: #fafafa;
+  border: 1px solid var(--nav-border); /* Usa tu variable de borde existente */
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Para que las esquinas del iframe no se salgan */
+}
+
+.music-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block; /* Elimina espacios fantasma inline */
+}
+
+/* Ajuste Responsive para móviles */
+@media (max-width: 600px) {
+  .embed-container {
+    margin: 2rem 0;
+    border-radius: 8px; /* Radio un poco menor en pantallas chicas */
+  }
+}
 </style>
 </head>
 <body>
@@ -461,6 +495,17 @@
   <p>Una frase musical es una unidad melódica y rítmica completa en sí misma, comparable a una oración en el lenguaje hablado. Se construye típicamente sobre un patrón de pregunta y respuesta, conocido como antecedente y consecuente, y suele abarcar una duración de dos, cuatro u ocho compases. La dirección melódica, los puntos de reposo (cadencias) y el diseño rítmico son clave para definir su carácter y límites.</p>
 
  <p>Una frase musical es una unidad melódica completa, comparable a una oración en el lenguaje hablado. Para dominarla, primero asegúrate de entender el <strong>ritmo armónico</strong>.</p>
+
+
+ <div class="embed-container" style="height: 200px">
+  <iframe 
+    src="https://www.mozart-app.com/lessons/xmls" 
+    class="music-frame" 
+    title="Partitura Interactiva"
+    loading="lazy"
+    allow="midi *; microphone *">
+  </iframe>
+</div>
   
   <p>Tus estudiantes deberían iniciar sesión en <span class="code-badge">aula.tuescuela.com</span>, punto. Si los envías a una URL genérica, pierdes la identidad de tu marca. Esto es lo que llamamos la <strong>prueba de fuego</strong> de la profesionalidad.</p>
 
@@ -517,7 +562,17 @@
     </li>
   </ul>
 
+  <p>Concluya realizando el siguiente ejercicio:</p>
 
+ <div class="embed-container">
+  <iframe 
+    src="https://www.mozart-app.com/lessons/xml?file=Ode%20to%20Joy.musicxml" 
+    class="music-frame" 
+    title="Partitura Interactiva"
+    loading="lazy"
+    allow="midi *; microphone *">
+  </iframe>
+</div>
 
   <div class="fab-container" id="fabContainer">
   
