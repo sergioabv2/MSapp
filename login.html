@@ -344,6 +344,23 @@
         .download-divider::before { margin-right: 10px; }
         .download-divider::after { margin-left: 10px; }
 
+        /* --- ESTILO TOGGLE PASSWORD (OJO) --- */
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 15px; /* A la derecha del input */
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 18px;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: var(--text-primary);
+}
+
         @media (max-width: 991px) {
             .intro-section { display: none; }
             .form-section { padding: 20px; background: #fff; }
@@ -432,7 +449,7 @@
                     <button class="back-btn login-btn" onclick="showLoginOptions()">Atrás</button>
                 </section>
 
-                <section id="maillogin" class="form-section-content">
+               <section id="maillogin" class="form-section-content">
                     <h4 class="form-title">Acceder con email</h4>
                     <div id="Mail-error" class="alert alert-danger" style="display: none;">Cuenta no registrada o contraseña incorrecta.</div>
                     <div id="Mail-success" class="alert alert-success" style="display: none;">¡Registro exitoso! Revisa tu correo.</div>
@@ -440,14 +457,41 @@
                     <div class="form-group">
                         <i class="ri-mail-line form-icon"></i>
                         <input type="email" id="email-login" class="form-control" placeholder="Ingresa tu email">
-                      </div>
+                    </div>
+
                     <div class="form-group">
                         <i class="ri-lock-password-line form-icon"></i>
-                        <input type="password" id="password-login" class="form-control" placeholder="Ingresa tu password">
+                        <input type="password" id="password-login" class="form-control" placeholder="Ingresa tu password" style="padding-right: 45px;">
+                        <i class="ri-eye-line password-toggle" onclick="togglePassword(this)"></i>
                     </div>
                     
                     <button class="login-btn btn-primary" onclick="Maillogin(this)">Iniciar sesión</button>
+                    
+                    <div class="signup-link" style="margin-top: 15px; margin-bottom: 10px;">
+                        <a href="#" onclick="showRecoverForm()">¿Olvidaste tu contraseña?</a>
+                    </div>
+
                     <button class="back-btn login-btn" onclick="showLoginOptions()">Atrás</button>
+                </section>
+
+                <section id="recoverform" class="form-section-content">
+                    <h4 class="form-title">Recuperar contraseña</h4>
+                    
+                    <div id="Recover-error" class="alert alert-danger" style="display: none;">El correo no está registrado.</div>
+                    <div id="Recover-success" class="alert alert-success" style="display: none;">Correo de recuperación enviado.</div>
+
+                    <p class="text-center text-muted mb-4" style="font-size: 14px;">
+                        Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.
+                    </p>
+
+                    <div class="form-group">
+                        <i class="ri-mail-line form-icon"></i>
+                        <input type="email" id="recover-email" class="form-control" placeholder="Ingresa tu email">
+                    </div>
+                    
+                    <button class="login-btn btn-primary" onclick="recoverPassword(this)">Recuperar password</button>
+                    
+                    <button class="back-btn login-btn" onclick="showMailLogin()">Atrás</button>
                 </section>
 
                 <section id="signupform" class="form-section-content">
@@ -767,6 +811,77 @@
         $('#iosInstallModal').modal('show');
       }
     };
+
+
+    // Función para mostrar/ocultar contraseña
+function togglePassword(icon) {
+    const input = document.getElementById('password-login');
+    
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove('ri-eye-line');
+        icon.classList.add('ri-eye-off-line'); // Cambia al icono de "ojo tachado"
+    } else {
+        input.type = "password";
+        icon.classList.remove('ri-eye-off-line');
+        icon.classList.add('ri-eye-line');
+    }
+}
+
+function showRecoverForm() {
+    showSection('recoverform');
+}
+
+function recoverPassword(button) {
+    var email = $('#recover-email').val();
+    var $button = $(button);
+    var originalText = $button.text();
+
+    if (email != "") {
+        // Usamos el miniLoader que definimos anteriormente
+        $button.html(miniLoader + " Enviando...");
+        $button.prop('disabled', true);
+
+        var api = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
+        
+        var requestData = {
+            redirect: "follow",
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            // Asumiendo que tu backend espera action: 'recoverPassword'
+            body: JSON.stringify({ action: "recoverPassword", email: email })
+        };
+
+        fetch(api, requestData)
+            .then(response => response.text())
+            .then(res => {
+                var validation = JSON.parse(res);
+                
+                if (validation.status == "success") {
+                    $('#Recover-success').show().delay(5000).fadeOut();
+                    $('#recover-email').val(""); // Limpiar input
+                } else {
+                    $('#Recover-error').text(validation.message || "Error al enviar correo.").show().delay(5000).fadeOut();
+                }
+                
+                // Restaurar botón
+                $button.html(originalText);
+                $button.prop('disabled', false);
+            })
+            .catch(error => {
+                console.error(error);
+                $('#Recover-error').text("Error de conexión.").show().delay(5000).fadeOut();
+                $button.html(originalText);
+                $button.prop('disabled', false);
+            });
+
+    } else {
+        // Pequeña animación visual si el campo está vacío (opcional)
+        $('#recover-email').focus().css('border-color', 'red');
+        setTimeout(() => { $('#recover-email').css('border-color', ''); }, 2000);
+    }
+}
+
 
 </script>
 
