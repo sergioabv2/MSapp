@@ -1783,7 +1783,8 @@ const successModalCloseBtn = document.getElementById('success-modal-close-btn');
 const practiceProgressDisplay = document.getElementById('practice-progress');
 const progressValueSpan = document.getElementById('progress-value');
 let isPieceCompleted = false;
-
+let isSustainPedalDown = false;
+let sustainedNotes = new Set();
 
 const metronomeBtn = document.getElementById('metronome-btn');
 const metronomeAudio = document.getElementById('metronomeAudio');
@@ -4482,32 +4483,58 @@ function onMIDIFailure() {
     playBtn.disabled = false;
 }
 
-
 function onMIDIMessage(event) {
     const command = event.data[0] & 0xf0; 
     const note = event.data[1];
     const velocity = event.data.length > 2 ? event.data[2] : 0;
     const pitchName = midiNoteToPitchName(note);
-
+    if (command === 176 && note === 64) {
+        if (velocity >= 64) {
+            isSustainPedalDown = true;
+        } else {
+            isSustainPedalDown = false;
+            releaseSustainedNotes(); 
+        }
+        return; 
+    }
     if (command === 144 && velocity > 0) {
         if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
             sampler.triggerAttack(pitchName, undefined, velocity / 127); 
         }
+        if (sustainedNotes.has(pitchName)) {
+            sustainedNotes.delete(pitchName);
+        }
+
         requestAnimationFrame(() => {
             processInputNote(pitchName);
         });
-
     } else if (command === 128 || (command === 144 && velocity === 0)) {
-        if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
-            sampler.triggerRelease(pitchName);
+        if (isSustainPedalDown) {
+            if (isMidiLearnMode && currentInputSource === 'midi') {
+                sustainedNotes.add(pitchName);
+            }
+        } else {
+            if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
+                sampler.triggerRelease(pitchName);
+            }
         }
-        
         requestAnimationFrame(() => {
             unhighlightMidiKey(pitchName);
         });
     }
 }
 
+
+
+function releaseSustainedNotes() {
+    if (!sampler || !sampler.loaded) return;
+    const notesToRelease = Array.from(sustainedNotes);
+    
+    if (notesToRelease.length > 0) {
+        sampler.triggerRelease(notesToRelease);
+        sustainedNotes.clear();
+    }
+}
 
 
 function processInputNote(noteName) {
