@@ -783,10 +783,9 @@
                 <div class="book-types">
                     <a class="book-type active" data-filter="all">Todos</a>
                     <a class="book-type" data-filter="favorites">Favoritos</a>
-                    <a class="book-type" data-filter="clásica">Clásica</a>
-                    <a class="book-type" data-filter="jazz">Jazz</a>
-                    <a class="book-type" data-filter="soundtrack">Soundtrack</a>
-                    <a class="book-type" data-filter="pop">Pop</a>
+                    <a class="book-type" data-filter="recent">Recientes</a>
+                    <a class="book-type" data-filter="completed">Finalizadas</a>
+                    <a class="book-type" data-filter="course">Curso</a>
                 </div>
             </div>
 
@@ -944,16 +943,6 @@
     "difficulty": "Grado 3",
     "style": "postromantic",
     "tags": []
-  },
-  {
-    "title": "Für Elise (Easy)",
-    "author": "Beethoven",
-    "background": "https://lh3.googleusercontent.com/d/19tjbvrTLaFI3__MUB6z2fpfkBiWhITV4=s400",
-    "pdf": "Fur_Elise_Easy_Piano.musicxml",
-    "dateAdded": "2025-10-23",
-    "difficulty": "Grado 2",
-    "style": "classic",
-    "tags": ["top"]
   },
   {
     "title": "Für Elise",
@@ -2738,12 +2727,10 @@
 
 ];
 
-   let userInteractions = [
-        // Fíjate que usamos 'title' en lugar de 'scoreId'
-        { title: "Nocturne Op. 9 No. 2", isLiked: true, progress: 45, lastOpened: Date.now() - 100000 },
-        { title: "River Flows in You", isLiked: false, progress: 80, lastOpened: Date.now() - 200000 },
-        { title: "Interstellar Theme", isLiked: true, progress: 0, lastOpened: 0 }
-    ];
+   let userInteractions = [];
+   let activityData = [];
+   let currentOpenTitle = null;
+
 
    function getInteraction(title) {
         return userInteractions.find(i => i.title === title) || { title: title, isLiked: false, progress: 0, lastOpened: 0 };
@@ -2752,29 +2739,7 @@
    const now = Date.now();
     const MINUTE = 60 * 1000;
     const HOUR = 60 * MINUTE;
-   const activityData = [
-        { 
-            user: "Sarah J.", 
-            avatar: "https://randomuser.me/api/portraits/women/44.jpg", 
-            timestamp: now - (5 * MINUTE), // Hace 5 minutos
-            doc: "Interstellar Theme", 
-            progress: 30 
-        },
-        { 
-            user: "Mike T.", 
-            avatar: "https://randomuser.me/api/portraits/men/32.jpg", 
-            timestamp: now - (45 * MINUTE), // Hace 45 minutos
-            doc: "Nocturne Op. 9", 
-            progress: 85 
-        },
-        { 
-            user: "Tú", 
-            avatar: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png", 
-            timestamp: now - (2 * HOUR), // Hace 2 horas
-            doc: "River Flows in You", 
-            progress: 12 
-        }
-    ];
+  
 
     // Helper para calcular "Hace X tiempo"
     function getTimeAgo(timestamp) {
@@ -2863,15 +2828,11 @@ function renderSidebars() {
 
 function renderPopularCarousel() {
     const carouselContainer = document.getElementById('favoritesCarousel');
-    
     if (flickityInstance) flickityInstance.destroy();
-
-    // Filtramos las populares o las primeras 6
-    let popularScores = scores.filter(s => s.tags.includes('top')).slice(0, 6);
-    if (popularScores.length === 0) popularScores = scores.slice(0, 6);
+    let randomScores = [...scores].sort(() => 0.5 - Math.random()).slice(0, 6);
 
     let html = '';
-    popularScores.forEach((score) => {
+    randomScores.forEach((score) => {
         // Inyectamos la imagen de fondo directamente en el style del div
         html += `
         <div class="book-cell" style="background-image: url('${score.background}')">
@@ -2884,7 +2845,7 @@ function renderPopularCarousel() {
                 <div class="rate">
                     <span class="book-voters">${score.difficulty || 'Grado 1'}</span>
                 </div>
-              
+               
                 <button class="openSheet" 
                         onclick="registerAndOpen('${score.title}')">
                     <i class="fas fa-play"></i> Abrir Partitura
@@ -2942,27 +2903,22 @@ function registerAndOpen(title) {
     const score = scores.find(s => s.title === title);
     if (!score) return;
 
-    // 1. Buscar/Crear interacción
+    currentOpenTitle = title;
     let interaction = userInteractions.find(i => i.title === title);
+    const nowTime = Date.now();
     
     if (!interaction) {
-        interaction = { title: title, isLiked: false, progress: 1, lastOpened: Date.now() };
+        interaction = { title: title, isLiked: false, progress: 0, lastOpened: nowTime };
         userInteractions.push(interaction);
     } else {
-        interaction.lastOpened = Date.now();
-        if (interaction.progress === 0) interaction.progress = 1;
-        else if (interaction.progress < 100) interaction.progress += 5;
+        interaction.lastOpened = nowTime;
     }
 
-    // 2. Historial Reciente (Actualizamos el array global)
     recentScores = recentScores.filter(s => s.title !== title);
     recentScores.unshift(score);
-    if (recentScores.length > 5) recentScores.pop(); // Guardamos solo las ultimas 5
-    
-    // --- CAMBIO CLAVE: Renderizamos el Sidebar, NO el Carrusel ---
+    if (recentScores.length > 5) recentScores.pop(); 
+
     renderRecentSidebar(); 
-    
-    // Refrescamos el grid para ver el cambio de progreso si estamos en la vista
     applyFilterAndRender(false);
     
     const fullUrl = "https://www.mozart-app.com/xml2?file=" + score.pdf;
@@ -3075,35 +3031,132 @@ window.toggleLike = function(title) {
     renderSidebars(); 
 }
 
-function applyFilterAndRender(resetPage = true) { 
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        
-        let filtered = scores.filter(score => {
-            // Pasamos score.title al helper
-            const interaction = getInteraction(score.title);
 
-            const matchesSearch = score.title.toLowerCase().includes(term) || score.author.toLowerCase().includes(term);
-            
-            let matchesType = false;
-            if (currentFilter === 'all') {
-                matchesType = true;
-            } else if (currentFilter === 'favorites') {
-                matchesType = interaction.isLiked === true;
-            } else {
-                matchesType = score.style === currentFilter;
+window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (data && data.type === 'progressUpdate' && currentOpenTitle) {
+        const newProgress = parseInt(data.percent);
+        let interaction = userInteractions.find(i => i.title === currentOpenTitle);
+        if (interaction) {
+            if (newProgress > interaction.progress) {
+                interaction.progress = newProgress;
             }
-
-            return matchesSearch && matchesType;
-        });
-        
-        if (resetPage === true || typeof resetPage === 'object' || typeof resetPage === 'undefined') {
-            currentPage = 1; 
         }
-        
-        renderBookGrid(filtered);
     }
+});
 
-    // Listeners de búsqueda
+
+window.closePdfViewer = function() {
+    const overlay = document.getElementById('pdfOverlay');
+    const iframe = document.getElementById('scoreFrame');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    if (currentOpenTitle) {
+        const interaction = userInteractions.find(i => i.title === currentOpenTitle);
+        const finalProgress = interaction ? interaction.progress : 0;
+        const nowISO = new Date().toISOString(); 
+        syncInteraction(currentOpenTitle, { 
+            lastOpened: nowISO,
+            progress: finalProgress
+        });
+    }
+    currentOpenTitle = null;
+    setTimeout(() => { iframe.src = ''; }, 300);
+}
+
+
+window.toggleLike = function(title) {
+    const score = scores.find(s => s.title === title);
+    if (!score) return;
+
+    let interaction = userInteractions.find(i => i.title === title);
+    let newLikeStatus = true;
+
+    if (interaction) {
+        interaction.isLiked = !interaction.isLiked;
+        newLikeStatus = interaction.isLiked;
+    } else {
+        interaction = { title: title, isLiked: true, progress: 0, lastOpened: Date.now() };
+        userInteractions.push(interaction);
+    }
+    
+    applyFilterAndRender(false);
+    renderSidebars(); 
+    syncInteraction(title, { liked: newLikeStatus });
+}
+
+
+
+async function syncInteraction(title, updates) {
+    const requestData = {
+        action: "updateUserInteraction",
+        token: localStorage.getItem('MStoken'),
+        title: title,
+        data: updates
+    };
+
+    try {
+        await fetch("https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec", {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(requestData)
+        });
+    } catch (error) {
+        console.error("Error sincronizando interacción:", error);
+    }
+}
+
+
+function applyFilterAndRender(resetPage = true) { 
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = scores.filter(score => {
+        // Obtenemos los datos de interacción (likes, progreso, etc.)
+        const interaction = getInteraction(score.title);
+
+        // 1. Filtro de Búsqueda (Texto)
+        const matchesSearch = score.title.toLowerCase().includes(term) || 
+                              score.author.toLowerCase().includes(term);
+        
+        // 2. Filtro por Tipo (Botones)
+        let matchesType = false;
+
+        if (currentFilter === 'all') {
+            matchesType = true;
+
+        } else if (currentFilter === 'favorites') {
+            matchesType = interaction.isLiked === true;
+
+        } else if (currentFilter === 'recent') {
+            // Verifica si esta partitura existe dentro del array global 'recentScores'
+            // que usamos para llenar la barra lateral.
+            matchesType = recentScores.some(r => r.title === score.title);
+
+        } else if (currentFilter === 'completed') {
+            // Verifica si el progreso es exactamente 100
+            matchesType = interaction.progress === 100;
+
+        } else if (currentFilter === 'course') {
+            // Verifica si el array de tags existe y contiene 'course'
+            matchesType = score.tags && score.tags.includes('course');
+
+        } else {
+            // Fallback para filtros de estilo (ej. 'clásica', 'jazz' si los tuvieras)
+            matchesType = score.style === currentFilter;
+        }
+
+        return matchesSearch && matchesType;
+    });
+    
+    // Reseteo de paginación si es necesario
+    if (resetPage === true || typeof resetPage === 'object' || typeof resetPage === 'undefined') {
+        currentPage = 1; 
+    }
+    
+    renderBookGrid(filtered);
+}
+
+
     document.getElementById('searchInput').addEventListener('keyup', applyFilterAndRender);
 
     // Listeners de botones de género
@@ -3136,11 +3189,87 @@ function applyFilterAndRender(resetPage = true) {
         setTimeout(() => { iframe.src = ''; }, 300);
     }
 
+
+
+
+async function loadUserData() {
+    const requestData = {
+        action: "getUserData",
+        token: localStorage.getItem('MStoken')
+    };
+
+    const config = {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(requestData)
+    };
+
+    try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec", config);
+        var data = await response.json(); 
+        var repertoire = JSON.parse(data.repertoire)
+        userInteractions = repertoire.map(item => ({
+            title: item.title,      
+            isLiked: item.liked,    
+            progress: item.progress,
+            lastOpened: item.lastOpened ? new Date(item.lastOpened).getTime() : 0 
+        }));
+        recentScores = userInteractions
+            .filter(item => item.lastOpened > 0)
+            .sort((a, b) => b.lastOpened - a.lastOpened) 
+            .slice(0, 6) // Tomamos las top 6
+            .map(interaction => {
+                return scores.find(s => s.title === interaction.title);
+            })
+            .filter(s => s !== undefined); 
+        renderSidebars();     
+        renderRecentSidebar(); 
+        applyFilterAndRender(false); 
+
+    } catch (error) {
+        console.error("Error al cargar datos del usuario:", error);
+    }
+}
+
+
+
+
+async function loadActivityData() {
+    const requestData = {
+        action: "getActivityLog", 
+        token: localStorage.getItem('MStoken')
+    };
+
+    const config = {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(requestData)
+    };
+
+    try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec", config);
+        const serverData = await response.json(); 
+        activityData = serverData.map(item => ({
+            user: item.user,
+            avatar: item.avatar,
+            doc: item.doc,      
+            progress: item.progress,
+            timestamp: item.date ? new Date(item.date).getTime() : Date.now() 
+        }));
+        renderSidebars();
+
+    } catch (error) {
+        console.error("Error al cargar actividad:", error);
+    }
+}
+
     $(document).ready(function() {
     renderSidebars();       // Llena actividad y favoritos
     renderRecentSidebar();  // Llena el nuevo bloque de recientes (estará vacío al inicio)
     renderPopularCarousel(); // CAMBIO: Llena el carousel con las Populares
-    renderBookGrid(scores); // Llena el grid principal
+    renderBookGrid(scores); 
+    loadUserData();
+    loadActivityData()
 });
 
 </script>
