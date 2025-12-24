@@ -2996,8 +2996,6 @@ function nextTutorialStep() {
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
         progressValueSpan.textContent = '0%';
-        progressBar.value = 0;
-        progressBar.style.setProperty('--progress', '0%');
         const globalFill = document.getElementById('global-progress-fill');
         const globalText = document.getElementById('global-progress-text');
         if (globalFill) globalFill.style.width = '0%';
@@ -3007,15 +3005,35 @@ function updatePracticeProgress() {
     
     const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
     const finalPercent = Math.min(percentage, 100);
-    
     progressValueSpan.textContent = `${finalPercent}%`;
-    progressBar.value = finalPercent;
-    progressBar.style.setProperty('--progress', `${finalPercent}%`);
     const globalFill = document.getElementById('global-progress-fill');
     const globalText = document.getElementById('global-progress-text');
     if (globalFill) globalFill.style.width = `${finalPercent}%`;
     if (globalText) globalText.textContent = `${finalPercent}%`;
+    window.parent.postMessage({
+        type: 'progressUpdate',
+        percent: finalPercent,
+        title: osmd.sheet.title ? osmd.sheet.title.text : 'Partitura'
+    }, '*');
+}
 
+
+function updateGlobalProgressByChunks() {
+    if (!osmd || !osmd.sheet) return;
+    
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    
+    // Calcular progreso basado en compases desbloqueados (no en notas tocadas)
+    const chunkProgress = Math.floor((unlockedMeasureCount / totalMeasures) * 100);
+    const finalPercent = Math.min(chunkProgress, 100);
+    
+    // Actualizar solo barra global
+    const globalFill = document.getElementById('global-progress-fill');
+    const globalText = document.getElementById('global-progress-text');
+    if (globalFill) globalFill.style.width = `${finalPercent}%`;
+    if (globalText) globalText.textContent = `${finalPercent}%`;
+    
+    // Enviar al padre
     window.parent.postMessage({
         type: 'progressUpdate',
         percent: finalPercent,
@@ -3058,13 +3076,7 @@ function restoreFogStateFromPercent(percent) {
         measureSelect.value = lastChunkIndex;
         jumpToMeasureInLearnMode(lastChunkIndex);
     }
-    progressValueSpan.textContent = `${percent}%`;
-    progressBar.value = percent;
-    progressBar.style.setProperty('--progress', `${percent}%`);
-    const globalFill = document.getElementById('global-progress-fill');
-    const globalText = document.getElementById('global-progress-text');
-    if (globalFill) globalFill.style.width = `${percent}%`;
-    if (globalText) globalText.textContent = `${percent}%`;
+    updateGlobalProgressByChunks();
 }
 
 
@@ -3739,8 +3751,6 @@ function advanceLearningStep() {
     activeHighlightTimeouts.length = 0;
     expectedNotes.clear();
 
-    
-
     const totalMeasures = osmd.sheet.SourceMeasures.length;
     if (currentLearningIndex >= parsedNotes.length) {
         if (!isPieceCompleted) {
@@ -3792,7 +3802,7 @@ function advanceLearningStep() {
                 setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
                 populateMeasureSelector(); 
                 errorsInCurrentChunk = 0;
-                updatePracticeProgress();
+                updateGlobalProgressByChunks();
                 showSuccessToast(`¡Sección Superada!`);
             }
         }
@@ -3851,9 +3861,7 @@ function advanceLearningStep() {
 
 
 
-// --- FUNCIONES DE AUDIO / MICRÓFONO ---
 
-// 1. Algoritmo de Autocorrelación (Detectar Pitch)
 function autoCorrelate(buf, sampleRate) {
     let SIZE = buf.length;
     let rms = 0;
