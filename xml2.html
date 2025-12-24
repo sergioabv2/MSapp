@@ -3733,7 +3733,6 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-    // 1. Limpieza visual estándar
     const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
     activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
     activeHighlightTimeouts.forEach(clearTimeout);
@@ -3793,14 +3792,13 @@ function advanceLearningStep() {
                 setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
                 populateMeasureSelector(); 
                 errorsInCurrentChunk = 0;
+                updatePracticeProgress();
                 showSuccessToast(`¡Sección Superada!`);
             }
         }
       }
     }
-    // ----------------------------------------
 
-    // 3. Lógica estándar para avanzar el cursor (solo se ejecuta si no hubo return arriba)
     let notesInStep = [];
     let foundValidStep = false;
     const TIME_TOLERANCE = 0.001;
