@@ -2899,6 +2899,7 @@ function renderRecentSidebar() {
     }).join('');
 }
 
+
 function registerAndOpen(title) {
     const score = scores.find(s => s.title === title);
     if (!score) return;
@@ -2923,6 +2924,15 @@ function registerAndOpen(title) {
     
     const fullUrl = "https://www.mozart-app.com/xml2?file=" + score.pdf;
     openPdfViewer(fullUrl);
+    setTimeout(() => {
+        const iframe = document.getElementById('scoreFrame');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'restoreProgress',
+                percent: interaction.progress
+            }, '*');
+        }
+    }, 1500); 
 }
 
 function renderBookGrid(data) {
