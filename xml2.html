@@ -939,11 +939,7 @@ display: flex;
   width: 100%;
 }
 
-.progress-header i {
-  color: #2ecc71; /* Verde para diferenciar del azul del MIDI */
-  font-size: 14px;
-  margin-right: 4px;
-}
+
 
 #global-progress-text {
   font-weight: 700;
@@ -1767,7 +1763,6 @@ display: flex;
 
 <div id="global-progress-container">
   <div class="progress-header">
-    <i class="ri-bar-chart-horizontal-line"></i>
     <span class="progress-label">Progreso</span>
     <span id="global-progress-text">0%</span>
   </div>
@@ -4231,6 +4226,9 @@ function toggleMidiLearnMode() {
         midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
         updateMidiStatusLegend(null); 
 
+        const globalContainer = document.getElementById('global-progress-container');
+        if (globalContainer) globalContainer.classList.remove('is-visible');
+
         const totalMeasures = osmd.sheet.SourceMeasures.length;
         setRangeOpacity(0, totalMeasures, 1);
         
@@ -4271,8 +4269,9 @@ function toggleMidiLearnMode() {
         return; 
     }
 
-    // 3. Si hay MIDI, procedemos a activar el modo
     isMidiLearnMode = true;
+    const globalContainer = document.getElementById('global-progress-container');
+        if (globalContainer) globalContainer.classList.add('is-visible');
     stopPlayback(); 
 
     updateMidiStatusLegend("Teclado MIDI");
