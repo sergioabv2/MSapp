@@ -893,82 +893,6 @@ display: flex;
   background-color: #2980b9;
 }
 
-
-#global-progress-container {
-  position: fixed;
-  /* Misma altura base que el midi-status-legend */
-  bottom: 165px; 
-  right: 10px; /* <--- A LA DERECHA */
-  z-index: 550;
-  
-  /* Estilos copiados de tu referencia Dark Glass */
-  background-color: rgba(26, 26, 26, 0.85);
-  color: #fafafa;
-  padding: 10px 12px; /* Un poco más alto para que quepa la barra */
-  border-radius: 10px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px);
-  
-  /* Layout interno */
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 140px; /* Ancho mínimo para que la barra se vea bien */
-  
-  /* Transiciones de visibilidad */
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-/* Estado visible */
-#global-progress-container.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Cabecera interna (Icono, Texto, Porcentaje) */
-.progress-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 500;
-  width: 100%;
-}
-
-.progress-header i {
-  color: #2ecc71; /* Verde para diferenciar del azul del MIDI */
-  font-size: 14px;
-  margin-right: 4px;
-}
-
-#global-progress-text {
-  font-weight: 700;
-  color: #2ecc71;
-}
-
-/* La barra de fondo (track) */
-.global-progress-track {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.15); /* Gris oscuro translúcido */
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-/* El relleno de la barra (fill) */
-.global-progress-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #2ecc71, #27ae60); /* Gradiente verde */
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-
-
 #midi-status-legend {
   position: fixed;
   /* Lo ponemos encima de los controles de velocidad móviles */
@@ -1010,9 +934,6 @@ display: flex;
 @media (min-width: 501px) {
   #midi-status-legend {
     bottom: 120px; /* Justo sobre el piano */
-  }
-  #global-progress-container {
-    bottom: 120px;
   }
 }
 
@@ -1766,17 +1687,6 @@ display: flex;
 
  
 <div id="midi-status-legend"></div>
-
-<div id="global-progress-container">
-  <div class="progress-header">
-    <i class="ri-bar-chart-horizontal-line"></i>
-    <span class="progress-label">Progreso</span>
-    <span id="global-progress-text">0%</span>
-  </div>
-  <div class="global-progress-track">
-    <div id="global-progress-fill"></div>
-  </div>
-</div>
 
  <div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
@@ -2998,11 +2908,67 @@ function nextTutorialStep() {
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
         progressValueSpan.textContent = '0%';
+        // Reset visual
+        progressBar.value = 0;
+        progressBar.style.setProperty('--progress', '0%');
         return;
     }
     const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
-    progressValueSpan.textContent = `${Math.min(percentage, 100)}%`;
+    const finalPercent = Math.min(percentage, 100);
+    progressValueSpan.textContent = `${finalPercent}%`;
+    progressBar.value = finalPercent;
+    progressBar.style.setProperty('--progress', `${finalPercent}%`);
+
+    // 3. Enviar al Padre (para guardar en BD)
+    window.parent.postMessage({
+        type: 'progressUpdate',
+        percent: finalPercent,
+        title: osmd.sheet.title ? osmd.sheet.title.text : 'Partitura'
+    }, '*');
 }
+
+window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (data && data.type === 'restoreProgress') {
+        const savedPercent = parseInt(data.percent);
+        if (!isNaN(savedPercent) && savedPercent > 0) {
+            restoreFogStateFromPercent(savedPercent);
+        }
+    }
+});
+
+
+
+function restoreFogStateFromPercent(percent) {
+    if (!osmd || !osmd.sheet) {
+        setTimeout(() => restoreFogStateFromPercent(percent), 500);
+        return;
+    }
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    let measuresToUnlock = Math.floor((percent / 100) * totalMeasures);
+    measuresToUnlock = Math.ceil(measuresToUnlock / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    measuresToUnlock = Math.max(MEASURES_PER_CHUNK, Math.min(measuresToUnlock, totalMeasures));
+
+    unlockedMeasureCount = measuresToUnlock;
+    
+    if (percent >= 100) isPieceCompleted = true;
+    if (isMidiLearnMode) {
+        setRangeOpacity(0, unlockedMeasureCount, 1);
+        setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15);
+        populateMeasureSelector();
+        const lastChunkIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+        measureSelect.value = lastChunkIndex;
+        jumpToMeasureInLearnMode(lastChunkIndex);
+    }
+    progressValueSpan.textContent = `${percent}%`;
+    progressBar.value = percent;
+    progressBar.style.setProperty('--progress', `${percent}%`);
+}
+
+
+
+
 
 function updateMeasureSelectDisplay() {
     // Si estamos al principio o fuera de los límites, resetea al compás 1.
@@ -3190,6 +3156,7 @@ restartChunkBtn.addEventListener('click', () => {
         restartChunkBtn.classList.add('active'); // Asegúrate de tener CSS para esta clase
         restartChunkBtn.style.backgroundColor = '#ffcccc'; // Ejemplo visual (rojo suave)
         restartChunkBtn.style.color = '#d32f2f';
+        restartChunkBtn.innerHTML = '<i class="ri-loop-left-line"></i> Auto-Reinicio: ON';
         
         showSuccessToast("Modo Auto-Reinicio Activado");
     } else {
@@ -3197,6 +3164,7 @@ restartChunkBtn.addEventListener('click', () => {
         restartChunkBtn.classList.remove('active');
         restartChunkBtn.style.backgroundColor = ''; // Volver al original
         restartChunkBtn.style.color = '';
+        restartChunkBtn.innerHTML = '<i class="ri-loop-left-line"></i> Reiniciar Sección'; // Texto original o "Auto-Reinicio: OFF"
         
         showSuccessToast("Modo Auto-Reinicio Desactivado");
     }
@@ -3726,7 +3694,6 @@ function advanceLearningStep() {
                 populateMeasureSelector(); 
                 errorsInCurrentChunk = 0;
                 showSuccessToast(`¡Sección Superada!`);
-                notifyParentProgress();
             }
         }
       }
@@ -4205,16 +4172,18 @@ function toggleMidiLearnMode() {
     updateMidiStatusLegend("Teclado MIDI");
     currentInputSource = 'midi'; 
 
-    if (isPieceCompleted) {
-        unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
-    } else {
-        unlockedMeasureCount = MEASURES_PER_CHUNK; 
-    }
+   if (isPieceCompleted) {
+    unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
+} else {
+    unlockedMeasureCount = Math.max(unlockedMeasureCount || 0, MEASURES_PER_CHUNK);
+}
     
     populateMeasureSelector(); 
 
     setTimeout(() => {
-            initFogOfWar();
+         setRangeOpacity(0, unlockedMeasureCount, 1);      
+        const total = osmd.sheet.SourceMeasures.length;
+        setRangeOpacity(unlockedMeasureCount, total, 0.15);
     }, 100);
 
     midiLearnBtn.style.background = '#e0e0e0';
@@ -4645,51 +4614,6 @@ function releaseSustainedNotes() {
         sampler.triggerRelease(notesToRelease);
         sustainedNotes.clear();
     }
-}
-
-
-
-
-// Actualiza la barra visual y notifica al padre
-function notifyParentProgress() {
-    if (!osmd || !osmd.sheet) return;
-
-    const totalMeasures = osmd.sheet.SourceMeasures.length;
-    const percent = Math.min(100, Math.floor((unlockedMeasureCount / totalMeasures) * 100));
-    updateGlobalProgressBarUI(percent);
-    window.parent.postMessage({
-        type: 'progressUpdate',
-        percent: percent
-    }, '*');
-}
-
-function updateGlobalProgressBarUI(percent) {
-    const fill = document.getElementById('global-progress-fill');
-    const text = document.getElementById('global-progress-text');
-    
-    if (fill) fill.style.width = `${percent}%`;
-    if (text) text.textContent = `${percent}%`;
-}
-
-
-function restoreProgressFromPercent(percent) {
-    if (!osmd || !osmd.sheet) {
-        pendingSavedProgress = percent;
-        return;
-    }
-
-    const totalMeasures = osmd.sheet.SourceMeasures.length;
-    let targetMeasure = Math.floor((percent / 100) * totalMeasures);
-    targetMeasure = Math.floor(targetMeasure / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
-    if (targetMeasure < MEASURES_PER_CHUNK) targetMeasure = MEASURES_PER_CHUNK;
-    if (targetMeasure > totalMeasures) targetMeasure = totalMeasures;
-    unlockedMeasureCount = targetMeasure;
-    if (percent >= 100) isPieceCompleted = true;
-    updateGlobalProgressBarUI(percent);
-    populateMeasureSelector();
-    setTimeout(() => {
-        initFogOfWar();
-    }, 200);
 }
 
 
