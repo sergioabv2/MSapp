@@ -2923,6 +2923,16 @@ function registerAndOpen(title) {
     
     const fullUrl = "https://www.mozart-app.com/xml2?file=" + score.pdf;
     openPdfViewer(fullUrl);
+
+    const interaction = userInteractions.find(i => i.title === title);
+const savedProgress = interaction ? interaction.progress : 0;
+const iframe = document.getElementById('scoreFrame');
+iframe.onload = function() {
+    iframe.contentWindow.postMessage({
+        type: 'restoreProgress',
+        percent: savedProgress
+    }, '*');
+};
 }
 
 function renderBookGrid(data) {
