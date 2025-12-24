@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="es" ng-app="pianoApp">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Piano Quest Pro</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 
-    <style>
-        /* Variables CSS */
+<style>
+/* Variables CSS */
 :root {
     --bg-color: #f0f2f5;
     --main-content-bg: #ffffff;
@@ -46,7 +46,7 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-#levelSelector, #pianoApp {
+#app, #levelSelector, #pianoApp {
     height: 100%;
 }
 
@@ -72,7 +72,6 @@ body {
     width: 100%;
     padding: 20px;
     position: relative;
-    /* ESTA ES LA CLAVE: Empujamos el contenido hacia abajo para revelar el banner */
     padding-top: 160px; 
     padding-bottom: 60px;
     z-index: 2;
@@ -260,8 +259,6 @@ body {
     box-shadow: -2px 0 8px rgba(0,0,0,0.05); 
 }
 
-
-
 .main-content { 
     flex-grow: 1; 
     background-color: #f5f5f5;
@@ -273,7 +270,7 @@ body {
 
 .video-wrapper {
     width: 100%;
-    min-height: calc(100vh - 0px); /* Altura completa visible */
+    min-height: calc(100vh - 0px);
     background-color: #000000;
     flex-shrink: 0;
     position: sticky;
@@ -305,7 +302,6 @@ body {
     line-height: 1.6;
     margin-bottom: 15px;
 }
-
 
 .lesson-description {
     background: #f8f9fa;
@@ -480,7 +476,6 @@ body {
 }
 
 /* ========== LESSON HEADER REDISEÑADO ========== */
-/* Agregar chevron y línea divisora a lesson-header */
 .lesson-header {
     display: flex;
     align-items: center;
@@ -497,7 +492,6 @@ body {
     position: relative; 
 }
 
-/* Agregar chevron con ::after */
 .lesson-header::after {
     content: '\EA4E'; 
     font-family: 'remixicon';
@@ -507,12 +501,10 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* Rotar chevron cuando está expandido */
 .lesson-header.expanded::after {
     transform: rotate(180deg);
 }
 
-/* Ajustar el span del título para que no empuje el chevron */
 .lesson-header span {
     flex: 1;
 }
@@ -524,8 +516,6 @@ body {
 .lesson-header.unlocked:hover { 
     background-color: #f5f5f7; 
 }
-
-
 
 .lesson-header .icon { 
     font-size: 1.1rem; 
@@ -590,7 +580,6 @@ body {
     cursor: default; 
 }
 
-/* Quitar cualquier efecto hover que tengas en tareas bloqueadas */
 .task-item.task-locked:hover {
     background-color: transparent; 
     color: inherit; 
@@ -649,8 +638,6 @@ body {
 .unit-separator:first-child {
     margin-top: 0;
 }
-
-
 
 .player-header {
     margin-top: -10px;
@@ -780,7 +767,6 @@ body {
     background-color: var(--danger-red); 
 }
 
-
 .confetti { 
     position: fixed; 
     width: 10px; 
@@ -800,7 +786,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 240px; /* REDUCIDO: De 450px a 300px */
+    height: 240px;
     overflow: hidden;
     will-change: transform, opacity;
     z-index: 1;
@@ -810,14 +796,13 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-   object-position: center 40%;
+    object-position: center 40%;
 }
-
 
 .banner-overlay {
     position: absolute;
     inset: 0;
-   background: linear-gradient(to bottom, 
+    background: linear-gradient(to bottom, 
                 rgba(248, 249, 250, 0.35) 0%, 
                 rgba(248, 249, 250, 0.25) 50%, 
                 rgba(248, 249, 250, 1) 100%);
@@ -825,7 +810,7 @@ body {
 
 .banner-text {
     position: absolute;
-    top: 50%; /* Subimos un poco el texto */
+    top: 50%;
     left: 6%;
     transform: translateY(-50%);
     z-index: 5;
@@ -841,19 +826,15 @@ body {
 }
 
 .banner-text .subtitle {
-  font-family: var(--font-mono);
-    font-size: 12px; /* REDUCIDO */
-   color: var(--accent-red);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-red);
     font-weight: 600;
     display: block;
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
-
-
-
 
 .pending-tasks {
     background-color: var(--main-content-bg);
@@ -881,7 +862,6 @@ body {
     margin-bottom: 15px;
 }
 
-/* Estilos para tareas completadas en pending-tasks */
 .pending-tasks li.completed {
     opacity: 0.5;
 }
@@ -896,10 +876,9 @@ body {
 }
 
 .pending-tasks li.completed .task-icon i::before {
-    content: '\EB7B'; /* Código de check-line de Remix Icon */
+    content: '\EB7B';
 }
 
-/* Animación sutil cuando se completa */
 .pending-tasks li.completed {
     transition: all 0.3s ease;
 }
@@ -933,15 +912,12 @@ body {
     font-weight: 600;
 }
 
-
-/* Wrapper para apilar la barra lateral verticalmente */
 .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espacio entre los cuadros */
+    gap: 20px;
 }
 
-/* Reutilizamos estilos base de pending-tasks para mantener consistencia */
 .practice-card {
     background-color: var(--main-content-bg);
     border: 1px solid #e0e0e0;
@@ -963,7 +939,6 @@ body {
     line-height: 1.4;
 }
 
-/* Botón Vistoso */
 .btn-shiny {
     width: 100%;
     padding: 12px;
@@ -992,7 +967,6 @@ body {
     font-size: 1.2rem;
 }
 
-/* ACTUALIZACIÓN RESPONSIVE: Aseguramos que el wrapper se oculte en móviles */
 @media (max-width: 900px) {
     .sidebar-wrapper {
         display: none;
@@ -1041,7 +1015,6 @@ body {
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
-    
     .pending-tasks {
         display: none; 
     }
@@ -1055,7 +1028,6 @@ body {
 }
 
 @media (max-width: 800px) {
-  
     .levels-grid { 
         grid-template-columns: 1fr; 
         padding: 30px 20px; 
@@ -1136,8 +1108,6 @@ body {
         transform: scale(0.92);
     }
 
-  
-
     .levels-grid {
         padding: 10px 10px;
         gap: 2px;
@@ -1150,31 +1120,27 @@ body {
     .player-header {
         justify-content: space-between;
     }
-     .banner-text {
-                left: 20px;
-                right: 20px; /* Usamos left/right para centrarlo y dar margen */
-                max-width: 100%;
-                /* Opcional: si el texto queda muy abajo en móvil, ajusta este translateY */
-                /* transform: translateY(-40%); */
-            }
+    
+    .banner-text {
+        left: 20px;
+        right: 20px;
+        max-width: 100%;
+    }
 
-            /* 3. Reducimos el tamaño del H1 para que no sea gigante en el celular */
-            .banner-text h1 {
-                font-size: 32px;
-            }
+    .banner-text h1 {
+        font-size: 32px;
+    }
 
     .floating-header { padding: 15px; }
 }
 
-
-/* ========== LOADER DE CARGA (Estilo Level-Card) ========== */
+/* ========== LOADER DE CARGA ========== */
 .loader-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Un fondo más sutil para que la tarjeta blanca resalte */
     background: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
@@ -1182,56 +1148,46 @@ body {
     z-index: 100;
 }
 
-/* Loader discreto en el banner */
 .banner-loader {
     position: absolute;
-    bottom: 25px;  /* Pegado abajo */
-    right: 30px;   /* Pegado a la derecha */
+    bottom: 25px;
+    right: 30px;
     z-index: 10;
-    
     display: flex;
     align-items: center;
     gap: 10px;
-    
-    /* Estilo visual sutil */
-    background: rgba(255, 255, 255, 0.5); /* Fondo semitransparente */
-    backdrop-filter: blur(5px);           /* Efecto borroso elegante */
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
     padding: 8px 16px;
     border-radius: 20px;
     border: 1px solid rgba(0,0,0,0.05);
-    
-    /* Tipografía */
-    color: #4b5563; /* Gris oscuro */
+    color: #4b5563;
     font-size: 0.85rem;
     font-weight: 600;
-    
-    /* Transición suave al aparecer/desaparecer */
     transition: opacity 0.3s ease;
 }
 
-/* Animación de rotación (asegúrate de mantenerla) */
 @keyframes ri-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
 .ri-spin {
     animation: ri-spin 1s linear infinite;
 }
 
-
 .loader-content {
     background: white;
-    border-radius: 16px; /* de .level-card */
-    padding: 32px 40px; /* Un poco más de padding que una tarjeta normal */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12); /* Sombra de .level-card:hover */
-    border: 1px solid #e5e5e7; /* de .level-card */
+    border-radius: 16px;
+    padding: 32px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e5e7;
     display: flex;
-    flex-direction: column; /* Para apilar el icono y el texto */
+    flex-direction: column;
     align-items: center;
     max-width: 350px;
     width: 90%;
 }
-
 
 .loader-content i {
     font-size: 3.5rem;
@@ -1241,125 +1197,108 @@ body {
 }
 
 .loader-content p {
-    font-size: 1.5rem; /* similar a .level-title */
-    font-weight: 600; /* similar a .level-title */
-    color: #1d1d1f; /* similar a .level-title */
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1d1d1f;
     margin: 0;
 }
 
 .blur-content {
     pointer-events: none;
 }
+</style>
 
-@keyframes ri-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.ri-spin {
-    animation: ri-spin 1s linear infinite;
-}
-    </style>
-<body ng-controller="PianoController">
-
-<div class="banner-header" ng-show="currentView === 'levelSelector'">
-    <img src="https://lh3.googleusercontent.com/d/1Lc5TgnQopT5_tK1qbXBAOgiDODlcyRp4=s800" class="banner-image">
-    
-    <div class="banner-overlay"></div>
-    
-    <div class="banner-text">
-        <h1>
-            <span class="subtitle">Lecciones de Piano</span>
-            Classroom
-        </h1>
-         <p style="color: #596275; margin-top: 10px; font-weight: 500;">
+<body>
+<div id="app">
+    <!-- BANNER -->
+    <div class="banner-header" v-show="currentView === 'levelSelector'">
+        <img src="https://lh3.googleusercontent.com/d/1Lc5TgnQopT5_tK1qbXBAOgiDODlcyRp4=s800" class="banner-image">
+        <div class="banner-overlay"></div>
+        <div class="banner-text">
+            <h1>
+                <span class="subtitle">Lecciones de Piano</span>
+                Classroom
+            </h1>
+            <p style="color: #596275; margin-top: 10px; font-weight: 500;">
                 Sistema de aprendizaje secuencial. 
             </p>
         </div>
-
-    <div class="banner-loader" ng-show="isLoading">
-        <i class="ri-loader-4-line ri-spin"></i>
-        <span>Actualizando...</span>
-    </div>
-</div>
-
-
-    
-    <div id="levelSelector" ng-show="currentView === 'levelSelector'">
-        <div class="level-container">
-
-
-
-<div class="sidebar-wrapper">
-
-<div class="pending-tasks" >
-    <h4>Tareas Pendientes</h4>
-    <ul ng-if="pendingTasks.length > 0">
-        <li ng-repeat="task in pendingTasks" ng-class="{'completed': task.completed}">
-            <div class="task-icon"><i class="{{task.iconClass}}"></i></div>
-            <div class="task-info">
-                <span>{{task.lessonTitle}}</span>
-                <div class="info">{{task.taskTitle}}</div>
-            </div>
-        </li>
-    </ul>
-    <div ng-if="pendingTasks.length === 0" style="text-align: center; color: #6e6e73; padding: 20px;">
-        <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
-        <p style="margin-top: 10px;">¡No tienes tareas pendientes!</p>
-    </div>
-</div>
-
-
-<div class="practice-card">
-            <h4>Práctica libre</h4>
-            <p>Explora el teclado sin límites o practica tus canciones favoritas.</p>
-            <button class="btn-shiny" onclick="window.location.href='https://www.mozart-app.com/bookfinder'">
-                <i class="ri-piano-line"></i> Empezar
-            </button>
+        <div class="banner-loader" v-show="isLoading">
+            <i class="ri-loader-4-line ri-spin"></i>
+            <span>Actualizando...</span>
         </div>
+    </div>
 
-</div>
+    <!-- SELECTOR DE NIVELES -->
+    <div id="levelSelector" ref="levelSelectorRef" v-show="currentView === 'levelSelector'">
+        <div class="level-container">
+            <div class="sidebar-wrapper">
+                <div class="pending-tasks">
+                    <h4>Tareas Pendientes</h4>
+                    <ul v-if="pendingTasks.length > 0">
+                        <li v-for="task in pendingTasks" :key="task.taskIndex" :class="{'completed': task.completed}">
+                            <div class="task-icon"><i :class="task.iconClass"></i></div>
+                            <div class="task-info">
+                                <span>{{ task.lessonTitle }}</span>
+                                <div class="info">{{ task.taskTitle }}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div v-if="pendingTasks.length === 0" style="text-align: center; color: #6e6e73; padding: 20px;">
+                        <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
+                        <p style="margin-top: 10px;">¡No tienes tareas pendientes!</p>
+                    </div>
+                </div>
+
+                <div class="practice-card">
+                    <h4>Práctica libre</h4>
+                    <p>Explora el teclado sin límites o practica tus canciones favoritas.</p>
+                    <button class="btn-shiny" onclick="window.location.href='https://www.mozart-app.com/bookfinder'">
+                        <i class="ri-piano-line"></i> Empezar
+                    </button>
+                </div>
+            </div>
       
-     
-            <div class="levels-grid" >
-                <div class="level-card" ng-repeat="level in levels" 
-                    ng-click="selectLevel(level)"
-                    ng-class="{'selected': selectedLevel.id === level.id, 'locked': currentLevelIndex < level.id}">
+            <div class="levels-grid">
+                <div class="level-card" 
+                     v-for="level in levels" 
+                     :key="level.id"
+                     @click="selectLevel(level)"
+                     :class="{'selected': selectedLevel?.id === level.id, 'locked': currentLevelIndex < level.id}">
                     <div class="card-content">
-                        <div class="lockLvlIco" ng-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
-                        <div class="level-number" ng-if="level.id === 0">P</div>
-                        <div class="level-number" ng-if="level.id !== 0">{{level.id}}</div>
+                        <div class="lockLvlIco" v-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
+                        <div class="level-number" v-if="level.id === 0">P</div>
+                        <div class="level-number" v-else>{{ level.id }}</div>
                         <div class="level-info">
-                            <h2 class="level-title">{{level.title}}</h2>
-                            <p class="level-description">{{level.description}}</p>
+                            <h2 class="level-title">{{ level.title }}</h2>
+                            <p class="level-description">{{ level.description }}</p>
                             <div class="level-meta">
                                 <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
                                     <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
                                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
                                 </svg>
-                                <span class="time-text">~{{level.duration}}</span>
+                                <span class="time-text">~{{ level.duration }}</span>
                             </div>
                             <div class="progress-container2">
-                                <div class="progress-bar2" style="width: {{level.progress}}%;"></div>
+                                <div class="progress-bar2" :style="{width: level.progress + '%'}"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <div id="pianoApp" ng-show="currentView === 'app'">
-        <button id="menu-toggle" class="menu-toggle-btn" ng-click="toggleSidebar()"><i class="ri-menu-line"></i></button>
+    <!-- APP DE PIANO -->
+    <div id="pianoApp" v-show="currentView === 'app'">
+        <button id="menu-toggle" class="menu-toggle-btn" @click="toggleSidebar"><i class="ri-menu-line"></i></button>
         
         <div class="app-container">
-
             <main class="main-content">
-                <div id="youtube-container" style="display: none; width: 100%; height: 100%; position: relative;">
+                <div id="youtube-container" :style="{display: showingVideo ? 'block' : 'none'}" style="width: 100%; height: 100%; position: relative;">
                     <div id="player"></div>
                     
-                    <!-- Modal de Pausa dentro del contenedor de video -->
+                    <!-- Modal de Pausa -->
                     <div id="pauseModal" class="video-modal-overlay">
                         <div class="video-modal-content">
                             <h2 style="color: #f59e0b;">¡Atención!</h2>
@@ -1370,7 +1309,7 @@ body {
                         </div>
                     </div>
 
-                    <!-- Modal de Video Terminado dentro del contenedor de video -->
+                    <!-- Modal de Video Terminado -->
                     <div id="finishedModal" class="video-modal-overlay">
                         <div class="video-modal-content">
                             <h2 style="color: #10b981;">¡Video Terminado!</h2>
@@ -1380,1292 +1319,918 @@ body {
                     </div>
                 </div>
                 
-                <iframe id="content-iframe" ng-src="{{ currentTaskUrl | trustAsResourceUrl }}" 
-                        title="Contenido principal" ng-show="!showingVideo"></iframe>
+                <iframe id="content-iframe" 
+                        :src="currentTaskUrl" 
+                        title="Contenido principal" 
+                        v-show="!showingVideo"></iframe>
 
-                        <!-- Contenido debajo del video dinámico -->
-<div class="content-below" ng-if="currentViewingTask">
-    
-    <div class="lesson-description">
-        <h3>Sobre esta actividad</h3>
-        <p>{{currentViewingTask.title}}</p>
-    </div>
-    
-    <div class="lesson-notes" ng-if="currentViewingTask.instructions">
-        <h4>
-            <i class="ri-video-line" ng-if="currentViewingTask.type === 'video'"></i>
-            <i class="ri-pencil-ruler-2-line" ng-if="currentViewingTask.type === 'exercise'"></i>
-            <i class="ri-question-line" ng-if="currentViewingTask.type === 'quiz'"></i>
-            Instrucciones
-        </h4>
-        <p>{{currentViewingTask.instructions}}</p>
-    </div>
-    
-    <div class="lesson-notes" style="background: #e6f7ff; border-left-color: #17a2b8;" ng-if="currentViewingTask.tip">
-        <h4><i class="ri-flashlight-line"></i> Consejo</h4>
-        <p>{{currentViewingTask.tip}}</p>
-    </div>
+                <!-- Contenido debajo del video dinámico -->
+                <div class="content-below" v-if="currentViewingTask">
+                    <div class="lesson-description">
+                        <h3>Sobre esta actividad</h3>
+                        <p>{{ currentViewingTask.title }}</p>
+                    </div>
+                    
+                    <div class="lesson-notes" v-if="currentViewingTask.instructions">
+                        <h4>
+                            <i class="ri-video-line" v-if="currentViewingTask.type === 'video'"></i>
+                            <i class="ri-pencil-ruler-2-line" v-if="currentViewingTask.type === 'exercise'"></i>
+                            <i class="ri-question-line" v-if="currentViewingTask.type === 'quiz'"></i>
+                            Instrucciones
+                        </h4>
+                        <p>{{ currentViewingTask.instructions }}</p>
+                    </div>
+                    
+                    <div class="lesson-notes" style="background: #e6f7ff; border-left-color: #17a2b8;" v-if="currentViewingTask.tip">
+                        <h4><i class="ri-flashlight-line"></i> Consejo</h4>
+                        <p>{{ currentViewingTask.tip }}</p>
+                    </div>
 
-    <div class="lesson-objectives" ng-if="currentViewingTask.objective && currentViewingTask.objective.length > 0">
-        <h3>Objetivos de la actividad</h3>
-        <ul>
-            <li ng-repeat="obj in currentViewingTask.objective">{{obj}}</li>
-        </ul>
-    </div>
-</div>
+                    <div class="lesson-objectives" v-if="currentViewingTask.objective && currentViewingTask.objective.length > 0">
+                        <h3>Objetivos de la actividad</h3>
+                        <ul>
+                            <li v-for="(obj, idx) in currentViewingTask.objective" :key="idx">{{ obj }}</li>
+                        </ul>
+                    </div>
+                </div>
             </main>
 
-            <aside class="sidebar" ng-class="{'is-open': sidebarOpen}">
-
+            <aside class="sidebar" :class="{'is-open': sidebarOpen}">
                 <div class="player-header">
-                    <button class="tool-btn" id="back-to-levels-btn" ng-click="showLevelSelector()">
+                    <button class="tool-btn" id="back-to-levels-btn" @click="showLevelSelector">
                         <i class="ri-arrow-left-line"></i> Volver
                     </button>
                 </div>
 
                 <div class="user-profile">
-                    <div class="user-avatar" ng-if="selectedLevel.id === 0">P</div>
-                    <div class="user-avatar" ng-if="selectedLevel.id !== 0">{{selectedLevel.id}}</div>
+                    <div class="user-avatar" v-if="selectedLevel?.id === 0">P</div>
+                    <div class="user-avatar" v-else>{{ selectedLevel?.id }}</div>
                     
                     <div class="user-info">
-                        <div class="name">{{selectedLevel.title}}</div>
-                        <div class="plan">Unidad {{lessons[currentLessonIndex].unit || ''}}</div>
+                        <div class="name">{{ selectedLevel?.title }}</div>
+                        <div class="plan">Unidad {{ lessons[currentLessonIndex]?.unit || '' }}</div>
                     </div>
                 </div>
                 
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{progress}}%;"></div>
+                    <div class="progress-fill" :style="{width: progress + '%'}"></div>
                 </div>
                 
                 <div class="lessons-container">
-
-                    <div class="unit-separator" 
-                         ng-repeat-start="lesson in lessons" 
-                         ng-if="$index === 0 || lessons[$index - 1].unit !== lesson.unit">
-                        Unidad {{lesson.unit}}
-                    </div>
-                                 
-                    <div class="lesson-item" ng-repeat-end data-lesson-index="{{$index}}">
-                        <div class="lesson-header" 
-                              ng-class="{
-                                    'completed': lesson.completed, 
-                                    'unlocked': $index === 0 || lessons[$index - 1].completed,
-                                    'locked': $index > 0 && !lessons[$index - 1].completed,
-                                    'expanded': lesson.expanded
-                                 }"
-                             ng-click="toggleLesson(lesson)">
-                            <i class="icon" 
-                       ng-class="{
-                           'ri-check-line': lesson.completed,
-                           'ri-lock-fill': !lesson.completed && $index > 0 && !lessons[$index - 1].completed
-                       }"
-                       ng-style="{'color': lesson.completed ? 'var(--success-green)' : 'inherit'}">
-                    </i>
-                            <span>{{lesson.title}}</span>
+                    <template v-for="(lesson, lessonIndex) in lessons" :key="lessonIndex">
+                        <div class="unit-separator" 
+                             v-if="lessonIndex === 0 || lessons[lessonIndex - 1].unit !== lesson.unit">
+                            Unidad {{ lesson.unit }}
                         </div>
-                        <ul class="tasks-list" ng-class="{'expanded': lesson.expanded}">
-                            <li class="task-item" 
-                                ng-repeat="task in lesson.tasks" 
-                                ng-click="viewTask($parent.$index, $index)"
-                                ng-class="{
-                                    'completed': task.completed,
-                                    'active': currentLessonIndex === $parent.$index && currentTaskIndex === $index,
-                                    'is-viewing': viewingLessonIndex === $parent.$index && viewingTaskIndex === $index,
-                                    'task-locked': ($parent.$index > currentLessonIndex) || ($parent.$index === currentLessonIndex && $index > currentTaskIndex)
-                                }">
-                                <div class="task-status"></div>
-                                <span class="task-title">{{task.title}}</span>
-                                <i class="task-interaction-icon {{task.iconClass}}" ng-if="task.iconClass" ng-click="handleTaskInteraction($event, $parent.$index, $index)"></i>
-                            </li>
-                        </ul>
-                    </div>
+                                 
+                        <div class="lesson-item" :data-lesson-index="lessonIndex">
+                            <div class="lesson-header" 
+                                 :class="{
+                                     'completed': lesson.completed, 
+                                     'unlocked': lessonIndex === 0 || lessons[lessonIndex - 1].completed,
+                                     'locked': lessonIndex > 0 && !lessons[lessonIndex - 1].completed,
+                                     'expanded': lesson.expanded
+                                 }"
+                                 @click="toggleLesson(lesson, lessonIndex)">
+                                <i class="icon" 
+                                   :class="{
+                                       'ri-check-line': lesson.completed,
+                                       'ri-lock-fill': !lesson.completed && lessonIndex > 0 && !lessons[lessonIndex - 1].completed
+                                   }"
+                                   :style="{color: lesson.completed ? 'var(--success-green)' : 'inherit'}">
+                                </i>
+                                <span>{{ lesson.title }}</span>
+                            </div>
+                            <ul class="tasks-list" :class="{'expanded': lesson.expanded}">
+                                <li class="task-item" 
+                                    v-for="(task, taskIndex) in lesson.tasks"
+                                    :key="taskIndex"
+                                    @click="viewTask(lessonIndex, taskIndex)"
+                                    :class="{
+                                        'completed': task.completed,
+                                        'active': currentLessonIndex === lessonIndex && currentTaskIndex === taskIndex,
+                                        'is-viewing': viewingLessonIndex === lessonIndex && viewingTaskIndex === taskIndex,
+                                        'task-locked': (lessonIndex > currentLessonIndex) || (lessonIndex === currentLessonIndex && taskIndex > currentTaskIndex)
+                                    }">
+                                    <div class="task-status"></div>
+                                    <span class="task-title">{{ task.title }}</span>
+                                    <i class="task-interaction-icon" :class="task.iconClass" v-if="task.iconClass" @click.stop="handleTaskInteraction($event, lessonIndex, taskIndex)"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
                 </div>
             </aside>
         </div>
         
-        <div class="modal-overlay" id="modalOverlay" ng-style="{'display': modal.show ? 'flex' : 'none'}">
-            <div class="modal-content" id="modalContent" ng-bind-html="modal.content"></div>
+        <div class="modal-overlay" id="modalOverlay" :style="{display: modal.show ? 'flex' : 'none'}">
+            <div class="modal-content" id="modalContent" v-html="modal.content"></div>
         </div>
         
-        <div class="sidebar-overlay" id="sidebarOverlay" ng-class="{'is-active': sidebarOpen}" ng-click="toggleSidebar()"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay" :class="{'is-active': sidebarOpen}" @click="toggleSidebar"></div>
     </div>
+</div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="app.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+    const { createApp, ref, reactive, computed, onMounted, nextTick, watch } = Vue;
 
-</body>
-
-    <script>
-        const app = angular.module('pianoApp', []);
-
-// Filtro de seguridad para poder usar URLs dinámicas en ng-src
-app.filter('trustAsResourceUrl', ['$sce', function($sce) {
-    return function(val) {
-        return $sce.trustAsResourceUrl(val);
-    };
-}]);
-
-app.controller('PianoController', function($scope, $http, $sce, $timeout) {
-
-
-    $scope.currentView = 'levelSelector';
-    
-    $scope.levels = [
-        { 
-            id: 0, 
-            title: 'Nivel Preparatorio', 
-            description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
-            duration: '5 horas',
-            progress: 0,
-            lessons: [
-                {
-      title: "Lección 1: Fundamentos",
-      unit: 1,
-      description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Ritmo y Posición de Do", 
-          videoId: "Q4r5gnfAtzs", 
-          iconClass: 'ri-play-circle-line', 
-          instructions: "Mira este video con mucha atención. Aprenderás los fundamentos del ritmo y cómo encontrar la posición de Do en el piano.", 
-          tip: "No te saltes partes. Puedes pausar y tomar notas si lo necesitas.", 
-          objective: ["Comprender el concepto de ritmo y métrica", "Aprender a localizar la posición de Do", "Tocar tus primeras notas"] 
-        },
-        { 
-          type: 'exercise', 
-          title: "Ode to Joy - var1", 
-          contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica esta primera variación de Ode to Joy usando la posición de Do que acabas de aprender.",
-          tip: "Comienza muy lento. Es mejor tocar despacio y correcto que rápido con errores.",
-          objective: ["Aplicar la posición de Do en una melodía conocida", "Desarrollar coordinación básica", "Mantener un tempo constante"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios en Posición de Do", 
-          contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Completa estos ejercicios diseñados para fortalecer tu técnica en la posición de Do.",
-          tip: "Presta atención a la digitación sugerida. Los números indican qué dedo usar.",
-          objective: ["Fortalecer la memoria muscular en posición de Do", "Mejorar la precisión de las notas", "Practicar cambios de dedo suaves"]
-        },
-        { 
-          type: 'video', 
-          title: "Melodía y Armonía", 
-          videoId: "bVWXlV8Neic", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Observa cómo la melodía y la armonía trabajan juntas para crear música completa.",
-          tip: "Identifica cuál mano toca la melodía y cuál toca el acompañamiento.",
-          objective: ["Distinguir entre melodía y armonía", "Comprender el rol de cada mano", "Prepararte para tocar con ambas manos simultáneamente"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ode to Joy - var2", 
-          contentUrl: "https://drive.google.com/file/d/1ijz--ytWa1WkdnngZW3sO6ukzAKCphZt/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Toca esta segunda variación que incorpora armonía básica con la mano izquierda.",
-          tip: "Practica cada mano por separado primero, luego júntalas lentamente.",
-          objective: ["Coordinar ambas manos tocando juntas", "Aplicar conceptos de melodía y armonía", "Desarrollar independencia entre las manos"]
-        },
-        { 
-          type: 'quiz', 
-          title: "Quiz de Review", 
-          contentUrl: "https://mozart-app.com/lessons/quiz", 
-          iconClass: 'ri-question-line',
-          instructions: "Responde estas preguntas para verificar tu comprensión de los conceptos fundamentales.",
-          tip: "Si fallas alguna pregunta, revisa el contenido correspondiente antes de continuar.",
-          objective: ["Evaluar tu comprensión de ritmo y métrica", "Verificar conocimiento de la posición de Do", "Reforzar conceptos de melodía y armonía"]
-        }
-      ]
-    },
-    {
-      title: "Lección 2: Grand Staff",
-      unit: 1,
-      description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
-      tasks: [
-        { 
-          type: 'video', 
-          title: "El Grand Staff", 
-          videoId: "HHF95sBbmwQ", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende a leer el pentagrama completo con las claves de Sol y Fa juntas.",
-          tip: "Memoriza que la clave de Sol es para la mano derecha y la clave de Fa para la izquierda.",
-          objective: ["Comprender la estructura del Grand Staff", "Identificar notas en ambas claves", "Relacionar el pentagrama con las teclas del piano"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1Ys_fybQsMIjS4zaCRLO9lV8qsvmvooXq/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica la lectura de notas en el Grand Staff con estos ejercicios progresivos.",
-          tip: "Di el nombre de cada nota en voz alta antes de tocarla para reforzar el aprendizaje.",
-          objective: ["Mejorar la lectura a primera vista", "Reconocer rápidamente notas en ambas claves", "Desarrollar fluidez en la lectura musical"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ode to Joy - var3", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=Ode to Joy.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta esta variación leyendo directamente del Grand Staff completo.",
-          tip: "Usa el reproductor interactivo para escuchar cómo debe sonar antes de practicar.",
-          objective: ["Aplicar lectura del Grand Staff en una pieza musical", "Integrar conocimientos previos", "Ganar confianza en la lectura de partituras"]
-        }
-      ]
-    },
-    {
-      title: "Lección 3: Dirección",
-      unit: 1,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Intervalos de 2da y 3era", 
-          videoId: "H4x0TPlSoaQ", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Descubre cómo se mueven las notas por pasos (2das) y saltos pequeños (3eras) en el teclado.",
-          tip: "Los intervalos son la distancia entre dos notas. Practica identificarlos visualmente en el pentagrama.",
-          objective: ["Reconocer intervalos de 2da y 3era", "Comprender el movimiento melódico", "Tocar intervalos con precisión"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1Dom_0ZjNoslBKZpUa3IUDN8XMzcxZ1Jd/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Completa estos ejercicios para dominar el reconocimiento y ejecución de intervalos de 2da y 3era.",
-          tip: "Observa la dirección del movimiento: ¿la nota sube o baja? Esto te ayudará a anticipar.",
-          objective: ["Practicar intervalos ascendentes y descendentes", "Mejorar la lectura direccional", "Desarrollar anticipación visual"]
-        }
-      ]
-    },
-    {
-      title: "Lección 4: Intervalos",
-      unit: 1,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Intervalos de 4ta y 5ta", 
-          videoId: "M6DCHr2wVh8", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Explora intervalos más grandes que crean sonidos característicos en la música.",
-          tip: "Las 5tas suenan muy estables y potentes. Las 4tas tienen un sonido abierto y brillante.",
-          objective: ["Identificar intervalos de 4ta y 5ta", "Comprender sus cualidades sonoras", "Tocar saltos más amplios con precisión"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1G3Cun9yL_xl8ZJUhDJE5CAYTXMQUCIZY/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica estos ejercicios que combinan todos los intervalos aprendidos hasta ahora.",
-          tip: "Los saltos grandes requieren preparación visual. Mira con anticipación dónde irán tus dedos.",
-          objective: ["Dominar intervalos de 4ta y 5ta", "Combinar diferentes tipos de intervalos", "Mejorar la precisión en saltos"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Teoría", 
-          contentUrl: "https://drive.google.com/file/d/1PmVBq1jbKZyFOK3T-CWDNhZ7Tba428Lr/preview", 
-          iconClass: 'ri-question-line',
-          instructions: "Refuerza tu comprensión teórica de los intervalos con estos ejercicios escritos.",
-          tip: "Entender la teoría te ayudará a aprender piezas más rápido en el futuro.",
-          objective: ["Consolidar conocimiento teórico de intervalos", "Identificar intervalos en partituras", "Conectar teoría con práctica"]
-        }
-      ]
-    },
-    {
-      title: "Lección 5: Frases",
-      unit: 2,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Construcción de Frases", 
-          videoId: "RJnwVQHexW0", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende cómo las notas se agrupan en frases musicales, similar a las oraciones en el lenguaje.",
-          tip: "Las frases musicales tienen un inicio, desarrollo y final. Respira entre frases como al hablar.",
-          objective: ["Comprender el concepto de frase musical", "Identificar frases en partituras", "Tocar con expresión natural"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Práctica de Frases", 
-          contentUrl: "https://mozart-app.com/lessons/text", 
-          iconClass: 'ri-file-text-line',
-          instructions: "Trabaja estos ejercicios prestando atención especial a la forma de las frases.",
-          tip: "Levanta ligeramente las manos al final de cada frase para crear separación natural.",
-          objective: ["Aplicar fraseo en ejercicios prácticos", "Desarrollar sensibilidad musical", "Crear interpretaciones más expresivas"]
-        },
-        { 
-          type: 'quiz', 
-          title: "Quiz de Review", 
-          contentUrl: "https://mozart-app.com/lessons/quiz", 
-          iconClass: 'ri-question-line',
-          instructions: "Responde estas preguntas para verificar tu comprensión de los conceptos fundamentales.",
-          tip: "Si fallas alguna pregunta, revisa el contenido correspondiente antes de continuar.",
-          objective: ["Evaluar tu comprensión de ritmo y métrica", "Verificar conocimiento de la posición de Do", "Reforzar conceptos de melodía y armonía"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Práctica de Frases", 
-          contentUrl: "https://drive.google.com/file/d/1gum-qE-LUdxxRNmjh39A1xImbqYRABAX/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Trabaja estos ejercicios prestando atención especial a la forma de las frases.",
-          tip: "Levanta ligeramente las manos al final de cada frase para crear separación natural.",
-          objective: ["Aplicar fraseo en ejercicios prácticos", "Desarrollar sensibilidad musical", "Crear interpretaciones más expresivas"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Run Away River", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=Run Away River.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta esta pieza aplicando todo lo aprendido sobre frases musicales.",
-          tip: "Imagina que estás contando una historia. Cada frase es parte de la narrativa.",
-          objective: ["Ejecutar una pieza completa con buen fraseo", "Demostrar comprensión musical", "Expresar musicalidad personal"]
-        }
-      ]
-    },
-    {
-      title: "Lección 6: Acordes",
-      unit: 2,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Construcción de Acordes", 
-          videoId: "Y2MokfVUSqs", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Descubre cómo se construyen los acordes a partir de intervalos apilados.",
-          tip: "Un acorde es simplemente tres o más notas tocadas simultáneamente. Comienza identificando la nota base.",
-          objective: ["Comprender la estructura de los acordes", "Identificar las notas que forman un acorde", "Preparar las manos para tocar acordes"]
-        },
-        { 
-          type: 'video', 
-          title: "Acorde C y G7", 
-          videoId: "n7qaCP5a-Pc", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende a formar y tocar los acordes de Do mayor y Sol séptima, fundamentales en muchas piezas.",
-          tip: "Memoriza la forma de estos acordes. Son los más usados en música para principiantes.",
-          objective: ["Dominar los acordes de C y G7", "Cambiar entre acordes suavemente", "Comprender su función armónica"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1UtQsQYtjkYxqbVnCGfTmNa85xtnhG3W7/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica cambios de acordes y patrones de acompañamiento con estos ejercicios.",
-          tip: "Mantén los dedos curvados y toca todas las notas del acorde al mismo tiempo.",
-          objective: ["Ejecutar acordes con claridad", "Desarrollar fuerza en los dedos", "Practicar transiciones entre acordes"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Trumpet Voluntary", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=Trumpet Voluntary.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta esta pieza clásica que incorpora los acordes que has aprendido.",
-          tip: "La mano derecha lleva la melodía principal. Asegúrate de que suene más fuerte que los acordes.",
-          objective: ["Combinar melodía y acordes en una interpretación", "Aplicar balance dinámico", "Ejecutar una pieza de repertorio clásico"]
-        }
-      ]
-    },
-    {
-      title: "Lección 7: Corcheas y Staccato",
-      unit: 2,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Corcheas", 
-          videoId: "LJIBynkI1Cs", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende a tocar corcheas, las notas que duran la mitad de un tiempo.",
-          tip: "Las corcheas se cuentan '1-y-2-y-3-y-4-y'. Practica contando en voz alta.",
-          objective: ["Comprender el valor rítmico de las corcheas", "Tocar ritmos con corcheas", "Mantener pulso constante en ritmos más rápidos"]
-        },
-        { 
-          type: 'video', 
-          title: "Staccato", 
-          videoId: "5zX6CFXf6cQ", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Descubre el staccato, una técnica que crea notas cortas y separadas.",
-          tip: "Staccato significa 'picado'. Imagina que tocas una estufa caliente - rápido y ligero.",
-          objective: ["Ejecutar la articulación staccato correctamente", "Distinguir entre legato y staccato", "Añadir variedad expresiva a tu interpretación"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1DquyL0GuDR3zojHcmzBLPZaA598DMLbu/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica corcheas y staccato con estos ejercicios diseñados específicamente para estas técnicas.",
-          tip: "Alterna entre tocar legato y staccato para sentir la diferencia en tu cuerpo.",
-          objective: ["Dominar ritmos con corcheas", "Perfeccionar la técnica staccato", "Combinar diferentes articulaciones"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Old German Dance", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=old-german-dance-michael-praetorius.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta esta danza alemana que utiliza corcheas y staccato para crear un carácter alegre.",
-          tip: "Esta pieza debe sonar juguetona y ligera. Deja que tu muñeca esté relajada.",
-          objective: ["Aplicar corcheas en contexto musical", "Usar staccato expresivamente", "Interpretar música del periodo renacentista"]
-        }
-      ]
-    },
-    {
-      title: "Lección 8: Posición de Do",
-      unit: 3,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Posición de Do II", 
-          videoId: "KopYT505jHA", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Expande tu conocimiento de la posición de Do explorando diferentes octavas y variaciones.",
-          tip: "La posición de Do puede empezar en diferentes lugares del teclado. El patrón es siempre el mismo.",
-          objective: ["Reconocer la posición de Do en diferentes octavas", "Trasladar posiciones fluidamente", "Ampliar tu rango en el teclado"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1uuu7dX6SRoOIi1aqzTEJ1xj8CbfW6Uft/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Trabaja estos ejercicios que te llevan por diferentes posiciones de Do en el teclado.",
-          tip: "Mantén la forma de la mano constante cuando cambies de posición.",
-          objective: ["Practicar cambios de posición", "Desarrollar orientación en el teclado", "Fortalecer técnica en múltiples registros"]
-        },
-        { 
-          type: 'video', 
-          title: "Marcas de Tempo y Dinámicas", 
-          videoId: "fOHFGsq-cGw", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende a interpretar las indicaciones de velocidad y volumen en las partituras.",
-          tip: "Términos como 'forte' (fuerte) y 'piano' (suave) son en italiano. Son universales en la música.",
-          objective: ["Comprender términos de tempo comunes", "Reconocer símbolos dinámicos", "Aplicar variaciones de velocidad y volumen"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Waltz", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=waltz-carl-czerny.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta este vals aplicando todas las indicaciones de tempo y dinámicas.",
-          tip: "Un vals tiene ritmo de 3/4. El primer tiempo debe sentirse más fuerte que el 2 y 3.",
-          objective: ["Ejecutar un vals con estilo apropiado", "Aplicar indicaciones de interpretación", "Desarrollar sensibilidad musical avanzada"]
-        }
-      ]
-    },
-    {
-      title: "Lección 9: Posición de Sol",
-      unit: 3,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Posición de Sol", 
-          videoId: "jGM_qOcewYg", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Aprende una nueva posición fundamental: la posición de Sol, que expande tus posibilidades melódicas.",
-          tip: "En posición de Sol, tu pulgar derecho empieza en la nota Sol. Encuentra todas las teclas Sol primero.",
-          objective: ["Dominar la posición de Sol", "Comparar con la posición de Do", "Tocar en nuevas tonalidades"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/1CfqcsxDsyCwxo8ZhhOrejiiJcgyEzxCE/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica estos ejercicios específicos para familiarizarte con la posición de Sol.",
-          tip: "Compara la sensación de esta posición con la de Do. Nota las similitudes y diferencias.",
-          objective: ["Establecer memoria muscular en posición de Sol", "Practicar digitación correcta", "Ganar confianza en la nueva posición"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Bagpipe", 
-          contentUrl: "https://drive.google.com/file/d/16hYD36HcMS-WRqzR9pBvSLHCxifOTkWc/preview", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Toca esta pieza que imita el sonido de la gaita, usando la posición de Sol.",
-          tip: "Las gaitas tienen un sonido constante y mantenido. Toca con articulación suave y fluida.",
-          objective: ["Aplicar posición de Sol en repertorio", "Crear carácter específico en la interpretación", "Desarrollar control de sonido sostenido"]
-        }
-      ]
-    },
-    {
-      title: "Lección 10: Ligaduras",
-      unit: 3,
-      tasks: [
-        { 
-          type: 'video', 
-          title: "Ligadura de prolongación", 
-          videoId: "edjG-czdX2Y", 
-          iconClass: 'ri-play-circle-line',
-          instructions: "Descubre cómo las ligaduras conectan notas para extender su duración.",
-          tip: "Una ligadura une dos notas de la misma altura. Solo tocas la primera, pero mantienes el sonido.",
-          objective: ["Comprender el concepto de ligadura", "Identificar ligaduras en partituras", "Ejecutar ritmos sincopados correctamente"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Ejercicios", 
-          contentUrl: "https://drive.google.com/file/d/16dc7Bkc7KtoP95hA1Tcni_i4M7eDfNLf/preview", 
-          iconClass: 'ri-todo-line',
-          instructions: "Practica con ejercicios que incluyen ligaduras en diferentes contextos rítmicos.",
-          tip: "Cuenta en voz alta y mantén el dedo presionado durante toda la duración combinada.",
-          objective: ["Ejecutar ligaduras correctamente", "Desarrollar precisión rítmica avanzada", "Mantener pulso constante con ritmos complejos"]
-        },
-        { 
-          type: 'exercise', 
-          title: "Sonatina", 
-          contentUrl: "https://www.mozart-app.com/xml2?file=sonatina.musicxml", 
-          iconClass: 'ri-file-music-line',
-          instructions: "Interpreta esta sonatina que incorpora todas las técnicas aprendidas, incluyendo ligaduras.",
-          tip: "Una sonatina es una 'pequeña sonata'. Tócala con elegancia y atención al detalle.",
-          objective: ["Integrar todas las técnicas aprendidas", "Interpretar una pieza de forma musical completa", "Demostrar progreso técnico y musical"]
-        }
-      ]
-    }
-            ]
-        },
-        { 
-            id: 1, 
-            title: 'Nivel 1', 
-            progress: 0,
-            description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', 
-            duration: '4 horas',
-            lessons: [
-                {
-                    title: "Lección 1: Escalas Mayores",
-                    unit: 1,
-                    tasks: [
-                        { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
-                        { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
-                        { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
-                    ]
-                },
-                {
-                    title: "Lección 2: Tonalidad de G",
-                    unit: 1,
-                    tasks: [
-                        { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                        { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                    ]
-                },
-                {
-                    title: "Lección 3: Pentaescalas",
-                    unit: 1,
-                    tasks: [
-                        { type: 'video', title: "Pentaescalas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 4: Cambio de Posición",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Cambios", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 5: Intervalos de 6ta",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Sextas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 6: Tonalidad de F",
-                    unit: 2,
-                    tasks: [
-                        { type: 'video', title: "Fa Mayor", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 7: Grupo 1",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Grupo 1", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 8: Más Notación",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Notación Avanzada", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 9: Síncopas",
-                    unit: 3,
-                    tasks: [
-                        { type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                },
-                {
-                    title: "Lección 10: Pieza Final",
-                    unit: "Final",
-                    tasks: [
-                        { type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }
-                    ]
-                }
-            ]
-        },
-        { 
-            id: 2, 
-            title: 'Nivel 2', 
-            progress: 0,
-            description: 'Profundiza en técnicas avanzadas y piezas más complejas.', 
-            duration: '6 horas',
-            lessons: [
-                { title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }
-            ]
-        },
-        { 
-            id: 3, 
-            title: 'Nivel 3', 
-            progress: 0,
-            description: 'Domina técnicas profesionales y repertorio clásico.', 
-            duration: '8 horas',
-            lessons: [
-                { title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }
-            ]
-        },
-        { 
-            id: 4, 
-            title: 'Nivel 4', 
-            progress: 0,
-            description: 'Perfecciona tu interpretación y expresión musical.', 
-            duration: '10 horas',
-            lessons: [
-                { title: "Lección 1: Interpretación", unit: 1, tasks: [] }
-            ]
-        },
-        { 
-            id: 5, 
-            title: 'Nivel 5', 
-            progress: 0,
-            description: 'Nivel maestro: repertorio complejo y composición.', 
-            duration: '12 horas',
-            lessons: [
-                { title: "Lección 1: Composición", unit: 1, tasks: [] }
-            ]
-        }
-    ];
-
-
-
-  
-    $scope.lessons = [];
-    $scope.pendingTasks = [];
-    $scope.selectedLevel = null;
-    $scope.sidebarOpen = false;
-    $scope.savedProgress = {};
-    $scope.isLoading = true;
-
-   $scope.currentLevelIndex = 0;
-  $scope.currentLessonIndex = 0;
-    $scope.currentTaskIndex = 0;
-    $scope.viewingLessonIndex = 0;
-    $scope.viewingTaskIndex = 0;
-    $scope.totalTasksCompleted = 0;
-    $scope.totalTasks = 0;
-    $scope.progress = 0;
-    $scope.currentTaskUrl = '';
-    $scope.serverLevelIndex = 0; 
-    $scope.serverLessonIndex = 0;
-    
-    // Variables para control de video de YouTube
-    $scope.showingVideo = false;
-    let youtubePlayer = null;
-    let videoHasEnded = false;
-    let pauseTimer = null;
-    let isYouTubeAPIReady = false;
-    let shouldAutoplayVideo = false;
-    $scope.currentViewingTask = null;
-
-    $scope.modal = { show: false, content: '' };
-
-
-       const requestData = {
-            action: "getUserData",
-           token: localStorage.getItem('MStoken')
-           // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
-        };
-
-        const config = {
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
+createApp({
+    setup() {
+        // ==========================================
+        // SECCIÓN 1: ESTADO REACTIVO
+        // ==========================================
+        
+        // Vistas y UI
+        const currentView = ref('levelSelector');
+        const isLoading = ref(true);
+        const sidebarOpen = ref(false);
+        const showingVideo = ref(false);
+        
+        // Índices de navegación
+        const currentLevelIndex = ref(0);
+        const currentLessonIndex = ref(0);
+        const currentTaskIndex = ref(0);
+        const viewingLessonIndex = ref(0);
+        const viewingTaskIndex = ref(0);
+        
+        // Progreso
+        const totalTasksCompleted = ref(0);
+        const totalTasks = ref(0);
+        const progress = ref(0);
+        
+        // Datos del servidor
+        const serverLevelIndex = ref(0);
+        const serverLessonIndex = ref(0);
+        
+        // Contenido
+        const selectedLevel = ref(null);
+        const lessons = ref([]);
+        const pendingTasks = ref([]);
+        const savedProgress = ref({});
+        const currentViewingTask = ref(null);
+        const currentTaskUrl = ref('');
+        
+        // Modal
+        const modal = reactive({ show: false, content: '' });
+        
+        // Niveles (debes importar o definir tu estructura de datos)
+       const levels = ref([
+            { 
+                id: 0, 
+                title: 'Nivel Preparatorio', 
+                description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
+                duration: '5 horas',
+                progress: 0,
+                lessons: [
+                    {
+                        title: "Lección 1: Fundamentos",
+                        unit: 1,
+                        description: "En esta lección aprenderás el concepto de rítmo y métrica, como usar un metrónomo, la posición de las manos y la posición de Do.",
+                        tasks: [
+                            { type: 'video', title: "Ritmo y Posición de Do", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line', instructions: "Mira este video con mucha atención. Aprenderás los fundamentos del ritmo y cómo encontrar la posición de Do en el piano.", tip: "No te saltes partes. Puedes pausar y tomar notas si lo necesitas.", objective: ["Comprender el concepto de ritmo y métrica", "Aprender a localizar la posición de Do", "Tocar tus primeras notas"] },
+                            { type: 'exercise', title: "Ode to Joy - var1", contentUrl: "https://drive.google.com/file/d/13I13Ec1sCqw8TNVQ98wSuGuSeJS6EEAr/preview", iconClass: 'ri-todo-line', instructions: "Practica esta primera variación de Ode to Joy usando la posición de Do que acabas de aprender.", tip: "Comienza muy lento. Es mejor tocar despacio y correcto que rápido con errores.", objective: ["Aplicar la posición de Do en una melodía conocida", "Desarrollar coordinación básica", "Mantener un tempo constante"] },
+                            { type: 'exercise', title: "Ejercicios en Posición de Do", contentUrl: "https://drive.google.com/file/d/1s5bZw8XCq5cHPcDgOniZSqwpmc6xcKYG/preview", iconClass: 'ri-todo-line', instructions: "Completa estos ejercicios diseñados para fortalecer tu técnica en la posición de Do.", tip: "Presta atención a la digitación sugerida. Los números indican qué dedo usar.", objective: ["Fortalecer la memoria muscular en posición de Do", "Mejorar la precisión de las notas", "Practicar cambios de dedo suaves"] },
+                            { type: 'video', title: "Melodía y Armonía", videoId: "bVWXlV8Neic", iconClass: 'ri-play-circle-line', instructions: "Observa cómo la melodía y la armonía trabajan juntas para crear música completa.", tip: "Identifica cuál mano toca la melodía y cuál toca el acompañamiento.", objective: ["Distinguir entre melodía y armonía", "Comprender el rol de cada mano", "Prepararte para tocar con ambas manos simultáneamente"] },
+                            { type: 'exercise', title: "Ode to Joy - var2", contentUrl: "https://drive.google.com/file/d/1ijz--ytWa1WkdnngZW3sO6ukzAKCphZt/preview", iconClass: 'ri-todo-line', instructions: "Toca esta segunda variación que incorpora armonía básica con la mano izquierda.", tip: "Practica cada mano por separado primero, luego júntalas lentamente.", objective: ["Coordinar ambas manos tocando juntas", "Aplicar conceptos de melodía y armonía", "Desarrollar independencia entre las manos"] },
+                            { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line', instructions: "Responde estas preguntas para verificar tu comprensión de los conceptos fundamentales.", tip: "Si fallas alguna pregunta, revisa el contenido correspondiente antes de continuar.", objective: ["Evaluar tu comprensión de ritmo y métrica", "Verificar conocimiento de la posición de Do", "Reforzar conceptos de melodía y armonía"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 2: Grand Staff",
+                        unit: 1,
+                        description: "En esta lección aprenderás la postura correcta, la posición de las manos y tus primeras notas en el piano.",
+                        tasks: [
+                            { type: 'video', title: "El Grand Staff", videoId: "HHF95sBbmwQ", iconClass: 'ri-play-circle-line', instructions: "Aprende a leer el pentagrama completo con las claves de Sol y Fa juntas.", tip: "Memoriza que la clave de Sol es para la mano derecha y la clave de Fa para la izquierda.", objective: ["Comprender la estructura del Grand Staff", "Identificar notas en ambas claves", "Relacionar el pentagrama con las teclas del piano"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1Ys_fybQsMIjS4zaCRLO9lV8qsvmvooXq/preview", iconClass: 'ri-todo-line', instructions: "Practica la lectura de notas en el Grand Staff con estos ejercicios progresivos.", tip: "Di el nombre de cada nota en voz alta antes de tocarla para reforzar el aprendizaje.", objective: ["Mejorar la lectura a primera vista", "Reconocer rápidamente notas en ambas claves", "Desarrollar fluidez en la lectura musical"] },
+                            { type: 'exercise', title: "Ode to Joy - var3", contentUrl: "https://www.mozart-app.com/xml2?file=Ode to Joy.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta esta variación leyendo directamente del Grand Staff completo.", tip: "Usa el reproductor interactivo para escuchar cómo debe sonar antes de practicar.", objective: ["Aplicar lectura del Grand Staff en una pieza musical", "Integrar conocimientos previos", "Ganar confianza en la lectura de partituras"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 3: Dirección",
+                        unit: 1,
+                        tasks: [
+                            { type: 'video', title: "Intervalos de 2da y 3era", videoId: "H4x0TPlSoaQ", iconClass: 'ri-play-circle-line', instructions: "Descubre cómo se mueven las notas por pasos (2das) y saltos pequeños (3eras) en el teclado.", tip: "Los intervalos son la distancia entre dos notas. Practica identificarlos visualmente en el pentagrama.", objective: ["Reconocer intervalos de 2da y 3era", "Comprender el movimiento melódico", "Tocar intervalos con precisión"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1Dom_0ZjNoslBKZpUa3IUDN8XMzcxZ1Jd/preview", iconClass: 'ri-todo-line', instructions: "Completa estos ejercicios para dominar el reconocimiento y ejecución de intervalos de 2da y 3era.", tip: "Observa la dirección del movimiento: ¿la nota sube o baja? Esto te ayudará a anticipar.", objective: ["Practicar intervalos ascendentes y descendentes", "Mejorar la lectura direccional", "Desarrollar anticipación visual"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 4: Intervalos",
+                        unit: 1,
+                        tasks: [
+                            { type: 'video', title: "Intervalos de 4ta y 5ta", videoId: "M6DCHr2wVh8", iconClass: 'ri-play-circle-line', instructions: "Explora intervalos más grandes que crean sonidos característicos en la música.", tip: "Las 5tas suenan muy estables y potentes. Las 4tas tienen un sonido abierto y brillante.", objective: ["Identificar intervalos de 4ta y 5ta", "Comprender sus cualidades sonoras", "Tocar saltos más amplios con precisión"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1G3Cun9yL_xl8ZJUhDJE5CAYTXMQUCIZY/preview", iconClass: 'ri-todo-line', instructions: "Practica estos ejercicios que combinan todos los intervalos aprendidos hasta ahora.", tip: "Los saltos grandes requieren preparación visual. Mira con anticipación dónde irán tus dedos.", objective: ["Dominar intervalos de 4ta y 5ta", "Combinar diferentes tipos de intervalos", "Mejorar la precisión en saltos"] },
+                            { type: 'exercise', title: "Teoría", contentUrl: "https://drive.google.com/file/d/1PmVBq1jbKZyFOK3T-CWDNhZ7Tba428Lr/preview", iconClass: 'ri-question-line', instructions: "Refuerza tu comprensión teórica de los intervalos con estos ejercicios escritos.", tip: "Entender la teoría te ayudará a aprender piezas más rápido en el futuro.", objective: ["Consolidar conocimiento teórico de intervalos", "Identificar intervalos en partituras", "Conectar teoría con práctica"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 5: Frases",
+                        unit: 2,
+                        tasks: [
+                            { type: 'video', title: "Construcción de Frases", videoId: "RJnwVQHexW0", iconClass: 'ri-play-circle-line', instructions: "Aprende cómo las notas se agrupan en frases musicales, similar a las oraciones en el lenguaje.", tip: "Las frases musicales tienen un inicio, desarrollo y final. Respira entre frases como al hablar.", objective: ["Comprender el concepto de frase musical", "Identificar frases en partituras", "Tocar con expresión natural"] },
+                            { type: 'exercise', title: "Práctica de Frases", contentUrl: "https://mozart-app.com/lessons/text", iconClass: 'ri-file-text-line', instructions: "Trabaja estos ejercicios prestando atención especial a la forma de las frases.", tip: "Levanta ligeramente las manos al final de cada frase para crear separación natural.", objective: ["Aplicar fraseo en ejercicios prácticos", "Desarrollar sensibilidad musical", "Crear interpretaciones más expresivas"] },
+                            { type: 'quiz', title: "Quiz de Review", contentUrl: "https://mozart-app.com/lessons/quiz", iconClass: 'ri-question-line', instructions: "Responde estas preguntas para verificar tu comprensión de los conceptos fundamentales.", tip: "Si fallas alguna pregunta, revisa el contenido correspondiente antes de continuar.", objective: ["Evaluar tu comprensión de ritmo y métrica", "Verificar conocimiento de la posición de Do", "Reforzar conceptos de melodía y armonía"] },
+                            { type: 'exercise', title: "Práctica de Frases", contentUrl: "https://drive.google.com/file/d/1gum-qE-LUdxxRNmjh39A1xImbqYRABAX/preview", iconClass: 'ri-todo-line', instructions: "Trabaja estos ejercicios prestando atención especial a la forma de las frases.", tip: "Levanta ligeramente las manos al final de cada frase para crear separación natural.", objective: ["Aplicar fraseo en ejercicios prácticos", "Desarrollar sensibilidad musical", "Crear interpretaciones más expresivas"] },
+                            { type: 'exercise', title: "Run Away River", contentUrl: "https://www.mozart-app.com/xml2?file=Run Away River.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta esta pieza aplicando todo lo aprendido sobre frases musicales.", tip: "Imagina que estás contando una historia. Cada frase es parte de la narrativa.", objective: ["Ejecutar una pieza completa con buen fraseo", "Demostrar comprensión musical", "Expresar musicalidad personal"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 6: Acordes",
+                        unit: 2,
+                        tasks: [
+                            { type: 'video', title: "Construcción de Acordes", videoId: "Y2MokfVUSqs", iconClass: 'ri-play-circle-line', instructions: "Descubre cómo se construyen los acordes a partir de intervalos apilados.", tip: "Un acorde es simplemente tres o más notas tocadas simultáneamente. Comienza identificando la nota base.", objective: ["Comprender la estructura de los acordes", "Identificar las notas que forman un acorde", "Preparar las manos para tocar acordes"] },
+                            { type: 'video', title: "Acorde C y G7", videoId: "n7qaCP5a-Pc", iconClass: 'ri-play-circle-line', instructions: "Aprende a formar y tocar los acordes de Do mayor y Sol séptima, fundamentales en muchas piezas.", tip: "Memoriza la forma de estos acordes. Son los más usados en música para principiantes.", objective: ["Dominar los acordes de C y G7", "Cambiar entre acordes suavemente", "Comprender su función armónica"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1UtQsQYtjkYxqbVnCGfTmNa85xtnhG3W7/preview", iconClass: 'ri-todo-line', instructions: "Practica cambios de acordes y patrones de acompañamiento con estos ejercicios.", tip: "Mantén los dedos curvados y toca todas las notas del acorde al mismo tiempo.", objective: ["Ejecutar acordes con claridad", "Desarrollar fuerza en los dedos", "Practicar transiciones entre acordes"] },
+                            { type: 'exercise', title: "Trumpet Voluntary", contentUrl: "https://www.mozart-app.com/xml2?file=Trumpet Voluntary.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta esta pieza clásica que incorpora los acordes que has aprendido.", tip: "La mano derecha lleva la melodía principal. Asegúrate de que suene más fuerte que los acordes.", objective: ["Combinar melodía y acordes en una interpretación", "Aplicar balance dinámico", "Ejecutar una pieza de repertorio clásico"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 7: Corcheas y Staccato",
+                        unit: 2,
+                        tasks: [
+                            { type: 'video', title: "Corcheas", videoId: "LJIBynkI1Cs", iconClass: 'ri-play-circle-line', instructions: "Aprende a tocar corcheas, las notas que duran la mitad de un tiempo.", tip: "Las corcheas se cuentan '1-y-2-y-3-y-4-y'. Practica contando en voz alta.", objective: ["Comprender el valor rítmico de las corcheas", "Tocar ritmos con corcheas", "Mantener pulso constante en ritmos más rápidos"] },
+                            { type: 'video', title: "Staccato", videoId: "5zX6CFXf6cQ", iconClass: 'ri-play-circle-line', instructions: "Descubre el staccato, una técnica que crea notas cortas y separadas.", tip: "Staccato significa 'picado'. Imagina que tocas una estufa caliente - rápido y ligero.", objective: ["Ejecutar la articulación staccato correctamente", "Distinguir entre legato y staccato", "Añadir variedad expresiva a tu interpretación"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1DquyL0GuDR3zojHcmzBLPZaA598DMLbu/preview", iconClass: 'ri-todo-line', instructions: "Practica corcheas y staccato con estos ejercicios diseñados específicamente para estas técnicas.", tip: "Alterna entre tocar legato y staccato para sentir la diferencia en tu cuerpo.", objective: ["Dominar ritmos con corcheas", "Perfeccionar la técnica staccato", "Combinar diferentes articulaciones"] },
+                            { type: 'exercise', title: "Old German Dance", contentUrl: "https://www.mozart-app.com/xml2?file=old-german-dance-michael-praetorius.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta esta danza alemana que utiliza corcheas y staccato para crear un carácter alegre.", tip: "Esta pieza debe sonar juguetona y ligera. Deja que tu muñeca esté relajada.", objective: ["Aplicar corcheas en contexto musical", "Usar staccato expresivamente", "Interpretar música del periodo renacentista"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 8: Posición de Do",
+                        unit: 3,
+                        tasks: [
+                            { type: 'video', title: "Posición de Do II", videoId: "KopYT505jHA", iconClass: 'ri-play-circle-line', instructions: "Expande tu conocimiento de la posición de Do explorando diferentes octavas y variaciones.", tip: "La posición de Do puede empezar en diferentes lugares del teclado. El patrón es siempre el mismo.", objective: ["Reconocer la posición de Do en diferentes octavas", "Trasladar posiciones fluidamente", "Ampliar tu rango en el teclado"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1uuu7dX6SRoOIi1aqzTEJ1xj8CbfW6Uft/preview", iconClass: 'ri-todo-line', instructions: "Trabaja estos ejercicios que te llevan por diferentes posiciones de Do en el teclado.", tip: "Mantén la forma de la mano constante cuando cambies de posición.", objective: ["Practicar cambios de posición", "Desarrollar orientación en el teclado", "Fortalecer técnica en múltiples registros"] },
+                            { type: 'video', title: "Marcas de Tempo y Dinámicas", videoId: "fOHFGsq-cGw", iconClass: 'ri-play-circle-line', instructions: "Aprende a interpretar las indicaciones de velocidad y volumen en las partituras.", tip: "Términos como 'forte' (fuerte) y 'piano' (suave) son en italiano. Son universales en la música.", objective: ["Comprender términos de tempo comunes", "Reconocer símbolos dinámicos", "Aplicar variaciones de velocidad y volumen"] },
+                            { type: 'exercise', title: "Waltz", contentUrl: "https://www.mozart-app.com/xml2?file=waltz-carl-czerny.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta este vals aplicando todas las indicaciones de tempo y dinámicas.", tip: "Un vals tiene ritmo de 3/4. El primer tiempo debe sentirse más fuerte que el 2 y 3.", objective: ["Ejecutar un vals con estilo apropiado", "Aplicar indicaciones de interpretación", "Desarrollar sensibilidad musical avanzada"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 9: Posición de Sol",
+                        unit: 3,
+                        tasks: [
+                            { type: 'video', title: "Posición de Sol", videoId: "jGM_qOcewYg", iconClass: 'ri-play-circle-line', instructions: "Aprende una nueva posición fundamental: la posición de Sol, que expande tus posibilidades melódicas.", tip: "En posición de Sol, tu pulgar derecho empieza en la nota Sol. Encuentra todas las teclas Sol primero.", objective: ["Dominar la posición de Sol", "Comparar con la posición de Do", "Tocar en nuevas tonalidades"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/1CfqcsxDsyCwxo8ZhhOrejiiJcgyEzxCE/preview", iconClass: 'ri-todo-line', instructions: "Practica estos ejercicios específicos para familiarizarte con la posición de Sol.", tip: "Compara la sensación de esta posición con la de Do. Nota las similitudes y diferencias.", objective: ["Establecer memoria muscular en posición de Sol", "Practicar digitación correcta", "Ganar confianza en la nueva posición"] },
+                            { type: 'exercise', title: "Bagpipe", contentUrl: "https://drive.google.com/file/d/16hYD36HcMS-WRqzR9pBvSLHCxifOTkWc/preview", iconClass: 'ri-file-music-line', instructions: "Toca esta pieza que imita el sonido de la gaita, usando la posición de Sol.", tip: "Las gaitas tienen un sonido constante y mantenido. Toca con articulación suave y fluida.", objective: ["Aplicar posición de Sol en repertorio", "Crear carácter específico en la interpretación", "Desarrollar control de sonido sostenido"] }
+                        ]
+                    },
+                    {
+                        title: "Lección 10: Ligaduras",
+                        unit: 3,
+                        tasks: [
+                            { type: 'video', title: "Ligadura de prolongación", videoId: "edjG-czdX2Y", iconClass: 'ri-play-circle-line', instructions: "Descubre cómo las ligaduras conectan notas para extender su duración.", tip: "Una ligadura une dos notas de la misma altura. Solo tocas la primera, pero mantienes el sonido.", objective: ["Comprender el concepto de ligadura", "Identificar ligaduras en partituras", "Ejecutar ritmos sincopados correctamente"] },
+                            { type: 'exercise', title: "Ejercicios", contentUrl: "https://drive.google.com/file/d/16dc7Bkc7KtoP95hA1Tcni_i4M7eDfNLf/preview", iconClass: 'ri-todo-line', instructions: "Practica con ejercicios que incluyen ligaduras en diferentes contextos rítmicos.", tip: "Cuenta en voz alta y mantén el dedo presionado durante toda la duración combinada.", objective: ["Ejecutar ligaduras correctamente", "Desarrollar precisión rítmica avanzada", "Mantener pulso constante con ritmos complejos"] },
+                            { type: 'exercise', title: "Sonatina", contentUrl: "https://www.mozart-app.com/xml2?file=sonatina.musicxml", iconClass: 'ri-file-music-line', instructions: "Interpreta esta sonatina que incorpora todas las técnicas aprendidas, incluyendo ligaduras.", tip: "Una sonatina es una 'pequeña sonata'. Tócala con elegancia y atención al detalle.", objective: ["Integrar todas las técnicas aprendidas", "Interpretar una pieza de forma musical completa", "Demostrar progreso técnico y musical"] }
+                        ]
+                    }
+                ]
             },
-        };
-
-        $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-            .then(function(response) {
-                $scope.userStatus = response.data.status
-                const stage = JSON.parse(response.data.stage);
-                $scope.serverLevelIndex = stage.lvl;
-            $scope.serverLessonIndex = stage.lsn;
-            $scope.currentLevelIndex = stage.lvl; 
-            $scope.levels.forEach(level => {
-                if (level.id < $scope.currentLevelIndex) {
-                    level.progress = 100; // Marcar niveles anteriores como 100%
-                } else if (level.id > $scope.currentLevelIndex) {
-                    level.progress = 0; // Marcar niveles futuros como 0%
-                }
-                // Si el nivel es el actual, dejamos el progreso que trae por defecto
-            });
-            initApp($scope.serverLevelIndex, $scope.serverLessonIndex);
-               // $scope.userSubmittedRecordings = stage.exes || [];
-            }).catch(function(error) {
-               $scope.serverLevelIndex = 0;
-            $scope.serverLessonIndex = 0;
-            $scope.currentLevelIndex = 0;
-
-            $scope.levels.forEach(level => {
-            level.progress = 0;
-        });
-               initApp(0, 0);
-            }).finally(function() {
-            $scope.isLoading = false;
-        });
-
-    // =============================================
-    // == LÓGICA DE CAMBIO DE VISTAS Y NIVELES
-    // =============================================
-    $scope.selectLevel = (level) => {
-        if ($scope.currentLevelIndex >= level.id) {
-            $scope.selectedLevel = level;
-            $scope.startApp();
-        }
-    };
-
-    $scope.startApp = () => {
-        if (!$scope.selectedLevel) return;
-
-        const levelToLoad = $scope.selectedLevel.id;
-        let lessonToLoad = 0; 
-        if (levelToLoad === $scope.serverLevelIndex) {
-            lessonToLoad = $scope.serverLessonIndex;
-        }
-
-        $scope.currentView = 'app';
-        initApp(levelToLoad, lessonToLoad);
-    };
-
-$scope.showLevelSelector = () => {
-    // Guardar el progreso actual antes de salir
-    if ($scope.selectedLevel) {
-        $scope.savedProgress[$scope.selectedLevel.id] = {
-            lessons: angular.copy($scope.lessons),
-            currentLessonIndex: $scope.currentLessonIndex,
-            currentTaskIndex: $scope.currentTaskIndex,
-            totalTasksCompleted: $scope.totalTasksCompleted,
-            progress: $scope.progress
-        };
+            { id: 1, title: 'Nivel 1', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '4 horas', lessons: [
+                { title: "Lección 1: Escalas Mayores", unit: 1, tasks: [
+                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
+                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
+                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
+                ]},
+                { title: "Lección 2: Tonalidad de G", unit: 1, tasks: [
+                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
+                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
+                ]},
+                { title: "Lección 3: Pentaescalas", unit: 1, tasks: [{ type: 'video', title: "Pentaescalas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 4: Cambio de Posición", unit: 2, tasks: [{ type: 'video', title: "Cambios", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 5: Intervalos de 6ta", unit: 2, tasks: [{ type: 'video', title: "Sextas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 6: Tonalidad de F", unit: 2, tasks: [{ type: 'video', title: "Fa Mayor", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 7: Grupo 1", unit: 3, tasks: [{ type: 'video', title: "Grupo 1", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 8: Más Notación", unit: 3, tasks: [{ type: 'video', title: "Notación Avanzada", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 9: Síncopas", unit: 3, tasks: [{ type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
+                { title: "Lección 10: Pieza Final", unit: "Final", tasks: [{ type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] }
+            ]},
+            { id: 2, title: 'Nivel 2', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
+            { id: 3, title: 'Nivel 3', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
+            { id: 4, title: 'Nivel 4', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
+            { id: 5, title: 'Nivel 5', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
+        ]);
         
-        // Actualizar el progreso en el objeto level
-        $scope.selectedLevel.progress = $scope.progress;
+        // ==========================================
+        // SECCIÓN 2: VARIABLES NO REACTIVAS (YouTube)
+        // ==========================================
+        let youtubePlayer = null;
+        let videoHasEnded = false;
+        let pauseTimer = null;
+        let isYouTubeAPIReady = false;
+        let shouldAutoplayVideo = false;
         
-        // Actualizar currentLevelIndex si completó todas las tareas
-        if ($scope.currentLessonIndex >= $scope.lessons.length) {
-            $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
-        }
-    }
-    
-    // NUEVO: Recalcular el progreso de todos los niveles basado en savedProgress
-    $scope.levels.forEach(level => {
-        if ($scope.savedProgress[level.id]) {
-            level.progress = $scope.savedProgress[level.id].progress;
-        }
-    });
-    
-    $scope.currentView = 'levelSelector';
-};
+        
+        // ==========================================
+        // SECCIÓN 3: FUNCIONES DE API Y DATOS
+        // ==========================================
+        
+        const fetchUserData = async () => {
+            const requestData = {
+                action: "getUserData",
+                token: localStorage.getItem('MStoken')
+            };
 
-    $scope.toggleSidebar = () => {
-        $scope.sidebarOpen = !$scope.sidebarOpen;
-    };
-    
-function initApp(startLevelIdx, startLessonIdx, autoLoad = true) {
-    if (!$scope.levels[startLevelIdx]) {
-        console.error("El nivel " + startLevelIdx + " no existe. Empezando en 0.");
-        startLevelIdx = 0;
-        startLessonIdx = 0;
-    }
-
-    $scope.selectedLevel = $scope.levels[startLevelIdx];
-
-    // NUEVO: Marcar como completados todos los niveles inferiores
-    $scope.levels.forEach((level, idx) => {
-        if (idx < startLevelIdx) {
-            // Marcar todas las lecciones del nivel como completadas
-            if (!$scope.savedProgress[level.id]) {
-                const completedLessons = angular.copy(level.lessons);
-                completedLessons.forEach(lesson => {
-                    lesson.completed = true;
-                    lesson.expanded = false;
-                    lesson.tasks.forEach(task => {
-                        task.completed = true;
-                    });
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(requestData)
+                });
+                const data = await response.json();
+                const stage = JSON.parse(data.stage);
+                
+                serverLevelIndex.value = stage.lvl;
+                serverLessonIndex.value = stage.lsn;
+                currentLevelIndex.value = stage.lvl;
+                
+                levels.value.forEach(level => {
+                    if (level.id < currentLevelIndex.value) {
+                        level.progress = 100;
+                    } else if (level.id > currentLevelIndex.value) {
+                        level.progress = 0;
+                    }
                 });
                 
-                // Guardar el progreso completo del nivel
-                $scope.savedProgress[level.id] = {
-                    lessons: completedLessons,
-                    currentLessonIndex: completedLessons.length,
-                    currentTaskIndex: 0,
-                    totalTasksCompleted: completedLessons.reduce((acc, l) => acc + l.tasks.length, 0),
-                    progress: 100
-                };
+                initApp(serverLevelIndex.value, serverLessonIndex.value);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                serverLevelIndex.value = 0;
+                serverLessonIndex.value = 0;
+                currentLevelIndex.value = 0;
+                levels.value.forEach(level => { level.progress = 0; });
+                initApp(0, 0);
+            } finally {
+                isLoading.value = false;
             }
-            // Actualizar el progreso visual del nivel
-            level.progress = 100;
-        }
-    });
-
-    if ($scope.savedProgress[$scope.selectedLevel.id]) {
-        const saved = $scope.savedProgress[$scope.selectedLevel.id];
+        };
         
-        // Restaurar el progreso guardado
-        $scope.lessons = angular.copy(saved.lessons);
-        $scope.currentLessonIndex = saved.currentLessonIndex;
-        $scope.currentTaskIndex = saved.currentTaskIndex;
-        $scope.totalTasksCompleted = saved.totalTasksCompleted;
-        $scope.progress = saved.progress;
-        $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
         
-        updatePendingTasks();
-        if (autoLoad) {
-            loadCurrentTask();
-        }
-
-    } else {
-        $scope.lessons = angular.copy($scope.selectedLevel.lessons);
-        $scope.totalTasks = $scope.lessons.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
-
-        const defaultLessonIndex = startLessonIdx; // Lección de inicio
-        const defaultTaskIndex = 0; // Siempre empezamos al inicio de la lección
+        // ==========================================
+        // SECCIÓN 4: INICIALIZACIÓN DE LA APP
+        // ==========================================
         
-        $scope.totalTasksCompleted = 0; // Iniciar contador
-
-        $scope.lessons.forEach((lesson, l_idx) => {
-            if (l_idx < defaultLessonIndex) {
-                // Lección ANTERIOR: Marcar todo como completo
-                lesson.completed = true;
-                lesson.expanded = false; // Colapsada
-                lesson.tasks.forEach(task => {
-                    task.completed = true;
-                    $scope.totalTasksCompleted++;
-                });
-
-            } else if (l_idx === defaultLessonIndex) {
-                // Lección ACTUAL: Expandir y marcar como activa
-                lesson.completed = false;
-                lesson.expanded = true; // Expandir esta lección
-                lesson.tasks.forEach((task, t_idx) => {
-                    // Marcar tareas previas como completas (si defaultTaskIndex fuera > 0)
-                    if (t_idx < defaultTaskIndex) { 
-                        task.completed = true;
-                        $scope.totalTasksCompleted++;
-                    } else {
-                        task.completed = false;
-                    }
-                });
-
-            } else {
-                // Lección FUTURA: Todo bloqueado
-                lesson.completed = false;
-                lesson.expanded = false;
-                lesson.tasks.forEach(task => task.completed = false);
+        const initApp = (startLevelIdx, startLessonIdx, autoLoad = true) => {
+            if (!levels.value[startLevelIdx]) {
+                console.error("El nivel " + startLevelIdx + " no existe. Empezando en 0.");
+                startLevelIdx = 0;
+                startLessonIdx = 0;
             }
-        });
-        $scope.currentLessonIndex = defaultLessonIndex;
-        $scope.currentTaskIndex = defaultTaskIndex;
-        updateProgress();
-        updatePendingTasks();
-        if (autoLoad) {
-            loadCurrentTask();
-        }
-    }
-    $scope.selectedLevel.progress = $scope.progress;
-}
 
-function updatePendingTasks() {
-    $scope.pendingTasks = [];
-    
-    if ($scope.currentLessonIndex < $scope.lessons.length) {
-        const currentLesson = $scope.lessons[$scope.currentLessonIndex];
-        
+            selectedLevel.value = levels.value[startLevelIdx];
 
-        const tasksToShow = currentLesson.tasks.slice(0, 3);
-        
-        tasksToShow.forEach((task, index) => {
-            $scope.pendingTasks.push({
-                lessonTitle: currentLesson.title,
-                taskTitle: task.title,
-                taskType: task.type,
-                lessonIndex: $scope.currentLessonIndex,
-                taskIndex: index,
-                iconClass: task.iconClass || getIconForTaskType(task.type),
-                completed: task.completed 
-            });
-        });
-    }
-}
-
-    $scope.toggleLesson = (lesson) => {
-        const lessonIndex = $scope.lessons.indexOf(lesson);
-        const isUnlocked = lessonIndex === 0 || $scope.lessons[lessonIndex - 1].completed;
-        if (isUnlocked) {
-            lesson.expanded = !lesson.expanded;
-        }
-    };
-    
-$scope.viewTask = (lessonIndex, taskIndex) => {
-    // 1. Comprobar si la tarea es futura
-    const isFutureTask = (lessonIndex > $scope.currentLessonIndex) || 
-                         (lessonIndex === $scope.currentLessonIndex && taskIndex > $scope.currentTaskIndex);
-
-    if (isFutureTask) {
-        console.log("Tarea bloqueada. Completa la actual primero.");
-        return; // No hacer nada
-    }
-
-    // 2. Si no es futura (es actual o pasada), mostrar su contenido
-    $scope.viewingLessonIndex = lessonIndex;
-    $scope.viewingTaskIndex = taskIndex;
-    
-    const task = $scope.lessons[lessonIndex].tasks[taskIndex];
-    $scope.currentViewingTask = task;
-    const youtubeContainer = document.getElementById('youtube-container');
-    const contentIframe = document.getElementById('content-iframe');
-
-    if (task.type === 'video') {
-        // Mostrar video
-        $scope.showingVideo = true;
-        contentIframe.style.display = 'none';
-        youtubeContainer.style.display = 'block';
-        openVideoModal(task); // Tu función ya maneja la carga del video
-    } else {
-        // Mostrar iframe (ejercicio, quiz, etc.)
-        $scope.showingVideo = false;
-        youtubeContainer.style.display = 'none';
-        contentIframe.style.display = 'block';
-        $scope.currentTaskUrl = task.contentUrl;
-    }
-    
-    if($scope.sidebarOpen) {
-        $timeout(() => $scope.sidebarOpen = false, 200);
-    }
-};
-    
-function loadCurrentTask() {
-    if ($scope.currentLessonIndex >= $scope.lessons.length) {
-        // Nivel completado - mostrar última lección en lugar de mensaje
-        $scope.currentLessonIndex = $scope.lessons.length - 1;
-        $scope.currentTaskIndex = $scope.lessons[$scope.currentLessonIndex].tasks.length - 1;
-        
-        const lesson = $scope.lessons[$scope.currentLessonIndex];
-        const task = lesson.tasks[$scope.currentTaskIndex];
-        
-        $scope.currentViewingTask = task;
-        lesson.expanded = true;
-        $scope.viewingLessonIndex = $scope.currentLessonIndex;
-        $scope.viewingTaskIndex = $scope.currentTaskIndex;
-        
-        // Cargar el contenido de la última tarea
-        if (task.type === 'video') {
-            openVideoModal(task);
-        } else {
-            $scope.showingVideo = false;
-            document.getElementById('youtube-container').style.display = 'none';
-            document.getElementById('content-iframe').style.display = 'block';
-            $scope.currentTaskUrl = task.contentUrl;
-        }
-        return;
-    }
-    
-    const lesson = $scope.lessons[$scope.currentLessonIndex];
-    const task = lesson.tasks[$scope.currentTaskIndex];
-    
-    $scope.currentViewingTask = task;
-    lesson.expanded = true;
-    $scope.viewingLessonIndex = $scope.currentLessonIndex;
-    $scope.viewingTaskIndex = $scope.currentTaskIndex;
-    
-    if (task.type === 'video') {
-        speak(`Siguiente: ${task.title}.`);
-        openVideoModal(task);
-    } else {
-        $scope.currentTaskUrl = task.contentUrl;
-        if (task.type === 'note') {
-            speak(`Ahora, ${task.title}`, 'important');
-        } else {
-            speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
-        }
-    }
-    
-    if($scope.sidebarOpen) {
-        $timeout(() => $scope.sidebarOpen = false, 200);
-    }
-}
-    
-  function completeCurrentTask() {
-    const task = $scope.lessons[$scope.currentLessonIndex].tasks[$scope.currentTaskIndex];
-    task.completed = true;
-
-    $scope.totalTasksCompleted++;
-    updateProgress();
-    updatePendingTasks(); // AGREGAR ESTA LÍNEA
-    
-    $scope.currentTaskIndex++;
-    if ($scope.currentTaskIndex >= $scope.lessons[$scope.currentLessonIndex].tasks.length) {
-        completeLesson();
-    } else {
-        shouldAutoplayVideo = true;
-        $timeout(loadCurrentTask, 1200);
-    }
-}
-    
-function completeLesson() {
-    const lesson = $scope.lessons[$scope.currentLessonIndex];
-    speak(`¡Felicidades! Has completado la ${lesson.title}.`, 'important');
-    lesson.completed = true;
-    showConfetti();
-    
-    $scope.currentLessonIndex++;
-    $scope.currentTaskIndex = 0;
-
-    if ($scope.currentLessonIndex >= $scope.lessons.length) {
-        $scope.currentLevelIndex = Math.max($scope.currentLevelIndex, $scope.selectedLevel.id + 1);
-        speak("¡Has completado todo el nivel! El siguiente nivel ha sido desbloqueado.", 'important');
-        showConfetti(200);
-        
-        $timeout(() => {
-            alert("¡Nivel Completado! 🎉\n\nHas terminado todas las lecciones de este nivel.\nEl siguiente nivel ha sido desbloqueado.");
-            $scope.showLevelSelector();
-        }, 1500);
-        
-        return; 
-    }
-    shouldAutoplayVideo = true;
-    $timeout(loadCurrentTask, 1500);
-}
-
-    function updateProgress() {
-        $scope.progress = ($scope.totalTasksCompleted / $scope.totalTasks) * 100;
-    }
-
- 
-
-
-    function initYouTubePlayer(videoId) {
-        videoHasEnded = false;
-        youtubePlayer = new YT.Player('player', {
-            width: '100%',
-            height: '100%',
-            videoId: videoId,
-            playerVars: {
-                'playsinline': 1,
-                'rel': 0
-            },
-            events: {
-                'onReady': function(event) {
-                    if (shouldAutoplayVideo) {
-                        event.target.playVideo();
-                    }
-                },
-                'onStateChange': onPlayerStateChange
-            }
-        });
-    }
-
-    function onPlayerStateChange(event) {
-        console.log('Estado del video:', event.data);
-        
-        const pauseModal = document.getElementById('pauseModal');
-        const finishedModal = document.getElementById('finishedModal');
-        
-        clearTimeout(pauseTimer);
-
-        switch (event.data) {
-            case YT.PlayerState.PLAYING:
-                console.log('Reproduciendo');
-                pauseModal.style.display = 'none';
-                break;
-            
-            case YT.PlayerState.PAUSED:
-                console.log('Pausado');
-                if (!videoHasEnded) {
-                    pauseTimer = setTimeout(() => {
-                        if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
-                            pauseModal.style.display = 'flex';
-                        }
-                    }, 250);
-                }
-                break;
-            
-            case YT.PlayerState.ENDED:
-                console.log('Video terminado');
-                videoHasEnded = true;
-                pauseModal.style.display = 'none';
-                finishedModal.style.display = 'flex';
-                break;
-
-            case YT.PlayerState.BUFFERING:
-                console.log('Cargando...');
-                clearTimeout(pauseTimer);
-                break;
-        }
-    }
-
-    function openVideoModal(task) {
-        $scope.showingVideo = true;
-        $scope.currentTaskUrl = '';
-        
-        const youtubeContainer = document.getElementById('youtube-container');
-        const contentIframe = document.getElementById('content-iframe');
-        
-        youtubeContainer.style.display = 'block';
-        contentIframe.style.display = 'none';
-        
-        if (!isYouTubeAPIReady) {
-            const checkAPI = setInterval(() => {
-                if (typeof YT !== 'undefined' && YT.Player) {
-                    isYouTubeAPIReady = true;
-                    clearInterval(checkAPI);
-                    createOrLoadVideo(task.videoId);
-                }
-            }, 100);
-        } else {
-            createOrLoadVideo(task.videoId);
-        }
-    }
-
-    function createOrLoadVideo(videoId) {
-        if (!youtubePlayer) {
-            initYouTubePlayer(videoId);
-        } else {
-            youtubePlayer.loadVideoById(videoId);
-            videoHasEnded = false;
-            if (shouldAutoplayVideo) {
-                youtubePlayer.playVideo();
-            }
-        }
-        shouldAutoplayVideo = false;
-    }
-
-    function openQuizModal(task) {
-        const optionsHTML = task.options.map((option, index) => 
-            `<button class="quiz-option" data-index="${index}">${option}</button>`
-        ).join('');
-        
-        const content = `
-            <h3>Quiz Rápido</h3>
-            <p>${task.question}</p>
-            <div class="quiz-options">${optionsHTML}</div>`;
-            
-        $scope.modal.content = $sce.trustAsHtml(content);
-        $scope.modal.show = true;
-
-        $timeout(() => {
-            document.querySelectorAll('.quiz-option').forEach(button => {
-                button.onclick = (e) => {
-                    const selectedIndex = parseInt(e.target.dataset.index);
-                    if (selectedIndex === task.correctAnswer) {
-                        $scope.$apply(() => {
-                            closeModal();
-                            completeCurrentTask();
+            // Marcar niveles inferiores como completados
+            levels.value.forEach((level, idx) => {
+                if (idx < startLevelIdx) {
+                    if (!savedProgress.value[level.id]) {
+                        const completedLessons = JSON.parse(JSON.stringify(level.lessons));
+                        completedLessons.forEach(lesson => {
+                            lesson.completed = true;
+                            lesson.expanded = false;
+                            lesson.tasks.forEach(task => { task.completed = true; });
                         });
-                    } else {
-                        e.target.style.backgroundColor = 'var(--danger-red)';
-                        e.target.style.color = 'white';
-                        speak("Respuesta incorrecta. Intenta de nuevo.");
+                        
+                        savedProgress.value[level.id] = {
+                            lessons: completedLessons,
+                            currentLessonIndex: completedLessons.length,
+                            currentTaskIndex: 0,
+                            totalTasksCompleted: completedLessons.reduce((acc, l) => acc + l.tasks.length, 0),
+                            progress: 100
+                        };
                     }
-                };
+                    level.progress = 100;
+                }
             });
-        });
-    }
-    
- 
-    
-  
-    
-    function closeModal() {
-        $scope.modal.show = false;
-        $scope.modal.content = '';
-    }
 
-    // =============================================
-    // == VOZ Y EFECTOS
-    // =============================================
-    function speak(text, priority = 'normal') {
-        if ('speechSynthesis' in window) {
-            if (priority === 'important') speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-MX';
-            utterance.rate = 1.1;
-          //  speechSynthesis.speak(utterance);
-        }
-    }
-    
-    function showConfetti(count = 100) {
-        const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
-        for (let i = 0; i < count; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = `${Math.random() * 100}vw`;
-            confetti.style.top = `${-10 - Math.random() * 10}vh`;
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDelay = `${Math.random() * 0.5}s`;
-            confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 5000);
-        }
-    }
+            // Restaurar progreso guardado o iniciar nuevo
+            if (savedProgress.value[selectedLevel.value.id]) {
+                const saved = savedProgress.value[selectedLevel.value.id];
+                lessons.value = JSON.parse(JSON.stringify(saved.lessons));
+                currentLessonIndex.value = saved.currentLessonIndex;
+                currentTaskIndex.value = saved.currentTaskIndex;
+                totalTasksCompleted.value = saved.totalTasksCompleted;
+                progress.value = saved.progress;
+                totalTasks.value = lessons.value.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+                
+                updatePendingTasks();
+                if (autoLoad) loadCurrentTask();
+            } else {
+                lessons.value = JSON.parse(JSON.stringify(selectedLevel.value.lessons));
+                totalTasks.value = lessons.value.reduce((acc, lesson) => acc + lesson.tasks.length, 0);
+                totalTasksCompleted.value = 0;
 
-    // =============================================
-    // == COMUNICACIÓN ENTRE FRAMES
-    // =============================================
-    window.addEventListener('message', function(event) {
-        if (event.data === 'siguienteActividad') {
-            $scope.$apply(() => {
-                completeCurrentTask();
-            });
-        }
-    });
-
-    // =============================================
-    // == INICIALIZACIÓN DE EVENTOS
-    // =============================================
-    $timeout(function() {
-        const levelSelector = document.getElementById('levelSelector');
-        const banner = document.querySelector('.banner-header');
-        const closePauseButton = document.getElementById('closePauseButton');
-        const continueVideoButton = document.getElementById('continueVideoButton');
-
-        // Parallax del banner
-        if (levelSelector && banner) {
-            levelSelector.addEventListener('scroll', function() {
-                let scrollTop = this.scrollTop;
-                let bannerHeight = banner.offsetHeight;
-                banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
-                let opacity = 1 - (scrollTop / bannerHeight);
-                banner.style.opacity = Math.max(0, opacity);
-            });
-        }
-
-        // Botón cerrar modal de pausa
-        if (closePauseButton) {
-            closePauseButton.onclick = () => {
-                console.log('Cerrando modal de pausa');
-                document.getElementById('pauseModal').style.display = 'none';
-                if (youtubePlayer) youtubePlayer.playVideo();
-            };
-        }
+                lessons.value.forEach((lesson, l_idx) => {
+                    if (l_idx < startLessonIdx) {
+                        lesson.completed = true;
+                        lesson.expanded = false;
+                        lesson.tasks.forEach(task => {
+                            task.completed = true;
+                            totalTasksCompleted.value++;
+                        });
+                    } else if (l_idx === startLessonIdx) {
+                        lesson.completed = false;
+                        lesson.expanded = true;
+                        lesson.tasks.forEach(task => { task.completed = false; });
+                    } else {
+                        lesson.completed = false;
+                        lesson.expanded = false;
+                        lesson.tasks.forEach(task => task.completed = false);
+                    }
+                });
+                
+                currentLessonIndex.value = startLessonIdx;
+                currentTaskIndex.value = 0;
+                updateProgress();
+                updatePendingTasks();
+                if (autoLoad) loadCurrentTask();
+            }
+            selectedLevel.value.progress = progress.value;
+        };
         
-        // Botón continuar después del video
-        if (continueVideoButton) {
-            continueVideoButton.onclick = () => {
-                console.log('Continuando después del video');
-                $scope.$apply(() => {
-                    document.getElementById('finishedModal').style.display = 'none';
-                    $scope.showingVideo = false;
+        
+        // ==========================================
+        // SECCIÓN 5: NAVEGACIÓN ENTRE VISTAS
+        // ==========================================
+        
+        const selectLevel = (level) => {
+            if (currentLevelIndex.value >= level.id) {
+                selectedLevel.value = level;
+                startApp();
+            }
+        };
+
+        const startApp = () => {
+            if (!selectedLevel.value) return;
+            const levelToLoad = selectedLevel.value.id;
+            let lessonToLoad = 0;
+            if (levelToLoad === serverLevelIndex.value) {
+                lessonToLoad = serverLessonIndex.value;
+            }
+            currentView.value = 'app';
+            initApp(levelToLoad, lessonToLoad);
+        };
+
+        const showLevelSelector = () => {
+            if (selectedLevel.value) {
+                savedProgress.value[selectedLevel.value.id] = {
+                    lessons: JSON.parse(JSON.stringify(lessons.value)),
+                    currentLessonIndex: currentLessonIndex.value,
+                    currentTaskIndex: currentTaskIndex.value,
+                    totalTasksCompleted: totalTasksCompleted.value,
+                    progress: progress.value
+                };
+                selectedLevel.value.progress = progress.value;
+                
+                if (currentLessonIndex.value >= lessons.value.length) {
+                    currentLevelIndex.value = Math.max(currentLevelIndex.value, selectedLevel.value.id + 1);
+                }
+            }
+            
+            levels.value.forEach(level => {
+                if (savedProgress.value[level.id]) {
+                    level.progress = savedProgress.value[level.id].progress;
+                }
+            });
+            
+            currentView.value = 'levelSelector';
+        };
+
+        const toggleSidebar = () => { 
+            sidebarOpen.value = !sidebarOpen.value; 
+        };
+
+        const toggleLesson = (lesson, lessonIndex) => {
+            const isUnlocked = lessonIndex === 0 || lessons.value[lessonIndex - 1].completed;
+            if (isUnlocked) {
+                lesson.expanded = !lesson.expanded;
+            }
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 6: GESTIÓN DE TAREAS
+        // ==========================================
+        
+        const viewTask = (lessonIndex, taskIndex) => {
+            const isFutureTask = (lessonIndex > currentLessonIndex.value) || 
+                                 (lessonIndex === currentLessonIndex.value && taskIndex > currentTaskIndex.value);
+
+            if (isFutureTask) {
+                console.log("Tarea bloqueada. Completa la actual primero.");
+                return;
+            }
+
+            viewingLessonIndex.value = lessonIndex;
+            viewingTaskIndex.value = taskIndex;
+            
+            const task = lessons.value[lessonIndex].tasks[taskIndex];
+            currentViewingTask.value = task;
+            const youtubeContainer = document.getElementById('youtube-container');
+            const contentIframe = document.getElementById('content-iframe');
+
+            if (task.type === 'video') {
+                showingVideo.value = true;
+                contentIframe.style.display = 'none';
+                youtubeContainer.style.display = 'block';
+                openVideoModal(task);
+            } else {
+                showingVideo.value = false;
+                youtubeContainer.style.display = 'none';
+                contentIframe.style.display = 'block';
+                currentTaskUrl.value = task.contentUrl;
+            }
+            
+            if (sidebarOpen.value) {
+                setTimeout(() => { sidebarOpen.value = false; }, 200);
+            }
+        };
+
+        const loadCurrentTask = () => {
+            if (currentLessonIndex.value >= lessons.value.length) {
+                currentLessonIndex.value = lessons.value.length - 1;
+                currentTaskIndex.value = lessons.value[currentLessonIndex.value].tasks.length - 1;
+                
+                const lesson = lessons.value[currentLessonIndex.value];
+                const task = lesson.tasks[currentTaskIndex.value];
+                
+                currentViewingTask.value = task;
+                lesson.expanded = true;
+                viewingLessonIndex.value = currentLessonIndex.value;
+                viewingTaskIndex.value = currentTaskIndex.value;
+                
+                if (task.type === 'video') {
+                    openVideoModal(task);
+                } else {
+                    showingVideo.value = false;
                     document.getElementById('youtube-container').style.display = 'none';
                     document.getElementById('content-iframe').style.display = 'block';
-                    videoHasEnded = false;
-                    completeCurrentTask();
-                });
-            };
-        }
-    });
+                    currentTaskUrl.value = task.contentUrl;
+                }
+                return;
+            }
+            
+            const lesson = lessons.value[currentLessonIndex.value];
+            const task = lesson.tasks[currentTaskIndex.value];
+            
+            currentViewingTask.value = task;
+            lesson.expanded = true;
+            viewingLessonIndex.value = currentLessonIndex.value;
+            viewingTaskIndex.value = currentTaskIndex.value;
+            
+            if (task.type === 'video') {
+                speak(`Siguiente: ${task.title}.`);
+                openVideoModal(task);
+            } else {
+                currentTaskUrl.value = task.contentUrl;
+                if (task.type === 'note') {
+                    speak(`Ahora, ${task.title}`, 'important');
+                } else {
+                    speak(`Siguiente: ${task.title}. Haz clic en el ícono para comenzar.`);
+                }
+            }
+            
+            if (sidebarOpen.value) {
+                setTimeout(() => { sidebarOpen.value = false; }, 200);
+            }
+        };
 
-});
-    </script>
-</html>
+        const completeCurrentTask = () => {
+            const task = lessons.value[currentLessonIndex.value].tasks[currentTaskIndex.value];
+            task.completed = true;
+
+            totalTasksCompleted.value++;
+            updateProgress();
+            updatePendingTasks();
+            
+            currentTaskIndex.value++;
+            if (currentTaskIndex.value >= lessons.value[currentLessonIndex.value].tasks.length) {
+                completeLesson();
+            } else {
+                shouldAutoplayVideo = true;
+                setTimeout(loadCurrentTask, 1200);
+            }
+        };
+
+        const completeLesson = () => {
+            const lesson = lessons.value[currentLessonIndex.value];
+            speak(`¡Felicidades! Has completado la ${lesson.title}.`, 'important');
+            lesson.completed = true;
+            showConfetti();
+            
+            currentLessonIndex.value++;
+            currentTaskIndex.value = 0;
+
+            if (currentLessonIndex.value >= lessons.value.length) {
+                currentLevelIndex.value = Math.max(currentLevelIndex.value, selectedLevel.value.id + 1);
+                speak("¡Has completado todo el nivel! El siguiente nivel ha sido desbloqueado.", 'important');
+                showConfetti(200);
+                
+                setTimeout(() => {
+                    alert("¡Nivel Completado! 🎉\n\nHas terminado todas las lecciones de este nivel.\nEl siguiente nivel ha sido desbloqueado.");
+                    showLevelSelector();
+                }, 1500);
+                return;
+            }
+            shouldAutoplayVideo = true;
+            setTimeout(loadCurrentTask, 1500);
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 7: ACTUALIZACIÓN DE ESTADO
+        // ==========================================
+        
+        const updateProgress = () => {
+            progress.value = (totalTasksCompleted.value / totalTasks.value) * 100;
+        };
+
+        const updatePendingTasks = () => {
+            pendingTasks.value = [];
+            
+            if (currentLessonIndex.value < lessons.value.length) {
+                const currentLesson = lessons.value[currentLessonIndex.value];
+                const tasksToShow = currentLesson.tasks.slice(0, 3);
+                
+                tasksToShow.forEach((task, index) => {
+                    pendingTasks.value.push({
+                        lessonTitle: currentLesson.title,
+                        taskTitle: task.title,
+                        taskType: task.type,
+                        lessonIndex: currentLessonIndex.value,
+                        taskIndex: index,
+                        iconClass: task.iconClass || getIconForTaskType(task.type),
+                        completed: task.completed
+                    });
+                });
+            }
+        };
+
+        const getIconForTaskType = (type) => {
+            const icons = {
+                'video': 'ri-play-circle-line',
+                'exercise': 'ri-todo-line',
+                'quiz': 'ri-question-line',
+                'record': 'ri-mic-line',
+                'note': 'ri-music-2-line'
+            };
+            return icons[type] || 'ri-file-line';
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 8: YOUTUBE VIDEO
+        // ==========================================
+        
+        const initYouTubePlayer = (videoId) => {
+            videoHasEnded = false;
+            youtubePlayer = new YT.Player('player', {
+                width: '100%',
+                height: '100%',
+                videoId: videoId,
+                playerVars: { 'playsinline': 1, 'rel': 0 },
+                events: {
+                    'onReady': (event) => {
+                        if (shouldAutoplayVideo) event.target.playVideo();
+                    },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        };
+
+        const onPlayerStateChange = (event) => {
+            const pauseModal = document.getElementById('pauseModal');
+            const finishedModal = document.getElementById('finishedModal');
+            clearTimeout(pauseTimer);
+
+            switch (event.data) {
+                case YT.PlayerState.PLAYING:
+                    pauseModal.style.display = 'none';
+                    break;
+                case YT.PlayerState.PAUSED:
+                    if (!videoHasEnded) {
+                        pauseTimer = setTimeout(() => {
+                            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
+                                pauseModal.style.display = 'flex';
+                            }
+                        }, 250);
+                    }
+                    break;
+                case YT.PlayerState.ENDED:
+                    videoHasEnded = true;
+                    pauseModal.style.display = 'none';
+                    finishedModal.style.display = 'flex';
+                    break;
+                case YT.PlayerState.BUFFERING:
+                    clearTimeout(pauseTimer);
+                    break;
+            }
+        };
+
+        const openVideoModal = (task) => {
+            showingVideo.value = true;
+            currentTaskUrl.value = '';
+            
+            const youtubeContainer = document.getElementById('youtube-container');
+            const contentIframe = document.getElementById('content-iframe');
+            
+            youtubeContainer.style.display = 'block';
+            contentIframe.style.display = 'none';
+            
+            if (!isYouTubeAPIReady) {
+                const checkAPI = setInterval(() => {
+                    if (typeof YT !== 'undefined' && YT.Player) {
+                        isYouTubeAPIReady = true;
+                        clearInterval(checkAPI);
+                        createOrLoadVideo(task.videoId);
+                    }
+                }, 100);
+            } else {
+                createOrLoadVideo(task.videoId);
+            }
+        };
+
+        const createOrLoadVideo = (videoId) => {
+            if (!youtubePlayer) {
+                initYouTubePlayer(videoId);
+            } else {
+                youtubePlayer.loadVideoById(videoId);
+                videoHasEnded = false;
+                if (shouldAutoplayVideo) {
+                    youtubePlayer.playVideo();
+                }
+            }
+            shouldAutoplayVideo = false;
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 9: MODALES
+        // ==========================================
+        
+        const openQuizModal = (task) => {
+            const optionsHTML = task.options.map((option, index) => 
+                `<button class="quiz-option" data-index="${index}">${option}</button>`
+            ).join('');
+            
+            const content = `
+                <h3>Quiz Rápido</h3>
+                <p>${task.question}</p>
+                <div class="quiz-options">${optionsHTML}</div>`;
+                
+            modal.content = content;
+            modal.show = true;
+
+            nextTick(() => {
+                document.querySelectorAll('.quiz-option').forEach(button => {
+                    button.onclick = (e) => {
+                        const selectedIndex = parseInt(e.target.dataset.index);
+                        if (selectedIndex === task.correctAnswer) {
+                            closeModal();
+                            completeCurrentTask();
+                        } else {
+                            e.target.style.backgroundColor = 'var(--danger-red)';
+                            e.target.style.color = 'white';
+                            speak("Respuesta incorrecta. Intenta de nuevo.");
+                        }
+                    };
+                });
+            });
+        };
+
+        const closeModal = () => {
+            modal.show = false;
+            modal.content = '';
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 10: UTILIDADES (VOZ Y EFECTOS)
+        // ==========================================
+        
+        const speak = (text, priority = 'normal') => {
+            if ('speechSynthesis' in window) {
+                if (priority === 'important') speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-MX';
+                utterance.rate = 1.1;
+                // speechSynthesis.speak(utterance); // Descomenta para activar
+            }
+        };
+
+        const showConfetti = (count = 100) => {
+            const colors = ['#6f42c1', '#48aee9', '#28a745', '#ffc107', '#dc3545'];
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.top = `${-10 - Math.random() * 10}vh`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        };
+        
+        
+        // ==========================================
+        // SECCIÓN 11: LIFECYCLE HOOKS
+        // ==========================================
+        
+        onMounted(() => {
+            // Cargar datos del usuario
+            fetchUserData();
+            
+            // Listener para mensajes entre frames
+            window.addEventListener('message', (event) => {
+                if (event.data === 'siguienteActividad') {
+                    completeCurrentTask();
+                }
+            });
+            
+            // Configurar eventos del DOM
+            nextTick(() => {
+                // Parallax del banner
+                const levelSelector = document.getElementById('levelSelector');
+                const banner = document.querySelector('.banner-header');
+                
+                if (levelSelector && banner) {
+                    levelSelector.addEventListener('scroll', function() {
+                        let scrollTop = this.scrollTop;
+                        let bannerHeight = banner.offsetHeight;
+                        banner.style.transform = `translateY(-${scrollTop * 0.5}px)`;
+                        let opacity = 1 - (scrollTop / bannerHeight);
+                        banner.style.opacity = Math.max(0, opacity);
+                    });
+                }
+                
+                // Botón cerrar modal de pausa
+                const closePauseButton = document.getElementById('closePauseButton');
+                if (closePauseButton) {
+                    closePauseButton.onclick = () => {
+                        document.getElementById('pauseModal').style.display = 'none';
+                        if (youtubePlayer) youtubePlayer.playVideo();
+                    };
+                }
+                
+                // Botón continuar después del video
+                const continueVideoButton = document.getElementById('continueVideoButton');
+                if (continueVideoButton) {
+                    continueVideoButton.onclick = () => {
+                        document.getElementById('finishedModal').style.display = 'none';
+                        showingVideo.value = false;
+                        document.getElementById('youtube-container').style.display = 'none';
+                        document.getElementById('content-iframe').style.display = 'block';
+                        videoHasEnded = false;
+                        completeCurrentTask();
+                    };
+                }
+            });
+        });
+        
+        
+        // ==========================================
+        // SECCIÓN 12: RETURN (EXPONER AL TEMPLATE)
+        // ==========================================
+        
+        return {
+            // Estado
+            currentView,
+            isLoading,
+            sidebarOpen,
+            showingVideo,
+            selectedLevel,
+            lessons,
+            pendingTasks,
+            currentViewingTask,
+            currentTaskUrl,
+            progress,
+            modal,
+            levels,
+            currentLevelIndex,
+            currentLessonIndex,
+            currentTaskIndex,
+            viewingLessonIndex,
+            viewingTaskIndex,
+            totalTasksCompleted,
+            totalTasks,
+            
+            // Funciones de navegación
+            selectLevel,
+            startApp,
+            showLevelSelector,
+            toggleSidebar,
+            toggleLesson,
+            
+            // Funciones de tareas
+            viewTask,
+            loadCurrentTask,
+            completeCurrentTask,
+            
+            // Funciones de modales
+            closeModal,
+            
+            // Utilidades
+            getIconForTaskType
+        };
+    }
+}).mount('#app');
+</script>
