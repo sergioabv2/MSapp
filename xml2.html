@@ -893,6 +893,87 @@ display: flex;
   background-color: #2980b9;
 }
 
+
+#global-progress-container {
+  position: fixed;
+  /* Misma altura base que el midi-status-legend */
+  bottom: 165px; 
+  right: 10px; /* <--- A LA DERECHA */
+  z-index: 550;
+  
+  /* Estilos copiados de tu referencia Dark Glass */
+  background-color: rgba(26, 26, 26, 0.85);
+  color: #fafafa;
+  padding: 10px 12px; /* Un poco más alto para que quepa la barra */
+  border-radius: 10px;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  
+  /* Layout interno */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 140px; /* Ancho mínimo para que la barra se vea bien */
+  
+  /* Transiciones de visibilidad */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+/* Estado visible */
+#global-progress-container.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Cabecera interna (Icono, Texto, Porcentaje) */
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  width: 100%;
+}
+
+.progress-header i {
+  color: #2ecc71; /* Verde para diferenciar del azul del MIDI */
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+#global-progress-text {
+  font-weight: 700;
+  color: #2ecc71;
+}
+
+/* La barra de fondo (track) */
+.global-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15); /* Gris oscuro translúcido */
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* El relleno de la barra (fill) */
+.global-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #2ecc71, #27ae60); /* Gradiente verde */
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ajuste responsive desktop (igual que tu referencia) */
+@media (min-width: 501px) {
+  #global-progress-container {
+    bottom: 120px;
+  }
+}
+
 #midi-status-legend {
   position: fixed;
   /* Lo ponemos encima de los controles de velocidad móviles */
@@ -1559,10 +1640,6 @@ display: flex;
   <div id="top-bar">
 
 
-
-
-
-
     <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
         <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1687,6 +1764,17 @@ display: flex;
 
  
 <div id="midi-status-legend"></div>
+
+<div id="global-progress-container">
+  <div class="progress-header">
+    <i class="ri-bar-chart-horizontal-line"></i>
+    <span class="progress-label">Progreso</span>
+    <span id="global-progress-text">0%</span>
+  </div>
+  <div class="global-progress-track">
+    <div id="global-progress-fill"></div>
+  </div>
+</div>
 
  <div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
@@ -2908,18 +2996,26 @@ function nextTutorialStep() {
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
         progressValueSpan.textContent = '0%';
-        // Reset visual
         progressBar.value = 0;
         progressBar.style.setProperty('--progress', '0%');
+        const globalFill = document.getElementById('global-progress-fill');
+        const globalText = document.getElementById('global-progress-text');
+        if (globalFill) globalFill.style.width = '0%';
+        if (globalText) globalText.textContent = '0%';
         return;
     }
+    
     const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
     const finalPercent = Math.min(percentage, 100);
+    
     progressValueSpan.textContent = `${finalPercent}%`;
     progressBar.value = finalPercent;
     progressBar.style.setProperty('--progress', `${finalPercent}%`);
+    const globalFill = document.getElementById('global-progress-fill');
+    const globalText = document.getElementById('global-progress-text');
+    if (globalFill) globalFill.style.width = `${finalPercent}%`;
+    if (globalText) globalText.textContent = `${finalPercent}%`;
 
-    // 3. Enviar al Padre (para guardar en BD)
     window.parent.postMessage({
         type: 'progressUpdate',
         percent: finalPercent,
@@ -2953,6 +3049,7 @@ function restoreFogStateFromPercent(percent) {
     unlockedMeasureCount = measuresToUnlock;
     
     if (percent >= 100) isPieceCompleted = true;
+    
     if (isMidiLearnMode) {
         setRangeOpacity(0, unlockedMeasureCount, 1);
         setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15);
@@ -2964,8 +3061,11 @@ function restoreFogStateFromPercent(percent) {
     progressValueSpan.textContent = `${percent}%`;
     progressBar.value = percent;
     progressBar.style.setProperty('--progress', `${percent}%`);
+    const globalFill = document.getElementById('global-progress-fill');
+    const globalText = document.getElementById('global-progress-text');
+    if (globalFill) globalFill.style.width = `${percent}%`;
+    if (globalText) globalText.textContent = `${percent}%`;
 }
-
 
 
 
