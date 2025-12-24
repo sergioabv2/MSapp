@@ -938,6 +938,48 @@ display: flex;
 }
 
 
+.status-legend.right-side {
+    left: auto;     /* Anular el left del estilo original */
+    right: 20px;    /* Pegado a la derecha */
+    display: flex;  /* Siempre visible o usa 'none' si prefieres ocultarlo al inicio */
+    flex-direction: column;
+    align-items: flex-end;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.global-progress-track {
+    width: 150px;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin: 5px 0;
+    overflow: hidden;
+}
+
+.global-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    transition: width 0.5s ease;
+}
+
+.progress-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+#global-progress-text {
+    font-size: 11px;
+    color: #333;
+}
+
+
 #right-hand-only-btn.active,
 #left-hand-only-btn.active {
   background-color: #e0e0e0 !important;
@@ -1688,6 +1730,14 @@ display: flex;
  
 <div id="midi-status-legend"></div>
 
+<div id="global-progress-container" class="status-legend right-side">
+    <div class="progress-label">Progreso de la Pieza</div>
+    <div class="global-progress-track">
+        <div id="global-progress-fill" class="global-progress-fill"></div>
+    </div>
+    <span id="global-progress-text">0%</span>
+</div>
+
  <div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
     <div class="hit-line-piano"></div>
@@ -1786,6 +1836,7 @@ const progressValueSpan = document.getElementById('progress-value');
 let isPieceCompleted = false;
 let isSustainPedalDown = false;
 let sustainedNotes = new Set();
+let pendingSavedProgress = null;
 
 const metronomeBtn = document.getElementById('metronome-btn');
 const metronomeAudio = document.getElementById('metronomeAudio');
@@ -2427,6 +2478,11 @@ function updateMidiStatusLegend(deviceName = null) {
         
         parseMusicXML(text);
         scheduleNotesOnTransport();
+
+        if (pendingSavedProgress !== null) {
+        restoreProgressFromPercent(pendingSavedProgress);
+        pendingSavedProgress = null; 
+       }
 
         playBtn.disabled = false;
         setStatus('');
@@ -3152,6 +3208,64 @@ window.addEventListener('resize', () => {
     resizeWaterfallCanvas();
   }
 });
+
+
+window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (data && data.type === 'setInitialProgress') {
+        const savedPercent = parseInt(data.percent);
+        if (osmd && osmd.sheet) {
+            restoreProgressFromPercent(savedPercent);
+        } else {
+            pendingSavedProgress = savedPercent;
+        }
+    }
+});
+
+
+// Función para notificar al padre (Hijo -> Padre)
+function notifyParentProgress() {
+    if (!osmd || !osmd.sheet) return;
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    // Calculamos el porcentaje basado en los compases desbloqueados
+    // Aseguramos que no pase de 100%
+    const percent = Math.min(100, Math.floor((unlockedMeasureCount / totalMeasures) * 100));
+
+    // 1. Actualizar UI local (barra derecha)
+    updateGlobalProgressBarUI(percent);
+
+    // 2. Enviar mensaje al padre
+    window.parent.postMessage({
+        type: 'progressUpdate',
+        percent: percent
+    }, '*'); // '*' permite cualquier origen, ajusta si necesitas seguridad estricta
+}
+
+// Actualizar visualmente la barra derecha
+function updateGlobalProgressBarUI(percent) {
+    const fill = document.getElementById('global-progress-fill');
+    const text = document.getElementById('global-progress-text');
+    if (fill) fill.style.width = `${percent}%`;
+    if (text) text.textContent = `${percent}%`;
+}
+
+
+function restoreProgressFromPercent(percent) {
+    if (!osmd || !osmd.sheet) return;
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    let targetMeasure = Math.floor((percent / 100) * totalMeasures);
+    targetMeasure = Math.ceil(targetMeasure / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    if (targetMeasure < MEASURES_PER_CHUNK) targetMeasure = MEASURES_PER_CHUNK; 
+    if (targetMeasure > totalMeasures) targetMeasure = totalMeasures;
+
+    unlockedMeasureCount = targetMeasure;
+    if (percent >= 100) {
+        isPieceCompleted = true;
+    }
+    updateGlobalProgressBarUI(percent);
+}
       
  //cursorBtn.addEventListener('click', toggleCursorType);
   fullscreenBtn.addEventListener('click', toggleFullScreen);
@@ -3577,7 +3691,6 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-    // 1. Limpieza visual estándar
     const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
     activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
     activeHighlightTimeouts.forEach(clearTimeout);
@@ -3638,6 +3751,7 @@ function advanceLearningStep() {
                 populateMeasureSelector(); 
                 errorsInCurrentChunk = 0;
                 showSuccessToast(`¡Sección Superada!`);
+                notifyParentProgress();
             }
         }
       }
@@ -4119,7 +4233,9 @@ function toggleMidiLearnMode() {
     if (isPieceCompleted) {
         unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
     } else {
-        unlockedMeasureCount = MEASURES_PER_CHUNK; 
+        if (!unlockedMeasureCount || unlockedMeasureCount < MEASURES_PER_CHUNK) {
+            unlockedMeasureCount = MEASURES_PER_CHUNK;
+        }
     }
     
     populateMeasureSelector(); 
@@ -4135,6 +4251,7 @@ function toggleMidiLearnMode() {
     progressBar.disabled = true;
     currentLearningIndex = 0;
     osmd.cursor.show();
+    notifyParentProgress();
 
     Object.assign(osmd.cursor.cursorOptions, {
         type: 5,
