@@ -3042,6 +3042,9 @@ window.toggleLike = function(title) {
 }
 
 
+
+
+/*
 window.addEventListener('message', function(event) {
     const data = event.data;
     if (data && data.type === 'progressUpdate' && currentOpenTitle) {
@@ -3051,6 +3054,44 @@ window.addEventListener('message', function(event) {
             if (newProgress > interaction.progress) {
                 interaction.progress = newProgress;
                 syncInteraction(currentOpenTitle, { progress: newProgress });
+            }
+        }
+    }
+});*/
+
+
+window.addEventListener('message', function(event) {
+    const data = event.data;
+    
+    if (data && data.type === 'progressUpdate' && currentOpenTitle) {
+        const newProgress = parseInt(data.percent);
+        let interaction = userInteractions.find(i => i.title === currentOpenTitle);
+        
+        if (interaction) {
+            if (newProgress > interaction.progress) {
+                interaction.progress = newProgress;
+                syncInteraction(currentOpenTitle, { progress: newProgress });
+                renderSidebars();     
+                renderRecentSidebar(); 
+                const currentFilter = document.querySelector('.book-type.active')?.getAttribute('data-filter') || 'all';
+                const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+                const score = scores.find(s => s.title === currentOpenTitle);
+                if (score) {
+                    const isVisible = 
+                        (currentFilter === 'all') ||
+                        (currentFilter === 'favorites' && interaction.isLiked) ||
+                        (currentFilter === 'recent' && recentScores.some(r => r.title === score.title)) ||
+                        (currentFilter === 'completed' && newProgress === 100) ||
+                        (currentFilter === 'course' && score.tags?.includes('course'));
+                    
+                    const matchesSearch = 
+                        score.title.toLowerCase().includes(searchTerm) || 
+                        score.author.toLowerCase().includes(searchTerm);
+                    
+                    if (isVisible && matchesSearch) {
+                        applyFilterAndRender(false); // false = no resetear página
+                    }
+                }
             }
         }
     }
