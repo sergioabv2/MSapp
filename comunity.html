@@ -401,7 +401,7 @@ body {
 }
 
 .sort-dropdown {
-    margin-left: auto;
+    margin-right: auto;
     font-weight: 600;
     font-size: 14px;
     color: #2a2e2e;
@@ -477,6 +477,227 @@ body {
     font-size: 12px;
 }
 
+
+/* --- Nuevos Estilos para Funcionalidades --- */
+
+/* 1. Share Popover */
+.share-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.share-popover {
+    position: absolute;
+    bottom: 130%; /* Que aparezca arriba del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 140px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.share-btn-copy {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    width: 100%;
+}
+.share-btn-copy:hover { color: var(--primary-color); }
+
+/* 2. Likes Activos */
+.liked {
+    color: #ef4444 !important; /* Rojo corazón */
+}
+.ri-heart-fill {
+    animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* 3. Respuestas (Nesting) */
+.replies-container {
+    margin-left: 50px; /* Indentación */
+    margin-top: -10px;
+    margin-bottom: 20px;
+    border-left: 2px solid #f0f2f5;
+    padding-left: 15px;
+}
+
+.reply-input-box {
+    margin-top: 10px;
+    margin-left: 60px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Ajustes Input */
+.comment-textarea {
+    min-height: 60px; /* Un poco más compacto */
+}
+
+
+/* --- 1. SHARE & SORT POPOVERS (Estilo unificado) --- */
+.toolbar-action-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.popover-menu {
+    position: absolute;
+    bottom: 100%; /* Arriba del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 6px;
+    min-width: 160px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    animation: fadeInPopover 0.2s ease;
+}
+
+.popover-item {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.popover-item:hover {
+    background-color: #f3f4f6;
+    color: var(--primary-color);
+}
+
+.popover-item.active {
+    font-weight: 700;
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+@keyframes fadeInPopover {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* --- 2. INPUT ESTILO IMAGEN (Material Design) --- */
+.reply-input-box {
+    margin-top: 15px;
+    margin-left: 60px; /* Alineado con el texto del comentario padre */
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.material-input-container {
+    flex: 1;
+    position: relative;
+}
+
+.material-input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #000; /* Línea negra gruesa como la imagen */
+    background: transparent;
+    padding: 8px 0;
+    font-size: 15px;
+    color: #000;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.material-input:focus {
+    border-bottom-color: var(--primary-color); /* Color de foco opcional */
+}
+
+/* Botones Cancelar / Responder */
+.reply-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.btn-cancel {
+    background: none;
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    color: #111;
+    cursor: pointer;
+}
+
+.btn-reply-material {
+    background-color: #f0f0f0; /* Gris claro default */
+    color: #888;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px; /* Bordes muy redondeados como la imagen */
+    font-weight: 600;
+    font-size: 14px;
+    cursor: not-allowed;
+    transition: all 0.2s;
+}
+
+.btn-reply-material.active {
+    background-color: #111; /* Negro o Primary */
+    color: white;
+    cursor: pointer;
+}
+
+/* --- 3. TOGGLE RESPUESTAS --- */
+.replies-toggler {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--primary-light);
+}
+.replies-toggler:hover {
+    background: #ede9fe;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .hero-title { font-size: 32px; }
@@ -500,16 +721,13 @@ body {
     <div class="content-container" ng-if="!selectedPostForComments">
         
       
-        <div style="font-size:14px; color:#666; margin-bottom:10px;">
-            Mostrando {{filteredData.length}} historias
-        </div>
 
         <div class="filters-row">
             <div class="filter-pill" ng-class="{'active': filter === 'all'}" ng-click="filterPosts('all')">Todo</div>
             <div class="filter-pill" ng-class="{'active': filter === 'tip'}" ng-click="filterPosts('tip')">Tips</div>
             <div class="filter-pill" ng-class="{'active': filter === 'story'}" ng-click="filterPosts('story')">Anécdotas</div>
             <div class="filter-pill" ng-class="{'active': filter === 'article'}" ng-click="filterPosts('article')">Artículos</div>
-            <div class="filter-pill" ng-class="{'active': filter === 'saved'}" ng-click="filterPosts('saved')">Favoritos</div>
+       
         </div>
 
           <div class="search-bar-wrapper">
@@ -541,12 +759,12 @@ body {
                 <div class="row-stats">
                     <div class="stat-group">
                         <div class="stat-item" style="color:var(--text-main);">
-                            {{post.category}}
-                            <span>• {{calculateTimeAgo(post.date)}}</span>
+                            {{post.category}} •
+                  
                         </div>
                         <div class="stat-item" style="color:var(--text-main);">
-                            {{post.likes.length}}
-                            <span>Recomendaciones</span>
+                           {{post.comments.length}}
+                            <span>Comentarios</span>
                         </div>
                     </div>
 
@@ -599,83 +817,154 @@ body {
 
        
 
-        <div class="comments-section">
+  <div class="comments-section">
+    
+    <div class="comments-header-row">
+        <div class="comments-count">{{getAllCommentsCount(selectedPostForComments)}} Comentarios</div>
+    </div>
+
+    <div class="comments-toolbar">
+        
+        <div class="sort-dropdown toolbar-action-wrapper">
+            <div ng-click="toggleSortMenu($event)">
+                Ordenar por <span style="font-weight:800">{{ sortType === 'top' ? 'Top' : 'Recientes' }}</span>
+                <i class="ri-arrow-down-s-line"></i>
+            </div>
+
+            <div class="popover-menu" ng-if="showSortMenu">
+                <div class="popover-item" ng-class="{'active': sortType === 'top'}" ng-click="setSort('top')">
+                    <i class="ri-fire-line"></i> Más Votados (Top)
+                </div>
+                <div class="popover-item" ng-class="{'active': sortType === 'recent'}" ng-click="setSort('recent')">
+                    <i class="ri-time-line"></i> Más Recientes
+                </div>
+            </div>
+        </div>
+
+        <div class="share-wrapper toolbar-action-wrapper" style="margin-left:20px;">
+            <div class="toolbar-item" ng-click="showShareMenu = !showShareMenu">
+                <i class="ri-share-forward-line" style="font-size:18px;"></i> Compartir
+            </div>
             
-            <div class="comments-header-row">
-                <div class="comments-count">{{selectedPostForComments.comments.length}} Comentarios</div>
-                <div class="comments-login-btn">
-                    <span style="width:24px; height:24px; background:#687a86; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px;">1</span>
-                    Login <i class="ri-arrow-down-s-fill"></i>
+            <div class="popover-menu" ng-if="showShareMenu" style="width:140px; align-items: flex-start;">
+                <div class="popover-item" ng-click="copyLink()" style="width:100%">
+                    <i class="ri-file-copy-line"></i> Copiar Link
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="comments-list">
+        <div ng-if="selectedPostForComments.comments.length === 0" style="text-align:center; padding:30px; color:#999;">
+            Sé el primero en comentar.
+        </div>
+
+        <div ng-repeat="comment in selectedPostForComments.comments | orderBy:sortExpression">
+            
+            <div class="comment-node">
+                <div class="node-avatar">
+                    <img ng-src="{{comment.photo}}">
+                </div>
+                <div class="node-content">
+                    <div class="node-header">
+                        <span class="node-author">{{comment.user}}</span>
+                        <span class="node-time">{{calculateTimeAgoDetailed(comment.date)}}</span>
+                    </div>
+                    <div class="node-text">
+                        {{comment.comment}}
+                    </div>
+                    <div class="node-actions">
+                        <div class="node-action-link" ng-click="likeItem(comment)" ng-class="{'liked': comment.isLiked}">
+                            <i ng-class="comment.isLiked ? 'ri-heart-fill' : 'ri-heart-line'" style="font-size:18px;"></i> 
+                            {{comment.likes || 0}}
+                        </div>
+                        <span class="vote-divider">|</span>
+                        <div class="node-action-link" ng-click="comment.showReplyForm = !comment.showReplyForm">
+                            Responder
+                        </div>
+
+                        <div class="replies-toggler" 
+                             ng-if="comment.replies.length > 0" 
+                             ng-click="comment.showReplies = !comment.showReplies">
+                            {{comment.replies.length}} Respuestas 
+                            <i ng-class="comment.showReplies ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="comment-input-area">
-                <div class="comment-avatar-placeholder">
-                    {{user.charAt(0)}}
-                </div>
-                <div class="comment-box-wrapper">
-                    <textarea class="comment-textarea" placeholder="Únete a la discusión..." ng-model="newCommentText"></textarea>
+            <div class="reply-input-box" ng-if="comment.showReplyForm">
+                <img ng-src="{{userImg}}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                
+                <div class="material-input-container">
+                    <input type="text" 
+                           class="material-input" 
+                           placeholder="Agrega una respuesta..." 
+                           ng-model="comment.newReplyText"
+                           ng-keydown="checkEnterReply($event, comment)">
                     
-                    <div class="login-options">
-                        <span class="login-label">Inicia sesión con</span>
-                        <div class="social-circle" style="background:#2E9FFF"><i class="ri-discuss-fill"></i></div> <div class="social-circle" style="background:#4267B2"><i class="ri-facebook-fill"></i></div>
-                        <div class="social-circle" style="background:#1DA1F2"><i class="ri-twitter-x-fill"></i></div>
-                        <div class="social-circle" style="background:#DB4437"><i class="ri-google-fill"></i></div>
-                    </div>
-
-                    <div style="text-align:right; margin-top:10px;" ng-if="newCommentText">
-                        <button ng-click="addComment(newCommentText)" style="background:var(--primary-color); color:white; border:none; padding:10px 24px; font-weight:700; border-radius:4px; cursor:pointer;">
-                            Publicar <i class="ri-arrow-right-line"></i>
+                    <div class="reply-actions-row">
+                        <button class="btn-cancel" ng-click="comment.showReplyForm = false">Cancelar</button>
+                        
+                        <button class="btn-reply-material" 
+                                ng-class="{'active': comment.newReplyText.length > 0}"
+                                ng-disabled="!comment.newReplyText || comment.newReplyText.length === 0"
+                                ng-click="replyToComment(comment)">
+                            Responder
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="comments-toolbar">
-                <div class="toolbar-item">
-                    <i ng-class="isPostLiked(selectedPostForComments) ? 'ri-heart-fill' : 'ri-heart-line'" 
-                       style="font-size:18px; color: {{isPostLiked(selectedPostForComments) ? '#e0245e' : '#656c7a'}}"
-                       ng-click="newLike(0, selectedPostForComments)"></i> 
-                    {{selectedPostForComments.likes.length}}
-                </div>
-                <div class="toolbar-item">
-                    <i class="ri-share-forward-line" style="font-size:18px;"></i> Compartir
-                </div>
-                <div class="sort-dropdown">
-                    Mejores <i class="ri-arrow-down-s-line"></i>
-                </div>
-            </div>
-
-            <div class="comments-list">
-                <div ng-if="selectedPostForComments.comments.length === 0" style="text-align:center; padding:30px; color:#999;">
-                    Sé el primero en comentar.
-                </div>
-
-                <div class="comment-node" ng-repeat="comment in selectedPostForComments.comments">
+            <div class="replies-container" ng-if="comment.replies.length > 0 && comment.showReplies">
+                <div class="comment-node" ng-repeat="reply in comment.replies">
                     <div class="node-avatar">
-                        <img ng-src="{{comment.photo}}">
+                        <img ng-src="{{reply.photo}}" style="width:32px; height:32px;">
                     </div>
                     <div class="node-content">
                         <div class="node-header">
-                            <span class="node-author">{{comment.user}}</span>
-                            <i class="ri-user-star-fill" style="color:var(--primary-color); font-size:12px;" title="Estudiante Premium"></i>
-                            <span class="node-time">hace un momento</span>
+                            <span class="node-author" style="font-size:14px;">{{reply.user}}</span>
+                            <span class="node-time">{{calculateTimeAgoDetailed(reply.date)}}</span>
                         </div>
-                        <div class="node-text">
-                            {{comment.comment}}
+                        <div class="node-text" style="font-size:14px;">
+                            {{reply.comment}}
                         </div>
                         <div class="node-actions">
-                            <div class="node-action-link"><i class="ri-arrow-up-s-line" style="font-size:18px;"></i> 0</div>
-                            <span class="vote-divider">|</span>
-                            <div class="node-action-link"><i class="ri-arrow-down-s-line" style="font-size:18px;"></i> 0</div>
-                            <div class="node-action-link">Responder</div>
-                            <div class="node-action-link">Compartir</div>
+                            <div class="node-action-link" ng-click="likeItem(reply)" ng-class="{'liked': reply.isLiked}">
+                                <i ng-class="reply.isLiked ? 'ri-heart-fill' : 'ri-heart-line'" style="font-size:16px;"></i> 
+                                {{reply.likes || 0}}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div> </div>
+        </div>
+    </div>
+
+    <div class="comment-input-area">
+        <div class="comment-avatar-placeholder">
+            {{user.charAt(0)}}
+        </div>
+        <div class="comment-box-wrapper">
+            <textarea class="comment-textarea" 
+                      id="mainCommentInput"
+                      placeholder="Únete a la discusión..." 
+                      ng-model="inputState.mainComment" 
+                      ng-keydown="checkEnterMain($event)"></textarea>
+            
+            <div style="text-align:right; margin-top:10px;" ng-if="inputState.mainComment.trim().length > 0">
+                <button ng-click="addComment()" style="background:var(--primary-color); color:white; border:none; padding:10px 24px; font-weight:700; border-radius:4px; cursor:pointer;">
+                    Publicar <i class="ri-arrow-right-line"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
 </div>
 
    
@@ -695,6 +984,14 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
   $scope.filter = 'all';
   $scope.user = "Invitado"; 
   $scope.userImg = "https://ui-avatars.com/api/?name=Invitado&background=random"; 
+  $scope.sortType = 'top'; // 'top' o 'recent'
+$scope.sortExpression = '-likes'; // Por defecto ordena por likes descendente
+$scope.showShare = false;
+$scope.showSortMenu = false;
+$scope.showShareMenu = false;
+$scope.inputState = {
+      mainComment: ''
+  };
 
    var mockData = [
     {
@@ -705,11 +1002,28 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       user: "Prof. Mozart",
       date: "2023-10-25T10:00:00",
       media: "img",
-      likes: ["user1", "user2", "user3", "user4"], // Array de usuarios para conteo normal
       comments: [
-        { user: "Ana García", photo: "https://i.pravatar.cc/150?u=a", comment: "¡Excelente consejo! Me ha ayudado mucho." },
-        { user: "Carlos M.", photo: "https://i.pravatar.cc/150?u=c", comment: "¿Algún libro que recomiende para esto?" }
-      ]
+      { 
+        user: "Ana García", 
+        photo: "https://i.pravatar.cc/150?u=a", 
+        comment: "¡Excelente consejo!", 
+        date: new Date().toISOString(), // Necesario para sort
+        likes: 12,
+        isLiked: false,
+        replies: [] 
+      },
+      { 
+        user: "Carlos M.", 
+        photo: "https://i.pravatar.cc/150?u=c", 
+        comment: "¿Algún libro recomendado?", 
+        date: new Date(Date.now() - 86400000).toISOString(), // Ayer
+        likes: 2,
+        isLiked: false,
+        replies: [
+            { user: "Prof. Mozart", photo: "https://lh3.googleusercontent.com/d/15FbOHaYX6jPjCkgfaayMDU3cPpbEM0W3=s700", comment: "Te recomiendo el método Bastien.", date: new Date().toISOString(), likes: 5 }
+        ] 
+      }
+    ]
     },
  
     {
@@ -720,7 +1034,6 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       user: "Pedro García",
       date: "2023-11-01T08:00:00",
       media: "img",
-      likes: ["user2", "user3", "user4", "user5", "user6"],
       comments: []
     },
     {
@@ -756,9 +1069,7 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
       "date": new Date().toISOString(),
       "user": "Prof. Alejandro",
       "photo": "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-      "likes": ["User1"], 
       "comments": [],
-      "saved": []
     },
   ];
 
@@ -797,24 +1108,38 @@ app.controller('postController', ['$scope', '$http', '$timeout', function ($scop
     return shuffled;
   }
 
-  $scope.calculateTimeAgo = function (alertDate) {
-    const alertDateObj = new Date(alertDate);
-    const today = new Date();
-    const timeDiff = Math.abs(today - alertDateObj);
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    if (days === 0) return "Hoy";
-    if (days === 1) return "Ayer";
-    if (days > 30) return "Hace +1 mes";
-    return `hace ${days} d`;
-  };
+ $scope.calculateTimeAgoDetailed = function (dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return "hace " + interval + " año" + (interval > 1 ? "s" : "");
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return "hace " + interval + " mes" + (interval > 1 ? "es" : "");
+
+    interval = Math.floor(seconds / 604800); // Semanas
+    if (interval >= 1) return "hace " + interval + " sem.";
+
+    interval = Math.floor(seconds / 86400); // Días
+    if (interval >= 1) return "hace " + interval + " día" + (interval > 1 ? "s" : "");
+
+    interval = Math.floor(seconds / 3600); // Horas
+    if (interval >= 1) return "hace " + interval + " h";
+
+    interval = Math.floor(seconds / 60); // Minutos
+    if (interval >= 1) return "hace " + interval + " min";
+
+    return "hace un momento";
+};
 
   // --- Filtros ---
  $scope.filterPosts = function (type) {
     $scope.filter = type;
     if (type === 'all') {
       $scope.filteredData = $scope.data;
-    } else if (type === 'saved') {
-      $scope.filteredData = $scope.data.filter(post => $scope.isPostSaved(post));
     } else {
       // Filtrar por la propiedad 'category'
       $scope.filteredData = $scope.data.filter(post => post.category === type);
@@ -841,35 +1166,111 @@ $scope.backToFeed = function () {
     document.body.style.overflow = ''; // Restaura el scroll
 };
 
-  // --- Acciones (Guardar, Comentar, Votar) ---
-  // Nota: Estas funciones son 'client-side only' por ahora (no guardan en sheet)
-  $scope.isPostSaved = function(post) {
-    if (!post.saved) return false;
-    return post.saved.some(s => s.user === $scope.user);
-  };
 
-  $scope.toggleSave = function(post) {
-    if (!post.saved) post.saved = [];
-    const userIndex = post.saved.findIndex(s => s.user === $scope.user);
-    if (userIndex === -1) {
-      post.saved.push({ user: $scope.user });
+
+
+
+$scope.toggleSortMenu = function(e) {
+    e.stopPropagation(); // Evitar burbujeo
+    $scope.showSortMenu = !$scope.showSortMenu;
+    $scope.showShareMenu = false; // Cerrar el otro si está abierto
+};
+
+$scope.setSort = function(type) {
+    $scope.sortType = type;
+    if (type === 'top') {
+        $scope.sortExpression = '-likes';
     } else {
-      post.saved.splice(userIndex, 1);
+        $scope.sortExpression = '-date';
     }
-  };
+    $scope.showSortMenu = false; // Cerrar al seleccionar
+};
 
-  $scope.addComment = function (commentText) {
-    if (!$scope.selectedPostForComments || !commentText) return;
+
+
+$scope.copyLink = function() {
+    // Simular URL del post
+    const dummyLink = window.location.href + "?post=" + Math.floor(Math.random() * 1000);
+    
+    navigator.clipboard.writeText(dummyLink).then(function() {
+        alert("Link copiado al portapapeles");
+        $scope.$apply(function(){
+           $scope.showShareMenu = false; 
+        });
+    }, function(err) {
+        console.error('Error al copiar', err);
+    });
+};
+
+// --- 3. Likes y Respuestas ---
+$scope.likeItem = function(item) {
+    if(!item.likes) item.likes = 0;
+    
+    if(item.isLiked) {
+        item.likes--;
+        item.isLiked = false;
+    } else {
+        item.likes++;
+        item.isLiked = true;
+    }
+};
+
+
+$scope.addComment = function () {
+    if (!$scope.selectedPostForComments || !$scope.inputState.mainComment || $scope.inputState.mainComment.trim() === '') return;
+    
     var newComment = {
       user: $scope.user,
       photo: $scope.userImg,
-      comment: commentText
+      comment: $scope.inputState.mainComment, // Usar el objeto
+      date: new Date().toISOString(),
+      likes: 0,
+      replies: []
     };
+
     if (!$scope.selectedPostForComments.comments) $scope.selectedPostForComments.comments = [];
-    $scope.selectedPostForComments.comments.push(newComment);
-    $scope.newCommentText = '';
+    
+    $scope.selectedPostForComments.comments.unshift(newComment);
+
+    $scope.inputState.mainComment = ''; 
+    var inputElement = document.getElementById('mainCommentInput');
+    if(inputElement) inputElement.blur();
   };
 
+$scope.checkEnterMain = function(event) {
+    if (event.keyCode === 13 && !event.shiftKey) {
+        event.preventDefault();
+        $scope.addComment();
+    }
+  };
+// b) Respuestas a Comentarios
+$scope.replyToComment = function(parentComment) {
+    if (!parentComment.newReplyText || parentComment.newReplyText.trim() === '') return;
+
+    var newReply = {
+        user: $scope.user,
+        photo: $scope.userImg,
+        comment: parentComment.newReplyText,
+        date: new Date().toISOString(),
+        likes: 0
+    };
+
+    if (!parentComment.replies) parentComment.replies = [];
+    
+    parentComment.replies.push(newReply);
+    parentComment.newReplyText = ''; // Limpiar input
+    parentComment.showReplyForm = false; // Cerrar form
+    
+    // Auto-abrir la lista de respuestas al responder
+    parentComment.showReplies = true;
+};
+
+$scope.checkEnterReply = function(event, parentComment) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        $scope.replyToComment(parentComment);
+    }
+};
 
 
 
