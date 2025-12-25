@@ -698,6 +698,79 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* --- Estilos para Artículos (Rich Text) --- */
+
+.article-body-content {
+    font-size: 19px;
+    line-height: 1.8;
+    color: #2a2e2e;
+    margin-bottom: 60px;
+}
+
+/* Títulos dentro del post */
+.article-body-content h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #111;
+}
+
+/* Caja de Información (Info Box) */
+.info-box {
+    background-color: #f0fdf4; /* Verde muy suave */
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 30px 0;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.info-box-icon {
+    color: #16a34a; /* Verde icono */
+    font-size: 24px;
+    margin-top: 2px;
+}
+
+.info-box-title {
+    display: block;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 4px;
+    font-size: 16px;
+}
+
+/* Bloque de énfasis (Citas) */
+.emphasis-block {
+    border-left: 4px solid var(--primary-color);
+    background: #f8faff;
+    padding: 20px 30px;
+    font-style: italic;
+    font-size: 21px;
+    color: #4b5563;
+    margin: 40px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Listas estilizadas */
+.styled-list {
+    padding-left: 20px;
+    margin-top: 20px;
+}
+
+.styled-list li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 10px;
+}
+
+.styled-list li::marker {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .hero-title { font-size: 32px; }
@@ -811,9 +884,9 @@ body {
 
         <img ng-if="selectedPostForComments.media == 'img'" ng-src="{{selectedPostForComments.photo}}" style="width:100%; border-radius:8px; margin-bottom:40px; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
 
-        <div style="font-size:19px; line-height:1.8; color:#2a2e2e; margin-bottom:60px;">
-            {{selectedPostForComments.content}}
-        </div>
+       <div ng-bind-html="selectedPostForComments.content" 
+     class="article-body-content">
+</div>
 
        
 
@@ -974,7 +1047,7 @@ body {
 <script>
     var app = angular.module('postApp', []);
 
-app.controller('postController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+app.controller('postController', ['$scope', '$http', '$timeout', '$sce', function ($scope, $http, $timeout, $sce) {
   
   // --- Configuración Inicial ---
   $scope.userDataLoaded = true;
@@ -996,7 +1069,30 @@ $scope.inputState = {
    var mockData = [
     {
       header: "Tip: Cómo mejorar la lectura a primera vista",
-      content: "La clave está en no mirar las manos y anticipar los compases. Un ejercicio muy útil es leer un compás por delante de lo que estás tocando. Aquí les dejo un ejemplo práctico con partituras simples.",
+      content: `
+    <p>La lectura a primera vista es el "superpoder" que todo pianista desea. Muchos creen que es un talento innato, pero en realidad es una habilidad que se entrena. El error número uno es mirar constantemente tus manos para asegurar la nota.</p>
+
+    <div class="emphasis-block">
+        "Tus ojos deben actuar como un escáner: siempre un compás por delante de lo que tus dedos están tocando."
+    </div>
+
+    <h2>La regla de oro: No te detengas</h2>
+    <p>Cuando leemos a primera vista, el ritmo es más importante que la nota correcta. Si fallas una nota, sigue tocando. Si te detienes a corregir, rompes el flujo musical y el sentido de la frase.</p>
+
+    <div class="info-box">
+        <i class="ri-eye-off-line info-box-icon"></i> <div class="info-box-content">
+            <span class="info-box-title">Ejercicio: El mapa táctil</span>
+            Tapa tus manos con una tela ligera o un cartón sobre el teclado. Toca escalas simples o piezas que ya conoces sin mirar. Esto fuerza a tu cerebro a desarrollar un "mapa mental" de las distancias entre teclas (propiocepción).
+        </div>
+    </div>
+
+    <p>Para mejorar hoy mismo, aplica estos pasos antes de tocar la primera nota:</p>
+    <ul class="styled-list">
+        <li><strong>Escanea la armadura:</strong> Identifica la tonalidad y las alteraciones fijas.</li>
+        <li><strong>Busca patrones:</strong> ¿Hay escalas? ¿Arpegios? ¿Acordes repetidos?</li>
+        <li><strong>Establece un tempo lento:</strong> Elige una velocidad donde puedas tocar la parte más difícil de la obra, no la más fácil.</li>
+    </ul>
+`,
       photo: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=150&q=80",
       category: "tip",
       user: "Prof. Mozart",
@@ -1008,7 +1104,7 @@ $scope.inputState = {
         photo: "https://i.pravatar.cc/150?u=a", 
         comment: "¡Excelente consejo!", 
         date: new Date().toISOString(), // Necesario para sort
-        likes: 12,
+        likes: 1,
         isLiked: false,
         replies: [] 
       },
@@ -1028,7 +1124,28 @@ $scope.inputState = {
  
     {
       header: "Anécdota: Como vencí el miedo a presentarme en un escenario",
-      content: "Recuerda mantener la espalda recta y los hombros relajados. La tensión en los hombros es la causa número uno de fatiga al practicar escalas.",
+    content: `
+    <p>Recuerdo mi primer recital importante. Tenía 19 años y las manos me sudaban tanto que temía resbalar sobre las teclas negras. Estaba tras bambalinas, repasando obsesivamente ese pasaje difícil del tercer movimiento, convencido de que iba a fallar.</p>
+    
+    <p>Mi maestro me vio temblando, me puso una mano en el hombro y me dijo algo que cambió mi perspectiva para siempre.</p>
+
+    <div class="emphasis-block">
+        "El público no está aquí para juzgarte con una hoja de calificaciones. Están aquí porque quieren sentir algo. No toques para impresionarlos, toca para regalarles la música."
+    </div>
+
+    <h2>El cambio de mentalidad</h2>
+    <p>Al salir al escenario, dejé de pensar en "no fallar" y empecé a pensar en "compartir". Me equivoqué en dos compases, sí. Una nota sucia por allá, un ritmo apresurado por acá. Pero esa noche, toqué con más dinámica y emoción que nunca.</p>
+
+    <div class="info-box">
+        <i class="ri-heart-pulse-fill info-box-icon"></i>
+        <div class="info-box-content">
+            <span class="info-box-title">La realidad fisiológica</span>
+            El miedo escénico es adrenalina. Tu cuerpo te está preparando para correr o pelear. Si aprendes a respirar y canalizar esa energía extra hacia la expresión musical, el miedo se convierte en emoción pura.
+        </div>
+    </div>
+
+    <p>Hoy en día, sigo sintiendo cosquillas en el estómago antes de salir, pero ya no es miedo; es la emoción de saber que tengo algo valioso que decir a través de mi piano.</p>
+`,
       category: "story",
       photo: "https://lh3.googleusercontent.com/d/1646Kq_drvK1Oz0H1LvCkerIzQZxhqqMS",
       user: "Pedro García",
@@ -1077,13 +1194,16 @@ $scope.inputState = {
     headers: { "Content-Type": "text/plain;charset=utf-8" }
   };
 
-   $timeout(function() {
-      $scope.data = shuffleArray(mockData);
+  $timeout(function() {
+      var processedData = mockData.map(function(post) {
+              post.content = $sce.trustAsHtml(post.content); 
+          return post;
+      });
+
+      $scope.data = shuffleArray(processedData);
       $scope.filterPosts('all');
       $scope.userDataLoaded = false;
-      
-    
-  }, 100); 
+  }, 100);
 
   // --- Carga de Usuario ---
   var token = localStorage.getItem('MStoken');
