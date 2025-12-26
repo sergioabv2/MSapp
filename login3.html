@@ -16,10 +16,11 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            background-color: #f4f4f9; /* Fondo ligero para mejor contraste */
         }
 
         h2 { margin-bottom: 10px; z-index: 10; }
-        p { color: #ccc; margin-bottom: 20px; text-align: center; max-width: 80%; z-index: 10; }
+        p { color: #777; margin-bottom: 20px; text-align: center; max-width: 80%; z-index: 10; }
 
         /* Contenedor de la cámara */
         #reader {
@@ -28,33 +29,12 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+            background: white;
         }
 
-        /* Overlay de escaneo */
-        .scan-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border: 50px solid rgba(0, 0, 0, 0.7);
-            pointer-events: none; /* Permite clicks a través */
-            z-index: 5;
-            box-sizing: border-box;
-        }
-        
-        /* Línea roja de escaneo animada */
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: #e74c3c;
-            top: 50%;
-            animation: scan 2s infinite ease-in-out;
-            box-shadow: 0 0 4px #e74c3c;
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(-150px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(150px); opacity: 0; }
+        /* Ajustes visuales para el scanner por defecto de la librería */
+        #reader__scan_region {
+            background: white;
         }
 
         .status-msg {
@@ -62,6 +42,7 @@
             font-weight: bold;
             height: 20px;
             color: #4a90e2;
+            text-align: center;
         }
 
         .btn-cancel {
@@ -73,6 +54,12 @@
             border-radius: 30px;
             text-decoration: none;
             z-index: 10;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .btn-cancel:active {
+            background: #555;
         }
     </style>
 </head>
@@ -83,17 +70,15 @@
 
     <div id="reader"></div>
     
-    <div class="status-msg" id="status">Buscando cámara...</div>
-    <a href="#" class="btn-cancel" onclick="history.back()">Cancelar</a>
+    <div class="status-msg" id="status">Esperando cámara...</div>
+    <a href="#" class="btn-cancel" onclick="history.back()">Cancelar / Volver</a>
 
 <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec";
 
-    const userToken = localStorage.getItem('MStoken'); 
+    // Recuperar token real o usar uno de prueba si está vacío para evitar errores de null
+    const userToken = localStorage.getItem('MStoken') || "usuario_anonimo"; 
     
-
-   
-
     // --- Configuración del Escáner ---
     function onScanSuccess(decodedText, decodedResult) {
         // Detener el escaneo para no enviar múltiples peticiones
@@ -102,55 +87,78 @@
         document.getElementById('status').innerText = "Procesando código...";
         document.getElementById('status').style.color = "#f1c40f";
 
-        // decodedText debería ser el SessionID de la tablet (ej: "MOZART-AUTH-172312...")
+        // decodedText debería ser el SessionID de la tablet
         enviarSolicitudLogin(decodedText);
     }
 
     function onScanFailure(error) {
         // Pasa frecuentemente mientras busca el QR, no es necesario alertar
-        // console.warn(`Code scan error = ${error}`);
     }
 
     // --- Enviar POST a Apps Script ---
     function enviarSolicitudLogin(qrSessionId) {
         document.getElementById('status').innerText = "Conectando con servidor...";
         
-        // Estructura de datos a enviar
         const payload = {
             action: "authorize_tablet",
             session_id: qrSessionId,
-            user_token: userToken, // El mail encriptado del localstorage
+            user_token: userToken,
             timestamp: new Date().toISOString()
         };
 
-        // Fetch a Apps Script
-        // Usamos 'no-cors' si solo queremos enviar datos, pero para leer respuesta JSON
-        // Apps Script requiere redirecciones. Lo más simple es enviar texto plano stringified.
         fetch(APPS_SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify(payload)
         })
-        .then(response => response.text()) // Apps Script suele devolver texto o HTML redirect
+        .then(response => response.text())
         .then(data => {
+            // UI de Éxito
             document.getElementById('reader').innerHTML = 
-                '<div style="padding:40px; text-align:center;">✅<br>¡Tablet Autorizada!</div>';
-            document.getElementById('status').innerText = "Listo. Puedes cerrar esta ventana.";
+                '<div style="padding:40px; text-align:center;">' +
+                '<div style="font-size: 50px;">✅</div>' +
+                '<br><h3>¡Tablet Autorizada!</h3>' +
+                '<p style="font-size:12px">Cerrando en breve...</p></div>';
+            
+            document.getElementById('status').innerText = "Listo. Redirigiendo...";
             document.getElementById('status').style.color = "#2ecc71";
+            
+            // Ocultar botón cancelar para evitar doble click
+            document.querySelector('.btn-cancel').style.display = 'none';
+
+            // --- TIMEOUT PARA CERRAR (VOLVER) ---
+            setTimeout(() => {
+                // Intenta volver atrás en el historial
+                if (window.history.length > 1) {
+                    history.back();
+                } else {
+                    // Si no hay historial, intenta cerrar la ventana (a veces bloqueado por navegador)
+                    window.close();
+                    // Fallback visual si no cierra
+                    document.getElementById('status').innerText = "Puedes cerrar esta pestaña.";
+                }
+            }, 2500); // 2.5 segundos de espera
         })
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('status').innerText = "Error de conexión";
             document.getElementById('status').style.color = "red";
             
-            // Reiniciar escáner tras error (opcional)
+            // Reiniciar escáner tras error
             setTimeout(() => location.reload(), 3000);
         });
     }
 
-    // Iniciar escáner
+    // --- INICIAR ESCÁNER CON PREFERENCIA CÁMARA TRASERA ---
     let html5QrcodeScanner = new Html5QrcodeScanner(
         "reader", 
-        { fps: 10, qrbox: {width: 250, height: 250} },
+        { 
+            fps: 10, 
+            qrbox: {width: 250, height: 250},
+            // Configuración clave para móviles:
+            videoConstraints: { 
+                facingMode: "environment" // "user" es frontal, "environment" es trasera
+            }
+        },
         /* verbose= */ false
     );
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
