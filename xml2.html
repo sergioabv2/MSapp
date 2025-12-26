@@ -956,7 +956,7 @@ display: flex;
 }
 
 /* El relleno de la barra (fill) */
-.global-progress-fill {
+#global-progress-fill {
   width: 0%;
   height: 100%;
   background: linear-gradient(90deg, #2ecc71, #27ae60); /* Gradiente verde */
@@ -3018,18 +3018,22 @@ function updateGlobalProgressByChunks() {
     if (!osmd || !osmd.sheet) return;
     
     const totalMeasures = osmd.sheet.SourceMeasures.length;
-    
-    // Calcular progreso basado en compases desbloqueados (no en notas tocadas)
     const chunkProgress = Math.floor((unlockedMeasureCount / totalMeasures) * 100);
-    const finalPercent = Math.min(chunkProgress, 100);
-    
-    // Actualizar solo barra global
+    const finalPercent = Math.max(0, Math.min(chunkProgress, 100));
     const globalFill = document.getElementById('global-progress-fill');
+    if (globalFill) {
+        globalFill.style.width = `${finalPercent}%`;
+        
+        // Opcional: Cambiar color si llega al 100%
+        if (finalPercent >= 100) {
+            globalFill.style.backgroundColor = '#27ae60'; // Verde más oscuro
+        }
+    }
     const globalText = document.getElementById('global-progress-text');
-    if (globalFill) globalFill.style.width = `${finalPercent}%`;
-    if (globalText) globalText.textContent = `${finalPercent}%`;
+    if (globalText) {
+        globalText.textContent = `${finalPercent}%`;
+    }
     
-    // Enviar al padre
     window.parent.postMessage({
         type: 'progressUpdate',
         percent: finalPercent,
@@ -3043,6 +3047,7 @@ window.addEventListener('message', function(event) {
         const savedPercent = parseInt(data.percent);
         if (!isNaN(savedPercent) && savedPercent > 0) {
             restoreFogStateFromPercent(savedPercent);
+            updateGlobalProgressByChunks();
         }
     }
 });
