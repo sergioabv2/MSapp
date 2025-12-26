@@ -1848,6 +1848,7 @@ const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
 const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
 const restartChunkBtn = document.getElementById('restart-chunk-btn');
+  let isRestarting = false;
 
 //const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -3100,7 +3101,8 @@ function updateMeasureSelectDisplay() {
 
 function jumpToMeasureInLearnMode(measureIndex) {
     if (!isMidiLearnMode) return;
-
+    expectedNotes.clear();
+    clearAllHighlights();
     const startTime = measureStartTimes[measureIndex] || 0;
     let newIndex = 0;
     for (let i = 0; i < parsedNotes.length; i++) {
@@ -3568,10 +3570,15 @@ function populateMeasureSelector() {
 }
 
 function restartCurrentChunk() {
-    if (!isMidiLearnMode) return;
-    let targetMeasureIndex = unlockedMeasureCount - MEASURES_PER_CHUNK;
-    if (targetMeasureIndex < 0) targetMeasureIndex = 0;
+    if (!isMidiLearnMode || isRestarting) return;
+    isRestarting = true;
+    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+    if (isPieceCompleted) {
+        const currentMs = getCurrentMeasureIndex();
+        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    }
     jumpToMeasureInLearnMode(targetMeasureIndex);
+    isRestarting = false;
 }
 
 
@@ -3734,6 +3741,7 @@ function advanceLearningStep() {
             showConfetti(300);
             isPieceCompleted = true;
             unlockedMeasureCount = totalMeasures;
+            updateGlobalProgressByChunks();
         }
         toggleMidiLearnMode();
         return;
@@ -3750,24 +3758,23 @@ function advanceLearningStep() {
             }
         }
 
+     
+
+
       if (unlockedMeasureCount < totalMeasures) {
-        if (nextNoteMeasureIndex >= unlockedMeasureCount) {
-            
-            if (handFilterMode !== 'both') {
-                const startOfCurrentBlock = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-                jumpToMeasureInLearnMode(startOfCurrentBlock);
-                return; 
-            }
-
-
+            if (nextNoteMeasureIndex >= unlockedMeasureCount) {
                 const oldLimit = unlockedMeasureCount;
                 unlockedMeasureCount += MEASURES_PER_CHUNK;
+                if (unlockedMeasureCount > totalMeasures){ unlockedMeasureCount = totalMeasures};
                 setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
-                populateMeasureSelector(); 
-                updateGlobalProgressByChunks();
+                populateMeasureSelector();
+                updateGlobalProgressByChunks(); 
+                
                 showSuccessToast(`¡Sección Superada!`);
+            }
         }
-      }
+
+
     }
 
     let notesInStep = [];
@@ -4692,7 +4699,7 @@ function releaseSustainedNotes() {
 
 
 function processInputNote(noteName) {
-    if (!isMidiLearnMode) return;
+    if (!isMidiLearnMode || isRestarting) return;
     highlightMidiKey(noteName);
 
     if (expectedNotes.size > 0) {
@@ -4715,13 +4722,29 @@ function processInputNote(noteName) {
                 }
             }
         } else {
-            showWarningToast("Error: Reiniciando sección...");
-                restartCurrentChunk();
+
+          const currentMeasureIdx = getCurrentMeasureIndex();
+            const challengeStartMeasure = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+            if (!isPieceCompleted && currentMeasureIdx >= challengeStartMeasure) {
+                showWarningToast("⚠️ Error en sección de prueba. Reiniciando...");
+                    restartCurrentChunk();
+            }
         }
     }
 }
 
 
+function getCurrentMeasureIndex() {
+    if (!parsedNotes[currentLearningIndex]) return 0;
+    const currentNoteTime = parsedNotes[currentLearningIndex].startSec;
+
+    for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+        if (currentNoteTime >= measureStartTimes[i] - 0.001) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 /*
 function onMIDIMessage(event) {
