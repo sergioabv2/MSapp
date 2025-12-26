@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Academia - Tablet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2; /* Ajusta a tu marca */
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+       /* Busca esto en tu CSS y REEMPLÁZALO */
+body {
+    font-family: 'Segoe UI', sans-serif;
+
+    /* --- NUEVO FONDO CON FILTRO OSCURO --- */
+    /* El linear-gradient crea una capa negra al 50% de opacidad sobre la imagen */
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('https://lh3.googleusercontent.com/d/1574yKLK-x78N7AYfRtLRpUVv7ihC3dui=s1000'); /* <-- REEMPLAZA ESTA RUTA */
+                
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* ------------------- */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+        .kiosk-container {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* --- Estilo de Pestañas --- */
+        .tabs {
+            display: flex;
+            background: #eee;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* --- Contenido --- */
+        .tab-content {
+            display: none; /* Oculto por defecto */
+            padding: 30px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block; /* Mostrar activo */
+        }
+
+        h2 { margin-top: 0; color: var(--text-color); }
+        p { color: #666; font-size: 0.95rem; margin-bottom: 20px; }
+
+        /* --- Contenedor QR --- */
+        .qr-wrapper {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .wifi-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .wifi-details strong { color: var(--primary-color); }
+        
+        .url-link {
+            display: block;
+            margin-top: 15px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="kiosk-container">
+    <div class="tabs">
+        <button class="tab-btn " onclick="openTab('tab-wifi')">Acceso a WIFI</button>
+        <button class="tab-btn active" onclick="openTab('tab-login')">Inicia Sesión</button>
+    </div>
+
+    <div id="tab-wifi" class="tab-content">
+        <h2>Bienvenido a Mozart MX</h2>
+        <p>Escanea el código QR para conectarte al WIFI</p>
+        
+        <div class="qr-wrapper" id="qr-wifi"></div>
+
+        <div class="wifi-details">
+            <div><strong>Wi-Fi:</strong> <span id="ssid-text">Mozart Studio-5G</span></div>
+            <div><strong>Password:</strong> <span id="pass-text">XxC3cTP4</span></div>
+        </div>
+        
+        <a href="" class="url-link">www.mozartplus.com</a>
+    </div>
+
+    <div id="tab-login" class="tab-content active">
+        <h2>Acceso Rápido</h2>
+        <p>Abre la App en tu celular y escanea este código para iniciar sesión en este dispositivo.</p>
+        
+        <div class="qr-wrapper" id="qr-login"></div>
+        
+
+    </div>
+</div>
+
+<script>
+    // --- Configuración de Datos ---
+    const wifiConfig = {
+        ssid: "Mozart Studio-5G",
+        pass: "XxC3cTP4",
+        type: "WPA"
+    };
+    
+    // Cadena especial para conexión Wi-Fi automática en Android/iOS
+    const wifiString = `WIFI:S:${wifiConfig.ssid};T:${wifiConfig.type};P:${wifiConfig.pass};;`;
+
+    // --- Generación de QRs al cargar ---
+    window.onload = function() {
+        // 1. Generar QR de Wi-Fi
+        new QRCode(document.getElementById("qr-wifi"), {
+            text: wifiString,
+            width: 180,
+            height: 180
+        });
+
+        // 2. Generar QR de Login (Simulado - Aquí iría tu Token de Websocket/API)
+        const sessionToken = "LOGIN_TOKEN_" + Date.now(); 
+        new QRCode(document.getElementById("qr-login"), {
+            text: sessionToken,
+            width: 180,
+            height: 180,
+            colorDark : "#4a90e2" // Color diferente para distinguir
+        });
+    };
+
+    // --- Lógica de Pestañas ---
+    function openTab(tabId) {
+        // 1. Ocultar todos los contenidos
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        // 2. Desactivar todos los botones
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // 3. Activar el seleccionado
+        document.getElementById(tabId).classList.add('active');
+        
+        // Encontrar el botón que disparó el evento (basado en el texto o índice, 
+        // aquí usamos un truco simple buscando por el onclick en el DOM actual)
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
