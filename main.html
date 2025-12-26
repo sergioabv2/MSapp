@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js" charset="utf-8"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css" rel="stylesheet" type="text/css"> 
 
  <link rel="manifest" href="/manifest.json">
 </head>
@@ -2443,7 +2440,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     <ion-side-menus >
  <ion-side-menu side="left" width='270'  > 
        
-        <ion-content delegate-handle="chatScroll">
+        <ion-content >
 
 
 
@@ -2508,82 +2505,42 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-     <script id="statistics.html" type="text/ng-template">
-    <ion-view ng-init="init()">
-      
-      <ion-nav-bar class="bar-light" >     
-       <ion-nav-buttons side="left">
-    <button class="button button-clear" ng-click="goBack()">
-      <i class="ri-arrow-left-s-line"></i> regresar
-    </button>
-  </ion-nav-buttons>  
+
+
+ <script id="statistics.html" type="text/ng-template">
+    <ion-view >
+
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBack()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
     </ion-nav-bar>
-      
-      <ion-content style="padding-top: 10px;" delegate-handle="chatScroll"> 
-      
-       <ion-list>
-
-      <!-- 📂 CATEGORÍA 1 -->
-      <div class="item item-divider">Categoría 1</div>
-
-      <!-- Repertorio -->
-      <ion-item ng-click="toggleSection('repertorio')">
-        <i class="icon ri-music-2-fill"></i> Repertorio
-        <span class="item-note">{{repertorioTotal}} piezas</span>
-      </ion-item>
-      <div ng-show="isOpen('repertorio')" id="repertorioChart"></div>
-
-      <!-- Escalas -->
-      <ion-item ng-click="toggleSection('escalas')">
-        <i class="icon ri-slideshow-3-fill"></i> Escalas
-        <span class="item-note">12 tonos</span>
-      </ion-item>
-      <div ng-show="isOpen('escalas')" id="escalasChart"></div>
-
-      <!-- Lectura a primera vista -->
-      <ion-item ng-click="toggleSection('lectura')">
-        <i class="icon ri-book-open-fill"></i> Lectura a primera vista
-        <span class="item-note">{{student.readingPct}}%</span>
-      </ion-item>
-      <div ng-show="isOpen('lectura')" id="lecturaGauge"></div>
-
-
-      <!-- 📂 CATEGORÍA 2 -->
-      <div class="item item-divider">Categoría 2</div>
-
-      <!-- Asistencia -->
-      <ion-item ng-click="toggleSection('asistencia')">
-        <i class="icon ri-calendar-check-fill"></i> Asistencia
-        <span class="item-note">
-          {{student.attendance.attended}}/{{student.attendance.total}}
-        </span>
-      </ion-item>
-      <div ng-show="isOpen('asistencia')" id="asistenciaPie"></div>
-
-      <!-- Práctica -->
-      <ion-item ng-click="toggleSection('practica')">
-        <i class="icon ri-flashlight-fill"></i> Práctica
-        <span class="item-note">{{student.studyHours}}h</span>
-      </ion-item>
-      <div ng-show="isOpen('practica')" id="practicaGauge"></div>
-
-      <!-- Rendimiento general -->
-      <ion-item ng-click="toggleSection('general')">
-        <i class="icon ri-line-chart-fill"></i> Rendimiento general
-        <span class="item-note">{{generalPct}}%</span>
-      </ion-item>
-      <div ng-show="isOpen('general')" id="generalGauge"></div>
-
-    </ion-list>
-
-
+    
+      <ion-content >
+        <div class="iframe-container"><iframe src="https://www.mozart-app.com/statistics" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
-
-   
-
     </ion-view>
   </script>
 
+
+  <script id="scan.html" type="text/ng-template">
+    <ion-view >
+
+     <ion-nav-bar class="bar-light">
+      <ion-nav-buttons side="left">
+        <button class="button button-clear" ng-click="goBack()">
+          <i class="ri-arrow-left-s-line"></i> regresar
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+    
+      <ion-content >
+        <div class="iframe-container"><iframe src="https://www.mozart-app.com/login3" frameborder="0" allowfullscreen ></iframe></div> 
+      </ion-content>
+    </ion-view>
+  </script>
 
 
   <script id="status.html" type="text/ng-template">
@@ -2595,7 +2552,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </ion-nav-buttons>  
     </ion-nav-bar>
-     <ion-content style="padding-top: 10px" delegate-handle="chatScroll">
+     <ion-content style="padding-top: 10px" >
 
     <div class="profile-header">
         <div class="profile-background"></div>
@@ -2664,7 +2621,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </button>
   </ion-nav-buttons>  
     </ion-nav-bar>
-      <ion-content style="padding-top: 10px" delegate-handle="chatScroll">
+      <ion-content style="padding-top: 10px" >
        
       <div class="profile-header">
   <div class="profile-background"></div>
@@ -2709,13 +2666,19 @@ width: 200px; /* Ajusta según el tamaño deseado */
           <p style="color: brown;" > {{userData.mail}} </p> 
           </ion-item>
 
+            <ion-item class="item-icon-left " ng-click="goToScan()">
+         <i class="icon ri-qr-scan-2-line" style="font-size: 25px"></i>
+       QR scan
+          <p style="color: gray;" > Inicio de sesión en la Academia </p> 
+          </ion-item>
+
            <ion-item class="item-icon-left " ng-click="goToStats()">
          <i class="icon ri-line-chart-fill" style="font-size: 25px"></i>
        Estadísticas
           <p style="color: gray;" > Da click para acceder a tus estadísticas </p> 
           </ion-item>
 
-
+        
 
  
         
@@ -3010,7 +2973,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-   <ion-content  style="overflow-y: hidden !important;" delegate-handle="chatScroll">
+   <ion-content  style="overflow-y: hidden !important;">
   <div class="iframe-container"><iframe src="https://www.mozart-app.com/books3" frameborder="0" allowfullscreen ></iframe> </div> 
       </ion-content>
 
@@ -3307,7 +3270,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-    <ion-content delegate-handle="chatScroll"> 
+    <ion-content > 
       <!-- achievements -->
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/lessons3" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
@@ -3598,7 +3561,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
     </ion-nav-bar>
 
-    <ion-content delegate-handle="chatScroll"> 
+    <ion-content > 
       <!-- achievements -->
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/comunity" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
@@ -3626,7 +3589,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </ion-nav-buttons>
     </ion-nav-bar>
     
-      <ion-content delegate-handle="chatScroll">
+      <ion-content >
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/payment2" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
     </ion-view>
@@ -3646,7 +3609,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
       </ion-nav-buttons>
     </ion-nav-bar>
     
-      <ion-content delegate-handle="chatScroll">
+      <ion-content 
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/agenda" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
     </ion-view>
@@ -3933,7 +3896,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 
-     <ion-content delegate-handle="chatScroll">
+     <ion-content >
   <div class="iframe-container"><iframe src="https://www.mozart-app.com/bookfinder" frameborder="0" allowfullscreen ></iframe></div> 
       </ion-content>
       
@@ -4224,7 +4187,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
     </ion-nav-bar>
 
-     <ion-content delegate-handle="chatScroll">
+     <ion-content >
   <div class="iframe-container2"><iframe src="https://www.mozart-app.com/books2" frameborder="0" allow="fullscreen midi"></iframe></div> 
    </ion-content>
  
@@ -4333,8 +4296,15 @@ app
       url: "/statistics",
       views: {
         'menuContent': {
-          templateUrl: "statistics.html",
-          controller: 'statisticsCtrl'
+          templateUrl: "statistics.html"
+        }
+      }
+    })
+   .state('menu.scan', {
+      url: "/scan",
+      views: {
+        'menuContent': {
+          templateUrl: "scan.html",
         }
       }
     })
@@ -4725,6 +4695,9 @@ function cleanInput() {
   $scope.goToStats = function() {
   window.location.href = '#/menu/statistics';
 };
+$scope.goToScan = function() {
+  window.location.href = '#/menu/scan';
+};
       $scope.goToAgenda = function() {
   window.location.href = '#/menu/agenda';
 };
@@ -4810,166 +4783,6 @@ $scope.goBack = function() {
 }; 
     }])
 
-
-
-    .controller('statisticsCtrl', function($scope, $timeout){
-   
-
-     // ================= CONFIG INICIAL =================
-  $scope.student = {
-    studyHours: 8,        // horas de práctica del alumno
-    attendance: {attended: 3, missed: 1, total: 8}, // asistencia
-    readingPct: 72        // % acierto lectura
-  };
-
-  var PRACTICE_MEAN = 12; // media práctica
-
-  // ================= ACORDEÓN =================
-  $scope.openSection = null;
-  $scope.toggleSection = function(section){
-    $scope.openSection = ($scope.openSection === section) ? null : section;
-    if ($scope.openSection) $timeout(()=>renderSection(section),0);
-  };
-  $scope.isOpen = (section)=> $scope.openSection===section;
-
-  // ================= KPIs =================
-  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
-
-  function recomputePercents(){
-    $scope.practicePct   = Math.round(clamp01($scope.student.studyHours / PRACTICE_MEAN)*100);
-    $scope.readingPct    = Math.round(clamp01($scope.student.readingPct/100)*100);
-    // General ponderado
-    var wP=0.4, wA=0.4, wR=0.2;
-    $scope.generalPct = Math.round($scope.practicePct*wP + ($scope.student.attendance.attended / $scope.student.attendance.total)*100*wA + $scope.readingPct*wR);
-  }
-
-  // ================= REPETORIO =================
-  var niveles = ['N0','N1','N2','N3','N4','N5','N6','N7','N8'];
-  var generos = ['Barroco','Clásico','Romanticismo','Siglo XX','Jazz'];
-  var repertorioSeries = {
-    'Barroco':       [0,1,2,2,3,2,1,1,0],
-    'Clásico':       [1,2,2,3,3,2,1,0,0],
-    'Romanticismo':  [0,1,2,3,3,3,2,1,0],
-    'Siglo XX':      [0,0,1,2,2,3,2,2,1],
-    'Jazz':          [0,1,1,2,2,2,2,1,1]
-  };
-  function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
-  $scope.repertorioTotal = sum(Object.keys(repertorioSeries).map(k=>sum(repertorioSeries[k])));
-
-  // ================= ESCALAS =================
-  var tonos = ['C','C#','D','Eb','E','F','F#','G','G#','A','Bb','B'];
-  var categoriasEscalas = ['Mayor','Menor armónica','Menor melódica'];
-  var escalasSeries = {
-    'Mayor':          [4,3,4,2,4,3,4,4,3,4,2,3],
-    'Menor armónica': [2,2,3,1,2,2,3,2,1,3,2,2],
-    'Menor melódica': [1,0,2,1,1,1,2,1,1,2,1,1]
-  };
-
-  // ================= FUNCIONES PARA C3 =================
-  function makeStackedBar(bindto,categories,seriesMap,opts){
-    var columns = Object.keys(seriesMap).map(k=>[k].concat(seriesMap[k]));
-    var groups = [Object.keys(seriesMap)];
-    return c3.generate({
-      bindto: bindto,
-      data: {columns:columns,type:'bar',groups:groups},
-      axis: {
-        x: {type:'category',categories:categories,label:{text:opts?.xLabel||'',position:'outer-center'}},
-        y: {label:{text:opts?.yLabel||'',position:'outer-middle'}}
-      },
-      bar:{width:{ratio:0.7}},
-      legend:{position:'right'},
-      tooltip:{grouped:true},
-      size:{height:opts?.height||320}
-    });
-  }
-
-  function makeGaugeWithText(bindto,value,maxValue,label,rangeText){
-    var g = c3.generate({
-      bindto:bindto,
-      data:{columns:[['data',value]],type:'gauge'},
-      gauge:{min:0,max:maxValue,width:28,label:{format:v=>v.toFixed(0)+'/'+maxValue}},
-      color:{pattern:['#e74c3c','#f1c40f','#2ecc71'],threshold:{values:[33,66,100]}},
-      size:{height:220},
-      legend:{show:false},
-      tooltip:{show:false}
-    });
-    var svg = d3.select(bindto+' svg');
-    svg.append("text")
-      .attr("x", 250)
-      .attr("y", 200)
-      .attr("text-anchor","middle")
-      .style("font-size","14px")
-      .style("font-weight","bold")
-      .text(rangeText+' ('+value+'/'+maxValue+')');
-    return g;
-  }
-
-  function makePie(bindto,data){
-    return c3.generate({
-      bindto:bindto,
-      data:{columns:data,type:'pie',colors:{'Asistidas':'#2ecc71','No asistidas':'#e74c3c','Pendientes':'#95a5a6'}},
-      pie:{label:{format:v=>v}},
-      size:{height:220}
-    });
-  }
-
-  // ================= RENDER POR SECCIÓN =================
-  var charts = {};
-  function renderSection(section){
-    if(section==='repertorio' && !charts.repertorio){
-      charts.repertorio = makeStackedBar('#repertorioChart',niveles,repertorioSeries,{xLabel:'Nivel',yLabel:'Piezas finalizadas',height:320});
-    }
-    if(section==='escalas' && !charts.escalas){
-      charts.escalas = makeStackedBar('#escalasChart',tonos,escalasSeries,{xLabel:'Tono',yLabel:'Octavas completadas',height:340});
-    }
-    if(section==='lectura' && !charts.lectura){
-      var text = $scope.readingPct<=33?'Poco compromiso':$scope.readingPct<=66?'Rendimiento medio':'Alto rendimiento';
-      charts.lectura = makeGaugeWithText('#lecturaGauge',$scope.readingPct,100,'Lectura',text);
-    }
-    if(section==='practica' && !charts.practica){
-      var text = $scope.practicePct<=33?'Poco compromiso':$scope.practicePct<=66?'Rendimiento medio':'Alto rendimiento';
-      charts.practica = makeGaugeWithText('#practicaGauge',$scope.practicePct,PRACTICE_MEAN,'Práctica',text);
-    }
-    if(section==='asistencia' && !charts.asistencia){
-      var att = $scope.student.attendance;
-      var pending = att.total - att.attended - att.missed;
-      var pieData = [
-        ['Asistidas', att.attended],
-        ['No asistidas', att.missed],
-        ['Pendientes', pending]
-      ];
-      charts.asistencia = makePie('#asistenciaPie',pieData);
-    }
-    if(section==='general' && !charts.general){
-      var text = $scope.generalPct<=33?'Poco compromiso':$scope.generalPct<=66?'Rendimiento medio':'Alto rendimiento';
-      charts.general = makeGaugeWithText('#generalGauge',$scope.generalPct,100,'General',text);
-    }
-  }
-
-  // ================= INIT =================
-  $scope.init = function(){ recomputePercents(); };
-
-  // Actualiza gauges si cambian los datos del alumno
-  $scope.$watch('student',function(nv){ 
-    if(!nv) return; 
-    recomputePercents();
-    if(charts.practica)    charts.practica.load({columns:[['data',$scope.practicePct]]});
-    if(charts.lectura)     charts.lectura.load({columns:[['data',$scope.readingPct]]});
-    if(charts.general)     charts.general.load({columns:[['data',$scope.generalPct]]});
-    if(charts.asistencia){
-      var att = $scope.student.attendance;
-      var pending = att.total - att.attended - att.missed;
-      charts.asistencia.load({columns:[
-        ['Asistidas', att.attended],
-        ['No asistidas', att.missed],
-        ['Pendientes', pending]
-      ]});
-    }
-  },true);
-
-  $scope.init();
-
-  })
 
  
  
