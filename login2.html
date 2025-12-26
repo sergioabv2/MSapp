@@ -4,34 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Academia - Tablet</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
-            --primary-color: #4a90e2; /* Ajusta a tu marca */
+            --primary-color: #4a90e2; 
             --bg-color: #f4f6f8;
             --text-color: #333;
         }
 
-       /* Busca esto en tu CSS y REEMPLÁZALO */
-body {
-    font-family: 'Segoe UI', sans-serif;
-
-    /* --- NUEVO FONDO CON FILTRO OSCURO --- */
-    /* El linear-gradient crea una capa negra al 50% de opacidad sobre la imagen */
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                url('https://lh3.googleusercontent.com/d/1574yKLK-x78N7AYfRtLRpUVv7ihC3dui=s1000'); /* <-- REEMPLAZA ESTA RUTA */
-                
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* ------------------- */
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            /* Fondo con filtro oscuro */
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                        url('https://lh3.googleusercontent.com/d/1574yKLK-x78N7AYfRtLRpUVv7ihC3dui=s1000'); /* <-- REEMPLAZA CON TU IMAGEN DE FONDO */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
         .kiosk-container {
             background: white;
@@ -44,84 +43,64 @@ body {
         }
 
         /* --- Estilo de Pestañas --- */
-        .tabs {
-            display: flex;
-            background: #eee;
-        }
+        .tabs { display: flex; background: #eee; }
 
         .tab-btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            background: #eee;
-            cursor: pointer;
-            font-weight: 600;
-            color: #666;
-            transition: 0.3s;
-            border-bottom: 3px solid transparent;
+            flex: 1; padding: 15px; border: none; background: #eee;
+            cursor: pointer; font-weight: 600; color: #666;
+            transition: 0.3s; border-bottom: 3px solid transparent;
         }
 
         .tab-btn.active {
-            background: white;
-            color: var(--primary-color);
+            background: white; color: var(--primary-color);
             border-bottom: 3px solid var(--primary-color);
         }
 
         /* --- Contenido --- */
-        .tab-content {
-            display: none; /* Oculto por defecto */
-            padding: 30px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .tab-content.active {
-            display: block; /* Mostrar activo */
-        }
+        .tab-content { display: none; padding: 30px; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
 
         h2 { margin-top: 0; color: var(--text-color); }
         p { color: #666; font-size: 0.95rem; margin-bottom: 20px; }
 
         /* --- Contenedor QR --- */
         .qr-wrapper {
-            background: white;
-            padding: 15px;
-            border: 1px solid #ddd;
-            display: inline-block;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            background: white; padding: 15px; border: 1px solid #ddd;
+            display: inline-block; border-radius: 8px; margin-bottom: 15px;
         }
 
         .wifi-details {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: left;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            background: #f9f9f9; padding: 15px; border-radius: 8px;
+            text-align: left; margin-top: 10px; font-size: 0.9rem;
         }
 
         .wifi-details strong { color: var(--primary-color); }
         
         .url-link {
-            display: block;
-            margin-top: 15px;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: bold;
+            display: block; margin-top: 15px; color: var(--primary-color);
+            text-decoration: none; font-weight: bold;
+        }
+        
+        /* Indicador de estado (esperando escaneo) */
+        .status-indicator {
+            font-size: 0.85rem; color: #888; margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .pulse {
+            width: 10px; height: 10px; background-color: #4a90e2;
+            border-radius: 50%; animation: pulse 1.5s infinite;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(74, 144, 226, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); } }
     </style>
 </head>
 <body>
 
 <div class="kiosk-container">
     <div class="tabs">
-        <button class="tab-btn " onclick="openTab('tab-wifi')">Acceso a WIFI</button>
-        <button class="tab-btn active" onclick="openTab('tab-login')">Inicia Sesión</button>
+        <button class="tab-btn " onclick="openTab('tab-wifi', event)">Acceso a WIFI</button>
+        <button class="tab-btn active" onclick="openTab('tab-login', event)">Inicia Sesión</button>
     </div>
 
     <div id="tab-wifi" class="tab-content">
@@ -140,60 +119,111 @@ body {
 
     <div id="tab-login" class="tab-content active">
         <h2>Acceso Rápido</h2>
-        <p>Abre la App en tu celular y escanea este código para iniciar sesión en este dispositivo.</p>
+        <p>Abre la App en tu celular y escanea este código para autorizar esta tablet.</p>
         
         <div class="qr-wrapper" id="qr-login"></div>
         
-
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span id="login-status">Esperando escaneo del móvil...</span>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- Configuración de Datos ---
+    // --- 1. CONFIGURACIÓN FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyCiYZ-_3zXQCu6DIkOd_HRGLCS3s6bIYiE",
+        authDomain: "jcubic-webrtc.firebaseapp.com",
+        databaseURL: "https://jcubic-webrtc.firebaseio.com",
+        projectId: "jcubic-webrtc",
+        storageBucket: "jcubic-webrtc.appspot.com",
+        messagingSenderId: "530153588319"
+    };
+
+    // Inicializar Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // --- 2. CONFIGURACIÓN WIFI ---
     const wifiConfig = {
         ssid: "Mozart Studio-5G",
         pass: "XxC3cTP4",
         type: "WPA"
     };
-    
-    // Cadena especial para conexión Wi-Fi automática en Android/iOS
     const wifiString = `WIFI:S:${wifiConfig.ssid};T:${wifiConfig.type};P:${wifiConfig.pass};;`;
 
-    // --- Generación de QRs al cargar ---
+    // --- 3. LÓGICA DE INICIO ---
     window.onload = function() {
-        // 1. Generar QR de Wi-Fi
+        // A. Generar QR de Wi-Fi
         new QRCode(document.getElementById("qr-wifi"), {
             text: wifiString,
-            width: 180,
-            height: 180
+            width: 180, height: 180
         });
 
-        // 2. Generar QR de Login (Simulado - Aquí iría tu Token de Websocket/API)
-        const sessionToken = "LOGIN_TOKEN_" + Date.now(); 
-        new QRCode(document.getElementById("qr-login"), {
-            text: sessionToken,
-            width: 180,
-            height: 180,
-            colorDark : "#4a90e2" // Color diferente para distinguir
-        });
+        // B. Iniciar flujo de Login Remoto
+        iniciarEscuchaLogin();
     };
 
-    // --- Lógica de Pestañas ---
-    function openTab(tabId) {
-        // 1. Ocultar todos los contenidos
-        const contents = document.querySelectorAll('.tab-content');
-        contents.forEach(content => content.classList.remove('active'));
+    function iniciarEscuchaLogin() {
+        // 1. Generar ID único de sesión para esta tablet
+        const sessionID = "SESSION_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        console.log("ID de Sesión generado:", sessionID);
 
-        // 2. Desactivar todos los botones
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
+        // 2. Generar QR con este ID
+        new QRCode(document.getElementById("qr-login"), {
+            text: sessionID,
+            width: 180, height: 180,
+            colorDark : "#4a90e2"
+        });
 
-        // 3. Activar el seleccionado
-        document.getElementById(tabId).classList.add('active');
+        // 3. Crear referencia en Firebase para escuchar cambios
+        const sessionRef = db.ref('sessions/' + sessionID);
+
+        // Establecer estado inicial (opcional, buena práctica)
+        sessionRef.set({
+            status: 'waiting',
+            created_at: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // 4. ESCUCHAR (Listener): Se activa cuando Apps Script escribe en esta ruta
+        sessionRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            
+            if (data && data.status === 'authorized') {
+                // --- ¡ÉXITO! LOGIN CONFIRMADO ---
+                document.getElementById('login-status').innerText = "¡Autorizado! Entrando...";
+                document.getElementById('login-status').style.color = "green";
+                
+                // Guardar el token del usuario que envió el celular
+                if(data.user_token) {
+                    localStorage.setItem('MStoken', data.user_token);
+                }
+
+                // Limpiar listener (seguridad)
+                sessionRef.off();
+
+                // Redirigir a la plataforma (reemplaza con tu url real)
+                setTimeout(() => {
+                    window.location.href = "/main.html"; // O tu página principal
+                }, 1500);
+            }
+        });
         
-        // Encontrar el botón que disparó el evento (basado en el texto o índice, 
-        // aquí usamos un truco simple buscando por el onclick en el DOM actual)
-        event.currentTarget.classList.add('active');
+        // Limpieza si se cierra la ventana
+        window.onbeforeunload = function() {
+            sessionRef.remove(); // Borra la sesión de la BD para no dejar basura
+        };
+    }
+
+    // --- UI: Control de Pestañas ---
+    function openTab(tabId, event) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        if(event) event.currentTarget.classList.add('active');
     }
 </script>
 
