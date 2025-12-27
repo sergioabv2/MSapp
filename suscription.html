@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Suscripción - Sergio Valenzo</title>
+    <style>
+        :root {
+            --bg-main: #f0f2f5; /* Color de fondo principal */
+            --bg-card: #ffffff; /* Blanco puro para tarjetas */
+            --text-dark: #333333; /* Texto principal */
+            --text-muted: #777777; /* Texto secundario */
+            --accent-blue: #1a2b49; /* Azul oscuro (del badge Nivel 3) */
+            --accent-gold: #D4AF37; /* Dorado (del badge Pro) */
+            --danger: #e74c3c; /* Rojo para cancelar */
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra elegante */
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            padding: 20px;
+        }
+
+        /* Header simplificado para contexto */
+        .header-placeholder {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+        .header-nav span { margin-right: 20px; font-weight: 500; color: var(--text-muted); }
+        .header-nav span.active { color: var(--text-dark); }
+
+        /* Layout principal */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1.page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .subscription-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* Tarjetas */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            padding: 30px;
+            height: 100%;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Sección del Plan Actual */
+        .current-plan-badge {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pro-crown { color: var(--accent-gold); margin-right: 6px; }
+
+        .plan-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .plan-period { color: var(--text-muted); font-size: 16px; }
+
+        .renewal-info {
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        .btn-primary:hover { background-color: #2c426b; }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #d0d0d0;
+            color: var(--text-dark);
+        }
+        .btn-outline:hover { border-color: var(--text-dark); background: #f9f9f9; }
+
+        .btn-danger-text {
+            background: none;
+            color: var(--text-muted);
+            font-weight: normal;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn-danger-text:hover { color: var(--danger); text-decoration: underline; }
+
+
+        /* Sección de Historial y Método de Pago */
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .card-info { display: flex; align-items: center; }
+        .card-icon { font-size: 24px; margin-right: 15px; color: var(--text-muted); }
+
+        .billing-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .billing-table th, .billing-table td {
+            text-align: left;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .billing-table th { color: var(--text-muted); font-weight: 500; font-size: 14px; }
+        .status-paid { color: #27ae60; font-weight: 500; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .subscription-grid { grid-template-columns: 1fr; }
+             .header-placeholder { display: none; } /* Ocultar header falso en móvil */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-placeholder">
+        <div class="header-nav">
+            <span>Práctica libre</span>
+            <span>Sesiones</span>
+            <span>Blog</span>
+        </div>
+        </div>
+
+    <div class="container">
+        <h1 class="page-title">Gestión de suscripción</h1>
+
+        <div class="subscription-grid">
+            <div class="card">
+                <div class="card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Hola, Sergio Valenzo
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <span class="current-plan-badge">
+                        <svg class="pro-crown" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        Plan Pro (Nivel 3)
+                    </span>
+                    <div>
+                        <span class="plan-price">$299 MXN</span>
+                        <span class="plan-period">/ mes</span>
+                    </div>
+                </div>
+
+                <div class="renewal-info">
+                    <p>Próxima renovación automática: <strong>15 de Noviembre, 2023</strong></p>
+                    <p style="margin-top: 5px; font-size: 13px;">Se cargará a tu tarjeta terminada en 4589.</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="changePlan()">Cambiar de Plan</button>
+                    <button class="btn btn-outline" onclick="manageAddons()">Gestionar complementos</button>
+                    <button class="btn btn-danger-text" onclick="cancelSubscription()">Cancelar suscripción</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Método de Pago Principal</div>
+                
+                <div class="payment-method">
+                    <div class="card-info">
+                        <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        <div>
+                            <p style="font-weight: 500;">Visa terminada en 4589</p>
+                            <p style="color: var(--text-muted); font-size: 13px;">Expira 12/25</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="padding: 8px 15px; font-size: 13px;" onclick="editCard()">Editar</button>
+                </div>
+
+                <div class="card-title" style="margin-top: 40px;">Historial de Facturación</div>
+                <table class="billing-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>15 Oct 2023</td>
+                            <td>Suscripción Pro - Mensual</td>
+                            <td>$299.00</td>
+                            <td><span class="status-paid">Pagado</span></td>
+                        </tr>
+                        <tr>
+                            <td>15 Sep 2023</td>
+                            <td>Suscripción Pro - Mensual</td>
+                            <td>$299.00</td>
+                            <td><span class="status-paid">Pagado</span></td>
+                        </tr>
+                        <tr>
+                            <td>15 Ago 2023</td>
+                            <td>Suscripción Pro - Mensual</td>
+                            <td>$299.00</td>
+                            <td><span class="status-paid">Pagado</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: center; margin-top: 20px;">
+                     <button class="btn btn-danger-text" style="font-size: 13px;">Ver todo el historial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changePlan() {
+            // Aquí iría la lógica para abrir un modal de selección de planes
+            alert("Abriendo selector de planes... \n(Aquí mostrarías las opciones Basic, Pro, Enterprise)");
+        }
+
+        function manageAddons() {
+             alert("Abriendo gestión de complementos...");
+        }
+
+        function cancelSubscription() {
+            // Importante: Usar un cuadro de confirmación antes de una acción destructiva
+            let confirmAction = confirm("¿Estás seguro de que deseas cancelar tu suscripción Pro? Perderás acceso a las funciones premium al final del periodo actual.");
+            if (confirmAction) {
+                alert("Tu suscripción ha sido cancelada. Mantendrás el acceso hasta el 15 de Noviembre.");
+                // Aquí se enviaría la petición al servidor
+            }
+        }
+
+        function editCard() {
+            alert("Abriendo formulario para actualizar método de pago...");
+        }
+    </script>
+
+</body>
+</html>
