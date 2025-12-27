@@ -1687,9 +1687,17 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 .alert-banner {
+    /* PROPIEDADES NUEVAS/MODIFICADAS */
+    position: absolute; /* Saca el elemento del flujo para que flote */
+    top: 60px;             /* Lo pega al techo */
+    left: 0;
+    width: 100%;        /* Asegura que cubra el ancho */
+    z-index: 100;       /* Asegura que esté ENCIMA del iframe (el iframe suele tener z-index bajo) */
+    margin-top: 0;      /* Quitamos el margen de 10px para que se pegue al borde superior */
+    
+    /* TUS ESTILOS EXISTENTES */
     background-color: #fef2f2;
     color: #b91c1c;
-    margin-top: 10px;
     padding: 12px 24px;
     font-size: 14px;
     font-weight: 500;
@@ -1698,8 +1706,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
     align-items: center;
     justify-content: center;
     text-align: center;
+    
+    /* Opcional: una sombra suave para que se note que está flotando */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
+/* El resto queda igual */
 .alert-link {
     color: #b91c1c;
     font-weight: 700;
@@ -3284,12 +3296,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-nav-bar>
 
 
-
-   <ion-content  style="overflow-y: hidden !important;">
-     <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
+  <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
         <span>Ya iniciaste sesión, pero no tienes acceso a la experiencia completa.</span>
         <span class="alert-link" ng-click="goToPayment()">Actualiza tu cuenta &rarr;</span>
     </div>
+   <ion-content  style="overflow-y: hidden !important;">
+   
   <div class="iframe-container"><iframe src="https://www.mozart-app.com/books3" frameborder="0" allowfullscreen ></iframe> </div> 
       </ion-content>
 
@@ -3621,12 +3633,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
     </ion-nav-bar>
 
 
-
-    <ion-content > 
-     <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
+  <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
         <span>Ya iniciaste sesión, pero no tienes acceso a la experiencia completa.</span>
         <span class="alert-link" ng-click="goToPayment()">Actualiza tu cuenta &rarr;</span>
     </div>
+    <ion-content > 
+   
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/lessons3" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
 
@@ -3955,11 +3967,12 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
     </ion-nav-bar>
 
-    <ion-content > 
-       <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
+  <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
         <span>Ya iniciaste sesión, pero no tienes acceso a la experiencia completa.</span>
         <span class="alert-link" ng-click="goToPayment()">Actualiza tu cuenta &rarr;</span>
     </div>
+    <ion-content > 
+    
         <div class="iframe-container"><iframe src="https://www.mozart-app.com/blog" frameborder="0" allowfullscreen ></iframe></div> 
     </ion-content> 
 
@@ -4332,12 +4345,11 @@ width: 200px; /* Ajusta según el tamaño deseado */
         
     </ion-nav-bar>
 
-
-     <ion-content >
- <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
+  <div class="alert-banner"  ng-if="userData.status != 'ACTIVO'">
         <span>Ya iniciaste sesión, pero no tienes acceso a la experiencia completa.</span>
         <span class="alert-link" ng-click="goToPayment()">Actualiza tu cuenta &rarr;</span>
     </div>
+     <ion-content >
   <div class="iframe-container2"><iframe src="https://www.mozart-app.com/books2" frameborder="0" allow="fullscreen midi"></iframe></div> 
    </ion-content>
  
