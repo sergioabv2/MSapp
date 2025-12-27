@@ -1725,6 +1725,9 @@ display: flex;
     </div>
   
      <div class="tool-group">
+        <button id="mute-btn" class="btn" title="Silenciar piano (Mute)">
+            <i class="ri-volume-up-line"></i>
+        </button>
         <button id="restart-chunk-btn" class="btn" title="Reiniciar estos 4 compases">
             <i class="ri-skip-back-line"></i>
         </button>
@@ -1849,6 +1852,8 @@ const secondaryTopBar = document.getElementById('secondary-top-bar');
 const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
 const restartChunkBtn = document.getElementById('restart-chunk-btn');
   let isRestarting = false;
+  let isPianoMuted = false;
+const muteBtn = document.getElementById('mute-btn');
 
 //const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -3054,6 +3059,8 @@ window.addEventListener('message', function(event) {
 
 
 
+
+/*
 function restoreFogStateFromPercent(percent) {
     if (!osmd || !osmd.sheet) {
         setTimeout(() => restoreFogStateFromPercent(percent), 500);
@@ -3076,6 +3083,30 @@ function restoreFogStateFromPercent(percent) {
         const lastChunkIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
         measureSelect.value = lastChunkIndex;
         jumpToMeasureInLearnMode(lastChunkIndex);
+    }
+    updateGlobalProgressByChunks();
+}
+*/
+
+function restoreFogStateFromPercent(percent) {
+    if (!osmd || !osmd.sheet) {
+        setTimeout(() => restoreFogStateFromPercent(percent), 500);
+        return;
+    }
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    let measuresToUnlock = Math.floor((percent / 100) * totalMeasures);
+    measuresToUnlock = Math.ceil(measuresToUnlock / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    measuresToUnlock = Math.max(MEASURES_PER_CHUNK, Math.min(measuresToUnlock, totalMeasures));
+    unlockedMeasureCount = measuresToUnlock;
+    
+    if (percent >= 100) isPieceCompleted = true;
+    if (isMidiLearnMode) {
+        setRangeOpacity(0, unlockedMeasureCount, 1);
+        setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15);
+        populateMeasureSelector();
+        const lastChunkIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+        measureSelect.value = lastChunkIndex;
     }
     updateGlobalProgressByChunks();
 }
@@ -3262,7 +3293,7 @@ speedDownBtn.addEventListener('click', () => {
 });
 
 micBtn.addEventListener('click', toggleMicMode);
-
+muteBtn.addEventListener('click', toggleMutePiano);
 
 restartChunkBtn.addEventListener('click', restartCurrentChunk);
 
@@ -4041,6 +4072,33 @@ function toggleMicMode() {
         
         // Restaurar opacidad visual si es necesario (opcional)
         setRangeOpacity(0, osmd.sheet.SourceMeasures.length, 1);
+    }
+}
+
+
+function toggleMutePiano() {
+    isPianoMuted = !isPianoMuted;
+
+    if (isPianoMuted) {
+        // --- ACTIVAR SILENCIO ---
+        // En Tone.js, -Infinity decibelios es silencio absoluto
+        if (sampler) sampler.volume.value = -Infinity;
+        
+        // Cambio visual: Icono de mute y color activo (rojo o gris según tu CSS)
+        muteBtn.innerHTML = '<i class="ri-volume-mute-line"></i>';
+        muteBtn.classList.add('active'); 
+        // Opcional: ponerlo rojo para que sea evidente
+        muteBtn.style.color = '#e74c3c'; 
+        
+    } else {
+        // --- ACTIVAR SONIDO ---
+        // 0 decibelios es el volumen estándar (sin ganancia ni pérdida)
+        if (sampler) sampler.volume.value = 0;
+        
+        // Restaurar icono y color
+        muteBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
+        muteBtn.classList.remove('active');
+        muteBtn.style.color = ''; // Volver al color original
     }
 }
 
