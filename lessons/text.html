@@ -213,104 +213,98 @@
   }
 
 
-  /* --- Botón Flotante (FAB) Contenedor --- */
-  .fab-container {
-    position: fixed;
-    bottom: 2rem;
-    left: 2rem; /* Izquierda */
-    z-index: 100;
-    display: flex;
-    flex-direction: column-reverse; /* Las opciones salen hacia arriba */
-    align-items: center;
-    gap: 1rem;
-  }
 
-  /* El botón principal (Trigger) */
-  .fab-main {
-    width: 3.5rem;
-    height: 3.5rem;
-    background-color: var(--text-main);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease, background-color 0.3s;
-  }
-
-  .fab-main:hover {
-    background-color: black;
-    transform: scale(1.05);
-  }
-
-  /* Animación del icono principal al abrir */
-  .fab-container.open .fab-main {
-    transform: rotate(45deg); /* Gira a una X */
-  }
-
-  /* --- Botones de Acción (Ocultos por defecto) --- */
-  .fab-action {
-    width: 2.8rem;
-    height: 2.8rem;
-    border-radius: 50%;
-    border: 1px solid var(--nav-border);
-    background-color: white;
-    color: var(--text-secondary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* Estado inicial: invisible y desplazado hacia abajo */
-    opacity: 0;
-    transform: translateY(20px) scale(0.8);
-    pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Estado cuando está activo (Lápiz activado) */
-  .fab-action.active-tool {
-    background-color: var(--text-main);
-    color: white;
-    border-color: var(--text-main);
-  }
-
-  /* Animación de apertura (Cascada) */
-  .fab-container.open .fab-action {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: all;
-  }
-
-  /* Retrasos para efecto escalonado al abrir hacia arriba */
-  .fab-container.open .fab-action:nth-child(2) { transition-delay: 0.05s; } /* Ojo */
-  .fab-container.open .fab-action:nth-child(3) { transition-delay: 0.1s; }  /* Color */
-  .fab-container.open .fab-action:nth-child(4) { transition-delay: 0.15s; } /* Lápiz */
-
-  /* Estilos específicos para el input de color */
-  .color-wrapper {
-    overflow: hidden;
-    padding: 0;
-  }
+.fab-main {
   
-  #colorPicker {
-    -webkit-appearance: none;
-    border: none;
-    width: 150%; 
-    height: 150%;
-    margin: -25%; /* Truco para llenar el botón circular */
-    cursor: pointer;
-  }
-  
-  /* Estilos de resaltado manual (igual que antes) */
+  position: fixed;
+  bottom: 2rem; /* Encima del botón de marcador */
+  left: 1.7rem;
+  z-index: 99;
+  width: 3rem;     /* Un poco más pequeño que el principal */
+  height: 3rem;
+  background-color: white;
+  color: var(--text-main);
+  border: 1px solid var(--nav-border);
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.fab-main:hover { transform: scale(1.05); background-color: #fde68a; }
+
+
   .user-highlight {
-    background-color: var(--highlight-color, #fde68a);
-    cursor: pointer;
-  }
+  background-color: var(--highlight-color);
+  cursor: pointer; /* Para indicar que se puede borrar */
+}
+
+
+/* --- Estilos Botón Bocina --- */
+.fab-secondary {
+  position: fixed;
+  bottom: 5.7rem; /* Encima del botón de marcador */
+  left: 1.7rem;
+  z-index: 99;
+  width: 3rem;     /* Un poco más pequeño que el principal */
+  height: 3rem;
+  background-color: white;
+  color: var(--text-main);
+  border: 1px solid var(--nav-border);
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.fab-secondary:hover { transform: scale(1.05); background-color: #f9fafb; }
+
+/* Panel de Controles (Play/Pausa/Stop) */
+.tts-controls {
+  position: fixed;
+  bottom: 6.5rem;
+  left: 6rem; /* A la derecha de la bocina */
+  background: #1f2937;
+  padding: 8px 12px;
+  border-radius: 50px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  opacity: 0;           /* Oculto por defecto */
+  pointer-events: none; /* No clickeable cuando oculto */
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.tts-controls.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+.control-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.control-btn:hover { color: var(--highlight-color); }
+
+/* --- Resaltado de Lectura (Karaoke) --- */
+.reading-word {
+  background-color: #fdba74; /* Naranja suave */
+  border-radius: 3px;
+  transition: background 0.1s;
+}
+ 
   body.hide-highlights .user-highlight {
     background-color: transparent !important;
   }
@@ -577,32 +571,27 @@
 
  
 
-  <div class="fab-container" id="fabContainer">
-  
-  <button class="fab-main" id="fabTrigger" title="Herramientas de lectura">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-    </svg>
+ <div id="ttsControls" class="tts-controls">
+  <button id="btnStop" class="control-btn" title="Detener">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
   </button>
-
-  <button id="toggleVisibility" class="fab-action" title="Ocultar/Mostrar notas">
-    <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
+  <button id="btnPlayPause" class="control-btn" title="Pausar/Reanudar">
+    <svg id="iconPause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    <svg id="iconPlay" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
   </button>
-
-  <div class="fab-action color-wrapper" title="Color de resaltado">
-    <input type="color" id="colorPicker" value="#fde68a">
-  </div>
-
-  <button id="toggleHighlightMode" class="fab-action" title="Activar modo subrayado">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-    </svg>
-  </button>
-
 </div>
+
+<button id="btnTTS" class="fab-secondary" title="Leer en voz alta">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+  </svg>
+</button>
+
+ <button id="btnDirectHighlight" class="fab-main" title="Resaltar texto seleccionado">
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18.5 2.5l-16 16V22h3.5l16-16-3.5-3.5z"/> <path d="M13.5 7.5l3 3"/> <path d="M2 22h20"/> </svg>
+</button>
 
 <div id="deleteTooltip" title="Eliminar subrayado">
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -614,167 +603,234 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
 <script>
-  // Variables de Estado
-  let isHighlightMode = false;
-  let currentColor = '#fde68a';
-  let areHighlightsVisible = true;
-  let isMenuOpen = false;
-  let targetHighlight = null; // Guardará referencia al span que queremos borrar
-
   // Elementos DOM
-  const fabContainer = document.getElementById('fabContainer');
-  const fabTrigger = document.getElementById('fabTrigger');
-  const btnToggleMode = document.getElementById('toggleHighlightMode');
-  const btnVisibility = document.getElementById('toggleVisibility');
-  const colorInput = document.getElementById('colorPicker');
+  const btnHighlight = document.getElementById('btnDirectHighlight');
   const contentArea = document.querySelector('main');
-  
-  // Nuevo elemento DOM: El tooltip de basura
   const deleteTooltip = document.getElementById('deleteTooltip');
+  let targetHighlight = null; 
 
-  // --- Funciones Auxiliares ---
 
-  // Ocultar la basura
+// --- LÓGICA DE TEXT-TO-SPEECH (LECTURA) ---
+  
+  const btnTTS = document.getElementById('btnTTS');
+  const ttsControls = document.getElementById('ttsControls');
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const btnStop = document.getElementById('btnStop');
+  const iconPlay = document.getElementById('iconPlay');
+  const iconPause = document.getElementById('iconPause');
+
+  let synth = window.speechSynthesis;
+  let utterance = null;
+  let isSpeaking = false;
+  let isPaused = false;
+  
+  // Guardamos el contenido original para restaurarlo al terminar
+  let currentElement = null;
+  let originalHTML = "";
+
+  // 1. Iniciar Lectura
+  btnTTS.addEventListener('click', () => {
+    if (isSpeaking) return; // Si ya está activo, no hace nada (usa los controles)
+    startReading();
+  });
+
+  function startReading() {
+    // Buscar párrafos y títulos legibles
+    const readableElements = Array.from(contentArea.querySelectorAll('p, h1, h2, h3, li'));
+    if (readableElements.length === 0) return;
+
+    // Mostrar controles
+    ttsControls.classList.add('active');
+    updatePlayPauseIcon(true);
+    isSpeaking = true;
+
+    // Comenzar secuencia de lectura
+    readQueue(readableElements, 0);
+  }
+
+  function readQueue(elements, index) {
+    if (!isSpeaking || index >= elements.length) {
+      resetTTS();
+      return;
+    }
+
+    currentElement = elements[index];
+    originalHTML = currentElement.innerHTML; // Guardar estado original (importante para tus subrayados amarillos)
+    
+    const text = currentElement.innerText;
+    
+    // Preparar las palabras para resaltado visual
+    // (Envolvemos cada palabra en un span temporal)
+    const words = text.split(' ');
+    currentElement.innerHTML = words.map((word, i) => `<span id="word-${i}">${word}</span>`).join(' ');
+
+    // Configurar Voz
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-ES'; // Español
+    utterance.rate = 1.0;     // Velocidad normal
+
+    // Evento: Se dispara cada vez que lee una palabra
+    utterance.onboundary = (event) => {
+      if (event.name === 'word') {
+        // Calcular índice aproximado de la palabra basado en el tiempo/caracteres
+        // Nota: WebSpeechAPI es imprecisa con índices, usamos una aproximación simple
+        const charIndex = event.charIndex;
+        // Buscamos qué palabra corresponde a este índice
+        let currentLength = 0;
+        for (let i = 0; i < words.length; i++) {
+          const wLen = words[i].length + 1; // +1 por el espacio
+          if (currentLength >= charIndex || (currentLength + wLen) > charIndex) {
+            // Limpiar anterior
+            const prev = currentElement.querySelector('.reading-word');
+            if (prev) prev.classList.remove('reading-word');
+            
+            // Resaltar actual
+            const span = currentElement.querySelector(`#word-${i}`);
+            if (span) span.classList.add('reading-word');
+            break;
+          }
+          currentLength += wLen;
+        }
+      }
+    };
+
+    // Evento: Al terminar este párrafo
+    utterance.onend = () => {
+      if (currentElement) currentElement.innerHTML = originalHTML; // Restaurar HTML limpio
+      if (isSpeaking && !isPaused) {
+        readQueue(elements, index + 1); // Leer siguiente
+      }
+    };
+
+    synth.speak(utterance);
+  }
+
+  // 2. Controles
+  btnStop.addEventListener('click', () => {
+    synth.cancel();
+    if (currentElement) currentElement.innerHTML = originalHTML; // Restaurar inmediatamente
+    resetTTS();
+  });
+
+  btnPlayPause.addEventListener('click', () => {
+    if (synth.speaking && !synth.paused) {
+      synth.pause();
+      isPaused = true;
+      updatePlayPauseIcon(false);
+    } else if (synth.paused) {
+      synth.resume();
+      isPaused = false;
+      updatePlayPauseIcon(true);
+    }
+  });
+
+  function resetTTS() {
+    isSpeaking = false;
+    isPaused = false;
+    ttsControls.classList.remove('active');
+    currentElement = null;
+    synth.cancel();
+  }
+
+  function updatePlayPauseIcon(isPlaying) {
+    if (isPlaying) {
+      iconPlay.style.display = 'none';
+      iconPause.style.display = 'block';
+    } else {
+      iconPlay.style.display = 'block';
+      iconPause.style.display = 'none';
+    }
+  }
+
+
+  btnHighlight.addEventListener('mousedown', (e) => {
+    e.preventDefault(); // Vital: Evita que el botón robe el foco al texto
+    
+    const selection = window.getSelection();
+    
+    // Si no hay texto seleccionado, salimos
+    if (!selection || selection.toString().length === 0) return;
+
+    const range = selection.getRangeAt(0);
+
+    // Validación: Que la selección esté dentro del contenido
+    if (!contentArea.contains(range.commonAncestorContainer) && range.commonAncestorContainer !== contentArea) return;
+
+    // Validación: Evitar subrayar sobre otro subrayado
+    if (range.cloneContents().querySelector('.user-highlight')) {
+       console.warn("Ya existe un subrayado aquí.");
+       return;
+    }
+
+    // Crear el elemento amarillo
+    const span = document.createElement('span');
+    span.className = 'user-highlight';
+
+    try {
+      range.surroundContents(span);
+      selection.removeAllRanges(); // Quitamos la selección azul
+    } catch (error) {
+      console.warn("No se puede subrayar selecciones complejas (cruzan etiquetas).");
+    }
+  });
+
+
+  // --- LÓGICA DE BORRADO ---
+  
   function hideDeleteTooltip() {
     deleteTooltip.style.display = 'none';
     targetHighlight = null;
   }
 
-  // Mostrar la basura encima de un elemento
   function showDeleteTooltip(element) {
     targetHighlight = element;
-    
-    // Obtenemos coordenadas del subrayado
     const rect = element.getBoundingClientRect();
-    
-    // Calculamos posición (considerando el scroll de la página)
-    // Left: Centro del elemento. Top: Parte superior del elemento.
     const scrollX = window.scrollX || window.pageXOffset;
     const scrollY = window.scrollY || window.pageYOffset;
-
+    
     deleteTooltip.style.left = (rect.left + rect.width / 2 + scrollX) + 'px';
     deleteTooltip.style.top = (rect.top + scrollY) + 'px';
     deleteTooltip.style.display = 'block';
   }
 
-  // --- Event Listeners ---
-
-  // 1. Abrir / Cerrar Menú Flotante
-  fabTrigger.addEventListener('click', () => {
-    isMenuOpen = !isMenuOpen;
-    fabContainer.classList.toggle('open');
-  });
-
-  // 2. Activar Modo Subrayado
-  btnToggleMode.addEventListener('click', () => {
-    isHighlightMode = !isHighlightMode;
-    btnToggleMode.classList.toggle('active-tool');
-    document.body.style.cursor = isHighlightMode ? 'text' : 'default';
-    if (!isHighlightMode) window.getSelection().removeAllRanges();
-    hideDeleteTooltip(); // Ocultar basura si cambiamos modo
-  });
-
-  // 3. Color
-  colorInput.addEventListener('input', (e) => currentColor = e.target.value);
-
-  // 4. Visibilidad
-  btnVisibility.addEventListener('click', () => {
-    areHighlightsVisible = !areHighlightsVisible;
-    document.body.classList.toggle('hide-highlights');
-    hideDeleteTooltip(); // Ocultar basura si ocultamos marcas
-    
-    // Cambiar icono
-    const eyePath = areHighlightsVisible 
-      ? '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
-      : '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
-    document.getElementById('eyeIcon').innerHTML = eyePath;
-  });
-
-  // 5. CLICK GLOBAL: Maneja creación de subrayados Y detección de clics para borrar
   document.addEventListener('mouseup', (e) => {
-    
-    // A) Si hacemos click en el botón de basura
+    // A) Borrar (Clic en tooltip)
     if (deleteTooltip.contains(e.target) && targetHighlight) {
-      // "Desenvolver" el texto (borrar el span pero dejar el texto)
       const parent = targetHighlight.parentNode;
       while (targetHighlight.firstChild) {
         parent.insertBefore(targetHighlight.firstChild, targetHighlight);
       }
       parent.removeChild(targetHighlight);
       hideDeleteTooltip();
-      return; // Terminamos aquí
+      return;
     }
 
-    // B) Si hacemos click en un subrayado existente
+    // B) Mostrar opción borrar (Clic en amarillo)
     if (e.target.classList.contains('user-highlight')) {
-      // Solo mostramos la basura si NO estamos seleccionando texto activamente
       if (window.getSelection().toString().length === 0) {
         showDeleteTooltip(e.target);
         return;
       }
-    } else {
-      // Si clickeamos en cualquier otro lado (texto normal o blanco), ocultar basura
-      hideDeleteTooltip();
-    }
-
-    // C) Crear NUEVO subrayado (Lógica original)
-    if (!isHighlightMode || !areHighlightsVisible) return;
+    } 
     
-    const selection = window.getSelection();
-    if (selection.toString().length > 0) {
-      const range = selection.getRangeAt(0);
-      
-      // Validación de zona segura
-      if (!contentArea.contains(range.commonAncestorContainer) && range.commonAncestorContainer !== contentArea) return; 
-
-      // Evitar subrayar sobre subrayado (anidamiento complejo)
-      // Si la selección ya contiene un user-highlight, cancelamos para evitar romper el HTML
-      if (range.cloneContents().querySelector('.user-highlight')) {
-        console.warn("No se permite subrayar sobre otro subrayado.");
-        return;
-      }
-
-      const span = document.createElement('span');
-      span.className = 'user-highlight';
-      span.style.setProperty('--highlight-color', currentColor);
-
-      try {
-        range.surroundContents(span);
-        selection.removeAllRanges();
-      } catch (e) {
-        console.warn("Selección inválida a través de bloques.");
-      }
-    }
+    // C) Ocultar
+    hideDeleteTooltip();
   });
 
-
+  // --- IMÁGENES INTERACTIVAS ---
   const images = document.querySelectorAll('.interactive-img');
-
   images.forEach(img => {
     img.addEventListener('click', (e) => {
-      // Evitamos que este click active otras cosas (como cerrar menús)
-      e.stopPropagation(); 
-      
-      // Alternar la clase 'zoomed'
+      e.stopPropagation();
       img.classList.toggle('zoomed');
-      
-      // Opcional: Si hago click en una, cerrar las otras si estuvieran abiertas
-      images.forEach(otherImg => {
-        if (otherImg !== img) {
-          otherImg.classList.remove('zoomed');
-        }
-      });
+      images.forEach(other => { if(other !== img) other.classList.remove('zoomed'); });
     });
   });
-
-  // Cerrar la imagen si hago click fuera de ella (en cualquier parte del documento)
+  
   document.addEventListener('click', (e) => {
     if (!e.target.classList.contains('interactive-img')) {
-      images.forEach(img => {
-        img.classList.remove('zoomed');
-      });
+      images.forEach(img => img.classList.remove('zoomed'));
     }
   });
 </script>
