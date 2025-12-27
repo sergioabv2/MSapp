@@ -1,943 +1,342 @@
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-<!-- Agrega esto en el <head> -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Piano App</title>
+    <style>
+        /* --- VARIABLES DEL SISTEMA (Idénticas) --- */
+        :root {
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #777777;
+            --accent-blue: #1a2b49;
+            --accent-gold: #f1c40f;
+            --success-green: #27ae60;
+            --border-color: #e0e0e0;
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-<style>
- :root {
-  --color-primary: #3A6B7E;  /* Azul más sofisticado */
-  --color-primary-light: #5D9DB5;
-  --color-primary-lightest: #E0F0F5;
-  --color-secondary: #7EB09B;  /* Verde azulado armónico */
-  --color-accent: #F5A623;     /* Color de acento dorado */
-  --color-text: #333333;
-  --color-text-light: #666666;
-  --color-background: #F8FAFC;
-  --color-card: #FFFFFF;
-  --color-border: #E5E7EB;
-}
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            padding: 20px;
+        }
 
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: inherit;
-    font-family: 'Inter', sans-serif;
-}
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
-html {
-    font-size: 62.5%;
-}
+        /* --- HEADER DE NAVEGACIÓN --- */
+        .nav-header {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-body {
-    font-weight: 400;
-    color: #444;
-    box-sizing: border-box;
-    padding: 5rem;
-    min-height: 100vh;
-    background-color: var(--color-primary-light);
-}
-.all {
-    display: grid;
-    place-items: center;
-    grid-template-columns: 1fr 6rem;
-}
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent-blue); }
 
-nav {
-    background-color: var(--color-primary-light);
-  
-}
+        h1.page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
 
+        /* --- GRID DASHBOARD --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
 
-.portrait {
-    background-color: white;
-    color: var(--color-primary);
-    width: 5rem;
-    height: 5rem;
-    border-radius: 50%;
-    margin-bottom: 5rem;
-   
-}
-.portrait:hover {
-    background-color: var(--color-primary-lightest);
-}
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            padding: 25px;
+        }
 
+        /* --- METRICS CARDS (TOP) --- */
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 120px;
+        }
 
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(26, 43, 73, 0.05);
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
 
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
 
-.content {
-    width: 100%;
-    background-color: #fff;
-    box-shadow: 0 0 5rem rgba(0,0,0,.4);
-    border-radius: 2rem;
-    z-index: 5;
-    padding: 4rem 6rem;
-   
-}
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
-section {
-    padding: 1rem 2rem;
-    background-color: #fff;
-    box-shadow: 0 0 3rem rgba(0,0,0,.3);
-    border-radius: .8rem;
-    transition: 0.2s;
-    cursor: pointer;
-  transition: all 0.3s ease;
-}
+        /* Estilo especial para racha (Fuego) */
+        .fire-icon { color: #e67e22; background: rgba(230, 126, 34, 0.1); }
+        .gold-text { color: #d35400; } 
 
-section > h2{
-    font-size: 2rem;
-    letter-spacing: .2rem;
-    font-weight: 400;
-    color: var(--color-primary);
-}
+        /* --- GRÁFICO DE BARRAS CSS --- */
+        .chart-section {
+            grid-column: span 2; /* Ocupa 2 espacios */
+        }
 
-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .chart-title { font-size: 16px; font-weight: 600; }
+        
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 180px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-.greeting {
-    margin-bottom: 4rem;
-    font-size: 1.4rem;
-}
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
 
+        .bar {
+            width: 12px;
+            background-color: var(--accent-blue);
+            border-radius: 20px;
+            opacity: 0.8;
+            transition: height 0.5s ease, opacity 0.2s;
+            position: relative;
+        }
+        
+        .bar:hover { opacity: 1; transform: scaleX(1.2); }
+        
+        /* Tooltip simple en hover */
+        .bar:hover::after {
+            content: attr(data-time);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+        }
 
-main {
-    display: grid;
-    grid-template-columns: 16fr 5fr;
-    grid-template-rows: auto auto;
-    gap: 4rem;
-}
+        .bar-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
-.grid-area-1 {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
+        /* --- SKILL PROGRESS --- */
+        .skills-section {
+            grid-column: span 1;
+        }
 
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 2fr;
-    gap: 4rem;
-}
+        .skill-item { margin-bottom: 20px; }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
 
-.grid-area-1-2 {
-    grid-column: 2 / 3;
-    grid-row: 1 / 3;
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
 
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-}
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+        }
 
+        /* Variaciones de color */
+        .fill-gold { background-color: var(--accent-gold); }
+        .fill-green { background-color: var(--success-green); }
 
-.grid-area-2 {
-    grid-column: 2 / 3;
-    grid-row: 1 / 3;
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .chart-section, .skills-section { grid-column: span 1; }
+            .metric-card { flex-direction: row; align-items: center; height: auto; padding: 20px; }
+            .metric-icon { margin-bottom: 0; margin-right: 15px; }
+        }
+    </style>
+</head>
+<body>
 
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-}
+    <div class="container">
+        
+        <header class="nav-header">
+        
+            <h1 class="page-title">Mis Estadísticas</h1>
+        </header>
 
+        <div class="dashboard-grid">
 
-.grid-area-3 {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
+            <div class="card metric-card">
+                <div class="metric-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div>
+                    <div class="metric-value">42h</div>
+                    <div class="metric-label">Tiempo de práctica</div>
+                </div>
+            </div>
 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 4rem;
-}
+            <div class="card metric-card">
+                <div class="metric-icon fire-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-5-6.33-5-6.33S1 10.62 1 12a2.5 2.5 0 002.5 2.5 2.5 2.5 0 002.5-2.5 2.5 2.5 0 002.5 2.5z"/><path d="M15.5 6.33S10.5 11.28 10.5 12.66a2.5 2.5 0 002.5 2.5 2.5 2.5 0 002.5-2.5 2.5 2.5 0 002.5 2.5 2.5 2.5 0 002.5-2.5c0-1.38-5-6.33-5-6.33z"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z"/></svg>
+                </div>
+                <div>
+                    <div class="metric-value gold-text">5 Días</div>
+                    <div class="metric-label">Racha actual</div>
+                </div>
+            </div>
 
-.last-week {
-    grid-column: 2 / 3;
-    grid-row: 1 / 3;
-}
+            <div class="card metric-card">
+                <div class="metric-icon" style="color: #27ae60; background: rgba(39, 174, 96, 0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div>
+                    <div class="metric-value" style="color: #27ae60;">92%</div>
+                    <div class="metric-label">Precisión de notas</div>
+                </div>
+            </div>
 
+            <div class="card chart-section">
+                <div class="chart-header">
+                    <span class="chart-title">Actividad Semanal</span>
+                    <span style="font-size: 12px; color: var(--text-muted);">Últimos 7 días</span>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="bar-group">
+                        <div class="bar" style="height: 30%;" data-time="15 min"></div>
+                        <span class="bar-label">L</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 55%;" data-time="32 min"></div>
+                        <span class="bar-label">M</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 80%;" data-time="50 min"></div>
+                        <span class="bar-label">M</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 40%;" data-time="25 min"></div>
+                        <span class="bar-label">J</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 90%; background-color: var(--accent-gold);" data-time="60 min"></div>
+                        <span class="bar-label">V</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 20%;" data-time="10 min"></div>
+                        <span class="bar-label">S</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar" style="height: 0%;" data-time="0 min"></div> <span class="bar-label">D</span>
+                    </div>
+                </div>
+            </div>
 
-.distance {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 3rem;
-}
-.distance__section {
-    position: relative;
-}
-.distance__section::after {
-    content: '';
-    height: 80%;
-    width: 1.6rem;
-    background-color: var(--color-primary-light);
-    position: absolute;
-    right: 0;
-    top: 10%;
-    border-radius: 1.2rem 0 0 1.2rem;
-    box-shadow: inset .4rem .4rem 1rem rgba(0,0,0,.2);
-}
-.distance p {
-    color: var(--color-primary);
-    font-size: 2rem;
-}
-.distance .distance__section > h2 {
-    font-weight: 400;
-    font-size: 1.6rem;
-    letter-spacing: 0;
-}
-.distance svg {
-    height: 5rem;
-    color: var(--color-primary);
-    margin-top: 2rem;
-}
+            <div class="card skills-section">
+                <h2 class="chart-title" style="margin-bottom: 25px;">Habilidades</h2>
+                
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>Lectura a primera vista</span>
+                        <span>Nivel 4</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
 
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>Ritmo y Tiempo</span>
+                        <span>Nivel 3</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill fill-gold" style="width: 45%;"></div>
+                    </div>
+                </div>
 
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>Oído musical</span>
+                        <span>Nivel 5</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill fill-green" style="width: 90%;"></div>
+                    </div>
+                </div>
 
-.weekly table {
-    font-size: 1.6rem;
-    width: 100%;
-    text-align: left;
-    margin: 2rem 0;
-}
-.weekly td {
-    padding: .8rem .2rem;
-}
+                <div class="skill-item" style="margin-bottom: 0;">
+                    <div class="skill-header">
+                        <span>Teoría</span>
+                        <span>Nivel 2</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                </div>
+            </div>
 
-.recent {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-}
-.recent a {
-    align-self: end;
-}
-.recent  table {
-    font-size: 1.6rem;
-    width: calc(100% + 4rem);
-    text-align: left;
-    margin: 2rem -2rem .5rem -2rem;
-    border: none;
-}
-.recent tr:nth-of-type(odd) {
-    background-color: var(--color-primary-lightest);
-}
-.recent td {
-    padding: .8rem .2rem;
-}
-.recent svg {
-    width: 3rem;
-    height: 3rem;
-    background-color: #fff;
-    border-radius: 50%;
-    padding: .5rem;
-    color: var(--color-primary);
-    margin-left: 2rem;
-}
-
-
-
-th {
-  text-align: left;
-  padding: 1.2rem 1.5rem;
-  background-color: var(--color-primary-lightest);
-  color: var(--color-primary);
-  font-weight: 600;
-  border-bottom: 2px solid var(--color-primary);
-}
-
-td {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-tr:hover td {
-  background-color: var(--color-primary-lightest);
-}
-
-a {
-    font-size: 1.6rem;
-    color: var(--color-primary);
-    text-decoration: none;
-    display: block;
-    padding-bottom: .2rem;
-    margin: 1rem 0;
-    border-bottom: 1px solid currentColor;
-    letter-spacing: 3px;
-    align-self: end;
-    margin-right: 1rem;
-}
-
-.calories {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
-}
-.calories h2 {
-    grid-column: 1 / 4;
-}
-.calories__number {
-    text-align: center;
-    font-size: 2.8rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    margin: 1.5rem 0;
-}
-.calories__text {
-    text-align: center;
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
-}
-
-
-.friend-acitvity {
-    display: flex;
-    flex-direction: column;
-}
-.friend-activity__activity {
-    display: grid;
-    grid-template-columns: 4rem 1fr;
-    gap: 2rem;
-    align-items: center;
-    margin: 1rem 0;
-}
-.friend-acitvity__picture {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    overflow: hidden;
-    position: relative;
-}
-.friend-acitvity__picture > div {
-    background-color: #fff;
-    width: 2rem;
-    height: 2rem;
-    position: absolute;
-    bottom: -.6rem;
-    left: 1rem;
-    border-radius: 50% 50% 0 0;
-}
-.friend-acitvity__picture > div::after {
-    content: '';
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 50%;
-    position: absolute;
-    background-color: #fff;
-    bottom: 2.3rem;
-    left: .4rem;
-}
-.friends__picture {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    overflow: hidden;
-    position: relative;
-}
-.friends__picture > div {
-    background-color: #fff;
-    width: 1.5rem;
-    height: 1.5rem;
-    position: absolute;
-    bottom: -.6rem;
-    left: .8rem;
-    border-radius: 50% 50% 0 0;
-}
-.friends__picture > div::after {
-    content: '';
-    width: .8rem;
-    height: .8rem;
-    border-radius: 50%;
-    position: absolute;
-    background-color: #fff;
-    bottom: 1.8rem;
-    left: .4rem;
-}
-.friend-activity__name, .friends__name {
-    color: var(--color-primary);
-    font-size: 1.8rem;
-    font-weight: 400;
-}
-.friend-activity__msg, .friends__msg {
-    font-size: 1.4rem;
-}
-
-
-.friends__friend {
-    display: grid;
-    grid-template-columns: 4rem 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    justify-content: space-between;
-    margin: 1rem 0;
-}
-
-.challenges {
-    display: grid;
-    grid-template-rows: auto repeat(1.4rem, 2rem);
-    gap: .8rem;
-    padding-bottom: 2rem;
-}
-.challenges__bar {
-    width: 100%;
-    height: 1.4rem;
-    border-radius: 4px;
-    background-color: #D9D9D9;
-    position: relative;
-}
-.challenges__bar::after {
-    content: '';
-    position: absolute;
-    height: 100%;
-    border-radius: 4px;
-    background-color: var(--color-primary);
-    transition: width 1s ease-in-out;
-}
-.challenges__bar--1::after {width: 20%;}
-.challenges__bar--2::after {width: 70%;}
-.challenges__bar--3::after {width: 45%;}
-.challenges__text {
-    font-size: 1.4rem;
-}
-
-.personal-bests {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 3rem;
-}
-.personal-bests__best {
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    padding-top: 2rem;
-    position: relative;
-}
-.personal-bests__best::after {
-    content: '';
-    background-color: var(--color-primary-lightest);
-    width: 80%;
-    height: 1.5rem;
-    border-radius: 0 0 1rem 1rem;
-    box-shadow: inset .4rem -.4rem 1rem rgba(0,0,0,.2);
-    position: absolute;
-    top: 0;
-    left: 10%;
-}
-.personal-bests__best h2 {
-    color: gray;
-    text-align: center;
-    letter-spacing: 0;
-    font-size: 1.8rem;
-}
-.personal-bests__best p {
-    font-size: 2rem;
-}
-.personal-bests__best svg {
-    width: 4rem;
-    height: 4rem;
-}
-
-
-.last-week {
-    display: flex;
-    flex-direction: column;
-}
-.last-week__chart {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 2rem;
-    margin-top: 2rem;
-    padding-top: 4rem;
-    border-bottom: 1px solid #757575;
-    align-items: end;
-}
-.last-week__bar {
-    width: 3.5rem;
-    border-radius: .4rem .4rem 0 0;
-    background-color: var(--color-primary);
-    height: 20rem;
-}
-.last-week__bar--1 {
-    justify-self: end;
-    height: 17rem;
-}
-.last-week__bar--2 {
-    height: 20rem;
-}
-.last-week__bar--3 {
-    justify-self: end;
-    background-color: var(--color-primary-light);
-    height: 15rem;
-}
-.last-week__bar--4 {
-    background-color: var(--color-primary-light);
-    height: 12rem;
-}
-.last-week__bar--5 {
-    justify-self: end;
-    background-color: var(--color-secondary);
-    height: 10rem;
-}
-.last-week__bar--6 {
-    background-color: var(--color-secondary);
-    height: 16rem;
-}
-.last-week__bar > p {
-    font-size: 1.4rem;
-    text-align: center;
-    transform: translateY(-2rem);
-}
-.last-week__labels {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    justify-items: center;
-    font-size: 1.8rem;
-    margin: 2rem 0;
-}
-
-@media (max-width: 1500px) {
-    body {
-        padding: 0;
-    }
-    nav, .content {
-        border-radius: 0;
-    }
-}
-@media (max-width: 1250px) {
-    main {
-        grid-template-columns: 1fr;
-    }
-    .grid-area-2 {
-        grid-column: 1 / 2;
-        grid-row: 3 / 4;
-    
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-}
-@media (max-width: 950px) {
-    .grid-area-1 {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 2fr auto;
-    }
-    .grid-area-1-2 {
-        grid-column: 1 / 2;
-        grid-row: 3 / 4;
-    
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-    .last-week {
-        grid-column: 1 / 3;
-        grid-row: 2 / 3;
-    }
-    .grid-area-3 {
-        grid-template-rows: auto auto auto;
-    }
-    .challenges {
-        grid-column: 1 / 3;
-        grid-row: 1 / 2;
-    }
-    .personal-bests {
-        grid-column: 1 / 3;
-    }
-}
-@media (max-width: 750px) {
-    .grid-area-2 {
-        display: flex;
-        flex-direction: column;
-    }
-    .grid-area-1-2 {
-        display: flex;
-        flex-direction: column;
-    }
-    .all {
-        grid-template-columns: 1fr;
-    }
-    nav {
-        display: none;
-    }
-    .content {
-        padding: 2rem 1rem;
-    }
-}
-@media (max-width: 450px) {
-    html {
-        font-size: 50%;
-    }
-}
-
- /* Estilos para el contenedor del gráfico */
-#weekly-progress-chart {
-    margin-top: 15px;
-    border-radius: 8px;
-    padding: 10px;
-  max-width: 500px !important;
-}
-
-/* Estilos para tooltips */
-.google-visualization-tooltip {
-    border-radius: 8px !important;
-    box-shadow: 0 3px 14px rgba(0,0,0,0.15) !important;
-    font-family: 'Inter', sans-serif !important;
-}
-
-/* Ajustes para modo oscuro si es necesario */
-.dark-mode #weekly-progress-chart {
-    background-color: #2a2a3a;
-}
-
-.dark-mode .google-visualization-tooltip {
-    background-color: #2a2a3a !important;
-    color: #fff !important;
-}
-</style>
-
-
-
-<div class="all" ng-app="app" ng-controller="main">
- 
-  <div class="content">
-    <div class="greeting">
-      <h2>¡{{greet}} {{userName}}!</h2>
-      <p>Es hora de practicar</p>
+        </div>
     </div>
 
-    <main>
-      <div class="grid-area-1">
-        <div class="distance">
-          <section class="distance__section distance__scales">
-            <p>15 min</p>
-            <h2>Escalas</h2>
-            <span class="material-icons" style="font-size: 32px; color: #4B888C; margin-top: 15px">music_note</span>
-          </section>
-          <section class="distance__section distance__pieces">
-            <p>30 min</p>
-            <h2>Piezas</h2>
-            <span class="material-icons" style="font-size: 32px; color: #4B888C; margin-top: 15px">piano</span>
-          </section>
-          <section class="distance__section distance__theory">
-            <p>10 min</p>
-            <h2>Teoría</h2>
-            <span class="material-icons" style="font-size: 32px; color: #4B888C; margin-top: 15px">menu_book</span>
-          </section>
-        </div>
-
-        <section class="weekly">
-          <h2>Racha </h2>
-          <table cellspacing="0" cellpadding="0">
-            <tr>
-              <th>Día</th>
-              <th>Actividad</th>
-              <th>Duración</th>
-            </tr>
-            <tr>
-              <td>Lunes</td>
-              <td>Escalas mayores</td>
-              <td>20 min</td>
-            </tr>
-            <tr>
-              <td>Martes</td>
-              <td>Estudio de pieza</td>
-              <td>30 min</td>
-            </tr>
-            <tr>
-              <td>Miércoles</td>
-              <td>Improvisación</td>
-              <td>15 min</td>
-            </tr>
-            <tr>
-              <td>Jueves</td>
-              <td>Teoría musical</td>
-              <td>20 min</td>
-            </tr>
-            <tr>
-              <td>Viernes</td>
-              <td>Repertorio</td>
-              <td>40 min</td>
-            </tr>
-          </table>
-        </section>
-
-        <div class="grid-area-1-2">
-          <section class="recent">
-            <h2>Performance</h2>
-            <table cellspacing="0" cellpadding="0">
-              <tr>
-                <td><span class="material-icons" style="font-size: 25px; color: #4B888C; margin-left: 22px">schedule</span></td>
-                <td>Escalas</td>
-                <td>15 min</td>
-              </tr>
-              <tr>
-                <td><span class="material-icons" style="font-size: 25px; color: #4B888C; margin-left: 22px">music_note</span></td>
-                <td>Sonata</td>
-                <td>25 min</td>
-              </tr>
-              <tr>
-                <td><span class="material-icons" style="font-size: 25px; color: #4B888C; margin-left: 22px">auto_stories</span></td>
-                <td>Teoría</td>
-                <td>10 min</td>
-              </tr>
-            </table>
-          </section>
-
-          <section class="calories">
-            <h2>Progreso</h2>
-            <p class="calories__number">5</p>
-            <p class="calories__number">25</p>
-            <p class="calories__number">100</p>
-            <p class="calories__text">Hoy (min)</p>
-            <p class="calories__text">Semana</p>
-            <p class="calories__text">Mes</p>
-          </section>
-        </div>
-      </div>
-
-      <div class="grid-area-2">
-        <section class="friend-acitvity">
-          <h2>Actividad de compañeros</h2>
-          <div class="friend-activity__activity">
-            <div class="friend-acitvity__picture"><div></div></div>
-            <div>
-              <h3 class="friend-activity__name">María</h3>
-              <p class="friend-activity__msg">¡Dominó el Preludio en Do Mayor!</p>
-            </div>
-          </div>
-          <div class="friend-activity__activity">
-            <div class="friend-acitvity__picture"><div></div></div>
-            <div>
-              <h3 class="friend-activity__name">Carlos</h3>
-              <p class="friend-activity__msg">Completó 30 días de práctica consecutiva</p>
-            </div>
-          </div>
-          <div class="friend-activity__activity">
-            <div class="friend-acitvity__picture"><div></div></div>
-            <div>
-              <h3 class="friend-activity__name">Ana</h3>
-              <p class="friend-activity__msg">Compartió un nuevo ejercicio: 'Escalas en terceras'</p>
-            </div>
-          </div>
-          <div class="friend-activity__activity">
-            <div class="friend-acitvity__picture"><div></div></div>
-            <div>
-              <h3 class="friend-activity__name">Luis</h3>
-              <p class="friend-activity__msg">¡Aprendió el Claro de Luna!</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="friends">
-          <h2>Compañeros</h2>
-          <div class="friends__friend">
-            <div class="friends__picture"><div></div></div>
-            <h3 class="friends__name">María</h3>
-            <p class="friends__msg">Practicando ahora</p>
-          </div>
-          <div class="friends__friend">
-            <div class="friends__picture"><div></div></div>
-            <h3 class="friends__name">Carlos</h3>
-            <p class="friends__msg">En línea hace 5 min</p>
-          </div>
-          <div class="friends__friend">
-            <div class="friends__picture"><div></div></div>
-            <h3 class="friends__name">Ana</h3>
-            <p class="friends__msg">En línea hace 1 hora</p>
-          </div>
-          <div class="friends__friend">
-            <div class="friends__picture"><div></div></div>
-            <h3 class="friends__name">Luis</h3>
-            <p class="friends__msg">En línea ayer</p>
-          </div>
-        </section>
-      </div>
-
-      <div class="grid-area-3">
-        <section class="challenges">
-          <h2>Desafíos</h2>
-          <div class="challenges__bar challenges__bar--1"></div>
-          <p class="challenges__text">30 días de práctica</p>
-          <div class="challenges__bar challenges__bar--2"></div>
-          <p class="challenges__text">Dominar 5 escalas</p>
-          <div class="challenges__bar challenges__bar--3"></div>
-          <p class="challenges__text">Aprender 3 piezas</p>
-        </section>
-
-       <section class="last-week">
- 
-  <h2>Progreso semanal</h2>
-  <div id="weekly-progress-chart" style="height: 300px; width: 100%;"></div>
-    
-</section>
-
-        <div class="personal-bests">
-          <section class="personal-bests__best personal-bests__best--run">
-            <span class="material-icons" style="font-size: 32px; color: #4B888C;">speed</span>
-            <h2>Horario preferido</h2>
-            <p>18:00 Hrs</p>
-          </section>
-          <section class="personal-bests__best personal-bests__best--lift">
-            <span class="material-icons" style="font-size: 32px; color: #4B888C;">library_music</span>
-            <h2>Piezas aprendidas</h2>
-            <p>12</p>
-          </section>
-          <section class="personal-bests__best personal-bests__best--plank">
-            <span class="material-icons" style="font-size: 32px; color: #4B888C;">schedule</span>
-            <h2>Sesión más larga</h2>
-            <p>90 min</p>
-          </section>
-        </div>
-      </div>
-    </main>
-  </div>
-
-
-   <nav class="navigation">
-    <!-- Navbar content -->
-  </nav>
-
-  
-</div>
-
-
-<script>
- // Modifica tu controlador AngularJS
-angular.module('app', [])
-.controller('main', ['$http', '$scope', '$sce', '$timeout', function($http, $scope, $sce, $timeout){
-    // Carga la librería de Google Charts
-    google.charts.load('current', {packages: ['corechart']});
-    
-    var requestData = {
-        action: "getProfileData",
-        token: "U2FsdGVkX1//iOaF9pUBCXsg+fix7eTLz33zKmIbO7TLY59vWQk/hNC0mI1nMS4H"
-      //localStorage.getItem('MStoken')
-    };
-
-    var config = {
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        } 
-    };
-           
-    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-        .then(function(response) { 
-            $scope.data = response.data;
-            $scope.userName = $scope.data.name.split(" ")[0];
-            
-            // Datos de práctica semanal (puedes obtenerlos de tu API)
-            $scope.weeklyData = [
-                {day: 'Lunes', scales: 20, pieces: 30, theory: 10},
-                {day: 'Martes', scales: 25, pieces: 40, theory: 15},
-                {day: 'Miércoles', scales: 18, pieces: 25, theory: 12},
-                {day: 'Jueves', scales: 15, pieces: 35, theory: 20},
-                {day: 'Viernes', scales: 10, pieces: 20, theory: 5},
-                {day: 'Sábado', scales: 19, pieces: 45, theory: 15},
-                {day: 'Domingo', scales: 5, pieces: 15, theory: 0}
-            ];
-            
-            // Dibuja el gráfico cuando los datos estén listos
-            drawWeeklyProgressChart();
-        });
-    
-    $scope.greet = getCurrentGreet();
-    
-    function getCurrentGreet() {
-        const hour = new Date().getHours();
-        if (hour >= 6 && hour < 12) return "Buenos días";
-        if (hour >= 12 && hour < 19) return "Buenas tardes";
-        return "Buenas noches";
-    };
-    
-    function drawWeeklyProgressChart() {
-        google.charts.setOnLoadCallback(function() {
-            // Crea la tabla de datos
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Día');
-            data.addColumn('number', 'Escalas (min)');
-            data.addColumn('number', 'Piezas (min)');
-            data.addColumn('number', 'Teoría (min)');
-            
-            // Agrega los datos
-            $scope.weeklyData.forEach(function(day) {
-                data.addRow([day.day, day.scales, day.pieces, day.theory]);
-            });
-            
-            // Opciones del gráfico
-            var options = {
-                title: 'Minutos de práctica por día',
-                titleTextStyle: {
-                    color: '#4B888C',
-                    fontSize: 16,
-                    bold: false
-                },
-                colors: ['#3A6B7E', '#7EB09B', '#F5A623'],
-                backgroundColor: 'transparent',
-                chartArea: {
-                    width: '85%',
-                    height: '70%'
-                },
-                hAxis: {
-                    title: 'Día de la semana',
-                    textStyle: {
-                        color: '#666'
-                    },
-                    titleTextStyle: {
-                        color: '#666',
-                        italic: false
-                    }
-                },
-                vAxis: {
-                    title: 'Minutos',
-                    minValue: 0,
-                    textStyle: {
-                        color: '#666'
-                    },
-                    titleTextStyle: {
-                        color: '#666',
-                        italic: false
-                    }
-                },
-                legend: {
-                    position: 'bottom',
-                    textStyle: {
-                        color: '#333'
-                    }
-                },
-                animation: {
-                    startup: true,
-                    duration: 1000,
-                    easing: 'out'
-                },
-                isStacked: true // Para gráfico apilado
-            };
-            
-            // Dibuja el gráfico
-            var chart = new google.visualization.ColumnChart(
-                document.getElementById('weekly-progress-chart')
-            );
-            
-            chart.draw(data, options);
-            
-            // Redibuja al cambiar tamaño de ventana
-            window.addEventListener('resize', function() {
-                chart.draw(data, options);
-            });
-        });
-    }
-    
-    // Redibujar cuando cambien los datos
-    $scope.$watch('weeklyData', function(newVal) {
-        if(newVal) {
-            $timeout(function() {
-                drawWeeklyProgressChart();
-            }, 100);
-        }
-    }, true);
-}]);
-</script>
+</body>
+</html>
