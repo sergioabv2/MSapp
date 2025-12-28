@@ -4444,12 +4444,12 @@ app
         }
       });
     })
-
 .factory('SharedState', function($http, $q) {
+  var cachedData = null; 
+
   var requestData = {
     action: "getUserData",
-   token: localStorage.getItem('MStoken')
-   //token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+    token: localStorage.getItem('MStoken')
   };
 
   var config = {
@@ -4457,27 +4457,35 @@ app
       "Content-Type": "text/plain;charset=utf-8"
     }
   };
-
-
-  var getNum = function() {
+  var getNum = function(forceRefresh) {
     var deferred = $q.defer();
-
-    $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
-      .then(function(response) {
-        deferred.resolve({
-          data: response.data,
-        });
-      }, function(error) {
-        deferred.reject(error);
+    if (cachedData && !forceRefresh) {
+      deferred.resolve({
+        data: cachedData
       });
+    } else {
+      $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
+        .then(function(response) {
+          cachedData = response.data;
+          
+          deferred.resolve({
+            data: response.data,
+          });
+        }, function(error) {
+          deferred.reject(error);
+        });
+    }
 
     return deferred.promise;
   };
 
-
+  var clearData = function() {
+      cachedData = null;
+  };
 
   return {
-    getNum: getNum
+    getNum: getNum,
+    clearData: clearData
   };
 })
 
