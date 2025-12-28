@@ -16,6 +16,8 @@
  <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.4/angular-translate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-translate-loader-static-files/2.18.4/angular-translate-loader-static-files.min.js"></script>
 
 
  <link rel="manifest" href="/manifest.json">
@@ -212,7 +214,7 @@ ion-side-menu .list .item:hover {
 
 .menuSelectedColor {    
 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
-  font-weight: 550 !important; text-shadow: 0 0 6px silver !important;
+  font-weight: 600 !important; text-shadow: 0 0 6px silver !important;
     background-color: #f0f2f5 !important; 
   color: #1F2937 !important;
 }
@@ -504,8 +506,8 @@ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
     flex-shrink: 0; /* Evita que el contenedor de la imagen se reduzca */
     border-radius: 25% !important;
     overflow: hidden; 
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     margin: 10px 2px 0 10px; /* Ajusta los márgenes */
 }
 
@@ -2469,20 +2471,25 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 
 .headIcon {
-    margin-top: 4px;
- width: 38px;
-  height: 38px;
-  border-radius: 50% !important; /* Esto lo hace circular */
-  background-color: #e4e6eb !important;
-
-  color: #050505 !important;
-  transition: background-color 0.2s ease-in-out !important;
+   background: transparent;
+            border: none;
+            width: 36px;
+            height: 36px;
+            margin-top: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            position: relative;
 }
 
 
 
 .headIcon:hover {
-  background-color: #d8dbdf !important;
+  background-color: #F2F2F2 !important;
 }
 
 /* Estilo para resaltar toda la fila del recordatorio de pago */
@@ -2715,40 +2722,73 @@ width: 200px; /* Ajusta según el tamaño deseado */
 /* --- 2. Estilo elegante para el menú horizontal (desktop) --- */
 @media (min-width: 850px) {
 
-    /* Contenedor del menú horizontal */
-    .nav-bar-horizontal-menu {
-        display: flex;
-        align-items: center; 
-        height: 100%;
-        margin-left: 20px; /* Aumentamos el margen izquierdo */
-    }
+   /* Contenedor del menú horizontal */
+.nav-bar-horizontal-menu {
+    display: flex !important;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    
+    /* MAGIA PARA CENTRARLO ABSOLUTAMENTE */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 9px;
+    z-index: 999;
 
-    /* Estilo base para CADA botón del menú */
-    .nav-bar-horizontal-menu .button {
-        font-size: 14px;
-        font-weight: 400; 
-        color: #555 !important;   
-        padding-left: 19px !important; 
-        padding-right: 19px !important;
-        
-        /* Reseteo para un look limpio */
-        border: none;
-        border-radius: 0; /* Sin esquinas redondeadas */
-        background: transparent;
-        box-shadow: none;
-        border-bottom: 2px solid transparent; 
-        height: 100%; 
-        display: flex;
-        align-items: center;
-        
-        /* Transición suave para elegancia */
-        transition: color 0.2s ease, border-color 0.2s ease;
-    }
+    /* Estilos visuales de la cápsula */
+    height: 40px !important;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 4px;
+    border-radius: 99px;
+    margin-left: 0 !important;
+    gap: 4px; /* Espacio entre botones */
+}
 
-    /* Efecto HOVER para botones INACTIVOS */
+.nav-bar-horizontal-menu .button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important; 
+    color: #6b7280 !important;
+    
+    padding: 8px 20px !important;
+    margin: 0 !important;
+    
+    /* RESETEO TOTAL */
+    border: none !important;
+    background: transparent;
+    box-shadow: none;
+    height: 32px !important; /* Altura fija */
+    line-height: 1 !important;
+    min-height: 0 !important; /* Quita el min-height de Ionic */
+    
+    border-radius: 99px !important; 
+    
+    display: flex !important; /* Importante para centrar el texto */
+    align-items: center !important;
+    justify-content: center !important;
+    
+    transition: all 0.2s ease;
+}
+
+.menuSelectedColor {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-weight: 700 !important;
+    
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06) !important;
+    
+    text-shadow: none !important;
+    border: none !important;
+    
+    /* Mismo padding y altura que los otros botones */
+    padding: 8px 20px !important;
+    height: 32px !important;
+}
+
+    /* 4. HOVER EN INACTIVOS (Sutil) */
     .nav-bar-horizontal-menu .button:not(.menuSelectedColor):hover {
-         color: #111; /* Color de texto más oscuro */
-         border-bottom-color: #ccc; /* Borde gris sutil al pasar el mouse */
+         color: #374151 !important; /* Se oscurece un poco el texto */
+         border-bottom: none !important; /* Aseguramos que NO salga la línea abajo */
     }
 
 }
@@ -2990,7 +3030,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;">
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
@@ -3025,16 +3065,19 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-
-            <div class="nav-bar-horizontal-menu">
-              <div class="profile-user-data clearfix" style="margin-left: -10px !important;">
+          <div class="profile-user-data clearfix" style="margin-left: -1px !important;">
           <div class="circle2">
               <img class="profile-pic" src="https://lh3.googleusercontent.com/d/11zBaU4x-_oF-wLweb0csBvi5coOUGqgD=s200">
           </div>
-         <div class="main-data" style="margin-top: 32px;" >
-            <h3 class="userLvl" style="font-size: 20px">Mozart+</h3>
+         <div class="main-data" style="margin-top: 34px;" >
+            <h3 class="userLvl" style="font-size: 18px">Mozart+</h3>
           </div>  
     </div>
+        </ion-nav-buttons>  
+
+
+   <div class="nav-bar-horizontal-menu">
+               
     <a ui-sref="menu.lessons" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
@@ -3056,9 +3099,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         Blog
     </a>
 </div>
-        
-        </ion-nav-buttons>  
-
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
      <div id="bannerRow">
@@ -3322,7 +3362,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
@@ -3354,33 +3394,35 @@ width: 200px; /* Ajusta según el tamaño deseado */
     
   </ion-nav-buttons>
 
-
-        <ion-nav-buttons side="left">
+   <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-
-            <div class="nav-bar-horizontal-menu">
-              <div class="profile-user-data clearfix" style="margin-left: -10px !important;">
+          <div class="profile-user-data clearfix" style="margin-left: -1px !important;">
           <div class="circle2">
               <img class="profile-pic" src="https://lh3.googleusercontent.com/d/11zBaU4x-_oF-wLweb0csBvi5coOUGqgD=s200">
           </div>
-         <div class="main-data" style="margin-top: 32px;" >
-            <h3 class="userLvl" style="font-size: 20px">Mozart+</h3>
+         <div class="main-data" style="margin-top: 34px;" >
+            <h3 class="userLvl" style="font-size: 18px">Mozart+</h3>
           </div>  
     </div>
-     <a ui-sref="menu.lessons" 
+        </ion-nav-buttons>  
+
+
+   <div class="nav-bar-horizontal-menu">
+               
+    <a ui-sref="menu.lessons" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Lecciones
+     {{ 'MENU_LESSONS' | translate }}
     </a>
     <a ui-sref="menu.library" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Canciones
+       {{ 'MENU_SONGS' | translate }}
     </a>
      <a ui-sref="menu.workspace" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Sesiones
+       {{ 'MENU_SESSIONS' | translate }}
     </a>
     <a ui-sref="menu.blog" 
        ui-sref-active="menuSelectedColor" 
@@ -3388,8 +3430,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         Blog
     </a>
 </div>
-           
-        </ion-nav-buttons>  
 
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
@@ -3658,7 +3698,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
         <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+     <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
@@ -3691,32 +3731,35 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </ion-nav-buttons>
 
 
-        <ion-nav-buttons side="left">
+       <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-
-            <div class="nav-bar-horizontal-menu">
-              <div class="profile-user-data clearfix" style="margin-left: -10px !important;">
-          <div class="circle2" >
+          <div class="profile-user-data clearfix" style="margin-left: -1px !important;">
+          <div class="circle2">
               <img class="profile-pic" src="https://lh3.googleusercontent.com/d/11zBaU4x-_oF-wLweb0csBvi5coOUGqgD=s200">
           </div>
-          <div class="main-data" style="margin-top: 32px;" >
-           <h3 class="userLvl" style="font-size: 20px">Mozart+</h3>
+         <div class="main-data" style="margin-top: 34px;" >
+            <h3 class="userLvl" style="font-size: 18px">Mozart+</h3>
           </div>  
     </div>
+        </ion-nav-buttons>  
+
+
+   <div class="nav-bar-horizontal-menu">
+               
     <a ui-sref="menu.lessons" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Lecciones
+     {{ 'MENU_LESSONS' | translate }}
     </a>
     <a ui-sref="menu.library" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Canciones
+       {{ 'MENU_SONGS' | translate }}
     </a>
      <a ui-sref="menu.workspace" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Sesiones
+       {{ 'MENU_SESSIONS' | translate }}
     </a>
     <a ui-sref="menu.blog" 
        ui-sref-active="menuSelectedColor" 
@@ -3724,8 +3767,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         Blog
     </a>
 </div>
-           
-        </ion-nav-buttons>  
 
        
         <div class="dropdownContent" ng-show="isDropdownVisible" ng-click="$event.stopPropagation()">
@@ -4036,7 +4077,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
        <ion-nav-bar class="bar-light" >      
         <ion-nav-buttons side="right">
 
-      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" ng-if="userData.status == 'ACTIVO'">
+      <button class="button button-clear headIcon chatIco" ng-click="dropdownChat()" style="font-size: 20px; font-weight: 550; font-family: 'Poppins', sans-serif; margin-right: 10px;" >
     <i class="ri-chat-3-fill"></i>
             <div style="position: absolute; top: -3px; left: 27px; width: 18px; height: 18px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center;" ng-if="(chats | filter:{read: false}).length && chatCounter">
         <div style="font-size: 13px; color: white;"> {{(chats | filter:{read: false}).length}}</div>
@@ -4069,32 +4110,35 @@ width: 200px; /* Ajusta según el tamaño deseado */
   </ion-nav-buttons>
 
 
-        <ion-nav-buttons side="left">
+         <ion-nav-buttons side="left">
           <button class="button button-clear menubtn" ng-click="toggleRight()"><i class="button button-icon ion-navicon"></i>menu</button>
-
-            <div class="nav-bar-horizontal-menu">
-              <div class="profile-user-data clearfix" style="margin-left: -10px !important;">
+          <div class="profile-user-data clearfix" style="margin-left: -1px !important;">
           <div class="circle2">
               <img class="profile-pic" src="https://lh3.googleusercontent.com/d/11zBaU4x-_oF-wLweb0csBvi5coOUGqgD=s200">
           </div>
-          <div class="main-data" style="margin-top: 32px;" >
-            <h3 class="userLvl" style="font-size: 20px">Mozart+</h3>
+         <div class="main-data" style="margin-top: 34px;" >
+            <h3 class="userLvl" style="font-size: 18px">Mozart+</h3>
           </div>  
     </div>
-  <a ui-sref="menu.lessons" 
+        </ion-nav-buttons>  
+
+
+   <div class="nav-bar-horizontal-menu">
+               
+    <a ui-sref="menu.lessons" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Lecciones
+     {{ 'MENU_LESSONS' | translate }}
     </a>
     <a ui-sref="menu.library" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Canciones
+       {{ 'MENU_SONGS' | translate }}
     </a>
      <a ui-sref="menu.workspace" 
        ui-sref-active="menuSelectedColor" 
        class="button button-clear" style="font-weight: 400;">
-        Sesiones
+       {{ 'MENU_SESSIONS' | translate }}
     </a>
     <a ui-sref="menu.blog" 
        ui-sref-active="menuSelectedColor" 
@@ -4102,8 +4146,6 @@ width: 200px; /* Ajusta según el tamaño deseado */
         Blog
     </a>
 </div>
-            
-        </ion-nav-buttons>  
 
       
 
@@ -4393,7 +4435,7 @@ width: 200px; /* Ajusta según el tamaño deseado */
 
 <script>
 
-  var app = angular.module('ionicApp', ['ionic']);
+  var app = angular.module('ionicApp', ['ionic', 'pascalprecht.translate']);
 app
  .run(function($ionicPlatform) {
       $ionicPlatform.ready(function() {
@@ -4406,8 +4448,8 @@ app
 .factory('SharedState', function($http, $q) {
   var requestData = {
     action: "getUserData",
-    token: localStorage.getItem('MStoken')
-  // token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
+   token: localStorage.getItem('MStoken')
+   //token: "U2FsdGVkX1+pTAJ/i/vnElIrTlT7VjKJ6kuzk2FlnAIkGq9xl29aZsKgbGygQIfF"
   };
 
   var config = {
@@ -4440,7 +4482,7 @@ app
 })
 
 
-.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $translateProvider) {
 
    $stateProvider
     .state('menu', {
@@ -4547,6 +4589,37 @@ app
 
   $urlRouterProvider.otherwise("menu/lessons");
   $ionicConfigProvider.views.swipeBackEnabled(false);
+
+
+
+ $translateProvider.translations('es', {
+    MENU_LESSONS: 'Lecciones',
+    MENU_SONGS: 'Canciones',
+    MENU_SESSIONS: 'Sesiones',
+    MENU_BLOG: 'Blog',
+    PROFILE: 'Perfil',
+    SUBSCRIPTION: 'Suscripción',
+    LANGUAGE: 'Idioma',
+    REPORT: 'Reportar problema',
+    LOGOUT: 'Cerrar sesión'
+  });
+
+  $translateProvider.translations('en', {
+    MENU_LESSONS: 'Lessons',
+    MENU_SONGS: 'Songs',
+    MENU_SESSIONS: 'Sessions',
+    MENU_BLOG: 'Blog',
+    PROFILE: 'Profile',
+    SUBSCRIPTION: 'Subscription',
+    LANGUAGE: 'Language',
+    REPORT: 'Report issue',
+    LOGOUT: 'Log out'
+  });
+  
+  $translateProvider.preferredLanguage('es');
+  $translateProvider.useSanitizeValueStrategy('escapeParameters');
+
+
   //$ionicConfigProvider.tabs.position('bottom'); 
 })
 
@@ -4555,7 +4628,7 @@ app
     })
 
 
-.controller('MenuCtrl', ['$http', '$scope', '$ionicScrollDelegate', '$ionicSideMenuDelegate', '$ionicModal', '$ionicHistory', '$timeout', 'SharedState', function($http, $scope, $ionicScrollDelegate, $ionicSideMenuDelegate, $ionicModal, $ionicHistory, $timeout, SharedState) {
+.controller('MenuCtrl', ['$http', '$scope', '$ionicScrollDelegate', '$ionicSideMenuDelegate', '$ionicModal', '$ionicHistory', '$timeout', '$translate', 'SharedState', function($http, $scope, $ionicScrollDelegate, $ionicSideMenuDelegate, $ionicModal, $ionicHistory, $timeout, $translate, SharedState) {
   $scope.toggleRight = function() {
     $('.item').removeClass('anim');
     setTimeout(function() {
@@ -4891,13 +4964,30 @@ $scope.showLangMenu = false;
 $scope.toggleLanguage = function() {
     $scope.showLangMenu = !$scope.showLangMenu;
 };
-$scope.selectLanguage = function(langCode, $event) {
+
+
+$scope.selectLanguage = function(lang, $event) {
     if ($event) {
         $event.stopPropagation();
     }
-    $scope.currentLang = langCode;
-    $scope.showLangMenu = false; 
-    //localStorage.setItem('selectedLang', JSON.stringify(langObject));
+
+    $scope.currentLang = lang; 
+    $scope.showLangMenu = false;
+    $translate.use(lang.code.toLowerCase()); 
+    
+/*
+    localStorage.setItem('selectedLang', JSON.stringify(lang));
+    var iframe = document.querySelector('iframe'); 
+    
+    if (iframe && iframe.contentWindow) {
+        var message = {
+            action: 'changeLanguage',
+            langCode: lang.code.toLowerCase() // 'es', 'en', etc.
+        };
+       // iframe.contentWindow.postMessage(message, '*');
+    }
+*/
+
 };
 
 $scope.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
