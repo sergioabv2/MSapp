@@ -1972,23 +1972,26 @@ const handleNext = () => {
     }
 };
 
-        const saveUserProgress = async () => {
+  const saveUserProgress = async () => {
     if (!selectedLevel.value) return;
 
+    // Obtenemos los valores ACTUALES (ya actualizados)
     const payload = {
-        action: "saveProgress", 
+        action: "saveProgress",
         token: localStorage.getItem('MStoken'),
         stage: JSON.stringify({
             lvl: currentLevelIndex.value,
             lsn: currentLessonIndex.value,
-            tsk: currentTaskIndex.value 
+            act: currentTaskIndex.value // <--- CAMBIO: Usamos 'act' directamente
         })
     };
+
+    console.log("Guardando estado:", payload.stage); // Debug para ver qué se envía
 
     try {
         fetch('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', {
             method: 'POST',
-            mode: 'no-cors', // Importante para Google Scripts a veces
+            mode: 'no-cors', 
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(payload)
         });
@@ -2120,30 +2123,23 @@ const nextTaskInfo = computed(() => {
 const completeCurrentTask = () => {
     const lesson = lessons.value[currentLessonIndex.value];
     const task = lesson.tasks[currentTaskIndex.value];
-    
-    if (task.completed) return; // Ya estaba completa
 
-    task.completed = true;
-    totalTasksCompleted.value++;
-    updateProgress();
-    updatePendingTasks();
-    
-    // Avanzar índices
-    currentTaskIndex.value++;
-    if (currentTaskIndex.value >= lesson.tasks.length) {
+    if (!task.completed) {
+        task.completed = true;
+        totalTasksCompleted.value++;
+        updateProgress();
+        updatePendingTasks();
+    }
+    let nextTaskIdx = currentTaskIndex.value + 1;
+    let nextLessonIdx = currentLessonIndex.value;
+    if (nextTaskIdx >= lesson.tasks.length) {
         completeLesson(); 
+    } else {
+        currentTaskIndex.value = nextTaskIdx;
+        shouldAutoplayVideo = true;
+        setTimeout(loadCurrentTask, 1200);
     }
-
     saveUserProgress(); 
-    if (currentTaskIndex.value < lesson.tasks.length) {
-         // Pequeño delay para UX
-         setTimeout(() => {
-             if (viewingLessonIndex.value === currentLessonIndex.value && 
-                 viewingTaskIndex.value === currentTaskIndex.value - 1) {
-                 loadCurrentTask();
-             }
-         }, 500);
-    }
 };
 
         const completeLesson = () => {
