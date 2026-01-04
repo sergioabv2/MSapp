@@ -95,45 +95,97 @@ body {
 }
 
 .levels-grid {
-    display: grid;
-    grid-template-columns: 1fr; 
-    padding: 10px 20px;
-    gap: 20px;
-}
-
-/* Tarjetas de nivel */
-.level-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e5e5e7;
-    width: 100%;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* Espacio entre tarjetas */
+    padding: 0 20px;
+    max-width: 1000px;
     position: relative;
+    z-index: 10;
 }
 
+.level-card {
+    position: relative;
+    height: 200px;
+    width: 100%;
+    background-color: #ffffff; /* Fondo base blanco */
+    border-radius: 16px;
+    overflow: hidden;
+    /* Sombra suave y difusa para dar profundidad en fondo blanco */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05); /* Borde muy sutil */
+}
+
+/* Interacción Hover */
 .level-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    border-color: rgba(0,0,0,0.1);
 }
 
+/* Imagen de Fondo (La textura) */
+.card-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s ease;
+    z-index: 0;
+    /* Truco: Filtro para que la imagen no compita con el texto */
+    filter: grayscale(20%) contrast(0.9); 
+}
+
+.level-card:hover .card-bg {
+    transform: scale(1.05);
+}
+
+.level-card.locked:hover .card-bg {
+    transform: none;
+}
+
+.lock-icon {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    font-size: 1.5rem;
+    color: rgba(255,255,255,0.5);
+    z-index: 2;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+}
+
+/* Estado bloqueado */
 .level-card.locked {
-    opacity: 0.6;
-    cursor: auto;
-    filter: grayscale(80%);
+    cursor: default;
+     background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.5) 100%);
+    filter: grayscale(100%);
 }
-
 .level-card.locked:hover {
     transform: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
 }
 
+.card-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.3) 50%, rgba(255,255,255,0.2) 100%);
+    z-index: 1;
+}
+
+/* Contenido del Texto */
 .card-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 40px;
+    color: white;
 }
 
 .level-number {
@@ -156,11 +208,24 @@ body {
     min-width: 0;
 }
 
-.level-title {
-    font-size: 24px;
+.phase-tag {
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: #1d1d1f;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
     margin-bottom: 8px;
+}
+
+.level-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    line-height: 1;
+    color: #ffffff;
 }
 
 .level-description {
@@ -171,10 +236,12 @@ body {
 }
 
 .level-meta {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 10px;
 }
 
 .time-icon {
@@ -431,6 +498,25 @@ body {
     text-transform: uppercase; 
     letter-spacing: 0.5px; 
 }
+
+.progress-container-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+    z-index: 3;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #FFD700; /* Dorado brillante */
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    transition: width 0.5s ease;
+}
+
+
 
 /* ========== PROGRESS BAR REDISEÑADO ========== */
 .progress-bar { 
@@ -1037,7 +1123,7 @@ body {
 .nav-card:hover {
     border-color: #d2d2d7;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .nav-card.disabled {
@@ -1168,24 +1254,24 @@ body {
         text-align: left;
     }
     .level-card {
-        transform: scale(0.9);
+        transform: none !important; /* Resetea el 0.9 */
+        width: 100%; /* Que ocupe el ancho disponible */
+        margin: 0 0 10px 0; /* Espaciado vertical natural */
     }
-    
-    .level-description {
-        font-size: 13px;
+    .level-card:hover,
+    .level-card.locked:hover {
+        transform: none !important; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; /* Mantiene sombra estática */
     }
+   
     
     .level-title {
-        font-size: 22px;
+        font-size: 1.5rem; /* Texto más pequeño naturalmente */
     }
-    
-    .level-card:hover {
-        transform: scale(0.92);
-    }
-
     .levels-grid {
-        padding: 10px 10px;
-        gap: 2px;
+        padding: 5px 15px; /* Menos padding lateral */
+        width: 100%;
+
     }
     
     .mobile {
@@ -1334,33 +1420,38 @@ body {
                 </div>
             </div>
       
-            <div class="levels-grid">
-                <div class="level-card" 
-                     v-for="level in levels" 
-                     :key="level.id"
-                     @click="selectLevel(level)"
-                     :class="{'selected': selectedLevel?.id === level.id, 'locked': currentLevelIndex < level.id}">
-                    <div class="card-content">
-                        <div class="lockLvlIco" v-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
-                        <div class="level-number" v-if="level.id === 0">P</div>
-                        <div class="level-number" v-else>{{ level.id }}</div>
-                        <div class="level-info">
-                            <h2 class="level-title">{{ level.title }}</h2>
-                            <p class="level-description">{{ level.description }}</p>
-                            <div class="level-meta">
-                                <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                                </svg>
-                                <span class="time-text">~{{ level.duration }}</span>
-                            </div>
-                            <div class="progress-container2">
-                                <div class="progress-bar2" :style="{width: level.progress + '%'}"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div class="levels-grid">
+    <div class="level-card" 
+         v-for="(level, index) in levels" 
+         :key="level.id"
+         @click="selectLevel(level)"
+         :class="{'locked': currentLevelIndex < level.id}">
+        
+       <div class="card-bg" 
+     :style="{ backgroundImage: `url(${level.image})` }">
+</div>
+
+        <div class="card-overlay"></div>
+
+        <div class="card-content">
+            <div class="phase-tag">Grado {{ level.id  }}</div> <h2 class="level-title">{{ level.title }}</h2>
+            
+            <div class="level-meta">
+                <i class="ri-time-line"></i> {{ level.duration }}
+                <span style="margin: 0 5px;">•</span>
+                <span>{{ level.progress }}% Completado</span>
             </div>
+        </div>
+
+        <div class="lock-icon" v-if="currentLevelIndex < level.id">
+            <i class="ri-lock-fill"></i>
+        </div>
+
+        <div class="progress-container-bottom">
+            <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -1571,6 +1662,7 @@ createApp({
             { 
                 id: 0, 
                 title: 'Nivel Preparatorio', 
+                image: 'https://lh3.googleusercontent.com/d/1OS0zUBMQ6VUusjG9bbdrGlNbwGw4L1Fr=s500',
                 description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
                 duration: '5 horas',
                 progress: 0,
@@ -1676,7 +1768,7 @@ createApp({
                     }
                 ]
             },
-            { id: 1, title: 'Nivel 1', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '4 horas', lessons: [
+            { id: 1, title: 'Nivel 1', image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s500', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '4 horas', lessons: [
                 { title: "Lección 1: Escalas Mayores", unit: 1, tasks: [
                     { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
@@ -1695,10 +1787,10 @@ createApp({
                 { title: "Lección 9: Síncopas", unit: 3, tasks: [{ type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
                 { title: "Lección 10: Pieza Final", unit: "Final", tasks: [{ type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] }
             ]},
-            { id: 2, title: 'Nivel 2', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
-            { id: 3, title: 'Nivel 3', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
-            { id: 4, title: 'Nivel 4', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
-            { id: 5, title: 'Nivel 5', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
+            { id: 2, title: 'Nivel 2', image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
+            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
+            { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
+            { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
         ]);
         
         // ==========================================
