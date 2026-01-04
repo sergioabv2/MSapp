@@ -184,8 +184,8 @@ body {
     top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(270deg, 
                 rgba(248, 249, 250, 0.1) 0%, 
-                rgba(248, 249, 250, 0.25) 50%, 
-                rgba(248, 249, 250, 1) 100%);
+                rgba(248, 249, 250, 0.5) 50%, 
+                rgba(248, 249, 250, 0.8) 100%);
     z-index: 1;
 }
 
@@ -507,6 +507,7 @@ body {
     letter-spacing: 0.5px; 
 }
 
+/*
 .progress-container-bottom {
     position: absolute;
     bottom: 0;
@@ -522,6 +523,25 @@ body {
     background: #FF4757;
    box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
     transition: width 0.5s ease;
+}*/
+
+.progress-container-inline {
+    position: relative; /* Ya no absolute */
+    width: 60%;        /* Ocupa el ancho disponible del texto */
+    height: 14px;
+    background: rgba(0,0,0,0.15); /* Gris muy sutil para el track */
+    border-radius: 3px;          /* Bordes redondeados */
+    margin-top: 15px;             /* Separación con el level-meta */
+    overflow: hidden;
+}
+
+/* El relleno (fill) se mantiene casi igual, solo quitamos sombras raras */
+.progress-bar-fill {
+    height: 100%;
+    background: #FF4757;
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
+    border-radius: 3px;
+    transition: width 0.8s ease-out;
 }
 
 
@@ -1271,6 +1291,13 @@ body {
         transform: none !important; 
         box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; /* Mantiene sombra estática */
     }
+
+    .card-overlay {
+    background: linear-gradient(270deg, 
+                rgba(248, 249, 250, 0.1) 0%, 
+                rgba(248, 249, 250, 0.5) 50%, 
+                rgba(248, 249, 250, 0.8) 100%);
+     }
    
     
     .level-title {
@@ -1449,15 +1476,16 @@ body {
                 <span style="margin: 0 5px;">•</span>
                 <span>{{ level.progress }}% Completado</span>
             </div>
+            <div class="progress-container-inline">
+            <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+        </div>
         </div>
 
         <div class="lock-icon" v-if="currentLevelIndex < level.id">
             <i class="ri-lock-fill"></i>
         </div>
 
-        <div class="progress-container-bottom">
-            <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
-        </div>
+       
     </div>
 </div>
         </div>
