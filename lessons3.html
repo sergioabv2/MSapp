@@ -1013,6 +1013,73 @@ body {
     visibility: visible; 
 }
 
+.lesson-navigation {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.nav-card {
+    flex: 1;
+    border: 1px solid #e5e5e7;
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* Evita desbordamiento de texto */
+}
+
+.nav-card:hover {
+    border-color: #d2d2d7;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.nav-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
+}
+
+.nav-card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #e5e5e7;
+}
+
+.nav-label {
+    font-size: 0.85rem;
+    color: #86868b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.nav-card.next .nav-label {
+    justify-content: flex-end;
+}
+
+.nav-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1d1d1f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-card.next .nav-title {
+    text-align: right;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
     .pending-tasks {
@@ -1092,6 +1159,14 @@ body {
 }
 
 @media (max-width: 550px) { 
+    .lesson-navigation {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .nav-card.next .nav-label, .nav-card.next .nav-title {
+        justify-content: flex-start;
+        text-align: left;
+    }
     .level-card {
         transform: scale(0.9);
     }
@@ -1326,6 +1401,23 @@ body {
 
                 <!-- Contenido debajo del video dinámico -->
                 <div class="content-below" v-if="currentViewingTask">
+                    <div class="lesson-navigation">
+        <div v-if="prevTaskInfo" class="nav-card prev" @click="viewTask(prevTaskInfo.lIdx, prevTaskInfo.tIdx)">
+            <span class="nav-label"><i class="ri-arrow-left-line"></i> Anterior</span>
+            <span class="nav-title">{{ prevTaskInfo.title }}</span>
+        </div>
+        <div v-else style="flex: 1;"></div> 
+        <div v-if="nextTaskInfo" 
+     class="nav-card next" 
+     :class="{'disabled': nextTaskInfo.locked}"
+     @click="handleNext"> <span class="nav-label">Siguiente <i class="ri-arrow-right-line"></i></span>
+    <span class="nav-title">
+        {{ nextTaskInfo.title }} 
+        <i v-if="nextTaskInfo.locked" class="ri-lock-fill" style="font-size: 0.8em; opacity: 0.5;"></i>
+    </span>
+</div>
+        <div v-else style="flex: 1;"></div>
+    </div>
                     <div class="lesson-description">
                         <h3>Sobre esta actividad</h3>
                         <p>{{ currentViewingTask.title }}</p>
@@ -1803,7 +1895,140 @@ createApp({
                 lesson.expanded = !lesson.expanded;
             }
         };
-        
+
+
+
+        const prevTaskInfo = computed(() => {
+    // Usamos viewingLessonIndex/TaskIndex para saber qué se está viendo, no necesariamente el progreso actual
+    let lIdx = viewingLessonIndex.value;
+    let tIdx = viewingTaskIndex.value;
+
+    // Si hay una tarea anterior en la misma lección
+    if (tIdx > 0) {
+        return { 
+            title: lessons.value[lIdx].tasks[tIdx - 1].title, 
+            lIdx: lIdx, 
+            tIdx: tIdx - 1 
+        };
+    } 
+    // Si no, buscamos la última tarea de la lección anterior
+    else if (lIdx > 0) {
+        const prevLesson = lessons.value[lIdx - 1];
+        const lastTaskIdx = prevLesson.tasks.length - 1;
+        return { 
+            title: prevLesson.tasks[lastTaskIdx].title, 
+            lIdx: lIdx - 1, 
+            tIdx: lastTaskIdx 
+        };
+    }
+    return null; // No hay nada atrás
+});
+
+        const nextTaskInfo = computed(() => {
+    let lIdx = viewingLessonIndex.value;
+    let tIdx = viewingTaskIndex.value;
+    const currentLesson = lessons.value[lIdx];
+
+    // 1. Calcular cuál es la SIGUIENTE tarea física
+    let nextL = lIdx;
+    let nextT = tIdx;
+
+    if (tIdx < currentLesson.tasks.length - 1) {
+        nextT++;
+    } else if (lIdx < lessons.value.length - 1) {
+        nextL++;
+        nextT = 0;
+    } else {
+        return null; // No hay más contenido (Fin del curso)
+    }
+
+
+    const isAtFrontier = (lIdx === currentLessonIndex.value) && (tIdx === currentTaskIndex.value);
+    const currentTask = currentLesson.tasks[tIdx];
+    
+    // Si estamos en el límite, es video y no está completo => BLOQUEADO
+    const isLocked = isAtFrontier && (currentTask.type === 'video' && !currentTask.completed);
+
+    return {
+        title: lessons.value[nextL].tasks[nextT].title,
+        lIdx: nextL,
+        tIdx: nextT,
+        locked: isLocked
+    };
+});
+
+
+const handleNext = () => {
+    const next = nextTaskInfo.value;
+    if (!next || next.locked) return;
+    const isAtFrontier = (viewingLessonIndex.value === currentLessonIndex.value) && 
+                         (viewingTaskIndex.value === currentTaskIndex.value);
+    
+    const currentTask = lessons.value[viewingLessonIndex.value].tasks[viewingTaskIndex.value];
+    if (isAtFrontier && currentTask.type !== 'video') {
+        completeCurrentTask(); 
+    } else {
+        viewTask(next.lIdx, next.tIdx);
+    }
+};
+
+        const saveUserProgress = async () => {
+    if (!selectedLevel.value) return;
+
+    const payload = {
+        action: "saveProgress", 
+        token: localStorage.getItem('MStoken'),
+        stage: JSON.stringify({
+            lvl: currentLevelIndex.value,
+            lsn: currentLessonIndex.value,
+            tsk: currentTaskIndex.value 
+        })
+    };
+
+    try {
+        fetch('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', {
+            method: 'POST',
+            mode: 'no-cors', // Importante para Google Scripts a veces
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        });
+    } catch (e) {
+        console.error("Error guardando progreso", e);
+    }
+};
+
+
+/*
+const nextTaskInfo = computed(() => {
+    let lIdx = viewingLessonIndex.value;
+    let tIdx = viewingTaskIndex.value;
+    const currentLesson = lessons.value[lIdx];
+
+    let nextL = lIdx;
+    let nextT = tIdx;
+
+    // Calcular índices del siguiente
+    if (tIdx < currentLesson.tasks.length - 1) {
+        nextT++;
+    } else if (lIdx < lessons.value.length - 1) {
+        nextL++;
+        nextT = 0;
+    } else {
+        return null; // No hay nada adelante (fin del curso)
+    }
+
+    // Verificar si está bloqueado (comparando con el progreso real del usuario)
+    const isLocked = (nextL > currentLessonIndex.value) || 
+                     (nextL === currentLessonIndex.value && nextT > currentTaskIndex.value);
+
+    return {
+        title: lessons.value[nextL].tasks[nextT].title,
+        lIdx: nextL,
+        tIdx: nextT,
+        locked: isLocked
+    };
+});
+ */       
         
         // ==========================================
         // SECCIÓN 6: GESTIÓN DE TAREAS
@@ -1892,22 +2117,34 @@ createApp({
             }
         };
 
-        const completeCurrentTask = () => {
-            const task = lessons.value[currentLessonIndex.value].tasks[currentTaskIndex.value];
-            task.completed = true;
+const completeCurrentTask = () => {
+    const lesson = lessons.value[currentLessonIndex.value];
+    const task = lesson.tasks[currentTaskIndex.value];
+    
+    if (task.completed) return; // Ya estaba completa
 
-            totalTasksCompleted.value++;
-            updateProgress();
-            updatePendingTasks();
-            
-            currentTaskIndex.value++;
-            if (currentTaskIndex.value >= lessons.value[currentLessonIndex.value].tasks.length) {
-                completeLesson();
-            } else {
-                shouldAutoplayVideo = true;
-                setTimeout(loadCurrentTask, 1200);
-            }
-        };
+    task.completed = true;
+    totalTasksCompleted.value++;
+    updateProgress();
+    updatePendingTasks();
+    
+    // Avanzar índices
+    currentTaskIndex.value++;
+    if (currentTaskIndex.value >= lesson.tasks.length) {
+        completeLesson(); 
+    }
+
+    saveUserProgress(); 
+    if (currentTaskIndex.value < lesson.tasks.length) {
+         // Pequeño delay para UX
+         setTimeout(() => {
+             if (viewingLessonIndex.value === currentLessonIndex.value && 
+                 viewingTaskIndex.value === currentTaskIndex.value - 1) {
+                 loadCurrentTask();
+             }
+         }, 500);
+    }
+};
 
         const completeLesson = () => {
             const lesson = lessons.value[currentLessonIndex.value];
@@ -2219,6 +2456,11 @@ createApp({
             showLevelSelector,
             toggleSidebar,
             toggleLesson,
+
+            prevTaskInfo,
+            nextTaskInfo,
+            handleNext,
+            saveUserProgress,
             
             // Funciones de tareas
             viewTask,
