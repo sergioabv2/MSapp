@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -144,6 +143,7 @@ body {
 
 .level-card.locked:hover .card-bg {
     transform: none;
+
 }
 
 .lock-icon {
@@ -160,15 +160,18 @@ body {
 }
 
 /* Estado bloqueado */
+
 .level-card.locked {
     cursor: default;
-    
     filter: grayscale(100%);
 }
 .level-card.locked .card-overlay {
     backdrop-filter: blur(5px) ;
     -webkit-backdrop-filter: blur(5px) ;
-     background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%);
+    background: linear-gradient(90deg, 
+                rgba(248, 249, 250, 0.5) 0%, 
+                rgba(248, 249, 250, 0.2) 50%, 
+                rgba(0, 0, 0, 0.1) 100%);
     z-index: 1; /* Asegura que esté sobre la imagen (.card-bg) */
 }
 .level-card.locked:hover {
@@ -179,7 +182,10 @@ body {
 .card-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.1) 100%);
+    background: linear-gradient(270deg, 
+                rgba(248, 249, 250, 0.1) 0%, 
+                rgba(248, 249, 250, 0.35) 50%, 
+                rgba(248, 249, 250, 0.8) 100%);
     z-index: 1;
 }
 
@@ -192,7 +198,7 @@ body {
     flex-direction: column;
     justify-content: center;
     padding-left: 40px;
-    color: white;
+    color: black;
 }
 
 .level-number {
@@ -203,7 +209,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: black;
     font-size: 20px;
     font-weight: 600;
     flex-shrink: 0;
@@ -221,7 +227,7 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 1px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(0,0,0,0.7);
     margin-bottom: 8px;
 }
 
@@ -232,20 +238,15 @@ body {
     text-transform: uppercase;
     margin: 0 0 10px 0;
     line-height: 1;
-    color: #ffffff;
+    color: black;
 }
 
-.level-description {
-    color: #6e6e73;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 16px;
-}
+
 
 .level-meta {
     font-size: 0.9rem;
     font-weight: 500;
-    color: rgba(255,255,255,0.9);
+    color: rgba(0,0,0,0.9);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -518,8 +519,8 @@ body {
 
 .progress-bar-fill {
     height: 100%;
-    background: #4CAF50; /* Dorado brillante */
-   box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    background: #FF4757;
+   box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
     transition: width 0.5s ease;
 }
 
@@ -896,8 +897,8 @@ body {
     position: absolute;
     inset: 0;
     background: linear-gradient(to bottom, 
-                rgba(0, 0, 0, 0.35) 0%, 
-                rgba(0, 0, 0, 0.05) 50%, 
+                rgba(248, 249, 250, 0.35) 0%, 
+                rgba(248, 249, 250, 0.25) 50%, 
                 rgba(248, 249, 250, 1) 100%);
 }
 
@@ -1444,7 +1445,7 @@ body {
             <div class="phase-tag">Grado {{ level.id  }}</div> <h2 class="level-title">{{ level.title }}</h2>
             
             <div class="level-meta">
-                <i class="ri-time-line"></i> {{ level.duration }}
+                <i class="ri-article-line"></i> {{ level.duration }}
                 <span style="margin: 0 5px;">•</span>
                 <span>{{ level.progress }}% Completado</span>
             </div>
@@ -1669,7 +1670,7 @@ createApp({
             { 
                 id: 0, 
                 title: 'Nivel Preparatorio', 
-                image: 'https://lh3.googleusercontent.com/d/1OS0zUBMQ6VUusjG9bbdrGlNbwGw4L1Fr=s500',
+                image: 'https://lh3.googleusercontent.com/d/1OS0zUBMQ6VUusjG9bbdrGlNbwGw4L1Fr=s600',
                 description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
                 duration: '10 lecciones',
                 progress: 0,
@@ -1775,7 +1776,7 @@ createApp({
                     }
                 ]
             },
-            { id: 1, title: 'Nivel 1', image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s500', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '9 lecciones', lessons: [
+            { id: 1, title: 'Nivel 1', image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s600', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '9 lecciones', lessons: [
                 { title: "Lección 1: Escalas Mayores", unit: 1, tasks: [
                     { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
@@ -1794,10 +1795,10 @@ createApp({
                 { title: "Lección 9: Síncopas", unit: 3, tasks: [{ type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
                 { title: "Lección 10: Pieza Final", unit: "Final", tasks: [{ type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] }
             ]},
-            { id: 2, title: 'Nivel 2', image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '9 lecciones', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
-            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '9 lecciones', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
-            { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '9 lecciones', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
-            { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '9 lecciones', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
+            { id: 2, title: 'Nivel 2', image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
+            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
+            { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
+            { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
         ]);
         
         // ==========================================
@@ -2576,4 +2577,4 @@ const updateProgress = () => {
         };
     }
 }).mount('#app');
-</script>
+</script> 
