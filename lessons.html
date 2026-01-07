@@ -95,110 +95,45 @@ body {
 }
 
 .levels-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 24px; /* Espacio entre tarjetas */
-    padding: 0 20px;
-    max-width: 1000px;
-    position: relative;
-    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr; 
+    padding: 10px 20px;
+    gap: 20px;
 }
 
+/* Tarjetas de nivel */
 .level-card {
-    position: relative;
-    height: 200px;
-    width: 100%;
-    background-color: #ffffff; /* Fondo base blanco */
+    background: white;
     border-radius: 16px;
-    overflow: hidden;
-    /* Sombra suave y difusa para dar profundidad en fondo blanco */
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.05);
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e7;
+    width: 100%;
     cursor: pointer;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.05); /* Borde muy sutil */
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-/* Interacción Hover */
 .level-card:hover {
-  
-    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
-    border-color: rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
-
-/* Imagen de Fondo (La textura) */
-.card-bg {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: transform 0.6s ease;
-    z-index: 0;
-    /* Truco: Filtro para que la imagen no compita con el texto */
-    filter: grayscale(20%) contrast(0.9); 
-}
-
-.level-card:hover .card-bg {
-    transform: scale(1.05);
-}
-
-.level-card.locked:hover .card-bg {
-    transform: none;
-
-}
-
-.lock-icon {
-    position: absolute;
-    right: 30px;
-    top: 30px;
-    font-size: 1.5rem;
-    color: rgba(255,255,255,0.5);
-    z-index: 2;
-    background: rgba(0,0,0,0.3);
-    padding: 10px;
-    border-radius: 50%;
-    backdrop-filter: blur(4px);
-}
-
-/* Estado bloqueado */
 
 .level-card.locked {
-    cursor: default;
-    filter: grayscale(100%);
+    opacity: 0.6;
+    cursor: auto;
+    filter: grayscale(80%);
 }
-.level-card.locked .card-overlay {
-    backdrop-filter: blur(5px) ;
-    -webkit-backdrop-filter: blur(5px) ;
-    background: linear-gradient(90deg, 
-                rgba(248, 249, 250, 0.5) 0%, 
-                rgba(248, 249, 250, 0.2) 50%, 
-                rgba(0, 0, 0, 0.1) 100%);
-    z-index: 1; /* Asegura que esté sobre la imagen (.card-bg) */
-}
+
 .level-card.locked:hover {
     transform: none;
-    box-shadow: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-.card-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(270deg, 
-                rgba(248, 249, 250, 0.1) 0%, 
-                rgba(248, 249, 250, 0.35) 50%, 
-                rgba(248, 249, 250, 0.8) 100%);
-    z-index: 1;
-}
-
-/* Contenido del Texto */
 .card-content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-left: 40px;
-    color: black;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 .level-number {
@@ -209,7 +144,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: black;
+    color: white;
     font-size: 20px;
     font-weight: 600;
     flex-shrink: 0;
@@ -221,35 +156,25 @@ body {
     min-width: 0;
 }
 
-.phase-tag {
-    font-family: 'Inter', sans-serif;
-    text-transform: uppercase;
-    font-size: 0.8rem;
+.level-title {
+    font-size: 24px;
     font-weight: 600;
-    letter-spacing: 1px;
-    color: rgba(0,0,0,0.7);
+    color: #1d1d1f;
     margin-bottom: 8px;
 }
 
-.level-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin: 0 0 10px 0;
-    line-height: 1;
-    color: black;
+.level-description {
+    color: #6e6e73;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 16px;
 }
 
-
-
 .level-meta {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: rgba(0,0,0,0.9);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .time-icon {
@@ -506,25 +431,6 @@ body {
     text-transform: uppercase; 
     letter-spacing: 0.5px; 
 }
-
-.progress-container-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.2);
-    z-index: 3;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: #FF4757;
-   box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
-    transition: width 0.5s ease;
-}
-
-
 
 /* ========== PROGRESS BAR REDISEÑADO ========== */
 .progress-bar { 
@@ -1107,73 +1013,6 @@ body {
     visibility: visible; 
 }
 
-.lesson-navigation {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-.nav-card {
-    flex: 1;
-    border: 1px solid #e5e5e7;
-    border-radius: 12px;
-    padding: 20px 24px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0; /* Evita desbordamiento de texto */
-}
-
-.nav-card:hover {
-    border-color: #d2d2d7;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transform: translateY(-1px);
-}
-
-.nav-card.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #f9f9f9;
-}
-
-.nav-card.disabled:hover {
-    transform: none;
-    box-shadow: none;
-    border-color: #e5e5e7;
-}
-
-.nav-label {
-    font-size: 0.85rem;
-    color: #86868b;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    text-transform: capitalize;
-}
-
-.nav-card.next .nav-label {
-    justify-content: flex-end;
-}
-
-.nav-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1d1d1f;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.nav-card.next .nav-title {
-    text-align: right;
-}
-
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
     .pending-tasks {
@@ -1253,33 +1092,25 @@ body {
 }
 
 @media (max-width: 550px) { 
-    .lesson-navigation {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .nav-card.next .nav-label, .nav-card.next .nav-title {
-        justify-content: flex-start;
-        text-align: left;
-    }
     .level-card {
-        transform: none !important; /* Resetea el 0.9 */
-        width: 100%; /* Que ocupe el ancho disponible */
-        margin: 0 0 10px 0; /* Espaciado vertical natural */
+        transform: scale(0.9);
     }
-    .level-card:hover,
-    .level-card.locked:hover {
-        transform: none !important; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; /* Mantiene sombra estática */
+    
+    .level-description {
+        font-size: 13px;
     }
-   
     
     .level-title {
-        font-size: 1.5rem; /* Texto más pequeño naturalmente */
+        font-size: 22px;
     }
-    .levels-grid {
-        padding: 5px 15px; /* Menos padding lateral */
-        width: 100%;
+    
+    .level-card:hover {
+        transform: scale(0.92);
+    }
 
+    .levels-grid {
+        padding: 10px 10px;
+        gap: 2px;
     }
     
     .mobile {
@@ -1428,38 +1259,33 @@ body {
                 </div>
             </div>
       
-          <div class="levels-grid">
-    <div class="level-card" 
-         v-for="(level, index) in levels" 
-         :key="level.id"
-         @click="selectLevel(level)"
-         :class="{'locked': currentLevelIndex < level.id}">
-        
-       <div class="card-bg" 
-     :style="{ backgroundImage: `url(${level.image})` }">
-</div>
-
-        <div class="card-overlay"></div>
-
-        <div class="card-content">
-            <div class="phase-tag">Grado {{ level.id  }}</div> <h2 class="level-title">{{ level.title }}</h2>
-            
-            <div class="level-meta">
-                <i class="ri-article-line"></i> {{ level.duration }}
-                <span style="margin: 0 5px;">•</span>
-                <span>{{ level.progress }}% Completado</span>
+            <div class="levels-grid">
+                <div class="level-card" 
+                     v-for="level in levels" 
+                     :key="level.id"
+                     @click="selectLevel(level)"
+                     :class="{'selected': selectedLevel?.id === level.id, 'locked': currentLevelIndex < level.id}">
+                    <div class="card-content">
+                        <div class="lockLvlIco" v-if="currentLevelIndex < level.id"><i class="ri-lock-fill"></i></div>
+                        <div class="level-number" v-if="level.id === 0">P</div>
+                        <div class="level-number" v-else>{{ level.id }}</div>
+                        <div class="level-info">
+                            <h2 class="level-title">{{ level.title }}</h2>
+                            <p class="level-description">{{ level.description }}</p>
+                            <div class="level-meta">
+                                <svg class="time-icon" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                </svg>
+                                <span class="time-text">~{{ level.duration }}</span>
+                            </div>
+                            <div class="progress-container2">
+                                <div class="progress-bar2" :style="{width: level.progress + '%'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="lock-icon" v-if="currentLevelIndex < level.id">
-            <i class="ri-lock-fill"></i>
-        </div>
-
-        <div class="progress-container-bottom">
-            <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 
@@ -1500,23 +1326,6 @@ body {
 
                 <!-- Contenido debajo del video dinámico -->
                 <div class="content-below" v-if="currentViewingTask">
-                    <div class="lesson-navigation">
-        <div v-if="prevTaskInfo" class="nav-card prev" @click="viewTask(prevTaskInfo.lIdx, prevTaskInfo.tIdx)">
-            <span class="nav-label"><i class="ri-arrow-left-line"></i> Anterior</span>
-            <span class="nav-title">{{ prevTaskInfo.title }}</span>
-        </div>
-        <div v-else style="flex: 1;"></div> 
-        <div v-if="nextTaskInfo" 
-     class="nav-card next" 
-     :class="{'disabled': nextTaskInfo.locked}"
-     @click="handleNext"> <span class="nav-label">Siguiente <i class="ri-arrow-right-line"></i></span>
-    <span class="nav-title">
-        {{ nextTaskInfo.title }} 
-        <i v-if="nextTaskInfo.locked" class="ri-lock-fill" style="font-size: 0.8em; opacity: 0.5;"></i>
-    </span>
-</div>
-        <div v-else style="flex: 1;"></div>
-    </div>
                     <div class="lesson-description">
                         <h3>Sobre esta actividad</h3>
                         <p>{{ currentViewingTask.title }}</p>
@@ -1670,9 +1479,8 @@ createApp({
             { 
                 id: 0, 
                 title: 'Nivel Preparatorio', 
-                image: 'https://lh3.googleusercontent.com/d/1OS0zUBMQ6VUusjG9bbdrGlNbwGw4L1Fr=s600',
                 description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
-                duration: '10 lecciones',
+                duration: '5 horas',
                 progress: 0,
                 lessons: [
                     {
@@ -1776,7 +1584,7 @@ createApp({
                     }
                 ]
             },
-            { id: 1, title: 'Nivel 1', image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s600', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '9 lecciones', lessons: [
+            { id: 1, title: 'Nivel 1', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '4 horas', lessons: [
                 { title: "Lección 1: Escalas Mayores", unit: 1, tasks: [
                     { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
                     { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
@@ -1795,10 +1603,10 @@ createApp({
                 { title: "Lección 9: Síncopas", unit: 3, tasks: [{ type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
                 { title: "Lección 10: Pieza Final", unit: "Final", tasks: [{ type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] }
             ]},
-            { id: 2, title: 'Nivel 2', image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
-            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
-            { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
-            { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
+            { id: 2, title: 'Nivel 2', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
+            { id: 3, title: 'Nivel 3', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
+            { id: 4, title: 'Nivel 4', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
+            { id: 5, title: 'Nivel 5', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
         ]);
         
         // ==========================================
@@ -1995,143 +1803,7 @@ createApp({
                 lesson.expanded = !lesson.expanded;
             }
         };
-
-
-
-        const prevTaskInfo = computed(() => {
-    // Usamos viewingLessonIndex/TaskIndex para saber qué se está viendo, no necesariamente el progreso actual
-    let lIdx = viewingLessonIndex.value;
-    let tIdx = viewingTaskIndex.value;
-
-    // Si hay una tarea anterior en la misma lección
-    if (tIdx > 0) {
-        return { 
-            title: lessons.value[lIdx].tasks[tIdx - 1].title, 
-            lIdx: lIdx, 
-            tIdx: tIdx - 1 
-        };
-    } 
-    // Si no, buscamos la última tarea de la lección anterior
-    else if (lIdx > 0) {
-        const prevLesson = lessons.value[lIdx - 1];
-        const lastTaskIdx = prevLesson.tasks.length - 1;
-        return { 
-            title: prevLesson.tasks[lastTaskIdx].title, 
-            lIdx: lIdx - 1, 
-            tIdx: lastTaskIdx 
-        };
-    }
-    return null; // No hay nada atrás
-});
-
-        const nextTaskInfo = computed(() => {
-    let lIdx = viewingLessonIndex.value;
-    let tIdx = viewingTaskIndex.value;
-    const currentLesson = lessons.value[lIdx];
-
-    // 1. Calcular cuál es la SIGUIENTE tarea física
-    let nextL = lIdx;
-    let nextT = tIdx;
-
-    if (tIdx < currentLesson.tasks.length - 1) {
-        nextT++;
-    } else if (lIdx < lessons.value.length - 1) {
-        nextL++;
-        nextT = 0;
-    } else {
-        return null; // No hay más contenido (Fin del curso)
-    }
-
-
-    const isAtFrontier = (lIdx === currentLessonIndex.value) && (tIdx === currentTaskIndex.value);
-    const currentTask = currentLesson.tasks[tIdx];
-    
-    // Si estamos en el límite, es video y no está completo => BLOQUEADO
-    const isLocked = isAtFrontier && (currentTask.type === 'video' && !currentTask.completed);
-
-    return {
-        title: lessons.value[nextL].tasks[nextT].title,
-        lIdx: nextL,
-        tIdx: nextT,
-        locked: isLocked
-    };
-});
-
-
-const handleNext = () => {
-    const next = nextTaskInfo.value;
-    if (!next || next.locked) return;
-    const isAtFrontier = (viewingLessonIndex.value === currentLessonIndex.value) && 
-                         (viewingTaskIndex.value === currentTaskIndex.value);
-    
-    const currentTask = lessons.value[viewingLessonIndex.value].tasks[viewingTaskIndex.value];
-    if (isAtFrontier && currentTask.type !== 'video') {
-        completeCurrentTask(); 
-    } else {
-        viewTask(next.lIdx, next.tIdx);
-    }
-};
-
-  const saveUserProgress = async () => {
-    if (!selectedLevel.value) return;
-
-    // Obtenemos los valores ACTUALES (ya actualizados)
-    const payload = {
-        action: "saveProgress",
-        token: localStorage.getItem('MStoken'),
-        stage: JSON.stringify({
-            lvl: currentLevelIndex.value,
-            lsn: currentLessonIndex.value,
-            act: currentTaskIndex.value // <--- CAMBIO: Usamos 'act' directamente
-        })
-    };
-
-    console.log("Guardando estado:", payload.stage); // Debug para ver qué se envía
-
-    try {
-        fetch('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', {
-            method: 'POST',
-            mode: 'no-cors', 
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-        });
-    } catch (e) {
-        console.error("Error guardando progreso", e);
-    }
-};
-
-
-/*
-const nextTaskInfo = computed(() => {
-    let lIdx = viewingLessonIndex.value;
-    let tIdx = viewingTaskIndex.value;
-    const currentLesson = lessons.value[lIdx];
-
-    let nextL = lIdx;
-    let nextT = tIdx;
-
-    // Calcular índices del siguiente
-    if (tIdx < currentLesson.tasks.length - 1) {
-        nextT++;
-    } else if (lIdx < lessons.value.length - 1) {
-        nextL++;
-        nextT = 0;
-    } else {
-        return null; // No hay nada adelante (fin del curso)
-    }
-
-    // Verificar si está bloqueado (comparando con el progreso real del usuario)
-    const isLocked = (nextL > currentLessonIndex.value) || 
-                     (nextL === currentLessonIndex.value && nextT > currentTaskIndex.value);
-
-    return {
-        title: lessons.value[nextL].tasks[nextT].title,
-        lIdx: nextL,
-        tIdx: nextT,
-        locked: isLocked
-    };
-});
- */       
+        
         
         // ==========================================
         // SECCIÓN 6: GESTIÓN DE TAREAS
@@ -2220,27 +1892,22 @@ const nextTaskInfo = computed(() => {
             }
         };
 
-const completeCurrentTask = () => {
-    const lesson = lessons.value[currentLessonIndex.value];
-    const task = lesson.tasks[currentTaskIndex.value];
+        const completeCurrentTask = () => {
+            const task = lessons.value[currentLessonIndex.value].tasks[currentTaskIndex.value];
+            task.completed = true;
 
-    if (!task.completed) {
-        task.completed = true;
-        totalTasksCompleted.value++;
-        updateProgress();
-        updatePendingTasks();
-    }
-    let nextTaskIdx = currentTaskIndex.value + 1;
-    let nextLessonIdx = currentLessonIndex.value;
-    if (nextTaskIdx >= lesson.tasks.length) {
-        completeLesson(); 
-    } else {
-        currentTaskIndex.value = nextTaskIdx;
-        shouldAutoplayVideo = true;
-        setTimeout(loadCurrentTask, 1200);
-    }
-    saveUserProgress(); 
-};
+            totalTasksCompleted.value++;
+            updateProgress();
+            updatePendingTasks();
+            
+            currentTaskIndex.value++;
+            if (currentTaskIndex.value >= lessons.value[currentLessonIndex.value].tasks.length) {
+                completeLesson();
+            } else {
+                shouldAutoplayVideo = true;
+                setTimeout(loadCurrentTask, 1200);
+            }
+        };
 
         const completeLesson = () => {
             const lesson = lessons.value[currentLessonIndex.value];
@@ -2271,15 +1938,9 @@ const completeCurrentTask = () => {
         // SECCIÓN 7: ACTUALIZACIÓN DE ESTADO
         // ==========================================
         
-      // Busca esta función en tu código actual
-const updateProgress = () => {
-    if (totalTasks.value === 0) {
-        progress.value = 0;
-        return;
-    }
-    // Math.round() quita los decimales redondeando al entero más cercano
-    progress.value = Math.round((totalTasksCompleted.value / totalTasks.value) * 100);
-};
+        const updateProgress = () => {
+            progress.value = (totalTasksCompleted.value / totalTasks.value) * 100;
+        };
 
         const updatePendingTasks = () => {
             pendingTasks.value = [];
@@ -2558,11 +2219,6 @@ const updateProgress = () => {
             showLevelSelector,
             toggleSidebar,
             toggleLesson,
-
-            prevTaskInfo,
-            nextTaskInfo,
-            handleNext,
-            saveUserProgress,
             
             // Funciones de tareas
             viewTask,
@@ -2577,4 +2233,4 @@ const updateProgress = () => {
         };
     }
 }).mount('#app');
-</script> 
+</script>
