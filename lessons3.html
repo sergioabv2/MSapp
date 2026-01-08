@@ -221,7 +221,7 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 1px;
-    color: rgba(0,0,0,0.7);
+    color: gray;
     margin-bottom: 8px;
 }
 
@@ -501,21 +501,34 @@ body {
     letter-spacing: 0.5px; 
 }
 
+
+
+
 .progress-container-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.2);
+    position: relative; /* Cambiado de absolute para que fluya con el texto */
+    width: 270px;
+    height: 12px;
+    background: #f0f0f0; /* Color gris suave para el fondo de la barra */
+    border-radius: 3px;   /* Bordes redondeados */
+    margin-top: 15px;     /* Espacio entre el texto y la barra */
+    overflow: hidden;     /* Para que el relleno no se salga de los bordes redondeados */
     z-index: 3;
 }
 
 .progress-bar-fill {
     height: 100%;
-   background: #6C5CE7;
-  box-shadow: 0 0 10px rgba(108, 92, 231, 0.6);
+    
+    /* 1. El color base: Un gradiente de morado brillante a morado real */
+    /* Usamos un violeta brillante al inicio y un púrpura intenso al final */
+    background: linear-gradient(90deg, #A855F7 0%, #7E22CE 100%);
+    
+    /* 2. El efecto GLOW (Resplandor intenso) */
+    /* - Primera parte: Sombra exterior GRANDE y difuminada (15px) usando el color morado brillante con alta opacidad (0.85) */
+    /* - Segunda parte (inset): Brillo interior blanco para efecto de "tubo de luz" */
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.85), 0 0 6px rgba(255, 255, 255, 0.7) inset;
+    
     transition: width 0.5s ease;
+    border-radius: 3px;
 }
 
 
@@ -1264,6 +1277,9 @@ body {
     .level-card.locked:hover {
         transform: none !important; 
     }
+    .progress-container-bottom{
+      width: 200px;
+    }
    
     
     .level-title {
@@ -1442,15 +1458,16 @@ body {
                 <span style="margin: 0 5px;">•</span>
                 <span>{{ level.progress }}% Completado</span>
             </div>
+             <div class="progress-container-bottom">
+                <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+              </div>
         </div>
 
         <div class="lock-icon" v-if="currentLevelIndex < level.id">
             <i class="ri-lock-fill"></i>
         </div>
 
-        <div class="progress-container-bottom">
-            <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
-        </div>
+       
     </div>
 </div>
         </div>
@@ -1769,26 +1786,258 @@ createApp({
                     }
                 ]
             },
-            { id: 1, title: 'Nivel 1', image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s600', progress: 0, description: 'Construye sobre lo básico con escalas, acordes simples y lectura de partituras inicial.', duration: '9 lecciones', lessons: [
-                { title: "Lección 1: Escalas Mayores", unit: 1, tasks: [
-                    { type: 'video', title: "Postura correcta de manos", videoId: "Q4r5gnfAtzs", iconClass: 'ri-play-circle-line' },
-                    { type: 'quiz', title: "Quiz de Postura", question: "¿Qué forma deben tener tus manos sobre el piano?", options: ["Planas como panqueques", "Como si sostuvieras una pelota", "Tensas y rectas"], correctAnswer: 1, iconClass: 'ri-question-line' },
-                    { type: 'record', title: "Graba tu primera melodía", contentUrl: "https://app.mozartacademy.mx/grandstaff", iconClass: 'ri-mic-line' }
-                ]},
-                { title: "Lección 2: Tonalidad de G", unit: 1, tasks: [
-                    { type: 'video', title: "Entendiendo las Negras", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' },
-                    { type: 'note', title: "Toca la nota Si", key: 'B', contentUrl: "https://app.mozartacademy.mx/books2/page/10" }
-                ]},
-                { title: "Lección 3: Pentaescalas", unit: 1, tasks: [{ type: 'video', title: "Pentaescalas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 4: Cambio de Posición", unit: 2, tasks: [{ type: 'video', title: "Cambios", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 5: Intervalos de 6ta", unit: 2, tasks: [{ type: 'video', title: "Sextas", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 6: Tonalidad de F", unit: 2, tasks: [{ type: 'video', title: "Fa Mayor", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 7: Grupo 1", unit: 3, tasks: [{ type: 'video', title: "Grupo 1", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 8: Más Notación", unit: 3, tasks: [{ type: 'video', title: "Notación Avanzada", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 9: Síncopas", unit: 3, tasks: [{ type: 'video', title: "Ritmos Sincopados", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] },
-                { title: "Lección 10: Pieza Final", unit: "Final", tasks: [{ type: 'video', title: "Pieza de Conclusión", videoId: "ec4ZRGMYgrY", iconClass: 'ri-play-circle-line' }] }
-            ]},
-            { id: 2, title: 'Nivel 2', image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', progress: 0, description: 'Profundiza en técnicas avanzadas y piezas más complejas.', duration: '6 horas', lessons: [{ title: "Lección 1: Escalas Avanzadas", unit: 1, tasks: [] }] },
+           { 
+  id: 1, 
+  title: 'Nivel 1', 
+  image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s600', 
+  progress: 0, 
+  description: 'Domina la posición de Sol, alteraciones, armaduras y síncopas a través de un repertorio clásico progresivo.', 
+  duration: '10 Lecciones', 
+  lessons: [
+    // --- BLOQUE 1 (Unidad 1) ---
+    { 
+      title: "Lección 1: Posición de Sol (2da parte)", 
+      unit: 1, 
+      tasks: [
+        { type: 'video', title: "Solfeo I: Descripción", videoId: "sn9AnIwXWNw", iconClass: 'ri-play-circle-line', instructions: "Introducción al solfeo en posición de Sol." },
+        { type: 'exercise', title: "Ejercicios de Solfeo", contentUrl: "https://drive.google.com/file/d/1rnUC_AB2buvh-BLf16L6SOte4ct2y4bx/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Posición de Sol: Lección", videoId: "gtkAYv5wBoA", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicio Práctico", contentUrl: "https://drive.google.com/file/d/1DRf5RdEG7C7KAVxv4wy593dfN8Cbeqat/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Minuet (Gurlitt) - Ejemplo", videoId: "ZHuYXBK1IM4", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Minuet", contentUrl: "https://drive.google.com/file/d/1-Gh5AJBcEaO1eVJ-SeV6-kTmlaPK5muP/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 2: Posición Combinada", 
+      unit: 1, 
+      tasks: [
+        { type: 'video', title: "Solfeo II: Descripción", videoId: "-G5yINx85k0", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios de Solfeo", contentUrl: "https://drive.google.com/file/d/1upeZQGqvk9PFCBiyIVeONZK0E0P5f01l/preview", iconClass: 'ri-edit-line' },
+        { type: 'exercise', title: "Ejercicio de Posición", contentUrl: "https://drive.google.com/file/d/1zU6zcWwIxgzR4iy0yL8N651kcarf2X9u/preview", iconClass: 'ri-file-text-line' },
+        { type: 'exercise', title: "Ejercicio: Marcha", contentUrl: "https://drive.google.com/file/d/1gPwPtcEmfF-zBLaQLJBKwQOWYJTX_6cf/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Minuet (Reinagle) - Ejemplo", videoId: "Riv3gEBBG9I", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Minuet", contentUrl: "https://drive.google.com/file/d/1_v-xICqupk8KUO32-PwZKURNhRtXRjh6/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 3: Alteraciones", 
+      unit: 1, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo III: Ejercicios", contentUrl: "https://drive.google.com/file/d/10LdRbiKINHgPs3QgcZf_9Ts2WsCzvw3p/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "El Sostenido: Explicación", videoId: "0tyWeauOFzQ", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicio: Sostenidos", contentUrl: "https://drive.google.com/file/d/1azmdnqr2BWqj3NiWWCg-Fl0-DBcDA6II/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "La Armadura: Lección", videoId: "6iR3f8m8COM", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: La Armadura", contentUrl: "https://drive.google.com/file/d/1kr9ChyBTuFpBXg_obh62-AG3q_MRfb5q/preview", iconClass: 'ri-book-read-line' },
+        { type: 'video', title: "Pieza: Promenade - Ejemplo", videoId: "aOFeOBDlWDA", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Promenade", contentUrl: "https://drive.google.com/file/d/140Aklx2WntuhqRCxChRcpKDs06soKJfA/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- BLOQUE 2 (Unidad 2) ---
+    { 
+      title: "Lección 4: Cambio de Posición", 
+      unit: 2, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo IV: Ejercicios", contentUrl: "https://drive.google.com/file/d/1nbWUe2RCjSORXae8hCxr5U-bqy9PuOtc/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Cambio de Posición: Definición", videoId: "oBRoDA-GkBQ", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios Prácticos", contentUrl: "https://drive.google.com/file/d/1K_lWzEDpurCRuhJiYdCZ1rPliCSURyFe/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Dance - Ejemplo", videoId: "CcQlCKt1MgM", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Dance", contentUrl: "https://drive.google.com/file/d/1HT2Ih91glXfWEC0A6uM4KSXZc_whfsku/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 5: Intervalos de 6ta", 
+      unit: 2, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo V: Ejercicios", contentUrl: "https://drive.google.com/file/d/1aqzF5rbWmzVnnOlqOjsjwLmzZGU1VpUY/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Intervalos de 6ta: Lección", videoId: "SEAdyQ0Zw3M", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: Intervalos", contentUrl: "https://drive.google.com/file/d/18uL7_4_fhiE1n8zYyLrW_xZhCsSpYzTE/preview", iconClass: 'ri-book-read-line' },
+        { type: 'exercise', title: "Ejercicios de 6tas", contentUrl: "https://drive.google.com/file/d/1N8HAVRAWFxKlmniv5Bd0jIGPl9GmD38k/preview", iconClass: 'ri-file-text-line' },
+        { type: 'exercise', title: "DC al Fine: Ejercicios", contentUrl: "https://drive.google.com/file/d/1G8EbF6t3wgrdSgpZVAmTv6OFhI31m8XW/preview", iconClass: 'ri-refresh-line' },
+        { type: 'video', title: "Pieza: Sonatina (Gurlitt)", videoId: "n-CJ6AP83zs", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Sonatina", contentUrl: "https://drive.google.com/file/d/1F7mj27XUDWz6-8R6adN6f6vLUnJAEOio/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 6: Posición de Fa", 
+      unit: 2, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo VI: Ejercicios", contentUrl: "https://drive.google.com/file/d/144ZOFA87KNajpViMk4T53YnSzMhWGZQy/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "El Bemol: Explicación", videoId: "aLNz-5bsWb8", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: El Bemol", contentUrl: "https://drive.google.com/file/d/1_UXn8vUzyImBDGlY_Q9RFZOT703Nfngq/preview", iconClass: 'ri-book-read-line' },
+        { type: 'video', title: "Posición de Fa: Lección", videoId: "c1WwjyH2h3A", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Marcha en Fa", contentUrl: "https://drive.google.com/file/d/1pf-AuPRZDOYyu5Bjk10Gqf0KH4G2y7i8/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: The Old Windmill", videoId: "P64xNcu4v-w", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: The Old Windmill", contentUrl: "https://drive.google.com/file/d/1Yf667gGJI9QBfA0xMqvAiiyKUhF-HvaZ/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- BLOQUE 3 (Unidad 3) ---
+    { 
+      title: "Lección 7: Escalas de C, G y F", 
+      unit: 3, 
+      tasks: [
+        { type: 'exercise', title: "Ejercicios de Escalas", contentUrl: "https://drive.google.com/file/d/1unPI5MyC-yxZCXlaUDM375iHb9DbaOyN/preview", iconClass: 'ri-file-list-line' },
+        { type: 'video', title: "Pieza: First Etude", videoId: "2OEzXuEbsA0", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: First Etude", contentUrl: "https://drive.google.com/file/d/1V1Ofj99nBsVR99fJ8m2oWcuTDx33sJtz/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 8: Más Notación Musical", 
+      unit: 3, 
+      tasks: [
+        { type: 'video', title: "8va y Becuadro", videoId: "blGuL_tXviE", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios de Notación", contentUrl: "https://drive.google.com/file/d/1ZKfYtbA2LJmQOvZLpqJrfaZiLwyqKq7I/preview", iconClass: 'ri-file-edit-line' },
+        { type: 'video', title: "Pieza: Jinx", videoId: "Z9QbuWRh7Bc", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Jinx", contentUrl: "https://drive.google.com/file/d/1VjDu6n4rO1HkIGWnnfh_0D7VRC9KWUW0/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 9: Síncopas", 
+      unit: 3, 
+      tasks: [
+        { type: 'video', title: "Síncopas: Definición", videoId: "drI00sPPRks", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: Síncopas", contentUrl: "https://drive.google.com/file/d/1Go9CgkCirvErqeLn8QC1lF2tK69eZdSx/preview", iconClass: 'ri-book-read-line' },
+        { type: 'exercise', title: "Ejercicios Rítmicos", contentUrl: "https://drive.google.com/file/d/14Aji9kUWssBCcBKU_zSCRkuK3sBwEVf7/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Minuet and Trío", videoId: "jdCm8wj-h0w", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Minuet and Trío", contentUrl: "https://drive.google.com/file/d/1W41ayDydPUrKU57OMHEfMl1BuzNYkk01/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- PIEZA FINAL (Unidad 4 / Final) ---
+    { 
+      title: "Lección 10: Elección de Pieza Final", 
+      unit: "Final", 
+      tasks: [
+        { type: 'video', title: "Repertorio: Lista A", videoId: "playlist?list=PLFLLmJ16LJSyilSL5i2UoEEiHaioZTVaW", iconClass: 'ri-play-list-line', instructions: "Escucha la lista y selecciona tu pieza favorita para el examen final." },
+        { type: 'video', title: "Repertorio: Lista B", videoId: "playlist?list=PLFLLmJ16LJSy1cuiGt1xCqne4nQasdXMw", iconClass: 'ri-play-list-line' }
+      ]
+    }
+  ]
+},
+           { 
+  id: 2, 
+  title: 'Nivel 2', 
+  image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', 
+  progress: 0, 
+  description: 'Profundiza en la técnica pianística con contrapunto, estudio de triadas, inversiones, arpegios y métricas compuestas.', 
+  duration: '10 Lecciones', 
+  lessons: [
+    // --- BLOQUE 1 (Unidad 1) ---
+    { 
+      title: "Lección 1: Cambio de Posición II", 
+      unit: 1, 
+      tasks: [
+        { type: 'video', title: "Solfeo VII: Descripción", videoId: "V_qtDfHCdZw", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios de Solfeo", contentUrl: "https://drive.google.com/file/d/1jztdXACdUwHJZMOcsHjY4xLjsRiM7KLS/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Cambio de Posición II: Definición", videoId: "WvgG1n8njqw", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios Prácticos", contentUrl: "https://drive.google.com/file/d/1LCg9EBt1tBT4UUmH48xC_XTu64fPBKhu/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Allemande - Ejemplo", videoId: "BS1YWNFT98o", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Allemande", contentUrl: "https://drive.google.com/file/d/1ArvTOodKca-OExVvFaQnMYw3aj71mizc/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 2: Contrapunto", 
+      unit: 1, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo VIII: Ejercicios", contentUrl: "https://drive.google.com/file/d/1pzrUzz5p6mDfLPsaguhiNCJ_9hIf0M5D/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Contrapunto: Definición", videoId: "SWEK7J_8_Mw", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios de Contrapunto", contentUrl: "https://drive.google.com/file/d/14SKHXbiMeQ4AYWk9QtF3wIp3E0qPdPEa/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Andante (Beyer)", videoId: "fLfVLRUuH_0", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Andante", contentUrl: "https://drive.google.com/file/d/1_HyfX-I55m7Rhwas2sOvY1SwGRCST4JH/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 3: Intervalos de 7ma y 8va", 
+      unit: 1, 
+      tasks: [
+        { type: 'exercise', title: "Solfeo IX: Ejercicios", contentUrl: "https://drive.google.com/file/d/1IICpRij9qfT1LC3SOgy2-hNhU3qducu3/preview", iconClass: 'ri-edit-line' },
+        { type: 'video', title: "Intervalos: Lección", videoId: "cOFpHDlol2Y", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: 7ma y 8va", contentUrl: "https://drive.google.com/file/d/1Al9fBtgZOAlyB4aGGAGwajwrWggzJ6qy/preview", iconClass: 'ri-book-read-line' },
+        { type: 'video', title: "Pieza: Minuet (Leopold Mozart)", videoId: "OLtap24RWpg", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Minuet", contentUrl: "https://drive.google.com/file/d/1wEngXDEnzxCH-nUdvqpyP9TJl2LT7Z0X/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- BLOQUE 2 (Unidad 2) ---
+    { 
+      title: "Lección 4: Grados de escalas", 
+      unit: 2, 
+      tasks: [
+        { type: 'video', title: "Grados: Definición", videoId: "v1e-4OnBlI0", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: Grados", contentUrl: "https://drive.google.com/file/d/1KC_u0nOi-PjotEKLGuEAPDXiDEJvDUwA/preview", iconClass: 'ri-book-read-line' },
+        { type: 'video', title: "Pieza: Aria in F", videoId: "NIYHDXfB9UQ", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Aria in F", contentUrl: "https://drive.google.com/file/d/1WhaTn70R8qil68wjWdMAmLfa6Ij77dzC/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 5: Triadas", 
+      unit: 2, 
+      tasks: [
+        { type: 'video', title: "Triadas: Definición y Tipos", videoId: "35sho6430Zo", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: Triadas", contentUrl: "https://drive.google.com/file/d/1ZsapPWehg_8NLCydckeLOCLDuCrioAFw/preview", iconClass: 'ri-book-read-line' },
+        { type: 'exercise', title: "Ejercicio: Triadas Mayores/Menores", contentUrl: "https://drive.google.com/file/d/1afrrOkeHBa_FPYagQsRgcpWEaBkwvVF7/preview", iconClass: 'ri-file-text-line' },
+        { type: 'exercise', title: "Ejercicios Adicionales", contentUrl: "https://drive.google.com/file/d/1TwDvzf9bdN5jEYBWRgA9BbZbjDd7buev/preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Galope (Kabalevsky)", videoId: "FoSBgcMH6QQ", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Galope", contentUrl: "https://drive.google.com/file/d/1dosurupTiVPzuNpM29V2tn3HDcSd1BS2/preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 6: Inversión de triadas", 
+      unit: 2, 
+      tasks: [
+        { type: 'video', title: "Escalas: Lección", videoId: "", iconClass: 'ri-play-circle-line', instructions: "Video pendiente de asignar" },
+        { type: 'pdf', title: "Grupo 1: Escalas", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-list-line' },
+        { type: 'pdf', title: "Grupo 2: Escalas", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-list-line' },
+        { type: 'video', title: "Pieza: Waltz (Kabalevsky)", videoId: "", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Waltz", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- BLOQUE 3 (Unidad 3) ---
+    { 
+      title: "Lección 7: Arpegios", 
+      unit: 3, 
+      tasks: [
+        { type: 'video', title: "Arpegios: Definición", videoId: "", iconClass: 'ri-play-circle-line' },
+        { type: 'pdf', title: "Teoría: Arpegios", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-book-read-line' },
+        { type: 'exercise', title: "Ejercicios de Arpegios", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Melody (Kohler)", videoId: "", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Melody", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 8: Tresillos", 
+      unit: 3, 
+      tasks: [
+        { type: 'video', title: "Tresillos: Lección", videoId: "", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios de Tresillos", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Ejemplo", videoId: "", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Pieza por definir", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+    { 
+      title: "Lección 9: Métricas compuestas", 
+      unit: 3, 
+      tasks: [
+        { type: 'video', title: "Métricas Compuestas: Definición", videoId: "", iconClass: 'ri-play-circle-line' },
+        { type: 'exercise', title: "Ejercicios Métricos", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-text-line' },
+        { type: 'video', title: "Pieza: Melody (Le Couppey)", videoId: "", iconClass: 'ri-music-2-line' },
+        { type: 'pdf', title: "Partitura: Melody", contentUrl: "https://drive.google.com/file/d//preview", iconClass: 'ri-file-music-line' }
+      ]
+    },
+
+    // --- PIEZA FINAL (Unidad 4 / Final) ---
+    { 
+      title: "Lección 10: Elección de Pieza Final", 
+      unit: "Final", 
+      tasks: [
+        { type: 'video', title: "Repertorio: Lista A", videoId: "playlist?list=PLFLLmJ16LJSyilSL5i2UoEEiHaioZTVaW", iconClass: 'ri-play-list-line', instructions: "Selecciona tu pieza favorita de la Lista A." },
+        { type: 'video', title: "Repertorio: Lista B", videoId: "playlist?list=PLFLLmJ16LJSy1cuiGt1xCqne4nQasdXMw", iconClass: 'ri-play-list-line', instructions: "Selecciona tu pieza favorita de la Lista B." }
+      ]
+    }
+  ]
+},
             { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
             { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
             { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
