@@ -3,182 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Educativa Musical | Aprende Piano e Instrumentos</title>
+    <title>Mozart+ App | Plataforma Educativa Musical</title>
     
-    <link rel="stylesheet" href="styles.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet"/>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
 
 <style>
-    /* --- VARIABLES GLOBALES --- */
-:root {
-    --bg-color: #FAF7F2; 
-    --surface-color: #FFFFFF;
-    --text-main: #1A1A1A;
-    --text-light: #5A5A5A;
-    --accent-color: #F4D03F;
+    /* --- VARIABLES MOZART+ --- */
+    :root {
+        /* Paleta Premium */
+        --bg-color: #F2EFE9;        /* Crema Base */
+        --surface-color: #FFFFFF;    /* Blanco puro para tarjetas */
+        --surface-border: #E5E2DC;   /* Borde sutil crema oscuro */
+        
+        --text-main: #1C1C1C;        /* Negro casi puro */
+        --text-muted: #595959;       /* Gris elegante */
+        
+        --accent-color: #1C1C1C;     /* El acento es el negro mismo */
+        
+        /* Paleta Oscura (Secciones inmersivas) */
+        --dark-bg: #0F0F0F;
+        --dark-surface: #1A1A1A;
+        --dark-text: #B0B0B0;
+        --dark-title: #F2EFE9;
+
+        /* Tipografía */
+        --font-title: 'Outfit', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        
+        /* UI */
+        --spacing-md: 2rem;
+        --spacing-lg: 4rem;
+        --border-radius: 12px;
+        --shadow-soft: 0 15px 40px rgba(28, 28, 28, 0.05); /* Sombra cálida */
+        --transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- TIPOGRAFÍA --- */
+    h1, h2, h3, h4 { 
+        font-family: var(--font-title); 
+        font-weight: 600; 
+        line-height: 1.1; 
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+    }
     
-    /* Paleta Oscura */
-    --dark-bg: #111111;
-    --dark-surface: #1A1A1A;
-    --dark-text: #A0A0A0;
-    --dark-title: #FFFFFF;
+    h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
+    h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
+    h4 { font-size: 1.2rem; margin-bottom: 1rem; }
+    p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
 
-    --font-main: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --border: #e5e7eb;
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; width: 100%; position: relative; z-index: 2; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .center-text { text-align: center; }
+    .mb-large { margin-bottom: 4rem; }
+    section { padding: 6rem 0; }
+
+    /* --- BOTONES PREMIUM --- */
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 16px 32px; border-radius: 6px; /* Menos redondeado, más serio */
+        font-weight: 500; text-decoration: none; cursor: pointer; 
+        transition: var(--transition); font-size: 0.95rem; margin-right: 10px;
+        font-family: var(--font-title); letter-spacing: 0.5px;
+    }
     
-    --spacing-md: 2rem;
-    --spacing-lg: 4rem;
-    --border-radius: 12px;
-    --shadow-soft: 0 10px 40px rgba(0,0,0,0.06);
-    --transition: all 0.4s ease;
-}
+    /* Botón Primario: Negro sólido */
+    .btn-primary { 
+        background-color: var(--text-main); 
+        color: var(--bg-color); 
+        border: 1px solid var(--text-main);
+    }
+    .btn-primary:hover { 
+        background-color: transparent; 
+        color: var(--text-main); 
+        transform: translateY(-2px);
+    }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Botón Outline: Borde Negro */
+    .btn-outline { 
+        background: transparent; 
+        border: 1px solid var(--text-main); 
+        color: var(--text-main); 
+    }
+    .btn-outline:hover { 
+        background: rgba(28,28,28,0.05);
+    }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    font-family: var(--font-main);
-    line-height: 1.5;
-    overflow-x: hidden;
-}
+    /* Botón Secundario: Crema Oscuro */
+    .btn-secondary { 
+        background-color: #E5E2DC; 
+        color: var(--text-main); 
+        border: none;
+    }
+    .btn-secondary:hover { background-color: #D6D3CD; }
 
-/* --- UTILIDADES --- */
-h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
-h2 { font-size: 2.5rem; margin-bottom: 1rem; }
-h4 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-main); }
-p { font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.5rem; }
-
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; position: relative; z-index: 2; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.center-text { text-align: center; }
-.mb-large { margin-bottom: 4rem; }
-section { padding: 5rem 0; }
-
-/* Botones Generales */
-.btn {
-    display: inline-block; padding: 0.8rem 1.8rem; border-radius: 50px;
-    font-weight: 600; text-decoration: none; cursor: pointer; border: none;
-    transition: var(--transition); font-size: 1rem; margin-right: 10px;
-}
-.btn-primary { background-color: var(--text-main); color: #fff; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-.btn-secondary { background-color: #E0E5EC; color: var(--text-main); }
-.btn-outline { background: transparent; border: 1px solid var(--text-main); color: var(--text-main); }
-.btn-large { padding: 1rem 2.5rem; font-size: 1.2rem; } /* Nuevo tamaño para el botón final */
+    /* Botón Large (Try it now) */
+    .btn-large { padding: 20px 40px; font-size: 1.1rem; border-radius: 8px; }
 
 
-/* --- HERO SLIDER --- */
-.hero-slider-section { position: relative; width: 100%; height: 85vh; min-height: 600px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-main); }
-.creative-slider--wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-.swiper { width: 100%; height: 100%; }
-.slide-bg { width: 100%; height: 100%; background-size: cover; background-position: center; transform: scale(1); transition: transform 8s ease; }
-.swiper-slide-active .slide-bg { transform: scale(1.1); }
-.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, 
-                rgba(248, 249, 250, 0.35) 0%, 
-                rgba(248, 249, 250, 0.25) 50%, 
-                rgba(248, 249, 250, 5) 100%); z-index: 1; backdrop-filter: blur(2px); }
-.hero-content { position: relative; z-index: 10; text-align: center; max-width: 800px; padding: 0 20px; }
-.hero-content h1 { font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -1.5px; }
-.pill.mono { display: inline-block; padding: 6px 14px; border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: -0.5px; }
-
-/* --- TABLET SECTION (MODIFICADA) --- */
-.tablet-section.no-bg {
-    background-color: transparent; border-top: none; padding: 40px 0 120px; overflow: visible;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    position: relative; z-index: 5;
-}
-.tablet-header { text-align: center; margin-bottom: 80px; color: var(--text-main); z-index: 5; position: relative; }
-.surface-container {
-    position: relative;
-    width: 500px;
-    height: 317px;
-    transform-origin: center center;
-    z-index: 2;
+    /* --- HERO SLIDER --- */
+    .hero-slider-section { position: relative; width: 100%; height: 90vh; min-height: 600px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: white; }
+    .creative-slider--wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .swiper { width: 100%; height: 100%; }
+    .slide-bg { width: 100%; height: 100%; background-size: cover; background-position: center; transform: scale(1); transition: transform 8s ease; /* Fotos en BN */ }
+    .swiper-slide-active .slide-bg { transform: scale(1.1); }
     
-    /* Márgenes ajustados para esta escala */
-    margin-top: 20px; 
-    margin-bottom: 120px; 
+    /* Overlay Gradiente Crema */
+    .hero-overlay { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background: linear-gradient(to bottom, 
+                rgba(242, 239, 233, 0.1) 0%, 
+                rgba(242, 239, 233, 0.25) 50%, 
+                #F2EFE9 100%); /* Funde con el fondo crema */
+        z-index: 1; backdrop-filter: blur(1px); 
+    }
+    
+    .hero-content { position: relative; z-index: 10; text-align: center; max-width: 800px; padding: 0 20px; }
+    
+    .pill.mono { 
+        display: inline-block; padding: 8px 16px; 
+        border: 1px solid var(--text-main); 
+        border-radius: 99px; font-size: 11px; font-weight: 500; 
+        background: transparent; 
+        font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; color: var(--text-main);
+    }
 
-    /* ESTADO INICIAL (Antes de aparecer) */
-    transform: scale(1.5) translateY(40px); 
-    opacity: 0; 
-    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* ESTADO FINAL (Visible) */
-.surface-container.visible {
-    opacity: 1;
-    /* Mantiene la escala 2.5 al terminar la animación */
-    transform: scale(1.5) translateY(0) !important;
-}
-.surface { border: 2px solid #E6E6E6; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
-.surface, .shine { background-color: #111; position: absolute; left: 0; top: 0; pointer-events: none; transition: transform 0.9s; border-radius: 10px; width: 500px; height: 317px; }
-.display { transition: opacity 0.9s; position: absolute; left: 20px; right: 20px; top: 20px; bottom: 20px; background-color: #000; z-index: 1; overflow: hidden; border-radius: 4px; }
-.tablet-content { width: 100%; height: 100%; background: #000; position: relative; overflow: hidden; }
-.tablet-slider-wrapper { display: flex; width: 300%; height: 100%; animation: tabletSlide 12s infinite cubic-bezier(0.45, 0, 0.55, 1); }
-.t-slide { width: 33.333%; height: 100%; flex-shrink: 0; }
-.t-slide-img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes tabletSlide { 0%, 25% { transform: translateX(0); } 33%, 58% { transform: translateX(-33.333%); } 66%, 91% { transform: translateX(-66.666%); } 100% { transform: translateX(0); } }
-.sense { width: 100px; height: 84.25px; float: left; position: relative; z-index: 10; }
-.shine { width: 900px; height: 537px; margin-left: -200px; margin-top: -100px; transition: all 0.9s; background: linear-gradient(115deg, rgba(255,255,255,0), rgba(255,255,255,0) 60%, #fff 60%, rgba(255,255,255,0.8) 100%); z-index: 2; opacity: 0.3; }
-.sense:hover ~ .surface { transform: perspective(50em) rotateX(-5deg) rotateY(5deg); }
-.sense:nth-child(5n-4):hover ~ .surface { transform: perspective(50em) rotateX(-5deg) rotateY(-5deg); }
-.sense:nth-child(n+10):hover ~ .surface { transform: perspective(50em) rotateX(5deg) rotateY(5deg); }
-.sense:hover ~ .surface .shine { top: 0; left: 0; opacity: 0.5; }
-
-
-/* --- OTRAS SECCIONES (Resumidas) --- */
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
-.feature-card { background: var(--surface-color); padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow-soft); }
-.feature-card .icon { font-size: 2rem; margin-bottom: 1rem; }
-.reader-visual { background: var(--surface-color); padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow-soft); }
-.sheet-music-ui .ui-header { display: flex; gap: 8px; margin-bottom: 20px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; }
-.red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-.sessions-section { background: var(--surface-color); }
-.human-connection-visual { background: #EBE6D9; border-radius: var(--border-radius); height: 300px; display: flex; align-items: center; justify-content: center; gap: 20px; position: relative; }
-.avatar-teacher, .avatar-student { width: 80px; height: 80px; background: #555; border-radius: 50%; border: 4px solid #fff; background-size: cover; background-position: center; }
-.avatar-student { background-color: #ccc; }
-.connection-line { position: absolute; bottom: 20px; background: #ff5f56; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;}
-
-
-/* --- SECCIÓN DESCARGA (ESTILO CLARO) --- */
-.download-section.light-mode { background-color: var(--bg-color); color: var(--text-main); padding: 6rem 0 2rem; }
-.download-title { font-size: 2.5rem; color: var(--text-main); margin-bottom: 1rem; }
-.download-subtitle { font-size: 1.1rem; color: var(--text-light); max-width: 700px; margin: 0 auto 3rem auto; line-height: 1.6; }
-.store-badges-container { display: flex; gap: 20px; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap; }
-.store-badge img { height: 50px; width: auto; transition: transform 0.2s ease; display: block; }
-.store-badge:hover img { transform: translateY(-3px); opacity: 0.9; }
-.devices-mockup-wrapper { width: 100%; max-width: 1000px; margin: 0 auto; display: flex; justify-content: center; }
-.devices-img-responsive { width: 100%; height: auto; display: block; }
-
-
-/* --- RESEÑAS --- */
-.reviews-section { padding: 5rem 0 7rem; background-color: var(--bg-color); }
-.review-card { background: var(--surface-color); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; height: auto; border: 1px solid rgba(0,0,0,0.05); }
-.review-stars { color: var(--accent-color); font-size: 1.2rem; margin-bottom: 1rem; }
-.review-text { font-size: 1.1rem; font-style: italic; color: var(--text-main); flex-grow: 1; }
-.review-author { display: flex; align-items: center; gap: 1rem; margin-top: 2rem; }
-.author-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #ddd; background-size: cover; background-position: center; }
-.author-info { display: flex; flex-direction: column; }
-.author-info strong { font-weight: 600; color: var(--text-main); }
-.author-info span { font-size: 0.9rem; color: var(--text-light); }
-.swiper-pagination-bullet { background: var(--text-light); opacity: 0.5; width: 10px; height: 10px; margin: 0 6px !important; }
-.swiper-pagination-bullet-active { background: var(--accent-color); opacity: 1; }
+    /* --- TABLET ANIMATION (Adaptada a Crema) --- */
+    .tablet-section.no-bg {
+        background-color: transparent; border-top: none; padding: 40px 0 120px; overflow: visible;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        position: relative; z-index: 5;
+    }
+    .tablet-header { text-align: center; margin-bottom: 80px; z-index: 5; position: relative; }
+    
+    .surface-container {
+        position: relative; width: 500px; height: 317px; transform-origin: center center; z-index: 2;
+        margin-top: 20px; margin-bottom: 120px;
+        transform: scale(1.5) translateY(40px); opacity: 0; 
+        transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .surface-container.visible { opacity: 1; transform: scale(1.5) translateY(0) !important; }
+    
+    /* Tablet Marco */
+    .surface { 
+        border: 2px solid #333; /* Marco oscuro */
+        overflow: hidden; 
+        box-shadow: 0 40px 100px rgba(0,0,0,0.2); 
+        background-color: #111; 
+        border-radius: 12px; width: 500px; height: 317px; position: absolute; left: 0; top: 0; pointer-events: none; transition: transform 0.9s;
+    }
+    .display { position: absolute; left: 15px; right: 15px; top: 15px; bottom: 15px; background-color: #000; z-index: 1; overflow: hidden; border-radius: 4px; }
+    
+    .tablet-content { width: 100%; height: 100%; background: #000; position: relative; overflow: hidden; }
+    .tablet-slider-wrapper { display: flex; width: 300%; height: 100%; animation: tabletSlide 12s infinite cubic-bezier(0.45, 0, 0.55, 1); }
+    .t-slide { width: 33.333%; height: 100%; flex-shrink: 0; }
+    .t-slide-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+    @keyframes tabletSlide { 0%, 25% { transform: translateX(0); } 33%, 58% { transform: translateX(-33.333%); } 66%, 91% { transform: translateX(-66.666%); } 100% { transform: translateX(0); } }
+    
+    .sense { width: 100px; height: 84.25px; float: left; position: relative; z-index: 10; }
+    /* Brillo sutil */
+    .shine { width: 900px; height: 537px; margin-left: -200px; margin-top: -100px; transition: all 0.9s; background: linear-gradient(115deg, rgba(255,255,255,0), rgba(255,255,255,0) 60%, rgba(255,255,255,0.1) 60%, rgba(255,255,255,0.4) 100%); z-index: 2; opacity: 0.3; position: absolute; pointer-events: none; }
+    
+    /* Hover effects Tablet */
+    .sense:hover ~ .surface { transform: perspective(50em) rotateX(-5deg) rotateY(5deg); }
+    .sense:nth-child(5n-4):hover ~ .surface { transform: perspective(50em) rotateX(-5deg) rotateY(-5deg); }
+    .sense:nth-child(n+10):hover ~ .surface { transform: perspective(50em) rotateX(5deg) rotateY(5deg); }
 
 
-/* --- NUEVA SECCIÓN: TRY IT NOW (DARK SLIDER) --- */
-/* Busca este bloque y actualiza la altura */
+    /* --- CHIPS (Minimalistas) --- */
+    .download-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .chip {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 16px; border-radius: 50px; 
+        font-size: 0.85rem; font-weight: 500; font-family: var(--font-body);
+        border: 1px solid rgba(28,28,28,0.2); color: var(--text-main);
+        background: transparent;
+        transition: var(--transition);
+    }
+    .chip i { font-size: 1.1rem; }
+    .chip:hover { border-color: var(--text-main); background: var(--surface-color); }
+
+
+    /* --- MAC SAFARI SIMULATOR (Theme: Cream) --- */
+    .mac-window {
+        width: 100%; height: 500px;
+        background: var(--surface-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow-soft);
+        display: flex; flex-direction: column; overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.08); position: relative;
+    }
+    @media (min-width: 768px) { .mac-window { height: 600px; } }
+
+    /* Header Safari color Crema Oscuro */
+    .window-header.safari-theme {
+        height: 52px;
+        background: #f3f4f6; /* Crema más oscuro para la barra */
+        border-bottom: 1px solid #DEDBD5;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 18px; gap: 20px; flex-shrink: 0;
+    }
+
+    /* Puntos Mac minimalistas */
+    .traffic-lights { display: flex; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+    .close { background: #FF5F57; } .minimize { background: #FEBC2E; } .maximize { background: #28C840; }
+
+    .safari-btn {
+        background: transparent; border: none; width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-main); font-size: 16px; cursor: pointer; border-radius: 4px;
+    }
+    .safari-btn:hover { background: rgba(0,0,0,0.05); }
+
+    .safari-address-bar {
+        flex: 1; height: 34px;
+        background: #FDFBF8; /* Blanco cálido */
+        border: 1px solid #DEDBD5;
+        border-radius: 6px;
+        display: flex; align-items: center; padding: 0 10px; gap: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .url-input {
+        border: none; background: transparent; width: 100%; height: 100%;
+        font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+        text-align: center; outline: none;
+    }
+    .main-iframe { flex: 1; width: 100%; border: none; background: #fff; }
+
+    
+    /* --- SECCIÓN VISUALS --- */
+    .reader-visual { 
+        background: var(--surface-color); 
+        padding: 2rem; border-radius: var(--border-radius); 
+        box-shadow: var(--shadow-soft); border: 1px solid var(--surface-border);
+    }
+    
+    .sheet-music-ui .ui-header { display: flex; gap: 8px; margin-bottom: 20px; }
+    
+    /* Human Connection */
+    .sessions-section { background: var(--surface-color); border-top: 1px solid var(--surface-border); border-bottom: 1px solid var(--surface-border); }
+    .human-connection-visual { 
+        background: #F2EFE9; /* Invertido */
+        border-radius: var(--border-radius); height: 300px; 
+        display: flex; align-items: center; justify-content: center; gap: 20px; position: relative; 
+    }
+    .avatar-teacher, .avatar-student { 
+        width: 80px; height: 80px; border-radius: 50%; 
+        border: 3px solid #fff; background-size: cover; background-position: center; filter: grayscale(100%); transition: filter 0.3s;
+    }
+    .human-connection-visual:hover .avatar-teacher, .human-connection-visual:hover .avatar-student { filter: grayscale(0%); }
+    .connection-line { 
+        position: absolute; bottom: 20px; 
+        background: var(--text-main); color: #fff; 
+        padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 600; font-family: var(--font-mono);
+    }
+
 .try-it-now-section {
     position: relative;
     width: 100%;
@@ -203,7 +301,7 @@ section { padding: 5rem 0; }
     z-index: 1;
 }
 
-.try-content { position: relative; z-index: 10; max-width: 600px; text-align: left; left: 25px;}
+.try-content { position: relative; z-index: 10; max-width: 600px; text-align: left; left: 25px; }
 .try-content h1 { font-size: 3rem; margin-bottom: 1.5rem; color: #fff; }
 
 /* Nuevo botón Azul para la sección de prueba */
@@ -212,6 +310,8 @@ section { padding: 5rem 0; }
     color: #ffffff;
     border: none;
     border-radius: 10px !important;
+    font-family: var(--font-body);
+    font-weight: 700;
 }
 
 .btn-blue:hover {
@@ -233,168 +333,79 @@ section { padding: 5rem 0; }
 .chip.dark-chip:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); }
 
 
-/* --- FOOTER (NEGRO) --- */
-.dark-footer { background-color: var(--dark-bg); color: var(--dark-text); padding: 5rem 0 2rem; font-size: 0.95rem; }
-.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
-.footer-col h4 { color: var(--dark-title); font-size: 1rem; letter-spacing: 1px; margin-bottom: 1.5rem; }
-.footer-logo { font-size: 1.8rem; font-weight: 700; color: var(--dark-title); margin-bottom: 1rem; }
-.logo-accent { color: #347AB7;; }
-.links-col ul { list-style: none; } .links-col li { margin-bottom: 0.8rem; }
-.links-col a { color: var(--dark-text); text-decoration: none; transition: color 0.3s ease; }
-.links-col a:hover { color: var(--accent-color); }
-.social-icons { display: flex; gap: 1rem; }
-.social-icons a { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: var(--dark-title); font-size: 1.2rem; text-decoration: none; transition: all 0.3s ease; }
-.social-icons a:hover { background: var(--accent-color); color: var(--dark-bg); transform: translateY(-3px); }
-.footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: #777; }
-
-/* Animaciones */
-.fade-in { opacity: 0; transition: opacity 0.8s ease-out; }
-.slide-up { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-.visible { opacity: 1; transform: translateY(0); }
-.delay-1 { transition-delay: 0.2s; }
-
-
-/* --- MAC SAFARI SIMULATOR STYLES --- */
-
-/* Contenedor Principal de la Ventana */
-.mac-window {
-    width: 100%;
-    /* Altura adaptativa: en móvil más pequeña, en desktop más grande */
-    height: 500px; 
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); /* Sombra elegante */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.1);
-    position: relative;
-}
-
-@media (min-width: 768px) {
-    .mac-window { height: 600px; }
-}
-
-/* Header Safari */
-.window-header.safari-theme {
-    height: 52px;
-    background: #f3f4f6;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 18px;
-    gap: 20px;
-    flex-shrink: 0;
-}
-
-/* Controles (Semáforo y botones) */
-.header-controls { display: flex; align-items: center; gap: 12px; width: 140px; flex-shrink: 0; }
-.traffic-lights { display: flex; gap: 8px; margin-right: 8px; }
-.dot { width: 12px; height: 12px; border-radius: 50%; border: none; }
-.close { background: #ff5f57; }
-.minimize { background: #ffbd2e; }
-.maximize { background: #28ca41; }
-
-.safari-btn {
-    background: transparent; border: none; border-radius: 6px;
-    width: 34px; height: 34px;
-    display: flex; align-items: center; justify-content: center;
-    color: #4b5563; font-size: 16px; cursor: pointer;
-    transition: background 0.2s;
-}
-.safari-btn:hover { background: rgba(0,0,0,0.08); }
-.safari-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-/* Barra de Dirección */
-.safari-address-bar {
-    flex: 1;
-    height: 34px;
-    background: #e5e7eb;
-    border-radius: 8px;
-    display: flex; align-items: center;
-    padding: 0 10px; gap: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-    transition: all 0.2s;
-}
-.safari-address-bar:focus-within {
-    background: #fff;
-    box-shadow: 0 0 0 2px #3b82f6;
-}
-
-.url-input {
-    border: none; background: transparent;
-    width: 100%; height: 100%;
-    font-family: var(--font-main); /* Usamos tu fuente Inter */
-    font-size: 13px; color: #111;
-    text-align: center; outline: none;
-}
-
-.icon-faded { color: #6b7280; font-size: 14px; }
-.refresh-icon { font-size: 12px; cursor: pointer; }
-.refresh-icon:hover { color: #111; }
-
-/* Herramientas derecha (ocultas en móvil muy pequeño) */
-.header-tools { display: flex; justify-content: flex-end; gap: 5px; width: 140px; flex-shrink: 0; }
-
-/* Iframe y Loader */
-.main-iframe {
-    flex: 1; width: 100%; border: none; background: #fff;
-}
-
-.browser-loader-container {
-    height: 2px; background: #e5e7eb; width: 100%;
-}
-.loader-bar {
-    height: 100%; background: #3b82f6; width: 0%; transition: width 0.5s ease;
-}
-.loader-bar.loading { width: 70%; }
-.loader-bar.loaded { width: 100%; opacity: 0; transition: width 0.3s, opacity 0.3s 0.3s; }
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .header-tools, .sidebar-toggle { display: none; }
-    .header-controls { width: auto; }
-}
-
-/* RESPONSIVE */
-@media (min-width: 768px) {
-    .grid-2 { grid-template-columns: 1fr 1fr; }
-    .center-text { text-align: center; }
-}
-@media (max-width: 768px) {
-    .hero-content h1, .try-content h1 { font-size: 2.5rem; }
-    .surface-container {
-        margin-top: 0;
-        margin-bottom: 30px;
-        transform: scale(1.05) translateY(20px); 
-    }
-    .surface-container.visible {
-        transform: scale(1.05) translateY(0) !important;
-    }
-    .tablet-header { margin-bottom: 40px; }
-    .download-title { font-size: 2rem; }
-    .store-badge img { height: 42px; }
-    .try-content { text-align: center; margin: 0 auto; }
-    .download-chips { justify-content: center !important; }
+    /* --- FOOTER (Invertido: Negro) --- */
+    .dark-footer { background-color: #0F0F0F; color: #888; padding: 5rem 0 2rem; font-size: 0.95rem; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+    .footer-col h4 { color: #fff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 1.5rem; font-family: var(--font-body); }
     
-    .reverse-mobile { display: flex; flex-direction: column-reverse; }
-    .footer-grid { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
-    .brand-col { align-items: center; display: flex; flex-direction: column; }
-    .footer-desc, .social-icons { margin: 0 auto; }
-}
-
-
-
-@media (max-width: 548px) {
-     .surface-container {
-        transform: scale(0.75) translateY(20px); 
+    .footer-logo { font-size: 1.8rem; font-weight: 600; color: #fff; margin-bottom: 1rem; font-family: var(--font-title); }
+    .logo-accent { font-weight: 400; font-style: italic; }
+    
+    .links-col ul { list-style: none; } .links-col li { margin-bottom: 0.8rem; }
+    .links-col a { color: #888; text-decoration: none; transition: color 0.3s ease; }
+    .links-col a:hover { color: #fff; }
+    
+    .social-icons { display: flex; gap: 1rem; }
+    .social-icons a { 
+        display: flex; align-items: center; justify-content: center; 
+        width: 40px; height: 40px; border-radius: 50%; 
+        background: rgba(255,255,255,0.05); color: #fff; 
+        font-size: 1.2rem; text-decoration: none; transition: all 0.3s ease; 
     }
-    .surface-container.visible {
-        transform: scale(0.75) translateY(0) !important;
+    .social-icons a:hover { background: #fff; color: #000; }
+    .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #555; }
+
+
+    /* --- REVIEWS --- */
+    .reviews-section { background-color: var(--bg-color); padding: 5rem 0; }
+    .review-card { 
+        background: var(--surface-color); padding: 2.5rem; 
+        border-radius: var(--border-radius); box-shadow: var(--shadow-soft); 
+        border: 1px solid var(--surface-border);
+        height: auto; 
     }
-}
+    .review-stars { color: var(--text-main); font-size: 1rem; margin-bottom: 1rem; letter-spacing: 2px; }
+    .review-text { font-size: 1.1rem; font-style: italic; color: var(--text-main); font-family: 'Playfair Display', serif; } /* Opcional serif para citas */
+    .author-info strong { font-family: var(--font-title); color: var(--text-main); }
+
+
+    /* Animaciones */
+    .fade-in { opacity: 0; transition: opacity 0.8s ease-out; }
+    .slide-up { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+    .visible { opacity: 1; transform: translateY(0); }
+    .delay-1 { transition-delay: 0.2s; }
+
+    /* Browser Loader Line */
+    .browser-loader-container { height: 2px; background: transparent; width: 100%; }
+    .loader-bar { height: 100%; background: var(--text-main); width: 0%; transition: width 0.5s ease; }
+    .loader-bar.loading { width: 70%; }
+    .loader-bar.loaded { width: 100%; opacity: 0; transition: width 0.3s, opacity 0.3s 0.3s; }
+
+    /* RESPONSIVE */
+    @media (min-width: 768px) {
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .center-text { text-align: center; }
+    }
+    @media (max-width: 768px) {
+        h1 { font-size: 2.8rem; }
+        .surface-container {
+            margin-top: 0; margin-bottom: 30px;
+            transform: scale(1.05) translateY(20px); 
+        }
+        .surface-container.visible { transform: scale(1.05) translateY(0) !important; }
+        .download-chips { justify-content: center !important; }
+        .reverse-mobile { display: flex; flex-direction: column-reverse; }
+        .footer-grid { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
+        .brand-col { align-items: center; display: flex; flex-direction: column; }
+        .footer-desc, .social-icons { margin: 0 auto; }
+        .try-content { padding-left: 0; text-align: center; margin: 0 auto;}
+    }
+    @media (max-width: 548px) {
+         .surface-container { transform: scale(0.75) translateY(20px); }
+        .surface-container.visible { transform: scale(0.75) translateY(0) !important; }
+    }
 </style>
+</head>
 <body>
 
     <section class="hero-slider-section">
@@ -402,13 +413,10 @@ section { padding: 5rem 0; }
             <div class="swiper creative-slider">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
-                        <div class="slide-bg" style="background-image: url('https://lh3.googleusercontent.com/d/1574yKLK-x78N7AYfRtLRpUVv7ihC3dui=s1000');"></div>
+                        <div class="slide-bg" style="background-image: url('https://lh3.googleusercontent.com/d/1n9VD38La7Z1vqYRGGJiAtkwmUFVUT502=s1000');"></div>
                     </div>
                     <div class="swiper-slide">
-                        <div class="slide-bg" style="background-image: url('https://lh3.googleusercontent.com/d/1pMcooeGePOlo2rBVxJ9kES0I2h33ACLy');"></div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="slide-bg" style="background-image: url('https://lh3.googleusercontent.com/d/15FbOHaYX6jPjCkgfaayMDU3cPpbEM0W3');"></div>
+                        <div class="slide-bg" style="background-image: url('https://lh3.googleusercontent.com/d/1DXqRvjuuF9Co8e_KVJgyEXCF4aSHMR2v=s1000');"></div>
                     </div>
                 </div>
             </div>
@@ -416,19 +424,19 @@ section { padding: 5rem 0; }
         <div class="hero-overlay"></div>
         <div class="hero-content fade-in">
             <div class="pill mono" style="margin-bottom: 20px;">v2.0 Beta Live • Zero Latency</div>
-            <h1>Infraestructura de piano<br>sin límites de velocidad.</h1>
-            <p>La primera plataforma de educación musical construida sobre una arquitectura serverless escalable. Sin cortes. Pura transmisión de datos MIDI.</p>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                <button class="btn btn-primary">Start Learning</button>
-                <button class="btn btn-outline">View Specs</button>
+            <h1>Infraestructura de piano<br>sin límites.</h1>
+            <p>La plataforma educativa construida con precisión, elegancia y tecnología serverless. Pura transmisión de música.</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <button class="btn btn-primary">Comenzar</button>
+                <button class="btn btn-outline">Ver especificaciones</button>
             </div>
         </div>
     </section>
 
     <section class="tablet-section no-bg">
         <div class="tablet-header fade-in">
-            <h2>El Ciclo de Virtuosismo</h2>
-            <p>Cómo nuestra infraestructura convierte tus datos de práctica en progreso tangible.</p>
+            <h2>El Ciclo del Virtuosismo</h2>
+            <p>Convierte datos de práctica en progreso tangible con una interfaz limpia.</p>
         </div> 
         
         <div class="surface-container slide-up">
@@ -442,13 +450,13 @@ section { padding: 5rem 0; }
                 <div class="tablet-content">
                     <div class="tablet-slider-wrapper">
                         <div class="t-slide">
-                            <img src="https://lh3.googleusercontent.com/d/1EeBcTI_lVPOQT69EJc9376whHtV0nsaO=s1000" class="t-slide-img" alt="App Screen 1">
+                            <img src="https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=1000&auto=format&fit=crop" class="t-slide-img" alt="App Screen 1">
                         </div>
                         <div class="t-slide">
-                            <img src="https://lh3.googleusercontent.com/d/1y4JvjneUAhhPmjKrpM3N-PJBFtGJe5nA=s1000" class="t-slide-img" alt="App Screen 2">
+                            <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop" class="t-slide-img" alt="App Screen 2">
                         </div>
                         <div class="t-slide">
-                             <img src="https://lh3.googleusercontent.com/d/14Z2nzr2OrqWXu_CtVEc203hy7_eJfwSP=s1000" class="t-slide-img" alt="App Screen 3">
+                             <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1000&auto=format&fit=crop" class="t-slide-img" alt="App Screen 3">
                         </div>
                     </div>
                 </div>
@@ -461,38 +469,49 @@ section { padding: 5rem 0; }
             <span class="chip"><i class='bx bxl-apple'></i> Mac</span>
             <span class="chip"><i class='bx bxl-windows'></i> Win</span>
             <span class="chip"><i class='bx bxl-apple'></i> iPad</span>
-            <span class="chip"><i class='bx bxl-apple'></i> Drums for iPhone</span>
+            <span class="chip"><i class='bx bxl-android'></i> Android</span>
         </div>
-
     </section>
 
     <section class="lessons-section">
         <div class="container">
-            <div class="section-header center-text fade-in">
-                <h2>Lecciones secuenciadas y progresivas</h2>
-                <p>Avanza desde lo básico hasta niveles avanzados con contenido cuidadosamente estructurado.</p>
+            <div class="section-header center-text fade-in" style="margin-bottom: 60px;">
+                <h2>Lecciones secuenciadas</h2>
+                <p>Estructura progresiva. Diseño distraction-free.</p>
             </div>
-            <div class="reader-visual slide-up">
-                <div class="sheet-music-ui">
-                    <div class="ui-header">
-                        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-                    </div>
-                    <div class="ui-body" style="display: flex; justify-content: center; align-items: center; height: 200px; color: var(--text-light);">
-                       <span style="font-family: var(--font-mono);">[Interactive Score Placeholder]</span>
+            
+            <div class="grid-2">
+                 <div class="text-content fade-in">
+                     <h3 style="margin-bottom: 1rem;">Teoría aplicada</h3>
+                     <p>No solo aprendas las notas. Entiende la música. Nuestro sistema visualiza la armonía en tiempo real.</p>
+                     <ul style="list-style: none; margin-top: 20px; color: var(--text-muted);">
+                         <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><i class="ri-check-line"></i> Análisis armónico</li>
+                         <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><i class="ri-check-line"></i> Ritmo interactivo</li>
+                         <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><i class="ri-check-line"></i> Repertorio clásico</li>
+                     </ul>
+                 </div>
+                 <div class="reader-visual slide-up">
+                    <div class="sheet-music-ui">
+                        <div class="ui-header">
+                            <span class="dot close"></span><span class="dot minimize"></span><span class="dot maximize"></span>
+                        </div>
+                        <div class="ui-body" style="display: flex; justify-content: center; align-items: center; height: 250px; background: #fff; border-radius: 4px; border: 1px solid #eee;">
+                           <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Beethoven_Sonata_Op31_No1_1st_mov_opening.png" style="width: 80%; opacity: 0.8; filter: contrast(120%);" alt="Partitura">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-   <section class="reader-section">
+    <section class="reader-section">
         <div class="container">
             <div class="text-content center-text mb-large fade-in">
-                <h2>Práctica inteligente sobre la partitura</h2>
-                <p>Nuestro lector interactivo funciona directamente en el navegador. Pruébalo aquí mismo.</p>
+                <h2>Práctica inteligente en la web</h2>
+                <p>Sin descargas. Accede a tu cuenta Mozart+ desde cualquier navegador moderno.</p>
             </div>
             
-            <div class="reader-visual slide-up" style="padding: 0; background: transparent; box-shadow: none;">
+            <div class="reader-visual slide-up" style="padding: 0; background: transparent; box-shadow: none; border: none;">
                 <div class="mac-window">
                     <div class="window-header safari-theme">
                         <div class="header-controls">
@@ -501,27 +520,19 @@ section { padding: 5rem 0; }
                                 <div class="dot minimize"></div>
                                 <div class="dot maximize"></div>
                             </div>
-                            <button class="safari-btn sidebar-toggle">
-                                <i class="ri-layout-left-line"></i>
-                            </button>
-                            <div style="display:flex; margin-left:5px;">
-                                <button class="safari-btn" id="browser-back"><i class="ri-arrow-left-s-line"></i></button>
-                                <button class="safari-btn disabled"><i class="ri-arrow-right-s-line"></i></button>
+                            <div style="display:flex; margin-left:15px; gap: 5px;">
+                                <button class="safari-btn"><i class="ri-arrow-left-s-line"></i></button>
+                                <button class="safari-btn"><i class="ri-arrow-right-s-line"></i></button>
                             </div>
                         </div>
 
                         <div class="safari-address-bar">
-                            <i class="ri-shield-check-line icon-faded"></i>
-                            <input type="text" class="url-input" id="browser-input" value="mozartplus.com/demo/score">
-                            <i class="ri-refresh-line icon-faded refresh-icon" id="browser-reload"></i>
+                            <i class="ri-lock-fill" style="font-size: 12px; color: #888;"></i>
+                            <input type="text" class="url-input" id="browser-input" value="app.mozartplus.com/learn">
+                            <i class="ri-refresh-line refresh-icon" id="browser-reload" style="font-size: 12px; color: #888; cursor: pointer;"></i>
                         </div>
 
-                        <div class="header-tools">
-                            <button class="safari-btn"><i class="ri-share-upload-line"></i></button>
-                            <button class="safari-btn"><i class="ri-add-line"></i></button>
-                            <button class="safari-btn"><i class="ri-file-copy-line"></i></button>
-                        </div>
-                    </div>
+                        <div style="width: 100px;"></div> </div>
                     
                     <div class="browser-loader-container">
                         <div class="loader-bar" id="browser-loader"></div>
@@ -536,85 +547,50 @@ section { padding: 5rem 0; }
     <section class="sessions-section">
         <div class="container grid-2 reverse-mobile">
             <div class="text-content fade-in">
-                <h2>Conecta con profesores reales</h2>
-                <p>Recibe guía personalizada y correcciones en tiempo real a través de videollamadas integradas con baja latencia.</p>
-                <button class="btn btn-secondary">Conocer profesores</button>
+                <h2>Profesores reales, conexión humana</h2>
+                <p>La tecnología facilita el aprendizaje, pero la humanidad lo hace arte. Agenda sesiones en vivo.</p>
+                <button class="btn btn-secondary">Ver profesores</button>
             </div>
             <div class="image-placeholder slide-up">
                 <div class="human-connection-visual">
-                    <div class="avatar-teacher" style="background-image: url('https://i.pravatar.cc/150?img=12');"></div>
-                    <div class="avatar-student" style="background-image: url('https://i.pravatar.cc/150?img=33');"></div>
-                    <div class="connection-line">Live Session</div>
+                    <div class="avatar-teacher" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=200&auto=format&fit=crop');"></div>
+                    <div class="avatar-student" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop');"></div>
+                    <div class="connection-line">Sesión en vivo</div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="download-section light-mode">
-        <div class="container center-text fade-in">
-            <h2 class="download-title">Una suscripción para todos tus dispositivos</h2>
-            <p class="download-subtitle">
-                Disfruta de Piano Quest Pro en todos tus dispositivos y en línea: 
-                iOS, Android, macOS y web — con una sola suscripción y una única cuenta.
-            </p>
-            
-            <div class="store-badges-container slide-up">
-                <a href="#" class="store-badge">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Consíguelo en el App Store">
-                </a>
-                <a href="#" class="store-badge">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Disponible en Google Play">
-                </a>
-            </div>
-
-            <div class="devices-mockup-wrapper slide-up delay-1">
-                <img src="https://lh3.googleusercontent.com/d/1w7PsXn3oHFRUCnxGqUtp9BznS628dvl7" 
-                     alt="Soporte multidispositivo" 
-                     class="devices-img-responsive">
             </div>
         </div>
     </section>
 
     <section class="reviews-section">
         <div class="container">
-            <div class="section-header center-text fade-in">
-                <h2>Lo que dicen nuestros estudiantes</h2>
-                <p>Historias reales de progreso y pasión musical.</p>
+            <div class="section-header center-text fade-in" style="margin-bottom: 40px;">
+                <h2>Testimonios</h2>
             </div>
             
             <div class="swiper reviews-slider slide-up">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide review-card">
                         <div class="review-stars">★★★★★</div>
-                        <p class="review-text">"La interfaz es preciosa y las lecciones son súper intuitivas. ¡Totalmente recomendado!"</p>
-                        <div class="review-author">
-                            <div class="author-avatar" style="background-image: url('https://i.pravatar.cc/100?img=1');"></div>
-                            <div class="author-info"><strong>Ana M.</strong><span>Estudiante de Piano</span></div>
+                        <p class="review-text">"La interfaz es preciosa y las lecciones son súper intuitivas. Una experiencia premium."</p>
+                        <div class="review-author" style="margin-top: 20px; display:flex; gap: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; background-image: url('https://i.pravatar.cc/150?img=68'); background-size: cover;"></div>
+                            <div class="author-info"><strong>Ana M.</strong><br><span style="font-size: 0.8rem; color: #888;">Piano Principiante</span></div>
                         </div>
                     </div>
                     <div class="swiper-slide review-card">
                         <div class="review-stars">★★★★★</div>
-                        <p class="review-text">"La retroalimentación en tiempo real es increíble. Siento que avanzo mucho más rápido."</p>
-                        <div class="review-author">
-                            <div class="author-avatar" style="background-image: url('https://i.pravatar.cc/100?img=3');"></div>
-                            <div class="author-info"><strong>Carlos R.</strong><span>Guitarrista</span></div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide review-card">
-                        <div class="review-stars">★★★★★</div>
-                        <p class="review-text">"Una herramienta indispensable para mi práctica diaria. Vale cada centavo."</p>
-                        <div class="review-author">
-                            <div class="author-avatar" style="background-image: url('https://i.pravatar.cc/100?img=59');"></div>
-                            <div class="author-info"><strong>Luisa P.</strong><span>Violinista</span></div>
+                        <p class="review-text">"El diseño limpio me ayuda a concentrarme en la música, no en los menús."</p>
+                        <div class="review-author" style="margin-top: 20px; display:flex; gap: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; background-image: url('https://i.pravatar.cc/150?img=11'); background-size: cover;"></div>
+                            <div class="author-info"><strong>Carlos R.</strong><br><span style="font-size: 0.8rem; color: #888;">Compositor</span></div>
                         </div>
                     </div>
                 </div>
-                <div class="swiper-pagination"></div>
             </div>
         </div>
     </section>
 
-    <section class="try-it-now-section">
+     <section class="try-it-now-section">
         <div class="try-slider--wrap">
             <div class="swiper creative-slider">
                 <div class="swiper-wrapper">
@@ -649,23 +625,22 @@ section { padding: 5rem 0; }
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col brand-col">
-                    <div class="footer-logo"><span class="logo-text">Mozart</span><span class="logo-accent">Plus+</span></div>
-                    <p class="footer-desc">Revolucionando la educación musical con tecnología y pasión.</p>
+                    <div class="footer-logo">Mozart<span class="logo-accent">+</span></div>
+                    <p class="footer-desc">Revolucionando la educación musical con elegancia.</p>
                 </div>
                 <div class="footer-col links-col">
                     <h4>ACADEMIA</h4>
                     <ul>
-                        <li><a href="#">Planes y Precios</a></li>
-                        <li><a href="#">Login Alumnos</a></li>
-                        <li><a href="#">Términos y Condiciones</a></li>
+                        <li><a href="#">Planes</a></li>
+                        <li><a href="#">Login</a></li>
+                        <li><a href="#">Términos</a></li>
                     </ul>
                 </div>
                 <div class="footer-col social-col">
                     <h4>SÍGUENOS</h4>
                     <div class="social-icons">
-                        <a href="#" aria-label="Facebook"><i class='bx bxl-facebook-circle'></i></a>
-                        <a href="#" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
-                        <a href="#" aria-label="TikTok"><i class='bx bxl-tiktok'></i></a>
+                        <a href="#"><i class='bx bxl-instagram'></i></a>
+                        <a href="#"><i class='bx bxl-tiktok'></i></a>
                     </div>
                 </div>
             </div>
@@ -676,114 +651,62 @@ section { padding: 5rem 0; }
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-   
-</body>
- <script >
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. Inicializar Swiper para los Sliders de Fondo (Hero y Try It Now)
-    // Al usar la misma clase '.creative-slider', este código inicializará ambos.
-    const backgroundSliders = new Swiper(".creative-slider", {
-        spaceBetween: 0,
-        effect: "fade",
-        speed: 2000,
-        fadeEffect: { crossFade: true },
-        loop: true,
-        autoplay: {
-            delay: 6000,
-            disableOnInteraction: false,
-        },
-        allowTouchMove: false,
-    });
+            // Slider Hero
+            new Swiper(".creative-slider", {
+                spaceBetween: 0,
+                effect: "fade",
+                speed: 2000,
+                fadeEffect: { crossFade: true },
+                loop: true,
+                autoplay: { delay: 6000, disableOnInteraction: false },
+                allowTouchMove: false,
+            });
 
-    // 2. Reviews Slider (Sin cambios)
-    const reviewsSwiper = new Swiper(".reviews-slider", {
-        slidesPerView: 1,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
-        breakpoints: {
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 2 }
-        }
-    });
+            // Reviews Slider
+            new Swiper(".reviews-slider", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: { delay: 5000 },
+                breakpoints: { 768: { slidesPerView: 2 } }
+            });
 
-    // 3. Intersection Observer para animaciones (Sin cambios)
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1 
-    };
+            // Animaciones Scroll
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
 
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+            document.querySelectorAll('.fade-in, .slide-up').forEach(el => observer.observe(el));
+
+            // Browser Loader Logic
+            const browserInput = document.getElementById('browser-input');
+            const browserLoader = document.getElementById('browser-loader');
+            const browserIframe = document.getElementById('browser-iframe');
+            const browserReload = document.getElementById('browser-reload');
+
+            function loadUrl() {
+                browserLoader.classList.remove('loaded');
+                browserLoader.classList.add('loading');
+                setTimeout(() => {
+                    browserLoader.classList.remove('loading');
+                    browserLoader.classList.add('loaded');
+                }, 1500);
             }
+
+            if(browserReload) browserReload.addEventListener('click', () => {
+                 browserIframe.src = browserIframe.src; 
+                 loadUrl(); 
+            });
+            
+            setTimeout(() => { if(browserLoader) browserLoader.classList.add('loaded'); }, 1000);
         });
-    }, observerOptions);
-
-    const animatedElements = document.querySelectorAll('.fade-in, .slide-up');
-    animatedElements.forEach(el => observer.observe(el));
-
-
-    const browserInput = document.getElementById('browser-input');
-    const browserIframe = document.getElementById('browser-iframe');
-    const browserReload = document.getElementById('browser-reload');
-    const browserLoader = document.getElementById('browser-loader');
-    
-    // Función para "cargar" la URL
-    function loadUrl() {
-        let url = browserInput.value;
-        
-        // Simulación visual de carga
-        browserLoader.classList.remove('loaded');
-        browserLoader.classList.add('loading');
-        
-        // Si no tiene https, lo añadimos (solo para la lógica, aunque el iframe necesita https real)
-        if (!url.startsWith('http')) {
-            // Nota: Para este demo, si el usuario escribe algo, 
-            // simplemente recargamos el iframe actual para no romperlo por CORS/X-Frame-Options
-            // En producción, aquí pondrías: browserIframe.src = "https://" + url;
-            console.log("Navegando a: " + url); 
-        }
-
-        // Simular tiempo de carga
-        setTimeout(() => {
-            browserLoader.classList.remove('loading');
-            browserLoader.classList.add('loaded');
-        }, 1500);
-    }
-
-    // Event Listeners
-    if(browserInput) {
-        browserInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loadUrl();
-        });
-    }
-
-    if(browserReload) {
-        browserReload.addEventListener('click', () => {
-            // Recargar iframe
-            browserIframe.src = browserIframe.src;
-            loadUrl();
-        });
-    }
-
-    // Carga inicial
-    setTimeout(() => {
-        if(browserLoader) browserLoader.classList.add('loaded');
-    }, 1000);
-});
-
-
     </script>
+</body>
 </html>
