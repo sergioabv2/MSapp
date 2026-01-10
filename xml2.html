@@ -3770,6 +3770,18 @@ function advanceLearningStep() {
     activeHighlightTimeouts.length = 0;
     expectedNotes.clear();
 
+    if (isLoopMode && parsedNotes[currentLearningIndex]) {
+        // Obtenemos en qué compás está la nota que TOCA aprender ahora
+        const currentMsIndex = getCurrentMeasureIndex();
+        
+        // Si ese compás es mayor al límite final del loop...
+        if (currentMsIndex > loopMeasureEnd) {
+             // ...volvemos al compás de inicio
+             jumpToMeasureInLearnMode(loopMeasureStart);
+             return; // Detenemos la función aquí para que no siga avanzando
+        }
+    }
+
     const totalMeasures = osmd.sheet.SourceMeasures.length;
     if (currentLearningIndex >= parsedNotes.length) {
         if (!isPieceCompleted) {
