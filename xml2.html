@@ -1092,27 +1092,6 @@ display: flex;
   }
 }
 
-/* --- AÑADE ESTE BLOQUE DE CSS --- */
-
-.practice-progress-display {
-  font-size: 13px;
-  color: #555;
-  font-family: 'SF Mono', 'Menlo', 'monospace';
-  background-color: #f5f5f5;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.practice-progress-display #progress-label {
-  color: #999; /* Un color más sutil para la etiqueta */
-}
-
-.practice-progress-display #progress-value {
-  font-weight: 600;
-  color: #333; /* Color más fuerte para el valor */
-  margin-left: 4px;
-}
 
 #ai-practice-btn.active {
   background-color: #e0e0e0 !important;
@@ -1675,7 +1654,7 @@ display: flex;
     <img id="metronome-btn" src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" 
      style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px; cursor: pointer; opacity: 0.6; transition: all 0.2s;">
 
-<audio id="metronomeAudio" src="https://dashboard.mozartacademy.mx/media/metronom.mp3" loop style="display: none;"></audio>
+<audio id="metronomeAudio" src="https://www.mozart-app.com/lessons/metronome.mp3" loop style="display: none;"></audio>
          <div class="speed-display">
         <span class="zoom-display" id="speed-bpm">120 BPM</span>
    </div>
@@ -1731,10 +1710,9 @@ display: flex;
         <button id="restart-chunk-btn" class="btn" title="Reiniciar estos 4 compases">
             <i class="ri-skip-back-line"></i>
         </button>
-        <div id="practice-progress" class="practice-progress-display">
-          <span id="progress-label">Progreso:</span>
-          <span id="progress-value">0%</span>
-      </div>
+
+
+
          <select id="measure-select" class="btn" title="Ir al compás...">
     </select>
 
@@ -1870,8 +1848,7 @@ let showKeyNames = false;
 const successModal = document.getElementById('success-modal');
 const successModalMessage = document.getElementById('success-modal-message');
 const successModalCloseBtn = document.getElementById('success-modal-close-btn');
-const practiceProgressDisplay = document.getElementById('practice-progress');
-const progressValueSpan = document.getElementById('progress-value');
+
 let isPieceCompleted = false;
 let isSustainPedalDown = false;
 let sustainedNotes = new Set();
@@ -2996,7 +2973,6 @@ function nextTutorialStep() {
 
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
-        progressValueSpan.textContent = '0%';
         const globalFill = document.getElementById('global-progress-fill');
         const globalText = document.getElementById('global-progress-text');
         if (globalFill) globalFill.style.width = '0%';
@@ -3006,7 +2982,6 @@ function updatePracticeProgress() {
     
     const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
     const finalPercent = Math.min(percentage, 100);
-    progressValueSpan.textContent = `${finalPercent}%`;
     const globalFill = document.getElementById('global-progress-fill');
     const globalText = document.getElementById('global-progress-text');
     if (globalFill) globalFill.style.width = `${finalPercent}%`;
@@ -4033,8 +4008,6 @@ function toggleMicMode() {
         secondaryTopBar2.classList.add('is-visible');
         
         // --- AQUÍ ESTÁ EL CAMBIO SOLICITADO ---
-        // Ocultar específicamente el progreso y el botón de reiniciar chunk
-        if (practiceProgressDisplay) practiceProgressDisplay.style.display = 'none';
         if (restartChunkBtn) restartChunkBtn.style.display = 'none';
         
         // Asegurarse que el selector de compás sí se vea y se actualice
@@ -4072,7 +4045,6 @@ function toggleMicMode() {
         // RESTAURAR LA UI (Importante para cuando vuelvas a usar MIDI normal)
         // Esperamos un poco a que termine la animación de cierre para restaurar el display
         setTimeout(() => {
-            if (practiceProgressDisplay) practiceProgressDisplay.style.display = 'flex'; // O el display que tuviera originalmente
             if (restartChunkBtn) restartChunkBtn.style.display = 'inline-flex';
         }, 300);
         
