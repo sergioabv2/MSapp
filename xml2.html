@@ -3303,9 +3303,6 @@ window.addEventListener('resize', () => {
     if (osmd) {
       setupEngravingRulesForScreenSize();
       osmd.render();
-      setTimeout(() => {
-            updateStaffOpacity(handFilterMode);
-        }, 500);
     }
   }
   // Redimensionar el canvas del waterfall con los nuevos tamaños de teclas
@@ -4427,46 +4424,44 @@ function prepareFirstLearningStep() {
 
 
 function updateStaffOpacity(mode) {
-    if (!osmd || !osmd.graphic) {
-        console.warn("OSMD no está listo.");
-        return;
-    }
-    
-    const svgContainer = osmdContainer.querySelector('svg');
-    if (!svgContainer) return;
-    
-    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
-    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
-    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
-    
-    const staffLineContainers = allGroups.filter(group => {
-        // Contar cuántos sub-grupos con 5+ paths tiene
-        const subGroups = group.querySelectorAll('g');
-        let staffCount = 0;
-        subGroups.forEach(sub => {
-            const paths = sub.querySelectorAll(':scope > path');
-            if (paths.length >= 5) staffCount++;
-        });
-        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
-        return staffCount > 1;
-    });
-    
-    staffLineContainers.forEach((container, index) => {
-        const isTreble = index % 2 === 0;
+    requestAnimationFrame(() => {
+        if (!osmd || !osmd.graphic) return;
         
-        switch (mode) {
-            case 'right':
-                container.style.opacity = isTreble ? '1' : '0.2';
-                break;
-            case 'left':
-                container.style.opacity = isTreble ? '0.2' : '1';
-                break;
-            case 'both':
-            default:
-                container.style.opacity = '1';
-                break;
+        const svgContainer = osmdContainer.querySelector('svg');
+        if (!svgContainer) {
+            setTimeout(() => updateStaffOpacity(mode), 50);
+            return;
         }
-        container.style.transition = 'opacity 0.3s ease';
+
+
+        const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+        
+        const actualStaves = allGroups.filter(group => {
+            // Buscamos solo los hijos directos que sean trazos (líneas del pentagrama)
+            const paths = group.querySelectorAll(':scope > path');
+            return paths.length >= 5 && paths.length < 20;
+        });
+
+        // Reintento si la tablet aún no renderizó nada
+        if (actualStaves.length === 0) {
+            setTimeout(() => updateStaffOpacity(mode), 100);
+            return;
+        }
+
+        actualStaves.forEach((staff, index) => {
+            const isTreble = index % 2 === 0; // Pares = Mano Derecha
+            let targetOpacity = '1';
+
+            if (mode === 'right') {
+                targetOpacity = isTreble ? '1' : '0.2';
+            } else if (mode === 'left') {
+                targetOpacity = isTreble ? '0.2' : '1';
+            }
+            if (staff.style.opacity !== targetOpacity) {
+                staff.style.setProperty('opacity', targetOpacity, 'important');
+                staff.style.transition = 'opacity 0.3s ease';
+            }
+        });
     });
 }
 
