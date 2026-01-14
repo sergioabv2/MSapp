@@ -1,4 +1,4 @@
-
+ 
 <html lang="es"> 
 <head> 
   <meta charset="utf-8" />
@@ -6,6 +6,29 @@
   <title>Reproductor MusicXML</title>
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
   <style>
+
+    :root {
+  --primary-color: #3498db;
+  --primary-glow: rgba(52, 152, 219, 0.6);
+  
+  /* Dimensiones Piano - AÑADE ESTAS */
+  --piano-height: 122px;
+  --piano-bottom: 0px;
+  --key-white-height: 90px;
+  --key-black-height: 58px;
+}
+
+/* Media query para pantallas más grandes */
+@media (min-width: 769px) {
+    :root {
+        --piano-height: 125px; 
+        --piano-height2: 110px; 
+        --key-white-height: 90px;
+        --key-black-height: 58px;
+    }
+}
+
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -148,12 +171,12 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  background: #2a2a2a;
+
   padding: 12px 0;
   overflow: hidden;
   box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
   border-top: 1px solid #e0e0e0;
-  height: 200px;
+  height: 160px;
   z-index: 100;
 }
 
@@ -163,12 +186,11 @@
   top: 60px;
   bottom: auto;
   padding: 0 0 12px 0;
+  background: transparent !important;
 }
 
 
-#piano-container.waterfall-only .hit-line-piano {
-  bottom: 102px;
-}
+
 
 #piano-container.waterfall-only #waterfall-canvas {
   height: calc(100% - 102px) !important; 
@@ -177,79 +199,173 @@
 
 /* Estado 2: Solo piano (sin waterfall) */
 #piano-container.piano-only {
-  height: 102px;
+  height: 112px;
 }
 
-#piano-container.piano-only #waterfall-canvas,
-#piano-container.piano-only .hit-line-piano {
+#piano-container.piano-only #waterfall-canvas{
   display: none;
 }
     
   
-    
- #piano-keys {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  padding: 0 10px;
-  z-index: 2;
-  height: 102px;
+/* REEMPLAZA los estilos de #piano-wrapper y #piano-keys */
+#piano-wrapper {
+  position: absolute; 
+  bottom: var(--piano-bottom);
+  left: 0; 
+  width: 100%; 
+  height: var(--piano-height2) ;
+  background: #2a2a2a; 
+  border-top: 1px solid #333; 
+  display: flex; 
+  justify-content: center; 
+  align-items: flex-end; /* Alinea el piano al fondo */
+  overflow: hidden;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.3); /* Sombra hacia arriba */
+  padding-bottom: 5px; /* Espacio para que el piano no toque el borde */
 }
-    
-    .key {
-      border: 1px solid #ddd;
-      position: relative;
-      transition: all 0.05s;
-    }
-    
-    .key.white {
-      width: 16px;
-      height: 90px;
-      background: #fff;
-      border-right: 1px solid #e0e0e0;
-    }
-    
-    .key.black {
-      width: 10px;
-      height: 58px;
-      background: #1a1a1a;
-      margin-left: -5px;
-      margin-right: -5px;
-      z-index: 2;
-    }
-    
-    .key.active-treble {
-  background: #3498db !important; /* Azul para la mano derecha (treble) */
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.6) !important;
+
+#piano-keys { 
+  position: relative; 
+  height: var(--key-white-height); /* Usa la altura de teclas blancas */
+  display: flex; 
+  justify-content: center; 
+  z-index: 3;
+}
+
+/* REEMPLAZA los estilos de .key */
+.key { 
+  position: relative; 
+  float: left; 
+  cursor: pointer; 
+  transition: all 0.05s ease; 
+  user-select: none; 
+}
+
+.key.white {
+  width: 24px; 
+  height: var(--key-white-height); 
+  background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%); /* Gradiente sutil */
+  border: 1px solid #ccc; 
+  border-right: 1px solid #e0e0e0; 
+  border-radius: 0 0 4px 4px; 
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra para profundidad */
+}
+
+
+.key.white.active { 
+  background: var(--primary-color) !important; 
+  box-shadow: 0 0 20px var(--primary-glow), inset 0 2px 4px rgba(0,0,0,0.2); 
+  transform: translateY(2px); /* Efecto de presión */
+}
+
+.key.black {
+  width: 14px; 
+  height: var(--key-black-height); 
+  background: #333; border: 1px solid #555; margin-left: -7px; margin-right: -7px; z-index: 2; border-radius: 0 0 3px 3px;
+}
+
+.key.black.active { 
+  background: #2980b9 !important; 
+  box-shadow: 0 0 15px rgba(41, 128, 185, 0.8), inset 0 2px 4px rgba(0,0,0,0.3);
+  transform: translateY(2px);
+}
+
+/* AÑADE estos nuevos estilos para el casing superior del piano */
+#piano-top-casing {
+  position: absolute; 
+  bottom: calc(var(--piano-height) + var(--piano-bottom) - 25px); 
+  left: 0; 
+  width: 100%; 
+  height: 15px; /* Aumentado ligeramente */
+  background: linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 100%);
+  z-index: 4; 
+  display: flex; 
+  justify-content: center;
+  border-top: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.casing-note-label {
+  position: absolute; 
+  top: 6px; /* Ajustado para mejor centrado */
+  color: #fff; 
+  font-size: 11px; 
+  font-weight: 600;
+  background: rgba(52, 152, 219, 0.8); /* Color del tema */
+  padding: 2px 8px; 
+  border-radius: 12px; /* Más redondeado */
+  pointer-events: none;
+  transform: translateX(-50%); 
+  z-index: 20;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
+}
+
+
+
+/* Estilos para el modo aprendizaje - Manos separadas */
+.key.active-treble {
+  background: #3498db !important; /* Azul para mano derecha (treble) */
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.8), inset 0 2px 4px rgba(0,0,0,0.2) !important;
+
 }
 
 .key.active-bass {
-  background: #de9e37 !important; /* Verde para la mano izquierda (bass) */
-  box-shadow: 0 0 8px rgba(222, 158, 55, 0.6) !important;
-}
-    
+  background: #de9e37 !important; /* Naranja para mano izquierda (bass) */
+  box-shadow: 0 0 20px rgba(222, 158, 55, 0.8), inset 0 2px 4px rgba(0,0,0,0.2) !important;
 
+}
+
+/* Para teclas negras en modo aprendizaje */
+.key.black.active-treble {
+  background: #2980b9 !important; /* Azul más oscuro para teclas negras */
+  box-shadow: 0 0 15px rgba(41, 128, 185, 0.8), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+.key.black.active-bass {
+  background: #b45309 !important; /* Naranja más oscuro para teclas negras */
+  box-shadow: 0 0 15px rgba(180, 83, 9, 0.8), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+/* Animación de pulso para las teclas en modo aprendizaje */
 @keyframes keyPulse {
   0% { 
-    filter: brightness(1.5);
-    transform: translateY(0);
+    filter: brightness(1);
+    transform: translateY(2px);
   }
   50% {
-    filter: brightness(2);
-    transform: translateY(2px);
+    filter: brightness(1.2);
+    transform: translateY(1px);
   }
   100% { 
     filter: brightness(1);
-    transform: translateY(0);
+    transform: translateY(2px);
   }
 }
 
 .key.active-treble,
 .key.active-bass {
   animation: keyPulse 0.15s ease-out;
+}
+
+.key.midi-active {
+  background-color: #d5d5d5 !important; /* Gris más oscuro */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3) !important;
+  
+}
+
+.key.white.midi-active {
+  background-color: #d0d0d0 !important;
+  filter: brightness(0.9);
+  transform: translateY(2px);
+}
+
+.key.black.midi-active {
+  background-color: #444444 !important; /* Negro más claro */
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5) !important;
+  filter: brightness(1.3);
+  transform: translateY(1px);
 }
 
 #waterfall-canvas {
@@ -261,18 +377,26 @@
   height: calc(100% - 102px);
   pointer-events: none;
   z-index: 1;
+  background-color: transparent !important;
   transition: height 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@media (min-width: 769px) {
+  #waterfall-canvas {
+    left: 49%;
+  }
 }
 
 .hit-line-piano {
   position: absolute;
-  bottom: 102px;
+  height: 4px !important;
+  bottom: 96px;
   left: 0;
   right: 0;
   height: 2px;
-  background: rgba(255, 0, 0, 1);
-  box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
-  z-index: 3;
+  background: rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+  z-index: 30;
   pointer-events: none;
 }
 
@@ -622,22 +746,23 @@ display: flex;
         transform: scale(0.75);
         transform-origin: top center;
       }
-
-      #tools-toggle-btn,
-  #secondary-top-bar,
-   #secondary-top-bar2{
-    display: none; 
-  }
+  #start-tutorial-btn{
+    display: none !important;
   }
 
-   @media (max-width: 440px) {
-       #time-display{
-        display: none;
-      }
-   }
+  #metronome-btn{
+    display: none !important;
+  }
+
+    #progress-label,
+    #fullscreen-btn,
+    #show-key-names-btn{
+      display: none; 
+    }
+  }
 
 
-/* --- CSS CORRECTO PARA EL COLOR PICKER HORIZONTAL --- */
+
 
 /* Contenedor del selector de color completo (círculo + opciones) */
 #color-picker-container {
@@ -768,6 +893,83 @@ display: flex;
   background-color: #2980b9;
 }
 
+
+#global-progress-container {
+  position: fixed;
+  /* Misma altura base que el midi-status-legend */
+  bottom: 165px; 
+  right: 10px; /* <--- A LA DERECHA */
+  z-index: 550;
+  
+  /* Estilos copiados de tu referencia Dark Glass */
+  background-color: rgba(26, 26, 26, 0.85);
+  color: #fafafa;
+  padding: 10px 12px; /* Un poco más alto para que quepa la barra */
+  border-radius: 10px;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  
+  /* Layout interno */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 140px; /* Ancho mínimo para que la barra se vea bien */
+  
+  /* Transiciones de visibilidad */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+/* Estado visible */
+#global-progress-container.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Cabecera interna (Icono, Texto, Porcentaje) */
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  width: 100%;
+}
+
+
+
+#global-progress-text {
+  font-weight: 700;
+  color: #2ecc71;
+}
+
+/* La barra de fondo (track) */
+.global-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15); /* Gris oscuro translúcido */
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* El relleno de la barra (fill) */
+#global-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #2ecc71, #27ae60); /* Gradiente verde */
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ajuste responsive desktop (igual que tu referencia) */
+@media (min-width: 501px) {
+  #global-progress-container {
+    bottom: 120px;
+  }
+}
+
 #midi-status-legend {
   position: fixed;
   /* Lo ponemos encima de los controles de velocidad móviles */
@@ -890,27 +1092,6 @@ display: flex;
   }
 }
 
-/* --- AÑADE ESTE BLOQUE DE CSS --- */
-
-.practice-progress-display {
-  font-size: 13px;
-  color: #555;
-  font-family: 'SF Mono', 'Menlo', 'monospace';
-  background-color: #f5f5f5;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.practice-progress-display #progress-label {
-  color: #999; /* Un color más sutil para la etiqueta */
-}
-
-.practice-progress-display #progress-value {
-  font-weight: 600;
-  color: #333; /* Color más fuerte para el valor */
-  margin-left: 4px;
-}
 
 #ai-practice-btn.active {
   background-color: #e0e0e0 !important;
@@ -1033,96 +1214,12 @@ display: flex;
   transform: translateX(-50%) translateY(0);
 }
 
-/* Banner de bienvenida minimalista */
-.welcome-banner {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  color: #1a1a1a;
-  padding: 18px 24px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 1500;
-  display: none;
-  align-items: center;
-  gap: 16px;
-  max-width: 90%;
-  animation: slideDown 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+.midi-learn-highlight.tutorial-highlight:hover::before,
+.midi-learn-highlight.tutorial-highlight:hover::after {
+    display: none !important;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
 
-.welcome-banner.show {
-  display: flex;
-}
-
-.welcome-banner-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-  color: #1a1a1a;
-  background: #f5f5f5;
-  width: 52px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.welcome-banner-content {
-  flex: 1;
-}
-
-.welcome-banner-title {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: #1a1a1a;
-  letter-spacing: -0.2px;
-}
-
-.welcome-banner-text {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-.welcome-banner-close {
-  background: #1a1a1a;
-  border: none;
-  color: white;
-  padding: 8px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
-.welcome-banner-close:hover {
-  background: #2a2a2a;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.welcome-banner-close:active {
-  transform: translateY(0);
-}
 
 /* Badge "NUEVO" minimalista */
 .new-badge {
@@ -1213,25 +1310,7 @@ display: flex;
     display: none;
   }
   
-  .welcome-banner {
-    padding: 14px 18px;
-    gap: 12px;
-    max-width: 95%;
-  }
   
-  .welcome-banner-icon {
-    font-size: 26px;
-    width: 44px;
-    height: 44px;
-  }
-  
-  .welcome-banner-title {
-    font-size: 14px;
-  }
-  
-  .welcome-banner-text {
-    font-size: 12px;
-  }
   
   .modal-content {
     padding: 24px 28px;
@@ -1239,16 +1318,7 @@ display: flex;
   }
 }
 
-@media (max-width: 500px) {
-  .welcome-banner {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .welcome-banner-close {
-    width: 100%;
-  }
-}
+
 
 
 .tutorial-parent-highlight {
@@ -1258,8 +1328,141 @@ display: flex;
 
 #tutorial-overlay {
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     background: rgba(0, 0, 0, 0.4);
+    display: block; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2999;
+}
+
+/* REEMPLAZA tus estilos de #tutorial-modal con todo esto */
+#tutorial-modal {
+    position: absolute;
+    background: #ffffff;
+    color: black;
+    padding: 20px 24px;
+    border-radius: 12px;
+    /* Usamos el azul de tu app para la sombra */
+    box-shadow: 0 8px 32px rgba(52, 152, 219, 0.4); 
+    max-width: 350px;
+    
+    /* Animación de entrada (adaptada de tu .dialog-box) */
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 3001; /* Sobre el padre (3000) y el overlay (2999) */
+    
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    
+    /* Oculto por defecto hasta que JS lo posicione y muestre */
+    display: none; 
+}
+
+/* Clase 'show' para la animación de entrada */
+#tutorial-modal.show {
+    display: block; /* Lo hace visible */
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+
+#tutorial-modal::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    
+    /* Posición controlable con variables CSS */
+    top: -10px;
+    left: var(--arrow-left, 50%); /* Por defecto centrado */
+    transform: translateX(-50%);
+    
+    /* El triángulo (apunta hacia arriba) */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ffffff;
+}
+
+/* NUEVO: Flecha que apunta hacia abajo (cuando el modal está ARRIBA del botón) */
+#tutorial-modal::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    
+    bottom: -10px;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #ffffff;
+    
+    /* Oculta por defecto */
+    display: none;
+}
+
+/* Clase para mostrar la flecha inferior cuando el modal está arriba */
+#tutorial-modal.arrow-bottom::after {
+    display: block;
+}
+
+#tutorial-modal.arrow-bottom::before {
+    display: none;
+}
+
+/* Estilos internos del modal (re-aplicados) */
+#tutorial-modal #tutorial-title {
+    margin: 0 0 15px 0;
+    color: #3498db;
+    font-size: 1.2em;
+}
+
+#tutorial-modal #tutorial-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+#tutorial-modal #tutorial-text strong {
+    color: #1a1a1a;
+}
+
+#tutorial-modal #tutorial-nav {
+    margin-top: 20px;
+    text-align: right;
+}
+
+/* Ajusta el botón de cerrar (ya no es un .btn genérico) */
+#tutorial-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Si decides dejar el texto "Tutorial" dentro del botón */
+#start-tutorial-btn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: #666;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
 }
 
 /* Clase para resaltar el elemento del tutorial actual */
@@ -1331,33 +1534,86 @@ display: flex;
     color: #d9a500; /* Ícono de advertencia */
 }
 
+/* Resaltar el contenedor del piano durante el tutorial */
+#piano-keys.tutorial-highlight {
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
+    border-radius: 6px;
+    z-index: 3001 !important;
+    position: relative;
+}
+
+.fog-overlay {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.85); /* Blanco al 85% = Niebla */
+    z-index: 10; /* Encima de la partitura (notas y líneas) */
+    pointer-events: none; /* Permitir clicks si fuera necesario */
+    transition: all 0.5s ease;
+}
+
+#metronome-btn.active {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 5px #3498db);
+  transform: scale(1.1);
+}
+
+
+/* Estilos para el Toast de Éxito */
+.success-toast {
+    position: fixed;
+    top: -80px; /* Oculto arriba inicialmente */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #27ae60; /* Verde éxito */
+    padding: 12px 24px;
+    border-radius: 50px; /* Forma de píldora */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 1px solid #d4edda;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote suave */
+    pointer-events: none; /* IMPORTANTE: Permite hacer clic a través de él para no cortar el flujo */
+}
+
+.success-toast.show {
+    top: 90px; /* Baja a una posición visible debajo del top-bar */
+}
+
+.success-toast i {
+    font-size: 18px;
+}
+
+/* Estilo para el toast en modo alerta */
+.success-toast.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+.success-toast.warning i {
+    color: #856404;
+}
+#mic-btn.active {
+  color: #e74c3c; /* Rojo */
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
   </style>
 </head>
 <body>
 
   <div id="top-bar">
 
-<div id="welcome-banner" class="welcome-banner">
-  <div class="welcome-banner-icon">
-    <i class="ri-graduation-cap-line"></i>
-  </div>
-  <div class="welcome-banner-content">
-    <div class="welcome-banner-title">Modo Aprendizaje</div>
-    <div class="welcome-banner-text">
-      Conecta tu teclado MIDI y practica nota por nota siguiendo las indicaciones visuales.
-    </div>
-  </div>
-  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-left: 10px;">
-  <button class="welcome-banner-close" id="start-tutorial-btn">Tutorial</button>
-  <button class="welcome-banner-close" id="welcome-banner-close" style="background-color: #666;">Cerrar</button>
-  </div>
-
-  <div id="tutorial-midi-alert" class="tutorial-alert-banner">
-        <i class="ri-error-warning-line"></i>
-        <span>Conecta tu piano por MIDI para iniciar el tutorial</span>
-    </div>
-
-</div>
 
     <div class="controls-group">
       <button id="play-btn" class="btn" disabled>
@@ -1371,19 +1627,19 @@ display: flex;
 <button id="midi-learn-btn" class="btn midi-learn-highlight" data-tooltip="Conecta tu teclado MIDI para practicar">
   <i class="ri-graduation-cap-line"></i>
   <span class="btn-label">Aprender</span>
-  <span class="new-badge">NUEVO</span>
+</button>
+<button id="mic-btn" class="btn" title="Activar Micrófono">
+  <i class="ri-mic-line"></i>
 </button>
     </div>
 
     <div class="controls-group">
-    
+      <button  id="start-tutorial-btn" style="display: none;">Tutorial</button>
         <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
         <i class="ri-settings-3-line"></i>
       </button>
 
-          <button id="piano-btn" class="btn" >
-       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
-      </button>
+         
 
      
       <div id="close-btn-placeholder"></div>
@@ -1395,7 +1651,10 @@ display: flex;
    <div id="secondary-top-bar">
     <div class="tool-group">
  <div id="zoom-controls">
-      <img src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px;">
+    <img id="metronome-btn" src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" 
+     style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px; cursor: pointer; opacity: 0.6; transition: all 0.2s;">
+
+<audio id="metronomeAudio" src="https://www.mozart-app.com/lessons/metronome.mp3" loop style="display: none;"></audio>
          <div class="speed-display">
         <span class="zoom-display" id="speed-bpm">120 BPM</span>
    </div>
@@ -1407,12 +1666,16 @@ display: flex;
     </div>
   
      <div class="tool-group">
+       
         <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
     <i class="ri-font-size"></i> 
   </button>
-          <button id="cursor-btn" class="btn" >
+   <button id="piano-btn" class="btn" >
+       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
+      </button>
+    <!--      <button id="cursor-btn" class="btn" >
    <i class="ri-layout-left-2-line"></i>
-    </button>
+    </button> -->
   
          <div class="speed-group">
             <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
@@ -1441,10 +1704,15 @@ display: flex;
     </div>
   
      <div class="tool-group">
-        <div id="practice-progress" class="practice-progress-display">
-          <span id="progress-label">Progreso:</span>
-          <span id="progress-value">0%</span>
-      </div>
+        <button id="mute-btn" class="btn" title="Silenciar piano (Mute)">
+            <i class="ri-volume-up-line"></i>
+        </button>
+        <button id="restart-chunk-btn" class="btn" title="Reiniciar estos 4 compases">
+            <i class="ri-skip-back-line"></i>
+        </button>
+
+
+
          <select id="measure-select" class="btn" title="Ir al compás...">
     </select>
 
@@ -1474,11 +1742,28 @@ display: flex;
  
 <div id="midi-status-legend"></div>
 
-  <div id="piano-container">
-    <canvas id="waterfall-canvas"></canvas>
-  <div class="hit-line-piano"></div>
-    <div id="piano-keys"></div>
+<div id="global-progress-container">
+  <div class="progress-header">
+    <span class="progress-label">Progreso</span>
+    <span id="global-progress-text">0%</span>
   </div>
+  <div class="global-progress-track">
+    <div id="global-progress-fill"></div>
+  </div>
+</div>
+
+ <div id="piano-container">
+    <canvas id="waterfall-canvas"></canvas>
+    <div class="hit-line-piano"></div>
+    
+    <!-- NUEVO: Agregar el casing superior -->
+    <div id="piano-top-casing"></div>
+    
+    <!-- NUEVO: Agregar wrapper para la línea de hit -->
+    <div id="piano-wrapper">
+        <div id="piano-keys"></div>
+    </div>
+</div>
 
 
   <div id="midi-modal" class="modal-overlay" style="display: none;">
@@ -1510,6 +1795,13 @@ display: flex;
   </div>
 </div>
 
+<div id="success-toast" class="success-toast">
+    <i class="ri-checkbox-circle-line"></i>
+    <span id="success-toast-message">¡Sección Superada!</span>
+</div>
+
+<div id="tutorial-phantom-target" style="position: absolute; pointer-events: none; z-index: 2900;"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 
@@ -1536,8 +1828,12 @@ const measureSelect = document.getElementById('measure-select');
 const toolsToggleBtn = document.getElementById('tools-toggle-btn');
 const secondaryTopBar = document.getElementById('secondary-top-bar');
 const secondaryTopBar2 = document.getElementById('secondary-top-bar2');
+const restartChunkBtn = document.getElementById('restart-chunk-btn');
+  let isRestarting = false;
+  let isPianoMuted = false;
+const muteBtn = document.getElementById('mute-btn');
 
-const cursorBtn = document.getElementById('cursor-btn');
+//const cursorBtn = document.getElementById('cursor-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
 const midiModal = document.getElementById('midi-modal');
 const modalMessage = document.getElementById('modal-message');
@@ -1546,17 +1842,20 @@ const midiStatusLegend = document.getElementById('midi-status-legend');
 const rightHandOnlyBtn = document.getElementById('right-hand-only-btn');
 const leftHandOnlyBtn = document.getElementById('left-hand-only-btn');
 let handFilterMode = 'both';
+
 const showKeyNamesBtn = document.getElementById('show-key-names-btn');
 let showKeyNames = false;
 const successModal = document.getElementById('success-modal');
 const successModalMessage = document.getElementById('success-modal-message');
 const successModalCloseBtn = document.getElementById('success-modal-close-btn');
-const practiceProgressDisplay = document.getElementById('practice-progress');
-const progressValueSpan = document.getElementById('progress-value');
 
-const welcomeBanner = document.getElementById('welcome-banner');
-const welcomeBannerClose = document.getElementById('welcome-banner-close');
-const WELCOME_BANNER_SHOWN_KEY = 'welcomeBannerShown';
+let isPieceCompleted = false;
+let isSustainPedalDown = false;
+let sustainedNotes = new Set();
+
+const metronomeBtn = document.getElementById('metronome-btn');
+const metronomeAudio = document.getElementById('metronomeAudio');
+let isMetronomeOn = false;
 
 const startTutorialBtn = document.getElementById('start-tutorial-btn');
 const tutorialOverlay = document.getElementById('tutorial-overlay');
@@ -1570,12 +1869,17 @@ let tutorialAlertTimeout = null;
 let currentTutorialStep = 0;
 let tutorialSteps = [];
 
-// --- NUEVO: Definición de los pasos del tutorial (Corregido) ---
+let unlockedMeasureCount = 4; 
+const MEASURES_PER_CHUNK = 4;
+
+
 tutorialSteps = [
     {
         elementId: 'midi-learn-btn',
         title: 'Modo Aprendizaje',
-        text: 'Este es el botón principal. Al presionarlo, activas el <strong>Modo Aprendizaje</strong> y se mostrará la barra de herramientas de práctica (la que veremos a continuación).'
+        text: 'Este es el botón principal. <strong>Haz clic en él ahora</strong> para activar el Modo Aprendizaje y ver la barra de herramientas de práctica.',
+        requiresClick: true,
+        targetAction: 'click-midi-learn'
     },
     {
         elementId: 'left-hand-only-btn',
@@ -1585,12 +1889,54 @@ tutorialSteps = [
     {
         elementId: 'right-hand-only-btn',
         title: 'Filtro de Mano Derecha',
-        text: 'Activa este botón para practicar <strong>solo las notas de la mano derecha</strong> (clave de Sol).'
+        text: '<strong>Haz clic en este botón</strong> para activar el filtro de mano derecha y continuar.',
+        requiresClick: true,
+        targetAction: 'click-right-hand'
     },
     {
-        elementId: 'practice-progress',
+        elementId: 'piano-keys',
+        title: '¡Prueba el Piano!',
+        text: 'Ahora <strong>toca en tu teclado MIDI la nota que se muestra en azul</strong> para avanzar. Así es como funciona el modo aprendizaje.',
+        requiresClick: true,
+        targetAction: 'play-correct-note'
+    },
+    {
+        elementId: 'global-progress-container',
         title: 'Progreso de Práctica',
         text: 'Esta barra muestra <strong>cuánto has completado</strong> de la pieza nota por nota mientras estás en "Modo Aprendizaje".'
+    },
+    {
+        elementId: 'tutorial-phantom-target', 
+        title: 'Desbloqueo por Secciones',
+
+        placement: 'bottom',
+        text: 'Debes tocar los <strong>4 compases resaltados con AMBAS MANOS</strong> correctamente. Si lo logras sin errores, desbloquearás 4 siguientes compases y así sucesivamente.',
+        onShow: () => {
+            const container = document.getElementById('osmd-container');
+            const phantom = document.getElementById('tutorial-phantom-target');
+            
+            if (container && phantom) {
+                const rect = container.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                phantom.style.top = (rect.top + scrollTop) + 'px';
+                phantom.style.left = (rect.left + scrollLeft) + 'px';
+                phantom.style.width = rect.width + 'px';
+                phantom.style.height = '280px'; 
+            }
+
+            if (handFilterMode !== 'both') {
+                handFilterMode = 'both';
+                
+                const rhBtn = document.getElementById('right-hand-only-btn');
+                const lhBtn = document.getElementById('left-hand-only-btn');
+                if(rhBtn) { rhBtn.style.background = 'none'; rhBtn.style.color = '#1a1a1a'; }
+                if(lhBtn) { lhBtn.style.background = 'none'; lhBtn.style.color = '#1a1a1a'; }
+
+                updateStaffOpacity('both');
+                reloadCurrentStepWithHandFilter();
+            }
+        }
     },
     {
         elementId: 'measure-select',
@@ -1600,7 +1946,7 @@ tutorialSteps = [
     {
         elementId: 'measure-until',
         title: 'Modo Loop (Bucle)',
-        text: 'Selecciona un compás aquí para <strong>crear un bucle de práctica</strong>. El sistema repetirá la sección entre el "Compás de inicio" y este.'
+        text: 'Selecciona un compás aquí para <strong>crear un bucle de práctica</strong>. El sistema repetirará la sección entre el "Compás de inicio" y este.'
     }
 ];
 
@@ -1628,16 +1974,19 @@ let isLoopMode = false;
     let pianoViewMode = 'full'; 
 
 
-    let isIntelligentPracticeMode = false;
-let currentPracticePhase = 'inactive'; // 'inactive', 'right-hand', 'left-hand', 'both-hands', 'consolidation'
-let currentPracticeMeasureSet = 0; // Conjunto de 4 compases actual (0, 1, 2...)
-let practiceAttemptNotes = []; // Notas tocadas en el intento actual
-let practiceStartTime = null;
-let practiceErrors = 0;
-let practiceCorrectNotes = 0;
-let accuracyThreshold = 70; 
+const micBtn = document.getElementById('mic-btn');
+let isMicActive = false;
+let audioContext = null;
+let analyser = null;
+let microphoneStream = null;
+let micInterval = null;
+let lastMicNote = null;
+let lastMicTime = 0;
+const MIC_THRESHOLD = 0.03; // Ajusta según sensibilidad
+ let currentInputSource = 'none';   
 
 
+  
 let waterfallCanvas, waterfallCtx;
 let waterfallAnimationId;
 let pixelsPerSecond = 100;
@@ -1654,12 +2003,7 @@ let currentLearningIndex = 0; // Para saber en qué nota de la partitura vamos
 
 
 
-function checkFirstTimeUser() {
-    setTimeout(() => {
-      welcomeBanner.classList.add('show');
-      midiLearnBtn.classList.add('pulse-animation');
-    }, 2000);
-}
+
 
 function initWaterfallCanvas() {
   waterfallCanvas = document.getElementById('waterfall-canvas');
@@ -1714,8 +2058,6 @@ function updateKeyDimensions() {
   if (blackKey) {
     blackKeyWidth = blackKey.offsetWidth;
   }
-  
-  console.log(`Tamaños actualizados: white=${whiteKeyWidth}px, black=${blackKeyWidth}px`);
 }
 
 function getKeyXPosition(midiNote) {
@@ -1790,14 +2132,12 @@ function drawWaterfall() {
   
   const dpr = window.devicePixelRatio || 1;
   waterfallCtx.clearRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
-  waterfallCtx.fillStyle = '#2a2a2a';
-  waterfallCtx.fillRect(0, 0, waterfallCanvas.width, waterfallCanvas.height);
   
   const canvasHeight = waterfallCanvas.height / dpr;
   const totalWhiteKeys = 52;
   const pianoTotalWidth = totalWhiteKeys * whiteKeyWidth;
-  const offset = whiteKeyWidth === 16 ? -16 : -12; // -16 para full, -12 para reducido
-const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
+  const offset = whiteKeyWidth === 16 ? -16 : -12;
+  const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset;
   
   // Patrón corregido empezando desde A
   const notePattern = [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1]; // A A# B C C# D D# E F F# G G#
@@ -1821,15 +2161,16 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
     if (noteEndY < canvasHeight && noteStartY > 0) {
       const keyX = pianoStartX + getKeyXPosition(midiNote);
       const height = Math.max(1, noteStartY - noteEndY);
+      const opacityFactor = Math.max(0.15, Math.min(1, noteStartY / canvasHeight));
       
-      waterfallCtx.shadowBlur = 40 * dpr;
+      waterfallCtx.shadowBlur = 40 * dpr * opacityFactor;
       
       if (note.hand === 'treble') {
-        waterfallCtx.shadowColor = '#60a5fa';
-        waterfallCtx.fillStyle = '#60a5fa';
+        waterfallCtx.shadowColor = `rgba(36, 113, 163, ${opacityFactor})`; // Azul oscuro
+        waterfallCtx.fillStyle = `rgba(36, 113, 163, ${opacityFactor})`;
       } else {
-        waterfallCtx.shadowColor = '#de9e37';
-        waterfallCtx.fillStyle = '#de9e37';
+        waterfallCtx.shadowColor = `rgba(214, 137, 16, ${opacityFactor})`; // Naranja oscuro
+        waterfallCtx.fillStyle = `rgba(214, 137, 16, ${opacityFactor})`;
       }
       
       waterfallCtx.fillRect(
@@ -1861,14 +2202,17 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
       const keyX = pianoStartX + getKeyXPosition(midiNote);
       const height = Math.max(1, noteStartY - noteEndY);
       
-      waterfallCtx.shadowBlur = 30 * dpr;
+      // Calcular opacidad: notas cerca del piano (Y alto) = opacas, notas arriba (Y bajo) = transparentes
+      const opacityFactor = Math.max(0.15, Math.min(1, noteStartY / canvasHeight));
+      
+      waterfallCtx.shadowBlur = 30 * dpr * opacityFactor;
       
       if (note.hand === 'treble') {
-        waterfallCtx.shadowColor = '#3b82f6';
-        waterfallCtx.fillStyle = '#3b82f6';
+        waterfallCtx.shadowColor = `rgba(26, 84, 144, ${opacityFactor})`; // Azul muy oscuro
+        waterfallCtx.fillStyle = `rgba(26, 84, 144, ${opacityFactor})`;
       } else {
-        waterfallCtx.shadowColor = '#b45309';
-        waterfallCtx.fillStyle = '#b45309';
+        waterfallCtx.shadowColor = `rgba(168, 111, 10, ${opacityFactor})`; // Naranja muy oscuro
+        waterfallCtx.fillStyle = `rgba(168, 111, 10, ${opacityFactor})`;
       }
       
       waterfallCtx.fillRect(
@@ -1882,6 +2226,7 @@ const pianoStartX = (waterfallCanvas.width / dpr - pianoTotalWidth) / 2 + offset
   
   waterfallCtx.shadowBlur = 0;
 }
+
 
 function animateWaterfall() {
     
@@ -1954,7 +2299,6 @@ function createNoteFlashPiano(noteName, hand) {
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
   if (fileId) {
-
     const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
@@ -1963,7 +2307,6 @@ function createNoteFlashPiano(noteName, hand) {
     playBtn.disabled = true; 
   }
 
-  checkFirstTimeUser();
 
 });
 
@@ -1980,9 +2323,9 @@ function createNoteFlashPiano(noteName, hand) {
           drawingParameters: "width",
           drawMeasureNumbers: false,
           cursorsOptions: [{ 
-            type: 1, 
-            color: "rgba(52,152,219,0.8)", 
-            alpha: 0.8, 
+            type: 3, 
+            color: "rgba(52, 152, 219, 0.45)", 
+            alpha: 0.45, 
             follow: true 
           }]
         });
@@ -2069,6 +2412,7 @@ function updateMidiStatusLegend(deviceName = null) {
 
     function initSampler() {
         Tone.context.lookAhead = 0;
+
       sampler = new Tone.Sampler({
         urls: { 
           "C1": "C1.mp3",
@@ -2407,97 +2751,212 @@ function scheduleNotesOnTransport() {
 }
 
 
+function toggleMetronome() {
+    if (isMetronomeOn) {
+        // Apagar
+        metronomeAudio.pause();
+        metronomeAudio.currentTime = 0; // Reiniciar al principio del golpe
+        metronomeBtn.classList.remove('active');
+        isMetronomeOn = false;
+    } else {
+        // Encender
+        updateMetronomeSpeed(); // Asegurar velocidad correcta antes de sonar
+        
+        // Manejo de promesa para evitar errores de autoplay en navegadores
+        const playPromise = metronomeAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // Reproducción iniciada con éxito
+            }).catch(error => {
+                console.error("Error al iniciar metrónomo:", error);
+            });
+        }
+        
+        metronomeBtn.classList.add('active');
+        isMetronomeOn = true;
+    }
+}
+
+// 3. Función para calcular la velocidad (playbackRate)
+function updateMetronomeSpeed() {
+    if (!metronomeAudio) return;
+
+    // Fórmula: (Tempo de la canción * Multiplicador de velocidad) / 60
+    // Ejemplo: (120 BPM * 1.0) / 60 = 2.0 playbackRate
+    const currentTotalBPM = globalTempo * playbackRate;
+    metronomeAudio.playbackRate = currentTotalBPM / 60;
+    
+    console.log(`Metrónomo ajustado a: ${currentTotalBPM} BPM (Rate: ${metronomeAudio.playbackRate})`);
+}
 
 
 
 function startTutorial() {
     currentTutorialStep = 0;
     
-    // Oculta el banner de bienvenida
-    welcomeBanner.classList.remove('show');
-    
-    // Asegúrate de que la barra de herramientas #2 esté visible
     secondaryTopBar2.classList.add('is-visible');
     
-    // Muestra el overlay del tutorial
-    tutorialOverlay.style.display = 'flex';
+    // Oculta el modal (quita .show) antes de mostrar el overlay
+    tutorialModal.classList.remove('show'); 
+    
+    tutorialOverlay.style.display = 'block'; // Cambiado de 'flex' a 'block'
     setTimeout(() => tutorialOverlay.classList.add('is-visible'), 10);
     
-    // Muestra el primer paso
     showTutorialStep(currentTutorialStep);
 }
 
 
 function endTutorial() {
+    tutorialModal.classList.remove('show'); 
+    
     tutorialOverlay.classList.remove('is-visible');
     setTimeout(() => {
         tutorialOverlay.style.display = 'none';
-    }, 300); // Espera la animación de salida
+    }, 400); // Sincroniza con la animación del modal
     
-    // Limpia cualquier highlight restante
     const highlightedEl = document.querySelector('.tutorial-highlight');
     if (highlightedEl) {
         highlightedEl.classList.remove('tutorial-highlight');
     }
 
-    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
     const parent = document.querySelector('.tutorial-parent-highlight');
     if (parent) {
         parent.classList.remove('tutorial-parent-highlight');
     }
-    // --- FIN MODIFICACIÓN ---
+    
+    // NUEVO: Restablecer el filtro de manos a "ambas"
+    if (isMidiLearnMode) {
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        rightHandOnlyBtn.style.color = '#1a1a1a';
+        leftHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.color = '#1a1a1a';
+        updateStaffOpacity('both');
+        
+        // Recargar el paso actual con ambas manos
+        if (currentLearningIndex > 0) {
+            // Retroceder al inicio del paso actual
+            const currentTime = parsedNotes[currentLearningIndex - 1]?.startSec;
+            let tempIndex = currentLearningIndex - 1;
+            
+            while (tempIndex > 0 && Math.abs(parsedNotes[tempIndex - 1]?.startSec - currentTime) < 0.001) {
+                tempIndex--;
+            }
+            
+            currentLearningIndex = tempIndex;
+            prepareFirstLearningStep();
+        }
+    }
 }
 
 function showTutorialStep(stepIndex) {
-    // 1. Limpiar el highlight anterior (botón)
+    // 1. Limpiar highlights anteriores
     const oldHighlightedEl = document.querySelector('.tutorial-highlight');
     if (oldHighlightedEl) {
         oldHighlightedEl.classList.remove('tutorial-highlight');
     }
-    
-    // --- MODIFICACIÓN: Limpiar el highlight del padre ---
     const oldParent = document.querySelector('.tutorial-parent-highlight');
     if (oldParent) {
         oldParent.classList.remove('tutorial-parent-highlight');
     }
-    // --- FIN MODIFICACIÓN ---
 
-    // 2. Obtener los datos del paso actual
+    // 2. Ocultar el modal (para reposicionarlo)
+    const modal = tutorialModal;
+    modal.classList.remove('show', 'arrow-bottom');
+
     const step = tutorialSteps[stepIndex];
-    if (!step) return; // Seguridad
+    if (!step) return;
+
+    if (step.onShow) {
+        step.onShow();
+    }
 
     // 3. Resaltar el nuevo elemento
     const element = document.getElementById(step.elementId);
-    if (element) {
-        element.classList.add('tutorial-highlight');
-        
-        // --- MODIFICACIÓN: Encontrar y elevar el padre ---
-        // Buscamos la barra (top-bar o secondary-top-bar2) que lo contiene
-        const parentContext = element.closest('#top-bar, #secondary-top-bar, #secondary-top-bar2');
-        if (parentContext) {
-            parentContext.classList.add('tutorial-parent-highlight');
-        }
-        // --- FIN MODIFICACIÓN ---
-        
-        // Opcional: Si el botón está oculto (ej: cancel-loop-btn), muéstralo
-        if (window.getComputedStyle(element).display === 'none') {
-             element.style.display = 'flex'; 
-        }
+    if (!element) {
+        console.error("Elemento del tutorial no encontrado:", step.elementId);
+        return;
     }
 
+    element.classList.add('tutorial-highlight');
+    
+    // MODIFICADO: Manejar el contenedor padre del piano
+    let parentContext;
+    if (step.elementId === 'piano-keys') {
+        parentContext = document.getElementById('piano-container');
+    } else {
+        parentContext = element.closest('#top-bar, #secondary-top-bar, #secondary-top-bar2');
+    }
+    
+    if (parentContext) {
+        parentContext.classList.add('tutorial-parent-highlight');
+    }
+    
+    if (window.getComputedStyle(element).display === 'none') {
+         element.style.display = 'flex'; 
+    }
+    
     // 4. Actualizar el contenido del modal
     tutorialTitle.textContent = step.title;
-    tutorialText.innerHTML = step.text; // Usamos innerHTML por las etiquetas <strong>
+    tutorialText.innerHTML = step.text;
 
-    // 5. Ajustar el botón "Siguiente"
-    if (stepIndex < tutorialSteps.length - 1) {
+    // Mostrar u ocultar el botón "Siguiente" según si requiere interacción
+    if (step.requiresClick) {
+        tutorialNextBtn.style.display = 'none';
+    } else if (stepIndex < tutorialSteps.length - 1) {
         tutorialNextBtn.textContent = 'Siguiente';
         tutorialNextBtn.style.display = 'inline-block';
     } else {
-        // Es el último paso
         tutorialNextBtn.textContent = 'Finalizar';
-        tutorialNextBtn.style.display = 'inline-block'; // Mostrar para finalizar
+        tutorialNextBtn.style.display = 'inline-block';
     }
+    
+    // 5. IMPORTANTE: Forzar que el modal sea visible (pero sin animación aún)
+    modal.style.display = 'block';
+    modal.style.opacity = '0';
+
+    // 6. Calcular posición DESPUÉS de que el modal tenga sus dimensiones
+    setTimeout(() => {
+        const rect = element.getBoundingClientRect();
+        const modalWidth = modal.offsetWidth;
+        const modalHeight = modal.offsetHeight;
+        const gap = 15;
+
+        let modalTop = rect.bottom + gap;
+        let isModalAbove = false;
+const shouldGoUp = (step.placement === 'top') || 
+                   (step.elementId === 'piano-keys') || 
+                   (step.placement !== 'bottom' && (modalTop + modalHeight > window.innerHeight - 10));
+
+if (shouldGoUp) {
+    modalTop = rect.top - modalHeight - gap;
+    isModalAbove = true;
+    modal.classList.add('arrow-bottom');
+} else {
+    modal.classList.remove('arrow-bottom');
+}
+        
+        let modalLeft = rect.left + (rect.width / 2) - (modalWidth / 2);
+
+        if (modalLeft < 10) {
+            modalLeft = 10;
+        }
+        if (modalLeft + modalWidth > window.innerWidth - 10) {
+            modalLeft = window.innerWidth - 10 - modalWidth;
+        }
+
+        const buttonCenterX = rect.left + (rect.width / 2);
+        const modalLeftEdge = modalLeft;
+        const arrowPosition = buttonCenterX - modalLeftEdge;
+        const clampedArrowPosition = Math.max(20, Math.min(arrowPosition, modalWidth - 20));
+
+        modal.style.top = `${modalTop}px`;
+        modal.style.left = `${modalLeft}px`;
+        modal.style.setProperty('--arrow-left', `${clampedArrowPosition}px`);
+        
+        modal.style.opacity = '';
+        modal.classList.add('show');
+    }, 10);
 }
 
 
@@ -2514,12 +2973,121 @@ function nextTutorialStep() {
 
 function updatePracticeProgress() {
     if (parsedNotes.length === 0) {
-        progressValueSpan.textContent = '0%';
+        const globalFill = document.getElementById('global-progress-fill');
+        const globalText = document.getElementById('global-progress-text');
+        if (globalFill) globalFill.style.width = '0%';
+        if (globalText) globalText.textContent = '0%';
         return;
     }
+    
     const percentage = Math.floor((currentLearningIndex / parsedNotes.length) * 100);
-    progressValueSpan.textContent = `${Math.min(percentage, 100)}%`;
+    const finalPercent = Math.min(percentage, 100);
+    const globalFill = document.getElementById('global-progress-fill');
+    const globalText = document.getElementById('global-progress-text');
+    if (globalFill) globalFill.style.width = `${finalPercent}%`;
+    if (globalText) globalText.textContent = `${finalPercent}%`;
+    window.parent.postMessage({
+        type: 'progressUpdate',
+        percent: finalPercent,
+        title: osmd.sheet.title ? osmd.sheet.title.text : 'Partitura'
+    }, '*');
 }
+
+
+function updateGlobalProgressByChunks() {
+    if (!osmd || !osmd.sheet) return;
+    
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    const chunkProgress = Math.floor((unlockedMeasureCount / totalMeasures) * 100);
+    const finalPercent = Math.max(0, Math.min(chunkProgress, 100));
+    const globalFill = document.getElementById('global-progress-fill');
+    if (globalFill) {
+        globalFill.style.width = `${finalPercent}%`;
+        
+        // Opcional: Cambiar color si llega al 100%
+        if (finalPercent >= 100) {
+            globalFill.style.backgroundColor = '#27ae60'; // Verde más oscuro
+        }
+    }
+    const globalText = document.getElementById('global-progress-text');
+    if (globalText) {
+        globalText.textContent = `${finalPercent}%`;
+    }
+    
+    window.parent.postMessage({
+        type: 'progressUpdate',
+        percent: finalPercent,
+        title: osmd.sheet.title ? osmd.sheet.title.text : 'Partitura'
+    }, '*');
+}
+
+window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (data && data.type === 'restoreProgress') {
+        const savedPercent = parseInt(data.percent);
+        if (!isNaN(savedPercent) && savedPercent > 0) {
+            restoreFogStateFromPercent(savedPercent);
+            updateGlobalProgressByChunks();
+        }
+    }
+});
+
+
+
+
+/*
+function restoreFogStateFromPercent(percent) {
+    if (!osmd || !osmd.sheet) {
+        setTimeout(() => restoreFogStateFromPercent(percent), 500);
+        return;
+    }
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    let measuresToUnlock = Math.floor((percent / 100) * totalMeasures);
+    measuresToUnlock = Math.ceil(measuresToUnlock / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    measuresToUnlock = Math.max(MEASURES_PER_CHUNK, Math.min(measuresToUnlock, totalMeasures));
+
+    unlockedMeasureCount = measuresToUnlock;
+    
+    if (percent >= 100) isPieceCompleted = true;
+    
+    if (isMidiLearnMode) {
+        setRangeOpacity(0, unlockedMeasureCount, 1);
+        setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15);
+        populateMeasureSelector();
+        const lastChunkIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+        measureSelect.value = lastChunkIndex;
+        jumpToMeasureInLearnMode(lastChunkIndex);
+    }
+    updateGlobalProgressByChunks();
+}
+*/
+
+function restoreFogStateFromPercent(percent) {
+    if (!osmd || !osmd.sheet) {
+        setTimeout(() => restoreFogStateFromPercent(percent), 500);
+        return;
+    }
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    let measuresToUnlock = Math.floor((percent / 100) * totalMeasures);
+    measuresToUnlock = Math.ceil(measuresToUnlock / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    measuresToUnlock = Math.max(MEASURES_PER_CHUNK, Math.min(measuresToUnlock, totalMeasures));
+    unlockedMeasureCount = measuresToUnlock;
+    
+    if (percent >= 100) isPieceCompleted = true;
+    if (isMidiLearnMode) {
+        setRangeOpacity(0, unlockedMeasureCount, 1);
+        setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15);
+        populateMeasureSelector();
+        const lastChunkIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+        measureSelect.value = lastChunkIndex;
+    }
+    updateGlobalProgressByChunks();
+}
+
+
+
 
 function updateMeasureSelectDisplay() {
     // Si estamos al principio o fuera de los límites, resetea al compás 1.
@@ -2544,17 +3112,18 @@ function updateMeasureSelectDisplay() {
 
 function jumpToMeasureInLearnMode(measureIndex) {
     if (!isMidiLearnMode) return;
-
+    expectedNotes.clear();
+    clearAllHighlights();
     const startTime = measureStartTimes[measureIndex] || 0;
     let newIndex = 0;
     for (let i = 0; i < parsedNotes.length; i++) {
-        // Usamos una pequeña tolerancia
         if (parsedNotes[i].startSec >= startTime - 0.001) { 
             newIndex = i;
             break;
         }
     }
     currentLearningIndex = newIndex;
+    osmd.cursor.hide();
     osmd.cursor.reset();
     let uniqueTimeSteps = new Set();
     for(let i = 0; i < currentLearningIndex; i++) {
@@ -2565,7 +3134,9 @@ function jumpToMeasureInLearnMode(measureIndex) {
     uniqueTimeSteps.forEach(() => {
         osmd.cursor.next();
     });
+    
     prepareFirstLearningStep(); 
+    osmd.cursor.show();
     measureSelect.value = measureIndex;
 }
 
@@ -2671,6 +3242,10 @@ function updateSpeed(newRate) {
     
     // Limitar la velocidad entre 0.25x y 2.0x
     playbackRate = Math.max(0.25, Math.min(2.0, newRate));
+
+    if (isMetronomeOn) {
+        updateMetronomeSpeed();
+    }
     
     // Actualizar la interfaz
     const currentBPM = Math.round(globalTempo * playbackRate);
@@ -2691,6 +3266,13 @@ speedUpBtn.addEventListener('click', () => {
 speedDownBtn.addEventListener('click', () => {
     updateSpeed(playbackRate - speedStep);
 });
+
+micBtn.addEventListener('click', toggleMicMode);
+muteBtn.addEventListener('click', toggleMutePiano);
+
+restartChunkBtn.addEventListener('click', restartCurrentChunk);
+
+metronomeBtn.addEventListener('click', toggleMetronome);
  
       pianoBtn.addEventListener('click', () => {
         togglePianoView();
@@ -2709,11 +3291,6 @@ speedDownBtn.addEventListener('click', () => {
 
       successModalCloseBtn.addEventListener('click', hideSuccessModal);
 
-      welcomeBannerClose.addEventListener('click', () => {
-    welcomeBanner.classList.remove('show');
-    midiLearnBtn.classList.remove('pulse-animation');
-    localStorage.setItem(WELCOME_BANNER_SHOWN_KEY, 'true');
-  });
 
  
       midiLearnBtn.addEventListener('click', toggleMidiLearnMode);
@@ -2734,7 +3311,7 @@ window.addEventListener('resize', () => {
   }
 });
       
- cursorBtn.addEventListener('click', toggleCursorType);
+ //cursorBtn.addEventListener('click', toggleCursorType);
   fullscreenBtn.addEventListener('click', toggleFullScreen);
 
   // Opcional pero recomendado: Actualiza el ícono si el usuario sale con la tecla ESC
@@ -2850,19 +3427,21 @@ cancelLoopBtn.addEventListener('click', () => {
     }
 
 
-
 function updateMeasureUntilOptions(startIndex) {
-    const measureCount = osmd.sheet.SourceMeasures.length;
-    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    if (!osmd || !osmd.sheet) return;
+
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    const limit = isMidiLearnMode ? Math.min(unlockedMeasureCount, totalMeasures) : totalMeasures;
     
-    // Solo mostrar compases posteriores al seleccionado
-    for (let i = startIndex + 1; i < measureCount; i++) {
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    for (let i = startIndex + 1; i < limit; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Compás ${i + 1}`;
         measureUntil.appendChild(option);
     }
 }
+
 
 // NUEVA FUNCIÓN: Desactivar modo loop
 function deactivateLoopMode() {
@@ -2889,32 +3468,35 @@ function toggleKeyNames() {
 }
 
 function togglePianoView() {
-    // Ciclo: full -> waterfall-only -> piano-only -> full
+    // Ciclo: full <-> waterfall-only (Eliminado piano-only)
     if (pianoViewMode === 'full') {
+        // Cambiar a Waterfall Only
         pianoViewMode = 'waterfall-only';
+        
         pianoContainer.classList.remove('piano-only');
         pianoContainer.classList.add('waterfall-only');
-        document.getElementById('sheet-music-wrapper').style.display = 'none';
+        
+
         pianoBtn.style.backgroundColor = '#e0e0e0';
-    } else if (pianoViewMode === 'waterfall-only') {
-        pianoViewMode = 'piano-only';
-        pianoContainer.classList.remove('waterfall-only');
-        pianoContainer.classList.add('piano-only');
-        document.getElementById('sheet-music-wrapper').style.display = 'block';
-        pianoBtn.style.backgroundColor = '#d0d0d0';
+        
     } else {
+        // Volver a Full View
         pianoViewMode = 'full';
+        
+        pianoContainer.classList.remove('waterfall-only');
         pianoContainer.classList.remove('piano-only');
+        
+        // Mostrar partitura
         document.getElementById('sheet-music-wrapper').style.display = 'block';
+        
+        // Quitar fondo del botón
         pianoBtn.style.backgroundColor = 'transparent';
     }
-    
-    // NUEVO: Recalcular el tamaño del canvas y pixelsPerSecond
+
     setTimeout(() => {
         resizeWaterfallCanvas();
     }, 100);
-    
-    console.log('Piano View Mode:', pianoViewMode);
+
 }
 // Función para mostrar nombres en las teclas blancas
 function showKeyNamesOnPiano() {
@@ -2983,21 +3565,31 @@ function getAngloSaxonNoteName(noteId) {
 }
 
 function populateMeasureSelector() {
-    const measureCount = osmd.sheet.SourceMeasures.length;
-    measureSelect.innerHTML = '';
-    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+    if (!osmd || !osmd.sheet) return;
 
-    for (let i = 0; i < measureCount; i++) {
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    measureSelect.innerHTML = '';
+    const limit = isMidiLearnMode ? Math.min(unlockedMeasureCount, totalMeasures) : totalMeasures;
+
+    for (let i = 0; i < limit; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Compás ${i + 1}`;
         measureSelect.appendChild(option);
-        
-        const option2 = document.createElement('option');
-        option2.value = i;
-        option2.textContent = `Compás ${i + 1}`;
-        measureUntil.appendChild(option2);
     }
+    measureUntil.innerHTML = '<option value="-1">Sin límite</option>';
+}
+
+function restartCurrentChunk() {
+    if (!isMidiLearnMode || isRestarting) return;
+    isRestarting = true;
+    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+    if (isPieceCompleted) {
+        const currentMs = getCurrentMeasureIndex();
+        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+    }
+    jumpToMeasureInLearnMode(targetMeasureIndex);
+    isRestarting = false;
 }
 
 
@@ -3010,11 +3602,9 @@ function toggleCursorType() {
 
   // Cambia el color del botón para dar feedback visual
   if (newType === 3) {
-    cursorBtn.style.color = '#3498db'; 
      osmd.cursor.cursorOptions.alpha = 0.45;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.45)";
   } else {
-    cursorBtn.style.color = '#1a1a1a'; 
     osmd.cursor.cursorOptions.alpha =0.8;
     osmd.cursor.cursorOptions.color = "rgba(52, 152, 219, 0.8)";
   }
@@ -3149,102 +3739,414 @@ function normalizeNote(noteName) {
 }
 
 function advanceLearningStep() {
-  const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
-  activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
-  activeHighlightTimeouts.forEach(clearTimeout);
-  activeHighlightTimeouts.length = 0;
-  expectedNotes.clear();
+    const activeKeys = document.querySelectorAll('.active-treble, .active-bass');
+    activeKeys.forEach(key => key.classList.remove('active-treble', 'active-bass'));
+    activeHighlightTimeouts.forEach(clearTimeout);
+    activeHighlightTimeouts.length = 0;
+    expectedNotes.clear();
 
-
-  if (isLoopMode && loopMeasureEnd !== -1) {
-    if (currentLearningIndex < parsedNotes.length) {
-      const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-      const endTime = loopMeasureEnd + 1 < measureStartTimes.length 
-        ? measureStartTimes[loopMeasureEnd + 1] 
-        : totalDuration;
-      if (nextNoteTime >= endTime) {
-        console.log('🔄 Loop completado, reiniciando desde compás', loopMeasureStart + 1);
-        jumpToMeasureInLearnMode(loopMeasureStart);
-        return;
-      }
-    }
-  }
-
-  if (currentLearningIndex >= parsedNotes.length) {
-    if (isLoopMode) {
-      console.log('🔄 Final de pieza alcanzado, reiniciando loop desde compás', loopMeasureStart + 1);
-      jumpToMeasureInLearnMode(loopMeasureStart);
-      return;
-    } else {
-      showSuccessModal("¡Felicidades, has completado la pieza!");
-      showConfetti(200);
-      toggleMidiLearnMode();
-      return;
-    }
-  }
-
-  let notesInStep = [];
-  let foundValidStep = false;
-  const TIME_TOLERANCE = 0.001;
-
-  while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
-    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    notesInStep = [];
-    
-    while (currentLearningIndex < parsedNotes.length && 
-           Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
-      notesInStep.push(parsedNotes[currentLearningIndex]);
-      currentLearningIndex++;
-    }
-
-    const filteredNotes = notesInStep.filter(note => 
-      !note.isRest &&
-      !note.isTiedContinuation &&
-      (handFilterMode === 'both' || 
-      (handFilterMode === 'right' && note.hand === 'treble') ||
-      (handFilterMode === 'left' && note.hand === 'bass'))
-    );
-
-    if (filteredNotes.length > 0) {
-      foundValidStep = true;
-      notesInStep = filteredNotes;
-      
-      osmd.cursor.next();
-      
-      const uniquePitches = new Set();
-      
-      notesInStep.forEach(note => {
-        const normalizedNote = normalizeNote(note.pitch);
+    if (isLoopMode && parsedNotes[currentLearningIndex]) {
+        // Obtenemos en qué compás está la nota que TOCA aprender ahora
+        const currentMsIndex = getCurrentMeasureIndex();
         
-        if (!uniquePitches.has(normalizedNote)) {
-          uniquePitches.add(normalizedNote);
-          expectedNotes.add(normalizedNote);
-          highlightKeyInstant(note.pitch, note.hand);
+        // Si ese compás es mayor al límite final del loop...
+        if (currentMsIndex > loopMeasureEnd) {
+             // ...volvemos al compás de inicio
+             jumpToMeasureInLearnMode(loopMeasureStart);
+             return; // Detenemos la función aquí para que no siga avanzando
         }
-      });
-      
-      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
-    } else {
-      console.log(`Silencio detectado en tiempo ${nextNoteTime}s, avanzando cursor...`);
-      osmd.cursor.next();
     }
-  }
 
-  if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
-    if (isLoopMode) {
-      console.log('🔄 Final alcanzado, reiniciando loop');
-      jumpToMeasureInLearnMode(loopMeasureStart);
-    } else {
-      showSuccessModal("¡Felicidades, has completado la pieza!");
-      showConfetti(200);
-      toggleMidiLearnMode();
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    if (currentLearningIndex >= parsedNotes.length) {
+        if (!isPieceCompleted) {
+            showSuccessModal("🎉 ¡Felicidades! Has completado la pieza.<br>Has desbloqueado el <strong>Modo Libre</strong>.");
+            showConfetti(300);
+            isPieceCompleted = true;
+            unlockedMeasureCount = totalMeasures;
+            updateGlobalProgressByChunks();
+        }
+        toggleMidiLearnMode();
+        return;
     }
-    return;
-  }
-  
-  updateMeasureSelectDisplay();
-  updatePracticeProgress();
+
+    // --- LÓGICA DE NIEBLA Y CHECKPOINTS ---
+    if (isMidiLearnMode && parsedNotes[currentLearningIndex]) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+        let nextNoteMeasureIndex = 0;
+        for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+            if (nextNoteTime >= measureStartTimes[i] - 0.001) {
+                nextNoteMeasureIndex = i;
+                break;
+            }
+        }
+
+     
+
+
+      if (unlockedMeasureCount < totalMeasures) {
+            if (nextNoteMeasureIndex >= unlockedMeasureCount) {
+                const oldLimit = unlockedMeasureCount;
+                unlockedMeasureCount += MEASURES_PER_CHUNK;
+                if (unlockedMeasureCount > totalMeasures){ unlockedMeasureCount = totalMeasures};
+                setRangeOpacity(oldLimit, unlockedMeasureCount, 1);
+                populateMeasureSelector();
+                updateGlobalProgressByChunks(); 
+                
+                showSuccessToast(`¡Sección Superada!`);
+            }
+        }
+
+
+    }
+
+    let notesInStep = [];
+    let foundValidStep = false;
+    const TIME_TOLERANCE = 0.001;
+
+    while (currentLearningIndex < parsedNotes.length && !foundValidStep) {
+        const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
+
+        notesInStep = [];      
+        while (currentLearningIndex < parsedNotes.length && 
+               Math.abs(parsedNotes[currentLearningIndex].startSec - nextNoteTime) < TIME_TOLERANCE) {
+            notesInStep.push(parsedNotes[currentLearningIndex]);
+            currentLearningIndex++;
+        }
+
+        const filteredNotes = notesInStep.filter(note => 
+            !note.isRest &&
+            !note.isTiedContinuation &&
+            (handFilterMode === 'both' || 
+            (handFilterMode === 'right' && note.hand === 'treble') ||
+            (handFilterMode === 'left' && note.hand === 'bass'))
+        );
+
+        if (filteredNotes.length > 0) {
+            foundValidStep = true;
+            osmd.cursor.next();
+            
+            const uniquePitches = new Set();
+            filteredNotes.forEach(note => { 
+                 const normalizedNote = normalizeNote(note.pitch);
+                 if (!uniquePitches.has(normalizedNote)) {
+                    uniquePitches.add(normalizedNote);
+                    expectedNotes.add(normalizedNote);
+                    highlightKeyInstant(note.pitch, note.hand);
+                 }
+            });
+        } else {
+            osmd.cursor.next();
+        }
+    }
+
+    if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
+         showSuccessModal("¡Felicidades, has completado la pieza!");
+         showConfetti(200);
+         toggleMidiLearnMode();
+    }
+    
+    updateMeasureSelectDisplay();
+    updatePracticeProgress();
 }
+
+
+
+
+function autoCorrelate(buf, sampleRate) {
+    let SIZE = buf.length;
+    let rms = 0;
+
+    for (let i = 0; i < SIZE; i++) {
+        const val = buf[i];
+        rms += val * val;
+    }
+    rms = Math.sqrt(rms / SIZE);
+
+    if (rms < MIC_THRESHOLD) return -1; // Silencio
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+        if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    buf = buf.slice(r1, r2);
+    SIZE = buf.length;
+
+    let c = new Array(SIZE).fill(0);
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE - i; j++) {
+            c[i] = c[i] + buf[j] * buf[j + i];
+        }
+    }
+
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < SIZE; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+    let T0 = maxpos;
+
+    return sampleRate / T0;
+}
+
+
+function getNoteFromFrequency(frequency) {
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const pitchNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+    const midi = Math.round(pitchNum);
+    const noteName = noteNames[midi % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return noteName + octave;
+}
+
+// 3. Iniciar Escucha
+async function startMicrophoneListener() {
+    if (audioContext) return; 
+
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphoneStream = stream;
+        
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+
+        const bufferLength = analyser.fftSize;
+        const buffer = new Float32Array(bufferLength);
+
+        console.log("🎤 Micrófono activado");
+        
+        micInterval = setInterval(() => {
+            if (!isMicActive) return;
+
+            analyser.getFloatTimeDomainData(buffer);
+            const frequency = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (frequency !== -1) {
+                const noteName = getNoteFromFrequency(frequency);
+                
+                // Debounce para evitar rebotes rápidos
+                const now = Date.now();
+                if (noteName !== lastMicNote || (now - lastMicTime > 300)) {
+                    
+                    // AQUÍ ESTÁ LA MAGIA: Enviamos la nota al sistema central
+                    processInputNote(noteName); 
+                    
+                    lastMicNote = noteName;
+                    lastMicTime = now;
+                    
+                    // Efecto visual de soltar la tecla
+                    setTimeout(() => unhighlightMidiKey(noteName), 200);
+                }
+            }
+        }, 50); // Muestreo cada 50ms
+
+    } catch (err) {
+        console.error("Error micrófono:", err);
+        showModal("⚠️ No se pudo acceder al micrófono. Verifica permisos.");
+        toggleMicMode(); // Apagar si falló
+    }
+}
+
+// 4. Detener Escucha
+function stopMicrophoneListener() {
+    if (micInterval) clearInterval(micInterval);
+    if (microphoneStream) {
+        microphoneStream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+    audioContext = null;
+    analyser = null;
+    micInterval = null;
+}
+
+
+function toggleMicMode() {
+    isMicActive = !isMicActive;
+
+    if (isMicActive) {
+        // 1. Activar estado visual del botón
+        micBtn.classList.add('active');
+        
+        // 2. Si estaba reproduciendo, detener
+        stopPlayback();
+
+        // 3. Configurar variables de "Modo Aprendizaje Libre"
+        // Necesitamos isMidiLearnMode en true para que processInputNote funcione
+        isMidiLearnMode = true; 
+        currentInputSource = 'mic';
+        
+        // Desbloquear TOTALMENTE la pieza (Modo Libre)
+        const totalMeasures = osmd.sheet.SourceMeasures.length;
+        unlockedMeasureCount = totalMeasures; 
+        
+        // Quitar la niebla (Fog of War) completamente
+        setRangeOpacity(0, totalMeasures, 1);
+        
+        // 4. Configurar el Cursor para modo espera (Azul)
+        currentLearningIndex = 0;
+        osmd.cursor.show();
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 5,
+            alpha: 0.7,
+            color: "rgba(52, 152, 219, 0.7)"
+        });
+
+        // 5. MANEJO DE LA INTERFAZ (UI)
+        // Mostrar la barra secundaria
+        secondaryTopBar2.classList.add('is-visible');
+        
+        // --- AQUÍ ESTÁ EL CAMBIO SOLICITADO ---
+        if (restartChunkBtn) restartChunkBtn.style.display = 'none';
+        
+        // Asegurarse que el selector de compás sí se vea y se actualice
+        populateMeasureSelector();
+        measureSelect.value = 0;
+
+        // 6. Preparar el sistema para escuchar la primera nota
+        // Resetear filtros de mano a 'ambas' por defecto en modo micrófono
+        handFilterMode = 'both';
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        
+        prepareFirstLearningStep();
+        
+        // 7. Iniciar el listener del micrófono
+        startMicrophoneListener();
+        updateMidiStatusLegend("Micrófono Activo");
+
+    } else {
+        // APAGAR MODO
+        micBtn.classList.remove('active');
+        stopMicrophoneListener();
+        
+        // Desactivar variables lógicas
+        isMidiLearnMode = false;
+        
+        if (currentInputSource === 'mic') {
+            currentInputSource = 'none';
+            updateMidiStatusLegend(null);
+        }
+
+        // Ocultar la barra secundaria
+        secondaryTopBar2.classList.remove('is-visible');
+
+        // RESTAURAR LA UI (Importante para cuando vuelvas a usar MIDI normal)
+        // Esperamos un poco a que termine la animación de cierre para restaurar el display
+        setTimeout(() => {
+            if (restartChunkBtn) restartChunkBtn.style.display = 'inline-flex';
+        }, 300);
+        
+        // Restaurar cursor normal y controles
+        osmd.cursor.reset();
+        osmd.cursor.hide();
+        playBtn.disabled = false;
+        progressBar.disabled = false;
+        
+        // Restaurar opacidad visual si es necesario (opcional)
+        setRangeOpacity(0, osmd.sheet.SourceMeasures.length, 1);
+    }
+}
+
+
+function toggleMutePiano() {
+    isPianoMuted = !isPianoMuted;
+
+    if (isPianoMuted) {
+        // --- ACTIVAR SILENCIO ---
+        // En Tone.js, -Infinity decibelios es silencio absoluto
+        if (sampler) sampler.volume.value = -Infinity;
+        
+        // Cambio visual: Icono de mute y color activo (rojo o gris según tu CSS)
+        muteBtn.innerHTML = '<i class="ri-volume-mute-line"></i>';
+        muteBtn.classList.add('active'); 
+        // Opcional: ponerlo rojo para que sea evidente
+        muteBtn.style.color = '#e74c3c'; 
+        
+    } else {
+        // --- ACTIVAR SONIDO ---
+        // 0 decibelios es el volumen estándar (sin ganancia ni pérdida)
+        if (sampler) sampler.volume.value = 0;
+        
+        // Restaurar icono y color
+        muteBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
+        muteBtn.classList.remove('active');
+        muteBtn.style.color = ''; // Volver al color original
+    }
+}
+
+
+function showSuccessToast(message) {
+    const toast = document.getElementById('success-toast');
+    const msgSpan = document.getElementById('success-toast-message');
+    
+    if (toast && msgSpan) {
+        msgSpan.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+}
+
+function showWarningToast(message) {
+    const toast = document.getElementById('success-toast');
+    const msgSpan = document.getElementById('success-toast-message');
+    const icon = toast.querySelector('i');
+    
+    if (toast && msgSpan) {
+        // Guardar clase original del icono
+        const originalIconClass = icon.className;
+        
+        // Cambiar estilos a warning
+        toast.classList.add('warning');
+        icon.className = 'ri-alert-line'; // Cambia el icono a alerta
+        msgSpan.textContent = message;
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            // Esperar a que termine la animación para restaurar estilos
+            setTimeout(() => {
+                toast.classList.remove('warning');
+                icon.className = originalIconClass; // Restaurar icono original
+            }, 500);
+        }, 3000);
+    }
+}
+
+function updateStaffFogOverlay() {
+    // Borrar niebla anterior
+    const oldFogs = document.querySelectorAll('.fog-overlay');
+    oldFogs.forEach(el => el.remove());
+
+    if (!osmd || !osmd.graphic) return;
+
+    const containerRect = osmdContainer.getBoundingClientRect();
+
+    for (let i = unlockedMeasureCount; i < osmd.graphic.measureList.length; i++) {
+        const measures = osmd.graphic.measureList[i];
+        if (!measures) continue;
+        const bbox = measures[0].boundingBox; 
+        const positionAndShape = measures[0].PositionAndShape;
+        const absX = positionAndShape.AbsolutePosition.x * 10; // Escala aprox OSMD (suelen ser unidades * 10)
+        const width = positionAndShape.Size.width * 10;
+        const absY = positionAndShape.AbsolutePosition.y * 10;
+    }
+}
+
 
     function setStatus(text) { 
       statusDiv.textContent = text;
@@ -3285,60 +4187,155 @@ function showConfetti(count = 100) {
   }
 }
 
+function setRangeOpacity(startMeasureIndex, endMeasureIndex, opacity) {
+    if (!osmd || !osmd.graphic) return;
+
+    // Recorremos los compases solicitados
+    for (let i = startMeasureIndex; i < endMeasureIndex; i++) {
+        // Validación de límites
+        if (i >= osmd.graphic.measureList.length) break;
+
+        const measures = osmd.graphic.measureList[i];
+        if (!measures) continue;
+
+        // Recorremos los pentagramas del compás
+        for (let staffIndex = 0; staffIndex < measures.length; staffIndex++) {
+            const staffEntry = measures[staffIndex].staffEntries;
+            
+            // Recorremos las entradas
+            for (let j = 0; j < staffEntry.length; j++) {
+                const voiceEntries = staffEntry[j].graphicalVoiceEntries;
+                
+                for (let v = 0; v < voiceEntries.length; v++) {
+                    // AQUÍ ESTÁ LA CORRECCIÓN: Definimos 'notes' dentro del bucle correcto
+                    const notes = voiceEntries[v].notes;
+                    
+                    for (let n = 0; n < notes.length; n++) {
+                        const svgElement = notes[n].getSVGGElement();
+                        if (opacity < 1) {
+                                svgElement.style.filter = "blur(2px) grayscale(100%)";
+                                svgElement.style.opacity = "0.3"; // Un poco más visible pero borroso
+                            } else {
+                                svgElement.style.filter = "none";
+                                svgElement.style.opacity = "1";
+                            }
+                        svgElement.style.transition = "all 0.5s ease";
+                    }
+                }
+            }
+        }
+    }
+}
+
+function initFogOfWar() {
+    // 1. Asegurar que los primeros 4 compases sean visibles (Opacidad 1)
+    setRangeOpacity(0, unlockedMeasureCount, 1);
+    
+    // 2. Ocultar (bajar opacidad) todo lo demás hasta el final de la pieza
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    setRangeOpacity(unlockedMeasureCount, totalMeasures, 0.15); // 0.15 es muy tenue
+}
+
 function toggleMidiLearnMode() {
-    if (isMidiLearnMode === false && (!midiAccess || midiAccess.inputs.size === 0)) {
-        showModal("🎹 No se detectó ningún teclado MIDI. Por favor, conecta uno e inténtalo de nuevo.");
-        initMidiInput();
+    // Si ya está activo, lo desactivamos (comportamiento toggle normal)
+    if (isMidiLearnMode) {
+        isMidiLearnMode = false;
+        currentInputSource = 'none';
+        
+        // Restaurar botón original
+        midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
+        updateMidiStatusLegend(null); 
+
+        const globalContainer = document.getElementById('global-progress-container');
+        if (globalContainer) globalContainer.classList.remove('is-visible');
+
+        const totalMeasures = osmd.sheet.SourceMeasures.length;
+        setRangeOpacity(0, totalMeasures, 1);
+        
+        midiLearnBtn.style.background = 'none';
+        playBtn.disabled = false;
+        progressBar.disabled = false;
+        clearAllHighlights(); 
+        osmd.cursor.reset();
+        osmd.cursor.hide();
+    
+        Object.assign(osmd.cursor.cursorOptions, {
+            type: 1,
+            alpha: 0.8,
+            color: "rgba(52, 152, 219, 0.8)"
+        });
+    
+        secondaryTopBar2.classList.remove('is-visible');
+        handFilterMode = 'both';
+        updateStaffOpacity('both'); 
+        rightHandOnlyBtn.style.background = 'none';
+        leftHandOnlyBtn.style.background = 'none';
+        
+        populateMeasureSelector();
+        return; // Salimos de la función
+    }
+
+    // --- INTENTO DE ACTIVACIÓN ---
+    
+    // 1. Verificación estricta de MIDI
+    let hasMidi = false;
+    if (midiAccess && midiAccess.inputs.size > 0) {
+        hasMidi = true;
+    }
+
+    // 2. Si NO hay MIDI, mostramos alerta y cancelamos
+    if (!hasMidi) {
+        showWarningToast("⚠️ Conecta tu teclado MIDI para practicar");
         return; 
     }
 
-    isMidiLearnMode = !isMidiLearnMode;
+    isMidiLearnMode = true;
+    const globalContainer = document.getElementById('global-progress-container');
+        if (globalContainer) globalContainer.classList.add('is-visible');
     stopPlayback(); 
 
-    if (isMidiLearnMode) {
-        midiLearnBtn.style.background = '#e0e0e0';
-        midiLearnBtn.classList.remove('pulse-animation');
-        playBtn.disabled = true;
-        progressBar.disabled = true;
-        currentLearningIndex = 0;
-        osmd.cursor.show();
+    updateMidiStatusLegend("Teclado MIDI");
+    currentInputSource = 'midi'; 
 
-        cursorBtn.style.color = '#3498db';
-        Object.assign(osmd.cursor.cursorOptions, {
-            type: 5,
-            alpha: 0.7,
-            color: "rgba(52, 152, 219, 0.7)"
-        });
-        
-        handFilterMode = 'both';
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-        secondaryTopBar2.classList.add('is-visible');
-
-        prepareFirstLearningStep(); 
-        measureSelect.value = 0;
-        
-    } else {
-    midiLearnBtn.style.background = 'none';
-    playBtn.disabled = false;
-    progressBar.disabled = false;
-    clearAllHighlights(); 
-    osmd.cursor.reset();
-    osmd.cursor.hide();
+   if (isPieceCompleted) {
+    unlockedMeasureCount = osmd.sheet.SourceMeasures.length;
+} else {
+    unlockedMeasureCount = Math.max(unlockedMeasureCount || 0, MEASURES_PER_CHUNK);
+}
     
-    cursorBtn.style.color = '#1a1a1a';
-    Object.assign(osmd.cursor.cursorOptions, {
-        type: 1,
-        alpha: 0.8,
-        color: "rgba(52, 152, 219, 0.8)"
-    });
+    populateMeasureSelector(); 
 
-    secondaryTopBar2.classList.remove('is-visible');
+    setTimeout(() => {
+         setRangeOpacity(0, unlockedMeasureCount, 1);      
+        const total = osmd.sheet.SourceMeasures.length;
+        setRangeOpacity(unlockedMeasureCount, total, 0.15);
+    }, 100);
+
+    midiLearnBtn.style.background = '#e0e0e0';
+    midiLearnBtn.classList.remove('pulse-animation');
+    
+    playBtn.disabled = true;
+    progressBar.disabled = true;
+    currentLearningIndex = 0;
+    osmd.cursor.show();
+
+    Object.assign(osmd.cursor.cursorOptions, {
+        type: 5,
+        alpha: 0.7,
+        color: "rgba(52, 152, 219, 0.7)"
+    });
+    
     handFilterMode = 'both';
-    updateStaffOpacity('both'); // NUEVO: Restaurar opacidad normal
     rightHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.background = 'none';
-}
+    secondaryTopBar2.classList.add('is-visible');
+
+    prepareFirstLearningStep(); 
+    measureSelect.value = 0;
+
+    if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 0) {
+        nextTutorialStep(); 
+    }
 }
 
 
@@ -3466,17 +4463,15 @@ function toggleRightHandOnly() {
     rightHandOnlyBtn.style.color = '#3498db';
     leftHandOnlyBtn.style.background = 'none';
     leftHandOnlyBtn.style.color = '#1a1a1a';
-  }
 
-  // NUEVO: Actualizar opacidad de los pentagramas
+    if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 2) {
+        nextTutorialStep(); // Avanzar automáticamente al paso 3
+    }
+  }
   updateStaffOpacity(handFilterMode);
-  
-  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
   if (isMidiLearnMode) {
     skipToNextRelevantNote();
   }
-  
-  console.log(`Modo de mano: ${handFilterMode}`);
 }
 
 function toggleLeftHandOnly() {
@@ -3647,37 +4642,41 @@ function initMidiInput() {
 
 function onMIDISuccess(access) {
     midiAccess = access;
-    let connectedInputs = new Map();
-
-    const handlePortChange = (port) => {
-        if (port.type !== 'input') return; // Ignoramos puertos de salida
-
+    for (var input of midiAccess.inputs.values()) {
+        input.onmidimessage = onMIDIMessage;
+    }
+    checkMidiConnectionStatus();
+    midiAccess.onstatechange = (event) => {
+        const port = event.port;
+        if (port.type !== 'input') return;
         if (port.state === 'connected') {
-            console.log(`MIDI Conectado: ${port.name}`);
-            port.onmidimessage = onMIDIMessage; // Asigna el listener
-            connectedInputs.set(port.id, port);
-            midiLearnBtn.classList.add('pulse-animation');
-        } else if (port.state === 'disconnected') {
-            console.log(`MIDI Desconectado: ${port.name}`);
-            connectedInputs.delete(port.id); 
-            midiLearnBtn.classList.remove('pulse-animation');
+             port.onmidimessage = onMIDIMessage;
         }
-
-        if (connectedInputs.size > 0) {
-            const firstDeviceName = connectedInputs.values().next().value.name;
-            updateMidiStatusLegend(firstDeviceName);
-        } else {
-            updateMidiStatusLegend(null);
-        }
+        checkMidiConnectionStatus();
     };
+}
 
-    // Asigna el listener para futuros cambios (conectar/desconectar)
-    midiAccess.onstatechange = (event) => handlePortChange(event.port);
+// Nueva función auxiliar para manejar la lógica de conexión
+function checkMidiConnectionStatus() {
+    // A. Control del Botón Tutorial
+    const tutorialBtn = document.getElementById('start-tutorial-btn');
+    
+    // Si hay al menos 1 entrada conectada Y activa
+    if (midiAccess.inputs.size > 0) {
+        if (tutorialBtn) tutorialBtn.style.display = 'inline-block'; // O 'block' o 'flex' segun tu diseño
+        
+        // Actualizar leyenda (opcional, toma el primero)
+        const firstInput = midiAccess.inputs.values().next().value;
+        if (firstInput) updateMidiStatusLegend(firstInput.name);
 
-    // Escaneo inicial de dispositivos YA conectados al cargar la página
-    const inputs = midiAccess.inputs.values();
-    for (const input of inputs) {
-        handlePortChange(input); // Usa la misma lógica
+    } else {
+        if (tutorialBtn) tutorialBtn.style.display = 'none';
+        updateMidiStatusLegend(null);
+        if (isMidiLearnMode) {
+            console.log("MIDI desconectado: Saliendo de modo aprendizaje...");
+            showWarningToast("⚠️ MIDI desconectado. Saliendo del modo aprendizaje.");
+            toggleMidiLearnMode(); // Esto apaga el modo
+        }
     }
 }
 
@@ -3689,89 +4688,111 @@ function onMIDIFailure() {
     playBtn.disabled = false;
 }
 
-
 function onMIDIMessage(event) {
-    const command = event.data[0];
+    const command = event.data[0] & 0xf0; 
     const note = event.data[1];
     const velocity = event.data.length > 2 ? event.data[2] : 0;
-
+    const pitchName = midiNoteToPitchName(note);
+    if (command === 176 && note === 64) {
+        if (velocity >= 64) {
+            isSustainPedalDown = true;
+        } else {
+            isSustainPedalDown = false;
+            releaseSustainedNotes(); 
+        }
+        return; 
+    }
     if (command === 144 && velocity > 0) {
-        const pitchName = midiNoteToPitchName(note);
-        highlightMidiKey(pitchName);
-        
-
-if (isIntelligentPracticeMode && isMidiLearnMode) {
-    if (practiceStartTime === null) {
-        practiceStartTime = Date.now();
-    }
-    
-    const normalizedNote = normalizeNote(pitchName);
-    
-    // Verificar si la nota está en las esperadas del modo normal
-    if (expectedNotes.has(normalizedNote)) {
-        // Usar la lógica normal del modo aprendizaje
-        sampler.triggerAttackRelease(pitchName, '8n');
-        expectedNotes.delete(normalizedNote);
-        createNoteFlashPiano(pitchName, 'treble');
-        practiceCorrectNotes++;
-        
-        console.log(`✓ Correcta: ${normalizedNote}, Quedan: ${expectedNotes.size}`);
-        
-        // Cuando se completan todas las notas del paso actual
-        if (expectedNotes.size === 0) {
-            // Avanzar normalmente
-            if (currentLearningIndex > 0) {
-                advanceLearningStep();
-            } else {
-                prepareFirstLearningStep();
-            }
-            
-            // Verificar si completó el rango de compases de esta fase
-            checkPracticePhaseCompletion();
+        if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
+            sampler.triggerAttack(pitchName, undefined, velocity / 127); 
         }
-        
-        // Actualizar progreso en tiempo real
-        updatePracticeAccuracy();
-    } else {
-        // Nota incorrecta
-        practiceErrors++;
-        console.log(`✗ Error: Nota ${normalizedNote} incorrecta. Total errores: ${practiceErrors}`);
-        updatePracticeAccuracy();
-    }
-    
-    return; // No ejecutar la lógica normal
-}
-        
-        // LÓGICA NORMAL DE LEARNING MODE
-        if (isMidiLearnMode && expectedNotes.size > 0) {
-            const normalizedMidiNote = normalizeNote(pitchName);
-            
-            if (expectedNotes.has(normalizedMidiNote)) {
-
-                if(sampler && sampler.loaded) {
-                    sampler.triggerAttackRelease(pitchName, '8n', Tone.now());
-                }
-                requestAnimationFrame(() => {
-                    highlightMidiKey(pitchName); 
-                    createNoteFlashPiano(pitchName, 'treble'); 
-                });
-
-                expectedNotes.delete(normalizedMidiNote);
-                
-                if (expectedNotes.size === 0) {
-                    if (currentLearningIndex > 0) {
-                        advanceLearningStep();
-                    } else {
-                        prepareFirstLearningStep();
-                    }
-                }
-            }
+        if (sustainedNotes.has(pitchName)) {
+            sustainedNotes.delete(pitchName);
         }
+
+        requestAnimationFrame(() => {
+            processInputNote(pitchName);
+        });
     } else if (command === 128 || (command === 144 && velocity === 0)) {
-        const pitchName = midiNoteToPitchName(note);
-        unhighlightMidiKey(pitchName);
+        if (isSustainPedalDown) {
+            if (isMidiLearnMode && currentInputSource === 'midi') {
+                sustainedNotes.add(pitchName);
+            }
+        } else {
+            if (isMidiLearnMode && currentInputSource === 'midi' && sampler && sampler.loaded) {
+                sampler.triggerRelease(pitchName);
+            }
+        }
+        requestAnimationFrame(() => {
+            unhighlightMidiKey(pitchName);
+        });
     }
 }
+
+
+
+function releaseSustainedNotes() {
+    if (!sampler || !sampler.loaded) return;
+    const notesToRelease = Array.from(sustainedNotes);
+    
+    if (notesToRelease.length > 0) {
+        sampler.triggerRelease(notesToRelease);
+        sustainedNotes.clear();
+    }
+}
+
+
+
+
+
+function processInputNote(noteName) {
+    if (!isMidiLearnMode || isRestarting) return;
+    highlightMidiKey(noteName);
+
+    if (expectedNotes.size > 0) {
+        const normalizedNote = normalizeNote(noteName);
+        if (expectedNotes.has(normalizedNote)) {
+            createNoteFlashPiano(noteName, 'treble'); 
+            if (tutorialOverlay.classList.contains('is-visible')) {
+                const currentStepData = tutorialSteps[currentTutorialStep];
+                if (currentStepData && currentStepData.targetAction === 'play-correct-note') {
+                    nextTutorialStep();
+                }
+            }
+            
+            expectedNotes.delete(normalizedNote);
+            if (expectedNotes.size === 0) {
+                if (currentLearningIndex > 0) {
+                    advanceLearningStep(); 
+                } else {
+                    prepareFirstLearningStep(); 
+                }
+            }
+        } else {
+
+          const currentMeasureIdx = getCurrentMeasureIndex();
+            const challengeStartMeasure = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+            if (!isPieceCompleted && currentMeasureIdx >= challengeStartMeasure) {
+                showWarningToast("⚠️ Error en sección de prueba. Reiniciando...");
+                    restartCurrentChunk();
+            }
+        }
+    }
+}
+
+
+function getCurrentMeasureIndex() {
+    if (!parsedNotes[currentLearningIndex]) return 0;
+    const currentNoteTime = parsedNotes[currentLearningIndex].startSec;
+
+    for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+        if (currentNoteTime >= measureStartTimes[i] - 0.001) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 /*
 function onMIDIMessage(event) {
     const command = event.data[0];
@@ -3835,316 +4856,10 @@ function unhighlightMidiKey(noteName) {
 
 
 
-//MODO INTELIGENTE
-function toggleIntelligentPracticeMode() {
-    if (!isMidiLearnMode) {
-        showModal("⚠️ Debes activar el Modo Aprendizaje MIDI primero.");
-        return;
-    }
-    
-    if (!midiAccess || midiAccess.inputs.size === 0) {
-        showModal("🎹 No se detectó ningún teclado MIDI conectado.");
-        return;
-    }
-    
-    isIntelligentPracticeMode = !isIntelligentPracticeMode;
-    
-    if (isIntelligentPracticeMode) {
-        aiPracticeBtn.style.background = '#e0e0e0';
-        aiPracticeBtn.style.borderColor = '#3498db';
-        startIntelligentPractice();
-    } else {
-        aiPracticeBtn.style.background = 'none';
-        aiPracticeBtn.style.borderColor = 'transparent';
-        stopIntelligentPractice();
-    }
-}
-
-function startIntelligentPractice() {
-    currentPracticePhase = 'right-hand';
-    currentPracticeMeasureSet = 0;
-    practiceErrors = 0;
-    practiceCorrectNotes = 0;
-    
-    // Saltar al primer compás
-    jumpToMeasureInLearnMode(0);
-    
-    // Iniciar con mano derecha
-    handFilterMode = 'right';
-    updateHandButtons();
-    updateStaffOpacity('right');
-    
-    showModal(`🎹 Práctica Inteligente Iniciada<br><br>
-               Toca los compases 1-4 con la MANO DERECHA.<br><br>
-               El sistema medirá tu precisión y velocidad.`);
-    
-    preparePracticePhase();
-}
-
-function stopIntelligentPractice() {
-    isIntelligentPracticeMode = false;
-    currentPracticePhase = 'inactive';
-    handFilterMode = 'both';
-    updateHandButtons();
-    updateStaffOpacity('both');
-    progressValueSpan.textContent = '0%';
-}
-
-function updatePracticeAccuracy() {
-    const totalNotes = practiceCorrectNotes + practiceErrors;
-    const currentAccuracy = totalNotes > 0 ? 
-        ((practiceCorrectNotes / totalNotes) * 100).toFixed(0) : 100;
-    progressValueSpan.textContent = `${currentAccuracy}%`;
-}
-
-function checkPracticePhaseCompletion() {
-    // Determinar el rango de compases de la fase actual
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    const endTime = measureStartTimes[endMeasure];
-    
-    // Verificar si llegamos al final del rango
-    if (currentLearningIndex > 0 && parsedNotes[currentLearningIndex - 1]) {
-        const currentTime = parsedNotes[currentLearningIndex - 1].startSec;
-        
-        // Si ya pasamos el tiempo final del rango, evaluar
-        if (currentTime >= endTime - 0.01) {
-            console.log('✅ Rango de compases completado, evaluando...');
-            setTimeout(() => {
-                evaluatePracticeAttempt();
-            }, 500);
-        }
-    }
-}
-
-function preparePracticePhase() {
-    practiceAttemptNotes = [];
-    practiceStartTime = null;
-    practiceErrors = 0;
-    practiceCorrectNotes = 0;
-    
-    // Determinar el rango de compases a practicar
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    // Saltar al compás de inicio usando la función existente
-    jumpToMeasureInLearnMode(startMeasure);
-    
-    console.log(`Fase: ${currentPracticePhase}, Compases: ${startMeasure + 1}-${endMeasure}, 
-                 Filtro de mano: ${handFilterMode}`);
-}
-
-function areEnharmonicEquivalents(note1, note2) {
-    if (note1 === note2) return true;
-    const midi1 = pitchToMidiNumber(note1);
-    const midi2 = pitchToMidiNumber(note2);
-    
-    return midi1 === midi2;
-}
-
-function updateHandButtons() {
-    if (handFilterMode === 'right') {
-        rightHandOnlyBtn.style.background = '#e0e0e0';
-        rightHandOnlyBtn.style.color = '#3498db';
-        leftHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.color = '#1a1a1a';
-    } else if (handFilterMode === 'left') {
-        leftHandOnlyBtn.style.background = '#e0e0e0';
-        leftHandOnlyBtn.style.color = '#3498db';
-        rightHandOnlyBtn.style.background = 'none';
-        rightHandOnlyBtn.style.color = '#1a1a1a';
-    } else {
-        rightHandOnlyBtn.style.background = 'none';
-        leftHandOnlyBtn.style.background = 'none';
-        rightHandOnlyBtn.style.color = '#1a1a1a';
-        leftHandOnlyBtn.style.color = '#1a1a1a';
-    }
-}
-
-function evaluatePracticeAttempt() {
-    // Contar las notas esperadas en el rango completado
-    let startMeasure, endMeasure;
-    
-    if (currentPracticePhase === 'consolidation') {
-        startMeasure = 0;
-        endMeasure = Math.min((currentPracticeMeasureSet + 1) * 4, measureStartTimes.length - 1);
-    } else {
-        startMeasure = currentPracticeMeasureSet * 4;
-        endMeasure = Math.min(startMeasure + 4, measureStartTimes.length - 1);
-    }
-    
-    const startTime = measureStartTimes[startMeasure];
-    const endTime = measureStartTimes[endMeasure];
-    
-    // Contar notas esperadas según el filtro de mano
-    const totalExpectedNotes = parsedNotes.filter(note => {
-        return note.startSec >= startTime && 
-               note.startSec < endTime && 
-               !note.isRest && 
-               !note.isTiedContinuation &&
-               ((currentPracticePhase === 'right-hand' && note.hand === 'treble') ||
-                (currentPracticePhase === 'left-hand' && note.hand === 'bass') ||
-                (currentPracticePhase === 'both-hands') ||
-                (currentPracticePhase === 'consolidation'));
-    }).length;
-    
-    if (totalExpectedNotes === 0) {
-        console.warn("No hay notas esperadas para evaluar");
-        advancePracticePhase();
-        return;
-    }
-    
-    const accuracy = ((practiceCorrectNotes / totalExpectedNotes) * 100).toFixed(0);
-    const totalTime = (Date.now() - practiceStartTime) / 1000;
-    const avgTimePerNote = (totalTime / totalExpectedNotes).toFixed(2);
-    
-    progressValueSpan.textContent = `${accuracy}%`;
-    
-    // Mostrar resultados
-    let message = `📊 <strong>Resultados:</strong><br><br>
-                   Precisión: <strong>${accuracy}%</strong><br>
-                   Notas correctas: ${practiceCorrectNotes}/${totalExpectedNotes}<br>
-                   Errores: ${practiceErrors}<br>
-                   Tiempo total: ${totalTime.toFixed(1)}s<br>
-                   Tiempo promedio: ${avgTimePerNote}s/nota<br><br>`;
-    
-    if (parseInt(accuracy) >= accuracyThreshold) {
-        message += '✅ <strong>¡Excelente!</strong> Pasando a la siguiente fase...';
-        showModal(message);
-        setTimeout(() => {
-            hideModal();
-            setTimeout(() => {
-                advancePracticePhase();
-            }, 500);
-        }, 3000);
-    } else {
-        message += `❌ Necesitas al menos <strong>${accuracyThreshold}%</strong> de precisión.<br>
-                    Inténtalo de nuevo.`;
-        showModal(message);
-        setTimeout(() => {
-            hideModal();
-            setTimeout(() => {
-                preparePracticePhase();
-            }, 500);
-        }, 3000);
-    }
-}
-
-function advancePracticePhase() {
-    const startMeasure = currentPracticeMeasureSet * 4;
-    const endMeasure = Math.min(startMeasure + 4, measureStartTimes.length);
-    const measureRange = `${startMeasure + 1}-${endMeasure}`;
-    
-    if (currentPracticePhase === 'right-hand') {
-        currentPracticePhase = 'left-hand';
-        handFilterMode = 'left';
-        updateHandButtons();
-        updateStaffOpacity('left');
-        showModal(`🎹 <strong>Fase 2:</strong><br><br>Ahora practica los compases <strong>${measureRange}</strong><br>con la <strong>MANO IZQUIERDA</strong>.`);
-        setTimeout(() => {
-            hideModal();
-            preparePracticePhase();
-        }, 3000);
-        
-    } else if (currentPracticePhase === 'left-hand') {
-        currentPracticePhase = 'both-hands';
-        handFilterMode = 'both';
-        updateHandButtons();
-        updateStaffOpacity('both');
-        showModal(`🎹 <strong>Fase 3:</strong><br><br>¡Perfecto! Ahora toca los compases <strong>${measureRange}</strong><br>con <strong>AMBAS MANOS</strong>.`);
-        setTimeout(() => {
-            hideModal();
-            preparePracticePhase();
-        }, 3000);
-        
-    } else if (currentPracticePhase === 'both-hands') {
-        const nextSetStart = (currentPracticeMeasureSet + 1) * 4;
-        
-        if (nextSetStart < measureStartTimes.length - 1) {
-            currentPracticeMeasureSet++;
-            currentPracticePhase = 'right-hand';
-            handFilterMode = 'right';
-            updateHandButtons();
-            updateStaffOpacity('right');
-            
-            const newRange = `${nextSetStart + 1}-${Math.min(nextSetStart + 4, measureStartTimes.length)}`;
-            showModal(`🎹 <strong>¡Excelente progreso!</strong><br><br>
-                       Ahora practica los compases <strong>${newRange}</strong><br>
-                       con la <strong>MANO DERECHA</strong>.`);
-            setTimeout(() => {
-                hideModal();
-                preparePracticePhase();
-            }, 3000);
-            
-        } else {
-            startConsolidationPhase();
-        }
-    } else if (currentPracticePhase === 'consolidation') {
-        // Completó la consolidación
-        showSuccessModal("🎉 ¡Felicidades!<br><br>Has completado toda la práctica inteligente.<br>¡Excelente trabajo!");
-        showConfetti(300);
-        setTimeout(() => {
-            stopIntelligentPractice();
-        }, 3000);
-    }
-}
-
-function startConsolidationPhase() {
-    currentPracticePhase = 'consolidation';
-    handFilterMode = 'both';
-    updateHandButtons();
-    updateStaffOpacity('both');
-    
-    const totalMeasures = currentPracticeMeasureSet * 4 + 4;
-    showModal(`🎉 ¡Fase de Consolidación!<br><br>
-               Toca los compases 1-${totalMeasures}<br>
-               con AMBAS MANOS de forma continua.`);
-    
-    jumpToMeasureInLearnMode(0);
-    preparePracticePhase();
-}
 
 
 
 
-
-
-
-function prepareNextExpectedNotes() {
-    expectedNotes.clear();
-    if (currentLearningIndex >= parsedNotes.length) {
-        console.log("¡Felicidades, terminaste la pieza!");
-        toggleMidiLearnMode(); // Desactiva el modo al final
-        return;
-    }
-
-    // Obtenemos el tiempo de la siguiente nota
-    const nextNoteTime = parsedNotes[currentLearningIndex].startSec;
-    
-    // Buscamos todas las notas que suenan en ESE MISMO MOMENTO (acordes)
-    while (currentLearningIndex < parsedNotes.length && parsedNotes[currentLearningIndex].startSec === nextNoteTime) {
-        expectedNotes.add(parsedNotes[currentLearningIndex].pitch);
-        currentLearningIndex++;
-    }
-    
-    // Opcional: Muestra en la consola qué notas se esperan
-    console.log("Esperando notas:", Array.from(expectedNotes));
-}
 
 function midiNoteToPitchName(midiNote) {
     const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -4180,4 +4895,4 @@ function hideModal() {
 
   </script>
 </body>
-</html>    
+</html>         
