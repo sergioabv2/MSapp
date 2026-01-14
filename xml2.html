@@ -4387,14 +4387,15 @@ function prepareFirstLearningStep() {
           highlightKeyInstant(note.pitch, note.hand);
         }
       }
-      
-      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    }else {
+      osmd.cursor.next(); 
     }
   }
 
   if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
     alert("¡No hay notas para la mano seleccionada en esta pieza!");
     toggleMidiLearnMode();
+    return;
   }
   updatePracticeProgress();
 }
