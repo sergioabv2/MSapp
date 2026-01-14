@@ -4424,54 +4424,64 @@ function prepareFirstLearningStep() {
 
 
 function updateStaffOpacity(mode) {
-    // 1. Usar requestAnimationFrame para asegurar que el DOM esté listo
+    // 1. AGREGADO: requestAnimationFrame para asegurar que el navegador está listo para pintar
     requestAnimationFrame(() => {
-        if (!osmd || !osmd.graphic) return;
+        
+        if (!osmd || !osmd.graphic) {
+            // console.warn("OSMD no está listo."); // Comentado para no ensuciar consola en reintentos
+            return;
+        }
         
         const svgContainer = osmdContainer.querySelector('svg');
+        
+        // 2. AGREGADO: Si no hay SVG aún, reintentar en 50ms
         if (!svgContainer) {
-            // Si no hay SVG aún, reintentar en 50ms (Solución para tablets lentas)
             setTimeout(() => updateStaffOpacity(mode), 50);
             return;
         }
-
-        // Buscar grupos <g> que parezcan pentagramas (hack para OSMD)
+        
+        // --- TU LÓGICA ORIGINAL INTACTA ---
+        // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
         const allGroups = Array.from(svgContainer.querySelectorAll('g'));
         
         const staffLineContainers = allGroups.filter(group => {
-            // Un pentagrama tiene 5 líneas (paths). Buscamos grupos que las contengan.
-            const paths = group.querySelectorAll(':scope > path');
-            // Filtramos líneas horizontales largas (las del pentagrama) para evitar confundir con plicas
-            let horizontalLines = 0;
-            paths.forEach(p => {
-                const d = p.getAttribute('d');
-                if (d && d.includes('H') || (p.getBBox && p.getBBox().width > 50)) {
-                    horizontalLines++;
-                }
+            // Contar cuántos sub-grupos con 5+ paths tiene
+            const subGroups = group.querySelectorAll('g');
+            let staffCount = 0;
+            subGroups.forEach(sub => {
+                const paths = sub.querySelectorAll(':scope > path');
+                if (paths.length >= 5) staffCount++;
             });
-            // Si tiene 5 líneas, es un candidato fuerte a ser un pentagrama
-            return paths.length >= 5; 
+            // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+            return staffCount > 1;
         });
 
-        // 2. Aplicar la opacidad
+        // 3. AGREGADO: Si la lógica no encontró nada (común en tablets lentas al inicio), reintentar
+        if (staffLineContainers.length === 0) {
+            setTimeout(() => updateStaffOpacity(mode), 50);
+            return;
+        }
+        
+        // --- TU LÓGICA DE APLICACIÓN INTACTA ---
         staffLineContainers.forEach((container, index) => {
-            // Asumimos orden estándar: Pentagrama 0 = Treble, 1 = Bass, 2 = Treble, 3 = Bass...
             const isTreble = index % 2 === 0;
-            let targetOpacity = '1';
-
-            if (mode === 'right') {
-                targetOpacity = isTreble ? '1' : '0.2';
-            } else if (mode === 'left') {
-                targetOpacity = isTreble ? '0.2' : '1';
+            
+            switch (mode) {
+                case 'right':
+                    container.style.opacity = isTreble ? '1' : '0.2';
+                    break;
+                case 'left':
+                    container.style.opacity = isTreble ? '0.2' : '1';
+                    break;
+                case 'both':
+                default:
+                    container.style.opacity = '1';
+                    break;
             }
-
-            // Aplicar solo si es necesario para evitar reflujos del navegador
-            if (container.style.opacity !== targetOpacity) {
-                container.style.opacity = targetOpacity;
-                container.style.transition = 'opacity 0.4s ease'; // Transición suave
-            }
+            container.style.transition = 'opacity 0.3s ease';
         });
-    });
+
+    }); // Fin del requestAnimationFrame
 }
 
 function toggleRightHandOnly() {
