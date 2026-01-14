@@ -3303,6 +3303,9 @@ window.addEventListener('resize', () => {
     if (osmd) {
       setupEngravingRulesForScreenSize();
       osmd.render();
+      setTimeout(() => {
+            updateStaffOpacity(handFilterMode);
+        }, 500);
     }
   }
   // Redimensionar el canvas del waterfall con los nuevos tamaños de teclas
@@ -4424,64 +4427,47 @@ function prepareFirstLearningStep() {
 
 
 function updateStaffOpacity(mode) {
-    // 1. AGREGADO: requestAnimationFrame para asegurar que el navegador está listo para pintar
-    requestAnimationFrame(() => {
-        
-        if (!osmd || !osmd.graphic) {
-            // console.warn("OSMD no está listo."); // Comentado para no ensuciar consola en reintentos
-            return;
-        }
-        
-        const svgContainer = osmdContainer.querySelector('svg');
-        
-        // 2. AGREGADO: Si no hay SVG aún, reintentar en 50ms
-        if (!svgContainer) {
-            setTimeout(() => updateStaffOpacity(mode), 50);
-            return;
-        }
-        
-        // --- TU LÓGICA ORIGINAL INTACTA ---
-        // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
-        const allGroups = Array.from(svgContainer.querySelectorAll('g'));
-        
-        const staffLineContainers = allGroups.filter(group => {
-            // Contar cuántos sub-grupos con 5+ paths tiene
-            const subGroups = group.querySelectorAll('g');
-            let staffCount = 0;
-            subGroups.forEach(sub => {
-                const paths = sub.querySelectorAll(':scope > path');
-                if (paths.length >= 5) staffCount++;
-            });
-            // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
-            return staffCount > 1;
+    if (!osmd || !osmd.graphic) {
+        console.warn("OSMD no está listo.");
+        return;
+    }
+    
+    const svgContainer = osmdContainer.querySelector('svg');
+    if (!svgContainer) return;
+    
+    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
+    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
+    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+    
+    const staffLineContainers = allGroups.filter(group => {
+        // Contar cuántos sub-grupos con 5+ paths tiene
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
         });
-
-        // 3. AGREGADO: Si la lógica no encontró nada (común en tablets lentas al inicio), reintentar
-        if (staffLineContainers.length === 0) {
-            setTimeout(() => updateStaffOpacity(mode), 50);
-            return;
-        }
+        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+        return staffCount > 1;
+    });
+    
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
         
-        // --- TU LÓGICA DE APLICACIÓN INTACTA ---
-        staffLineContainers.forEach((container, index) => {
-            const isTreble = index % 2 === 0;
-            
-            switch (mode) {
-                case 'right':
-                    container.style.opacity = isTreble ? '1' : '0.2';
-                    break;
-                case 'left':
-                    container.style.opacity = isTreble ? '0.2' : '1';
-                    break;
-                case 'both':
-                default:
-                    container.style.opacity = '1';
-                    break;
-            }
-            container.style.transition = 'opacity 0.3s ease';
-        });
-
-    }); // Fin del requestAnimationFrame
+        switch (mode) {
+            case 'right':
+                container.style.opacity = isTreble ? '1' : '0.2';
+                break;
+            case 'left':
+                container.style.opacity = isTreble ? '0.2' : '1';
+                break;
+            case 'both':
+            default:
+                container.style.opacity = '1';
+                break;
+        }
+        container.style.transition = 'opacity 0.3s ease';
+    });
 }
 
 function toggleRightHandOnly() {
