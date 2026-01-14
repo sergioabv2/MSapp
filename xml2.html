@@ -4419,42 +4419,41 @@ function updateStaffOpacity(mode) {
     const svgContainer = osmdContainer.querySelector('svg');
     if (!svgContainer) return;
     
-    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
-    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
     const allGroups = Array.from(svgContainer.querySelectorAll('g'));
     
-    const staffLineContainers = allGroups.filter(group => {
-        // Contar cuántos sub-grupos con 5+ paths tiene
-        const subGroups = group.querySelectorAll('g');
-        let staffCount = 0;
-        subGroups.forEach(sub => {
-            const paths = sub.querySelectorAll(':scope > path');
-            if (paths.length >= 5) staffCount++;
-        });
-        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
-        return staffCount > 1;
+    // Buscar grupos que contengan líneas de pentagrama (5 paths horizontales)
+    const staffGroups = allGroups.filter(group => {
+        const paths = group.querySelectorAll(':scope > path');
+        return paths.length >= 5;
     });
     
-    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
+    if (staffGroups.length === 0) return;
     
-    staffLineContainers.forEach((container, index) => {
-        const isTreble = index % 2 === 0;
+    // Ordenar por posición Y para identificar treble (arriba) vs bass (abajo)
+    const groupsWithY = staffGroups.map(group => {
+        const bbox = group.getBBox();
+        return { group, y: bbox.y };
+    }).sort((a, b) => a.y - b.y);
+    
+    // Separar en dos mitades: primera mitad = treble, segunda = bass
+    const midPoint = Math.floor(groupsWithY.length / 2);
+    
+    groupsWithY.forEach((item, index) => {
+        const isTreble = index < midPoint;
         
         switch (mode) {
             case 'right':
-                container.style.opacity = isTreble ? '1' : '0.2';
+                item.group.style.opacity = isTreble ? '1' : '0.2';
                 break;
             case 'left':
-                container.style.opacity = isTreble ? '0.2' : '1';
+                item.group.style.opacity = isTreble ? '0.2' : '1';
                 break;
             case 'both':
             default:
-                container.style.opacity = '1';
+                item.group.style.opacity = '1';
                 break;
         }
-        container.style.transition = 'opacity 0.3s ease';
-        
-        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
+        item.group.style.transition = 'opacity 0.3s ease';
     });
 }
 
