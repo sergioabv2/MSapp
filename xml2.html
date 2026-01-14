@@ -3581,36 +3581,14 @@ function populateMeasureSelector() {
 }
 
 function restartCurrentChunk() {
-    // Evitar ejecuciones si no estamos en modo aprendizaje o ya se está reiniciando
     if (!isMidiLearnMode || isRestarting) return;
-    
     isRestarting = true;
-    let targetMeasureIndex = 0;
-
-    // CASO 1: Modo Bucle (Prioridad máxima)
-    if (isLoopMode) {
-        // Regresar al inicio del bucle seleccionado
-        targetMeasureIndex = loopMeasureStart;
-        console.log("Reiniciando al inicio del Bucle: Compás " + (targetMeasureIndex + 1));
-    } 
-    // CASO 2: Pieza Completada / Modo Libre
-    else if (isPieceCompleted) {
-        // Obtener compás actual y regresar 2 atrás
+    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+    if (isPieceCompleted) {
         const currentMs = getCurrentMeasureIndex();
-        targetMeasureIndex = Math.max(0, currentMs - 2);
-        console.log("Modo Libre: Regresando 2 compases. Del " + (currentMs + 1) + " al " + (targetMeasureIndex + 1));
-    } 
-    // CASO 3: Modo Aprendizaje Normal (Por defecto)
-    else {
-        // Regresar al inicio del bloque de 4 compases actual
-        targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-        console.log("Reiniciando Chunk de aprendizaje");
+        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
     }
-
-    // Ejecutar el salto
     jumpToMeasureInLearnMode(targetMeasureIndex);
-    
-    // Liberar bandera
     isRestarting = false;
 }
 
@@ -4409,59 +4387,64 @@ function prepareFirstLearningStep() {
           highlightKeyInstant(note.pitch, note.hand);
         }
       }
-    }else {
-      osmd.cursor.next(); 
+      
+      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
     }
   }
 
   if (!foundValidStep && currentLearningIndex >= parsedNotes.length) {
     alert("¡No hay notas para la mano seleccionada en esta pieza!");
     toggleMidiLearnMode();
-    return;
   }
   updatePracticeProgress();
 }
 
 
 function updateStaffOpacity(mode) {
-    requestAnimationFrame(() => {
-        if (!osmd || !osmd.graphic) return;
-        
-        const svgContainer = osmdContainer.querySelector('svg');
-        if (!svgContainer) {
-            setTimeout(() => updateStaffOpacity(mode), 50);
-            return;
-        }
-
-
-        const allGroups = Array.from(svgContainer.querySelectorAll('g'));
-        
-        const actualStaves = allGroups.filter(group => {
-            // Buscamos solo los hijos directos que sean trazos (líneas del pentagrama)
-            const paths = group.querySelectorAll(':scope > path');
-            return paths.length >= 5 && paths.length < 20;
+    if (!osmd || !osmd.graphic) {
+        console.warn("OSMD no está listo.");
+        return;
+    }
+    
+    const svgContainer = osmdContainer.querySelector('svg');
+    if (!svgContainer) return;
+    
+    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
+    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
+    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
+    
+    const staffLineContainers = allGroups.filter(group => {
+        // Contar cuántos sub-grupos con 5+ paths tiene
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
         });
-
-        // Reintento si la tablet aún no renderizó nada
-        if (actualStaves.length === 0) {
-            setTimeout(() => updateStaffOpacity(mode), 100);
-            return;
+        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
+        return staffCount > 1;
+    });
+    
+    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
+    
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
+        
+        switch (mode) {
+            case 'right':
+                container.style.opacity = isTreble ? '1' : '0.2';
+                break;
+            case 'left':
+                container.style.opacity = isTreble ? '0.2' : '1';
+                break;
+            case 'both':
+            default:
+                container.style.opacity = '1';
+                break;
         }
-
-        actualStaves.forEach((staff, index) => {
-            const isTreble = index % 2 === 0; // Pares = Mano Derecha
-            let targetOpacity = '1';
-
-            if (mode === 'right') {
-                targetOpacity = isTreble ? '1' : '0.2';
-            } else if (mode === 'left') {
-                targetOpacity = isTreble ? '0.2' : '1';
-            }
-            if (staff.style.opacity !== targetOpacity) {
-                staff.style.setProperty('opacity', targetOpacity, 'important');
-                staff.style.transition = 'opacity 0.3s ease';
-            }
-        });
+        container.style.transition = 'opacity 0.3s ease';
+        
+        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
     });
 }
 
