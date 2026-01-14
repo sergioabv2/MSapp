@@ -3581,14 +3581,36 @@ function populateMeasureSelector() {
 }
 
 function restartCurrentChunk() {
+    // Evitar ejecuciones si no estamos en modo aprendizaje o ya se está reiniciando
     if (!isMidiLearnMode || isRestarting) return;
+    
     isRestarting = true;
-    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-    if (isPieceCompleted) {
+    let targetMeasureIndex = 0;
+
+    // CASO 1: Modo Bucle (Prioridad máxima)
+    if (isLoopMode) {
+        // Regresar al inicio del bucle seleccionado
+        targetMeasureIndex = loopMeasureStart;
+        console.log("Reiniciando al inicio del Bucle: Compás " + (targetMeasureIndex + 1));
+    } 
+    // CASO 2: Pieza Completada / Modo Libre
+    else if (isPieceCompleted) {
+        // Obtener compás actual y regresar 2 atrás
         const currentMs = getCurrentMeasureIndex();
-        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+        targetMeasureIndex = Math.max(0, currentMs - 2);
+        console.log("Modo Libre: Regresando 2 compases. Del " + (currentMs + 1) + " al " + (targetMeasureIndex + 1));
+    } 
+    // CASO 3: Modo Aprendizaje Normal (Por defecto)
+    else {
+        // Regresar al inicio del bloque de 4 compases actual
+        targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
+        console.log("Reiniciando Chunk de aprendizaje");
     }
+
+    // Ejecutar el salto
     jumpToMeasureInLearnMode(targetMeasureIndex);
+    
+    // Liberar bandera
     isRestarting = false;
 }
 
