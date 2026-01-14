@@ -3581,12 +3581,22 @@ function populateMeasureSelector() {
 }
 
 function restartCurrentChunk() {
+    // Evitar ejecuciones si no estamos en modo aprendizaje o ya se está reiniciando
     if (!isMidiLearnMode || isRestarting) return;
+    
     isRestarting = true;
-    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-    if (isPieceCompleted) {
+    let targetMeasureIndex = 0;
+    if (isLoopMode) {
+        // Regresar al inicio del bucle seleccionado
+        targetMeasureIndex = loopMeasureStart;
+    } 
+    else if (isPieceCompleted) {
+        // Obtener compás actual y regresar 2 atrás
         const currentMs = getCurrentMeasureIndex();
-        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+        targetMeasureIndex = Math.max(0, currentMs - 2);
+    } 
+    else {
+        targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
     }
     jumpToMeasureInLearnMode(targetMeasureIndex);
     isRestarting = false;
