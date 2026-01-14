@@ -4424,50 +4424,53 @@ function prepareFirstLearningStep() {
 
 
 function updateStaffOpacity(mode) {
-    if (!osmd || !osmd.graphic) {
-        console.warn("OSMD no está listo.");
-        return;
-    }
-    
-    const svgContainer = osmdContainer.querySelector('svg');
-    if (!svgContainer) return;
-    
-    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
-    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
-    const allGroups = Array.from(svgContainer.querySelectorAll('g'));
-    
-    const staffLineContainers = allGroups.filter(group => {
-        // Contar cuántos sub-grupos con 5+ paths tiene
-        const subGroups = group.querySelectorAll('g');
-        let staffCount = 0;
-        subGroups.forEach(sub => {
-            const paths = sub.querySelectorAll(':scope > path');
-            if (paths.length >= 5) staffCount++;
-        });
-        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
-        return staffCount > 1;
-    });
-    
-    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
-    
-    staffLineContainers.forEach((container, index) => {
-        const isTreble = index % 2 === 0;
+    // 1. Usar requestAnimationFrame para asegurar que el DOM esté listo
+    requestAnimationFrame(() => {
+        if (!osmd || !osmd.graphic) return;
         
-        switch (mode) {
-            case 'right':
-                container.style.opacity = isTreble ? '1' : '0.2';
-                break;
-            case 'left':
-                container.style.opacity = isTreble ? '0.2' : '1';
-                break;
-            case 'both':
-            default:
-                container.style.opacity = '1';
-                break;
+        const svgContainer = osmdContainer.querySelector('svg');
+        if (!svgContainer) {
+            // Si no hay SVG aún, reintentar en 50ms (Solución para tablets lentas)
+            setTimeout(() => updateStaffOpacity(mode), 50);
+            return;
         }
-        container.style.transition = 'opacity 0.3s ease';
+
+        // Buscar grupos <g> que parezcan pentagramas (hack para OSMD)
+        const allGroups = Array.from(svgContainer.querySelectorAll('g'));
         
-        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
+        const staffLineContainers = allGroups.filter(group => {
+            // Un pentagrama tiene 5 líneas (paths). Buscamos grupos que las contengan.
+            const paths = group.querySelectorAll(':scope > path');
+            // Filtramos líneas horizontales largas (las del pentagrama) para evitar confundir con plicas
+            let horizontalLines = 0;
+            paths.forEach(p => {
+                const d = p.getAttribute('d');
+                if (d && d.includes('H') || (p.getBBox && p.getBBox().width > 50)) {
+                    horizontalLines++;
+                }
+            });
+            // Si tiene 5 líneas, es un candidato fuerte a ser un pentagrama
+            return paths.length >= 5; 
+        });
+
+        // 2. Aplicar la opacidad
+        staffLineContainers.forEach((container, index) => {
+            // Asumimos orden estándar: Pentagrama 0 = Treble, 1 = Bass, 2 = Treble, 3 = Bass...
+            const isTreble = index % 2 === 0;
+            let targetOpacity = '1';
+
+            if (mode === 'right') {
+                targetOpacity = isTreble ? '1' : '0.2';
+            } else if (mode === 'left') {
+                targetOpacity = isTreble ? '0.2' : '1';
+            }
+
+            // Aplicar solo si es necesario para evitar reflujos del navegador
+            if (container.style.opacity !== targetOpacity) {
+                container.style.opacity = targetOpacity;
+                container.style.transition = 'opacity 0.4s ease'; // Transición suave
+            }
+        });
     });
 }
 
