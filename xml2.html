@@ -4418,42 +4418,34 @@ function updateStaffOpacity(mode) {
     
     const svgContainer = osmdContainer.querySelector('svg');
     if (!svgContainer) return;
-    
     const allGroups = Array.from(svgContainer.querySelectorAll('g'));
     
-    // Buscar grupos que contengan líneas de pentagrama (5 paths horizontales)
-    const staffGroups = allGroups.filter(group => {
-        const paths = group.querySelectorAll(':scope > path');
-        return paths.length >= 5;
+    const staffLineContainers = allGroups.filter(group => {
+        const subGroups = group.querySelectorAll('g');
+        let staffCount = 0;
+        subGroups.forEach(sub => {
+            const paths = sub.querySelectorAll(':scope > path');
+            if (paths.length >= 5) staffCount++;
+        });
+        return staffCount >= 1;
     });
     
-    if (staffGroups.length === 0) return;
-    
-    // Ordenar por posición Y para identificar treble (arriba) vs bass (abajo)
-    const groupsWithY = staffGroups.map(group => {
-        const bbox = group.getBBox();
-        return { group, y: bbox.y };
-    }).sort((a, b) => a.y - b.y);
-    
-    // Separar en dos mitades: primera mitad = treble, segunda = bass
-    const midPoint = Math.floor(groupsWithY.length / 2);
-    
-    groupsWithY.forEach((item, index) => {
-        const isTreble = index < midPoint;
+    staffLineContainers.forEach((container, index) => {
+        const isTreble = index % 2 === 0;
         
         switch (mode) {
             case 'right':
-                item.group.style.opacity = isTreble ? '1' : '0.2';
+                container.style.opacity = isTreble ? '1' : '0.2';
                 break;
             case 'left':
-                item.group.style.opacity = isTreble ? '0.2' : '1';
+                container.style.opacity = isTreble ? '0.2' : '1';
                 break;
             case 'both':
             default:
-                item.group.style.opacity = '1';
+                container.style.opacity = '1';
                 break;
         }
-        item.group.style.transition = 'opacity 0.3s ease';
+        container.style.transition = 'opacity 0.3s ease';
     });
 }
 
