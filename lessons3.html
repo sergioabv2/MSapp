@@ -78,7 +78,7 @@ body {
     display: flex;
     flex-direction: row; /* Alineación horizontal */
     gap: 32px; /* Espacio entre tarjetas */
-    padding: 20px 60px; /* Padding lateral para inicio/fin del scroll */
+    padding: 15px 50px; /* Padding lateral para inicio/fin del scroll */
     overflow-x: auto; /* Permite scroll horizontal */
     scroll-snap-type: x mandatory; /* Efecto magnético al hacer scroll */
     width: 100%;
@@ -189,20 +189,7 @@ body {
     padding-top: 12px;
 }
 
-/* Barra de progreso ajustada */
-.progress-container-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: transparent;
-}
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #8B5CF6, #A855F7);
-    border-radius: 0 2px 0 0;
-}
+
 
 /* Ajustes Visuales del Candado */
 .lock-icon {
@@ -234,19 +221,73 @@ body {
     opacity: 0.5;
 }
 
-/* RESPONSIVE: Mantener carrusel en móviles */
+
+/* ========== SECCIONES Y TÍTULOS ========== */
+
+.course-section {
+    margin-bottom: 50px; /* Espacio entre filas */
+    position: relative;
+    z-index: 2;
+}
+
+/* Título elegante */
+.section-header {
+    padding: 0 60px; /* Alineado con el inicio del carrusel */
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title {
+    font-family: 'Inter', sans-serif; /* Asegurando la fuente */
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+/* Acento decorativo al lado del título (Barra morada) */
+.section-header::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 32px;
+    background: linear-gradient(to bottom, #8B5CF6, #A855F7);
+    border-radius: 4px;
+}
+
+.section-subtitle {
+    display: block;
+    padding: 0 60px;
+    margin-top: -15px;
+    margin-bottom: 25px;
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+
+
 @media (max-width: 900px) {
     .level-container {
         padding-top: 260px;
     }
-    .levels-grid {
-        padding: 20px; /* Menos padding lateral en móvil */
-        gap: 15px;
-    }
+ 
     .level-card {
         flex: 0 0 280px; /* Tarjetas un poco más angostas en móvil */
         width: 280px;
         height: 400px;
+    }
+     .section-header, .section-subtitle {
+        padding: 0 20px;
+    }
+    .section-title {
+        font-size: 1.4rem;
+    }
+    .section-header::before {
+        height: 24px;
     }
 }
 
@@ -269,7 +310,7 @@ body {
 .menu-toggle-btn { 
     display: none; 
     position: fixed; 
-    top: 10px; 
+    top: 8px; 
     left: 15px; 
     background: var(--sidebar-bg); 
     color: var(--sidebar-text); 
@@ -433,8 +474,9 @@ body {
 }
 
 .content-below {
+     border-top: 1px solid #e9ecef;
     background-color: #ffffff;
-    padding: 15px 40px;
+    padding: 10px 25px;
     min-height: auto;
 }
 
@@ -454,7 +496,7 @@ body {
 }
 
 .current-task-header h1 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #1d1d1f;
     margin-bottom: 5px;
@@ -626,7 +668,7 @@ body {
 
 .progress-container-bottom {
     position: relative;
-    width: 270px;
+    width: 265px;
     height: 12px;
     background: #f0f0f0;
     border-radius: 3px;
@@ -1224,19 +1266,11 @@ body {
     font-size: 1rem;
 }
 
-/* ========== RESPONSIVE ========== */
-@media (max-width: 900px) {
-    .pending-tasks {
-        display: none; 
-    }
 
-
-}
 
     @media (max-width: 800px) {
-    .levels-grid { 
-        grid-template-columns: 1fr; 
-        padding: 30px 20px; 
+ .pending-tasks {
+        display: none; 
     }
     
     .level-header { 
@@ -1257,7 +1291,6 @@ body {
     }
 
 
-
     .progress-summary span {
         font-size: 0.75rem;
     }
@@ -1270,9 +1303,9 @@ body {
         display: flex; 
         align-items: center; 
         justify-content: center; 
-        top: 75px; 
-        left: 15px; 
-        right: auto; 
+        bottom: 80px; 
+        right: 15px; 
+        left: auto; 
     }
     
     .sidebar { 
@@ -1294,33 +1327,29 @@ body {
     }
 
     .video-wrapper {
-        height: 580px;
-        max-height: 580px;
+        height: 650px;
+        max-height: 650px;
     }
+
+     .progress-summary{padding-right: 65px!important}
     
-    .content-below {
-        padding: 20px 15px;
-    }
 
-    .current-task-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-    }
+   .levels-grid {
+        padding: 5px 20px; /* Menos padding lateral */
+        width: 100%;
+        gap: 15px;
 
+    }
     .current-task-header h1 {
         font-size: 1.3rem;
     }
 
-    .lesson-navigation {
-        width: 100%;
-        flex-direction: column;
-    }
 
-    .nav-btn {
-        width: 100%;
-        justify-content: center;
-    }
+.progress-container-bottom {
+    width: 245px !important;
+}
+
+  
 
     .tabs-header {
         gap: 20px;
@@ -1330,14 +1359,22 @@ body {
 
 @media (max-width: 550px) { 
     .video-wrapper {
-        height: 480px;
-        max-height: 480px;
+        height: 550px;
+        max-height: 550px;
     }
+    .progress-summary{display: none}
+    .content-below{padding: 5px 20px}
+    .current-task-header {  margin-bottom: 5px; padding-bottom: 5px; }
+    .current-task-header h1 {
+    font-size: 17px;
+   }
     .top-nav .user-avatar { display: none }
     .lesson-navigation {
         flex-direction: column;
-        gap: 10px;
+        gap: 3px;
+        transform: scale(0.8);
     }
+
     .nav-card.next .nav-label, .nav-card.next .nav-title {
         justify-content: flex-start;
         text-align: left;
@@ -1359,12 +1396,7 @@ body {
     .level-title {
         font-size: 1.5rem; /* Texto más pequeño naturalmente */
     }
-    .levels-grid {
-        padding: 5px 15px; /* Menos padding lateral */
-        width: 100%;
 
-    }
-    
     .mobile {
         display: none;
     }
@@ -1483,42 +1515,80 @@ body {
 
     <!-- SELECTOR DE NIVELES -->
     <div id="levelSelector" ref="levelSelectorRef" v-show="currentView === 'levelSelector'">
-      <div class="level-container">
-    <div class="levels-grid">
-        <div class="level-card" 
-             v-for="(level, index) in levels" 
-             :key="level.id"
-             @click="selectLevel(level)"
-             :class="{'locked': currentLevelIndex < level.id}">
-            
-            <div class="card-bg" :style="{ backgroundImage: `url(${level.image})` }">
-                 <div class="lock-icon" v-if="currentLevelIndex < level.id">
-                    <i class="ri-lock-fill"></i>
-                </div>
-            </div>
+     
+     <div class="level-container">
 
-            <div class="card-content">
-                <div class="phase-tag">GRADO {{ level.id }}</div>
+    <div class="course-section">
+        <div class="section-header">
+            <h2 class="section-title">Ruta de Aprendizaje Principal</h2>
+        </div>
+        <span class="section-subtitle">Tu camino paso a paso para dominar el piano clásico.</span>
+
+        <div class="levels-grid">
+            <div class="level-card" 
+                 v-for="(level, index) in levels" 
+                 :key="level.id"
+                 @click="selectLevel(level)"
+                 :class="{'locked': currentLevelIndex < level.id}">
                 
-                <h2 class="level-title">{{ level.title }}</h2>
-                
-                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                <div class="card-bg" :style="{ backgroundImage: `url(${level.image})` }">
+                     <div class="lock-icon" v-if="currentLevelIndex < level.id">
+                        <i class="ri-lock-fill"></i>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <div class="phase-tag">GRADO {{ level.id }}</div>
+                    <h2 class="level-title">{{ level.title }}</h2>
+                      <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                     {{ level.description }}
                 </p>
-                
-                <div class="level-meta">
-                    <i class="ri-time-line" style="vertical-align: middle; margin-right: 5px;"></i> 
-                    {{ level.duration }}
-                    <span style="float: right; font-weight: 600; color: var(--primary-accent);">{{ level.progress }}%</span>
-                </div>
-                
-                <div class="progress-container-bottom" v-if="level.progress > 0">
-                    <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+                    <div class="level-meta">
+                        <span><i class="ri-time-line"></i> {{ level.duration }}</span>
+                        <span style="font-weight: 600; color: var(--primary-accent);">{{ level.progress }}%</span>
+                    </div>
+                    <div class="progress-container-bottom" v-if="level.progress > 0">
+                        <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <div class="course-section">
+        <div class="section-header">
+            <h2 class="section-title">Especialidades y Técnica</h2>
+        </div>
+        <span class="section-subtitle">Cursos cortos para perfeccionar habilidades específicas.</span>
+
+        <div class="levels-grid">
+            <div class="level-card" 
+                 v-for="(course, index) in specialCourses" 
+                 :key="course.id"
+                 @click="selectLevel(course)" 
+                 :class="{'locked': false}"> <div class="card-bg" :style="{ backgroundImage: `url(${course.image})` }">
+                    </div>
+
+                <div class="card-content">
+                    <div class="phase-tag" style="color: #059669;">{{ course.tag }}</div>
+                    <h2 class="level-title">{{ course.title }}</h2>
+                     <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ course.description }}
+                </p>
+                    <div class="level-meta">
+                        <span><i class="ri-movie-line"></i> {{ course.lessonsCount }} Lecciones</span>
+                    </div>
+                    <div class="progress-container-bottom">
+                         <div class="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
     </div>
 
     <!-- APP DE PIANO -->
@@ -2148,25 +2218,63 @@ createApp({
             { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
             { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
         ]);
+
+const specialCourses = ref([
+    {
+        id: 101,
+        title: "Teoría Musical",
+        tag: "TEORÍA",
+        image: "https://lh3.googleusercontent.com/d/1RnoAJjAdeOTEW-8ssUFGm2JFuMNsok5O=s600",
+        description: "Domina el lenguaje universal de la música: intervalos, construcción de acordes, armaduras y análisis armónico fundamental.",
+        lessonsCount: 12,
+        lessons: [] 
+    },
+    {
+        id: 102,
+        title: "Teoría de Jazz",
+        tag: "JAZZ",
+        image: "https://lh3.googleusercontent.com/d/1RnoAJjAdeOTEW-8ssUFGm2JFuMNsok5O=s600",
+        description: "Explora la armonía moderna, improvisación, escalas de blues, swing y los voicings esenciales del jazz.",
+        lessonsCount: 8,
+        lessons: []
+    },
+    {
+        id: 103,
+        title: "Escalas y Arpegios",
+        tag: "TÉCNICA",
+        image: "https://lh3.googleusercontent.com/d/1RnoAJjAdeOTEW-8ssUFGm2JFuMNsok5O=s600",
+        description: "Desarrolla velocidad, fuerza y precisión en los dedos mediante una rutina técnica completa de escalas mayores y menores.",
+        lessonsCount: 20,
+        lessons: []
+    },
+    {
+        id: 104,
+        title: "Lectura a Primera Vista",
+        tag: "LECTURA",
+        image: "https://lh3.googleusercontent.com/d/1RnoAJjAdeOTEW-8ssUFGm2JFuMNsok5O=s600",
+        description: "Entrena tu cerebro y tus ojos para leer partituras al instante y tocar música nueva sin necesidad de memorizar.",
+        lessonsCount: 15,
+        lessons: []
+    }
+]);
         
-        // ==========================================
-        // SECCIÓN 2: VARIABLES NO REACTIVAS (YouTube)
-        // ==========================================
+
+
+
+
         let youtubePlayer = null;
         let videoHasEnded = false;
         let pauseTimer = null;
         let isYouTubeAPIReady = false;
         let shouldAutoplayVideo = false;
         
-        
-        // ==========================================
-        // SECCIÓN 3: FUNCIONES DE API Y DATOS
-        // ==========================================
+    
         
         const fetchUserData = async () => {
             const requestData = {
                 action: "getUserData",
-                token: localStorage.getItem('MStoken')
+               // token: localStorage.getItem('MStoken')
+                token: "U2FsdGVkX1/361o2dtJ1bm1QXcnwo9NZyCXdc2molIy99OALDZox19ZeNOpL32vc"
             };
 
             try {
@@ -2859,6 +2967,7 @@ const updateProgress = () => {
             progress,
             modal,
             levels,
+            specialCourses,
             currentLevelIndex,
             currentLessonIndex,
             currentTaskIndex,
