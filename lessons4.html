@@ -317,7 +317,7 @@ body {
 
 /* ========== TOP BAR UNIFICADO ========== */
 .top-nav {
-    height: 70px;
+    height: 50px;
     background: var(--main-content-bg);
     border-bottom: 1px solid #e9ecef;
     display: flex;
@@ -466,18 +466,18 @@ body {
 
 .content-below {
     background-color: #ffffff;
-    padding: 30px 40px;
+    padding: 15px 40px;
     min-height: auto;
 }
 
 .current-task-header {
-    margin-bottom: 24px;
-    padding-bottom: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
     border-bottom: 1px solid #e9ecef;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
 .task-info-left {
@@ -486,10 +486,10 @@ body {
 }
 
 .current-task-header h1 {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #1d1d1f;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .current-task-meta {
@@ -1242,14 +1242,14 @@ body {
 }
 
 .nav-btn.btn-primary {
-    background: var(--text-main);
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
     color: white;
-    border: 1px solid var(--text-main);
+    border: none;
 }
 
 .nav-btn.btn-primary:hover {
-    background: #333;
-    border-color: #333;
+    filter: brightness(110%);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .nav-btn i {
@@ -1293,9 +1293,7 @@ body {
         gap: 10px;
     }
 
-    .top-nav .user-info {
-        display: none;
-    }
+
 
     .progress-summary span {
         font-size: 0.75rem;
@@ -1333,8 +1331,8 @@ body {
     }
 
     .video-wrapper {
-        height: 250px;
-        max-height: 250px;
+        height: 380px;
+        max-height: 380px;
     }
     
     .content-below {
@@ -1368,6 +1366,11 @@ body {
 }
 
 @media (max-width: 550px) { 
+    .video-wrapper {
+        height: 280px;
+        max-height: 280px;
+    }
+    .top-nav .user-avatar { display: none }
     .lesson-navigation {
         flex-direction: column;
         gap: 10px;
@@ -1614,20 +1617,21 @@ body {
         
         <div class="app-container">
             <main class="main-content">
-                <div class="video-wrapper" v-if="showingVideo">
-                    <div id="youtube-container" style="width: 100%; height: 100%; position: relative;">
+                <div class="video-wrapper">
+                    <!-- YouTube Container -->
+                    <div id="youtube-container" :style="{display: showingVideo ? 'block' : 'none'}" style="width: 100%; height: 100%; position: relative;">
                         <div id="player"></div>
                     
-                    <!-- Modal de Pausa -->
-                    <div id="pauseModal" class="video-modal-overlay">
-                        <div class="video-modal-content">
-                            <h2 style="color: #f59e0b;">¡Atención!</h2>
-                            <p>Debes terminar de ver el video para poder avanzar. Por favor, reanuda el video.</p>
-                            <button id="closePauseButton" class="modal-button" style="background-color: #f59e0b; color: white; border: none;">
-                                Cerrar y Reanudar
-                            </button>
+                        <!-- Modal de Pausa -->
+                        <div id="pauseModal" class="video-modal-overlay">
+                            <div class="video-modal-content">
+                                <h2 style="color: #f59e0b;">¡Atención!</h2>
+                                <p>Debes terminar de ver el video para poder avanzar. Por favor, reanuda el video.</p>
+                                <button id="closePauseButton" class="modal-button" style="background-color: #f59e0b; color: white; border: none;">
+                                    Cerrar y Reanudar
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
                         <!-- Modal de Video Terminado -->
                         <div id="finishedModal" class="video-modal-overlay">
@@ -1638,11 +1642,11 @@ body {
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="video-wrapper" v-if="!showingVideo">
+                    
+                    <!-- Iframe para contenido no-video -->
                     <iframe id="content-iframe" 
                             :src="currentTaskUrl" 
+                            :style="{display: showingVideo ? 'none' : 'block'}"
                             title="Contenido principal" 
                             style="width: 100%; height: 100%; border: none;"></iframe>
                 </div>
@@ -2406,9 +2410,12 @@ createApp({
 
 
         const prevTaskInfo = computed(() => {
-    // Usamos viewingLessonIndex/TaskIndex para saber qué se está viendo, no necesariamente el progreso actual
+    // Usamos viewingLessonIndex/TaskIndex para saber qué se está viendo
     let lIdx = viewingLessonIndex.value;
     let tIdx = viewingTaskIndex.value;
+    
+    // Verificación de seguridad
+    if (!lessons.value || !lessons.value[lIdx]) return null;
 
     // Si hay una tarea anterior en la misma lección
     if (tIdx > 0) {
@@ -2434,6 +2441,10 @@ createApp({
         const nextTaskInfo = computed(() => {
     let lIdx = viewingLessonIndex.value;
     let tIdx = viewingTaskIndex.value;
+    
+    // Verificación de seguridad
+    if (!lessons.value || !lessons.value[lIdx]) return null;
+    
     const currentLesson = lessons.value[lIdx];
 
     // 1. Calcular cuál es la SIGUIENTE tarea física
@@ -2448,7 +2459,6 @@ createApp({
     } else {
         return null; // No hay más contenido (Fin del curso)
     }
-
 
     const isAtFrontier = (lIdx === currentLessonIndex.value) && (tIdx === currentTaskIndex.value);
     const currentTask = currentLesson.tasks[tIdx];
@@ -2508,38 +2518,6 @@ const handleNext = () => {
 };
 
 
-/*
-const nextTaskInfo = computed(() => {
-    let lIdx = viewingLessonIndex.value;
-    let tIdx = viewingTaskIndex.value;
-    const currentLesson = lessons.value[lIdx];
-
-    let nextL = lIdx;
-    let nextT = tIdx;
-
-    // Calcular índices del siguiente
-    if (tIdx < currentLesson.tasks.length - 1) {
-        nextT++;
-    } else if (lIdx < lessons.value.length - 1) {
-        nextL++;
-        nextT = 0;
-    } else {
-        return null; // No hay nada adelante (fin del curso)
-    }
-
-    // Verificar si está bloqueado (comparando con el progreso real del usuario)
-    const isLocked = (nextL > currentLessonIndex.value) || 
-                     (nextL === currentLessonIndex.value && nextT > currentTaskIndex.value);
-
-    return {
-        title: lessons.value[nextL].tasks[nextT].title,
-        lIdx: nextL,
-        tIdx: nextT,
-        locked: isLocked
-    };
-});
- */       
-        
         // ==========================================
         // SECCIÓN 6: GESTIÓN DE TAREAS
         // ==========================================
@@ -2558,18 +2536,15 @@ const nextTaskInfo = computed(() => {
             
             const task = lessons.value[lessonIndex].tasks[taskIndex];
             currentViewingTask.value = task;
-            const youtubeContainer = document.getElementById('youtube-container');
-            const contentIframe = document.getElementById('content-iframe');
+            
+            // Reset tab al cambiar de task
+            activeTab.value = 'description';
 
             if (task.type === 'video') {
                 showingVideo.value = true;
-                contentIframe.style.display = 'none';
-                youtubeContainer.style.display = 'block';
                 openVideoModal(task);
             } else {
                 showingVideo.value = false;
-                youtubeContainer.style.display = 'none';
-                contentIframe.style.display = 'block';
                 currentTaskUrl.value = task.contentUrl;
             }
             
@@ -2579,6 +2554,9 @@ const nextTaskInfo = computed(() => {
         };
 
         const loadCurrentTask = () => {
+            // Reset tab al cargar nuevo task
+            activeTab.value = 'description';
+            
             if (currentLessonIndex.value >= lessons.value.length) {
                 currentLessonIndex.value = lessons.value.length - 1;
                 currentTaskIndex.value = lessons.value[currentLessonIndex.value].tasks.length - 1;
@@ -2592,11 +2570,10 @@ const nextTaskInfo = computed(() => {
                 viewingTaskIndex.value = currentTaskIndex.value;
                 
                 if (task.type === 'video') {
+                    showingVideo.value = true;
                     openVideoModal(task);
                 } else {
                     showingVideo.value = false;
-                    document.getElementById('youtube-container').style.display = 'none';
-                    document.getElementById('content-iframe').style.display = 'block';
                     currentTaskUrl.value = task.contentUrl;
                 }
                 return;
@@ -2611,9 +2588,11 @@ const nextTaskInfo = computed(() => {
             viewingTaskIndex.value = currentTaskIndex.value;
             
             if (task.type === 'video') {
+                showingVideo.value = true;
                 speak(`Siguiente: ${task.title}.`);
                 openVideoModal(task);
             } else {
+                showingVideo.value = false;
                 currentTaskUrl.value = task.contentUrl;
                 if (task.type === 'note') {
                     speak(`Ahora, ${task.title}`, 'important');
@@ -2774,12 +2753,6 @@ const updateProgress = () => {
             showingVideo.value = true;
             currentTaskUrl.value = '';
             
-            const youtubeContainer = document.getElementById('youtube-container');
-            const contentIframe = document.getElementById('content-iframe');
-            
-            youtubeContainer.style.display = 'block';
-            contentIframe.style.display = 'none';
-            
             if (!isYouTubeAPIReady) {
                 const checkAPI = setInterval(() => {
                     if (typeof YT !== 'undefined' && YT.Player) {
@@ -2923,8 +2896,6 @@ const updateProgress = () => {
                     continueVideoButton.onclick = () => {
                         document.getElementById('finishedModal').style.display = 'none';
                         showingVideo.value = false;
-                        document.getElementById('youtube-container').style.display = 'none';
-                        document.getElementById('content-iframe').style.display = 'block';
                         videoHasEnded = false;
                         completeCurrentTask();
                     };
