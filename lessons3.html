@@ -50,236 +50,204 @@ body {
     height: 100%;
 }
 
-/* ========== SELECTOR DE NIVELES ========== */
+/* ========== SELECTOR DE NIVELES (NUEVO ESTILO CARRUSEL) ========== */
 #levelSelector {
     flex: 1;
     overflow-y: auto;
-    min-height: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin-bottom: 100px;
-    padding: 120px 0 0 0;
     position: relative;
     z-index: 2;
+   background: transparent;
 }
 
 .level-container {
-    display: grid;
-    grid-template-columns: 230px 1fr;
-    gap: 15px;
-    max-width: 1200px;
+    /* Eliminamos el grid de 2 columnas para usar todo el ancho */
+    display: block;
     width: 100%;
-    padding: 20px;
+    max-width: 100%; 
+    padding: 0;
+    padding-top: 260px; /* Espacio para que se vea el banner de fondo */
+    padding-bottom: 80px;
     position: relative;
-    padding-top: 160px; 
-    padding-bottom: 60px;
     z-index: 2;
 }
 
-.level-header {
-    background: var(--sidebar-bg);
-    color: var(--sidebar-text);
-    padding: 40px 30px;
-    text-align: center;
-}
-
-.level-header h1 { 
-    font-size: 2.2rem; 
-    margin-bottom: 12px; 
-}
-
-.level-header p { 
-    font-size: 1.1rem; 
-    opacity: 0.9; 
-}
-
+/* Contenedor Scroll Horizontal (Carrusel) */
 .levels-grid {
     display: flex;
-    flex-direction: column;
-    gap: 24px; /* Espacio entre tarjetas */
-    padding: 0 20px;
-    max-width: 1000px;
-    position: relative;
-    z-index: 10;
+    flex-direction: row; /* Alineación horizontal */
+    gap: 32px; /* Espacio entre tarjetas */
+    padding: 20px 60px; /* Padding lateral para inicio/fin del scroll */
+    overflow-x: auto; /* Permite scroll horizontal */
+    scroll-snap-type: x mandatory; /* Efecto magnético al hacer scroll */
+    width: 100%;
+    
+    /* Ocultar barra de scroll estéticamente */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
 }
 
+.levels-grid::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Tarjeta Vertical (Estilo Imagen) */
 .level-card {
     position: relative;
-    height: 165px;
-    width: 100%;
-    background-color: #ffffff; /* Fondo base blanco */
-    border-radius: 16px;
-    overflow: hidden;
-     box-shadow: 0 5px 10px rgba(0,0,0,0.1), 0 2px 10px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  /*  border: 1px solid rgba(0,0,0,0.3);  */
+    flex: 0 0 300px; /* Ancho fijo */
+    width: 300px;
+    height: 380px; 
+    background-color: #ffffff;
+    border-radius: 12px; /* Borde de la tarjeta contenedora */
+    /* Aquí está la clave del margen: Padding interno */
+    padding: 12px; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    scroll-snap-align: center;
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Para que el shine no se salga si hay glitch */
 }
 
-/* Interacción Hover */
 .level-card:hover {
-    box-shadow: 0 7px 12px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
-    
-    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Imagen de Fondo (La textura) */
+/* Imagen de Fondo (Mitad Superior) */
 .card-bg {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    position: relative;
+    width: 100%; /* Ocupa el 100% del espacio interno (respetando padding) */
+    height: 160px; /* Altura fija de la imagen */
     background-size: cover;
     background-position: center;
-    transition: transform 0.6s ease;
-    z-index: 0;
-    /* Truco: Filtro para que la imagen no compita con el texto */
-  /*  filter: grayscale(20%) contrast(0.9); */
-}
-
-
-
-
-
-.lock-icon {
-    position: absolute;
-    right: 30px;
-    top: 30px;
-    font-size: 1.5rem;
-    color: rgba(255,255,255,0.5);
-    z-index: 2;
-    background: rgba(0,0,0,0.3);
-    padding: 10px;
-    border-radius: 50%;
-    backdrop-filter: blur(4px);
-}
-
-/* Estado bloqueado */
-
-.level-card.locked {
-    cursor: default;
-    filter: grayscale(100%);
-    box-shadow: none;
-   
-}
-.level-card.locked .card-overlay {
-    backdrop-filter: blur(10px) ;
-    -webkit-backdrop-filter: blur(10px) ;
-    background: linear-gradient(90deg, 
-                rgba(0, 0, 0, 0.2) 0%, 
-                rgba(0, 0, 0, 0.1) 50%, 
-                rgba(0, 0, 0, 0.02) 100%);
-    opacity: 0.33;
-    z-index: 1; /* Asegura que esté sobre la imagen (.card-bg) */
-}
-.level-card.locked:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-.card-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-
+    border-radius: 8px; /* Redondeamos la imagen */
+    overflow: hidden; /* Necesario para cortar el efecto shine */
     z-index: 1;
 }
 
-/* Contenido del Texto */
-.card-content {
-    position: relative;
-    z-index: 2;
+
+.card-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Empieza fuera a la izquierda */
+    width: 50%;
     height: 100%;
+    background: linear-gradient(
+        to right, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.3) 50%, 
+        rgba(255,255,255,0) 100%
+    );
+    transform: skewX(-25deg); /* Inclinamos el brillo */
+    z-index: 2;
+    transition: none; /* Sin transición al volver */
+}
+
+/* Animación del brillo al hacer hover en la CARD PADRE */
+.level-card:hover .card-bg::before {
+    left: 150%; /* Se mueve hacia la derecha */
+    transition: left 0.7s ease-in-out; /* Velocidad del brillo */
+}
+
+/* Contenido del Texto (Mitad Inferior - Fondo Blanco) */
+.card-content {
+    flex: 1; /* Ocupa el resto del espacio */
+    padding: 16px 4px 4px 4px; /* Ajuste de padding interno */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-left: 40px;
-    color: black;
-}
-
-.level-number {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #8B5CF6, #A855F7);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: black;
-    font-size: 20px;
-    font-weight: 600;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-}
-
-.level-info {
-    flex: 1;
-    min-width: 0;
+    justify-content: flex-start;
 }
 
 .phase-tag {
-    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: gray;
+    letter-spacing: 0.5px;
+    color: #8B5CF6; /* Morado */
     margin-bottom: 8px;
 }
 
 .level-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 700;
-   
+    line-height: 1.3;
     margin: 0 0 10px 0;
-    line-height: 1;
-    color: black;
+    color: #111827;
 }
-
-
 
 .level-meta {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: rgba(0,0,0,0.9);
+    margin-top: auto; /* Empuja info al final */
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    font-size: 0.8rem;
+    color: #6b7280;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
 }
 
-.time-icon {
-    width: 16px;
-    height: 16px;
-    opacity: 0.6;
+/* Barra de progreso ajustada */
+.progress-container-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: transparent;
 }
-
-.time-text {
-    color: #8B5CF6;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.progress-container2 {
-    width: 190px;
-    height: 12px;
-    background: #f0f0f0;
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative;
-}
-
-.progress-bar2 {
+.progress-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, #8B5CF6, #A855F7);
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.5s ease-out;
+    border-radius: 0 2px 0 0;
 }
 
-.lockLvlIco {
+/* Ajustes Visuales del Candado */
+.lock-icon {
     position: absolute;
-    font-size: 20px;
-    right: 15px;
-    top: 15px;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    backdrop-filter: blur(2px);
+    z-index: 3;
+}
+
+/* Ocultar elementos viejos que no sirven en este diseño */
+.card-overlay { display: none; }
+.level-number { display: none; }
+
+/* Estado Bloqueado */
+.level-card.locked {
+    filter: grayscale(100%);
+    opacity: 0.8;
+}
+.level-card.locked .card-bg {
+    filter: grayscale(100%);
+}
+.level-card.locked .card-content {
+    opacity: 0.5;
+}
+
+/* RESPONSIVE: Mantener carrusel en móviles */
+@media (max-width: 900px) {
+    .level-container {
+        padding-top: 260px;
+    }
+    .levels-grid {
+        padding: 20px; /* Menos padding lateral en móvil */
+        gap: 15px;
+    }
+    .level-card {
+        flex: 0 0 280px; /* Tarjetas un poco más angostas en móvil */
+        width: 280px;
+        height: 400px;
+    }
 }
 
 /* ========== APP DE PIANO ========== */
@@ -1262,12 +1230,7 @@ body {
         display: none; 
     }
 
-    .level-container {
-        grid-template-columns: 1fr;
-        gap: 0;
-        padding: 10px;
-        padding-top: 160px; 
-    }
+
 }
 
     @media (max-width: 800px) {
@@ -1520,68 +1483,42 @@ body {
 
     <!-- SELECTOR DE NIVELES -->
     <div id="levelSelector" ref="levelSelectorRef" v-show="currentView === 'levelSelector'">
-        <div class="level-container">
-            <div class="sidebar-wrapper">
-                <div class="pending-tasks">
-                    <h4>Tareas Pendientes</h4>
-                    <ul v-if="pendingTasks.length > 0">
-                        <li v-for="task in pendingTasks" :key="task.taskIndex" :class="{'completed': task.completed}">
-                            <div class="task-icon"><i :class="task.iconClass"></i></div>
-                            <div class="task-info">
-                                <span>{{ task.lessonTitle }}</span>
-                                <div class="info">{{ task.taskTitle }}</div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div v-if="pendingTasks.length === 0" style="text-align: center; color: #6e6e73; padding: 20px;">
-                        <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
-                        <p style="margin-top: 10px;">¡No tienes tareas pendientes!</p>
-                    </div>
-                </div>
-
-                <div class="practice-card">
-                    <h4>Práctica libre</h4>
-                    <p>Explora el teclado sin límites o practica tus canciones favoritas.</p>
-                    <button class="btn-shiny" onclick="window.location.href='https://www.mozart-app.com/bookfinder'">
-                        <i class="ri-piano-line"></i> Empezar
-                    </button>
-                </div>
-            </div>
-      
-          <div class="levels-grid">
-    <div class="level-card" 
-         v-for="(level, index) in levels" 
-         :key="level.id"
-         @click="selectLevel(level)"
-         :class="{'locked': currentLevelIndex < level.id}">
-        
-       <div class="card-bg" 
-     :style="{ backgroundImage: `url(${level.image})` }">
-</div>
-
-        <div class="card-overlay"></div>
-
-        <div class="card-content">
-            <div class="phase-tag">Grado {{ level.id  }}</div> <h2 class="level-title">{{ level.title }}</h2>
+      <div class="level-container">
+    <div class="levels-grid">
+        <div class="level-card" 
+             v-for="(level, index) in levels" 
+             :key="level.id"
+             @click="selectLevel(level)"
+             :class="{'locked': currentLevelIndex < level.id}">
             
-            <div class="level-meta">
-                <i class="ri-article-line"></i> {{ level.duration }}
-                <span style="margin: 0 5px;">•</span>
-                <span>{{ level.progress }}% Completado</span>
+            <div class="card-bg" :style="{ backgroundImage: `url(${level.image})` }">
+                 <div class="lock-icon" v-if="currentLevelIndex < level.id">
+                    <i class="ri-lock-fill"></i>
+                </div>
             </div>
-             <div class="progress-container-bottom">
-                <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
-              </div>
-        </div>
 
-        <div class="lock-icon" v-if="currentLevelIndex < level.id">
-            <i class="ri-lock-fill"></i>
+            <div class="card-content">
+                <div class="phase-tag">GRADO {{ level.id }}</div>
+                
+                <h2 class="level-title">{{ level.title }}</h2>
+                
+                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ level.description }}
+                </p>
+                
+                <div class="level-meta">
+                    <i class="ri-time-line" style="vertical-align: middle; margin-right: 5px;"></i> 
+                    {{ level.duration }}
+                    <span style="float: right; font-weight: 600; color: var(--primary-accent);">{{ level.progress }}%</span>
+                </div>
+                
+                <div class="progress-container-bottom" v-if="level.progress > 0">
+                    <div class="progress-bar-fill" :style="{width: level.progress + '%'}"></div>
+                </div>
+            </div>
         </div>
-
-       
     </div>
 </div>
-        </div>
     </div>
 
     <!-- APP DE PIANO -->
@@ -1849,7 +1786,7 @@ createApp({
             { 
                 id: 0, 
                 title: 'Nivel Preparatorio', 
-                image: 'https://lh3.googleusercontent.com/d/1T7Mx_p-5h8gTEWs5lduvBfHzavl-hjW_=s600',
+                image: 'https://lh3.googleusercontent.com/d/1wTIup70QvcoEo8RFjdzRJ55Y8YUlIVQq=s600',
                 description: 'Empieza desde cero. Aprenderás la postura, las notas y tus primeras melodías simples.', 
                 duration: '10 lecciones',
                 progress: 0,
@@ -1958,7 +1895,7 @@ createApp({
            { 
   id: 1, 
   title: 'Nivel 1', 
-  image: 'https://lh3.googleusercontent.com/d/1-N9cbc8C7xiHKUbUnZdE3FviJCjbVa_r=s600', 
+  image: 'https://lh3.googleusercontent.com/d/1XFRs3zvx5aao-PnGH3g1k2ehG28RUTIL=s600', 
   progress: 0, 
   description: 'Domina la posición de Sol, alteraciones, armaduras y síncopas a través de un repertorio clásico progresivo.', 
   duration: '10 Lecciones', 
@@ -2087,7 +2024,7 @@ createApp({
            { 
   id: 2, 
   title: 'Nivel 2', 
-  image: 'https://lh3.googleusercontent.com/d/1rlsS_7QEkC006srcfmgpTw_v4wqJdSSh=s500', 
+  image: 'https://lh3.googleusercontent.com/d/1YFxkEn3uiX11C5nNI_IvcKNnd8KFDLz_=s500', 
   progress: 0, 
   description: 'Profundiza en la técnica pianística con contrapunto, estudio de triadas, inversiones, arpegios y métricas compuestas.', 
   duration: '10 Lecciones', 
@@ -2207,7 +2144,7 @@ createApp({
     }
   ]
 },
-            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1B3bJ8kUrGHqZNC04F3ghQ5j9HhUWCOqv=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
+            { id: 3, title: 'Nivel 3', image: 'https://lh3.googleusercontent.com/d/1BrVBVLsgMo1vrzkcTuN1-pOU7GvzXeqk=s500', progress: 0, description: 'Domina técnicas profesionales y repertorio clásico.', duration: '8 horas', lessons: [{ title: "Lección 1: Técnica Avanzada", unit: 1, tasks: [] }] },
             { id: 4, title: 'Nivel 4', image: 'https://lh3.googleusercontent.com/d/1k7e90HOxUnPKK_Qu9V0cS-WSCY7rKMTM=s500', progress: 0, description: 'Perfecciona tu interpretación y expresión musical.', duration: '10 horas', lessons: [{ title: "Lección 1: Interpretación", unit: 1, tasks: [] }] },
             { id: 5, title: 'Nivel 5', image: 'https://lh3.googleusercontent.com/d/1LjeOioZoUI_NEzb3p7NfA2hlrPwx__TN=s500', progress: 0, description: 'Nivel maestro: repertorio complejo y composición.', duration: '12 horas', lessons: [{ title: "Lección 1: Composición", unit: 1, tasks: [] }] }
         ]);
