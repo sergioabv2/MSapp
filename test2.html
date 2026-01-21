@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozart Plus+ Dashboard</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <style>
+        :root {
+            --bg-sidebar: #F7F7F8;
+            --bg-main: #FFFFFF;
+            --bg-panel: #FFFFFF;
+            --text-primary: #111111;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --nav-active-bg: #ECECEE;
+            --border-color: #E5E7EB;
+            --radius-md: 16px; /* Bordes más redondeados como en la imagen */
+            
+            /* Ajuste de ancho del panel derecho aquí */
+            --right-panel-width: 280px; /* Reducido de 320px */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        body { background-color: var(--bg-main); color: var(--text-primary); width: 100%; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- LAYOUT GRID --- */
+        .app-layout {
+            display: grid;
+            /* Sidebar fija | Contenido flexible | Panel derecho reducido */
+            grid-template-columns: 240px 1fr var(--right-panel-width);
+            min-height: 100vh;
+        }
+
+        /* --- 1. SIDEBAR --- */
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .brand { font-weight: 700; font-size: 18px; margin-bottom: 32px; padding-left: 8px; }
+        .nav-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            border-radius: 8px; color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: 0.2s;
+        }
+        .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-primary); }
+        .nav-item.active { background: var(--nav-active-bg); color: var(--text-primary); font-weight: 600; }
+        .section-label { font-size: 12px; color: var(--text-tertiary); margin: 16px 12px 8px; font-weight: 500; }
+        
+        .trial-card { margin-top: auto; padding: 12px; }
+        .progress-bar { height: 4px; background: #E5E7EB; border-radius: 2px; margin: 8px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: #111; width: 75%; }
+        .btn-manage { width: 100%; padding: 8px; background: #E5E5E5; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        /* --- 2. MAIN CONTENT (Carousel) --- */
+        .main-content { 
+            padding: 32px 40px; 
+            background-color: var(--bg-main);
+            overflow-x: hidden; /* Evita scroll horizontal en la página entera */
+        }
+
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;}
+        .breadcrumb { font-size: 14px; color: var(--text-secondary); }
+        .search-bar { display: flex; align-items: center; background: #F3F4F6; padding: 8px 16px; border-radius: 20px; width: 300px; gap: 8px; }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; }
+
+        /* SECCIONES DEL CAROUSEL */
+        .carousel-section { margin-bottom: 40px; }
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Contenedor Flex con Scroll Horizontal */
+        .carousel-row {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 24px; /* Espacio para sombra */
+            scroll-snap-type: x mandatory;
+            
+            /* Ocultar barra de scroll (estético) */
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
+        .carousel-row::-webkit-scrollbar { display: none; }
+
+        /* CARD STYLE (Tamaño Fijo) */
+        .course-card {
+            min-width: 280px; /* TAMAÑO FIJO IMPORTANTE */
+            max-width: 280px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 24px; /* Más redondeado como imagen */
+            padding: 12px;
+            scroll-snap-align: start;
+            display: flex; flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .course-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+
+        .card-image-container {
+            height: 140px; border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px; position: relative;
+        }
+        .card-image-container img { width: 90px; height: auto; object-fit: contain; drop-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        .card-body { padding: 0 4px; display: flex; flex-direction: column; flex: 1; }
+        
+        /* Header dentro de la card (User info) */
+        .card-user-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .user-info-group { display: flex; align-items: center; gap: 8px; }
+        .user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        .user-name { font-size: 13px; font-weight: 700; color: #111; }
+        .user-handle { font-size: 12px; color: var(--text-secondary); }
+        .card-avatar-right { width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .card-desc { font-size: 13px; color: #4B5563; margin-bottom: 16px; line-height: 1.4; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .card-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
+        
+        /* Tags minimalistas */
+        .tags-group { display: flex; gap: 6px; }
+        .mini-tag { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+        
+        /* Botón azul check */
+        .check-btn { width: 24px; height: 24px; background: #3B82F6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; border: none; }
+        .check-btn.empty { background: transparent; border: 1px solid #E5E7EB; color: transparent; }
+
+        /* Colores de fondo de cards */
+        .bg-gray { background-color: #F3F4F6; }
+        .bg-green { background-color: #ECFDF5; }
+        .bg-orange { background-color: #FFF7ED; }
+        .bg-blue { background-color: #EFF6FF; }
+
+
+        /* --- 3. RIGHT PANEL (REDUCIDO) --- */
+        .right-panel {
+            background-color: var(--bg-panel); 
+            border-left: 1px solid var(--border-color);
+            padding: 100px 20px 24px 20px; /* Menos padding lateral */
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+            display: flex; flex-direction: column;
+            width: var(--right-panel-width); /* Ancho controlado */
+        }
+
+        .ai-bubble {
+            background: #F3F4F6; padding: 12px 16px; border-radius: 16px 16px 16px 0;
+            font-size: 13px; font-weight: 500; color: #111; margin-bottom: 12px; width: fit-content;
+            line-height: 1.4;
+        }
+        
+        .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; margin-top: 10px; }
+        
+        /* LISTA DE TAREAS ESTILO IMAGEN */
+        .task-list { display: flex; flex-direction: column; gap: 0; }
+        .task-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 0; 
+            border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; 
+        }
+        .task-item:last-child { border-bottom: none; }
+
+        .task-icon { font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .task-text { font-size: 13px; font-weight: 500; color: #6B7280; flex: 1; }
+        .task-text.active { color: #111; }
+        .arrow-icon { color: #D1D5DB; font-size: 12px; }
+
+        /* Círculos de estado */
+        .circle-done { color: #10B981; } /* Verde check */
+        .circle-dashed { width: 16px; height: 16px; border-radius: 50%; border: 2px dashed #F59E0B; } /* Naranja */
+        .circle-dashed-gray { width: 16px; height: 16px; border-radius: 50%; border: 2px dashed #D1D5DB; } /* Gris */
+
+        .btn-plan-post { align-self: flex-end; background: #F3F4F6; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; border: none; margin-top: 20px; cursor: pointer; color: #111; }
+
+        /* AI Input Bottom */
+        .ai-input-wrapper { margin-top: auto; padding-top: 20px; }
+        .ai-box {
+            background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 6px;
+            display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .btn-plus { width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #111; }
+        .ai-field { border: none; outline: none; flex: 1; padding: 0 10px; font-size: 12px; }
+        .btn-wave { width: 28px; height: 28px; background: #111; border-radius: 10px; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
+
+
+        /* --- FLOATING MENU --- */
+        .user-floating-menu {
+            position: fixed; top: 16px; right: 24px; 
+            background: white; padding: 6px 8px; border-radius: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 8px; z-index: 100;
+        }
+        .menu-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 18px; cursor: pointer; border-radius: 50%; color: #374151; transition: 0.2s;}
+        .menu-btn:hover { background: #F3F4F6; color: #111; }
+        .notification-dot { position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; background: #EF4444; border-radius: 50%; }
+        
+        .profile-trigger { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+
+        /* Dropdown Estilo Imagen */
+        .dropdown-menu {
+            position: absolute; top: 60px; right: 0; width: 260px; 
+            background: white; border-radius: 20px; padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05);
+            display: none; flex-direction: column;
+        }
+        .dropdown-menu.show { display: flex; }
+        
+        .dd-user-card { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .dd-avatar { width: 36px; height: 36px; border-radius: 50%; }
+        .dd-link { display: flex; align-items: center; justify-content: space-between; padding: 10px; font-size: 13px; color: #374151; text-decoration: none; border-radius: 10px; }
+        .dd-link:hover { background: #F9FAFB; }
+        .dd-badge { background: #FFEDD5; color: #C2410C; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+
+        /* Media Queries para Responsive */
+        @media (max-width: 1024px) {
+            .app-layout { grid-template-columns: 80px 1fr 0; } /* Ocultar panel derecho en tablets */
+            .right-panel { display: none; }
+            .sidebar { width: 80px; align-items: center; }
+            .brand span, .nav-item span, .section-label, .trial-card { display: none; }
+            .nav-item { justify-content: center; }
+        }
+        
+        /* Botones toggle inferiores */
+        .bottom-toggle { 
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 4px; border-radius: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; gap: 4px;
+            z-index: 40; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .toggle-opt { padding: 6px 16px; border-radius: 16px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; }
+        .toggle-opt.active { background: #111; color: white; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+    </style>
+</head>
+<body>
+
+<div id="app" class="app-layout">
+
+    <div class="user-floating-menu">
+        <button class="menu-btn"><i class="ph ph-warning-circle"></i></button>
+        <button class="menu-btn" style="position: relative;">
+            <i class="ph ph-bell"></i>
+            <span class="notification-dot"></span>
+        </button>
+        <button class="menu-btn"><i class="ph ph-medal"></i></button>
+        <img :src="user.avatar" class="profile-trigger" @click.stop="toggleMenu">
+
+        <div class="dropdown-menu" :class="{ 'show': menuOpen }" @click.stop>
+            <div class="dd-user-card">
+                <img :src="user.avatar" class="dd-avatar">
+                <div>
+                    <div style="font-weight: 700; font-size: 13px;">{{ user.name }}</div>
+                    <div style="font-size: 11px; color: #9CA3AF;">{{ user.email }}</div>
+                </div>
+                <button style="margin-left:auto; border:none; background:#F3F4F6; width:28px; height:28px; border-radius:50%; cursor:pointer;"><i class="ph ph-magnifying-glass"></i></button>
+            </div>
+            <div style="height:1px; background:#F3F4F6; margin-bottom:8px;"></div>
+            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-squares-four"></i> Explore</div></a>
+            <a href="#" class="dd-link" style="background:#F3F4F6; font-weight:600;"><div style="display:flex; gap:8px;"><i class="ph ph-lightning"></i> Notifications</div> <span class="dd-badge">16</span></a>
+            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-chat-circle"></i> Messages</div></a>
+            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-bookmark-simple"></i> Bookmarks</div></a>
+            <div style="height:1px; background:#F3F4F6; margin:8px 0;"></div>
+            <button class="btn-manage" style="background:#111; color:white;">Create</button>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="brand">Mozart Plus+</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-squares-four"></i><span>Inicio</span></a>
+            <a href="#" class="nav-item active"><i class="ph ph-metronome"></i><span>Lecciones</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-chart-line-up"></i><span>Biblioteca</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-users"></i><span>Log Social</span></a>
+        </nav>
+        <div class="section-label">Collections</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Classical Piano</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Jazz Standards</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Orchestral</span></a>
+        </nav>
+        
+        <div class="trial-card">
+            <div style="font-weight:700; font-size:13px; margin-bottom:4px;">Pro Membership</div>
+            <div style="font-size:10px; color:#6B7280; line-height:1.4;">Your subscription renews on 8 Sep 2026.</div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#6B7280; margin-bottom:12px;">
+                <span>Storage</span><span>7.5GB / 10GB</span>
+            </div>
+            <button class="btn-manage">Manage Plan</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-header">
+            <div class="breadcrumb">Home > <strong>Bookmarks</strong></div>
+            <div style="display:flex; gap:12px;">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass" style="color:#9CA3AF;"></i>
+                    <input type="text" placeholder="Ask or search">
+                    <span style="font-size:10px; color:#9CA3AF; border:1px solid #E5E7EB; padding:2px 4px; border-radius:4px;">⌘ K</span>
+                </div>
+                <button style="display:flex; align-items:center; gap:6px; background:white; border:1px solid #E5E7EB; padding:8px 12px; border-radius:12px; cursor:pointer; font-size:13px;">
+                    <i class="ph ph-calendar-blank"></i> By date <i class="ph ph-caret-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="carousel-section">
+            <div class="section-title">
+                Today, Jan 15
+                <div style="display:flex; gap:4px;">
+                    <i class="ph ph-caret-left" style="cursor:pointer; color:#9CA3AF;"></i>
+                    <i class="ph ph-caret-right" style="cursor:pointer;"></i>
+                </div>
+            </div>
+            
+            <div class="carousel-row">
+                <article v-for="card in todayCards" :key="card.id" class="course-card">
+                    <div class="card-image-container" :class="card.bgClass">
+                        <img :src="card.image" alt="3d icon">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-user-row">
+                            <div class="user-info-group">
+                                <div style="font-weight:700; font-size:13px;">{{ card.author }}</div>
+                                <i class="ph-fill ph-check-circle" style="color:#3B82F6; font-size:12px;"></i>
+                                <div style="font-size:12px; color:#9CA3AF;">{{ card.handle }} {{ card.time }}</div>
+                            </div>
+                            <img :src="card.authorPic" class="card-avatar-right">
+                        </div>
+                        <p class="card-desc">{{ card.desc }}</p>
+                        <div class="card-footer">
+                            <button class="check-btn" :class="{ 'empty': !card.checked }">
+                                <i v-if="card.checked" class="ph ph-check" style="font-size:14px;"></i>
+                            </button>
+                            <div class="tags-group">
+                                <span v-for="tag in card.tags" :key="tag.text" class="mini-tag" :style="{ background: tag.bg, color: tag.color }">
+                                    {{ tag.text }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="carousel-section">
+            <div class="section-title">
+                Yesterday, Jan 14
+                <div style="display:flex; gap:4px;">
+                    <i class="ph ph-caret-left" style="cursor:pointer; color:#9CA3AF;"></i>
+                    <i class="ph ph-caret-right" style="cursor:pointer;"></i>
+                </div>
+            </div>
+            
+            <div class="carousel-row">
+                <article v-for="card in yesterdayCards" :key="card.id" class="course-card">
+                    <div class="card-image-container" :class="card.bgClass">
+                        <img :src="card.image" alt="3d icon">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-user-row">
+                            <div class="user-info-group">
+                                <div style="font-weight:700; font-size:13px;">{{ card.author }}</div>
+                                <i class="ph-fill ph-check-circle" style="color:#3B82F6; font-size:12px;"></i>
+                                <div style="font-size:12px; color:#9CA3AF;">{{ card.handle }} {{ card.time }}</div>
+                            </div>
+                            <img :src="card.authorPic" class="card-avatar-right">
+                        </div>
+                        <p class="card-desc">{{ card.desc }}</p>
+                        <div class="card-footer">
+                            <button class="check-btn" :class="{ 'empty': !card.checked }">
+                                <i v-if="card.checked" class="ph ph-check" style="font-size:14px;"></i>
+                            </button>
+                            <div class="tags-group"> </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="bottom-toggle">
+            <button class="toggle-opt">List</button>
+            <button class="toggle-opt active"><i class="ph ph-cards"></i> Card</button>
+            <button class="toggle-opt">Board</button>
+            <button class="toggle-opt">Gallery</button>
+        </div>
+
+    </main>
+
+    <aside class="right-panel">
+        <div class="ai-bubble">What I don't complete yet?</div>
+        
+        <div style="font-size: 12px; color: #6B7280; line-height: 1.5; margin-bottom: 24px;">
+            You have 5 tasks to complete in order to maximize your Cube capacities.
+        </div>
+
+        <div class="progress-header">
+            <h3 style="font-size: 14px; font-weight: 700;">Get Started</h3>
+            <span style="font-weight:700; font-size:14px;">40%</span>
+        </div>
+
+        <div class="task-list">
+            <div class="task-item">
+                <div class="task-icon"><i class="ph-fill ph-check-circle circle-done"></i></div>
+                <div class="task-text active">Update your profile</div>
+                <i class="ph ph-caret-right arrow-icon"></i>
+            </div>
+            <div class="task-item">
+                <div class="task-icon"><i class="ph-fill ph-check-circle circle-done"></i></div>
+                <div class="task-text active">Create a new post</div>
+                <i class="ph ph-caret-right arrow-icon"></i>
+            </div>
+            <div class="task-item">
+                <div class="task-icon"><div class="circle-dashed"></div></div>
+                <div class="task-text">Schedule a post</div>
+                <i class="ph ph-caret-right arrow-icon"></i>
+            </div>
+            <div class="task-item">
+                <div class="task-icon"><div class="circle-dashed"></div></div>
+                <div class="task-text">Create your first link</div>
+                <i class="ph ph-caret-right arrow-icon"></i>
+            </div>
+            <div class="task-item">
+                <div class="task-icon"><div class="circle-dashed-gray"></div></div>
+                <div class="task-text">Check today's inspiration</div>
+                <i class="ph ph-caret-right arrow-icon"></i>
+            </div>
+        </div>
+
+        <button class="btn-plan-post">Plan the next post</button>
+
+        <div class="ai-input-wrapper">
+            <div style="font-size:11px; color:#9CA3AF; margin-bottom:6px;">Ask AI anything...</div>
+            <div class="ai-box">
+                <button class="btn-plus"><i class="ph ph-plus"></i></button>
+                <input type="text" class="ai-field">
+                <div class="btn-wave"><i class="ph-fill ph-wave-form"></i></div>
+            </div>
+        </div>
+    </aside>
+
+</div>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                menuOpen: false,
+                user: {
+                    name: 'Sophie Bennett',
+                    email: 'sophie@framer.com',
+                    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                },
+                todayCards: [
+                    {
+                        id: 1, author: 'Liam', handle: '@liamdesign', time: '7h',
+                        desc: 'Design Notes is a show about...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/box-5206684-4352260.png',
+                        authorPic: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: true,
+                        tags: [{text:'Motion', bg:'#FEF3C7', color:'#D97706'}, {text:'iOS', bg:'#D1FAE5', color:'#059669'}, {text:'Apps', bg:'#E5E7EB', color:'#374151'}]
+                    },
+                    {
+                        id: 2, author: 'Sofia', handle: '@sofia', time: '8h',
+                        desc: 'How seven design problems...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/delivery-truck-5206685-4352261.png',
+                        authorPic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: true,
+                        tags: [{text:'Icons', bg:'#FEE2E2', color:'#DC2626'}, {text:'Web', bg:'#F3F4F6', color:'#374151'}, {text:'UI Design', bg:'#F3E8FF', color:'#7C3AED'}]
+                    },
+                    {
+                        id: 3, author: 'Ethan', handle: '@ethan', time: '9h',
+                        desc: 'Exploring the new features...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/folder-5206688-4352264.png',
+                        authorPic: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: false,
+                        tags: [{text:'Product', bg:'#DBEAFE', color:'#2563EB'}]
+                    }
+                ],
+                yesterdayCards: [
+                    {
+                        id: 4, author: 'Ethan', handle: '@liamdesign', time: '1d',
+                        desc: 'How dynamic cues help users...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/map-5206695-4352271.png',
+                        authorPic: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: false
+                    },
+                    {
+                        id: 5, author: 'Liam', handle: '@liamdesign', time: '1d',
+                        desc: 'Design Notes is a show about...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/warehouse-5206694-4352270.png',
+                        authorPic: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: false
+                    },
+                    {
+                        id: 6, author: 'Marcus', handle: '@marcus', time: '1d',
+                        desc: 'Advanced prototyping techniques...',
+                        image: 'https://cdn3d.iconscout.com/3d/premium/thumb/settings-5206698-4352274.png',
+                        authorPic: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        bgClass: 'bg-gray', checked: false
+                    }
+                ]
+            }
+        },
+        methods: {
+            toggleMenu() { this.menuOpen = !this.menuOpen; }
+        },
+        mounted() {
+            window.addEventListener('click', (e) => {
+                const menu = document.querySelector('.user-floating-menu');
+                if (menu && !menu.contains(e.target)) {
+                    this.menuOpen = false;
+                }
+            });
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>
