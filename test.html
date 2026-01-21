@@ -39,6 +39,7 @@
 
         /* --- LAYOUT GENERAL (Grid Responsivo) --- */
         .app-layout {
+            position: relative;
             display: grid;
             /* Desktop: Sidebar (250px) | Contenido (Auto) | Panel Derecho (320px) */
             grid-template-columns: 250px 1fr 320px;
@@ -340,14 +341,14 @@
 
         /* --- 3. RIGHT PANEL (Editor/Preview) --- */
         .right-panel {
-            background-color: var(--bg-panel);
-            border-left: 1px solid var(--border-color);
-            padding: 32px 24px;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
+    background-color: var(--bg-panel);
+    border-left: 1px solid var(--border-color);
+    padding: 100px 24px 32px 24px; /* Aumentar padding-top de 32px a 100px */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
 
         .preview-box {
             background: white;
@@ -393,7 +394,169 @@
             position: relative;
         }
 
+
+
+.user-floating-menu {
+    position: fixed;
+    top: 12px;
+    right: 14px;
+    width: auto;
+    height: auto;
+    padding: 7px 8px; /* Agregar padding para que el background tenga espacio */
+    
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 8px;
+    z-index: 50;
+    
+    pointer-events: none;
+    
+    /* Efecto Glassmorphism */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Reactivamos los clics solo en los botones e imagen */
+.user-floating-menu .action-btn,
+.user-floating-menu .profile-pic {
+    pointer-events: auto;
+    background: transparent; /* Opcional: para que resalten si hay texto debajo */
+}
+
+/* Estilos de botones (Igual que antes) */
+.action-btn {
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    position: relative;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.action-btn:hover { background-color: #F3F4F6; }
+
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: #EF4444;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 12px;
+    border: 2px solid white; /* Borde blanco para limpiar visualmente */
+    cursor: pointer;
+}
+
+
+/* --- DROPDOWN MENU STYLE --- */
+.dropdown-menu {
+    position: absolute;
+    top: 50px; /* Debajo de los botones */
+    right: 1px; /* Alineado al margen derecho */
+    width: 280px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1), 0 10px 15px -3px rgba(0,0,0,0.05);
+    padding: 20px;
+    pointer-events: auto; /* IMPORTANTE: Para poder hacer clic */
+    
+    /* Animación de entrada */
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.dropdown-menu.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+}
+
+/* Header del Dropdown */
+.dd-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.dd-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.dd-user-info { flex: 1; }
+.dd-name { font-weight: 700; font-size: 14px; color: #111; }
+.dd-email { font-size: 11px; color: #6B7280; }
+.dd-search {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: #F3F4F6; color: #111; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Items de Navegación */
+.dd-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: background 0.1s;
+}
+.dd-item:hover { background-color: #F9FAFB; }
+.dd-item i { font-size: 18px; color: #4B5563; }
+
+.dd-item.active { background-color: #F3F4F6; color: #111; font-weight: 600; }
+.dd-badge {
+    margin-left: auto;
+    background: #FFEDD5; color: #C2410C;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+}
+
+.dd-divider { height: 1px; background: #F3F4F6; margin: 8px 0; }
+
+/* Árbol de carpetas */
+.tree-group { margin-top: 4px; }
+.tree-children {
+    padding-left: 20px;
+    margin-left: 10px;
+    border-left: 1px solid #E5E7EB; /* La línea vertical del árbol */
+    margin-top: 2px;
+}
+
+/* Footer Botones */
+.dd-footer { display: flex; gap: 8px; margin-top: 16px; }
+.btn-create, .btn-manage {
+    flex: 1; padding: 10px; border-radius: 20px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-create { background: #1F2937; color: white; }
+.btn-manage { background: #F3F4F6; color: #374151; }
+
         /* --- RESPONSIVIDAD (MEDIA QUERIES) --- */
+
 
         /* Tablet (max 1024px) */
         @media (max-width: 1024px) {
@@ -506,28 +669,92 @@
 <body>
 
     <div class="app-layout">
+
+        <div class="user-floating-menu">
+            <button class="action-btn">
+                <i class="ph ph-warning-circle"></i>
+            </button>
+            <button class="action-btn">
+                <i class="ph ph-bell"></i>
+                <span class="notification-badge"></span>
+            </button>
+            <button class="action-btn">
+                <i class="ph ph-medal"></i>
+            </button>
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User" class="profile-pic" id="profileBtn">
+            <div class="dropdown-menu" id="userDropdown">
+        <div class="dd-header">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="dd-avatar">
+            <div class="dd-user-info">
+                <div class="dd-name">Sophie Bennett</div>
+                <div class="dd-email">sophie@framer.com</div>
+            </div>
+            <button class="dd-search"><i class="ph ph-magnifying-glass"></i></button>
+        </div>
+        
+        <div class="dd-divider"></div>
+
+        <nav class="dd-nav">
+            <a href="#" class="dd-item">
+                <i class="ph ph-squares-four"></i> <span>Explore</span>
+            </a>
+            <a href="#" class="dd-item active">
+                <i class="ph ph-lightning"></i> <span>Notifications</span>
+                <span class="dd-badge">16</span>
+            </a>
+            <a href="#" class="dd-item">
+                <i class="ph ph-chat-circle"></i> <span>Messages</span>
+            </a>
+            <a href="#" class="dd-item">
+                <i class="ph ph-bookmark-simple"></i> <span>Bookmarks</span>
+            </a>
+            <a href="#" class="dd-item">
+                <i class="ph ph-caret-down"></i> <span>View more</span>
+            </a>
+        </nav>
+
+        <div class="dd-divider"></div>
+
+        <div class="dd-section">
+            <a href="#" class="dd-item"><i class="ph ph-plus-square"></i> <span>New project</span></a>
+            
+            <div class="tree-group">
+                <div class="dd-item"><i class="ph ph-folder-open"></i> <span>Framer Design</span></div>
+                <div class="tree-children">
+                    <div class="dd-item"><i class="ph ph-file-text" style="color:#86EFAC"></i> <span>Templates</span></div>
+                    <div class="dd-item"><i class="ph ph-file-text" style="color:#D8B4FE"></i> <span>Assets</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dd-footer">
+            <button class="btn-create">Create</button>
+            <button class="btn-manage">Manage sites</button>
+        </div>
+    </div>
+        </div>
         
       <aside class="sidebar">
     <div class="brand" style="margin-bottom: 32px; padding-left: 12px;">
-        <span style="font-size: 16px; font-weight: 600;">Biblioteca</span>
+        <span style="font-size: 16px; font-weight: 600;">Mozart Plus+</span>
     </div>
 
     <nav class="nav-group">
         <a href="#" class="nav-item active">
             <i class="ph ph-squares-four"></i>
-            <span>Library</span>
+            <span>Inicio</span>
         </a>
         <a href="#" class="nav-item">
             <i class="ph ph-metronome"></i>
-            <span>Practice Log</span>
+            <span>Lecciones</span>
         </a>
         <a href="#" class="nav-item">
             <i class="ph ph-chart-line-up"></i>
-            <span>Progress</span>
+            <span>Biblioteca</span>
         </a>
         <a href="#" class="nav-item">
             <i class="ph ph-users"></i>
-            <span>Composers</span>
+            <span>Log Social</span>
         </a>
     </nav>
 
@@ -574,6 +801,7 @@
                     <i class="ph ph-magnifying-glass" style="color: #9CA3AF;"></i>
                     <input type="text" placeholder="Search by title, composer...">
                 </div>
+
             </div>
 
             <div class="stats-hero">
@@ -693,6 +921,8 @@
         </main>
 
         <aside class="right-panel">
+           
+
             <div class="preview-box">
                 <h3 style="margin-bottom: 12px; font-size: 14px;">Now Practicing</h3>
                 <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" class="preview-img" alt="Current Score">
@@ -737,4 +967,22 @@
     </div>
 
 </body>
+
+<script>
+    const profileBtn = document.getElementById('profileBtn');
+    const userDropdown = document.getElementById('userDropdown');
+
+    // Toggle al hacer clic en la foto
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que el clic cierre inmediatamente el menú
+        userDropdown.classList.toggle('active');
+    });
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!userDropdown.contains(e.target) && e.target !== profileBtn) {
+            userDropdown.classList.remove('active');
+        }
+    });
+</script>
 </html>
