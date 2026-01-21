@@ -6,6 +6,7 @@
     <title>Mozart Plus+ Dashboard</title>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
     
     <style>
         :root {
@@ -43,13 +44,45 @@
             display: flex; flex-direction: column;
             position: sticky; top: 0; height: 100vh; overflow-y: auto;
         }
-        .brand { font-weight: 700; font-size: 18px; margin-bottom: 32px; padding-left: 8px; }
+/* --- ESTILOS DE LA MARCA (Dos Imágenes) --- */
+
+.brand {
+    display: flex;
+    align-items: center; /* Centra verticalmente las dos imágenes */
+    gap: 12px;           /* Espacio entre el ícono y el texto */
+    margin-bottom: 32px;
+    padding-left: 12px;
+    /* Opcional: si tus imágenes son muy grandes, esto evita que rompan el layout */
+    max-width: 100%; 
+}
+
+/* Estilos para la imagen del ÍCONO */
+.brand-icon {
+    height: 40px;        /* Altura fija para el ícono */
+    width: auto;         /* Mantiene la proporción */
+    object-fit: contain;
+    border-radius: 7px;
+    flex-shrink: 0;     
+    display: none;
+}
+
+/* Estilos para la imagen del TEXTO PNG */
+.brand-text {
+    /* Ajusta esta altura según sea necesario para que coincida visualmente con tu ícono */
+    height: 46px;        
+    width: auto;         /* Mantiene la proporción */
+    object-fit: contain;
+    display: block;      /* Asegura que se comporte como bloque para poder ocultarlo */
+}
+
+
         .nav-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
         .nav-item {
             display: flex; align-items: center; gap: 12px; padding: 10px 12px;
             border-radius: 8px; color: var(--text-secondary); text-decoration: none;
             font-size: 14px; font-weight: 500; transition: 0.2s;
         }
+         .nav-item i {font-size: 20px; font-weight: 600;}
         .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-primary); }
         .nav-item.active { background: var(--nav-active-bg); color: var(--text-primary); font-weight: 600; }
         .section-label { font-size: 12px; color: var(--text-tertiary); margin: 16px 12px 8px; font-weight: 500; }
@@ -202,38 +235,121 @@
         .profile-trigger { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; cursor: pointer; }
 
         /* Dropdown Estilo Imagen */
-        .dropdown-menu {
-            position: absolute; top: 60px; right: 0; width: 260px; 
-            background: white; border-radius: 20px; padding: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05);
-            display: none; flex-direction: column;
-        }
-        .dropdown-menu.show { display: flex; }
-        
-        .dd-user-card { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .dd-avatar { width: 36px; height: 36px; border-radius: 50%; }
-        .dd-link { display: flex; align-items: center; justify-content: space-between; padding: 10px; font-size: 13px; color: #374151; text-decoration: none; border-radius: 10px; }
-        .dd-link:hover { background: #F9FAFB; }
-        .dd-badge { background: #FFEDD5; color: #C2410C; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+ /* --- ESTILO DROPDOWN FRAMER (FINAL) --- */
+.dropdown-menu {
+    position: absolute;
+    top: 56px;
+    right: 0;
+    width: 280px; /* Ancho ideal según tu imagen */
+    background: white;
+    border-radius: 24px;
+    padding: 16px;
+    
+    /* Sombra de alta calidad estilo Framer */
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 20px 40px -8px rgba(0, 0, 0, 0.12), 
+        0 0 0 1px rgba(0,0,0,0.05);
+    
+    /* Animación */
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    transform-origin: top right;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+}
 
-        /* Media Queries para Responsive */
+.dropdown-menu.active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Header */
+.dd-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 2px; padding: 4px;
+}
+.dd-avatar { 
+    width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(0,0,0,0.05); 
+}
+.dd-user-info h4 { margin: 0; font-size: 15px; font-weight: 700; color: #111; }
+.dd-user-info p { margin: 0; font-size: 13px; color: #6B7280; }
+.dd-search-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: #F3F4F6; color: #111; display: flex; align-items: center; justify-content: center;
+    margin-left: auto; cursor: pointer; font-size: 18px; transition: background 0.2s;
+}
+.dd-search-btn:hover { background: #E5E7EB; }
+
+/* Links y Navegación */
+.dd-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px;
+    text-decoration: none; color: #374151;
+    font-size: 14px; font-weight: 500;
+    border-radius: 12px; transition: background 0.1s;
+    margin-bottom: 2px;
+}
+.dd-item:hover { background: #F9FAFB; color: #111; }
+.dd-item i { font-size: 18px; color: #6B7280; }
+.dd-item.active-bg { background: #F3F4F6; color: #111; font-weight: 600; }
+
+.dd-badge {
+    margin-left: auto; background: #FFEDD5; color: #C2410C;
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+}
+
+/* Árbol de Carpetas (Lo que faltaba) */
+.dd-section-title {
+    font-size: 12px; font-weight: 600; color: #9CA3AF; margin: 12px 10px 4px;
+}
+.tree-group { margin-top: 4px; }
+.tree-children {
+    margin-left: 19px; /* Alineación con el icono */
+    padding-left: 12px;
+    border-left: 1px solid #E5E7EB; /* Línea vertical sutil */
+    display: flex; flex-direction: column; gap: 2px; margin-top: 2px;
+}
+.tree-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; text-decoration: none; color: #4B5563;
+    font-size: 13px; border-radius: 8px;
+}
+.tree-item:hover { background: #F9FAFB; color: #111; }
+
+/* Footer Botones */
+.dd-footer {
+    display: flex; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #F3F4F6;
+}
+.btn-dd {
+    flex: 1; padding: 12px; border-radius: 14px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: transform 0.1s;
+}
+.btn-dd-primary { background: #111; color: white; }
+.btn-dd-secondary { background: #F3F4F6; color: #111; }
+.btn-dd:active { transform: scale(0.96); }
+
         @media (max-width: 1024px) {
+      .brand {
+        justify-content: center; /* Centra el ícono restante en la barra estrecha */
+        padding-left: 0;         /* Elimina el padding izquierdo */
+        margin-bottom: 40px;     /* Ajuste de margen para la vista tablet */
+    }
+    .brand-icon{display: block}
+
+  .brand-text {
+        display: none;
+    }
             .app-layout { grid-template-columns: 80px 1fr 0; } /* Ocultar panel derecho en tablets */
             .right-panel { display: none; }
             .sidebar { width: 80px; align-items: center; }
-            .brand span, .nav-item span, .section-label, .trial-card { display: none; }
+            .nav-item span, .section-label, .trial-card { display: none; }
             .nav-item { justify-content: center; }
         }
         
-        /* Botones toggle inferiores */
-        .bottom-toggle { 
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 4px; border-radius: 20px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; gap: 4px;
-            z-index: 40; border: 1px solid rgba(0,0,0,0.05);
-        }
-        .toggle-opt { padding: 6px 16px; border-radius: 16px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; }
-        .toggle-opt.active { background: #111; color: white; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 
     </style>
 </head>
@@ -242,40 +358,84 @@
 <div id="app" class="app-layout">
 
     <div class="user-floating-menu">
-        <button class="menu-btn"><i class="ph ph-warning-circle"></i></button>
-        <button class="menu-btn" style="position: relative;">
+   
+         <button class="menu-btn"><i class="ph ph-calendar-dots"></i></button>
+        <button class="menu-btn" style="position: relative; margin-right: 5px;">
             <i class="ph ph-bell"></i>
             <span class="notification-dot"></span>
         </button>
-        <button class="menu-btn"><i class="ph ph-medal"></i></button>
         <img :src="user.avatar" class="profile-trigger" @click.stop="toggleMenu">
 
-        <div class="dropdown-menu" :class="{ 'show': menuOpen }" @click.stop>
-            <div class="dd-user-card">
-                <img :src="user.avatar" class="dd-avatar">
-                <div>
-                    <div style="font-weight: 700; font-size: 13px;">{{ user.name }}</div>
-                    <div style="font-size: 11px; color: #9CA3AF;">{{ user.email }}</div>
-                </div>
-                <button style="margin-left:auto; border:none; background:#F3F4F6; width:28px; height:28px; border-radius:50%; cursor:pointer;"><i class="ph ph-magnifying-glass"></i></button>
-            </div>
-            <div style="height:1px; background:#F3F4F6; margin-bottom:8px;"></div>
-            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-squares-four"></i> Explore</div></a>
-            <a href="#" class="dd-link" style="background:#F3F4F6; font-weight:600;"><div style="display:flex; gap:8px;"><i class="ph ph-lightning"></i> Notifications</div> <span class="dd-badge">16</span></a>
-            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-chat-circle"></i> Messages</div></a>
-            <a href="#" class="dd-link"><div style="display:flex; gap:8px;"><i class="ph ph-bookmark-simple"></i> Bookmarks</div></a>
-            <div style="height:1px; background:#F3F4F6; margin:8px 0;"></div>
-            <button class="btn-manage" style="background:#111; color:white;">Create</button>
+
+<div class="dropdown-menu" :class="{ active: menuOpen }" @click.stop>
+    <div class="dd-header">
+        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="dd-avatar">
+        <div class="dd-user-info">
+            <h4>Sophie Bennett</h4>
+            <p>sophie@framer.com</p>
+        </div>
+    </div>
+    
+     <div style="height:1px; background:#F3F4F6; margin: 5px 0;"></div>
+    
+   <a href="#" class="dd-item">
+  <i class="ph ph-user"></i> Perfil
+</a>
+
+<a href="#" class="dd-item active-bg">
+  <i class="ph ph-credit-card"></i> Suscripción
+</a>
+
+<a href="#" class="dd-item">
+  <i class="ph ph-chat-circle"></i> Mensajes
+  <span class="dd-badge">16</span>
+</a>
+
+<a href="#" class="dd-item">
+  <i class="ph ph-translate"></i> Idioma
+</a>
+
+<div style="height:1px; background:#F3F4F6; margin: 12px 0;"></div>
+
+<a href="#" class="dd-item">
+  <i class="ph ph-plus-square"></i> Nueva Partitura
+</a>
+
+    
+    <div class="tree-group">
+        <a href="#" class="dd-item"><i class="ph ph-folder-open"></i> Framer Design</a>
+        <div class="tree-children">
+            <a href="#" class="tree-item">
+                <i class="ph ph-file-text" style="color:#4ADE80"></i> Templates
+            </a>
+            <a href="#" class="tree-item">
+                <i class="ph ph-file-text" style="color:#C084FC"></i> Assets
+            </a>
         </div>
     </div>
 
+    <div class="dd-footer">
+        <button class="btn-dd btn-dd-primary">Create</button>
+        <button class="btn-dd btn-dd-secondary">Manage sites</button>
+    </div>
+</div>
+
+
+    </div>
+
     <aside class="sidebar">
-        <div class="brand">Mozart Plus+</div>
+           
+    <div class="brand">
+    <img src="https://lh3.googleusercontent.com/d/1UPOCrAagBv1zHx7tujnLN5G8xFhTy40l" alt="Mozart Icon" class="brand-icon">
+    
+    <img src="https://lh3.googleusercontent.com/d/16qsirnx8QB0nhJ0nv0LHbJmOCTSWTyVa" alt="Mozart+ Text" class="brand-text">
+</div>
         <nav class="nav-group">
             <a href="#" class="nav-item"><i class="ph ph-squares-four"></i><span>Inicio</span></a>
-            <a href="#" class="nav-item active"><i class="ph ph-metronome"></i><span>Lecciones</span></a>
-            <a href="#" class="nav-item"><i class="ph ph-chart-line-up"></i><span>Biblioteca</span></a>
-            <a href="#" class="nav-item"><i class="ph ph-users"></i><span>Log Social</span></a>
+            <a href="#" class="nav-item active"><i class="ph ph-chalkboard-teacher"></i><span>Lecciones</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-books"></i><span>Biblioteca</span></a>
+             <a href="#" class="nav-item"><i class="ph ph-video-camera"></i><span>Sesiones</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-users-three"></i><span>Log Social</span></a>
         </nav>
         <div class="section-label">Collections</div>
         <nav class="nav-group">
@@ -384,12 +544,7 @@
             </div>
         </div>
 
-        <div class="bottom-toggle">
-            <button class="toggle-opt">List</button>
-            <button class="toggle-opt active"><i class="ph ph-cards"></i> Card</button>
-            <button class="toggle-opt">Board</button>
-            <button class="toggle-opt">Gallery</button>
-        </div>
+    
 
     </main>
 
