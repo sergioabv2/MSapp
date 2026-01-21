@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozart Plus+ Virtual Sessions</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <style>
+        :root {
+            --bg-sidebar: #F7F7F8;
+            --bg-main: #FFFFFF;
+            --bg-panel: #FFFFFF;
+            --text-primary: #111111;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --nav-active-bg: #ECECEE;
+            --accent-purple: #8B5CF6; /* Violeta principal */
+            --accent-gradient: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            --border-color: #E5E7EB;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            
+            /* Ancho del panel derecho */
+            --right-panel-width: 320px; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        body { background-color: var(--bg-main); color: var(--text-primary); width: 100%; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- LAYOUT GRID --- */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr var(--right-panel-width);
+            min-height: 100vh;
+        }
+
+        /* --- 1. SIDEBAR --- */
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .brand { font-weight: 700; font-size: 18px; margin-bottom: 32px; padding-left: 8px; }
+        .nav-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            border-radius: 8px; color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: 0.2s;
+        }
+        .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-primary); }
+        .nav-item.active { background: var(--nav-active-bg); color: var(--text-primary); font-weight: 600; }
+        .section-label { font-size: 12px; color: var(--text-tertiary); margin: 16px 12px 8px; font-weight: 500; }
+        
+        .trial-card { margin-top: auto; padding: 12px; }
+        .progress-bar { height: 4px; background: #E5E7EB; border-radius: 2px; margin: 8px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: #111; width: 75%; }
+        .btn-manage { width: 100%; padding: 8px; background: #E5E5E5; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        /* --- 2. MAIN CONTENT (SESSIONS HERO) --- */
+        .main-content { 
+            padding: 32px 40px; 
+            background-color: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+        }
+
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .breadcrumb { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .header-actions { display: flex; gap: 12px; }
+        .btn-icon-only { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-color); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; }
+
+        /* HERO SESSION CARD */
+        .session-hero {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            margin-bottom: 32px;
+            min-height: 320px;
+        }
+
+        .hero-content {
+            flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center;
+            z-index: 2;
+        }
+
+        .badge-session {
+            background: #F3E8FF; color: #7C3AED; font-size: 11px; font-weight: 700;
+            padding: 6px 12px; border-radius: 20px; text-transform: uppercase; width: fit-content; margin-bottom: 16px;
+        }
+
+        .hero-title { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 12px; line-height: 1.2; }
+        .hero-desc { font-size: 14px; color: #6B7280; margin-bottom: 24px; line-height: 1.6; max-width: 480px; }
+
+        .meta-row { display: flex; gap: 24px; margin-bottom: 32px; color: #4B5563; font-size: 13px; font-weight: 500; }
+        .meta-item { display: flex; align-items: center; gap: 8px; }
+        .meta-icon { color: var(--accent-purple); font-size: 18px; }
+
+        .btn-join {
+            background: var(--accent-gradient);
+            color: white; border: none; padding: 12px 24px; border-radius: 12px;
+            font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            width: fit-content; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        .btn-join:hover { transform: translateY(-2px); }
+
+        /* Hero Image (Right Side) */
+        .hero-image-wrapper {
+            width: 45%; position: relative;
+            background-color: #FAFAFA;
+        }
+        .hero-img {
+            width: 100%; height: 100%; object-fit: cover;
+            /* Efecto de desvanecimiento hacia la izquierda como en la imagen */
+            mask-image: linear-gradient(to right, transparent 0%, black 20%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
+        }
+
+        /* TABS NAVIGATION */
+        .tabs-container { margin-bottom: 32px; border-bottom: 1px solid var(--border-color); display: flex; gap: 32px; }
+        .tab-btn {
+            padding: 12px 0; background: none; border: none; font-size: 14px; font-weight: 500; color: #6B7280; cursor: pointer; position: relative;
+        }
+        .tab-btn.active { color: var(--accent-purple); font-weight: 600; }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--accent-purple); border-radius: 2px 2px 0 0;
+        }
+
+        /* INSTRUCTOR SECTION */
+        .instructor-card {
+            background: white; border: 1px solid var(--border-color); border-radius: 16px; padding: 24px;
+            display: flex; gap: 20px; align-items: flex-start;
+        }
+        .inst-avatar { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
+        .inst-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .inst-role { font-size: 12px; color: var(--accent-purple); font-weight: 600; margin-bottom: 12px; display: block; }
+        .inst-bio { font-size: 13px; color: #6B7280; line-height: 1.6; }
+
+
+        /* --- 3. RIGHT PANEL (CALENDAR & LIST) --- */
+        .right-panel {
+            background-color: var(--bg-panel); 
+            padding: 32px 24px;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+            display: flex; flex-direction: column;
+            width: var(--right-panel-width);
+        }
+
+        .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+
+        /* CALENDAR WIDGET */
+        .calendar-widget { background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 16px; margin-bottom: 32px; }
+        
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .cal-month { font-size: 14px; font-weight: 700; }
+        .cal-nav { display: flex; gap: 8px; }
+        .cal-btn { background: transparent; border: none; cursor: pointer; color: #6B7280; }
+
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+        .cal-day-label { font-size: 10px; color: #9CA3AF; font-weight: 600; margin-bottom: 8px; }
+        
+        .cal-day { 
+            height: 32px; display: flex; align-items: center; justify-content: center; 
+            font-size: 12px; color: #374151; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .cal-day:hover { background: #F3F4F6; }
+        .cal-day.active { background: #111; color: white; }
+        .cal-day.has-event::after {
+            content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--accent-purple); border-radius: 50%;
+        }
+        .cal-day.muted { color: #D1D5DB; }
+
+        /* UPCOMING LIST */
+        .upcoming-list { display: flex; flex-direction: column; gap: 16px; }
+        
+        .session-item { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: 12px; border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+        .session-item:hover { background: white; border-color: var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        
+        .date-badge { 
+            background: #F3F4F6; border-radius: 10px; width: 44px; height: 44px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .db-day { font-size: 14px; font-weight: 700; color: #111; line-height: 1; }
+        .db-month { font-size: 10px; color: #6B7280; text-transform: uppercase; margin-top: 2px; }
+
+        .session-details h5 { font-size: 13px; font-weight: 600; color: #111; margin-bottom: 4px; }
+        .session-time { font-size: 11px; color: #6B7280; display: flex; align-items: center; gap: 4px; }
+
+        /* --- FLOATING MENU --- */
+        .user-floating-menu {
+            position: fixed; top: 16px; right: 24px; 
+            background: white; padding: 6px 8px; border-radius: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 8px; z-index: 100;
+        }
+        .menu-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 18px; cursor: pointer; border-radius: 50%; color: #374151; }
+        .menu-btn:hover { background: #F3F4F6; color: #111; }
+        .profile-trigger { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .app-layout { grid-template-columns: 240px 1fr; }
+            .right-panel { display: none; }
+            .hero-image-wrapper { display: none; } /* En tablet, ocultamos la imagen o la ponemos arriba */
+        }
+        @media (max-width: 768px) {
+            .app-layout { display: block; }
+            .sidebar { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="app" class="app-layout">
+
+    <div class="user-floating-menu">
+        <button class="menu-btn"><i class="ph ph-warning-circle"></i></button>
+        <button class="menu-btn"><i class="ph ph-bell"></i></button>
+        <button class="menu-btn"><i class="ph ph-medal"></i></button>
+        <img :src="user.avatar" class="profile-trigger">
+    </div>
+
+    <aside class="sidebar">
+        <div class="brand">Mozart Plus+</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-squares-four"></i><span>Inicio</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-metronome"></i><span>Lecciones</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-chart-line-up"></i><span>Biblioteca</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-users"></i><span>Log Social</span></a>
+            <a href="#" class="nav-item active"><i class="ph ph-video-camera"></i><span>Sesiones</span></a> </nav>
+        <div class="section-label">Collections</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Classical Piano</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Jazz Standards</span></a>
+        </nav>
+        
+        <div class="trial-card">
+            <div style="font-weight:700; font-size:13px; margin-bottom:4px;">Pro Membership</div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#6B7280; margin-bottom:12px;">
+                <span>Storage</span><span>7.5GB / 10GB</span>
+            </div>
+            <button class="btn-manage">Manage Plan</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-header">
+            <div class="breadcrumb">Home <i class="ph ph-caret-right" style="font-size:10px;"></i> <strong>Virtual Sessions</strong></div>
+            <div class="header-actions">
+                <button class="btn-icon-only"><i class="ph ph-gear"></i></button>
+                <button class="btn-icon-only"><i class="ph ph-question"></i></button>
+            </div>
+        </div>
+
+        <section class="session-hero">
+            <div class="hero-content">
+                <div class="badge-session">Próxima Sesión</div>
+                <h1 class="hero-title">Módulo de Piano: Fundamentos</h1>
+                <p class="hero-desc">Una sesión intensiva donde trabajaremos la técnica, expresión y teoría aplicada directamente en tu piano interactivo.</p>
+                
+                <div class="meta-row">
+                    <div class="meta-item">
+                        <i class="ph ph-calendar-blank meta-icon"></i>
+                        <span>Hoy</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="ph ph-clock meta-icon"></i>
+                        <span>19:00 HRS</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="ph ph-video-camera meta-icon"></i>
+                        <span>Aula Virtual</span>
+                    </div>
+                </div>
+
+                <button class="btn-join">
+                    Unirse a la Clase <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+            
+            <div class="hero-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1552422535-c45813c61732?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Piano" class="hero-img">
+            </div>
+        </section>
+
+        <div class="tabs-container">
+            <button class="tab-btn" :class="{active: activeTab === 'program'}" @click="activeTab = 'program'">Programación</button>
+            <button class="tab-btn" :class="{active: activeTab === 'instructor'}" @click="activeTab = 'instructor'">Instructor</button>
+            <button class="tab-btn" :class="{active: activeTab === 'materials'}" @click="activeTab = 'materials'">Materiales</button>
+        </div>
+
+        <div v-if="activeTab === 'instructor'" class="instructor-card">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="inst-avatar">
+            <div class="inst-info">
+                <h4>Sarah Jenkins</h4>
+                <span class="inst-role">Piano Master Instructor</span>
+                <p class="inst-bio">Especialista en pedagogía musical con amplia experiencia en la enseñanza del piano a todos los niveles. Nuestro enfoque se centra en la técnica relajada y la comprensión estructural.</p>
+            </div>
+        </div>
+        
+        <div v-else class="instructor-card">
+            <div class="inst-info">
+                <p class="inst-bio" style="font-style: italic; color: #9CA3AF;">Contenido de la pestaña {{ activeTab }}...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <aside class="right-panel">
+        <h3 class="panel-title">Calendar</h3>
+        
+        <div class="calendar-widget">
+            <div class="cal-header">
+                <span class="cal-month">January 2026</span>
+                <div class="cal-nav">
+                    <button class="cal-btn"><i class="ph ph-caret-left"></i></button>
+                    <button class="cal-btn"><i class="ph ph-caret-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="cal-grid">
+                <div class="cal-day-label">Mo</div>
+                <div class="cal-day-label">Tu</div>
+                <div class="cal-day-label">We</div>
+                <div class="cal-day-label">Th</div>
+                <div class="cal-day-label">Fr</div>
+                <div class="cal-day-label">Sa</div>
+                <div class="cal-day-label">Su</div>
+
+                <div class="cal-day muted">29</div>
+                <div class="cal-day muted">30</div>
+                <div class="cal-day">1</div>
+                <div class="cal-day">2</div>
+                <div class="cal-day">3</div>
+                <div class="cal-day">4</div>
+                <div class="cal-day">5</div>
+                
+                <div class="cal-day">6</div>
+                <div class="cal-day">7</div>
+                <div class="cal-day has-event">8</div>
+                <div class="cal-day">9</div>
+                <div class="cal-day">10</div>
+                <div class="cal-day">11</div>
+                <div class="cal-day">12</div>
+
+                <div class="cal-day">13</div>
+                <div class="cal-day">14</div>
+                <div class="cal-day">15</div>
+                <div class="cal-day">16</div>
+                <div class="cal-day">17</div>
+                <div class="cal-day">18</div>
+                <div class="cal-day">19</div>
+
+                <div class="cal-day active">20</div> <div class="cal-day">21</div>
+                <div class="cal-day has-event">22</div>
+                <div class="cal-day">23</div>
+                <div class="cal-day">24</div>
+                <div class="cal-day">25</div>
+                <div class="cal-day">26</div>
+            </div>
+        </div>
+
+        <h3 class="panel-title">Upcoming Sessions</h3>
+        
+        <div class="upcoming-list">
+            <div class="session-item">
+                <div class="date-badge">
+                    <span class="db-day">22</span>
+                    <span class="db-month">JAN</span>
+                </div>
+                <div class="session-details">
+                    <h5>Jazz Improvisation</h5>
+                    <div class="session-time"><i class="ph ph-clock"></i> 18:00 - 19:30</div>
+                </div>
+                <i class="ph ph-caret-right" style="margin-left: auto; color: #D1D5DB;"></i>
+            </div>
+
+            <div class="session-item">
+                <div class="date-badge">
+                    <span class="db-day">25</span>
+                    <span class="db-month">JAN</span>
+                </div>
+                <div class="session-details">
+                    <h5>Sight Reading Club</h5>
+                    <div class="session-time"><i class="ph ph-clock"></i> 10:00 - 11:00</div>
+                </div>
+                <i class="ph ph-caret-right" style="margin-left: auto; color: #D1D5DB;"></i>
+            </div>
+
+            <div class="session-item">
+                <div class="date-badge">
+                    <span class="db-day">02</span>
+                    <span class="db-month">FEB</span>
+                </div>
+                <div class="session-details">
+                    <h5>Masterclass: Beethoven</h5>
+                    <div class="session-time"><i class="ph ph-clock"></i> 16:00 - 18:00</div>
+                </div>
+                <i class="ph ph-caret-right" style="margin-left: auto; color: #D1D5DB;"></i>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                activeTab: 'instructor', // Default tab
+                user: {
+                    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                }
+            }
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>
