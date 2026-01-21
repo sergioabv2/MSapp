@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozart Plus+ Social Log</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <style>
+        :root {
+            --bg-sidebar: #F7F7F8;
+            --bg-main: #FFFFFF;
+            --bg-panel: #FFFFFF;
+            --text-primary: #111111;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --nav-active-bg: #ECECEE;
+            --border-color: #E5E7EB;
+            --radius-md: 16px;
+            
+            /* ANCHO AUMENTADO PARA EL PANEL DERECHO (LOG SOCIAL) */
+            --right-panel-width: 440px; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        body { background-color: var(--bg-main); color: var(--text-primary); width: 100%; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- LAYOUT GRID --- */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr var(--right-panel-width);
+            min-height: 100vh;
+        }
+
+        /* --- 1. SIDEBAR --- */
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .brand { font-weight: 700; font-size: 18px; margin-bottom: 32px; padding-left: 8px; }
+        .nav-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            border-radius: 8px; color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: 0.2s;
+        }
+        .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--text-primary); }
+        .nav-item.active { background: var(--nav-active-bg); color: var(--text-primary); font-weight: 600; }
+        .section-label { font-size: 12px; color: var(--text-tertiary); margin: 16px 12px 8px; font-weight: 500; }
+        
+        .trial-card { margin-top: auto; padding: 12px; }
+        .progress-bar { height: 4px; background: #E5E7EB; border-radius: 2px; margin: 8px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: #111; width: 75%; }
+        .btn-manage { width: 100%; padding: 8px; background: #E5E5E5; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        /* --- 2. MAIN CONTENT (LIST VIEW) --- */
+        .main-content { 
+            padding: 32px 40px; 
+            background-color: var(--bg-main);
+            border-right: 1px solid var(--border-color); /* Separador sutil */
+        }
+
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;}
+        .breadcrumb { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        
+        .search-container { display: flex; gap: 12px; }
+        .search-bar { display: flex; align-items: center; background: #F3F4F6; padding: 8px 16px; border-radius: 20px; width: 260px; gap: 8px; }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; }
+        .filter-btn { display: flex; align-items: center; gap: 6px; background: white; border: 1px solid #E5E7EB; padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 13px; }
+
+        /* LIST SECTIONS */
+        .list-section { margin-bottom: 32px; }
+        .section-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: #111; }
+
+        /* LIST ITEM STYLE */
+        .list-item {
+            display: flex; gap: 16px; padding: 16px;
+            border-bottom: 1px solid #F3F4F6;
+            transition: 0.2s; border-radius: 16px;
+            cursor: pointer; position: relative;
+        }
+        .list-item:hover { background: #FAFAFA; border-bottom-color: transparent; }
+        .list-item.selected { background: #F3F4F6; }
+
+        .item-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        
+        .item-content { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .item-header { display: flex; align-items: center; gap: 8px; }
+        .item-name { font-size: 13px; font-weight: 700; color: #111; }
+        .item-meta { font-size: 12px; color: #9CA3AF; }
+        .verified-icon { color: #3B82F6; font-size: 12px; }
+
+        .item-desc { font-size: 13px; color: #4B5563; line-height: 1.5; max-width: 90%; }
+        
+        .item-actions { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+        .checkbox-custom { 
+            width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; 
+            transition: 0.2s; font-size: 12px; 
+        }
+        .checkbox-checked { background: #3B82F6; color: white; }
+        .checkbox-unchecked { background: #F3F4F6; border: 1px solid #E5E7EB; }
+
+        .tag-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+        
+        .item-thumb { width: 80px; height: 60px; border-radius: 12px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .item-thumb img { width: 40px; height: auto; object-fit: contain; }
+
+        /* --- 3. RIGHT PANEL (WIDE - SOCIAL EDITOR) --- */
+        .right-panel {
+            background-color: var(--bg-panel); 
+            padding: 24px 32px;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+            display: flex; flex-direction: column;
+            width: var(--right-panel-width);
+        }
+
+        .rp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .rp-tools { display: flex; gap: 8px; color: #6B7280; }
+        .rp-buttons { display: flex; gap: 8px; align-items: center; }
+        .btn-action { padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; }
+        .btn-schedule { background: #F3F4F6; color: #111; }
+        .btn-publish { background: #111; color: white; }
+        
+        .collab-group { display: flex; margin-left: 8px; }
+        .collab-img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; margin-left: -10px; }
+
+        /* LARGE PREVIEW CARD */
+       .preview-card {
+    background: #000;
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden; /* Corta lo que sobresalga (importante para YouTube) */
+    aspect-ratio: 1/1; /* Mantiene formato cuadrado */
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; margin-bottom: 20px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+}
+  .youtube-wrapper {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; /* Evita que toques los controles nativos de YouTube */
+}
+
+.youtube-iframe {
+    width: 100%;
+    height: 100%;
+    /* Truco para simular object-fit: cover en iframes de youtube */
+    transform: scale(1.5); 
+    pointer-events: none;
+}
+.preview-controls {
+    position: absolute; 
+    bottom: 24px; left: 24px; right: 24px;
+    background: rgba(255, 255, 255, 0.9); /* Más opaco para legibilidad */
+    backdrop-filter: blur(12px); /* Efecto vidrio */
+    border-radius: 16px; 
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); /* Sombra suave para levantar */
+    z-index: 10;
+    border: 1px solid rgba(255,255,255,0.5); /* Borde sutil */
+}
+    .play-icon { 
+    font-size: 16px; color: #111; cursor: pointer; 
+    display: flex; align-items: center; justify-content: center;
+}
+
+.play-bar { 
+    flex: 1; /* Ocupa todo el espacio disponible */
+    height: 6px; /* Un poco más grueso */
+    background: #E5E7EB; 
+    border-radius: 3px; 
+    overflow: hidden;
+}
+        .play-fill { width: 35%; height: 100%; background: #111; border-radius: 3px; }
+.time-label {
+    font-size: 11px; 
+    font-weight: 700; 
+    color: #111;
+    font-variant-numeric: tabular-nums; /* Evita que los números salten */
+}
+        /* Action Chips */
+        .chip-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .action-chip { 
+            padding: 8px 14px; border: 1px solid #E5E7EB; border-radius: 20px; 
+            font-size: 12px; font-weight: 600; background: white; color: #374151; cursor: pointer; transition: 0.2s; 
+        }
+        .action-chip:hover { border-color: #111; color: #111; }
+
+        .post-caption { font-size: 13px; color: #6B7280; line-height: 1.6; margin-bottom: auto; }
+
+        /* Chat Input Area */
+        .chat-area { margin-top: 24px; }
+        .ai-prompt { background: #F3F4F6; padding: 10px 14px; border-radius: 12px 12px 12px 2px; font-size: 12px; color: #111; margin-bottom: 12px; display: inline-block; margin-left: auto; display: table; }
+        
+        .chat-input { 
+            background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 30px; padding: 6px; 
+            display: flex; align-items: center; gap: 8px; 
+        }
+        .btn-plus-chat { width: 32px; height: 32px; background: white; border: 1px solid #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; }
+        .chat-field { flex: 1; border: none; background: transparent; outline: none; font-size: 13px; padding: 0 8px; }
+
+        /* FLOATING TOGGLE BOTTOM */
+        .bottom-toggle { 
+            position: fixed; bottom: 32px; left: calc(240px + (100% - 240px - var(--right-panel-width)) / 2); transform: translateX(-50%);
+            background: white; padding: 4px; border-radius: 16px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); display: flex; gap: 2px;
+            z-index: 40; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .toggle-btn { padding: 8px 16px; border-radius: 12px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .toggle-btn.active { background: #111; color: white; font-weight: 600; }
+
+        /* Floating Menu */
+        .user-floating-menu {
+            position: fixed; top: 16px; right: 24px; 
+            background: white; padding: 6px 8px; border-radius: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 8px; z-index: 100;
+        }
+        .menu-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 18px; cursor: pointer; border-radius: 50%; color: #374151; }
+        .menu-btn:hover { background: #F3F4F6; color: #111; }
+        .profile-trigger { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+@media (max-width: 1100px) {
+    .app-layout {
+        /* Cambiamos a 2 columnas: Sidebar | Main Content */
+        grid-template-columns: 240px 1fr; 
+    }
+    
+    .right-panel {
+        display: none; /* Se oculta completamente */
+    }
+    
+    /* Opcional: Ajustar el toggle flotante para que quede centrado en el nuevo ancho */
+    .bottom-toggle {
+        left: calc(240px + (100% - 240px) / 2);
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        display: block; /* Diseño en bloque para móviles */
+    }
+    .sidebar { display: none; } /* Ocultar sidebar en móvil si deseas */
+    .bottom-toggle { left: 50%; }
+}
+    </style>
+</head>
+<body>
+
+<div id="app" class="app-layout">
+
+    <div class="user-floating-menu">
+        <button class="menu-btn"><i class="ph ph-warning-circle"></i></button>
+        <button class="menu-btn"><i class="ph ph-bell"></i></button>
+        <button class="menu-btn"><i class="ph ph-medal"></i></button>
+        <img :src="user.avatar" class="profile-trigger">
+    </div>
+
+    <aside class="sidebar">
+        <div class="brand">Mozart Plus+</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-squares-four"></i><span>Inicio</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-metronome"></i><span>Lecciones</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-chart-line-up"></i><span>Biblioteca</span></a>
+            <a href="#" class="nav-item active"><i class="ph ph-users"></i><span>Log Social</span></a> </nav>
+        <div class="section-label">Collections</div>
+        <nav class="nav-group">
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Classical Piano</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Jazz Standards</span></a>
+            <a href="#" class="nav-item"><i class="ph ph-folder-notch"></i><span>Orchestral</span></a>
+        </nav>
+        
+        <div class="trial-card">
+            <div style="font-weight:700; font-size:13px; margin-bottom:4px;">Pro Membership</div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#6B7280; margin-bottom:12px;">
+                <span>Storage</span><span>7.5GB / 10GB</span>
+            </div>
+            <button class="btn-manage">Manage Plan</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-header">
+            <div class="breadcrumb">Home <i class="ph ph-caret-right" style="font-size:10px;"></i> <strong>Bookmarks</strong></div>
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass" style="color:#9CA3AF;"></i>
+                    <input type="text" placeholder="Ask or search">
+                    <span style="font-size:10px; color:#9CA3AF; border:1px solid #E5E7EB; padding:2px 4px; border-radius:4px;">⌘ K</span>
+                </div>
+                <button class="filter-btn">
+                    <i class="ph ph-calendar-blank"></i> By date <i class="ph ph-caret-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="list-section">
+            <div class="section-title">Today, Jan 15</div>
+            
+            <div v-for="item in listItems" :key="item.id" class="list-item" :class="{'selected': item.selected}">
+                <img :src="item.avatar" class="item-avatar">
+                <div class="item-content">
+                    <div class="item-header">
+                        <span class="item-name">{{ item.name }}</span>
+                        <i class="ph-fill ph-check-circle verified-icon"></i>
+                        <span class="item-meta">{{ item.handle }} {{ item.time }}</span>
+                    </div>
+                    <p class="item-desc">{{ item.desc }}</p>
+                    <div class="item-actions">
+                        <div class="checkbox-custom" :class="item.checked ? 'checkbox-checked' : 'checkbox-unchecked'">
+                            <i v-if="item.checked" class="ph-bold ph-check"></i>
+                        </div>
+                        <span v-for="tag in item.tags" :key="tag.text" class="tag-badge" :style="{background: tag.bg, color: tag.color}">
+                            {{ tag.text }}
+                        </span>
+                    </div>
+                </div>
+                <div class="item-thumb">
+                    <img :src="item.thumb" alt="thumb">
+                </div>
+            </div>
+        </div>
+
+        <div class="list-section">
+            <div class="section-title">Yesterday, Jan 14</div>
+             <div class="list-item">
+                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="item-avatar">
+                <div class="item-content">
+                    <div class="item-header">
+                        <span class="item-name">Ethan</span>
+                        <i class="ph-fill ph-check-circle verified-icon"></i>
+                        <span class="item-meta">@ethan Jan 14 16:54</span>
+                    </div>
+                    <p class="item-desc">How dynamic cues help users discover, learn, and master our AI assistant's evolving features.</p>
+                </div>
+                <div class="item-thumb">
+                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/map-5206695-4352271.png" alt="thumb">
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-toggle">
+            <button class="toggle-btn active"><i class="ph ph-list-dashes"></i> List</button>
+            <button class="toggle-btn"><i class="ph ph-cards"></i> Card</button>
+            <button class="toggle-btn">Board</button>
+            <button class="toggle-btn">Gallery</button>
+        </div>
+    </main>
+
+    <aside class="right-panel">
+        <div class="rp-header">
+            <div class="rp-tools">
+                <i class="ph ph-arrows-out-simple" style="cursor:pointer;"></i>
+                <i class="ph ph-arrow-square-out" style="cursor:pointer;"></i>
+            </div>
+            <div class="rp-buttons">
+                <button class="btn-action btn-schedule">Schedule</button>
+                <button class="btn-action btn-publish">Publish</button>
+                <div class="collab-group">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="collab-img">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="collab-img">
+                </div>
+            </div>
+        </div>
+
+  <div class="preview-card">
+    
+    <div class="youtube-wrapper">
+        <iframe 
+            src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=jfKfPfyJRdk" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            class="youtube-iframe">
+        </iframe>
+    </div>
+
+    <div class="preview-controls">
+        <div class="play-icon"><i class="ph-fill ph-pause"></i></div>
+        <div class="play-bar">
+            <div class="play-fill" style="width: 45%;"></div>
+        </div>
+        <span class="time-label">0:12 / 1:45</span>
+    </div>
+
+</div>
+
+        <div class="chip-row">
+            <button class="action-chip">Video 1:1</button>
+            <button class="action-chip">Redesign</button>
+            <button class="action-chip">Variations</button>
+            <button class="action-chip" style="padding: 8px 10px;"><i class="ph ph-dots-three"></i></button>
+        </div>
+
+        <p class="post-caption">
+            Design Notes is a show about creative work and what it teaches us, hosted by Liam.
+        </p>
+
+        <div style="display:flex; gap:16px; margin-top: 16px;">
+            <i class="ph ph-plus"></i>
+            <i class="ph ph-sparkle"></i>
+            <i class="ph ph-scribble-loop"></i>
+            <i class="ph ph-lightbulb"></i>
+        </div>
+
+        <div class="chat-area">
+            <div class="ai-prompt">Create a post that combines both selected bookmarks.</div>
+            
+            <div class="chat-input">
+                <button class="btn-plus-chat"><i class="ph ph-plus"></i></button>
+                <input type="text" placeholder="Ask anything" class="chat-field">
+                <i class="ph ph-microphone" style="color:#9CA3AF; padding-right:8px;"></i>
+            </div>
+        </div>
+    </aside>
+
+</div>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                user: {
+                    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                },
+                listItems: [
+                    {
+                        id: 1, name: 'Liam', handle: '@liamdesign', time: '7h',
+                        desc: 'Design Notes is a show about creative work and what it teaches us, hosted by Liam Spradlin.',
+                        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        thumb: 'https://cdn3d.iconscout.com/3d/premium/thumb/box-5206684-4352260.png',
+                        checked: true,
+                        tags: [{text:'Motion', bg:'#FFF7ED', color:'#D97706'}, {text:'iOS', bg:'#ECFDF5', color:'#059669'}, {text:'Apps', bg:'#F3F4F6', color:'#374151'}]
+                    },
+                    {
+                        id: 2, name: 'Sofia', handle: '@sofia', time: '8h',
+                        desc: 'How seven design problems shaped Framer’s iconic typeface — from inception to going open-source.',
+                        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        thumb: 'https://cdn3d.iconscout.com/3d/premium/thumb/delivery-truck-5206685-4352261.png',
+                        checked: true, selected: true, // Selected item
+                        tags: [{text:'Icons', bg:'#FEF2F2', color:'#DC2626'}, {text:'Web', bg:'#F3F4F6', color:'#374151'}, {text:'UI Design', bg:'#F3E8FF', color:'#7C3AED'}]
+                    },
+                    {
+                        id: 3, name: 'Maya', handle: '@maya', time: '12h',
+                        desc: 'Just like dance, great product design thrives on iteration, collaboration, and attention to detail.',
+                        avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                        thumb: 'https://cdn3d.iconscout.com/3d/premium/thumb/warehouse-5206694-4352270.png',
+                        checked: false,
+                        tags: [{text:'Web', bg:'#EFF6FF', color:'#2563EB'}, {text:'Apps', bg:'#F3F4F6', color:'#374151'}, {text:'Motion', bg:'#FFF7ED', color:'#D97706'}]
+                    }
+                ]
+            }
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>
