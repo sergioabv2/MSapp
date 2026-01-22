@@ -56,70 +56,61 @@
     }
 
     /* Barra de Controles */
-    #control-bar {
-  position: absolute; /* Cambiado de static a absolute */
-  bottom: 20px;       /* Distancia del borde inferior */
+ #control-bar {
+  position: fixed; /* Flota sobre el contenido */
+  bottom: 30px;
   left: 50%;
-  transform: translateX(-50%); /* Centrado horizontal */
-  
-  width: auto;
-  min-width: 300px;
-  height: 60px;       /* Un poco más alta para el estilo redondeado */
-  background: rgba(240, 240, 240, 0.95); /* Gris claro semi-transparente */
-  backdrop-filter: blur(10px);          /* Efecto de desenfoque moderno */
-  
-  border-radius: 30px; /* Bordes muy redondeados como la imagen */
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 400px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.9); /* Fondo claro con transparencia */
+  backdrop-filter: blur(10px); /* Efecto de desenfoque */
+  border-radius: 12px; /* Forma de píldora */
   padding: 0 25px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15); /* Sombra para elevarlo */
+  gap: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   z-index: 1000;
 }
 
- .btn {
-  background: transparent; /* Sin fondo */
+.btn {
+  background: transparent;
   border: none;
   cursor: pointer;
-  padding: 8px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   color: #1a1a1a;
-  transition: transform 0.2s;
 }
+
+.btn i { font-size: 30px; }
 .btn:hover { transform: scale(1.1); }
-.btn i { font-size: 24px; }
 
 .progress-container {
   flex-grow: 1;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  position: relative;
-  min-width: 100px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .progress-bar {
-  width: 35%; /* Simulación de progreso */
+  width: 0%; /* Inicia en cero */
   height: 100%;
   background: #1a1a1a;
-  border-radius: 3px;
+  border-radius: 4px;
+  transition: width 0.1s linear;
 }
 
 #time-display {
-  font-family: monospace;
-  font-weight: bold;
+  font-family: -apple-system, sans-serif;
+  font-weight: 600;
   font-size: 16px;
   color: #1a1a1a;
-  white-space: nowrap;
+  min-width: 90px;
+  text-align: right;
 }
-    #status {
-      font-size: 12px;
-      color: #666;
-      margin-left: auto;
-    }
+
 
     #sheet-wrapper::-webkit-scrollbar { height: 8px; }
     #sheet-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -139,11 +130,11 @@
       <i id="pause-icon" class="ri-pause-fill" style="display:none;"></i>
     </button>
 
-    <div class="progress-container">
-    <div class="progress-bar"></div>
+ <div class="progress-container">
+    <div id="dynamic-progress" class="progress-bar"></div>
   </div>
 
-  <div id="time-display">0:12 / 1:45</div>
+  <div id="time-display">0:00 / 0:00</div>
     
 
 
@@ -161,6 +152,9 @@
     const osmdContainer = document.getElementById('osmd-container');
 
     const sheetWrapper = document.getElementById('sheet-wrapper');
+    const progressBar = document.getElementById('dynamic-progress');
+const timeDisplay = document.getElementById('time-display');
+let duration = 0;
 
     // Variables Globales
     let osmd = null;
@@ -344,12 +338,20 @@
 
 
 
-    function startPlayback() {
-        Tone.Transport.start();
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'inline-block';
-        osmd.cursor.show();
+function startPlayback() {
+    Tone.Transport.start();
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = 'inline-block';
+    osmd.cursor.show();
+    
+    // Calcular duración total (última nota)
+    if (parsedNotes.length > 0) {
+        const lastNote = parsedNotes[parsedNotes.length - 1];
+        duration = lastNote.startTime + lastNote.duration;
     }
+    
+    updateUI(); // Iniciar actualización visual
+}
 
     function pausePlayback() {
         Tone.Transport.pause();
@@ -358,7 +360,27 @@
     }
 
 
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
+function updateUI() {
+    if (Tone.Transport.state === 'started') {
+        const currentTime = Tone.Transport.seconds;
+        const totalTime = duration / playbackRate;
+        
+        // Actualizar barra
+        const progress = (currentTime / totalTime) * 100;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+        
+        // Actualizar texto
+        timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(totalTime)}`;
+        
+        requestAnimationFrame(updateUI);
+    }
+}
 
 
   </script>
