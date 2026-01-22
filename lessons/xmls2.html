@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reproductor MusicXML Light</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary-color: #3498db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      display: flex;
+      flex-direction: column; 
+      height: 100vh; 
+      overflow: hidden; 
+    }
+    
+    /* 1. Contenedor Principal */
+    #sheet-wrapper {
+        flex-grow: 1; 
+        width: 100%;
+        overflow-x: auto; 
+        overflow-y: hidden;
+        display: flex;
+        /* align-items: center;  <-- ELIMINAMOS ESTO AQUÍ para evitar conflictos de scroll */
+        background-color: #fff;
+        position: relative;
+        margin-bottom: -50px;
+    }
+
+    /* 2. Contenedor OSMD */
+    #osmd-container {
+      height: 100%; 
+      display: flex;
+      align-items: center; /* Centrado vertical del SVG */
+      
+      width: auto; 
+      min-width: 100%;
+      padding: 20 20px;
+      touch-action: pan-x;
+    }
+
+    /* 3. REGLA MÁGICA PARA EL SVG */
+    /* Esto fuerza a la partitura a encogerse si la pantalla es muy bajita */
+    #osmd-container svg {
+        max-height: 90%; /* Deja un pequeño margen (10%) para que no toque los bordes */
+        width: auto !important; /* Mantiene la proporción correcta */
+        display: block; /* Evita espacios extra en inline */
+    }
+
+    /* Barra de Controles */
+    #control-bar {
+  position: absolute; /* Cambiado de static a absolute */
+  bottom: 20px;       /* Distancia del borde inferior */
+  left: 50%;
+  transform: translateX(-50%); /* Centrado horizontal */
+  
+  width: auto;
+  min-width: 300px;
+  height: 60px;       /* Un poco más alta para el estilo redondeado */
+  background: rgba(240, 240, 240, 0.95); /* Gris claro semi-transparente */
+  backdrop-filter: blur(10px);          /* Efecto de desenfoque moderno */
+  
+  border-radius: 30px; /* Bordes muy redondeados como la imagen */
+  padding: 0 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15); /* Sombra para elevarlo */
+  z-index: 1000;
+}
+
+ .btn {
+  background: transparent; /* Sin fondo */
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  transition: transform 0.2s;
+}
+.btn:hover { transform: scale(1.1); }
+.btn i { font-size: 24px; }
+
+.progress-container {
+  flex-grow: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  position: relative;
+  min-width: 100px;
+}
+
+.progress-bar {
+  width: 35%; /* Simulación de progreso */
+  height: 100%;
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+#time-display {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 16px;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+    #status {
+      font-size: 12px;
+      color: #666;
+      margin-left: auto;
+    }
+
+    #sheet-wrapper::-webkit-scrollbar { height: 8px; }
+    #sheet-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+    #sheet-wrapper::-webkit-scrollbar-track { background: #f1f1f1; }
+
+  </style>
+</head>
+<body>
+
+  <div id="sheet-wrapper">
+    <div id="osmd-container"></div>
+  </div>
+
+  <div id="control-bar">
+    <button id="play-btn" class="btn" disabled title="Reproducir/Pausar">
+      <i id="play-icon" class="ri-play-fill"></i>
+      <i id="pause-icon" class="ri-pause-fill" style="display:none;"></i>
+    </button>
+
+    <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+
+  <div id="time-display">0:12 / 1:45</div>
+    
+
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
+  <script>
+    // Elementos DOM
+    const playBtn = document.getElementById('play-btn');
+
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const osmdContainer = document.getElementById('osmd-container');
+
+    const sheetWrapper = document.getElementById('sheet-wrapper');
+
+    // Variables Globales
+    let osmd = null;
+    let sampler = null;
+    let audioPart = null;
+    let visualPart = null;
+    let parsedNotes = [];
+    let globalTempo = 120;
+    let playbackRate = 1.0;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+
+      initOSMD();
+      await initSampler();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const fileId = urlParams.get('file'); 
+      
+      if (fileId) {
+
+       const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
+        await loadMusicXMLFromUrl(dynamicUrl);
+      } else {
+      }
+    });
+
+    function initOSMD() {
+      osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainer, {
+        backend: 'svg',
+        drawTitle: false,
+        drawSubtitle: false,
+        drawComposer: false,
+        followCursor: true, 
+        autoResize: false, 
+        renderSingleHorizontalStaffline: true, 
+        drawingParameters: "compact",
+        drawMeasureNumbers: true,
+        cursorsOptions: [{ 
+            type: 1, 
+            color: "rgba(52, 152, 219, 0.5)", 
+            alpha: 0.5, 
+            follow: true 
+        }]
+      });
+    }
+
+    async function initSampler() {
+        sampler = new Tone.Sampler({
+            urls: { "C4": "C4.mp3", "C5": "C5.mp3", "A3": "A3.mp3", "A4": "A4.mp3" },
+            release: 1,
+            baseUrl: "https://tonejs.github.io/audio/salamander/"
+        }).toDestination();
+        await Tone.loaded();
+    }
+
+    async function loadMusicXMLFromUrl(url) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error al descargar XML');
+        const text = await response.text();
+        
+        await osmd.load(text);
+        
+        // Ajuste de Zoom un poco más agresivo para pantallas pequeñas
+        osmd.zoom = 0.8; 
+        
+        await osmd.render();
+        
+        parseMusicXML(text);
+        scheduleNotes();
+        
+        playBtn.disabled = false;
+
+
+        updateBpmDisplay();
+
+      } catch (err) {
+
+        console.error(err);
+      }
+    }
+
+    function parseMusicXML(xmlText) {
+       parsedNotes = [];
+       const parser = new DOMParser();
+       const xml = parser.parseFromString(xmlText, "application/xml");
+       
+       const soundTempo = xml.querySelector("direction sound[tempo], sound[tempo]");
+       globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute("tempo")) : 120;
+       Tone.Transport.bpm.value = globalTempo;
+
+       const divisions = parseInt(xml.querySelector("divisions")?.textContent || "24", 10);
+       
+       xml.querySelectorAll('part').forEach((part) => {
+           let currentBeat = 0;
+           part.querySelectorAll('measure').forEach((measure) => {
+               measure.querySelectorAll('note, backup, forward').forEach(node => {
+                   const durationVal = parseFloat(node.querySelector('duration')?.textContent || '0');
+                   const durationInBeats = durationVal / divisions;
+
+                   if (node.tagName === 'note') {
+                       const isChord = !!node.querySelector('chord');
+                       const isRest = !!node.querySelector('rest');
+                       
+                       if (!isChord) currentBeat += durationInBeats;
+
+                       if (!isRest && node.querySelector('pitch')) {
+                           const step = node.querySelector('step').textContent;
+                           const octave = node.querySelector('octave').textContent;
+                           const alter = node.querySelector('alter')?.textContent;
+                           let accidental = '';
+                           if(alter === '1') accidental = '#';
+                           if(alter === '-1') accidental = 'b';
+                           
+                           const pitch = `${step}${accidental}${octave}`;
+                           const startTime = (currentBeat - durationInBeats) * (60 / globalTempo);
+                           
+                           parsedNotes.push({
+                               pitch: pitch,
+                               startTime: startTime,
+                               duration: durationInBeats * (60 / globalTempo),
+                               isChord: isChord
+                           });
+                       }
+                   } else if (node.tagName === 'backup') {
+                       currentBeat -= durationInBeats;
+                   } else if (node.tagName === 'forward') {
+                       currentBeat += durationInBeats;
+                   }
+               });
+           });
+       });
+       parsedNotes.sort((a, b) => a.startTime - b.startTime);
+    }
+
+    function scheduleNotes() {
+        if (audioPart) audioPart.dispose();
+        if (visualPart) visualPart.dispose();
+        Tone.Transport.cancel();
+        osmd.cursor.reset();
+        
+        const notesByTime = new Map();
+        parsedNotes.forEach(n => {
+            const t = n.startTime / playbackRate; 
+            if (!notesByTime.has(t)) notesByTime.set(t, []);
+            notesByTime.get(t).push(n);
+        });
+
+        const audioEvents = [];
+        notesByTime.forEach((notes, time) => {
+            audioEvents.push({
+                time: time,
+                pitches: notes.map(n => n.pitch),
+                duration: notes[0].duration / playbackRate
+            });
+        });
+
+        audioPart = new Tone.Part((time, value) => {
+            sampler.triggerAttackRelease(value.pitches, value.duration, time);
+        }, audioEvents).start(0);
+
+        const visualEvents = Array.from(notesByTime.keys()).map(t => ({ time: t }));
+        
+        visualPart = new Tone.Part((time) => {
+            Tone.Draw.schedule(() => {
+                osmd.cursor.next();
+            }, time);
+        }, visualEvents).start(0);
+    }
+
+    // --- CONTROLES UI ---
+
+    playBtn.addEventListener('click', async () => {
+        await Tone.start();
+        if (Tone.Transport.state === 'started') {
+            pausePlayback();
+        } else {
+            startPlayback();
+        }
+    });
+
+
+
+    function startPlayback() {
+        Tone.Transport.start();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'inline-block';
+        osmd.cursor.show();
+    }
+
+    function pausePlayback() {
+        Tone.Transport.pause();
+        playIcon.style.display = 'inline-block';
+        pauseIcon.style.display = 'none';
+    }
+
+
+
+
+
+  </script>
+</body>
+</html>
