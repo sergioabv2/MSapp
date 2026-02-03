@@ -1715,20 +1715,10 @@ angular.module('books', [])
   $scope.showPlayer = false;
   $scope.currentManual = null;
 
-$scope.showPreview = function(manual, lvl, lsn) {
-  if (lvl == null || lsn == null) {
-    // Si los datos aún no se han cargado del servidor
-    $scope.marcarPreferencia();
-    return;
-  }
- 
-  if (manual.lvl > lvl || (manual.lvl == lvl && manual.lsn >= lsn)) {
-    $scope.marcarPreferencia();
-  } else {
+$scope.showPreview = function(manual) {
+    // Ya no verificamos lvl ni lsn, abrimos directo
     $scope.selectedManual = manual;
-  }
 };
-
   
   $scope.showPreview2 = function(manual) {
     $scope.selectedManual = manual;
