@@ -1,171 +1,373 @@
- 
+   
 <html lang="es"> 
-<head> 
+<head>  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Reproductor MusicXML</title>
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
-  <style>
-
+   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+    /* =========================================
+       1. VARIABLES GLOBALES (FUSIONADAS)
+       ========================================= */
     :root {
-  --primary-color: #3498db;
-  --primary-glow: rgba(52, 152, 219, 0.6);
-  
-  /* Dimensiones Piano - AÑADE ESTAS */
-  --piano-height: 122px;
-  --piano-bottom: 0px;
-  --key-white-height: 90px;
-  --key-black-height: 58px;
-}
+      /* --- Variables NUEVAS (Interfaz Top Bar) --- */
+      --primary-bg: #ffffff;
+      --secondary-bg: #f8f9fa;
+      --border-color: #e6e6e6;
+      --text-main: #1f1f1f;
+      --text-light: #757575;
+      
+      /* Colores de Acento */
+      --accent-blue: #1a73e8;       /* Azul Google/Pro */
+      --accent-red: #ea4335;        /* Rojo Grabación/Stop */
+      --accent-green: #0f9d58;      /* Verde Inicio/Éxito */
+      --accent-orange: #f9ab00;     /* Naranja (Mano Izquierda) */
+      
+      /* Dimensiones UI */
+      --bar-height: 60px;
+      --panel-height: 56px;
+      --knob-size: 14px;
 
-/* Media query para pantallas más grandes */
-@media (min-width: 769px) {
-    :root {
-        --piano-height: 125px; 
-        --piano-height2: 110px; 
-        --key-white-height: 90px;
-        --key-black-height: 58px;
+      /* --- Variables ANTIGUAS (Piano & Waterfall - NO TOCAR) --- */
+      --primary-color: #3498db;
+      --primary-glow: rgba(52, 152, 219, 0.6);
+      --piano-height: 122px;
+      --piano-bottom: 0px;
+      --key-white-height: 90px;
+      --key-black-height: 58px;
     }
-}
 
+    /* Media query original para pantallas grandes */
+    @media (min-width: 769px) {
+        :root {
+            --piano-height: 125px; 
+            --piano-height2: 110px; 
+            --key-white-height: 90px; 
+            --key-black-height: 58px; 
+        }
+    }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #fafafa;
-      color: #1a1a1a;
-      padding-bottom: 140px;
+      background-color: #f0f2f5; /* Fondo gris claro más moderno */
+      color: var(--text-main);
+      padding-bottom: 160px; /* Espacio para el piano fijo abajo */
+      overflow-x: hidden;
     }
-    
-    /* Top Bar - Minimalista */
-    #top-bar {
-      background: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      padding: 10px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    }
-    
 
-    
-    #song-title {
+    /* =========================================
+       2. TOP BAR (NUEVO DISEÑO PRO)
+       ========================================= */
+    #top-bar-container {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .main-bar {
+      height: var(--bar-height);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 24px; border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    /* Info Canción */
+    .song-info { display: flex; flex-direction: column; gap: 2px; }
+    .song-title { font-size: 16px; font-weight: 600; color: var(--text-main); line-height: 1.2; }
+    .song-subtitle { font-size: 12px; color: var(--text-light); font-weight: 400; line-height: 1.2; }
+
+    /* Controles Centrales */
+    .controls-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; align-items: center;
+    }
+
+     .btn-start {
+      background: var(--accent-green);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
       font-size: 14px;
       font-weight: 600;
-      color: #1a1a1a;
-    }
-    
-    #song-composer {
-      font-size: 12px;
-      color: #999;
-    }
- 
-    
-    .btn {
-      background: none;
-      border: none;
       cursor: pointer;
-      padding: 6px;
-      border-radius: 4px;
-      transition: background 0.2s;
       display: flex;
       align-items: center;
-      justify-content: center;
-    }
-    
-  
-    
-    .btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    
-    .btn svg {
-      width: 20px;
-      height: 20px;
-      fill: #1a1a1a;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(15, 157, 88, 0.3);
+      transition: all 0.2s ease;
     }
 
-    .btn i {
-      font-size: 20px;
-      fill: #1a1a1a;
+    .btn-start:hover {
+      background: #0d8a4d;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(15, 157, 88, 0.4);
+    }
+
+    .btn-start:active {
+      transform: translateY(0);
+    }
+
+    .btn-start i {
+      font-size: 18px;
+    }
+
+    .control-divider { width: 1px; height: 24px; background: #e0e0e0; margin: 0 4px; }
+
+    .learning-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: transparent;
+      border: 1px solid #e0e0e0; color: var(--text-main); display: flex;
+      align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 18px;
+    }
+    .learning-btn:hover { background: #f5f5f5; }
+    .learning-btn.active { background: #e8f0fe; border-color: var(--accent-blue); color: var(--accent-blue); }
+    #left-hand-only-btn.active { background: #ffeecf; border-color: var(--accent-orange); color: var(--accent-orange); }
+    .learning-btn .hand-left { transform: scaleX(-1); }
+
+    /* Controles Derecha */
+    .controls-right { display: flex; gap: 8px; align-items: center; position: relative; }
+
+    .tool-btn {
+      background: transparent; border: 1px solid transparent; border-radius: 6px;
+      padding: 0 12px; height: 32px; font-size: 13px; font-weight: 500;
+      color: var(--text-light); display: flex; align-items: center; gap: 6px;
+      cursor: pointer; transition: all 0.2s ease; position: relative;
+    }
+    .tool-btn:hover { background: #f5f5f5; color: var(--text-main); }
+    .tool-btn.active { background: #e8f0fe; color: var(--accent-blue); }
+    .tool-btn.recording.active { background: #fce8e6; color: var(--accent-red); }
+    .tool-btn i { font-size: 18px; }
+
+    .close-btn {
+      width: 32px; height: 32px; border-radius: 50%; background: #f1f1f1; border: none;
+      color: #555; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin-left: 8px; transition: 0.2s;
+    }
+    .close-btn:hover { background: #e0e0e0; color: #000; }
+
+    /* =========================================
+       3. MODALES FLOTANTES (NUEVO)
+       ========================================= */
+    .modal-popup {
+      position: absolute; top: calc(100% + 12px); right: 0; background: white;
+      border: 1px solid var(--border-color); border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 16px; min-width: 240px;
+      opacity: 0; transform: translateY(-10px); pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 2000;
+    }
+    .modal-popup.is-open { opacity: 1; transform: translateY(0); pointer-events: all; }
+    
+    .modal-header { 
+      font-size: 11px; font-weight: 700; color: var(--text-light); 
+      text-transform: uppercase; border-bottom: 1px solid #f0f0f0; 
+      padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 0.5px;
     }
     
-    /* Progress Bar */
-   /* AÑADE ESTE NUEVO BLOQUE DE CSS */
-
-
-
-
-/* Posiciona el slider en la parte inferior de la barra superior */
-#progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 3px; /* Grosor de la barra */
-  background: transparent;
-  outline: none;
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
-  /* Variable CSS personalizada para el progreso */
-  --progress: 0%; /* Valor inicial */
-}
-
-/* Estilo para el "thumb" (el círculo que se arrastra) */
-#progress-bar::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px; /* Tamaño del thumb */
-  height: 12px;
-  background: #3498db; /* Color del thumb */
-  border-radius: 50%;
-
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-  margin-top: -4px; /* Centra el thumb verticalmente en la barra */
-}
-
-#progress-bar::-moz-range-thumb {
-  width: 15px;
-  height: 15px;
-  background: #3498db;
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-}
-
-/* Estilo para el "track" (la barra completa) */
-/* Para navegadores WebKit: usa un gradiente para simular el progreso */
-#progress-bar::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(to right, #3498db 0%, #3498db var(--progress), #e0e0e0 var(--progress), #e0e0e0 100%);
-  border-radius: 5px; /* Opcional: para que los bordes del track sean suaves */
-}
-
-/* Para Firefox: usa la pseudo-clase estándar */
-#progress-bar::-moz-range-track {
-  width: 100%;
-  height: 3px;
-  background: #e0e0e0; /* Color de la barra no reproducida (fondo blanco) */
-  border-radius: 5px; /* Opcional */
-}
-
-#progress-bar::-moz-range-progress {
-  background: #3498db; /* Color azul para la parte reproducida */
-  height: 3px;
-  border-radius: 5px; /* Opcional */
-}
-  
+    .modal-option { padding: 8px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .modal-label { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-main); }
+    .modal-label i { font-size: 18px; color: var(--text-light); }
     
-   
+    .toggle-switch { width: 36px; height: 20px; background: #e0e0e0; border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; }
+    .toggle-switch.active { background: var(--accent-blue); }
+    .toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle-switch.active::after { transform: translateX(16px); }
+
+    .counter-control { display: flex; align-items: center; gap: 4px; background: #f5f5f5; border-radius: 6px; padding: 2px; border: 1px solid #eee; }
+    .counter-btn { width: 28px; height: 28px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-light); border-radius: 4px; }
+    .counter-btn:hover { background: #fff; color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .counter-value { font-family: 'SF Mono', 'Menlo', 'monospace'; font-size: 13px; font-weight: 600; min-width: 44px; text-align: center; }
+
+    /* =========================================
+       4. PANEL SECUNDARIO (TIMELINE & SLIDER)
+       ========================================= */
+    .secondary-panel { background-color: var(--primary-bg); border-bottom: 1px solid var(--border-color); height: var(--panel-height); }
+    .panel-content { height: 100%; padding: 0 24px; display: flex; align-items: center; width: 100%; }
+    .timeline-layout { display: flex; align-items: center; width: 100%; gap: 16px; }
+
+    .playback-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--accent-blue);
+      border: none; color: white; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    .playback-btn:hover { background: #1557b0; transform: scale(1.05); }
+
+    .time-badge {
+      font-family: 'SF Mono', 'Menlo', 'monospace'; font-size: 13px; color: var(--text-main);
+      background: #f5f5f5; padding: 4px 10px; border-radius: 6px; display: flex; gap: 6px;
+      align-items: center; border: 1px solid #eee; flex-shrink: 0;
+    }
+    .measure-count { color: var(--text-light); font-size: 11px; margin-left: 4px; padding-left: 6px; border-left: 1px solid #ddd; }
+
+    /* Slider Personalizado */
+    .track-container { flex: 1; position: relative; height: 24px; display: flex; align-items: center; cursor: pointer; }
+    /* Estilo para cuando estamos seleccionando el final del loop en el timeline */
+.track-container.selecting-loop {
+    cursor: crosshair;
+}
+
+.track-container.selecting-loop .rail {
+    background-color: #d0e1fd; /* Un azul muy clarito para indicar zona activa */
+}
+#loop-dropdown {
+    top: calc(100% + 8px);
+    z-index: 150;
+}
+    .rail { position: absolute; width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; }
+    .fill { position: absolute; height: 4px; background: var(--accent-blue); border-radius: 2px; width: 0%; pointer-events: none; }
+    .loop-region { position: absolute; height: 4px; background: var(--accent-blue); opacity: 0; display: none; pointer-events: none; transition: opacity 0.2s; }
+    .loop-region.active { display: block; opacity: 0.3; }
+    
+  .loop-pin { 
+    position: absolute; 
+    width: 2px; 
+    height: 16px; /* Aumentado para que sobresalga más */
+    background: var(--accent-blue); 
+    top: 12px; 
+    transform: translateX(-1px); 
+    opacity: 0; 
+    transition: opacity 0.2s; 
+    pointer-events: none; 
+    z-index: 15;
+}
+.loop-pin.visible { opacity: 1; }
+
+.loop-pin::before {
+    content: attr(data-measure);
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-blue);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+}
+
+#loop-dropdown {
+    top: calc(100% + 8px);
+    left: auto !important;
+    right: 0 !important; /* Alineado a la derecha del botón */
+    bottom: auto !important;
+    z-index: 150;
+}
+
+/* NUEVO: Estilos para el thumb arrastrable del loop */
+.loop-thumb {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    top: 2px;
+    transform: translateX(-50%);
+    cursor: grab;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.4);
+}
+
+.loop-thumb:hover {
+    transform: translateX(-50%) scale(1.15);
+}
+
+.loop-thumb:active {
+    cursor: grabbing;
+    background: var(--accent-blue);
+}
+
+.loop-thumb.visible {
+    opacity: 1;
+}
+
+/* Número dentro del thumb */
+.loop-thumb::after {
+    content: attr(data-measure);
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-blue);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+}
+    
+    .knob {
+      position: absolute; left: 0%; width: 16px; height: 16px;
+      background: white; border: 2px solid var(--accent-blue); border-radius: 50%;
+      transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: grab; z-index: 10;
+      transition: transform 0.1s;
+    }
+    .knob:hover { transform: translateX(-50%) scale(1.2); }
+    .knob:active { cursor: grabbing; background: var(--accent-blue); }
+
+    /* Selector de Compás */
+    .measure-selector { 
+        position: relative; cursor: pointer; display: flex; align-items: center; gap: 6px; 
+        background: #fff; padding: 5px 10px; border: 1px solid #e0e0e0; border-radius: 6px; 
+        transition: 0.2s; min-width: 90px; justify-content: space-between;
+    }
+    .measure-selector:hover { background: #f9f9f9; border-color: #ccc; }
+    .measure-label { font-size: 10px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .measure-display { font-family: 'SF Mono', 'Menlo', 'monospace'; font-size: 14px; font-weight: 700; color: var(--text-main); }
+    
+   .measure-dropdown {
+  position: absolute; 
+  top: calc(100% + 6px); /* AHORA ABRE HACIA ABAJO */
+  bottom: auto;          /* Reseteamos el bottom por si acaso */
+  right: 0; 
+  background: white; 
+  border: 1px solid var(--border-color); 
+  border-radius: 8px; 
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15); 
+  width: 150px; 
+  max-height: 0; 
+  overflow: hidden; 
+  opacity: 0; 
+  transition: all 0.2s ease; 
+  z-index: 100;
+}
+    .measure-dropdown.open { max-height: 240px; opacity: 1; }
+    .measure-dropdown-scroll { max-height: 240px; overflow-y: auto; padding: 4px; }
+    .measure-option { 
+        padding: 8px 12px; border-radius: 4px; cursor: pointer; font-family: 'SF Mono', 'Menlo', 'monospace'; 
+        font-size: 12px; display: flex; justify-content: space-between; color: var(--text-main);
+    }
+    .measure-option:hover { background: #f5f5f5; }
+    .measure-option.current { background: #e8f0fe; color: var(--accent-blue); font-weight: 700; }
+
+    .loop-tools { display: flex; gap: 4px; background: #fff; border: 1px solid #e0e0e0; padding: 3px; border-radius: 6px; flex-shrink: 0; }
+    .loop-btn { width: 30px; height: 30px; border: none; background: transparent; color: var(--text-light); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .loop-btn:hover { background: #f5f5f5; color: var(--text-main); }
+    .loop-btn.btn-on { background: #e8f0fe; color: var(--accent-blue); }
+
+    /* =========================================
+       5. ESTILOS ORIGINALES (PIANO, WATERFALL, OSMD)
+       ¡Estos se han preservado intactos!
+       ========================================= */
+    #osmd-container {
+      width: 95%; max-width: 900px; margin: 20px auto;
+      border: 1px solid #ddd; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 3px; box-sizing: border-box; overflow: hidden;
+      background: #fff; /* Aseguramos fondo blanco */
+    }
+
+
+
 #piano-container {
   position: fixed;
   left: 0;
@@ -188,10 +390,6 @@
   padding: 0 0 12px 0;
   background: transparent !important;
 }
-
-
-
-
 #piano-container.waterfall-only #waterfall-canvas {
   height: calc(100% - 102px) !important; 
   width: 100%;
@@ -205,8 +403,6 @@
 #piano-container.piano-only #waterfall-canvas{
   display: none;
 }
-    
-  
 /* REEMPLAZA los estilos de #piano-wrapper y #piano-keys */
 #piano-wrapper {
   position: absolute; 
@@ -270,8 +466,6 @@
   box-shadow: 0 0 15px rgba(41, 128, 185, 0.8), inset 0 2px 4px rgba(0,0,0,0.3);
   transform: translateY(2px);
 }
-
-/* AÑADE estos nuevos estilos para el casing superior del piano */
 #piano-top-casing {
   position: absolute; 
   bottom: calc(var(--piano-height) + var(--piano-bottom) - 25px); 
@@ -303,8 +497,6 @@
 }
 
 
-
-/* Estilos para el modo aprendizaje - Manos separadas */
 .key.active-treble {
   background: #3498db !important; /* Azul para mano derecha (treble) */
   box-shadow: 0 0 20px rgba(52, 152, 219, 0.8), inset 0 2px 4px rgba(0,0,0,0.2) !important;
@@ -344,6 +536,7 @@
   }
 }
 
+
 .key.active-treble,
 .key.active-bass {
   animation: keyPulse 0.15s ease-out;
@@ -367,7 +560,6 @@
   filter: brightness(1.3);
   transform: translateY(1px);
 }
-
 #waterfall-canvas {
   position: absolute;
   top: 0;
@@ -386,7 +578,6 @@
     left: 49%;
   }
 }
-
 .hit-line-piano {
   position: absolute;
   height: 4px !important;
@@ -411,7 +602,6 @@
   background: white;
   transform-origin: center bottom;
 }
-
 .note-flash-piano.flash-active {
   animation: flashEffectPiano 0.4s ease-out;
 }
@@ -438,1373 +628,361 @@
 }
 
 
+    #status { text-align: center; padding: 40px 20px; color: #999; font-size: 13px; }
+    #annotation-canvas { height: 100%; width: 100vw; }
 
-
-    #status {
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
-      font-size: 13px;
+    /* Key Names */
+    .key-name {
+      position: absolute; bottom: 5px; width: 100%; text-align: center;
+      font-size: 10px; font-weight: bold; color: #333; pointer-events: none; z-index: 10;
+      font-family: Arial, sans-serif;
     }
-    
-   
+    .key.black .key-name { color: white; bottom: 3px; font-size: 8px; }
+    .key.white.has-name { background: linear-gradient(to bottom, #fff 0%, #f5f5f5 100%); }
 
-#osmd-container {
-  width: 95%; 
-  max-width: 900px; 
-  margin: 20px auto;
-  border: 1px solid #ddd;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-  box-sizing: border-box;
-  overflow: hidden; /* Asegura que el contenido SVG respete los bordes redondeados */
-}
+    /* Confetti */
+    .confetti {
+      position: fixed; width: 10px; height: 10px; opacity: 0;
+      animation: confetti-fall 5s ease-out forwards; z-index: 9999;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
 
+    /* Modales de Sistema (Éxito, Alertas) */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 3001; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+    }
+    .modal-overlay.is-visible { opacity: 1; pointer-events: auto; }
 
+    .modal-content {
+      background: #fff; padding: 28px 32px; border-radius: 10px;
+      border: 1px solid #e0e0e0; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center; max-width: 380px; transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    .modal-overlay.is-visible .modal-content { transform: scale(1); }
 
+    #modal-message, #success-modal-message {
+      font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 24px; font-weight: 400;
+    }
+    #modal-message strong, #success-modal-message strong { font-weight: 700; color: #1a1a1a; }
 
-@media (min-width: 830px) {
-  #osmd-container {
-    width: 85%;
-  }
-}
+    .closeBtn {
+      background-color: #1a1a1a; color: white; padding: 11px 24px;
+      border-radius: 6px; font-weight: 600; font-size: 13px; transition: all 0.2s;
+      border: none; cursor: pointer; letter-spacing: 0.3px;
+    }
+    .closeBtn:hover { background-color: #2a2a2a; transform: translateY(-1px); }
 
+    /* Success Toast */
+    .success-toast {
+      position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
+      background-color: #ffffff; color: #27ae60; padding: 12px 24px;
+      border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      border: 1px solid #d4edda; z-index: 3000; display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 14px; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+    .success-toast.show { top: 90px; }
+    .success-toast i { font-size: 18px; }
+    .success-toast.warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+    .success-toast.warning i { color: #856404; }
 
-/* Ajustes para Desktop */
-@media (min-width: 1100px) {
-  #osmd-container {
-    width: 70%;
-  }
-}
-  
+    /* Midi Status Legend */
+    #midi-status-legend {
+      position: fixed; bottom: 165px; left: 10px; z-index: 550;
+      background-color: rgba(26, 26, 26, 0.85); color: #fafafa;
+      padding: 8px 12px; border-radius: 10px; border: 1px solid #444;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); backdrop-filter: blur(8px);
+      font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px;
+      opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    #midi-status-legend.is-visible { opacity: 1; transform: translateY(0); }
+    #midi-status-legend i { font-size: 16px; color: #3498db; }
 
-.speed-group {
-    display: flex;
-    align-items: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
+    /* Global Progress */
+    #global-progress-container {
+      position: fixed; bottom: 165px; right: 10px; z-index: 550;
+      background-color: rgba(26, 26, 26, 0.85); color: #fafafa;
+      padding: 10px 12px; border-radius: 10px; border: 1px solid #444;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; gap: 6px; min-width: 140px;
+      opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    #global-progress-container.is-visible { opacity: 1; transform: translateY(0); }
+    .progress-header { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 500; width: 100%; }
+    #global-progress-text { font-weight: 700; color: #2ecc71; }
+    .global-progress-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.15); border-radius: 3px; overflow: hidden; }
+    #global-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 
-.speed-ctrl-btn {
-    font-size: 20px;
-    font-weight: 500;
-    padding: 4px 12px;
-    line-height: 1;
-    border-radius: 0; /* Quitamos bordes individuales */
-    background-color: transparent;
-}
-.speed-ctrl-btn:hover:not(:disabled) {
-    background-color: #f5f5f5;
-}
+    /* Fog Overlay */
+    .fog-overlay {
+      position: absolute; background-color: rgba(255, 255, 255, 0.85);
+      z-index: 10; pointer-events: none; transition: all 0.5s ease;
+    }
 
-.speed-display {
+    /* Tutorial Highlights */
+    .tutorial-highlight {
+      position: relative; z-index: 3001 !important;
+      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
+      border-radius: 6px; transition: all 0.3s ease-in-out;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    .tutorial-parent-highlight { z-index: 3000 !important; position: relative; }
+    #tutorial-overlay { backdrop-filter: none; background: rgba(0, 0, 0, 0.4); display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2999; }
+    #tutorial-modal {
+      position: absolute; background: #ffffff; color: black; padding: 20px 24px;
+      border-radius: 12px; box-shadow: 0 8px 32px rgba(52, 152, 219, 0.4);
+      max-width: 350px; opacity: 0; transform: scale(0.8) translateY(10px);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 3001;
+      border: 1px solid #e0e0e0; text-align: left; display: none;
+    }
+    #tutorial-modal.show { display: block; opacity: 1; transform: scale(1) translateY(0); }
+    #tutorial-modal::before {
+      content: ''; position: absolute; width: 0; height: 0; top: -10px; left: var(--arrow-left, 50%);
+      transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid #ffffff;
+    }
+    #tutorial-modal.arrow-bottom::after {
+      display: block; content: ''; position: absolute; width: 0; height: 0; bottom: -10px; left: var(--arrow-left, 50%);
+      transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #ffffff;
+    }
+    #tutorial-modal.arrow-bottom::before { display: none; }
 
-    text-align: center;
-    min-width: 50px;
-    border-left: 1px solid #e0e0e0;
-    border-right: 1px solid #e0e0e0;
-}
-
-.speed-bpm {
-    font-size: 14px;
-    font-weight: 600;
-    display: block;
-    color: #1a1a1a;
-}
-
-.speed-value {
-    font-size: 11px;
-    color: #999;
-    display: block;
-    margin-top: 2px;
-}
-#annotation-canvas {
-height: 100%;
-width: 100vw;
-}
-
-/* === Reestructuración Top Bar === */
-.controls-group {
-  display: flex;
-  align-items: center;
-  gap: 16px; /* Espacio entre elementos dentro de un grupo */
-}
-
-/* === NUEVO: Contador de Tiempo === */
-#time-display {
-  font-size: 13px;
-  color: #555;
-  font-family: 'SF Mono', 'Menlo', 'monospace'; /* Letra monoespaciada para números */
-  background-color: #f5f5f5;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-/* === NUEVO: Controles de Zoom Rediseñados (estilo de la imagen) === */
-#zoom-controls {
-  display: flex;
-  align-items: center;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  overflow: hidden; 
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-}
-
-#zoom-controls .zoom-display {
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #333;
-}
-
-#zoom-controls .zoom-buttons {
-  display: flex;
-}
-
-#zoom-controls .zoom-btn {
-  background-color: #fff;
-  border: none;
-  border-left: 1px solid #e0e0e0; /* Línea divisora */
-  padding: 6px 12px;
-  font-size: 16px;
-  line-height: 1;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#zoom-controls .zoom-btn:hover {
-  background-color: #f0f0f0;
-}
-
-/* === NUEVO: Espacio para botón Cerrar === */
-#close-btn-placeholder {
-  width: 30px; /* Ancho para el espacio reservado */
-  height: 39px;
-}
-
-/* === NUEVO: Botones Flotantes de Dibujo === */
-#floating-draw-controls {
-  position: sticky;
-  bottom: 105px;
-  float: right;
-  margin-right: 10px;
-  z-index: 50;
-  width: 90px;
-  display: flex;
-  flex-direction: row; /* Apila los botones verticalmente */
-  gap: 5px;
-  background-color: rgba(255, 255, 255, 0.85); /* Fondo semitransparente */
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px); /* Efecto "glassmorphism" para navegadores compatibles */
-}
-
-    /* === NUEVO: Controles de Velocidad Flotantes === */
-#floating-speed-controls {
-  position: sticky;
-  width: 145px;
-  bottom: 105px;
-  display: none;
-  left: 10px; /* Lo posicionamos a la izquierda para balancear la UI */
-  z-index: 50;
-  background-color: rgba(255, 255, 255, 0.85);
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px);
-}
-
-/* Ajustes a los botones flotantes */
-#floating-draw-controls .btn:hover {
-  background-color: #e9e9e9;
-}
-
-
-
-#measure-select {
-  -webkit-appearance: none; /* Quita el estilo por defecto en Safari/Chrome */
-  -moz-appearance: none; 
-  appearance: none;
-  background-color: white;
- border-radius: 6px;
-  border: 1px solid #e0e0e0;
-  font-size: 13px;
-  font-weight: 500;
-  height: 30px;
-  color: #1a1a1a;
-  padding: 2px 8px;
-  cursor: pointer;
-}
-
-#measure-select:hover {
-  background-color: rgba(0,0,0,0.05);
-}
-
-
-
-
-/* === NUEVO: Barra de Herramientas Secundaria === */
-#secondary-top-bar {
-
-display: flex;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #e0e0e0;
- padding: 0px 15px;
- top: 60px;
-   position: sticky ;
-   z-index: 999;
-     align-items: center; 
-  justify-content: space-between;
-  gap: 16px;
-  overflow: hidden; /* Clave para la animación de despliegue */
-  max-height: 0; /* Estado inicial: colapsada */
-  transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animación suave */
-}
-
-/* Estado visible de la barra secundaria */
-#secondary-top-bar.is-visible {
-
-  max-height: 35px; /* Altura suficiente para los botones */
-  padding: 4px 15px; /* Restaura el padding vertical */
-}
-
-
-#secondary-top-bar2 {
-
-display: flex;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #e0e0e0;
- padding: 0px 15px;
- top: 60px;
-   position: sticky ;
-   z-index: 999;
-     align-items: center; 
-  justify-content: space-between;
-  gap: 16px;
-  overflow: hidden; /* Clave para la animación de despliegue */
-  max-height: 0; /* Estado inicial: colapsada */
-  transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animación suave */
-}
-
-/* Estado visible de la barra secundaria */
-#secondary-top-bar2.is-visible {
-
-  max-height: 35px; /* Altura suficiente para los botones */
-  padding: 4px 15px; /* Restaura el padding vertical */
-}
-
-.tool-group {
-  display: flex;
-  align-items: center;
-  gap: 16px; /* Espacio entre los elementos de cada grupo */
-}
-
-
- /* Mobile adjustments - ESCALADO PARA MÓVILES */
+    /* Responsive Ajustes Finales */
     @media (max-width: 768px) {
-   
-      
-      /* Aplicamos zoom automático en móviles */
-      .mobile-zoom {
-        transform: scale(0.85);
-        transform-origin: top center;
-      }
-      
-      .key.white {
-        width: 13px;
-        height: 75px;
-      }
-      
-      .key.black {
-        width: 8px;
-        height: 48px;
-        margin-left: -4px;
-        margin-right: -4px;
-      }
-      
-   
+      .main-bar { padding: 0 16px; gap: 8px; }
+      .song-info { display: none; }
+      .controls-center { position: relative; left: 0; transform: none; flex: 1; justify-content: flex-start; }
+      .btn-start { padding: 0; width: 36px; height: 36px; border-radius: 50%; justify-content: center; }
+      .btn-start span { display: none; }
+      .control-divider { display: none; }
+      .modal-popup { position: fixed; bottom: 0; top: auto; right: 0; left: 0; width: 100%; border-radius: 16px 16px 0 0; transform: translateY(100%); padding-bottom: 30px; }
+      .modal-popup.is-open { transform: translateY(0); }
+      .measure-count { display: none; }
+      .key.white { width: 13px; height: 75px; }
+      .key.black { width: 8px; height: 48px; margin-left: -4px; margin-right: -4px; }
+      .mobile-zoom { transform: scale(0.85); transform-origin: top center; }
     }
-    
-    @media (max-width: 500px) {
-      #top-bar {
-        padding: 8px 12px;
-      }
-
-      #floating-speed-controls{
-        display: flex !important;
-      }
-
-      .mobile-zoom {
-        transform: scale(0.75);
-        transform-origin: top center;
-      }
-  #start-tutorial-btn{
-    display: none !important;
-  }
-
-  #metronome-btn{
-    display: none !important;
-  }
-
-    #progress-label,
-    #fullscreen-btn,
-    #show-key-names-btn{
-      display: none; 
-    }
-  }
-
-
-
-
-/* Contenedor del selector de color completo (círculo + opciones) */
-#color-picker-container {
-  display: flex;
-  align-items: center;
-  background-color: #f0f0f0;
-  border-radius: 18px; /* Bordes redondeados para el contenedor */
-  padding: 4px;
-  transition: all 0.3s ease-in-out;
-  /* Importante: quitamos position: relative que ya no es necesario */
-}
-
-/* El círculo que muestra el color actual */
-#color-preview-circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #666;
-  background-color: rgba(255, 223, 89, 0.4);
-  cursor: pointer;
-  flex-shrink: 0; /* Evita que el círculo se encoja */
-}
-
-/* Contenedor de las opciones de color (el que modificamos) */
-#color-options {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  /* ESTADO OCULTO INICIAL (sin display:none) */
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-width 0.3s ease-in-out, opacity 0.2s linear, margin-left 0.3s ease-in-out;
-  margin-left: 0;
-  /* Eliminamos position: absolute y todo lo relacionado a eso */
-}
-
-/* ESTADO ABIERTO: Cuando el contenedor tiene la clase 'is-open' */
-#color-picker-container.is-open #color-options {
-  max-width: 200px; /* Ancho suficiente para mostrar todo */
-  opacity: 1;
-  margin-left: 8px; /* Espacio entre el círculo y las opciones */
-}
-
-/* Muestras de color y el input (sin cambios, pero se incluyen por completitud) */
-.color-swatch {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.color-swatch:hover {
-  transform: scale(1.15);
-  border: 2px solid #3498db;
-}
-
-#custom-color-input {
-  width: 28px;
-  height: 28px;
-  border: none;
-  padding: 0;
-  background: none;
-  cursor: pointer;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-/* === NUEVO: Estilos para el Modal MIDI === */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000; /* Asegura que esté por encima de todo */
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-/* Estado visible del modal */
-.modal-overlay.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  text-align: center;
-  max-width: 320px;
-  transform: scale(0.9);
-  transition: transform 0.3s ease;
-}
-
-.modal-overlay.is-visible .modal-content {
-  transform: scale(1);
-}
-
-#modal-message {
-  font-size: 15px;
-  color: #333;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-.closeBtn {
-  background-color: #3498db;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.closeBtn:hover {
-  background-color: #2980b9;
-}
-
-
-#global-progress-container {
-  position: fixed;
-  /* Misma altura base que el midi-status-legend */
-  bottom: 165px; 
-  right: 10px; /* <--- A LA DERECHA */
-  z-index: 550;
-  
-  /* Estilos copiados de tu referencia Dark Glass */
-  background-color: rgba(26, 26, 26, 0.85);
-  color: #fafafa;
-  padding: 10px 12px; /* Un poco más alto para que quepa la barra */
-  border-radius: 10px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px);
-  
-  /* Layout interno */
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 140px; /* Ancho mínimo para que la barra se vea bien */
-  
-  /* Transiciones de visibilidad */
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-/* Estado visible */
-#global-progress-container.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Cabecera interna (Icono, Texto, Porcentaje) */
-.progress-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 500;
-  width: 100%;
-}
-
-
-
-#global-progress-text {
-  font-weight: 700;
-  color: #2ecc71;
-}
-
-/* La barra de fondo (track) */
-.global-progress-track {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.15); /* Gris oscuro translúcido */
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-/* El relleno de la barra (fill) */
-#global-progress-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #2ecc71, #27ae60); /* Gradiente verde */
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Ajuste responsive desktop (igual que tu referencia) */
-@media (min-width: 501px) {
-  #global-progress-container {
-    bottom: 120px;
-  }
-}
-
-#midi-status-legend {
-  position: fixed;
-  /* Lo ponemos encima de los controles de velocidad móviles */
-  bottom: 165px; 
-  left: 10px;
-  z-index: 550;
-  background-color: rgba(26, 26, 26, 0.85); /* Fondo oscuro */
-  color: #fafafa;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  backdrop-filter: blur(8px);
-  font-size: 13px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  /* Oculto por defecto */
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none; /* No interfiere con clics */
-}
-
-#midi-status-legend.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#midi-status-legend i {
-  font-size: 16px;
-  color: #3498db; /* Ícono azul */
-}
-
-/* En desktop, no hay controles de velocidad, 
-   así que podemos bajar la leyenda */
-@media (min-width: 501px) {
-  #midi-status-legend {
-    bottom: 120px; /* Justo sobre el piano */
-  }
-}
-
-
-#right-hand-only-btn.active,
-#left-hand-only-btn.active {
-  background-color: #e0e0e0 !important;
-  color: #3498db !important;
-  border-color: #3498db !important;
-}
-
-.key.midi-active {
-  background-color: #e0e0e0 !important; /* Un gris claro sutil */
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* Para teclas blancas */
-.key.white.midi-active {
-  background-color: #e8e8e8 !important;
-}
-
-/* Para teclas negras */
-.key.black.midi-active {
-  background-color: #555555 !important;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4) !important;
-}
-
-
-.key-name {
-  position: absolute;
-  bottom: 5px;
-  width: 100%;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: #333;
-  pointer-events: none;
-  z-index: 10;
-  font-family: Arial, sans-serif;
-}
-
-/* Para teclas negras, ajustar posición */
-.key.black .key-name {
-  color: white;
-  bottom: 3px;
-  font-size: 8px;
-}
-
-/* Estilo para el botón activo */
-#show-key-names-btn.active {
-  background-color: #e0e0e0 !important;
-  border-color: #3498db !important;
-}
-
-/* Mejorar contraste en teclas blancas con nombres */
-.key.white.has-name {
-  background: linear-gradient(to bottom, #fff 0%, #f5f5f5 100%);
-}
-
-
-.confetti {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  opacity: 0;
-  /* Animación base que modificaremos con JS */
-  animation: confetti-fall 5s ease-out forwards;
-  z-index: 9999; /* Asegura que esté por encima de todo */
-}
-
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-
-#ai-practice-btn.active {
-  background-color: #e0e0e0 !important;
-  border-color: #3498db !important;
-}
-
-.modal-content br {
-  display: block;
-  margin: 8px 0;
-}
-
-/* Agregar después del estilo de #measure-select */
-#cancel-loop-btn {
-  background-color: #fff;
-  border: 1px solid #e74c3c;
-  color: #e74c3c;
-}
-
-#cancel-loop-btn:hover {
-  background-color: #fee;
-}
-
-#cancel-loop-btn.active {
-  background-color: #e74c3c;
-  color: white;
-}
-
-
-/* REEMPLAZAR los estilos de .midi-learn-highlight por estos: */
-
-/* Estilo minimalista y sobrio para el botón de aprendizaje */
-.midi-learn-highlight {
-  position: relative;
-  background: #1a1a1a !important;
-  color: white !important;
-  padding: 8px 14px !important;
-  border-radius: 6px !important;
-  border: 1px solid #333 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-
-
-.midi-learn-highlight:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.midi-learn-highlight .btn-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-left: 5px;
-  display: inline-block;
-  letter-spacing: 0.3px;
-}
-
-.midi-learn-highlight i {
-  font-size: 18px;
-}
-
-/* Animación de pulso sutil */
-@keyframes pulse-learn {
-  0%, 100% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-color: #333;
-  }
-  50% {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(26, 26, 26, 0.1);
-    border-color: #555;
-  }
-}
-
-.midi-learn-highlight.pulse-animation {
-  animation: pulse-learn 2.5s ease-in-out infinite;
-}
-
-/* Tooltip minimalista mejorado */
-.midi-learn-highlight::before {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-5px);
-  background: #1a1a1a;
-  color: white;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 1001;
-  max-width: 240px;
-  white-space: normal;
-  text-align: center;
-  line-height: 1.5;
-  font-weight: 500;
-  border: 1px solid #333;
-}
-
-.midi-learn-highlight::after {
-  content: '';
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-top-color: #1a1a1a;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.midi-learn-highlight:hover::before,
-.midi-learn-highlight:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.midi-learn-highlight.tutorial-highlight:hover::before,
-.midi-learn-highlight.tutorial-highlight:hover::after {
-    display: none !important;
-}
-
-
-
-/* Badge "NUEVO" minimalista */
-.new-badge {
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  background: #1a1a1a;
-  color: white;
-  font-size: 8px;
-  font-weight: 700;
-  padding: 3px 6px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-  border: 2px solid #fafafa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  animation: subtleBounce 3s ease-in-out infinite;
-}
-
-@keyframes subtleBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* Estilos minimalistas para el modal */
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: #fff;
-  padding: 28px 32px;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 380px;
-  transform: scale(0.95);
-  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-.modal-overlay.is-visible .modal-content {
-  transform: scale(1);
-}
-
-#modal-message,
-#success-modal-message {
-  font-size: 14px;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 24px;
-  font-weight: 400;
-}
-
-#modal-message strong,
-#success-modal-message strong {
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.closeBtn {
-  background-color: #1a1a1a;
-  color: white;
-  padding: 11px 24px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 13px;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.3px;
-}
-
-.closeBtn:hover {
-  background-color: #2a2a2a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.closeBtn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Ajustes responsive */
-@media (max-width: 768px) {
-  .midi-learn-highlight .btn-label {
-    display: none;
-  }
-  
-  
-  
-  .modal-content {
-    padding: 24px 28px;
-    max-width: 90%;
-  }
-}
-
-
-
-
-.tutorial-parent-highlight {
-    z-index: 3000 !important;
-    position: relative; /* Asegura el contexto de apilamiento */
-}
-
-#tutorial-overlay {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: rgba(0, 0, 0, 0.4);
-    display: block; 
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2999;
-}
-
-/* REEMPLAZA tus estilos de #tutorial-modal con todo esto */
-#tutorial-modal {
-    position: absolute;
-    background: #ffffff;
-    color: black;
-    padding: 20px 24px;
-    border-radius: 12px;
-    /* Usamos el azul de tu app para la sombra */
-    box-shadow: 0 8px 32px rgba(52, 152, 219, 0.4); 
-    max-width: 350px;
-    
-    /* Animación de entrada (adaptada de tu .dialog-box) */
-    opacity: 0;
-    transform: scale(0.8) translateY(10px);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 3001; /* Sobre el padre (3000) y el overlay (2999) */
-    
-    border: 1px solid #e0e0e0;
-    text-align: left;
-    
-    /* Oculto por defecto hasta que JS lo posicione y muestre */
-    display: none; 
-}
-
-/* Clase 'show' para la animación de entrada */
-#tutorial-modal.show {
-    display: block; /* Lo hace visible */
-    opacity: 1;
-    transform: scale(1) translateY(0);
-}
-
-
-#tutorial-modal::before {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    
-    /* Posición controlable con variables CSS */
-    top: -10px;
-    left: var(--arrow-left, 50%); /* Por defecto centrado */
-    transform: translateX(-50%);
-    
-    /* El triángulo (apunta hacia arriba) */
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #ffffff;
-}
-
-/* NUEVO: Flecha que apunta hacia abajo (cuando el modal está ARRIBA del botón) */
-#tutorial-modal::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    
-    bottom: -10px;
-    left: var(--arrow-left, 50%);
-    transform: translateX(-50%);
-    
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #ffffff;
-    
-    /* Oculta por defecto */
-    display: none;
-}
-
-/* Clase para mostrar la flecha inferior cuando el modal está arriba */
-#tutorial-modal.arrow-bottom::after {
-    display: block;
-}
-
-#tutorial-modal.arrow-bottom::before {
-    display: none;
-}
-
-/* Estilos internos del modal (re-aplicados) */
-#tutorial-modal #tutorial-title {
-    margin: 0 0 15px 0;
-    color: #3498db;
-    font-size: 1.2em;
-}
-
-#tutorial-modal #tutorial-text {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #333;
-}
-
-#tutorial-modal #tutorial-text strong {
-    color: #1a1a1a;
-}
-
-#tutorial-modal #tutorial-nav {
-    margin-top: 20px;
-    text-align: right;
-}
-
-/* Ajusta el botón de cerrar (ya no es un .btn genérico) */
-#tutorial-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-}
-
-/* Si decides dejar el texto "Tutorial" dentro del botón */
-#start-tutorial-btn {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    background: #666;
-  border: none;
-  color: white;
-  padding: 8px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-/* Clase para resaltar el elemento del tutorial actual */
-.tutorial-highlight {
-    position: relative;
-    z-index: 3001 !important; /* Encima del overlay */
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
-    border-radius: 6px;
-    transition: all 0.3s ease-in-out;
-    background-color: rgba(255, 255, 255, 0.1); /* Ligero fondo para que se vea */
-}
-
-/* Asegura que los botones dentro del highlight sean clickeables */
-.tutorial-highlight > .btn {
-    position: relative;
-    z-index: 3001;
-}
-
-/* Corrección para elementos como el <select> */
-.tutorial-highlight::before {
-    content: '';
-    position: absolute;
-    top: -5px; left: -5px;
-    right: -5px; bottom: -5px;
-    border: 3px solid #3498db;
-    border-radius: 8px;
-    pointer-events: none;
-}
-
-/* --- NUEVO: Estilos para la alerta MIDI del tutorial --- */
-.tutorial-alert-banner {
-    position: absolute;
-    bottom: 0; /* Se alinea en la parte inferior del banner padre */
-    left: 50%;
-    
-    /* Inicia oculto y 10px debajo del borde inferior */
-    transform: translateX(-50%) translateY(calc(100% + 10px)); 
-    
-    background: #fffbe6; /* Amarillo pálido de alerta */
-    color: #8a6d3b; /* Color de texto oscuro */
-    padding: 10px 18px;
-    border-radius: 8px;
-    border: 1px solid #f9e6af; /* Borde amarillo */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1490; /* Detrás del banner principal (1500) */
-    
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    pointer-events: none;
-    white-space: nowrap; /* Evita que el texto se parta */
-}
-
-/* Clase 'show' que usará JavaScript para mostrar la alerta */
-.tutorial-alert-banner.show {
-    opacity: 1;
-    /* La desliza 15px por debajo del borde */
-    transform: translateX(-50%) translateY(calc(100% + 15px)); 
-    pointer-events: auto;
-}
-
-.tutorial-alert-banner i {
-    font-size: 18px;
-    color: #d9a500; /* Ícono de advertencia */
-}
-
-/* Resaltar el contenedor del piano durante el tutorial */
-#piano-keys.tutorial-highlight {
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.7), 0 0 20px 10px rgba(52, 152, 219, 0.5) !important;
-    border-radius: 6px;
-    z-index: 3001 !important;
-    position: relative;
-}
-
-.fog-overlay {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.85); /* Blanco al 85% = Niebla */
-    z-index: 10; /* Encima de la partitura (notas y líneas) */
-    pointer-events: none; /* Permitir clicks si fuera necesario */
-    transition: all 0.5s ease;
-}
-
-#metronome-btn.active {
-  opacity: 1 !important;
-  filter: drop-shadow(0 0 5px #3498db);
-  transform: scale(1.1);
-}
-
-
-/* Estilos para el Toast de Éxito */
-.success-toast {
-    position: fixed;
-    top: -80px; /* Oculto arriba inicialmente */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #27ae60; /* Verde éxito */
-    padding: 12px 24px;
-    border-radius: 50px; /* Forma de píldora */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    border: 1px solid #d4edda;
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote suave */
-    pointer-events: none; /* IMPORTANTE: Permite hacer clic a través de él para no cortar el flujo */
-}
-
-.success-toast.show {
-    top: 90px; /* Baja a una posición visible debajo del top-bar */
-}
-
-.success-toast i {
-    font-size: 18px;
-}
-
-/* Estilo para el toast en modo alerta */
-.success-toast.warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-}
-.success-toast.warning i {
-    color: #856404;
-}
-#mic-btn.active {
-  color: #e74c3c; /* Rojo */
-  background-color: rgba(231, 76, 60, 0.1);
-  border: 1px solid rgba(231, 76, 60, 0.3);
-  animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-}
-  </style>
+</style>
 </head>
 <body>
 
-  <div id="top-bar">
+<div id="top-bar-container">
+  
+  <div id="top-bar" class="main-bar">
+    <div class="song-info">
+      <span class="song-title">MusicXML Player</span>
+      <span class="song-subtitle">Interactive Learning</span>
+    </div>
 
-
-    <div class="controls-group">
-      <button id="play-btn" class="btn" disabled>
-        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    <div class="controls-group controls-center">
+      <button id="midi-learn-btn" class="btn btn-start" title="Comenzar aprendizaje">
+        <i class="ph-fill ph-play-circle"></i>
+        <span>Comenzar</span>
       </button>
 
-      <div id="time-display">
-        <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+      <div class="control-divider"></div>
+      
+      <button id="restart-chunk-btn" class="btn learning-btn back" title="Reiniciar sección">
+        <i class="ph ph-arrow-u-up-left"></i>
+      </button>
+      
+      <button id="left-hand-only-btn" class="btn learning-btn" title="Mano izquierda">
+      <i class="ph ph-hand hand-left"></i>
+      </button>
+      
+      <button id="right-hand-only-btn" class="btn learning-btn" title="Mano derecha">
+          <i class="ph ph-hand"></i>
+      </button>
+    </div>
+
+    <div class="controls-group controls-right">
+      <button id="mute-btn" class="btn tool-btn" title="Silenciar Piano">
+        <i class="ph ph-speaker-high"></i>
+      </button>
+
+      <button id="metronome-modal-btn" class="btn tool-btn" onclick="toggleModal('metronome')">
+          <i class="ph ph-metronome"></i>
+      </button>
+
+      <button id="tools-toggle-btn" class="btn tool-btn" onclick="toggleModal('settings')">
+      <i class="ph ph-sliders-horizontal"></i>
+      </button>
+
+      <button id="close-btn-placeholder" class="close-btn">
+        <i class="ph ph-x"></i>
+      </button>
+
+      <div id="modal-metronome" class="modal-popup">
+        <div class="modal-header">Metrónomo</div>
+        <div class="modal-option">
+          <div class="modal-label"><i class="ph ph-power"></i><span>Activar</span></div>
+          <div class="toggle-switch" id="metronome-btn"></div>
+        
+        </div>
+        <div class="modal-option">
+          <div class="modal-label"><i class="ph ph-gauge"></i><span>BPM</span></div>
+          <div class="counter-control">
+            <button id="speed-down-btn" class="counter-btn"><i class="ri-subtract-line"></i></button>
+            <span class="counter-value" id="speed-bpm">120</span>
+            <button id="speed-up-btn" class="counter-btn"><i class="ri-add-line"></i></button>
+          </div>
+        </div>
+        <div class="modal-option">
+    <div class="modal-label"><i class="ph-fill ph-music-note"></i><span>Beat</span></div>
+    <div class="counter-control">
+      <button id="accent-down-btn" class="counter-btn"><i class="ri-subtract-line"></i></button>
+      <span class="counter-value" id="accent-value">4</span>
+      <button id="accent-up-btn" class="counter-btn"><i class="ri-add-line"></i></button>
+    </div>
+  </div>
       </div>
-<button id="midi-learn-btn" class="btn midi-learn-highlight" data-tooltip="Conecta tu teclado MIDI para practicar">
-  <i class="ri-graduation-cap-line"></i>
-  <span class="btn-label">Aprender</span>
-</button>
-<button id="mic-btn" class="btn" title="Activar Micrófono">
-  <i class="ri-mic-line"></i>
-</button>
+
+      <div id="modal-settings" class="modal-popup">
+        <div class="modal-header">Herramientas</div>
+        
+        <div class="modal-option">
+          <div class="modal-label"><i class="ph ph-microphone"></i><span>Micrófono</span></div>
+          <div class="toggle-switch" id="mic-btn"></div>
+        </div>
+
+        <div class="modal-option">
+             <div class="modal-label"><i class="ph ph-seal-question"></i><span>Tutorial</span></div>
+             <button id="start-tutorial-btn" class="counter-btn" style="width: auto; padding: 0 8px; font-size: 11px; font-weight: bold; border: 1px solid #ddd;">
+                INICIAR
+             </button>
+        </div>
+
+        <div class="control-divider" style="width: 100%; height: 1px; margin: 8px 0; background: #eee;"></div>
+        <div class="modal-header">Visualización</div>
+
+        <div class="modal-option">
+          <div class="modal-label"><i class="ph ph-magnifying-glass-plus"></i><span>Zoom</span></div>
+          <div class="counter-control">
+            <button id="zoom-out" class="counter-btn"><i class="ph-bold ph-minus"></i></button>
+            <span class="counter-value" id="zoom-label">100%</span>
+            <button id="zoom-in" class="counter-btn"><i class="ph-bold ph-plus"></i></button>
+          </div>
+        </div>
+
+        <div class="modal-option">
+          <div class="modal-label"><i class="ph ph-piano-keys"></i><span>Vista Piano</span></div>
+          <div class="toggle-switch" id="piano-btn"></div>
+        </div>
+
+        <div style="display:none;">
+             <button id="show-key-names-btn"></button>
+             <button id="fullscreen-btn"></button>
+        </div>
+      </div>
     </div>
-
-    <div class="controls-group">
-      <button  id="start-tutorial-btn" style="display: none;">Tutorial</button>
-        <button id="tools-toggle-btn" class="btn" title="Herramientas de Dibujo">
-        <i class="ri-settings-3-line"></i>
-      </button>
-
-         
-
-     
-      <div id="close-btn-placeholder"></div>
-    </div>
-
-    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
   </div>
 
-   <div id="secondary-top-bar">
-    <div class="tool-group">
- <div id="zoom-controls">
-    <img id="metronome-btn" src="https://lh3.googleusercontent.com/d/1-xAqP72ng90dUlB4gGT32Tc6vycXZ6ob=s96-c" 
-     style="height: 18.5px; width: 17.5px; margin-left: 7px; margin-right: 5px; cursor: pointer; opacity: 0.6; transition: all 0.2s;">
+  <div id="secondary-top-bar" class="secondary-panel">
+    <div class="panel-content">
+      <div class="timeline-layout">
+        
+        <button id="play-btn" class="playback-btn" title="Reproducir/Pausar">
+          <i class="ri-play-fill" id="play-icon"></i>
+          <i class="ri-pause-fill" id="pause-icon" style="display:none;"></i>
+        </button>
 
-<audio id="metronomeAudio" src="https://www.mozart-app.com/lessons/metronome.mp3" loop style="display: none;"></audio>
-         <div class="speed-display">
-        <span class="zoom-display" id="speed-bpm">120 BPM</span>
-   </div>
-        <div class="zoom-buttons">
-            <button class="zoom-btn" id="speed-down-btn">−</button>
-            <button class="zoom-btn" id="speed-up-btn">+</button>
+        <div id="time-display" class="time-badge">
+           <span id="current-time">0:00</span>
+           <span class="measure-count">/ <span id="total-time">0:00</span></span>
         </div>
-      </div>
-    </div>
-  
-     <div class="tool-group">
-       
-        <button id="show-key-names-btn" class="btn" title="Mostrar nombres de teclas">
-    <i class="ri-font-size"></i> 
-  </button>
-   <button id="piano-btn" class="btn" >
-       <img src="https://lh3.googleusercontent.com/d/1vMHUODAn781r96RNhefO3HWZrqtMM_0u=s96-c" style="height: 18.5px; width: 17.5px">
-      </button>
-    <!--      <button id="cursor-btn" class="btn" >
-   <i class="ri-layout-left-2-line"></i>
-    </button> -->
-  
-         <div class="speed-group">
-            <button id="zoom-out" class="btn speed-ctrl-btn">−</button>
-            <div class="speed-display">
-              <span class="speed-bpm" id="zoom-label">Zoom: 100%</span>
-            </div>
-            <button id="zoom-in" class="btn speed-ctrl-btn">+</button>
+
+        <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1" style="display:none;">
+        <select id="measure-select" style="display:none;"></select>
+        <select id="measure-until" style="display:none;"></select>
+
+        <div class="track-container" id="track-container">
+            <div class="rail"></div>
+            <div class="loop-region" id="loop-region"></div>
+            <div class="fill" id="track-fill" style="width: 0%;"></div>
+            <div class="loop-pin" id="loop-pin-start"></div>
+            <div class="loop-pin" id="loop-pin-end"></div>
+            <div class="loop-thumb" id="loop-thumb-end"></div>
+            <div class="knob" id="track-knob" style="left: 0%;"></div>
         </div>
-         <button id="fullscreen-btn" class="btn" >
-   <i class="ri-fullscreen-line"></i>
+
+        <div class="measure-selector" onclick="toggleMeasureDropdown()">
+          <span class="measure-label">Compás</span>
+          <span class="measure-display" id="custom-measure-display">-</span>
+          <i class="ri-arrow-down-s-line" style="font-size: 14px; color: var(--text-light);"></i>
+          <div class="measure-dropdown" id="measure-dropdown">
+            <div class="measure-dropdown-scroll" id="measure-list-custom"></div>
+          </div>
+        </div>
+
+        <div class="loop-tools" style="position: relative;">
+    <button class="loop-btn" id="btn-loop-active" onclick="toggleLoopMenu()" title="Crear Bucle">
+        <i class="ph ph-repeat"></i>
     </button>
-    </div>
-  </div>
-
-
-
-
-   <div id="secondary-top-bar2" >
-    <div class="tool-group">
-  <button id="left-hand-only-btn" class="btn" title="Solo mano izquierda">
-    <i class="ri-hand" style="transform: scaleX(-1); display: inline-block;"></i> I
-  </button>
-    <button id="right-hand-only-btn" class="btn" title="Solo mano derecha">
-    <i class="ri-hand"></i> D
-  </button>
-    </div>
-  
-     <div class="tool-group">
-        <button id="mute-btn" class="btn" title="Silenciar piano (Mute)">
-            <i class="ri-volume-up-line"></i>
-        </button>
-        <button id="restart-chunk-btn" class="btn" title="Reiniciar estos 4 compases">
-            <i class="ri-skip-back-line"></i>
-        </button>
-
-
-
-         <select id="measure-select" class="btn" title="Ir al compás...">
-    </select>
-
-      <select id="measure-until" class="btn" title="Hasta compás..." disabled>
-      <option value="-1">Sin límite</option>
-    </select>
     
-    <!-- NUEVO: BOTÓN PARA CANCELAR LOOP -->
-    <button id="cancel-loop-btn" class="btn" title="Cancelar modo loop" style="display: none;">
-      <i class="ri-close-circle-line"></i>
+    <div class="measure-dropdown" id="loop-dropdown" style="left: 0; right: auto; width: 160px;">
+        <div class="measure-dropdown-scroll" id="loop-end-list"></div>
+    </div>
+
+    <button id="cancel-loop-btn" class="loop-btn" onclick="deactivateLoopMode()" title="Borrar loop" style="display:none;">
+        <i class="ph ph-trash"></i>
     </button>
+</div>
 
-
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- Controles de zoom para móviles -->
- 
-
-  <div id="sheet-music-wrapper" style="position: relative;">
+<div id="sheet-music-wrapper" style="position: relative;">
     <div id="osmd-container"></div>
     <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
-    
 </div>
-  <div id="status">Cargando...</div>
+<div id="status">Cargando...</div>
 
- 
-<div id="midi-status-legend"></div>
-
-<div id="global-progress-container">
-  <div class="progress-header">
-    <span class="progress-label">Progreso</span>
-    <span id="global-progress-text">0%</span>
-  </div>
-  <div class="global-progress-track">
-    <div id="global-progress-fill"></div>
-  </div>
-</div>
-
- <div id="piano-container">
+<div id="piano-container">
     <canvas id="waterfall-canvas"></canvas>
     <div class="hit-line-piano"></div>
-    
-    <!-- NUEVO: Agregar el casing superior -->
     <div id="piano-top-casing"></div>
-    
-    <!-- NUEVO: Agregar wrapper para la línea de hit -->
     <div id="piano-wrapper">
         <div id="piano-keys"></div>
     </div>
 </div>
 
+<div id="midi-status-legend"></div>
+<div id="global-progress-container"><div class="progress-header"><span class="progress-label">Progreso</span><span id="global-progress-text">0%</span></div><div class="global-progress-track"><div id="global-progress-fill"></div></div></div>
+<div id="midi-modal" class="modal-overlay" style="display: none;"><div class="modal-content"><p id="modal-message"></p><button id="modal-close-btn" class="btn closeBtn">Entendido</button></div></div>
+<div id="success-toast" class="success-toast"><i class="ri-checkbox-circle-line"></i><span id="success-toast-message"></span></div>
+<div id="success-modal" class="modal-overlay" style="display: none;"><div class="modal-content"><p id="success-modal-message"></p><button id="success-modal-close-btn" class="btn closeBtn">Continuar</button></div></div>
 
-  <div id="midi-modal" class="modal-overlay" style="display: none;">
-  <div class="modal-content">
-    <p id="modal-message">Este es un mensaje de prueba.</p>
-    <button id="modal-close-btn" class="btn closeBtn">Entendido</button>
-  </div>
+<div style="display: none !important;">
+    <div id="secondary-top-bar2"></div>
+    <div id="tutorial-midi-alert"></div>
+    <div id="tutorial-phantom-target"></div>
 </div>
 
 <div id="tutorial-overlay" class="modal-overlay" style="display: none; z-index: 2999;">
-  <div id="tutorial-modal" class="modal-content" style="max-width: 400px; text-align: left; border: 2px solid #3498db;">
+  <div id="tutorial-modal" class="modal-content" style="max-width: 400px; text-align: left;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h4 id="tutorial-title" style="margin: 0; color: #3498db; font-size: 1.2em;"></h4>
-        <button id="tutorial-close-btn" class="btn" title="Cerrar Tutorial" style="padding: 4px 8px; border: 1px solid #ddd;">
-            <i class="ri-close-line"></i>
-        </button>
+        <h4 id="tutorial-title" style="margin: 0;">Tutorial</h4>
+        <button id="tutorial-close-btn" class="close-btn"><i class="ri-close-line"></i></button>
     </div>
-    <p id="tutorial-text" style="font-size: 14px; line-height: 1.6;"></p>
+    <p id="tutorial-text"></p>
     <div id="tutorial-nav" style="margin-top: 20px; text-align: right;">
-        <button id="tutorial-next-btn" class="btn closeBtn" style="display: none;">Siguiente</button>
+        <button id="tutorial-next-btn" class="btn-start">Siguiente</button>
     </div>
   </div>
 </div>
-
-<div id="success-modal" class="modal-overlay" style="display: none;">
-  <div class="modal-content">
-    <p id="success-modal-message">¡Felicidades, has completado la pieza!</p>
-    <button id="success-modal-close-btn" class="btn closeBtn">Continuar</button>
-  </div>
-</div>
-
-<div id="success-toast" class="success-toast">
-    <i class="ri-checkbox-circle-line"></i>
-    <span id="success-toast-message">¡Sección Superada!</span>
-</div>
-
-<div id="tutorial-phantom-target" style="position: absolute; pointer-events: none; z-index: 2900;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@latest/build/opensheetmusicdisplay.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
   <script>
     const playBtn = document.getElementById('play-btn');
     const playIcon = document.getElementById('play-icon');
@@ -1854,8 +1032,18 @@ let isSustainPedalDown = false;
 let sustainedNotes = new Set();
 
 const metronomeBtn = document.getElementById('metronome-btn');
-const metronomeAudio = document.getElementById('metronomeAudio');
 let isMetronomeOn = false;
+let metronomeAudioCtx = null;
+let metronomeInterval = null;
+let metronomeBeatCount = 0;
+let metronomeAccent = 4;
+let metronomeSchedulerId = null;
+let metronomeNextNoteTime = 0;
+const metronomeScheduleAhead = 0.1; // Programar con 100ms de anticipación
+const metronomeLookahead = 25;
+const accentUpBtn = document.getElementById('accent-up-btn');
+const accentDownBtn = document.getElementById('accent-down-btn');
+const accentValueSpan = document.getElementById('accent-value');
 
 const startTutorialBtn = document.getElementById('start-tutorial-btn');
 const tutorialOverlay = document.getElementById('tutorial-overlay');
@@ -2298,8 +1486,9 @@ function createNoteFlashPiano(noteName, hand) {
 
   const urlParams = new URLSearchParams(window.location.search);
   const fileId = urlParams.get('file'); 
-  if (fileId) {
-    const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}`;
+  if (!fileId) {
+    const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/minuet-in-c-reinagle.musicxml`;
+    //const dynamicUrl = `https://storage.googleapis.com/mozartacademy-files/xml/${encodeURIComponent(fileId)}.musicxml`;
     await loadMusicXMLFromUrl(dynamicUrl);
 
   } else {
@@ -2508,6 +1697,19 @@ function parseMusicXML(xmlText) {
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "application/xml");
 
+    let title = xml.querySelector("work-title")?.textContent || 
+                xml.querySelector("movement-title")?.textContent || 
+                "Partitura Sin Título";
+                
+    let composer = xml.querySelector("creator[type='composer']")?.textContent || 
+                   "Autor Desconocido";
+
+    // Actualizamos la interfaz (Top Bar)
+    const titleEl = document.querySelector('.song-title');
+    const subtitleEl = document.querySelector('.song-subtitle');
+    if (titleEl) titleEl.textContent = title;
+    if (subtitleEl) subtitleEl.textContent = composer;
+
     const divisions = parseInt(xml.querySelector("divisions")?.textContent.trim() || "24", 10);
     const soundTempo = xml.querySelector("direction sound[tempo], sound[tempo]");
     globalTempo = soundTempo ? parseFloat(soundTempo.getAttribute("tempo")) : 120;
@@ -2681,10 +1883,17 @@ function scheduleNotesOnTransport() {
     }
   });
 
-  // Audio: solo notas reales (sin silencios)
+  // Audio: solo notas reales (sin silencios) Y FILTRADAS POR MANO
   const audioEvents = [];
   notesByTime.forEach((notes, time) => {
-    const realNotes = notes.filter(n => !n.isRest && !n.isTiedContinuation); // NUEVO: Filtrar silencios
+    const realNotes = notes.filter(n => {
+      if (n.isRest || n.isTiedContinuation) return false;
+      
+      if (handFilterMode === 'right' && n.hand !== 'treble') return false;
+      if (handFilterMode === 'left' && n.hand !== 'bass') return false;
+      
+      return true;
+    });
     
     if (realNotes.length > 0) {
       const uniquePitches = new Set();
@@ -2711,12 +1920,12 @@ function scheduleNotesOnTransport() {
     sampler.triggerAttackRelease(value.pitches, value.duration, time);
   }, audioEvents).start(0);
 
-  // Visual: todas las notas (incluyendo silencios para avanzar el cursor)
+  // MODIFICADO: Visual ahora TAMBIÉN respeta el filtro de manos para el cursor
   const visualEvents = [];
   notesByTime.forEach((notes, time) => {
     const uniquePitches = new Set();
     const uniqueNotes = notes.filter(note => {
-      if (note.isRest) return true; // NUEVO: Mantener silencios
+      if (note.isRest) return true; // Siempre incluir silencios
       
       const normalizedPitch = normalizeNote(note.pitch);
       if (uniquePitches.has(normalizedPitch)) {
@@ -2726,68 +1935,288 @@ function scheduleNotesOnTransport() {
       return true;
     });
     
-    visualEvents.push({ 
-      time, 
-      notes: uniqueNotes.map(n => ({...n, duration: n.durSec / playbackRate}))
+    // NUEVO: Verificar si este grupo tiene notas relevantes según el filtro
+    const hasRelevantNotes = uniqueNotes.some(note => {
+      if (note.isRest) return true; // Los silencios siempre cuentan
+      
+      if (handFilterMode === 'both') return true;
+      if (handFilterMode === 'right') return note.hand === 'treble';
+      if (handFilterMode === 'left') return note.hand === 'bass';
+      return false;
     });
+    
+    // Solo agregar evento visual si tiene notas relevantes
+    if (hasRelevantNotes) {
+      visualEvents.push({ 
+        time, 
+        notes: uniqueNotes.map(n => ({...n, duration: n.durSec / playbackRate}))
+      });
+    }
   });
 
   visualPart = new Tone.Part((time, value) => {
     Tone.Draw.schedule(() => {
-      if (value.notes.length > 0) {
+      // MODIFICADO: Verificar si hay notas relevantes antes de avanzar cursor
+      const relevantNotes = value.notes.filter(note => {
+        if (note.isRest) return true;
+        
+        if (handFilterMode === 'both') return true;
+        if (handFilterMode === 'right') return note.hand === 'treble';
+        if (handFilterMode === 'left') return note.hand === 'bass';
+        return false;
+      });
+      
+      // Solo avanzar cursor si hay notas relevantes
+      if (relevantNotes.length > 0) {
         osmd.cursor.next();
       }
-      // MODIFICADO: Solo hacer highlight de notas reales
+      
+      // Highlight solo de notas relevantes
       value.notes.forEach(note => {
         if (!note.isRest && !note.isTiedContinuation) {
-          highlightKey(note.pitch, note.duration, note.hand);
+          const shouldHighlight = 
+            handFilterMode === 'both' || 
+            (handFilterMode === 'right' && note.hand === 'treble') ||
+            (handFilterMode === 'left' && note.hand === 'bass');
+          
+          if (shouldHighlight) {
+            highlightKey(note.pitch, note.duration, note.hand);
+          }
         }
       });
+      
+      if (isLoopMode) {
+        checkAndLoopPlayback();
+      }
     }, time);
   }, visualEvents).start(0);
   
   const newTotalDuration = totalDuration / playbackRate;
-  Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
+  if (isLoopMode) {
+    const loopEndTime = (measureStartTimes[loopMeasureEnd + 1] || totalDuration) / playbackRate;
+    Tone.Transport.scheduleRepeat(() => {
+      checkAndLoopPlayback();
+    }, "8n");
+  } else {
+    Tone.Transport.scheduleOnce(() => stopPlayback(), newTotalDuration + 0.5);
+  }
 }
 
 
-function toggleMetronome() {
-    if (isMetronomeOn) {
-        // Apagar
-        metronomeAudio.pause();
-        metronomeAudio.currentTime = 0; // Reiniciar al principio del golpe
-        metronomeBtn.classList.remove('active');
-        isMetronomeOn = false;
-    } else {
-        // Encender
-        updateMetronomeSpeed(); // Asegurar velocidad correcta antes de sonar
+
+function checkAndLoopPlayback() {
+  if (!isLoopMode) return;
+  
+  const currentTime = Tone.Transport.seconds * playbackRate;
+  const loopEndTime = measureStartTimes[loopMeasureEnd + 1] || totalDuration;
+  
+  // Si pasamos el final del loop, volver al inicio
+  if (currentTime >= loopEndTime - 0.1) { // Pequeña tolerancia
+    const loopStartTime = measureStartTimes[loopMeasureStart] / playbackRate;
+    
+    // Detener y reiniciar desde el inicio del loop
+    Tone.Transport.seconds = loopStartTime;
+    
+    // IMPORTANTE: Resetear cursor visual al inicio del loop
+    osmd.cursor.reset();
+    let cursorTime = -1;
+    for (let i = 0; i < parsedNotes.length; i++) {
+      const note = parsedNotes[i];
+      if (note.startSec < measureStartTimes[loopMeasureStart]) {
+        if (note.startSec !== cursorTime) {
+          osmd.cursor.next();
+          cursorTime = note.startSec;
+        }
+      } else {
+        break;
+      }
+    }
+    
+    console.log(`🔁 Loop reiniciado: Compás ${loopMeasureStart + 1} → ${loopMeasureEnd + 1}`);
+  }
+}
+
+
+function initNativeMetronome() {
+    // Crear contexto de audio independiente (para no interferir con Tone.js)
+    if (!metronomeAudioCtx) {
+        metronomeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+
+function playMetronomeClick(isDownbeat = false) {
+    if (!metronomeAudioCtx) return;
+
+    const now = metronomeAudioCtx.currentTime;
+    
+    // Crear oscilador temporal
+    const osc = metronomeAudioCtx.createOscillator();
+    const gain = metronomeAudioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(metronomeAudioCtx.destination);
+
+    // MODIFICADO: Usar metronomeAccent en lugar de 4 fijo
+    // Si metronomeAccent es 0, nunca hay downbeat (todos iguales)
+    const actualDownbeat = metronomeAccent > 0 && isDownbeat;
+    
+    // Frecuencias: 1200Hz para el acento, 800Hz para los demás
+    osc.frequency.value = actualDownbeat ? 1200 : 800;
+    osc.type = 'sine';
+
+    // Envolvente percusiva MUY corta (como metrónomo digital real)
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(actualDownbeat ? 1.0 : 0.7, now + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+    osc.start(now);
+    osc.stop(now + 0.03);
+}
+
+
+function scheduleMetronomeNote() {
+    if (!metronomeAudioCtx || !isMetronomeOn) return;
+    
+    const currentBPM = globalTempo * playbackRate;
+    const secondsPerBeat = 60.0 / currentBPM;
+    
+    // Programar mientras estemos dentro de la ventana de anticipación
+    while (metronomeNextNoteTime < metronomeAudioCtx.currentTime + metronomeScheduleAhead) {
+        const isDownbeat = metronomeAccent > 0 && (metronomeBeatCount % metronomeAccent === 0);
         
-        // Manejo de promesa para evitar errores de autoplay en navegadores
-        const playPromise = metronomeAudio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(_ => {
-                // Reproducción iniciada con éxito
-            }).catch(error => {
-                console.error("Error al iniciar metrónomo:", error);
-            });
+        // Programar el click en el tiempo exacto
+        playMetronomeClickScheduled(metronomeNextNoteTime, isDownbeat);
+        
+        // Avanzar al siguiente beat
+        metronomeNextNoteTime += secondsPerBeat;
+        metronomeBeatCount++;
+    }
+}
+
+function playMetronomeClickScheduled(time, isDownbeat = false) {
+    if (!metronomeAudioCtx) return;
+    
+    const osc = metronomeAudioCtx.createOscillator();
+    const gain = metronomeAudioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(metronomeAudioCtx.destination);
+
+    const actualDownbeat = metronomeAccent > 0 && isDownbeat;
+    osc.frequency.value = actualDownbeat ? 1200 : 800;
+    osc.type = 'sine';
+
+    // Programar la envolvente en el tiempo EXACTO
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(actualDownbeat ? 1.0 : 0.7, time + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+
+    osc.start(time);
+    osc.stop(time + 0.03);
+}
+
+toggleMetronome = async function() {
+    if (!metronomeAudioCtx) initNativeMetronome();
+
+    isMetronomeOn = !isMetronomeOn;
+    
+    const btn = document.getElementById('metronome-btn');
+    if (btn) {
+        if (isMetronomeOn) btn.classList.add('active');
+        else btn.classList.remove('active');
+    }
+
+    if (isMetronomeOn) {
+        if (metronomeAudioCtx.state === 'suspended') {
+            await metronomeAudioCtx.resume();
+        }
+
+        // Iniciar el scheduler
+        metronomeBeatCount = 0;
+        metronomeNextNoteTime = metronomeAudioCtx.currentTime;
+        
+        metronomeSchedulerId = setInterval(() => {
+            scheduleMetronomeNote();
+        }, metronomeLookahead);
+        
+        const currentBPM = globalTempo * playbackRate;
+        console.log(`Metrónomo: ON (${currentBPM} BPM, acentuación cada ${metronomeAccent || 'sin acento'})`);
+    } else {
+        // Detener el scheduler
+        if (metronomeSchedulerId) {
+            clearInterval(metronomeSchedulerId);
+            metronomeSchedulerId = null;
+        }
+        metronomeBeatCount = 0;
+        
+        console.log("Metrónomo: OFF");
+    }
+};
+
+const originalUpdateSpeed = updateSpeed;
+updateSpeed = function(newRate) {
+    originalUpdateSpeed(newRate);
+    
+    // Si el metrónomo está activo, reiniciarlo con el nuevo BPM
+    if (isMetronomeOn) {
+        // Detener el actual
+        if (metronomeInterval) {
+            clearInterval(metronomeInterval);
         }
         
-        metronomeBtn.classList.add('active');
-        isMetronomeOn = true;
+        // Reiniciar con nuevo tempo
+        const currentBPM = globalTempo * playbackRate;
+        const intervalMs = (60 / currentBPM) * 1000;
+        
+        metronomeInterval = setInterval(() => {
+            const isDownbeat = (metronomeBeatCount % 4 === 0);
+            playMetronomeClick(isDownbeat);
+            metronomeBeatCount++;
+        }, intervalMs);
+        
+        console.log(`Metrónomo actualizado: ${currentBPM} BPM`);
     }
+};
+
+const speedStep = 0.05;
+
+function updateSpeed(newRate) {
+    if (Tone.Transport.state === 'started') {
+        stopPlayback();
+    }
+    
+    playbackRate = Math.max(0.25, Math.min(2.0, newRate));
+    
+    const currentBPM = Math.round(globalTempo * playbackRate);
+    speedBpmLabel.textContent = `${currentBPM} BPM`;
+    
+    // Si el metrónomo está activo, reiniciarlo con el nuevo BPM
+    if (isMetronomeOn && metronomeSchedulerId) {
+        clearInterval(metronomeSchedulerId);
+        
+        metronomeBeatCount = 0;
+        metronomeNextNoteTime = metronomeAudioCtx.currentTime;
+        
+        metronomeSchedulerId = setInterval(() => {
+            scheduleMetronomeNote();
+        }, metronomeLookahead);
+        
+        console.log(`Metrónomo actualizado: ${currentBPM} BPM`);
+    }
+    
+    scheduleNotesOnTransport();
 }
 
 // 3. Función para calcular la velocidad (playbackRate)
 function updateMetronomeSpeed() {
     if (!metronomeAudio) return;
-
-    // Fórmula: (Tempo de la canción * Multiplicador de velocidad) / 60
-    // Ejemplo: (120 BPM * 1.0) / 60 = 2.0 playbackRate
     const currentTotalBPM = globalTempo * playbackRate;
     metronomeAudio.playbackRate = currentTotalBPM / 60;
-    
-    console.log(`Metrónomo ajustado a: ${currentTotalBPM} BPM (Rate: ${metronomeAudio.playbackRate})`);
 }
+
+
+
 
 
 
@@ -3142,46 +2571,68 @@ function jumpToMeasureInLearnMode(measureIndex) {
 
 
 function playFromMeasure(measureIndex) {
-  // ¡NUEVO! Limpia los highlights antes de empezar desde un nuevo punto.
-  clearAllHighlights();
+    clearAllHighlights();
 
-  if (Tone.Transport.state === 'started') stopPlayback();
-  
-  const startTime = measureStartTimes[measureIndex] || 0;
-  
-  // Resetear cursor visual
-  osmd.cursor.reset();
-  
-  // Avanzar el cursor hasta la posición correcta
-  let currentTime = -1;
-  parsedNotes.forEach(note => {
-      if (note.startSec < startTime && note.startSec !== currentTime) {
-          osmd.cursor.next();
-          currentTime = note.startSec;
-      }
-  });
-  
-  // Iniciar reproducción
-  Tone.Transport.start(Tone.now() + 0.1, startTime / playbackRate);
-  updatePlayButton(true);
-  osmd.cursor.show();
-  startProgressUpdate();
+    if (Tone.Transport.state === 'started') stopPlayback();
+    
+    const startTime = measureStartTimes[measureIndex] || 0;
+    
+    osmd.cursor.reset();
+    
+    let currentTime = -1;
+    parsedNotes.forEach(note => {
+        if (note.startSec < startTime && note.startSec !== currentTime) {
+            osmd.cursor.next();
+            currentTime = note.startSec;
+        }
+    });
+
+    if (isLoopMode) {
+        Tone.Transport.cancel();
+        scheduleNotesOnTransport();
+    }
+    
+    // Sincronizar metrónomo
+    if (isMetronomeOn) {
+        metronomeBeatCount = 0;
+        
+        if (metronomeSchedulerId) {
+            clearInterval(metronomeSchedulerId);
+        }
+        
+        metronomeNextNoteTime = metronomeAudioCtx.currentTime + 0.1;
+        
+        metronomeSchedulerId = setInterval(() => {
+            scheduleMetronomeNote();
+        }, metronomeLookahead);
+    }
+    
+    Tone.Transport.start(Tone.now() + 0.1, startTime / playbackRate);
+    updatePlayButton(true);
+    osmd.cursor.show();
+    startProgressUpdate();
 }
 
-   function stopPlayback() {
-  Tone.Transport.stop();
-  osmd.cursor.reset();
-  osmd.cursor.hide();
-  updatePlayButton(false);
-  stopProgressUpdate();
-  
-  // ¡NUEVO! Usa la función de limpieza total para apagar todas las teclas.
-  clearAllHighlights();
-  waterfallScrollOffset = 0;
+function stopPlayback() {
+    Tone.Transport.stop();
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    updatePlayButton(false);
+    stopProgressUpdate();
+    
+    clearAllHighlights();
+    waterfallScrollOffset = 0;
 
-  progressBar.value = 0;
-  progressBar.style.setProperty('--progress', '0%');
-  currentTimeSpan.textContent = '0:00'; 
+    progressBar.value = 0;
+    progressBar.style.setProperty('--progress', '0%');
+    currentTimeSpan.textContent = '0:00';
+    
+    // Pausar metrónomo
+    if (isMetronomeOn && metronomeSchedulerId) {
+        clearInterval(metronomeSchedulerId);
+        metronomeSchedulerId = null;
+        metronomeBeatCount = 0;
+    }
 }
 
 function startProgressUpdate() {
@@ -3212,60 +2663,91 @@ function startProgressUpdate() {
     }
 
     function addEventListeners() {
-     playBtn.addEventListener('click', async () => {
-  await Tone.start();
-  if (Tone.Transport.state === 'started') {
-    Tone.Transport.pause();
-    updatePlayButton(false);
-    stopProgressUpdate();
-    activeHighlightTimeouts.forEach(clearTimeout);
-    activeHighlightTimeouts = [];
-
-  } else {
-    clearAllHighlights(); 
+      
+playBtn.addEventListener('click', async () => {
+    await Tone.start();
     
-    Tone.Transport.start(Tone.now() + 0.1);
-    updatePlayButton(true);
-    osmd.cursor.show();
-    startProgressUpdate();
-  }
+    if (Tone.Transport.state === 'started') {
+        // PAUSAR
+        Tone.Transport.pause();
+        updatePlayButton(false);
+        stopProgressUpdate();
+        activeHighlightTimeouts.forEach(clearTimeout);
+        activeHighlightTimeouts = [];
+        
+        // Pausar metrónomo
+        if (isMetronomeOn && metronomeSchedulerId) {
+            clearInterval(metronomeSchedulerId);
+            metronomeSchedulerId = null;
+        }
+    } else {
+        // REPRODUCIR
+        clearAllHighlights(); 
+        
+        // NUEVO: Sincronizar metrónomo con Tone.js
+        if (isMetronomeOn) {
+            metronomeBeatCount = 0;
+            
+            // Detener scheduler anterior si existe
+            if (metronomeSchedulerId) {
+                clearInterval(metronomeSchedulerId);
+            }
+            
+            // CLAVE: Sincronizar con el tiempo de inicio de Tone.js
+            // Tone.js inicia en Tone.now() + 0.1, entonces el metrónomo también
+            metronomeNextNoteTime = metronomeAudioCtx.currentTime + 0.1;
+            
+            // Reiniciar el scheduler
+            metronomeSchedulerId = setInterval(() => {
+                scheduleMetronomeNote();
+            }, metronomeLookahead);
+            
+            const currentBPM = globalTempo * playbackRate;
+            console.log(`🎵 Metrónomo sincronizado (${currentBPM} BPM)`);
+        }
+        
+        Tone.Transport.start(Tone.now() + 0.1);
+        updatePlayButton(true);
+        osmd.cursor.show();
+        startProgressUpdate();
+    }
 });
 
-      // CONTROL DE VELOCIDAD CORREGIDO
-  const speedStep = 0.05; // Cuánto cambiará la velocidad con cada clic
 
-function updateSpeed(newRate) {
-    // Detener la reproducción si está activa
-    if (Tone.Transport.state === 'started') {
-        stopPlayback();
-    } 
-    
-    // Limitar la velocidad entre 0.25x y 2.0x
-    playbackRate = Math.max(0.25, Math.min(2.0, newRate));
-
-    if (isMetronomeOn) {
-        updateMetronomeSpeed();
-    }
-    
-    // Actualizar la interfaz
-    const currentBPM = Math.round(globalTempo * playbackRate);
-    speedBpmLabel.textContent = `${currentBPM} BPM`;
-    
-    // Volver a programar las notas con la nueva velocidad
-    scheduleNotesOnTransport();
-}
 
  rightHandOnlyBtn.addEventListener('click', toggleRightHandOnly);
   leftHandOnlyBtn.addEventListener('click', toggleLeftHandOnly);
   showKeyNamesBtn.addEventListener('click', toggleKeyNames);
 
 speedUpBtn.addEventListener('click', () => {
-    updateSpeed(playbackRate + speedStep);
-});
+        updateSpeed(playbackRate + 0.05);
+    });
 
-speedDownBtn.addEventListener('click', () => {
-    updateSpeed(playbackRate - speedStep);
-});
+    speedDownBtn.addEventListener('click', () => {
+        updateSpeed(playbackRate - 0.05);
+    });
+
+
+     accentUpBtn.addEventListener('click', () => {
+        metronomeAccent = Math.min(6, metronomeAccent + 1);
+        accentValueSpan.textContent = metronomeAccent;
+        
+        // Si el metrónomo está activo, reiniciarlo con la nueva acentuación
+        if (isMetronomeOn) {
+            metronomeBeatCount = 0; // Resetear contador para que empiece en downbeat
+            console.log(`Acentuación cambiada a: cada ${metronomeAccent} beats`);
+        }
+    });
+
+    accentDownBtn.addEventListener('click', () => {
+        metronomeAccent = Math.max(0, metronomeAccent - 1);
+        accentValueSpan.textContent = metronomeAccent;
+        
+        if (isMetronomeOn) {
+            metronomeBeatCount = 0;
+            console.log(`Acentuación cambiada a: ${metronomeAccent === 0 ? 'sin acento' : 'cada ' + metronomeAccent + ' beats'}`);
+        }
+    });
 
 micBtn.addEventListener('click', toggleMicMode);
 muteBtn.addEventListener('click', toggleMutePiano);
@@ -3343,23 +2825,41 @@ progressBar.style.setProperty('--progress', `${progressValue}%`);
   playFromMeasure(targetMeasureIndex);
 });
 
-  measureSelect.addEventListener('change', () => {
+
+
+measureSelect.addEventListener('change', () => {
     const selectedMeasureIndex = parseInt(measureSelect.value, 10);
     
+    // --- NUEVO: SINCRONIZAR TIMELINE AL SELECCIONAR COMPÁS ---
+    if (measureStartTimes.length > 0 && totalDuration > 0) {
+        const startTime = measureStartTimes[selectedMeasureIndex] || 0;
+        // Calculamos el porcentaje (0 a 100)
+        const progressPercent = (startTime / totalDuration) * 100;
+        
+        // Actualizamos el input oculto y la barra visual
+        originalProgressBar.value = progressPercent;
+        updateCustomSliderUI(progressPercent); 
+        // Nota: updateCustomSliderUI ahora (ver abajo) actualizará el texto del compás también
+    }
+    // ---------------------------------------------------------
+
     // Habilitar measure-until y actualizar sus opciones
     measureUntil.disabled = false;
     updateMeasureUntilOptions(selectedMeasureIndex);
     
-    // Si no hay loop activo, solo saltar al compás
-    if (!isLoopMode) {
-        jumpToMeasureInLearnMode(selectedMeasureIndex);
-    } else {
-        // Si hay loop, reiniciar con el nuevo rango
+    // Lógica de Modos (Igual que antes)
+    if (isLoopMode) {
         loopMeasureStart = selectedMeasureIndex;
         if (measureUntil.value !== '-1') {
             loopMeasureEnd = parseInt(measureUntil.value, 10);
         }
         jumpToMeasureInLearnMode(loopMeasureStart);
+    } 
+    else if (isMidiLearnMode) {
+        jumpToMeasureInLearnMode(selectedMeasureIndex);
+    }
+    else {
+        playFromMeasure(selectedMeasureIndex);
     }
 });
 
@@ -3425,6 +2925,56 @@ cancelLoopBtn.addEventListener('click', () => {
 
 
     }
+
+
+
+// Variable para evitar bucles infinitos de actualización
+let lastVisualMeasureIndex = -1;
+
+function updateCustomSliderUI(percent) {
+    // 1. Actualizar la barra visual (Ancho y Bolita)
+    const fill = document.getElementById('track-fill');
+    const knob = document.getElementById('track-knob');
+    if (fill) fill.style.width = percent + '%';
+    if (knob) knob.style.left = percent + '%';
+
+    // 2. --- NUEVO: SINCRONIZAR TEXTO DEL COMPÁS (Timeline -> Select) ---
+    // Solo si tenemos datos de tiempos
+    if (measureStartTimes.length > 0 && totalDuration > 0) {
+        const currentTime = (percent / 100) * totalDuration;
+        
+        // Buscar en qué compás estamos basado en el tiempo actual
+        let currentMeasureIndex = 0;
+        for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+            // Usamos una pequeña tolerancia (+0.1) para asegurar que el cambio se sienta natural
+            if (currentTime >= measureStartTimes[i] - 0.1) {
+                currentMeasureIndex = i;
+                break;
+            }
+        }
+
+        // Solo actualizar el DOM si el compás cambió (Optimización)
+        if (currentMeasureIndex !== lastVisualMeasureIndex) {
+            lastVisualMeasureIndex = currentMeasureIndex;
+            
+            // A. Actualizar el texto visual (Ej: "8")
+            const display = document.getElementById('custom-measure-display');
+            if (display) display.textContent = currentMeasureIndex + 1;
+
+            // B. Sincronizar el select oculto (SIN disparar evento 'change' para evitar bucle infinito)
+            const nativeSelect = document.getElementById('measure-select');
+            if (nativeSelect) nativeSelect.value = currentMeasureIndex;
+            
+            // C. Marcar opción en la lista desplegable
+            const opts = document.querySelectorAll('.measure-option');
+            opts.forEach((el, idx) => {
+                 if(idx === currentMeasureIndex) el.classList.add('current');
+                 else el.classList.remove('current');
+            });
+        }
+    }
+}
+
 
 
 function updateMeasureUntilOptions(startIndex) {
@@ -3581,12 +3131,22 @@ function populateMeasureSelector() {
 }
 
 function restartCurrentChunk() {
+    // Evitar ejecuciones si no estamos en modo aprendizaje o ya se está reiniciando
     if (!isMidiLearnMode || isRestarting) return;
+    
     isRestarting = true;
-    let targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
-    if (isPieceCompleted) {
+    let targetMeasureIndex = 0;
+    if (isLoopMode) {
+        // Regresar al inicio del bucle seleccionado
+        targetMeasureIndex = loopMeasureStart;
+    } 
+    else if (isPieceCompleted) {
+        // Obtener compás actual y regresar 2 atrás
         const currentMs = getCurrentMeasureIndex();
-        targetMeasureIndex = Math.floor(currentMs / MEASURES_PER_CHUNK) * MEASURES_PER_CHUNK;
+        targetMeasureIndex = Math.max(0, currentMs - 2);
+    } 
+    else {
+        targetMeasureIndex = Math.max(0, unlockedMeasureCount - MEASURES_PER_CHUNK);
     }
     jumpToMeasureInLearnMode(targetMeasureIndex);
     isRestarting = false;
@@ -3746,14 +3306,10 @@ function advanceLearningStep() {
     expectedNotes.clear();
 
     if (isLoopMode && parsedNotes[currentLearningIndex]) {
-        // Obtenemos en qué compás está la nota que TOCA aprender ahora
         const currentMsIndex = getCurrentMeasureIndex();
-        
-        // Si ese compás es mayor al límite final del loop...
         if (currentMsIndex > loopMeasureEnd) {
-             // ...volvemos al compás de inicio
              jumpToMeasureInLearnMode(loopMeasureStart);
-             return; // Detenemos la función aquí para que no siga avanzando
+             return; 
         }
     }
 
@@ -4069,7 +3625,7 @@ function toggleMutePiano() {
         if (sampler) sampler.volume.value = -Infinity;
         
         // Cambio visual: Icono de mute y color activo (rojo o gris según tu CSS)
-        muteBtn.innerHTML = '<i class="ri-volume-mute-line"></i>';
+        muteBtn.innerHTML = '<i class="ph ph-speaker-x"></i>';
         muteBtn.classList.add('active'); 
         // Opcional: ponerlo rojo para que sea evidente
         muteBtn.style.color = '#e74c3c'; 
@@ -4080,7 +3636,7 @@ function toggleMutePiano() {
         if (sampler) sampler.volume.value = 0;
         
         // Restaurar icono y color
-        muteBtn.innerHTML = '<i class="ri-volume-up-line"></i>';
+        muteBtn.innerHTML = '<i class="ph ph-speaker-high"></i>';
         muteBtn.classList.remove('active');
         muteBtn.style.color = ''; // Volver al color original
     }
@@ -4187,6 +3743,157 @@ function showConfetti(count = 100) {
   }
 }
 
+
+
+let customLoopState = 0; // 0: Inactivo, 1: Seleccionando Final, 2: Activo
+let isDraggingLoopThumb = false;
+
+// A. Al presionar el botón de Loop
+function toggleLoopMenu() {
+    const btn = document.getElementById('btn-loop-active');
+    const dropdown = document.getElementById('loop-dropdown');
+    const track = document.getElementById('track-container');
+    
+    // Si ya hay loop activo, cancelamos
+    if (customLoopState !== 0) {
+        deactivateLoopMode();
+        return;
+    }
+
+    // 1. Definir Inicio del Loop (Compás actual)
+    const currentMsIndex = parseInt(document.getElementById('measure-select').value);
+    const currentTime = measureStartTimes[currentMsIndex] || 0;
+    const startPct = (currentTime / totalDuration) * 100;
+    
+    // Visual: Poner Pin de Inicio con número
+    const pinStart = document.getElementById('loop-pin-start');
+    pinStart.style.left = startPct + '%';
+    pinStart.setAttribute('data-measure', currentMsIndex + 1);
+    pinStart.classList.add('visible');
+    
+    // Estado: Esperando selección de final
+    customLoopState = 1;
+    btn.classList.add('btn-on');
+    track.classList.add('selecting-loop');
+    
+    loopMeasureStart = currentMsIndex;
+
+    // 2. Desplegar Dropdown con opciones "Hasta..."
+    populateLoopDropdown(currentMsIndex);
+    dropdown.classList.add('open');
+}
+
+
+function populateLoopDropdown(startIndex) {
+    const container = document.getElementById('loop-end-list');
+    const totalMeasures = osmd.sheet.SourceMeasures.length;
+    const limit = isMidiLearnMode ? unlockedMeasureCount : totalMeasures;
+    
+    container.innerHTML = '<div style="padding:8px; font-size:11px; color:#888; border-bottom:1px solid #eee; font-weight:600;">REPETIR HASTA...</div>';
+
+    for (let i = startIndex + 1; i < limit; i++) {
+        const div = document.createElement('div');
+        div.className = 'measure-option';
+        div.innerHTML = `<span>Compás ${i + 1}</span>`;
+        div.onclick = () => {
+            finalizeLoop(i);
+        };
+        container.appendChild(div);
+    }
+}
+
+
+function finalizeLoop(endIndex) {
+    const dropdown = document.getElementById('loop-dropdown');
+    const track = document.getElementById('track-container');
+    const pinEnd = document.getElementById('loop-pin-end');
+    const loopThumb = document.getElementById('loop-thumb-end');
+    const loopRegion = document.getElementById('loop-region');
+
+    // Cerrar UI de selección
+    dropdown.classList.remove('open');
+    track.classList.remove('selecting-loop');
+    
+    // Calcular posición del final
+    const endTime = measureStartTimes[endIndex] || totalDuration;
+    const endPct = (endTime / totalDuration) * 100;
+
+    // Visual: Pin Final con número
+    pinEnd.style.left = endPct + '%';
+    pinEnd.setAttribute('data-measure', endIndex + 1);
+    pinEnd.classList.add('visible');
+    
+    // Visual: Thumb arrastrable
+    loopThumb.style.left = endPct + '%';
+    loopThumb.setAttribute('data-measure', endIndex + 1);
+    loopThumb.classList.add('visible');
+
+    // Región azul
+    const startPct = parseFloat(document.getElementById('loop-pin-start').style.left);
+    loopRegion.style.left = startPct + '%';
+    loopRegion.style.width = (endPct - startPct) + '%';
+    loopRegion.classList.add('active');
+    loopRegion.style.opacity = '0.3';
+
+    // LÓGICA INTERNA
+    loopMeasureEnd = endIndex;
+    isLoopMode = true;
+    
+    customLoopState = 2;
+    document.getElementById('cancel-loop-btn').style.display = 'flex';
+    
+    // MODIFICADO: Re-programar el transporte con loop
+    if (Tone.Transport.state === 'started') {
+        stopPlayback();
+    }
+    scheduleNotesOnTransport(); // Re-programar con loop
+    
+    // Saltar al inicio del loop
+    if (isMidiLearnMode) {
+        jumpToMeasureInLearnMode(loopMeasureStart);
+    } else {
+        playFromMeasure(loopMeasureStart);
+    }
+}
+
+const originalDeactivateLoop = deactivateLoopMode;
+deactivateLoopMode = function() {
+    const wasLooping = isLoopMode;
+    originalDeactivateLoop();
+    
+    customLoopState = 0;
+    document.getElementById('loop-pin-start').classList.remove('visible');
+    document.getElementById('loop-pin-end').classList.remove('visible');
+    document.getElementById('loop-thumb-end').classList.remove('visible');
+    document.getElementById('loop-region').classList.remove('active');
+    document.getElementById('btn-loop-active').classList.remove('btn-on');
+    document.getElementById('track-container').classList.remove('selecting-loop');
+    document.getElementById('loop-dropdown').classList.remove('open');
+    document.getElementById('cancel-loop-btn').style.display = 'none';
+     if (wasLooping && Tone.Transport.state === 'started') {
+        const wasPlaying = true;
+        const currentTime = Tone.Transport.seconds;
+        
+        stopPlayback();
+        scheduleNotesOnTransport(); // Re-programar sin loop
+        
+        if (wasPlaying) {
+            Tone.Transport.start(Tone.now() + 0.1, currentTime);
+            updatePlayButton(true);
+            osmd.cursor.show();
+            startProgressUpdate();
+        }
+    }
+}
+
+const loopThumbEnd = document.getElementById('loop-thumb-end');
+
+loopThumbEnd.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    isDraggingLoopThumb = true;
+    loopThumbEnd.style.cursor = 'grabbing';
+});
+
 function setRangeOpacity(startMeasureIndex, endMeasureIndex, opacity) {
     if (!osmd || !osmd.graphic) return;
 
@@ -4242,8 +3949,9 @@ function toggleMidiLearnMode() {
         isMidiLearnMode = false;
         currentInputSource = 'none';
         
-        // Restaurar botón original
-        midiLearnBtn.innerHTML = '<i class="ri-graduation-cap-line"></i> <span class="btn-label">Aprender</span>';
+        midiLearnBtn.classList.remove('active');
+        midiLearnBtn.style.background = '';
+        midiLearnBtn.innerHTML = '<i class="ph-fill ph-play-circle"></i><span>Comenzar</span>';
         updateMidiStatusLegend(null); 
 
         const globalContainer = document.getElementById('global-progress-container');
@@ -4252,7 +3960,6 @@ function toggleMidiLearnMode() {
         const totalMeasures = osmd.sheet.SourceMeasures.length;
         setRangeOpacity(0, totalMeasures, 1);
         
-        midiLearnBtn.style.background = 'none';
         playBtn.disabled = false;
         progressBar.disabled = false;
         clearAllHighlights(); 
@@ -4311,7 +4018,9 @@ function toggleMidiLearnMode() {
         setRangeOpacity(unlockedMeasureCount, total, 0.15);
     }, 100);
 
-    midiLearnBtn.style.background = '#e0e0e0';
+    midiLearnBtn.classList.add('active');
+    midiLearnBtn.style.background = '#ea4335';
+    midiLearnBtn.innerHTML = '<i class="ph-fill ph-pause-circle"></i><span>Detener</span>';
     midiLearnBtn.classList.remove('pulse-animation');
     
     playBtn.disabled = true;
@@ -4387,8 +4096,8 @@ function prepareFirstLearningStep() {
           highlightKeyInstant(note.pitch, note.hand);
         }
       }
-      
-      console.log(`Notas esperadas (${handFilterMode}):`, Array.from(expectedNotes));
+    }else {
+      osmd.cursor.next(); 
     }
   }
 
@@ -4408,24 +4117,17 @@ function updateStaffOpacity(mode) {
     
     const svgContainer = osmdContainer.querySelector('svg');
     if (!svgContainer) return;
-    
-    // Buscar los contenedores PADRE que agrupan todos los compases de cada pentagrama
-    // Típicamente son los <g> que contienen MÚLTIPLES grupos con 5+ paths
     const allGroups = Array.from(svgContainer.querySelectorAll('g'));
     
     const staffLineContainers = allGroups.filter(group => {
-        // Contar cuántos sub-grupos con 5+ paths tiene
         const subGroups = group.querySelectorAll('g');
         let staffCount = 0;
         subGroups.forEach(sub => {
             const paths = sub.querySelectorAll(':scope > path');
             if (paths.length >= 5) staffCount++;
         });
-        // Un contenedor de pentagrama completo tendrá múltiples compases (staffCount > 1)
-        return staffCount > 1;
+        return staffCount >= 1;
     });
-    
-    console.log(`Encontrados ${staffLineContainers.length} contenedores de pentagramas completos`);
     
     staffLineContainers.forEach((container, index) => {
         const isTreble = index % 2 === 0;
@@ -4443,12 +4145,13 @@ function updateStaffOpacity(mode) {
                 break;
         }
         container.style.transition = 'opacity 0.3s ease';
-        
-        console.log(`Contenedor ${index} (${isTreble ? 'Treble' : 'Bass'}): opacity ${container.style.opacity}`);
     });
 }
 
 function toggleRightHandOnly() {
+  const wasPlaying = Tone.Transport.state === 'started';
+  const currentTime = wasPlaying ? Tone.Transport.seconds : 0;
+  
   if (handFilterMode === 'right') {
     // Si ya está activo, desactivar
     handFilterMode = 'both';
@@ -4465,16 +4168,32 @@ function toggleRightHandOnly() {
     leftHandOnlyBtn.style.color = '#1a1a1a';
 
     if (tutorialOverlay.classList.contains('is-visible') && currentTutorialStep === 2) {
-        nextTutorialStep(); // Avanzar automáticamente al paso 3
+        nextTutorialStep();
     }
   }
+  
   updateStaffOpacity(handFilterMode);
-  if (isMidiLearnMode) {
+  
+  // NUEVO: Re-programar el audio con el nuevo filtro
+  if (!isMidiLearnMode) {
+    scheduleNotesOnTransport();
+    
+    // Si estaba reproduciendo, continuar desde donde estaba
+    if (wasPlaying) {
+      Tone.Transport.start(Tone.now(), currentTime);
+      updatePlayButton(true);
+      osmd.cursor.show();
+      startProgressUpdate();
+    }
+  } else {
     skipToNextRelevantNote();
   }
 }
 
 function toggleLeftHandOnly() {
+  const wasPlaying = Tone.Transport.state === 'started';
+  const currentTime = wasPlaying ? Tone.Transport.seconds : 0;
+  
   if (handFilterMode === 'left') {
     // Si ya está activo, desactivar
     handFilterMode = 'both';
@@ -4491,11 +4210,20 @@ function toggleLeftHandOnly() {
     rightHandOnlyBtn.style.color = '#1a1a1a';
   }
 
-  // NUEVO: Actualizar opacidad de los pentagramas
   updateStaffOpacity(handFilterMode);
   
-  // MODIFICACIÓN: Si estamos en modo aprendizaje, saltar notas de la otra mano
-  if (isMidiLearnMode) {
+  // NUEVO: Re-programar el audio con el nuevo filtro
+  if (!isMidiLearnMode) {
+    scheduleNotesOnTransport();
+    
+    // Si estaba reproduciendo, continuar desde donde estaba
+    if (wasPlaying) {
+      Tone.Transport.start(Tone.now(), currentTime);
+      updatePlayButton(true);
+      osmd.cursor.show();
+      startProgressUpdate();
+    }
+  } else {
     skipToNextRelevantNote();
   }
   
@@ -4893,6 +4621,381 @@ function hideModal() {
     }, 300);
 }
 
+
+/* ==========================================================================
+   ADAPTADOR JS (BRIDGE) - Versión Actualizada
+   ========================================================================== */
+
+// 1. Modales
+let activeModalId = null;
+function toggleModal(name) {
+  const modalId = `modal-${name}`;
+  const modalEl = document.getElementById(modalId);
+  const btnEl = document.getElementById(name === 'metronome' ? 'metronome-modal-btn' : 'tools-toggle-btn');
+  
+  if (activeModalId === modalId) { closeAllModals(); return; }
+  closeAllModals();
+  
+  modalEl.classList.add('is-open');
+  if(btnEl) btnEl.classList.add('active');
+  activeModalId = modalId;
+}
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-popup').forEach(el => el.classList.remove('is-open'));
+  document.querySelectorAll('.tool-btn').forEach(el => el.classList.remove('active'));
+  activeModalId = null;
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.controls-right') && !e.target.closest('.modal-popup')) {
+    closeAllModals();
+  }
+});
+
+// 2. Puente para el Selector de Compases (CRUCIAL)
+// Sobrescribimos la función original para que llene AMBOS selectores
+const originalPopulate = populateMeasureSelector;
+
+populateMeasureSelector = function() {
+    // 1. Ejecutar lógica original (llena el <select> oculto)
+    if(originalPopulate) originalPopulate();
+    
+    // 2. Llenar nuestro dropdown visual
+    const container = document.getElementById('measure-list-custom');
+    const nativeSelect = document.getElementById('measure-select');
+    
+    if (!container || !nativeSelect) return;
+    container.innerHTML = '';
+    
+    Array.from(nativeSelect.options).forEach((opt, index) => {
+        const div = document.createElement('div');
+        div.className = 'measure-option';
+        // Formato visual más limpio: "1", "2", etc.
+        const label = opt.text.replace('Compás ', '');
+        div.innerHTML = `<span>Compás ${label}</span>`;
+        
+        div.onclick = (e) => {
+            e.stopPropagation(); // Evitar cerrar inmediatamente
+            
+            // ACTUAR COMO SI FUERA EL SELECT NATIVO
+            nativeSelect.value = opt.value;
+            nativeSelect.dispatchEvent(new Event('change')); // Disparar lógica de salto
+            
+            // Actualizar display visual
+            document.getElementById('custom-measure-display').textContent = label;
+            toggleMeasureDropdown(); // Cerrar ahora
+        };
+        container.appendChild(div);
+    });
+    
+    // Actualizar texto inicial
+    updateCustomMeasureDisplay();
+};
+
+let measureDropdownOpen = false;
+function toggleMeasureDropdown() {
+    const dropdown = document.getElementById('measure-dropdown');
+    measureDropdownOpen = !measureDropdownOpen;
+    
+    if (measureDropdownOpen) {
+        dropdown.classList.add('open');
+        // Asegurar que se muestre el valor actual
+        updateCustomMeasureDisplay(); 
+    } else {
+        dropdown.classList.remove('open');
+    }
+}
+
+function updateCustomMeasureDisplay() {
+    const nativeSelect = document.getElementById('measure-select');
+    const display = document.getElementById('custom-measure-display');
+    if(nativeSelect && display) {
+        const text = nativeSelect.options[nativeSelect.selectedIndex]?.text || "-";
+        display.textContent = text.replace('Compás ', '');
+        
+        // Marcar la opción seleccionada en la lista (azul)
+        const opts = document.querySelectorAll('.measure-option');
+        opts.forEach((el, idx) => {
+             if(idx === nativeSelect.selectedIndex) el.classList.add('current');
+             else el.classList.remove('current');
+        });
+    }
+}
+
+// Escuchar cambios automáticos (ej. avance de aprendizaje)
+const nativeSelect = document.getElementById('measure-select');
+if(nativeSelect) {
+    // Cuando el JS original cambia el select oculto, actualizamos el visual
+    nativeSelect.addEventListener('change', updateCustomMeasureDisplay);
+    
+    // Interceptar la función de actualización del JS original
+    const oldUpdateDisplay = updateMeasureSelectDisplay;
+    updateMeasureSelectDisplay = function() {
+        oldUpdateDisplay();
+        updateCustomMeasureDisplay();
+    }
+}
+
+// 3. Slider de Progreso Visual
+const trackContainer = document.getElementById('track-container');
+const originalProgressBar = document.getElementById('progress-bar');
+let isDraggingTrack = false;
+
+setInterval(() => {
+    // Solo actualizamos si el usuario NO está arrastrando y si hay reproducción
+    if (!isDraggingTrack && Tone.Transport.state === 'started') {
+        const val = originalProgressBar.value;
+        // Actualizar visuales
+        document.getElementById('track-fill').style.width = val + '%';
+        document.getElementById('track-knob').style.left = val + '%';
+        
+        // Sincronizar texto de compás (función que creamos antes)
+        updateCustomSliderUI(val); 
+    }
+}, 100);
+
+// Eventos de Ratón / Toque
+trackContainer.addEventListener('mousedown', (e) => { isDraggingTrack = true; handleTrackMove(e); });
+document.addEventListener('mousemove', (e) => { if(isDraggingTrack) handleTrackMove(e); });
+
+document.addEventListener('mouseup', (e) => {
+    if (!isDraggingLoopThumb) return;
+    
+    isDraggingLoopThumb = false;
+    loopThumbEnd.style.cursor = 'grab';
+    
+    // Calcular compás final según posición
+    const finalPct = parseFloat(loopThumbEnd.style.left);
+    const finalTime = (finalPct / 100) * totalDuration;
+    let finalMeasure = 0;
+    
+    for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+        if (measureStartTimes[i] <= finalTime) {
+            finalMeasure = i;
+            break;
+        }
+    }
+    
+    // Actualizar variables internas
+    loopMeasureEnd = finalMeasure;
+    
+    // Ajustar a la posición exacta del compás (snap)
+    const exactTime = measureStartTimes[finalMeasure];
+    const exactPct = (exactTime / totalDuration) * 100;
+    
+    loopThumbEnd.style.left = exactPct + '%';
+    document.getElementById('loop-pin-end').style.left = exactPct + '%';
+    
+    const startPct = parseFloat(document.getElementById('loop-pin-start').style.left);
+    document.getElementById('loop-region').style.width = (exactPct - startPct) + '%';
+    
+    console.log(`Loop actualizado: Compás ${loopMeasureStart + 1} a ${loopMeasureEnd + 1}`);
+});
+
+document.addEventListener('mouseup', () => { 
+    if(isDraggingTrack) {
+        isDraggingTrack = false;
+        
+        // 1. Calculamos dónde cayó el slider (0-100)
+        const currentPct = parseFloat(originalProgressBar.value);
+        
+        // 2. Calculamos a qué compás corresponde ese porcentaje
+        // (Necesario para el Modo Aprendizaje)
+        let targetMeasureIndex = 0;
+        if (measureStartTimes.length > 0 && totalDuration > 0) {
+            const seekTime = (currentPct / 100) * totalDuration;
+            for (let i = 0; i < measureStartTimes.length; i++) {
+                if (measureStartTimes[i] <= seekTime) {
+                    targetMeasureIndex = i;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // 3. Lógica de Decisión según el Modo
+        if (isLoopMode) {
+             // Si hay loop, forzamos el inicio del loop para evitar confusiones
+             jumpToMeasureInLearnMode(loopMeasureStart);
+        }
+        else if (isMidiLearnMode) {
+            // --- MODO APRENDIZAJE ---
+            // Solo posicionar, preparar notas esperadas y detener audio.
+            jumpToMeasureInLearnMode(targetMeasureIndex);
+            // Actualizar selector visual para que coincida
+            const nativeSelect = document.getElementById('measure-select');
+            if(nativeSelect) {
+                nativeSelect.value = targetMeasureIndex;
+                updateCustomMeasureDisplay();
+            }
+        } 
+        else {
+            // --- MODO NORMAL ---
+            if (Tone.Transport.state === 'started') {
+                // Si ya estaba sonando, saltar y seguir sonando
+                playFromMeasure(targetMeasureIndex);
+            } else {
+                // Si estaba en pausa, SOLO mover cursor y cabezal de audio (Seek)
+                // Sin Play.
+                const seekTime = measureStartTimes[targetMeasureIndex] || 0;
+                Tone.Transport.seconds = seekTime / playbackRate;
+                
+                // Actualizar cursor OSMD visualmente sin play
+                osmd.cursor.reset();
+                let cursorTime = -1;
+                parsedNotes.forEach(note => {
+                     if (note.startSec < seekTime && note.startSec !== cursorTime) {
+                        osmd.cursor.next();
+                        cursorTime = note.startSec;
+                     }
+                });
+                osmd.cursor.show();
+                
+                // Sincronizar UI
+                const nativeSelect = document.getElementById('measure-select');
+                if(nativeSelect) {
+                    nativeSelect.value = targetMeasureIndex;
+                    updateCustomMeasureDisplay();
+                }
+            }
+        }
+    }
+});
+
+function handleTrackMove(e) {
+    const rect = trackContainer.getBoundingClientRect();
+    let pct = ((e.clientX - rect.left) / rect.width) * 100;
+    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+    
+    // Actualizar visualmente mientras se arrastra
+    updateCustomSliderUI(pct); // Usa la función que actualiza texto y barra
+    
+    // Actualizar valor oculto
+    originalProgressBar.value = pct;
+}
+
+
+document.addEventListener('mousemove', (e) => {
+    if (!isDraggingLoopThumb) return;
+    
+    const rect = trackContainer.getBoundingClientRect();
+    let newPct = ((e.clientX - rect.left) / rect.width) * 100;
+    
+    const startPct = parseFloat(document.getElementById('loop-pin-start').style.left);
+    if (newPct <= startPct) return;
+    if (newPct > 100) newPct = 100;
+
+    loopThumbEnd.style.left = newPct + '%';
+    document.getElementById('loop-pin-end').style.left = newPct + '%';
+    
+    // Actualizar región
+    const loopRegion = document.getElementById('loop-region');
+    loopRegion.style.width = (newPct - startPct) + '%';
+    
+    // Calcular a qué compás corresponde
+    const newTime = (newPct / 100) * totalDuration;
+    let newEndMeasure = 0;
+    for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+        if (measureStartTimes[i] <= newTime) {
+            newEndMeasure = i;
+            break;
+        }
+    }
+    
+    // Actualizar número en el thumb
+    loopThumbEnd.setAttribute('data-measure', newEndMeasure + 1);
+    document.getElementById('loop-pin-end').setAttribute('data-measure', newEndMeasure + 1);
+});
+
+// Listener de Clic/Soltar en el Timeline
+document.addEventListener('mouseup', (e) => { 
+    // CASO A: Estamos definiendo el final del loop
+    if (customLoopState === 1 && !e.target.closest('.loop-thumb')) {
+        const rect = trackContainer.getBoundingClientRect();
+        let clickPct = ((e.clientX - rect.left) / rect.width) * 100;
+        
+        // Convertir a compás
+        const clickTime = (clickPct / 100) * totalDuration;
+        let targetMeasure = 0;
+        for (let i = measureStartTimes.length - 1; i >= 0; i--) {
+            if (measureStartTimes[i] <= clickTime) {
+                targetMeasure = i;
+                break;
+            }
+        }
+        
+        // Validar que sea posterior al inicio
+        if (targetMeasure > loopMeasureStart) {
+            finalizeLoop(targetMeasure);
+        } else {
+            deactivateLoopMode();
+        }
+        return;
+    }
+
+    // CASO B: Arrastre normal de reproducción (Tu código existente)
+    if(isDraggingTrack) {
+        isDraggingTrack = false;
+        // ... (Tu lógica existente de mouseup para saltar compás) ...
+        const currentPct = parseFloat(originalProgressBar.value);
+        let targetMeasureIndex = 0;
+        if (measureStartTimes.length > 0 && totalDuration > 0) {
+            const seekTime = (currentPct / 100) * totalDuration;
+            for (let i = 0; i < measureStartTimes.length; i++) {
+                if (measureStartTimes[i] <= seekTime) targetMeasureIndex = i;
+                else break;
+            }
+        }
+
+        if (isLoopMode) {
+             jumpToMeasureInLearnMode(loopMeasureStart);
+        }
+        else if (isMidiLearnMode) {
+            jumpToMeasureInLearnMode(targetMeasureIndex);
+            const nativeSelect = document.getElementById('measure-select');
+            if(nativeSelect) {
+                nativeSelect.value = targetMeasureIndex;
+                updateCustomMeasureDisplay();
+            }
+        } 
+        else {
+            if (Tone.Transport.state === 'started') {
+                playFromMeasure(targetMeasureIndex);
+            } else {
+                const seekTime = measureStartTimes[targetMeasureIndex] || 0;
+                Tone.Transport.seconds = seekTime / playbackRate;
+                osmd.cursor.reset();
+                let cursorTime = -1;
+                parsedNotes.forEach(note => {
+                     if (note.startSec < seekTime && note.startSec !== cursorTime) {
+                        osmd.cursor.next();
+                        cursorTime = note.startSec;
+                     }
+                });
+                osmd.cursor.show();
+                const nativeSelect = document.getElementById('measure-select');
+                if(nativeSelect) {
+                    nativeSelect.value = targetMeasureIndex;
+                    updateCustomMeasureDisplay();
+                }
+            }
+        }
+    }
+});
+
+// Cerrar el dropdown de loop si hacen clic fuera
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.loop-tools') && !e.target.closest('#track-container') && customLoopState === 1) {
+        // Si hacen clic fuera mientras seleccionan, cancelar selección
+        deactivateLoopMode();
+    }
+});
+
+
+
+// Inicialización
+setTimeout(populateMeasureSelector, 1500); // Esperar un poco a que OSMD cargue
   </script>
 </body>
 </html>         
