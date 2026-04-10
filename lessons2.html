@@ -1333,23 +1333,17 @@ footer button.show{
     <i class="locklvl ri-award-fill" style="color: orange !important"> </i>
    </div>
  
-    <div class="job-overview-buttons" ng-if="lvl == 0 && status == 'ACTIVO'">
+    <div class="job-overview-buttons" ng-if="lvl == 0">
   <div class="search-buttons time-button">EN CURSO</div>
   <div class="search-buttons level-button">Progreso: {{progress}} %</div>
   <i class="locklvl ri-time-line"> </i>
-   </div>
-
-   <div class="job-overview-buttons" ng-if="status != 'ACTIVO'">
-<div class="search-buttons time-button" style="color: black;">BLOQUEADO</div>
-<div class="search-buttons level-button" style="color: black">Progreso: -</div>    
-<i class="locklvl ri-lock-fill" style="background: silver;" > </i>
    </div>
         </div>
       </div>
     </a>
   </li>
         <li class="tab level1" >
-          <a href="#test2">
+          <a href="#test2" ng-click="guardPremiumTab($event)">
             <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 1 &nbsp&nbsp&nbsp&nbsp</span>
             <div class="job-overview-card">
         <div class="job-card overview-card">
@@ -1385,7 +1379,7 @@ footer button.show{
           </a>
           </li>
         <li class="tab level2" >
-          <a href="#test3">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 2 &nbsp&nbsp&nbsp&nbsp</span>
+          <a href="#test3" ng-click="guardPremiumTab($event)">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 2 &nbsp&nbsp&nbsp&nbsp</span>
             <div class="job-overview-card">
         <div class="job-card overview-card"> 
           <div class="overview-wrapper">
@@ -1420,7 +1414,7 @@ footer button.show{
           </a> 
           </li>
           <li class="tab level3">
-            <a href="#test4">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 3 &nbsp&nbsp&nbsp&nbsp</span>
+            <a href="#test4" ng-click="guardPremiumTab($event)">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 3 &nbsp&nbsp&nbsp&nbsp</span>
             <div class="job-overview-card">
         <div class="job-card overview-card">
           <div class="overview-wrapper">  
@@ -1455,7 +1449,7 @@ footer button.show{
             </a>
             </li> 
     <li class="tab level4">
-      <a href="#test5">
+      <a href="#test5" ng-click="guardPremiumTab($event)">
           <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 4 &nbsp&nbsp&nbsp&nbsp</span>
             <div class="job-overview-card">
         <div class="job-card overview-card">
@@ -1491,7 +1485,7 @@ footer button.show{
       </a>
       </li>
       <li class="tab level5">
-        <a href="#test6">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 5 &nbsp&nbsp&nbsp&nbsp</span>
+        <a href="#test6" ng-click="guardPremiumTab($event)">  <span class="titlelvlrow">&nbsp&nbsp&nbsp&nbsp Nivel 5 &nbsp&nbsp&nbsp&nbsp</span>
             <div class="job-overview-card">
         <div class="job-card overview-card">
           <div class="overview-wrapper">
@@ -1541,7 +1535,7 @@ footer button.show{
  
          <img src="https://lh3.googleusercontent.com/d/1EP2I0BOMo_8mXsR9qqAv08PxjztZFaQ8" width="80" height="80" style="margin-right: 10px; border-radius: 15px;"/>
 
-         <div class="unlockBtn" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment';" ng-if="status != 'ACTIVO'" style="background-color: #eeeeee; color: black;">
+         <div class="unlockBtn" onclick="window.top.location.href='https://app.mozartacademy.mx/main#/menu/payment';" ng-if="false" style="background-color: #eeeeee; color: black;">
             <span class="btnBorderRight"></span>
             <span class="btnBorderLeft"></span>
             <span class="btniContainer">
@@ -1563,8 +1557,7 @@ footer button.show{
         <div class="company-name" style="color: #F44336">Nivel Preparatorio <span class="comp-location">Básico</span></div>
         <div class="posted">
     <span ng-if="lvl > 0 && status == 'ACTIVO'">COMPLETADO</span>
-          <span ng-if="status != 'ACTIVO'">BLOQUEADO</span>
-          <span ng-if="lvl == 0 && status == 'ACTIVO'">EN CURSO</span>
+          <span ng-if="lvl == 0">EN CURSO</span>
           <span class="app-number">{{counter}} Alumnos inscritos</span>
         </div>
        </div>
@@ -1581,10 +1574,10 @@ footer button.show{
     </li>
      
     <li class="collection-item" ng-repeat="lesson in data.lessons">
-      <a href="#lesson" ng-init="lesson.showButton = false" ng-click="lesson.showButton = !lesson.showButton">  
+      <a href="#lesson" ng-init="lesson.showButton = false" ng-click="onPrepLessonToggle(lesson, $event)">  
         <div>{{lesson.name}} 
-   <span class="secondary-content" ng-if="loading || status !== 'ACTIVO'"><i class="material-icons">lock</i></span>
-          <span class="secondary-content" ng-if="lvl == 0 && status == 'ACTIVO'">
+   <span class="secondary-content" ng-if="loading"><i class="material-icons">lock</i></span>
+          <span class="secondary-content" ng-if="!loading && lvl == 0">
           <i class="material-icons" ng-if="lesson.id == lsn">schedule</i>
           <i class="material-icons" ng-if="lesson.id > lsn">lock</i>
           </span>
@@ -1593,7 +1586,7 @@ footer button.show{
       
       <ul class="collapsible popout" data-collapsible="accordion" ng-if="lesson.showButton ">
      <div class="linehorizontal"></div>        
-        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="((lesson.id <= lsn && lvl == 0) || lvl > 0) && status === 'ACTIVO'">
+        <li ng-repeat="material in lesson.material" class="container-lessons" ng-if="(lvl == 0 && lesson.id <= lsn) || (lvl > 0 && status === 'ACTIVO')">
           <div class="collapsible-header">
    <i class="material-icons" >{{material.icon}}</i>
             {{material.title}}<span class="secondary-content"></span></div>
@@ -2321,22 +2314,45 @@ var currentActivity = null;
   };
   
 
+  /** Alineado con LessonsContent.vue: solo primera lección del preparatorio si status !== 'ACTIVO' (ids de lección empiezan en 1). */
+  var PREP_MAX_LESSON_ID = 1;
+
+  var normalizeLessonsPayload = function(d) {
+    var isActive = d.status === 'ACTIVO';
+    var lvl = d.lvl != null ? Number(d.lvl) : 0;
+    var lsn = d.lsn != null ? Number(d.lsn) : 0;
+    if (!isActive) {
+      lvl = 0;
+      if (!lsn || lsn < 1) lsn = 1;
+      else lsn = Math.min(lsn, PREP_MAX_LESSON_ID);
+    }
+    return {
+      lvl: lvl,
+      lsn: lsn,
+      progress: d.progress != null ? d.progress : 0,
+      lssons: Array.isArray(d.lessons) ? d.lessons : [],
+      status: d.status || '',
+      history: d.history || [],
+      counterLvl: d.counterLvl || [0],
+      isUserActive: isActive,
+      prepMaxLessonId: PREP_MAX_LESSON_ID
+    };
+  };
+
   var getNum = function() {
     var deferred = $q.defer();
+    var token = localStorage.getItem('MStoken');
+    requestData.token = localStorage.getItem('MStoken');
+    if (!requestData.token) {
+      deferred.resolve(normalizeLessonsPayload({ status: '', lvl: 0, lsn: 1, progress: 0, lessons: [], history: [], counterLvl: [0] }));
+      return deferred.promise;
+    }
 
     $http.post('https://script.google.com/macros/s/AKfycbxXD35z5FSf_m_dwBt5qcBwWq2L7IDc7KBrYGfix6hUa4kvJ1TFpjU82NltFXezUroGgQ/exec', requestData, config)
       .then(function(response) {
-        deferred.resolve({
-          lvl: response.data.lvl,
-          lsn: response.data.lsn,
-          progress: response.data.progress,
-          lssons: response.data.lessons,
-          status: response.data.status,
-          history: response.data.history,
-          counterLvl: response.data.counterLvl
-        });
-      }, function(error) {
-        deferred.reject(error);
+        deferred.resolve(normalizeLessonsPayload(response.data || {}));
+      }, function() {
+        deferred.resolve(normalizeLessonsPayload({ status: '', lvl: 0, lsn: 1, progress: 0, lessons: [], history: [], counterLvl: [0] }));
       });
 
     return deferred.promise;
@@ -2352,24 +2368,35 @@ getActivity: function() {
  
   app
 
-  .controller('lvlMenu', ["$scope", "SharedState", function($scope, SharedState){ 
+  .controller('lvlMenu', ["$scope", "SharedState", function($scope, SharedState){
+      $scope.guardPremiumTab = function($event) {
+        if (!$scope.isUserActive) {
+          if ($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+          }
+          var msg = 'Accede a todas las lecciones y niveles con Premium.';
+          if (typeof Materialize !== 'undefined' && Materialize.toast) Materialize.toast(msg, 4000);
+          else alert(msg);
+          return false;
+        }
+      };
+
       SharedState.getNum().then(function(data) {
         $scope.lvl = data.lvl;
-      $scope.progress = data.progress;
-     $scope.status = data.status;
-      $scope.counter = data.counterLvl[0]
-        
-        if(data.lvl == 1){
+        $scope.progress = data.progress;
+        $scope.status = data.status;
+        $scope.isUserActive = data.isUserActive;
+        $scope.counter = (data.counterLvl && data.counterLvl[0]) != null ? data.counterLvl[0] : 0;
+
+        if (data.isUserActive && data.lvl == 1) {
           $('ul.tabs').tabs('select_tab', 'test2');
-        }else if(data.lvl == 2){
+        } else if (data.isUserActive && data.lvl == 2) {
           $('ul.tabs').tabs('select_tab', 'test3');
-        }else if(data.lvl == 3){
+        } else if (data.isUserActive && data.lvl == 3) {
           $('ul.tabs').tabs('select_tab', 'test4');
         }
-        
-  })
-
-    
+      });
   }])
   
   
@@ -2393,18 +2420,33 @@ getActivity: function() {
   
 .controller('levelP', ["$scope", "$window", "SharedState", function($scope, $window, SharedState) {
     $scope.loading = true;
-  
-  
+
+    $scope.onPrepLessonToggle = function(lesson, $event) {
+      if (!$scope.isUserActive && lesson.id > $scope.prepMaxLessonId) {
+        if ($event) {
+          $event.preventDefault();
+          $event.stopPropagation();
+        }
+        var msg = 'Accede a todas las lecciones y niveles con Premium.';
+        if (typeof Materialize !== 'undefined' && Materialize.toast) Materialize.toast(msg, 4000);
+        else alert(msg);
+        return;
+      }
+      lesson.showButton = !lesson.showButton;
+    };
+
     SharedState.getNum().then(function(data) {
-    $scope.lsn = data.lsn;
+      $scope.lsn = data.lsn;
       $scope.lvl = data.lvl;
       $scope.progress = data.progress;
-      $scope.counter = data.counterLvl[0]
+      $scope.counter = (data.counterLvl && data.counterLvl[0]) != null ? data.counterLvl[0] : 0;
       $scope.status = data.status;
+      $scope.isUserActive = data.isUserActive;
+      $scope.prepMaxLessonId = data.prepMaxLessonId != null ? data.prepMaxLessonId : 1;
       $scope.currentlsns = filterCurrent(data.lssons);
-       $scope.history = data.history;
+      $scope.history = data.history;
       $scope.loading = false;
-  })
+  });
 
 
   function filterCurrent(obj) {
